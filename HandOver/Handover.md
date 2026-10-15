@@ -27,8 +27,10 @@ next_actor: SERVER_AI
 3. 指定代码提交已经存在。以下两条须成功；若失败，不要运行：
 
 ```bash
-git merge-base --is-ancestor 29df6de0bbfc72807095e75d77fa803276177e65 HEAD
-git diff --exit-code 29df6de0bbfc72807095e75d77fa803276177e65 HEAD -- tools/pilot docs/research_brief.md
+(
+  git merge-base --is-ancestor 29df6de0bbfc72807095e75d77fa803276177e65 HEAD || exit 1
+  git diff --exit-code 29df6de0bbfc72807095e75d77fa803276177e65 HEAD -- tools/pilot docs/research_brief.md || exit 1
+)
 ```
 
 4. 将本请求原样保存为 `HandOver/history/L2S-20261016-001.md`。把当前文件改为回执 `S2L-20261016-001`、`in_reply_to: L2S-20261016-001`、`direction: SERVER_TO_LOCAL`、`status: RUNNING`、`updated_by: SERVER_AI`，保留任务/代码信息，记录实际领取时间和 `git rev-parse HEAD`。提交并推送领取记录，确认成功后再执行；无推送能力则保留现场并通知用户。
@@ -47,10 +49,18 @@ git diff --exit-code 29df6de0bbfc72807095e75d77fa803276177e65 HEAD -- tools/pilo
 从仓库根目录运行。输出目录必须未存在；若已存在，先检查是否已执行，不能覆盖或自动换名重跑。
 
 ```bash
-mkdir HandOver/results/ENV-20261016-001
-python tools/pilot/server_check.py --workspace . --output HandOver/results/ENV-20261016-001/environment.json > HandOver/results/ENV-20261016-001/environment.log 2>&1
-task_env_exit=$?
-printf '%s\n' "$task_env_exit" > HandOver/results/ENV-20261016-001/exit_code.txt
+(
+  git merge-base --is-ancestor 29df6de0bbfc72807095e75d77fa803276177e65 HEAD || exit 1
+  git diff --exit-code 29df6de0bbfc72807095e75d77fa803276177e65 HEAD -- tools/pilot docs/research_brief.md || exit 1
+  mkdir HandOver/results/ENV-20261016-001 || exit 1
+  if python tools/pilot/server_check.py --workspace . --output HandOver/results/ENV-20261016-001/environment.json > HandOver/results/ENV-20261016-001/environment.log 2>&1; then
+    task_env_exit=0
+  else
+    task_env_exit=$?
+  fi
+  printf '%s\n' "$task_env_exit" > HandOver/results/ENV-20261016-001/exit_code.txt
+  exit "$task_env_exit"
+)
 ```
 
 目录创建失败时停止，不继续运行后两行。记录实际代码提交、当前文档提交、Python环境、开始/结束时间和退出码；无需额外运行训练来验证 GPU。
