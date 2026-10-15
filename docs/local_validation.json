@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-16",
+  "environment": "local development machine, not the GPU server",
+  "python_version": "3.9.6",
+  "tests": {
+    "command": "python3 -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py'",
+    "passed": 15,
+    "failed": 0,
+    "data": "synthetic tiny ZIP fixtures only"
+  },
+  "cli_help": [
+    "server_check.py passed",
+    "audit_mtad_level2.py passed"
+  ],
+  "python_compile": "passed",
+  "migrated_python_files_identical_to_original": true,
+  "server_runs": 0,
+  "model_training_runs": 0
+}

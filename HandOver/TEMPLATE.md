@@ -1,0 +1,38 @@
+---
+handover_id: L2S-YYYYMMDD-NNN 或 S2L-YYYYMMDD-NNN
+in_reply_to: none 或上一条 handover_id
+direction: LOCAL_TO_SERVER 或 SERVER_TO_LOCAL
+status: READY 或 RUNNING 或 COMPLETED 或 FAILED 或 BLOCKED
+updated_by: LOCAL_AI 或 SERVER_AI
+updated_at: 实际 ISO8601 时间及偏移
+task_id: 本轮任务 ID
+run_id: 本次执行唯一 ID
+code_commit: 已存在的完整 Git SHA
+next_actor: SERVER_AI 或 LOCAL_AI
+---
+
+# 本地 AI → 服务器 AI／服务器 AI → 本地 AI（保留实际方向）
+
+## 任务与依据
+
+目标、计划/配置版本、关联假设；只验环境时明确无模型实验。
+
+## 输入、环境、资源和前置条件
+
+数据路径/哈希、环境、GPU、时间/内存预算、必需文件；未知写 unknown。code_commit 是代码版本，交接文档提交可不同；核对代码目录没有偏离该提交。
+
+## 精确命令与输出
+
+从仓库根目录运行的命令、预期新输出位置、命令退出码的记录方式。输出不得覆盖旧 run_id。
+
+## 完成、失败与停止条件
+
+必须回传的证据、允许重试范围及次数、何时停止/回退单源/报错。没有授权的重试写 0；不能用无限重试代替问题反馈。
+
+## 服务器实际执行回执
+
+领取/结束时间；实际 code_commit 和文档 commit；环境、设备、命令、退出码、相关进程/终止状态；结果/日志路径与小型产物，较大文件路径/大小/哈希；所有失败与偏差。未执行的项写未执行，不能替本地预填成功。
+
+## 下一步与责任方
+
+服务器只提供事实与建议；研究判断、方法/协议/代码修改及下一轮下发由本地负责。

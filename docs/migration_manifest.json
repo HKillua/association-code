@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-16",
+  "canonical_repository": "https://github.com/HKillua/association-code",
+  "files": [
+    {
+      "path": "tools/pilot/server_check.py",
+      "origin_project": "biye-ronghe",
+      "origin_relative_path": "tools/pilot/server_check.py",
+      "sha256": "ed2ddf85dc1a7789afa5057aef2073a7e5d66f62d128e3d659afd16bfd9f26ba",
+      "bytes": 4057,
+      "code_changed_during_migration": false
+    },
+    {
+      "path": "tools/pilot/audit_mtad_level2.py",
+      "origin_project": "biye-ronghe",
+      "origin_relative_path": "tools/pilot/audit_mtad_level2.py",
+      "sha256": "5bf7613a8415c0680e745a0a802d5bd9a53071f740e2d3f067048273fe53a829",
+      "bytes": 22965,
+      "code_changed_during_migration": false
+    },
+    {
+      "path": "tools/pilot/test_audit_mtad_level2.py",
+      "origin_project": "biye-ronghe",
+      "origin_relative_path": "tools/pilot/test_audit_mtad_level2.py",
+      "sha256": "87d76e1f0fc37020d5e0e67f5e39d0e5b9528fd0eb25fb2df998e657169baaf0",
+      "bytes": 8398,
+      "code_changed_during_migration": false
+    }
+  ]
+}
