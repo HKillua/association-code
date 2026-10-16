@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
-# Verification only. Run through the bounded ENV-004 wrapper; never installs packages.
+# Verification only. Run through the current handover budget wrapper; never installs packages.
+# Arguments: [attempt=1] [run_id=ENV-20261016-004]
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 task_repo=$(pwd -P)
+(( $# <= 2 )) || exit 2
 case "${1-1}" in 1|2) task_attempt=${1-1} ;; *) exit 2 ;; esac
 task_env=/home/wangguangjie/djs/mtad-field-20261016
 task_python="$task_env/bin/python"
-task_root=HandOver/results/ENV-20261016-004
+task_run_id=${2-ENV-20261016-004}
+[[ "$task_run_id" =~ ^ENV-[0-9]{8}-[0-9]{3}$ ]] || exit 2
+task_root="HandOver/results/$task_run_id"
 task_out="$task_root/attempt-$task_attempt"
 mkdir -p "$task_root"
 mkdir "$task_out"
@@ -81,11 +85,8 @@ if custom_record['exists']:
         custom_record['copy'] = str(destination / 'sitecustomize.py')
 payload = {'field_artifacts': records, 'sitecustomize': custom_record}
 (out / 'field_evidence.json').write_text(json.dumps(payload, indent=2) + '\n')
-paths = sorted({*root.joinpath('association').rglob('*.py'), *root.joinpath('tests').rglob('*.py'),
-                *root.joinpath('configs').rglob('*.json'), *root.joinpath('tools').rglob('*.py'),
-                *root.joinpath('tools').rglob('*.sh'), root / 'pyproject.toml'})
-(out / 'source_files.json').write_text(json.dumps(
-    {str(path.relative_to(root)): digest(path) for path in paths}, indent=2) + '\n')
+from tools.setup.verification_contract import source_manifest
+(out / 'source_files.json').write_text(json.dumps(source_manifest(root), indent=2) + '\n')
 EVIDENCE
 task_done
 
@@ -106,11 +107,19 @@ assert torch.cuda.device_count() == 0, 'CPU verification must hide GPUs'
 assert Path(association.__file__).resolve() == root / 'association' / '__init__.py', association.__file__
 for package in (numpy, torch):
     assert Path(package.__file__).resolve().is_relative_to(Path(sys.prefix).resolve()), package.__file__
-print(json.dumps({'python': platform.python_version(), 'python_executable': sys.executable,
-                  'prefix': sys.prefix, 'base_prefix': sys.base_prefix, 'numpy': numpy.__version__,
+print(json.dumps({'python': platform.python_version(), 'python_executable': str(Path(sys.executable).absolute()),
+                  'prefix': str(Path(sys.prefix).resolve()), 'base_prefix': str(Path(sys.base_prefix).resolve()), 'numpy': numpy.__version__,
                   'torch': torch.__version__, 'cuda_build': torch.version.cuda,
                   'visible_gpu_count': torch.cuda.device_count(), 'code_sha256': code_fingerprint(),
-                  'package_sources': {p.__name__: p.__file__ for p in (numpy, torch, association)}}, indent=2))
+                  'package_sources': {p.__name__: str(Path(p.__file__).resolve()) for p in (numpy, torch, association)}}, indent=2))
+CHECK
+task_done
+task_begin environment_snapshot
+"$task_python" - "$task_repo" <<'CHECK' > "$task_out/environment.json"
+import json, sys
+from pathlib import Path
+from tools.setup.verification_contract import capture_environment
+print(json.dumps(capture_environment(Path(sys.argv[1])), indent=2))
 CHECK
 task_done
 task_run_logged tests "$task_out/tests.log" "$task_python" -m unittest discover -s tests
@@ -118,13 +127,25 @@ task_run_logged legacy_tests "$task_out/legacy_tests.log" "$task_python" -m unit
 task_run_logged cli_help "$task_out/cli_help.txt" "$task_python" -m association.cli --help
 task_begin acceptance
 "$task_python" - "$task_out" <<'CHECK'
-import json, sys
+import hashlib, json, sys
 from pathlib import Path
+from tools.setup.verification_contract import capture_environment, source_manifest
 out = Path(sys.argv[1])
+root = Path.cwd().resolve()
+if json.loads((out / 'source_files.json').read_text()) != source_manifest(root):
+    raise RuntimeError('Source/config changed during CPU verification')
+if json.loads((out / 'environment.json').read_text()) != capture_environment(root):
+    raise RuntimeError('Environment fields changed during CPU verification')
+def evidence_hash(name):
+    return hashlib.sha256((out / name).read_bytes()).hexdigest()
 checks = ('pip_check', 'pip_freeze', 'tests', 'legacy_tests', 'cli_help')
 assert all((out / (name + '_exit_code.txt')).read_text().strip() == '0' for name in checks)
 report = {'status': 'COMPLETED', 'kind': 'existing_FIELD_environment_verification',
           'actual_commit': (out / 'actual_commit.txt').read_text().strip(),
+          'environment_snapshot': 'environment.json',
+          'environment_rechecked': True,
+          'source_files_sha256': evidence_hash('source_files.json'),
+          'environment_sha256': evidence_hash('environment.json'),
           'checks': {name: 0 for name in checks},
           'import_check': json.loads((out / 'import_check.json').read_text()),
           'cuda_smoke': 'not_run_by_this_script'}
