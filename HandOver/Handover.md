@@ -8,7 +8,7 @@ updated_at: 2026-10-16
 timezone: Asia/Shanghai
 task_id: ENV-002
 run_id: ENV-20261016-002
-code_commit: 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b
+code_commit: e1c3c530c312ffd7197f7890c42a37e28536b9b4
 next_actor: SERVER_AI
 ---
 
@@ -31,8 +31,8 @@ ENV-001 回执已审阅，实际 Python 3.9.18 / PyTorch 2.4.1+cu121 低于项�
 3. 以下两项均须成功：
 
 ```bash
-git merge-base --is-ancestor 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b HEAD
-git diff --exit-code 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b HEAD -- association configs tests tools pyproject.toml docs
+git merge-base --is-ancestor e1c3c530c312ffd7197f7890c42a37e28536b9b4 HEAD
+git diff --exit-code e1c3c530c312ffd7197f7890c42a37e28536b9b4 HEAD -- association configs tests tools pyproject.toml docs
 ```
 
 4. 原样归档本请求到 `HandOver/history/L2S-20261016-002.md`，再将当前文件改为 `S2L-20261016-002 / SERVER_TO_LOCAL / RUNNING`，`in_reply_to: L2S-20261016-002`；记录领取时间和实际HEAD，提交并推送成功后执行。不要把代码改动混入回执。
@@ -47,7 +47,7 @@ git diff --exit-code 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b HEAD -- associatio
 (
   task_out=HandOver/results/ENV-20261016-002
   test ! -e "$task_out" || exit 1
-  if timeout --signal=TERM --kill-after=30s 44m30s bash tools/setup/env_002.sh; then
+  if timeout --signal=TERM --kill-after=30s 2670s bash tools/setup/env_002.sh; then
     task_rc=0
   else
     task_rc=$?
@@ -72,7 +72,7 @@ git diff --exit-code 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b HEAD -- associatio
   task_gpu=实际选定的0到3之一
   task_out=HandOver/results/ENV-20261016-002
   test ! -e "$task_out/cuda" || exit 1
-  if timeout --signal=TERM --kill-after=30s 9m30s bash tools/setup/cuda_smoke_002.sh "$task_gpu"; then
+  if timeout --signal=TERM --kill-after=30s 570s bash tools/setup/cuda_smoke_002.sh "$task_gpu"; then
     task_rc=0
   else
     task_rc=$?
