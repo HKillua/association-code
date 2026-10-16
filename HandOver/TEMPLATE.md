@@ -11,6 +11,8 @@ code_commit: 已存在的完整 Git SHA
 next_actor: SERVER_AI 或 LOCAL_AI
 ---
 
+用法：复制本模板为 `HandOver/<handover_id>.md`，文件名与 frontmatter 的 `handover_id` 完全一致（本地 `L2S-YYYYMMDD-NNN`，服务器 `S2L-YYYYMMDD-NNN`）。每个 `handover_id` 一个新文件，创建后在 `HandOver/Handover.md` 索引登记；一方只更新自己那份文件（服务器在同一份 `S2L` 内从 RUNNING 推进到终态），不覆盖对方文件，也不再复制到 `history/`。
+
 # 本地 AI → 服务器 AI／服务器 AI → 本地 AI（保留实际方向）
 
 ## 任务与依据

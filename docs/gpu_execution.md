@@ -1,6 +1,6 @@
 # GPU execution notes
 
-**This page contains examples, not a READY task.** The current execution authority is always `HandOver/Handover.md`. The commands below are examples; the current handover identifies the authorized stage and frozen code.
+**This page contains examples, not a READY task.** The current execution authority is the separate round file pointed to by `HandOver/Handover.md`. The commands below are examples; the current handover identifies the authorized stage and frozen code.
 
 The local AI writes and tests code, fixes defects, chooses protocols, and interprets results. The server AI executes an authorized frozen request, monitors processes/resources/logs, enforces its stop conditions, and returns evidence. A Git push does not start a run or transfer monitoring responsibility to the local AI.
 
