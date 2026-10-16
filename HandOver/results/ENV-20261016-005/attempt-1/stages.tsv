@@ -1,0 +1,21 @@
+2026-10-16T15:11:26Z	preflight	start
+2026-10-16T15:11:26Z	preflight	complete
+2026-10-16T15:11:26Z	evidence	start
+2026-10-16T15:11:27Z	evidence	complete
+2026-10-16T15:11:27Z	pip_check	start
+2026-10-16T15:11:29Z	pip_check	complete
+2026-10-16T15:11:29Z	pip_freeze	start
+2026-10-16T15:11:30Z	pip_freeze	complete
+2026-10-16T15:11:30Z	import_check	start
+2026-10-16T15:11:36Z	import_check	complete
+2026-10-16T15:11:36Z	environment_snapshot	start
+2026-10-16T15:11:39Z	environment_snapshot	complete
+2026-10-16T15:11:39Z	tests	start
+2026-10-16T15:11:59Z	tests	complete
+2026-10-16T15:11:59Z	legacy_tests	start
+2026-10-16T15:11:59Z	legacy_tests	complete
+2026-10-16T15:11:59Z	cli_help	start
+2026-10-16T15:12:02Z	cli_help	complete
+2026-10-16T15:12:02Z	acceptance	start
+2026-10-16T15:12:05Z	acceptance	complete
+2026-10-16T15:12:05Z	acceptance	exit=0	signal=none

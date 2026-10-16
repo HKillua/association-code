@@ -1,0 +1,19 @@
+...................................................................F.........................
+======================================================================
+FAIL: test_identical_tam_input_reuses_shared_encoder (test_models.AssociationModelTests.test_identical_tam_input_reuses_shared_encoder)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/home/wangguangjie/djs/association-code/tests/test_models.py", line 128, in test_identical_tam_input_reuses_shared_encoder
+    torch.testing.assert_close(encoded[0], encoded[1], rtol=0, atol=0)
+  File "/home/wangguangjie/djs/mtad-field-20261016/lib/python3.11/site-packages/torch/testing/_comparison.py", line 1530, in assert_close
+    raise error_metas[0].to_error(msg)
+AssertionError: Tensor-likes are not equal!
+
+Mismatched elements: 30 / 48 (62.5%)
+Greatest absolute difference: 2.384185791015625e-07 at index (3,)
+Greatest relative difference: 5.496955054695718e-05 at index (5,)
+
+----------------------------------------------------------------------
+Ran 93 tests in 20.981s
+
+FAILED (failures=1)
