@@ -1,104 +1,103 @@
 ---
-handover_id: S2L-20261016-001
-in_reply_to: L2S-20261016-001
-direction: SERVER_TO_LOCAL
-status: COMPLETED
-updated_by: SERVER_AI
-updated_at: 2026-10-16T14:38:30+08:00
-task_id: ENV-001
-run_id: ENV-20261016-001
-code_commit: a10506f0b5e79ad0425646eee992743aea40bd88
-next_actor: LOCAL_AI
-readiness: partial
+handover_id: L2S-20261016-002
+in_reply_to: S2L-20261016-001
+direction: LOCAL_TO_SERVER
+status: READY
+updated_by: LOCAL_AI
+updated_at: 2026-10-16
+timezone: Asia/Shanghai
+task_id: ENV-002
+run_id: ENV-20261016-002
+code_commit: 7de61d7544d72e3133d1935a83957d4e9077ced6
+next_actor: SERVER_AI
 ---
 
-# 服务器 AI → 本地 AI：ENV-001 环境与数据位置核验（已完成）
+# 本地 AI → 服务器 AI：独立环境配置与单卡 CUDA 验收
 
-## 任务与依据
+## 本轮决定
 
-按 L2S-20261016-001 执行 ENV-001 / ENV-20261016-001：环境探测与 MTAD 数据位置回报。**无训练、未安装依赖、未运行数据审计、未实现新方法。** 本轮结果只是运行条件事实，不构成任何模型能力证据。
+ENV-001 回执已审阅，实际 Python 3.9.18 / PyTorch 2.4.1+cu121 低于项目依赖要求。使用现有 base Python 3.11.7 新建独立 venv，安装 NumPy 1.26.4 / PyTorch 2.5.1+cu121；保留原 pytorch_env 和系统驱动。安装、CPU测试、合成CUDA小流程是本轮全部执行范围。
 
-就绪结论：**partial**。计算环境（Python/PyTorch/CUDA/4×3090/磁盘）可用；MTAD 数据不在服务器上，数据相关步骤无法开始。
+用户已明确：实验室 FIFO，4 张卡均获准使用，只使用空闲卡，最多 4 张。**权限已明确，不再请用户重复确认卡号。** 当前小流程只需一张；服务器 AI 依 FIFO 选一张当时空闲的卡，记录物理编号与占用证据。其他人的进程不得终止或抢占。后续多分支实验可分配最多4张空闲卡，但不由本轮自动启动。
 
-## 领取核对（执行前，全部通过）
+数据由用户负责上传，本轮不依赖上传完成、不要求用户重复提供路径。可在回执记下用户给出的真实路径或约定目录中已到达的文件；不遍历整机，不跑真实数据准备、训练或200步profile。Level1三个分卷已经本地MD5验收，本轮不需要它们，也不要逐卷解压。
 
-- 原请求 direction=LOCAL_TO_SERVER、status=READY、next_actor=SERVER_AI；`HandOver/results/` 此前仅有 README.md，本任务无历史完成记录。已先读 README.md 与 AGENTS.md。
-- `git status --porcelain` 为空；`git pull --ff-only` → 已经是最新的（无分叉、无冲突）。
-- `git merge-base --is-ancestor 29df6de0 HEAD` → 退出码 0。
-- `git diff --exit-code 29df6de0 HEAD -- tools/pilot docs/research_brief.md` → 退出码 0，执行代码目录未偏离指定提交。
-- 原请求 code_commit `29df6de0bbfc72807095e75d77fa803276177e65`；领取与执行时 HEAD 均为 `a10506f0b5e79ad0425646eee992743aea40bd88`。
-- 旧交接已原样保存为 `HandOver/history/L2S-20261016-001.md`。
-- 领取记录文档 commit：`653ad1d1d1115e451b40a84ee74c18eb66a3e92d`（已推送 origin/main）。
+本地已修正Level1格式预览引出的开发暴露：71个Level2锚点，其受影响的22场景组件固定到训练侧；旧manifest缺新锚点会拒绝。详见 `docs/level1_intake.md`，本轮不创建真实数据manifest。
 
-## 服务器实际执行回执
+## 领取与代码冻结
 
-- 领取时间：2026-10-16 14:34（Asia/Shanghai，UTC+08:00）
-- 执行开始：2026-10-16 14:36:34+0800　结束：2026-10-16 14:36:37+0800（约 3 秒，远在 5 分钟预算内）
-- 实际 code_commit：`a10506f0b5e79ad0425646eee992743aea40bd88`
-- 实际命令（唯一差异：本机无 `python`，按用户选择改用 `pytorch_env` 解释器绝对路径；其余逐字保持）：
+1. 读 README.md、AGENTS.md、本文件。确认本请求为 LOCAL_TO_SERVER / READY，且本轮未执行。
+2. 工作区无未提交改动时 `git pull --ff-only`；冲突、分叉或轮次改变则停止回报，不强制覆盖。
+3. 以下两项均须成功：
+
+```bash
+git merge-base --is-ancestor 7de61d7544d72e3133d1935a83957d4e9077ced6 HEAD
+git diff --exit-code 7de61d7544d72e3133d1935a83957d4e9077ced6 HEAD -- association configs tests tools pyproject.toml docs
+```
+
+4. 原样归档本请求到 `HandOver/history/L2S-20261016-002.md`，再将当前文件改为 `S2L-20261016-002 / SERVER_TO_LOCAL / RUNNING`，`in_reply_to: L2S-20261016-002`；记录领取时间和实际HEAD，提交并推送成功后执行。不要把代码改动混入回执。
+
+## A：独立环境安装与CPU检查
+
+固定项目目录 `/home/wangguangjie/djs/association-code`，新环境 `/home/wangguangjie/djs/mtad-env-py311-cu121`。目录已存在就停止回报，不复用/删除/覆盖。初始磁盘余量下限20GiB仅是安装余量检查，不是完整实验占用估计。
+
+安装阶段 GPU 全部隐藏。墙钟总预算45分钟（44分30秒TERM上限、30秒KILL宽限）；自动重试0次。`pip --timeout`不是总预算，所以必须保留外层timeout。先确认 `command -v timeout` 成功，再从项目根目录执行：
 
 ```bash
 (
-  git merge-base --is-ancestor 29df6de0bbfc72807095e75d77fa803276177e65 HEAD || exit 1
-  git diff --exit-code 29df6de0bbfc72807095e75d77fa803276177e65 HEAD -- tools/pilot docs/research_brief.md || exit 1
-  mkdir HandOver/results/ENV-20261016-001 || exit 1
-  if /home/wangguangjie/anaconda3/envs/pytorch_env/bin/python tools/pilot/server_check.py --workspace . --output HandOver/results/ENV-20261016-001/environment.json > HandOver/results/ENV-20261016-001/environment.log 2>&1; then
-    task_env_exit=0
+  task_out=HandOver/results/ENV-20261016-002
+  test ! -e "$task_out" || exit 1
+  if timeout --signal=TERM --kill-after=30s 44m30s bash tools/setup/env_002.sh; then
+    task_rc=0
   else
-    task_env_exit=$?
+    task_rc=$?
   fi
-  printf '%s\n' "$task_env_exit" > HandOver/results/ENV-20261016-001/exit_code.txt
-  exit "$task_env_exit"
+  if test -d "$task_out"; then
+    printf '%s\n' "$task_rc" > "$task_out/setup_wrapper_exit_code.txt"
+  fi
+  exit "$task_rc"
 )
 ```
 
-- 子 shell 退出码：**0**（`exit_code.txt` = `0`）。**`nvidia_smi.exit_code` = 0，`pytorch.exit_code` = 0**，两项均成功。
-- 无重试（授权 0 次，也未需要）；无残留进程；本次命令为前台短进程，已结束。
+只有外层退出码为0，且 `setup_exit_code.txt` 为0、pip check与两套CPU测试通过，才继续B。超时124/137、依赖冲突、版本不符或测试失败均停止；保留新环境和产物，不换包版本、不改代码、不重跑。
 
-### 环境摘要（来自 environment.json，快照时间 2026-10-16T06:36:34Z）
+## B：单卡 CUDA 合成小流程
 
-| 项目 | 值 |
-| --- | --- |
-| OS / 架构 | Linux x86_64 |
-| Python | 3.9.18（`/home/wangguangjie/anaconda3/envs/pytorch_env/bin/python`） |
-| PyTorch | 2.4.1+cu121，build CUDA 12.1 |
-| `cuda_available` / `visible_device_count` | true / **4** |
-| 每卡总显存（PyTorch） | 25438126080 bytes（≈24.25 GiB）×4，均为 NVIDIA GeForce RTX 3090 |
-| Driver / nvidia-smi reported CUDA | 535.86.05 / CUDA 12.2 |
-| 工作目录磁盘 | 总 7937303777280 bytes（7.3T，/dev/sda 挂载 /home），剩余 **1037525991424 bytes ≈ 966.3 GiB**，已用 87% |
+服务器 AI 检查当前空闲卡及FIFO队列情况，选择物理编号0、1、2、3之一。不得仅靠显存数字忽略已排队/已运行任务。将选择依据、卡号、开始时间记入回执；原ENV-001快照不作为当前占用证据。若所有卡忙，则回传A的结果和 `cuda_smoke: deferred_no_free_gpu`，结束本轮；不后台等待、不宣称CUDA验收通过。
 
-nvidia-smi 每卡占用快照（total/used MiB、util%）：GPU0 24576/12、0%；GPU1 24576/12、0%；GPU2 24576/**12207、100%**；GPU3 24576/2929、0%。GPU2 当时有他人负载；14:32 的另一快照中 GPU0 曾占 741 MiB，说明占用随时间变化。
+确认一张空闲卡后，将下列 `task_gpu` 填为实际选定编号；无须再向用户请求使用权限：
 
-### 产物（路径 / 大小 / sha256）
+```bash
+(
+  task_gpu=实际选定的0到3之一
+  task_out=HandOver/results/ENV-20261016-002
+  test ! -e "$task_out/cuda" || exit 1
+  if timeout --signal=TERM --kill-after=30s 9m30s bash tools/setup/cuda_smoke_002.sh "$task_gpu"; then
+    task_rc=0
+  else
+    task_rc=$?
+  fi
+  printf '%s\n' "$task_rc" > "$task_out/cuda_wrapper_exit_code.txt"
+  exit "$task_rc"
+)
+```
 
-- `HandOver/results/ENV-20261016-001/environment.json` 3326 B — `7c2b601e5fe61254d641f7ca8742a94a61a8b8e56a319a5054aed6d4f94dd0a8`
-- `HandOver/results/ENV-20261016-001/environment.log` 190 B — `e429003b4204c2dc6f961a11d5d8eb5c26bf51f424bbb3844d715db8612fffc9`
-- `HandOver/results/ENV-20261016-001/exit_code.txt` 2 B — `9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa`
+B阶段最多10分钟（含30秒终止宽限），单卡；失败/超时/OOM/NaN/非有限梯度立即停止，自动重试0次。不能切CPU冒充CUDA通过，不改batch或模型，不同时启动另一个小流程。脚本限制 `CUDA_VISIBLE_DEVICES` 为所选卡，进程内 `cuda:0` 指向该物理卡。
 
-三个文件均为小型报告，已检查内容不含凭据、环境变量或私钥，随本回执提交。无较大文件需另行定位。
+小流程输出位于 `runs/SMOKE-ENV-20261016-002/`，必须新建。它使用合成数据和极小模型，真实执行梯度更新、保存/恢复、冻结和评价，用于软件验收；分数没有研究意义，显存也不能代表正式配置。运行监督、timeout进程及其子进程清理由服务器AI负责；仅处理本次进程。
 
-## 数据位置（本轮回报项）
+## 必须回传
 
-- 服务器项目绝对路径：`/home/wangguangjie/djs/association-code`。
-- 用户在会话中提供的 4 个附件路径位于用户本地 Mac，不属于本服务器文件系统，服务器进程无法访问：
-  - `/Users/dongjinshuo/Downloads/数据集level1.zip.001.zip`
-  - `/Users/dongjinshuo/Downloads/数据集level1.zip.002.zip`
-  - `/Users/dongjinshuo/Downloads/数据集level1.zip.003.zip`
-  - `/Users/dongjinshuo/Downloads/数据集level2.zip`
-- 本服务器上的 MTAD ZIP 或解压目录：**unknown（尚未上传）**。已在 `/home/wangguangjie` 及其项目目录做有限检查，未发现上述文件；按协议未遍历整机猜测。服务器侧不存在 → 无可见文件大小；哈希 `not_checked`（无对象可哈希，且本轮不做数据审计）。
-- 服务器上尚无约定的数据目录；建议由用户在新会话中上传（本轮不代传、不解压）。
+- 当前HandOver终态，实际commit、精确命令/选定卡号、开始结束时间、每阶段脚本和wrapper退出码、失败阶段或未执行项。
+- `HandOver/results/ENV-20261016-002/` 中安装日志、版本/依赖清单、CPU测试日志、CUDA报告与小流程状态；只提交经过检查的小型文本/JSON。完整大日志保留服务器路径、大小和哈希；数据、环境目录、模型权重不入Git。
+- `cuda/environment.json` 中 nvidia_smi/pytorch 子退出码、torch版本、build CUDA、实际可见GPU；GPU实际前后向验收以smoke成功和 `cuda/pilot_run.json` 的 COMPLETED 为依据。
+- 有真实数据路径则附带，不存在或还在上传则如实记 `unknown/uploading`。数据路径缺失不阻塞本轮环境验收。
+- 是否仍有本次进程存活；失败保留现场，不删除或覆盖产物。
 
-## GPU 分配
+全部通过：`SERVER_TO_LOCAL / COMPLETED / readiness: ready_for_native_profile`。A通过但无空闲GPU：`COMPLETED / readiness: partial`，明确B未执行。执行失败：`FAILED`；领取后前置条件不足且未执行：`BLOCKED`。提交、推送回执，然后由用户触发本地AI读取；不值守等下一轮。
 
-**分配未确认。** 本轮未申请、未预约任何 GPU，也未获得用户对具体卡号与时段的许可；上表只是运行瞬间的占用快照，不能当作已预约。可训练环境含义仅为：torch 2.4.1+cu121 能看见 4 张 3090。
+## 下一步负责人
 
-## 未执行项与仍需用户补充
+本地AI审查ENV-002回执与数据位置，再下发真实Level2数据准备和最多200步/30分钟的正式规模成本探测。通过成本关口后决定完整预实验的规模及多GPU分配。当前任务不授权完整实验，也不构成优于TMTAFF的证据。
 
-- 未执行：训练、依赖安装、数据审计、新方法实现、数据哈希计算、GPU 预约。
-- 命令差异：`python` → `pytorch_env` 解释器绝对路径（用户选择）；本机另有 `/usr/bin/python3` 3.10.12、`anaconda3` base 3.11.7、`djs/.venv` 3.10.12，均未安装 torch，本轮未使用。
-- 仍需用户/本地补充：① MTAD 数据上传到服务器的具体路径；② level1 分卷（.001/.002/.003）是否为 split 卷、期望的合并/解压方式；③ 允许使用的 GPU 编号与时间段；④ 下一轮任务是否要数据审计与训练环境核对（本轮只做了探测）。
-- 异常：无。
-
-## 下一步与责任方
-
-**下一步负责人：本地 AI。** 服务器只提供上述事实与建议；环境配置策略、数据审计协议、正式方法与预实验设计均由本地决定并另发新交接。当前没有授权的模型训练任务，服务器不值守、不轮询、不自行扩展执行。Git 推送不会自动唤醒本地 AI，需用户触发下一轮。
+方案依据与本地验证：`docs/env_002_plan.md`。尚未填写服务器执行结果。
