@@ -13,7 +13,12 @@ exec >"$task_out/cuda/smoke.log" 2>&1
 trap 'task_rc=$?; printf "%s\n" "$task_rc" > "$task_out/cuda/exit_code.txt"; date -u +%FT%TZ > "$task_out/cuda/ended_at.txt"' EXIT
 date -u +%FT%TZ > "$task_out/cuda/started_at.txt"
 printf '%s\n' "$task_gpu" > "$task_out/cuda/physical_gpu.txt"
-export CUDA_VISIBLE_DEVICES="$task_gpu"
+# Bind the nvidia-smi physical card by UUID; CUDA ordinals may differ.
+task_gpu_uuid=$(nvidia-smi -i "$task_gpu" --query-gpu=uuid --format=csv,noheader)
+[[ "$task_gpu_uuid" =~ ^GPU-[a-fA-F0-9-]+$ ]]
+printf '%s\n' "$task_gpu_uuid" > "$task_out/cuda/physical_gpu_uuid.txt"
+nvidia-smi -i "$task_gpu" --query-gpu=index,uuid,pci.bus_id,memory.used,utilization.gpu --format=csv > "$task_out/cuda/allocation_snapshot.csv"
+export CUDA_VISIBLE_DEVICES="$task_gpu_uuid"
 export OMP_NUM_THREADS=1
 export MKL_NUM_THREADS=1
 export PYTHONNOUSERSITE=1
