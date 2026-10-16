@@ -14,11 +14,11 @@
 
 | 文件 | direction | status | task_id | run_id | next_actor |
 | --- | --- | --- | --- | --- | --- |
-| [S2L-20261016-003.md](S2L-20261016-003.md) | SERVER_TO_LOCAL | **RUNNING** | ENV-003 | ENV-20261016-003 | SERVER_AI（执行中） |
+| [S2L-20261016-003.md](S2L-20261016-003.md) | SERVER_TO_LOCAL | **FAILED**（readiness: pip_transport_unusable） | ENV-003 | ENV-20261016-003 | LOCAL_AI |
 
 本地已审阅 ENV-002 终态：依赖元数据读超时，CPU/CUDA 验收未执行。新 ENV-003 保留旧现场，使用新环境和新输出；先保存主 wheel，再下载依赖并离线安装，A 最多 60 分钟，B 单卡 CUDA 最多 10 分钟。服务器只领取上方新请求，旧轮次不重跑。详见[失败核验](../docs/env_002_failure_record.md)和[最新方案](../docs/env_003_plan.md)。
 
-服务器 AI 已于 16:42 领取 ENV-003：领取核对全部通过（冻结范围与 `5796636` 逐字节一致，三个新目录均不存在，`/home` 剩余 963 G），原请求未修改；ENV-002 回执中 `actual_commit` 被误写为 `db5f59d` 的更正已按本请求第 5 条记入该回执，本轮实际执行 SHA 一律以脚本写出的 `actual_commit.txt` 为准。
+服务器 AI 于 16:42 领取 ENV-003（领取核对全部通过，冻结范围与 `5796636` 逐字节一致），A 于 **17:42:28 用尽 3570 秒预算**，wrapper 退出码 **124**：60 分钟内 `wheels/` 落盘 **0 个文件**，全部时间耗在 `pypi.org` 与 `files.pythonhosted.org` 的 120 秒读超时重试上；脚本 trap 写出的 `setup_exit_code.txt=0` 是 SIGTERM 打断时的残留值、不构成阶段成功，权威结论以 124 为准。B 未执行，未占用任何 GPU。实际执行 SHA 依 `actual_commit.txt` = `2be9490`。用户在 17:2x 授权服务器按现场情况自行处置，服务器另起一条**不属于交接轮次**的 FIELD 对照安装（同一组 pin，只把 PyPI 传输换成清华 TUNA 镜像），其依赖阶段 147 秒即完成，详见回执 FIELD 节。
 
 ## 全部轮次
 
@@ -26,7 +26,7 @@
 | --- | --- | --- | --- |
 | ENV-001 | [L2S-20261016-001.md](L2S-20261016-001.md) | [S2L-20261016-001.md](S2L-20261016-001.md) | COMPLETED / partial：4×3090 + torch 2.4.1+cu121 可见，但探测用的 `pytorch_env`（Python 3.9.18）不满足 `pyproject.toml` 的 `>=3.10`、`torch>=2.5,<2.11`（由 ENV-002 处理）。回执 15:33 补记：MTAD 四文件已在 `/home/wangguangjie/djs/data/mtad/`，Level2 MD5 与官方值一致。GPU 授权已由 ENV-002 明确（FIFO、最多 4 张空闲卡），本行早期“分配未确认”不再有效 |
 | ENV-002 | [L2S-20261016-002.md](L2S-20261016-002.md) | [S2L-20261016-002.md](S2L-20261016-002.md) | **FAILED**：NumPy 1.26.4 装成、torch 主 wheel 显示 780.5 MB 下载完成，但 typing_extensions 元数据读超时；耗时 1959 s、内外退出码 1；CPU/CUDA 检查未执行。旧 wheel 是否仍存在未知，保留半成品 venv。原始 actual_commit 为 a6d6a04，与回执 db5f59d 不同，但执行代码相同，详见本地审计 |
-| ENV-003 | [L2S-20261016-003.md](L2S-20261016-003.md) | [S2L-20261016-003.md](S2L-20261016-003.md) | **RUNNING**（16:42 领取）：新环境、显式保存主 wheel、有限网络重试/持久缓存、离线安装、CPU 与单卡 CUDA 验收；无真实数据训练授权 |
+| ENV-003 | [L2S-20261016-003.md](L2S-20261016-003.md) | [S2L-20261016-003.md](S2L-20261016-003.md) | **FAILED**：A 在 `download_bootstrap` 用满 3570 秒，wrapper **124**，`wheels/` 落盘 0 个文件；全程卡在 `pypi.org` / `files.pythonhosted.org` 的 120 秒读超时重试，torch 主 wheel 阶段未开始。脚本 trap 的 `setup_exit_code.txt=0` 与 `download_bootstrap exit=0` 是 SIGTERM 残留值、不作成功依据。CPU 测试与 B 全部未执行，未占用 GPU；env003 venv 与 package-cache 现场原样保留。实际执行 SHA `2be9490`。传输方案诊断与 FIELD 对照见回执 |
 
 MTAD 四文件已在服务器，Level2 MD5 已匹配。本轮不要求用户重新上传数据，也无需重复确认空闲 GPU 的使用授权。
 
