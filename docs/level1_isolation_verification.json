@@ -1,0 +1,43 @@
+{
+  "date": "2026-10-16",
+  "scope": "All labels only; no measurements/references, no training",
+  "development_anchors": 71,
+  "affected_components": {
+    "component-9322e9da0f8c1a13b77c34eb": {
+      "split": "T_core",
+      "scene_count": 22
+    }
+  },
+  "split_counts": {
+    "T_core": {
+      "assigned_scenes": 4014,
+      "selected_scenes": 512,
+      "assigned_components": 65,
+      "selected_components": 33,
+      "largest_selected_component_scenes": 234
+    },
+    "T_head": {
+      "assigned_scenes": 399,
+      "selected_scenes": 128,
+      "assigned_components": 45,
+      "selected_components": 27,
+      "largest_selected_component_scenes": 23
+    },
+    "V_select": {
+      "assigned_scenes": 426,
+      "selected_scenes": 64,
+      "assigned_components": 44,
+      "selected_components": 17,
+      "largest_selected_component_scenes": 28
+    },
+    "T_test": {
+      "assigned_scenes": 161,
+      "selected_scenes": 128,
+      "assigned_components": 44,
+      "selected_components": 38,
+      "largest_selected_component_scenes": 30
+    }
+  },
+  "candidate_manifest_sha256": "0b4df901d075776973c209e835ac6d2a7bd95dc978c7f88a718b6ea274ee354c",
+  "label_members_read": 5000
+}

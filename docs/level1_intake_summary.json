@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-16",
+  "scope": "Archive metadata and all association-table labels; no model evaluation. Level1 scene0 first600 bytes in each of label/measurement/reference were inspected for schema before overlap was known. No other new measurement/reference content read.",
+  "part_hashes": [
+    {
+      "name": "数据集level1.zip.001.zip",
+      "bytes": 1073741824,
+      "md5": "01aada7fb84787e5cdd3c52b5e98d787"
+    },
+    {
+      "name": "数据集level1.zip.002.zip",
+      "bytes": 1073741824,
+      "md5": "7e7212f33363e972beae91ae13ab1f6b"
+    },
+    {
+      "name": "数据集level1.zip.003.zip",
+      "bytes": 534048695,
+      "md5": "aee80c86f4079ebd6da97af45b1b0901"
+    }
+  ],
+  "level1": {
+    "categories": {
+      "关联表": {
+        "files": 5000,
+        "raw_bytes": 16183117,
+        "compressed_bytes": 5593229
+      },
+      "真实场景": {
+        "files": 5000,
+        "raw_bytes": 1076956128,
+        "compressed_bytes": 269520426
+      },
+      "量测场景": {
+        "files": 5000,
+        "raw_bytes": 7012073307,
+        "compressed_bytes": 2403674724
+      }
+    },
+    "label_totals": {
+      "label_rows": 369167,
+      "source_9001": 204552,
+      "source_9002": 164615,
+      "nonzero_fragment_label_rows": 123154
+    },
+    "unique_A": 31953,
+    "unique_AB": 38888,
+    "label_headers": {
+      "t_s,t_e,mmsi,source,batch": 5000
+    }
+  },
+  "level2": {
+    "categories": {
+      "关联表": {
+        "files": 5000,
+        "raw_bytes": 20190567,
+        "compressed_bytes": 6436155
+      },
+      "真实场景": {
+        "files": 5000,
+        "raw_bytes": 914866106,
+        "compressed_bytes": 308017479
+      },
+      "量测场景": {
+        "files": 5000,
+        "raw_bytes": 1650647429,
+        "compressed_bytes": 607288421
+      }
+    },
+    "label_totals": {
+      "label_rows": 506683,
+      "source_9001": 280098,
+      "source_9002": 226585,
+      "nonzero_fragment_label_rows": 301876
+    },
+    "unique_A": 30805,
+    "unique_AB": 37092,
+    "label_headers": {
+      "t_s,t_e,mmsi,source,batch": 5000
+    }
+  },
+  "central_directory_comparison": {
+    "same_relative_paths": 15000,
+    "same_size_and_crc_by_category": {},
+    "note": "ZIP metadata equality is not a bytewise comparison; reference payloads not opened here."
+  },
+  "overlap": {
+    "shared_A": 26221,
+    "level1_only_A": 5732,
+    "level2_only_A": 4584,
+    "same_numeric_scene_ids": 5000,
+    "same_scene_equal_A_sets": 0,
+    "same_scene_equal_AB_sets": 0,
+    "same_scene_equal_label_key_sets": 0,
+    "byte_identical_label_files": 0
+  },
+  "exposure_check": {
+    "level1_scene0_A_count": 58,
+    "A_already_in_level2_development_scenes": 0,
+    "A_not_in_level2_development_scenes": 58,
+    "directly_related_level2_scene_ids": [
+      "133",
+      "878",
+      "938",
+      "1174",
+      "1214",
+      "1372",
+      "1443",
+      "1853",
+      "1929",
+      "2052",
+      "2244",
+      "2697",
+      "3048",
+      "3670",
+      "3839",
+      "4576",
+      "4682",
+      "4731"
+    ],
+    "all_scene0_A_already_development": false
+  },
+  "same_id_scene0_label_counts": {
+    "level1": {
+      "A": 58,
+      "AB": 59,
+      "full_identities": 98,
+      "source_batch_identity_keys": 157
+    },
+    "level2": {
+      "A": 3,
+      "AB": 3,
+      "full_identities": 8,
+      "source_batch_identity_keys": 15
+    }
+  }
+}

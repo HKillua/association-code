@@ -11,7 +11,8 @@ import zipfile
 
 import numpy as np
 
-from association.data import (DEFAULT_DEVELOPMENT_SCENES, DataError, MTADArchive,
+from association.data import (DEFAULT_DEVELOPMENT_SCENES,
+                              LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES, DataError, MTADArchive,
                               Scene, Track, build_manifest, resample_scene,
                               validate_manifest)
 
@@ -229,9 +230,27 @@ class DataTests(unittest.TestCase):
         with self.assertRaises(DataError):
             validate_manifest(manifest)
 
-    def test_development_inventory_has_53_scenes(self):
-        self.assertEqual(len(DEFAULT_DEVELOPMENT_SCENES), 53)
-        self.assertEqual(len(set(DEFAULT_DEVELOPMENT_SCENES)), 53)
+    def test_cross_level_preview_pins_the_whole_component_and_rejects_stale_manifest(self):
+        from association.config import load_config, validate_manifest_config
+        config = load_config(Path(__file__).resolve().parents[1] / 'configs/pilot.json')
+        specs = {int(s): basic_scene('EXPOSED-0-0')
+                 for s in LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES}
+        # An unlisted scene sharing A must be pinned too, before scene caps.
+        specs[71] = basic_scene('EXPOSED-1-0')
+        specs.update({s: basic_scene(f'PRIVATE{s}-0-0') for s in range(61, 69)})
+        fixture_zip(self.path, specs)
+        with MTADArchive(self.path) as archive:
+            stale = build_manifest(archive, config['split_seed'], config['caps'], [])
+            with self.assertRaisesRegex(ValueError, 'development scenes are not all pinned'):
+                validate_manifest_config(stale, config)
+            current = build_manifest(archive, config['split_seed'], config['caps'],
+                                     LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES)
+            self.assertTrue(validate_manifest_config(current, config))
+            for sid in (*LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES, '71'):
+                cid = current['components'][sid]
+                self.assertEqual(current['component_splits'][cid], 'T_core')
+            self.assertEqual({r['kind'] for r in archive.members_read}, {'labels'})
+        self.assertEqual(len(set(DEFAULT_DEVELOPMENT_SCENES)), 71)
 
 
 class ResamplingTests(unittest.TestCase):

@@ -1,6 +1,6 @@
 # CDF1 pilot execution protocol
 
-These interfaces are implemented. They are **not** the current server task: read `HandOver/Handover.md` before executing anything. ENV-001 still requests only an environment/data-location receipt. The local AI makes research and implementation decisions; the server AI owns execution and monitoring.
+These interfaces are implemented. They are **not** the current server task: read `HandOver/Handover.md` before executing anything. The current handover names the authorized environment/preflight/experiment stage. The local AI makes research and implementation decisions; the server AI owns execution and monitoring.
 
 ## Reproducible inputs
 

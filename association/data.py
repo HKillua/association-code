@@ -19,7 +19,15 @@ import numpy as np
 
 
 SPLIT_NAMES = ("T_core", "T_head", "V_select", "T_test")
-DEFAULT_DEVELOPMENT_SCENES = tuple(str(x) for x in [0, 1, 2, *range(100, 5000, 100), 4999])
+# Level1 scene 0 was previewed during intake. All Level2 scenes sharing any
+# of its A identities must join the development side; see docs/level1_intake.md.
+LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES = (
+    "133", "878", "938", "1174", "1214", "1372", "1443", "1853", "1929",
+    "2052", "2244", "2697", "3048", "3670", "3839", "4576", "4682", "4731",
+)
+DEFAULT_DEVELOPMENT_SCENES = tuple(sorted(
+    {str(x) for x in [0, 1, 2, *range(100, 5000, 100), 4999]}
+    | set(LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES), key=int))
 REGISTRATION_POLICY = "scene64-quantized-endpoints-in-support-v1"
 UNIT_CONTRACT = {"time": "native elapsed seconds", "lat": "degrees",
                  "lon": "degrees", "vel": "native MTAD velocity (no conversion)",
