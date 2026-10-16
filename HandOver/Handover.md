@@ -14,7 +14,7 @@
 
 | 文件 | direction | status | task_id | run_id | next_actor |
 | --- | --- | --- | --- | --- | --- |
-| [L2S-20261016-005.md](L2S-20261016-005.md) | LOCAL_TO_SERVER | **READY** | ENV-005 | ENV-20261016-005 | SERVER_AI |
+| [S2L-20261016-005.md](S2L-20261016-005.md) | SERVER_TO_LOCAL | **RUNNING** | ENV-005 | ENV-20261016-005 | SERVER_AI（执行中） |
 
 ENV-004 的 CPU 验收已通过：95 项 tests、15 项旧审计、32 秒，内外退出码及源码哈希核对一致。CUDA 尚未执行，原始等待日志 18 次采样均无空闲卡。本地已修复后续补跑被整仓 HEAD 相等检查误拦的问题；新 ENV-005 先复用现有 FIELD 环境补齐新契约的 CPU 快照，再补单卡 CUDA。详见[本轮请求](L2S-20261016-005.md)与[修复及审计记录](../docs/env_005_plan.md)。
 
@@ -30,7 +30,7 @@ ENV-004 的 CPU 验收已通过：95 项 tests、15 项旧审计、32 秒，内�
 | ENV-002 | [L2S-20261016-002.md](L2S-20261016-002.md) | [S2L-20261016-002.md](S2L-20261016-002.md) | **FAILED**：NumPy 1.26.4 装成、torch 主 wheel 显示 780.5 MB 下载完成，但 typing_extensions 元数据读超时；耗时 1959 s、内外退出码 1；CPU/CUDA 检查未执行。旧 wheel 是否仍存在未知，保留半成品 venv。原始 actual_commit 为 a6d6a04，与回执 db5f59d 不同，但执行代码相同，详见本地审计 |
 | ENV-003 | [L2S-20261016-003.md](L2S-20261016-003.md) | [S2L-20261016-003.md](S2L-20261016-003.md) | **FAILED**：A 在 `download_bootstrap` 用满 3570 秒，wrapper **124**，`wheels/` 落盘 0 个文件；全程卡在 `pypi.org` / `files.pythonhosted.org` 的 120 秒读超时，torch 主 wheel 阶段未开始。脚本 trap 的 `setup_exit_code.txt=0` 与 `download_bootstrap exit=0` 是 SIGTERM 残留值、不作成功依据。env003 venv 与 package-cache 原样保留，实际执行 SHA `2be9490`。**FIELD 补充（非本轮 A/B）**：根因是本机 IPv6 出口不通，强制 IPv4 + TUNA 主索引后同一组 pin 装成，`pip check`、导入断言、`tools/pilot` 15 项全过，但仓库 `tests` 93 项有 1 项失败（`test_models.py:128` 的 `rtol=0,atol=0` 逐位相等断言，实测差 `2.4e-7`）；CUDA 记 `deferred_no_free_gpu`（18:06 四卡全有他人进程），未抢占、未占用 GPU |
 | ENV-004 | [L2S-20261016-004.md](L2S-20261016-004.md) | [S2L-20261016-004.md](S2L-20261016-004.md) | **COMPLETED / partial**（`cuda_smoke: deferred_no_free_gpu`）：A 一次通过——32 秒内内外 rc 均 0、`validation.json=COMPLETED`、`pip check` 无问题、95 项 tests OK、15 项旧审计 OK、CLI OK，pin 与 `association` 导入来源已核验，实际执行 SHA `6db0695`，未做任何环境修复。B 未执行——20 分钟前台等待 18 次检查，四卡 UUID 始终有他人 compute 进程，`free_cards` 全空，故未初始化 cuda 截止时间、未创建 `runs/`，未抢占、未后台轮询。**CUDA 通路仍无证据，`ready_for_native_profile` 未取得** |
-| ENV-005 | [L2S-20261016-005.md](L2S-20261016-005.md) | 待服务器新建 S2L-20261016-005.md | **READY**：修复纯回执提交误拦；在已有 FIELD 环境刷新 CPU 契约，再补单卡 CUDA。源码增删改、环境差异和失败凭据仍拒绝；独立输出/预算、不共享他人卡 |
+| ENV-005 | [L2S-20261016-005.md](L2S-20261016-005.md) | [S2L-20261016-005.md](S2L-20261016-005.md) | **RUNNING**（23:10 领取，冻结检查全通过）：修复纯回执提交误拦；在已有 FIELD 环境刷新 CPU 契约，再补单卡 CUDA。源码增删改、环境差异和失败凭据仍拒绝；独立输出/预算、不共享他人卡 |
 
 本地复核 ENV-004 的 22:30 补记：整仓 HEAD 相等检查确实会阻止后续补跑，但不是已经发生的 CUDA 失败；从 CPU 提交到回执提交仅 HandOver 变化，旧 CPU 通过结论仍有效。ENV-005 已替换该检查，不再要求纯文档提交前后 HEAD 相同。等待日志实际跨度1167秒、含19/20秒两个短间隔，不能称全部至少60秒；离散采样不能证明四小时连续无空档，也没有 smoke 显存实测。原始服务器叙述保留在其 S2L，本地核验口径见 env_005_plan。
 
