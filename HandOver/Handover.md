@@ -14,16 +14,16 @@
 
 | 文件 | direction | status | task_id | run_id | next_actor |
 | --- | --- | --- | --- | --- | --- |
-| [L2S-20261016-002.md](L2S-20261016-002.md) | LOCAL_TO_SERVER | READY | ENV-002 | ENV-20261016-002 | SERVER_AI |
+| [S2L-20261016-002.md](S2L-20261016-002.md) | SERVER_TO_LOCAL | RUNNING | ENV-002 | ENV-20261016-002 | LOCAL_AI（待终态） |
 
-当前只领取 ENV-002。ENV-001 已完成，不重复执行。
+服务器 AI 已于 15:38 领取 ENV-002 并开始执行，原请求 `L2S-20261016-002.md` 未修改。ENV-001 已完成，不重复执行。
 
 ## 全部轮次
 
 | 轮次 | 请求 | 回执 | 结论 |
 | --- | --- | --- | --- |
-| ENV-001 | [L2S-20261016-001.md](L2S-20261016-001.md) | [S2L-20261016-001.md](S2L-20261016-001.md) | COMPLETED / partial：4×3090 + torch 2.4.1+cu121 可见，但探测用的 `pytorch_env`（Python 3.9.18）不满足 `pyproject.toml` 的 `>=3.10`、`torch>=2.5,<2.11`；MTAD 数据未上传到服务器；GPU 分配未确认 |
-| ENV-002 | [L2S-20261016-002.md](L2S-20261016-002.md) | 尚未创建（服务器领取后新建 S2L-20261016-002.md） | READY：独立环境配置、CPU检查、单卡CUDA合成验收；用户允许按FIFO使用最多4张空闲卡，本轮仅需1张 |
+| ENV-001 | [L2S-20261016-001.md](L2S-20261016-001.md) | [S2L-20261016-001.md](S2L-20261016-001.md) | COMPLETED / partial：4×3090 + torch 2.4.1+cu121 可见，但探测用的 `pytorch_env`（Python 3.9.18）不满足 `pyproject.toml` 的 `>=3.10`、`torch>=2.5,<2.11`（由 ENV-002 处理）。回执 15:33 补记：MTAD 四文件已在 `/home/wangguangjie/djs/data/mtad/`，Level2 MD5 与官方值一致。GPU 授权已由 ENV-002 明确（FIFO、最多 4 张空闲卡），本行早期“分配未确认”不再有效 |
+| ENV-002 | [L2S-20261016-002.md](L2S-20261016-002.md) | [S2L-20261016-002.md](S2L-20261016-002.md) | RUNNING（15:38 领取）：独立环境配置、CPU检查、单卡CUDA合成验收；用户允许按FIFO使用最多4张空闲卡，本轮仅需1张 |
 
 ENV-002 已给出环境版本、安装脚本、执行预算和GPU选择规则；数据上传由用户处理，本轮不依赖真实数据。
 
