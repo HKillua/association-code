@@ -1,6 +1,6 @@
 # GPU execution notes
 
-**This page contains examples, not a READY task.** The current execution authority is always `HandOver/Handover.md`. ENV-001 remains the active environment-check request until its actual terminal receipt is reviewed; the commands below do not authorize model training or GPU allocation.
+**This page contains examples, not a READY task.** The execution authority is the round file marked READY in the `HandOver/Handover.md` index. ENV-001 was executed and returned its terminal receipt (`COMPLETED` / readiness `partial`, data not yet on the server); no READY round exists until the local AI issues one, and the commands below never authorize model training or GPU allocation.
 
 The local AI writes and tests code, fixes defects, chooses protocols, and interprets results. The server AI executes an authorized frozen request, monitors processes/resources/logs, enforces its stop conditions, and returns evidence. A Git push does not start a run or transfer monitoring responsibility to the local AI.
 

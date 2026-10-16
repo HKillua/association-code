@@ -22,7 +22,7 @@ MTAD 航迹关联与融合研究的执行代码仓库。**所有需要在服务�
 
 ## 唯一交接入口
 
-每轮先读 **[HandOver/Handover.md](HandOver/Handover.md)**。这是持续迭代的当前任务/回执；[模板](HandOver/TEMPLATE.md)固定字段，[history](HandOver/history/README.md)和 Git 历史保留旧轮次。
+每轮先读 **[HandOver/Handover.md](HandOver/Handover.md)**，它只登记当前待处理和已有轮次；真正的任务与回执是各自独立的文件，一律用[模板](HandOver/TEMPLATE.md)的固定字段。一方一个文件、创建后不覆盖成别的轮次，状态演变由 Git 历史保留，不设 `history/` 副本目录。
 
 | direction | 谁给谁 | 主要内容 |
 | --- | --- | --- |
@@ -33,10 +33,10 @@ MTAD 航迹关联与融合研究的执行代码仓库。**所有需要在服务�
 
 ### 每轮如何交接
 
-1. **本地下发。** 先提交通过本地检查的代码，再写 `LOCAL_TO_SERVER / READY`。`code_commit` 填代码提交的完整 SHA；交接文档另一次提交，避免让文档引用包含自身的未知 SHA。命令、配置、预算和验收标准必须可在服务器直接理解。
-2. **服务器领取。** 拉取后检查方向、状态、`handover_id`、`code_commit`、前置条件。同一任务已经完成则不重复运行。把原请求原样保存为 `HandOver/history/<handover_id>.md`；当前文件换成 `SERVER_TO_LOCAL / RUNNING`，设置自己的回执 ID 和 `in_reply_to`，推送领取记录后再启动。
-3. **服务器执行与回传。** 保持本次代码不变，记录实际命令和代码 SHA。运行中由服务器 AI 监督；完成/失败后更新同一回执为终态，提交小型报告、指标和必要日志。输出用唯一 `run_id` 目录，保留首次失败，不能覆盖后重跑。重试仅限交接已明确允许的范围。
-4. **本地决策。** 收到终态回执后审阅证据，将回执归档，再写新的 `LOCAL_TO_SERVER` 任务。未收到终态或双方明确取消前，不覆盖运行中的交接，也不默认开启下一实验。
+1. **本地下发。** 先提交通过本地检查的代码，再新建 `HandOver/L2S-<YYYYMMDD>-<NNN>.md`，写 `LOCAL_TO_SERVER / READY`，并在 `HandOver/Handover.md` 索引登记该轮。`code_commit` 填代码提交的完整 SHA；交接文档另一次提交，避免让文档引用包含自身的未知 SHA。命令、配置、预算和验收标准必须可在服务器直接理解。下发后本地不再修改这个文件。
+2. **服务器领取。** 拉取后读索引指向的 `L2S-*.md`，检查方向、状态、`handover_id`、`code_commit`、前置条件。同一任务已经完成则不重复运行。**不修改本地那份文件**（它本身就是存档，不再复制进 `history/`）；新建自己的 `HandOver/S2L-<YYYYMMDD>-<NNN>.md`，`SERVER_TO_LOCAL / RUNNING`，设置回执 ID 和 `in_reply_to`，更新索引并推送领取记录后再启动。
+3. **服务器执行与回传。** 保持本次代码不变，记录实际命令和代码 SHA。运行中由服务器 AI 监督；完成/失败后**只更新自己那份 `S2L-*.md`**为终态并同步索引，提交小型报告、指标和必要日志。输出用唯一 `run_id` 目录，保留首次失败，不能覆盖后重跑。重试仅限交接已明确允许的范围。
+4. **本地决策。** 收到终态回执后审阅证据，旧轮次文件原样留在 `HandOver/`，再**新建** `L2S-...-<下一个NNN>.md` 下发新任务并更新索引。未收到终态或双方明确取消前，不修改运行中的 `S2L-*.md`，也不默认开启下一实验。
 
 每次读取/写入前核对工作区并同步：
 
@@ -45,12 +45,12 @@ git status --short
 git pull --ff-only
 ```
 
-若有未提交修改，先判断归属并保存，不直接拉取覆盖。若出现分叉、冲突、轮次已被另一方改变或代码不符合指定 SHA，停止执行并报告，不能强推、`reset --hard` 或静默合并交接语义。双方交替更新当前文件；运行中本地不向 `main` 推送下一实验的代码。代码冻结的核验方式见本轮交接。
+若有未提交修改，先判断归属并保存，不直接拉取覆盖。若出现分叉、冲突、轮次已被另一方改变或代码不符合指定 SHA，停止执行并报告，不能强推、`reset --hard` 或静默合并交接语义。每份 `L2S-*.md` 只由本地写、每份 `S2L-*.md` 只由服务器写，索引 `Handover.md` 是唯一双方都会追加登记的公共文件；写索引前先拉取再改，不删除对方登记的轮次。运行中本地不向 `main` 推送下一实验的代码。代码冻结的核验方式见本轮交接。
 
 回传可以使用：
 
 ```bash
-git add HandOver/Handover.md HandOver/history HandOver/results
+git add HandOver/S2L-<YYYYMMDD>-<NNN>.md HandOver/Handover.md HandOver/results
 git diff --cached --stat
 git commit -m "handover: return ENV-20261016-001 results"
 git push origin main
@@ -65,9 +65,9 @@ git clone https://github.com/HKillua/association-code.git
 cd association-code
 ```
 
-已有 checkout 则同步后读取 `README.md`、`AGENTS.md` 和 `HandOver/Handover.md`。**执行当前交接列出的任务**，不要把 README 的示例当成另一轮任务。
+已有 checkout 则同步后读取 `README.md`、`AGENTS.md` 和 `HandOver/Handover.md` 索引，再打开索引指向的状态为 `READY` 的 `L2S-*.md`。**只执行该交接列出的任务**，不要把 README 的示例当成另一轮任务，也不要重跑已有终态回执的轮次。
 
-当前第一轮仅检查环境并回报数据路径/可用 GPU；不安装训练环境、不训练、不重复全量数据审计。后续代码与实验由本地逐轮下发。
+第一轮 ENV-001（环境与数据位置核验）已由服务器回传终态 `COMPLETED` / readiness `partial`：计算环境可用，MTAD 数据尚未上传到服务器。后续代码与实验由本地逐轮新建交接下发；索引中没有 `READY` 时，服务器不自行开始任何工作。
 
 ## 已实现的模型与实验代码
 
@@ -83,7 +83,7 @@ cd association-code
 | `configs/pilot.json`、`configs/smoke.json` | 正式规模候选配置与独立的小模型检查配置 |
 | `tests/` | 数据隔离、模型梯度、冻结选择、缓存、评价与失败路径测试 |
 | `tools/pilot/` | 原有环境检查与 ZIP 审计脚本，仍可仅用标准库运行 |
-| `HandOver/` | 双向交接、历史和小型执行证据 |
+| `HandOver/` | 按 `handover_id` 逐轮保存的请求与回执文件、交接索引和小型执行证据 |
 
 正式模型在服务器明确使用 **`--device cuda:0`**；CUDA 不可用会失败，不会自动退到 CPU。4 张 RTX 3090 可以分配给独立实验；代码当前按单卡执行，不自动占满 4 卡，也不把多卡数当作已确认的配额。数据读取、统计和指标计算在 CPU，神经网络前后向和优化在所选 GPU。
 
