@@ -8,7 +8,7 @@ updated_at: 2026-10-16
 timezone: Asia/Shanghai
 task_id: ENV-002
 run_id: ENV-20261016-002
-code_commit: 7de61d7544d72e3133d1935a83957d4e9077ced6
+code_commit: 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b
 next_actor: SERVER_AI
 ---
 
@@ -31,8 +31,8 @@ ENV-001 回执已审阅，实际 Python 3.9.18 / PyTorch 2.4.1+cu121 低于项�
 3. 以下两项均须成功：
 
 ```bash
-git merge-base --is-ancestor 7de61d7544d72e3133d1935a83957d4e9077ced6 HEAD
-git diff --exit-code 7de61d7544d72e3133d1935a83957d4e9077ced6 HEAD -- association configs tests tools pyproject.toml docs
+git merge-base --is-ancestor 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b HEAD
+git diff --exit-code 23f0399de6b3293ebf4dff6cc4b67fc5a2212b2b HEAD -- association configs tests tools pyproject.toml docs
 ```
 
 4. 原样归档本请求到 `HandOver/history/L2S-20261016-002.md`，再将当前文件改为 `S2L-20261016-002 / SERVER_TO_LOCAL / RUNNING`，`in_reply_to: L2S-20261016-002`；记录领取时间和实际HEAD，提交并推送成功后执行。不要把代码改动混入回执。
@@ -63,7 +63,7 @@ git diff --exit-code 7de61d7544d72e3133d1935a83957d4e9077ced6 HEAD -- associatio
 
 ## B：单卡 CUDA 合成小流程
 
-服务器 AI 检查当前空闲卡及FIFO队列情况，选择物理编号0、1、2、3之一。不得仅靠显存数字忽略已排队/已运行任务。将选择依据、卡号、开始时间记入回执；原ENV-001快照不作为当前占用证据。若所有卡忙，则回传A的结果和 `cuda_smoke: deferred_no_free_gpu`，结束本轮；不后台等待、不宣称CUDA验收通过。
+服务器 AI 检查当前空闲卡及FIFO队列情况，并在启动前再次核对占用，选择物理编号0、1、2、3之一。不得仅靠显存数字忽略已排队/已运行任务。将选择依据、卡号、开始时间记入回执；原ENV-001快照不作为当前占用证据。若所有卡忙，则回传A的结果和 `cuda_smoke: deferred_no_free_gpu`，结束本轮；不后台等待、不宣称CUDA验收通过。
 
 确认一张空闲卡后，将下列 `task_gpu` 填为实际选定编号；无须再向用户请求使用权限：
 
@@ -82,7 +82,7 @@ git diff --exit-code 7de61d7544d72e3133d1935a83957d4e9077ced6 HEAD -- associatio
 )
 ```
 
-B阶段最多10分钟（含30秒终止宽限），单卡；失败/超时/OOM/NaN/非有限梯度立即停止，自动重试0次。不能切CPU冒充CUDA通过，不改batch或模型，不同时启动另一个小流程。脚本限制 `CUDA_VISIBLE_DEVICES` 为所选卡，进程内 `cuda:0` 指向该物理卡。
+B阶段最多10分钟（含30秒终止宽限），单卡；失败/超时/OOM/NaN/非有限梯度立即停止，自动重试0次。不能切CPU冒充CUDA通过，不改batch或模型，不同时启动另一个小流程。脚本通过 nvidia-smi 查询所选物理卡的 UUID，用 UUID 限制 `CUDA_VISIBLE_DEVICES` 并保存对应关系，避免 CUDA 序号与物理卡号不一致；进程内 `cuda:0` 指向该卡。
 
 小流程输出位于 `runs/SMOKE-ENV-20261016-002/`，必须新建。它使用合成数据和极小模型，真实执行梯度更新、保存/恢复、冻结和评价，用于软件验收；分数没有研究意义，显存也不能代表正式配置。运行监督、timeout进程及其子进程清理由服务器AI负责；仅处理本次进程。
 
