@@ -69,24 +69,37 @@ cd association-code
 
 当前第一轮仅检查环境并回报数据路径/可用 GPU；不安装训练环境、不训练、不重复全量数据审计。后续代码与实验由本地逐轮下发。
 
-## 目录与当前代码
+## 已实现的模型与实验代码
+
+已实现可训练的 **TMTAFF 风格 TCM + TAM 关联参考模型**（CE / contrastive 两个损失分支），以及 CDF1 单次上下文残差和对照实验。它是独立实现的关联预实验，尚未复现作者完整 TFM 融合系统，也没有真实数据训练结果或“超过 TMTAFF”的结论。具体对应与差异见 [模型实现说明](docs/model_conformance.md)。
 
 | 路径 | 用途 |
 | --- | --- |
-| `tools/pilot/server_check.py` | 环境检查，输出 Python/PyTorch/CUDA/GPU/空间报告 |
-| `tools/pilot/audit_mtad_level2.py` | 只读 ZIP 完整性与抽样内容检查；异常时保留报告并返回非零 |
-| `tools/pilot/test_audit_mtad_level2.py` | 使用合成小 ZIP 的 15 项行为测试 |
+| `association/data.py`、`dataset.py` | 原生 Level2 ZIP、A–B 身份标签、共享 A 组件隔离划分、异常记录与时间配准 |
+| `association/models.py`、`reference.py` | 实际 TCM/TAM 模型、梯度训练、验证选权重、保存与恢复、冻结分数缓存 |
+| `association/context.py`、`heads.py` | 单调校准、CDF1、EndpointMarginal / PairMLP / ScenePool / FixedRule / B_shuffle |
+| `association/metrics.py`、`pipeline.py` | 全部种子先完成验证选择，再读取测试量测；逐场景指标、组件 bootstrap、误桥与第三节点诊断 |
+| `association/cli.py`、`profile.py` | 数据准备、GPU 实测、单个参考训练、完整实验、合成流程检查 |
+| `configs/pilot.json`、`configs/smoke.json` | 正式规模候选配置与独立的小模型检查配置 |
+| `tests/` | 数据隔离、模型梯度、冻结选择、缓存、评价与失败路径测试 |
+| `tools/pilot/` | 原有环境检查与 ZIP 审计脚本，仍可仅用标准库运行 |
 | `HandOver/` | 双向交接、历史和小型执行证据 |
-| `docs/` | 执行所需研究边界、版本迁移与本地检查记录 |
 
-现有脚本只依赖 Python 标准库；环境脚本会探测已安装的 PyTorch，缺失也能生成报告。尚未实现 TMTAFF 参考模型或新方法训练程序，不把基础脚本当作模型成果。
+正式模型在服务器明确使用 **`--device cuda:0`**；CUDA 不可用会失败，不会自动退到 CPU。4 张 RTX 3090 可以分配给独立实验；代码当前按单卡执行，不自动占满 4 卡，也不把多卡数当作已确认的配额。数据读取、统计和指标计算在 CPU，神经网络前后向和优化在所选 GPU。
 
-本地检查命令：
+安装时先由服务器环境回执确定兼容的 CUDA 版 PyTorch；本地 AI 再下发安装命令。不要根据 Mac 的 CPU 验证环境安装服务器 PyTorch。已有兼容 PyTorch 后可在仓库根目录执行 `python -m pip install -e .`。依赖范围见 `pyproject.toml`；实际 Python / PyTorch / CUDA 版本随运行报告记录。
+
+### 使用与检查
+
+以下是接口示例，不替代当前 HandOver 任务。完整命令与产物见 [执行协议](docs/pilot_execution.md) 和 [GPU 执行说明](docs/gpu_execution.md)。
 
 ```bash
+python -m association.cli --help
+python -m unittest discover -s tests
 python -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py'
-python tools/pilot/server_check.py --help
-python tools/pilot/audit_mtad_level2.py --help
+python -m association.cli smoke --output runs/SMOKE-unique --device cpu
 ```
 
-工具细节见 [tools/pilot/README.md](tools/pilot/README.md)。新增服务器代码继续进入本仓库，不能重新在聊天附件或研究笔记目录维护另一份可编辑副本。
+合成 smoke 会真实训练四个小参考模型和所有上下文对照，保存并重新载入权重，再生成测试报告；其分数没有科研意义。正式配置的耗时、显存与收敛必须在服务器验证。当前尚未验证 CUDA 实测和真实 MTAD 训练，本地检查结果见 [验证记录](docs/verification-2026-10-16.md)，下一步按 [实施状态](HandOver/implementation_status.md) 衔接。
+
+所有输出使用新目录，已存在即拒绝覆盖；失败保留 `run.json`、已有曲线和缓存。数据、PDF、权重、大日志与 `runs/` 不进 Git。任何参数、划分或模型变更都由本地提交并在后续交接明确记录。
