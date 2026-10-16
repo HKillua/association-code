@@ -1,5 +1,6 @@
 import io
 import unittest
+from unittest.mock import patch
 
 import torch
 
@@ -121,13 +122,44 @@ class AssociationModelTests(unittest.TestCase):
                 model.complete(self.values[:1], torch.tensor([support]))
 
     def test_identical_tam_input_reuses_shared_encoder(self):
+        for branch in ("ce", "contrastive"):
+            with self.subTest(branch=branch):
+                model = AssociationModel(self.config, branch).eval()
+                # Two identical tracks plus a distinct track exercise the shared
+                # batch encoder, rather than relying on bitwise-equal kernels.
+                values = self.values[[0, 0, 1]]
+                support = self.observed[[0, 0, 1]]
+                with patch.object(model.tam_encoder, "forward",
+                                  wraps=model.tam_encoder.forward) as encoder:
+                    encoded = model.encode_tracks(values, support)
+                    encoder.assert_called_once()
+                    self.assertEqual(tuple(encoder.call_args.args[0].shape), (3, 6, 8))
+                    model.score_pairs(encoded, self.pairs)
+                    encoder.assert_called_once()  # scoring reuses track embeddings
+                # Float32 batch rows need not be bitwise identical across
+                # PyTorch/platform kernels. Only this numerical contract allows
+                # roundoff; data-preservation assertions above remain exact.
+                torch.testing.assert_close(encoded[0], encoded[1], rtol=1e-5, atol=1e-6)
+
+    def test_track_encoding_is_independent_of_batch_neighbors_and_order(self):
         model = AssociationModel(self.config).eval()
-        repeated = self.values[:1].repeat(2, 1, 1)
-        support = self.observed[:1].repeat(2, 1)
-        encoded = model.encode_tracks(repeated, support)
-        torch.testing.assert_close(encoded[0], encoded[1], rtol=0, atol=0)
-        score = model.score_pairs(encoded, torch.tensor([[0, 1]]))
-        self.assertEqual(score.item(), 0.0)
+        batch = model.encode_tracks(self.values, self.observed)
+        separate = torch.cat([
+            model.encode_tracks(self.values[i:i + 1], self.observed[i:i + 1])
+            for i in range(len(self.values))
+        ])
+        order = torch.tensor([2, 0, 1])
+        permuted = model.encode_tracks(self.values[order], self.observed[order])
+        torch.testing.assert_close(batch, separate, rtol=1e-5, atol=1e-6)
+        torch.testing.assert_close(batch[order], permuted, rtol=1e-5, atol=1e-6)
+
+    def test_exactly_identical_embeddings_have_exactly_zero_pair_score(self):
+        for branch in ("ce", "contrastive"):
+            with self.subTest(branch=branch):
+                model = AssociationModel(self.config, branch).eval()
+                embeddings = torch.randn(1, model.embedding_dim).repeat(2, 1)
+                score = model.score_pairs(embeddings, torch.tensor([[0, 1]]))
+                self.assertEqual(score.item(), 0.0)
 
     def test_explicit_frozen_and_joint_stage_controls(self):
         model = AssociationModel(self.config)
