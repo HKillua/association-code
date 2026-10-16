@@ -1,0 +1,7 @@
+{
+  "python": "3.11.7 (main, Dec 15 2023, 18:12:31) [GCC 11.2.0]",
+  "numpy": "1.26.4",
+  "torch": "2.5.1+cu121",
+  "build_cuda": "12.1",
+  "gpu_hidden_for_setup": true
+}

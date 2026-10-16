@@ -1,0 +1,29 @@
+{
+  "status": "COMPLETED",
+  "kind": "existing_FIELD_environment_verification",
+  "actual_commit": "6db0695003b4c25a892178ea53357aff786d725e",
+  "checks": {
+    "pip_check": 0,
+    "pip_freeze": 0,
+    "tests": 0,
+    "legacy_tests": 0,
+    "cli_help": 0
+  },
+  "import_check": {
+    "python": "3.11.7",
+    "python_executable": "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "prefix": "/home/wangguangjie/djs/mtad-field-20261016",
+    "base_prefix": "/home/wangguangjie/anaconda3",
+    "numpy": "1.26.4",
+    "torch": "2.5.1+cu121",
+    "cuda_build": "12.1",
+    "visible_gpu_count": 0,
+    "code_sha256": "6f2a6142184e8f38eb62ad604860781404b220c17c5cd0361c05827661998549",
+    "package_sources": {
+      "numpy": "/home/wangguangjie/djs/mtad-field-20261016/lib/python3.11/site-packages/numpy/__init__.py",
+      "torch": "/home/wangguangjie/djs/mtad-field-20261016/lib/python3.11/site-packages/torch/__init__.py",
+      "association": "/home/wangguangjie/djs/association-code/association/__init__.py"
+    }
+  },
+  "cuda_smoke": "not_run_by_this_script"
+}

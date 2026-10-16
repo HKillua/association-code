@@ -1,0 +1,13 @@
+usage: cli.py [-h] {prepare,train-reference,run-pilot,profile,smoke} ...
+
+Repository-local CLI. CUDA requests fail rather than silently using CPU.
+
+positional arguments:
+  {prepare,train-reference,run-pilot,profile,smoke}
+    prepare             Create immutable split and training/validation
+                        coverage audit
+    smoke               Synthetic end-to-end functional check; never a
+                        research result
+
+options:
+  -h, --help            show this help message and exit
