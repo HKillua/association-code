@@ -1,6 +1,6 @@
 # TMTAFF融合组件实现约定
 
-2026-10-18。目标：让既有TCM补全输出可训练地进入TFM，并提供显式参考对齐接口。仅隔离分支开发及合成软件验证，不改变活动011、不下发原生训练或选定新的评价协议。原文§2.4–2.5；论文未公开处如下明示。
+2026-10-18。目标：让既有TCM补全输出进入TFM，接通监督、分组输出、评价和训练更新。011已结束，当前012只补回文件；新增功能只做CPU软件验证，不下发原生训练或据此确定新的评价/选模协议。正式配置和预算另见[草案](../tmtaff_complete_plan.md)。原文§2.4–2.5；论文未公开处如下明示。
 
 ## 数据接口
 
@@ -24,7 +24,7 @@
 
 按§2.5在最终状态投影前另加配置中的dropout。长度64、维128时，仅两FC参数量为`24577×fc_hidden+8192`；中间宽128/256/8192分别约3.15M/6.30M/201.34M，不能把未知宽度随意当8192。当前自回归重复计算完整历史，真实成本须随后在完整配置上测量，不能以TSA的耗时外推。
 
-`forward_pairs(completed_tracks,pairs)`从[N,L,d]按[E,2]索引，无detach；可直接接`AssociationModel.complete`。不改原model/trainer/CLI。递归反馈正文与Algorithm1不一致，本次不静默决定完整递归规则，也不将4维预测当成128维嵌入。
+`forward_pairs(completed_tracks,pairs)`从[N,L,d]按[E,2]索引，无detach；可直接接`AssociationModel.complete`。不改原model/trainer/CLI。递归反馈正文与Algorithm1不一致，下述独立推断接口要求调用方显式选择FC memory解释，不将4维预测当成128维嵌入；这是待正式方案审阅的近似。
 
 原文§2.4的TFM训练仅使用同一目标的真配对；此接口不接收身份，也不替调用方选择训练对。后续trainer必须以训练侧身份构建正配对，不能把TAM预测的正边直接当融合监督。预测关联分组属于完整推断/评价侧，用于检验错配对融合的影响。
 
@@ -36,6 +36,28 @@
 
 速度采用log(value+1e-6)差平方，航向采用1-cos(pi/180*差)。四项损失用Eq18可学习log variance s组合：sum(.5*exp(-s)*L+softplus(s))，初始s=0；不暗改单位或自动截断数值。返回total、分项loss和学习到的variance，保存重载必须一致。
 
+微批累积可显式传`normalization_counts[4]`与`regularizer_weight`：每维按整个有效batch的监督数归一化，返回分项是本微批对全目标的贡献，日志相加；四项uncertainty正则全batch合计一次。局部微批某维无监督贡献可微零；全batch任一维无监督仍失败，不能重抽或删对。默认调用保持原完整batch语义。
+
+## 分组与递归输出
+
+`fusion_inference.py`的预测分组只接节点数、候选边、分数和显式阈值，不接身份或参考。必须显式选择`grouping_policy='anchor_direct'`和`node_order='input'`：依输入顺序取首个未分组节点为锚点，收纳与锚点直接判连的剩余节点，不做传递闭包。缺边不连，`>=`含同分，`None`沿既有指标表示全拒绝；重复无向候选、自边或非有限分数报错。所有节点恰出现一次。真身份分组是分离的评价helper，不能冒作预测关联。
+
+`fuse_track_groups`要求模型已eval、完整固定序分区，显式`feedback_policy='fc_memory'`、`singleton_policy='missing'`。每次左输入为累计FC memory，右输入为下一片段TCM输出，最后一步四维状态为本组输出。单节点组保留记录、状态为singleton_missing、输出None，不自配对、不丢弃；上层须接单源轨迹。混合身份的预测组照常融合，不读取真身份纠正。空场景仍检查接口；不修改权重、模式或输入。
+
+## 评价原语与边界
+
+`evaluate_aligned_fusion`接完整、由调用方显式对齐的预测/真值[N,L,4]、两份逐特征mask及[N,L]区域mask。位置按球半径6371000米的haversine距离，速度保留native单位，航向按最短圆周度差；分别给MAE/MSE/RMSE、可评真值数、预测交集数、缺预测数、点及轨迹覆盖。漏预测留在真值分母；零交集误差null，零真值覆盖null。非法声明为有效的值报错，不能以region mask隐藏。已观测/缺失区间由调用方分别明确mask。
+
+`group_membership_diagnostics`在同一完整节点人口上计算拆分/错误合并的配对数及受影响组数；未分组节点单独计数，不把None聚为同一目标。它不选择轨迹真值匹配、不做Hungarian、不生成新综合惩罚分数。上层全目标对应、单源轨迹装配和最终汇总/选模仍须固定；该原语通过不等于完整评价完成。
+
+## 三模块训练更新
+
+`fusion_training_parameters`显式设置TFM_FROZEN或JOINT阶段模式/可训练参数，提供新optimizer成员，包含FusionLoss四个参数。`fusion_training_step`只接受已抽取的有效batch；不采样、不读数据、不启动fit、不选择checkpoint。正对target按labels==1的原顺序装配，重复抽样不去重。TFM_FROZEN只接真配对，整个关联模型冻结/eval；JOINT分别计算TAM＋completion_weight×TCM＋TFM。
+
+关联微批均值乘本微批配对数/全batch配对数；TCM辅助仅对全batch唯一端点，按`2*d_model*Σmax(observed_count−1,0)`分配监督元素权重；融合损失按每维全batch有效数，正则只在第一个正对微批加一次。先核全batch监督和optimizer完整参数集合，再反传；一次清梯度、裁剪、step。异常/已有run deadline中断清除部分梯度且不step，不跳过并补抽。
+
+`pair_microbatch`的TCM前向最多含其2倍端点；`track_microbatch`只限制TCM辅助loss前向，不能声称控制所有TCM显存。每个配对微批内TCM结果共享给TAM/TFM，跨微批重算以释放反向图。开启dropout会改变随机mask实现，精确梯度等价只在dropout=0下验证；默认精度/模型规模不因此修改。原生监督装配、四阶段外层loop、完整checkpoint（association/fusion/loss及配置）、选择与输出入口尚未完成。
+
 ## 必须验证
 
 | 行为 | 检查 |
@@ -44,6 +66,9 @@
 | encoder独立、输出shape/有限性、无真值输入、eval可重现 | 小模型真实forward及重载 |
 | TCM→TFM可微，TAM另有监督 | 含缺端点的合成输入；TCM/TAM/TFM三loss联合backward/optimizer，三模块梯度有限非零 |
 | loss不吞坏值或全空监督 | 手算圆周/速度/位置边界与mask测试 |
+| 分组保留全部节点、非传递、FC递归无真值输入 | 链图、错组、None阈值/同分、singleton及真实小模型手工递归对照 |
+| 评价不因缺预测缩小分母 | 日期线/圆周手算、特征缺失、全部漏目标、split/merge计数 |
+| 微批不改损失分母、冻结正确、未丢loss权重 | CE/contrastive独立整批梯度对照，重复pair/缺局部监督/纯负微批，dropout有限反传，超时无部分step |
 | 活动行为不回归 | 新模块测试＋已有模型/数据/原始reader测试；不跑原生数据或GPU训练 |
 
-合成通过只说明接口和数值路径可用；参考时钟/网格的原生配置、递归/目标分组、完整评价、正式训练入口及预算仍未完成。没有“完整TMTAFF已复现”的结论。
+合成通过只说明接口和数值路径可用；参考时钟/网格的原生配置、单源与全目标评价装配、正式完整训练入口及预算仍未完成。没有“完整TMTAFF已复现”的结论。

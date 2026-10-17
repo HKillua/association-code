@@ -168,7 +168,15 @@ class FusionLoss(nn.Module):
         # quadratic branch cannot overflow and poison a linear-branch gradient.
         return (0.5 * error[small].square().sum() + (absolute[~small] - 0.0005).sum()) / error.numel()
 
-    def forward(self, prediction: Tensor, target: Tensor, valid: Tensor) -> dict:
+    def forward(self, prediction: Tensor, target: Tensor, valid: Tensor, *,
+                normalization_counts=None, regularizer_weight: float = 1.0) -> dict:
+        """Full-batch loss or an additive, explicitly normalized microbatch.
+
+        Accumulation passes the full effective batch's four valid counts and
+        includes the uncertainty regularizer exactly once across chunks.
+        Empty features within a chunk contribute zero; an empty feature in the
+        effective batch still fails. Defaults retain full-batch behavior.
+        """
         if prediction.ndim != 3 or prediction.shape[-1] != 4 or target.shape != prediction.shape:
             raise ValueError("prediction and target must have identical [B, L, 4] shapes")
         if not prediction.is_floating_point() or not target.is_floating_point():
@@ -179,13 +187,26 @@ class FusionLoss(nn.Module):
             raise ValueError("loss inputs and FusionLoss must use the same device")
         if prediction.dtype != target.dtype:
             raise ValueError("prediction and target must use the same dtype")
+        if (isinstance(regularizer_weight, bool) or not math.isfinite(regularizer_weight)
+                or not 0 <= regularizer_weight <= 1):
+            raise ValueError("regularizer_weight must be finite and in [0, 1]")
+        local_counts = valid.sum(dim=(0, 1))
+        counts = local_counts if normalization_counts is None else torch.as_tensor(
+            normalization_counts, device=prediction.device)
+        if counts.shape != (4,) or counts.dtype not in (torch.int32, torch.int64):
+            raise ValueError("normalization_counts must contain four integer counts")
+        if (counts <= 0).any():
+            raise ValueError("no valid supervision for at least one effective-batch feature")
+        if (counts < local_counts).any():
+            raise ValueError("normalization_counts must cover this chunk")
         losses = {}
         for index, name in enumerate(self.feature_names):
             mask = valid[..., index]
-            if not mask.any():
-                raise ValueError(f"no valid supervision for {name}")
             pred = prediction[..., index][mask]
             truth = target[..., index][mask]
+            if not mask.any():
+                losses[name] = pred.sum()  # Differentiable zero for an empty chunk feature.
+                continue
             if not torch.isfinite(pred).all() or not torch.isfinite(truth).all():
                 raise ValueError(f"valid prediction and target must be finite for {name}")
             if index < 2:
@@ -196,10 +217,11 @@ class FusionLoss(nn.Module):
                 loss = ((pred + 1e-6).log() - (truth + 1e-6).log()).square().mean()
             else:
                 loss = (1 - torch.cos((pred - truth) * (math.pi / 180))).mean()
-            losses[name] = loss
+            losses[name] = loss * (local_counts[index].to(loss.dtype) / counts[index])
         components = torch.stack(tuple(losses.values()))
         variance = self.log_variance.exp()
-        total = (0.5 * (-self.log_variance).exp() * components + F.softplus(self.log_variance)).sum()
+        total = (0.5 * (-self.log_variance).exp() * components
+                 + regularizer_weight * F.softplus(self.log_variance)).sum()
         if not torch.isfinite(components).all() or not torch.isfinite(variance).all() or not torch.isfinite(total):
             raise ValueError("fusion loss or learned variance is non-finite")
         return {"total": total, "losses": losses, "variance": variance}
