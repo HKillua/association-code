@@ -1,0 +1,64 @@
+{
+  "status": "COLLECTED",
+  "scope": "artifact transport only; no training or GPU use",
+  "files": [
+    {
+      "source": "/home/wangguangjie/djs/association-code/HandOver/results/PROFILE-DIAG-20261017-008/accept-1/stdout.log",
+      "name": "acceptance.json",
+      "bytes": 2125,
+      "sha256": "f64aaf1f2e105a536ea4adba7d5c6d23fb6541fe520af37c7b927aaa58ca1ac5",
+      "status": "COPIED",
+      "copy": "files/acceptance.json",
+      "copy_sha256": "f64aaf1f2e105a536ea4adba7d5c6d23fb6541fe520af37c7b927aaa58ca1ac5"
+    },
+    {
+      "source": "/home/wangguangjie/djs/association-code/runs/PROFILE-DIAG-20261017-008-attempt-1/profile.json",
+      "name": "profile.json",
+      "bytes": 19090,
+      "sha256": "c3c47005abdd93d5b52f90cd1bc1ec0292f9a003efb5a8c67fa700027e714c69",
+      "status": "COPIED",
+      "copy": "files/profile.json",
+      "copy_sha256": "c3c47005abdd93d5b52f90cd1bc1ec0292f9a003efb5a8c67fa700027e714c69"
+    },
+    {
+      "source": "/home/wangguangjie/djs/association-code/runs/PROFILE-DIAG-20261017-008-attempt-1/run.json",
+      "name": "run.json",
+      "bytes": 2998,
+      "sha256": "68b04b0974785520d147ca43a0ce7b69620144e20df1e9109d516018072bc521",
+      "status": "COPIED",
+      "copy": "files/run.json",
+      "copy_sha256": "68b04b0974785520d147ca43a0ce7b69620144e20df1e9109d516018072bc521"
+    },
+    {
+      "source": "/home/wangguangjie/djs/diag008_wrapper.sh",
+      "name": "attachment-01-diag008_wrapper.sh",
+      "bytes": 2946,
+      "sha256": "6894fd7481756d45d884642eeaf1448010c5d886ad41ee5d09100a045a76e7ae",
+      "status": "COPIED",
+      "copy": "files/attachment-01-diag008_wrapper.sh",
+      "copy_sha256": "6894fd7481756d45d884642eeaf1448010c5d886ad41ee5d09100a045a76e7ae"
+    },
+    {
+      "source": "/home/wangguangjie/djs/diag008_phaseAB.sh",
+      "name": "attachment-02-diag008_phaseAB.sh",
+      "bytes": 4282,
+      "sha256": "67c74c505ca6d85db4e4df298a67e7f392ad84a9ddd3854fb621629955614236",
+      "status": "COPIED",
+      "copy": "files/attachment-02-diag008_phaseAB.sh",
+      "copy_sha256": "67c74c505ca6d85db4e4df298a67e7f392ad84a9ddd3854fb621629955614236"
+    },
+    {
+      "source": "/home/wangguangjie/djs/diag008_phaseC.sh",
+      "name": "attachment-03-diag008_phaseC.sh",
+      "bytes": 4569,
+      "sha256": "efa76c132a699d75b24281827e28ddc5c8da4d54908d2c3393e92073b7b8b866",
+      "status": "COPIED",
+      "copy": "files/attachment-03-diag008_phaseC.sh",
+      "copy_sha256": "efa76c132a699d75b24281827e28ddc5c8da4d54908d2c3393e92073b7b8b866"
+    }
+  ],
+  "errors": [],
+  "limits": [],
+  "attachments_supplied": 3,
+  "profile_run_hash_link_verified": true
+}
