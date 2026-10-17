@@ -71,7 +71,7 @@ cd association-code
 
 已有 checkout 则同步后读取 `README.md`、`AGENTS.md` 和 `HandOver/Handover.md` 索引，再打开索引指向的状态为 `READY` 的 `L2S-*.md`。**只执行该交接列出的任务**，不要把 README 的示例当成另一轮任务，也不要重跑已有终态回执的轮次。
 
-ENV-005 已通过 CPU 与真实 CUDA 合成验收；007 的真实 MTAD Level2 准备通过，但正式配置探测在30分钟内只完成9/200步，显存峰值未保存。当前 [PROFILE-DIAG-008](HandOver/L2S-20261017-008.md) 复用007准备结果，以相同配置 A0/CE/seed20 只跑6步，补齐各阶段耗时与逐步显存快照，GPU累计最多30分钟。允许动态选卡、共卡及预算内资源重试，不重复prepare或环境smoke。探测仅供瓶颈诊断，不自动授权完整训练；事实限定见 [007成本复核](docs/native_007_cost_audit.md)，执行以索引和本轮请求为准。
+ENV-005 已通过 CPU 与真实 CUDA 合成验收；007 的真实 MTAD Level2 准备通过。008 的六步诊断命令已退出0，验收摘要记录约11.5GiB分配器峰值及六步零正例；但回传提交遗漏profile/run原始JSON与实际包装器，须只读补交后完成本地复核。首尾GPU快照不能证明全程无竞争，零正例在当前稀疏分布下也不能单独证明采样器bug。详见[008证据复核](docs/native_008_evidence_audit.md)。不重跑已完成阶段，不自动授权完整训练；执行以索引的新轮次为准。
 
 ## 已实现的模型与实验代码
 
