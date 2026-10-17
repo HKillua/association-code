@@ -14,7 +14,7 @@
 
 | 文件 | direction | status | task_id | run_id | next_actor |
 | --- | --- | --- | --- | --- | --- |
-| [L2S-20261017-010.md](L2S-20261017-010.md) | LOCAL_TO_SERVER | **READY** | FIRST-FIT-010 | FIRST-FIT-20261017-010 | SERVER_AI |
+| [S2L-20261017-010.md](S2L-20261017-010.md) | SERVER_TO_LOCAL | **RUNNING** | FIRST-FIT-010 | FIRST-FIT-20261017-010 | SERVER_AI（执行中） |
 
 用户于2026-10-17直接授权不固定哪张卡、允许共卡。服务器可按实时剩余显存/负载自主选卡，已有compute进程不再构成拒绝条件；后续任务可在各自预算内同配置换卡。无需逐卡请示，不终止他人进程，模型/数据/评价标准保持冻结，详见[现场授权](../docs/server_autonomy.md)。该授权覆盖历史轮次的空闲卡限制。
 
@@ -39,7 +39,7 @@ GPU-POLICY-006的授权与设备查询由007承接：若006尚未领取，不再
 | NATIVE-PROFILE-007 | [L2S-20261017-007.md](L2S-20261017-007.md) | [S2L-20261017-007.md](S2L-20261017-007.md) | **FAILED / prepare_ok_profile_timeout**：真实准备73秒通过，可复用；profile外层rc124、1784秒完成9/200步，均值184.85秒（warmup后181.17），原报告RUNNING保留，峰值unknown。启动快照无其他进程不代表全程无竞争；单场景TAM投影不作完整训练实测。008补齐分段成本与显存证据，详见本地审计 |
 | PROFILE-DIAG-008 | [L2S-20261017-008.md](L2S-20261017-008.md) | [S2L-20261017-008.md](S2L-20261017-008.md) | **服务器COMPLETED；本地原件复核未闭合**：profile外层/内层rc0、973.63s，冻结执行代码相符；accept摘要6步分段均值152.6095s，allocated11.497GiB，六个正例计数0。原profile/run与实际wrapper未入提交，009只读补交。首尾快照不证明全程独占，峰值不能推出仅容一个作业；零正例在已知稀疏分布下概率至少50.49%，不能单独判采样bug。单场景1个warmup后样本不作全训练成本结论，详见本地审计 |
 | EVIDENCE-009 | [L2S-20261017-009.md](L2S-20261017-009.md) | [S2L-20261017-009.md](S2L-20261017-009.md) | **COMPLETED / readiness `original_evidence_ready_for_local_review`**：一次收集 exit 0、`COLLECTED`，`profile_run_hash_link_verified=true`、`errors=[]`；`profile.json` COPIED 19,090 B `c3c47005…`、`run.json` COPIED 2,998 B `68b04b09…` 均与本请求预期 SHA 一致，`acceptance.json` `f64aaf1f…` 相符，五个副本经绝对路径 `cmp` 与原件逐字节一致；三份真实 008 wrapper 齐全，`6894fd74…`、`67c74c50…` **与 008 声明相符**，phaseC 此前未声明、本轮记录 `efa76c13…`；`check-ignore` rc=1、暂存清单已验证含全部原件。**全轮 56 秒／300 秒，GPU 使用 0**，未改 007/008 任何产物。如实记录服务器两处自写缺陷：收集脚本 review 块误把 `collection.json` 的 `files` 当 dict 解析（`AttributeError` + `set -e` 中断尾部）、`cmp` 相对路径算错一度误报不一致，均在**同一 deadline 内**以正确结构与绝对路径补齐并复核，第一版 `review.txt` 被补齐版覆盖（同轮同标签，无其他删改）。本回执同时更正 008 的两处过度表述 |
-| FIRST-FIT-010 | [L2S-20261017-010.md](L2S-20261017-010.md) | 待服务器领取 | **READY**：单A0/CE/seed20，TCM100/TAM100/joint20，最多6小时；现有完整验证选模，测试集封存，真实训练结果优先 |
+| FIRST-FIT-010 | [L2S-20261017-010.md](L2S-20261017-010.md) | [S2L-20261017-010.md](S2L-20261017-010.md) | **RUNNING**（19:32 领取；冻结核对全通过，prepared 两件套 SHA 预核成功；19:31 GPU0／GPU1 各 24,247 MiB 空闲、util 0%）：单A0/CE/seed20，TCM100/TAM100/joint20，最多6小时；现有完整验证选模，测试集封存，真实训练结果优先 |
 
 本地复核 ENV-004 的 22:30 补记：整仓 HEAD 相等检查确实会阻止后续补跑，但不是已经发生的 CUDA 失败；从 CPU 提交到回执提交仅 HandOver 变化，旧 CPU 通过结论仍有效。ENV-005 已替换该检查，不再要求纯文档提交前后 HEAD 相同。等待日志实际跨度1167秒、含19/20秒两个短间隔，不能称全部至少60秒；离散采样不能证明四小时连续无空档，也没有 smoke 显存实测。原始服务器叙述保留在其 S2L，本地核验口径见 env_005_plan。
 
