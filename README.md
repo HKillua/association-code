@@ -8,7 +8,7 @@ MTAD 航迹关联与融合研究的执行代码仓库。**规范执行脚本、�
 
 ## 研究目标
 
-参考 TMTAFF 的任务构造，研究有证据支持的改进方法。首周需要提出至少一个有机制依据、可验证的候选，争取获得其相对 TMTAFF 有潜力的初步证据；完整实验窗口约两个半月。服务器已报告 RTX 3090 ×4，执行按实时资源自主选卡，不限定该型号或固定编号。
+2026-10-17用户再次明确：**完成TMTAFF的补全—关联—融合近似复现，并用一个候选的同协议预实验判断课题潜力。** 当前仅有两个关联短训结果，TFM融合仍未实现，未达到该交付。011收尾的同时，本地下一项是补齐TFM、监督接口、完整轨迹和单源/简单融合对照；`A_full`只表示扩大关联训练池，不表示完整论文系统。最短路径见[研究目标与最近交付](docs/research_brief.md)。服务器按实时资源自主选卡，不固定GPU编号。
 
 简单距离基线和数据检查只负责验收流程，不能充当“有机会超过 TMTAFF”的证据。正式方法在本地完成文献、迁移条件和公平对照审查后下发；不预先限定全局关联、学习平滑或离线。具体边界见 [研究目标与比较原则](docs/research_brief.md)。
 
@@ -81,7 +81,7 @@ ENV-005 已通过 CPU 与真实 CUDA 合成验收；007 的真实 MTAD Level2 �
 
 ## 已实现的模型与实验代码
 
-已实现可训练的 **TMTAFF 风格 TCM + TAM 关联参考模型**（CE / contrastive 两个损失分支）、CDF1 单次上下文残差及机制对照，以及独立TSA-cTFER离线适配。010已完成A0/CE首轮真实验证；CDF1/A_full/TSA真实比较待正式交接后执行。它们是独立实现的关联预实验，尚未复现作者完整 TFM 融合系统，也没有“超过 TMTAFF”的结论。具体对应与差异见 [模型实现说明](docs/model_conformance.md)及[TSA适配说明](docs/tsactfer_adaptation.md)。
+已实现可训练的 **TMTAFF 风格 TCM + TAM 关联参考模型**（CE / contrastive 两个损失分支）、CDF1 单次上下文残差及机制对照，以及独立TSA-cTFER离线适配。010的A0/CE和011的TSA已完成真实验证；CDF1/A_full在途。它们是独立实现的关联预实验，尚未复现作者完整 TFM 融合系统，也没有“超过 TMTAFF”的结论。具体对应与差异见 [模型实现说明](docs/model_conformance.md)及[TSA适配说明](docs/tsactfer_adaptation.md)。
 
 | 路径 | 用途 |
 | --- | --- |
@@ -112,6 +112,6 @@ python -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py'
 python -m association.cli smoke --output runs/SMOKE-unique --device cpu
 ```
 
-合成 smoke 会真实训练四个小参考模型和所有上下文对照，保存并重新载入权重，再生成测试报告；其分数没有科研意义，且该示例不是当前正式任务。ENV-005已通过合成CUDA smoke；010已有真实短训耗时、显存及开发验证结果，尚不能证明收敛。下一阶段真实CDF1/A_full/TSA比较待执行。本地早期检查结果见 [验证记录](docs/verification-2026-10-16.md)，当前进展和下一步以 [交接索引](HandOver/Handover.md) 为准。
+合成 smoke 会真实训练四个小参考模型和所有上下文对照，保存并重新载入权重，再生成测试报告；其分数没有科研意义，且该示例不是当前正式任务。ENV-005已通过合成CUDA smoke；010已有真实短训耗时、显存及开发验证结果，尚不能证明收敛。011的TSA已完成，CDF1/A_full仍在途。本地早期检查结果见 [验证记录](docs/verification-2026-10-16.md)，当前进展和下一步以 [交接索引](HandOver/Handover.md) 为准。
 
 所有输出使用新目录，已存在即拒绝覆盖；失败保留 `run.json`、已有曲线和缓存。数据、PDF、权重、大日志与 `runs/` 不进 Git。任何参数、划分或模型变更都由本地提交并在后续交接明确记录。
