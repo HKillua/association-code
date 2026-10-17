@@ -14,13 +14,15 @@
 
 | 文件 | direction | status | task_id | run_id | next_actor |
 | --- | --- | --- | --- | --- | --- |
-| [L2S-20261017-006.md](L2S-20261017-006.md) | LOCAL_TO_SERVER | **READY** | GPU-POLICY-006 | GPU-POLICY-20261017-006 | SERVER_AI |
+| [L2S-20261017-007.md](L2S-20261017-007.md) | LOCAL_TO_SERVER | **READY** | NATIVE-PROFILE-007 | NATIVE-20261017-007 | SERVER_AI |
 
 用户于2026-10-17直接授权不固定哪张卡、允许共卡。服务器可按实时剩余显存/负载自主选卡，已有compute进程不再构成拒绝条件；后续任务可在各自预算内同配置换卡。无需逐卡请示，不终止他人进程，模型/数据/评价标准保持冻结，详见[现场授权](../docs/server_autonomy.md)。该授权覆盖历史轮次的空闲卡限制。
 
 **ENV-005 已通过 CPU 和真实 CUDA，保持 readiness: ready_for_native_profile。** CPU 95项测试、15项旧审计通过；CUDA外层67秒、合成pilot34.02秒、进程峰值分配18500096B。内外rc=0、COMPLETED及回传hash一致，实际使用当时空闲的GPU1，尚无共卡实测。本地核验复制的pilot_run.json哈希与acceptance相符，两份report_sha256相同；完整report留服务器。CPU实际提交2af59d6与CUDA的ebc9522不同但受检源码/环境相同，修复后的契约按设计放行。完整事实和等待历史保留在[S2L-005](S2L-20261016-005.md)。
 
-**当前GPU-POLICY-006只同步新规则并做一次有界只读设备查询**，不重跑CPU/CUDA、不重开ENV-005预算，不启动真实数据训练。查询不保留GPU、不构成性能验收；无候选也不抹除既有CUDA成功。具体5分钟现场预算、40秒查询超时及命令见本轮请求。代码已支持auto、任意物理index或UUID并允许共卡；本地32项setup回归通过。后续真实数据准备/profile另行下发。
+**当前NATIVE-PROFILE-007推进真实Level2准备与正式配置成本探测**：准备固定共享A组件划分、检查训练/验证覆盖；随后A0/CE/seed20最多200步，测真实CUDA耗时、梯度和显存。准备与GPU阶段各累计30分钟，允许动态选卡/共卡/同配置资源重试。不重复环境smoke，不启动完整训练，不打开测试量测。profile仅外推TAM部分成本，未覆盖TCM预训练、验证和缓存。
+
+GPU-POLICY-006的授权与设备查询由007承接：若006尚未领取，不再单独执行；若服务器已有006领取或完成记录，先结束短查询并保留/补交真实回执后再执行007。**本地尚未收到006回执，不代填成功或失败。** 旧请求保持原样；执行以007中的衔接规则为准。
 
 ## 全部轮次
 
@@ -31,7 +33,8 @@
 | ENV-003 | [L2S-20261016-003.md](L2S-20261016-003.md) | [S2L-20261016-003.md](S2L-20261016-003.md) | **FAILED**：A 在 `download_bootstrap` 用满 3570 秒，wrapper **124**，`wheels/` 落盘 0 个文件；全程卡在 `pypi.org` / `files.pythonhosted.org` 的 120 秒读超时，torch 主 wheel 阶段未开始。脚本 trap 的 `setup_exit_code.txt=0` 与 `download_bootstrap exit=0` 是 SIGTERM 残留值、不作成功依据。env003 venv 与 package-cache 原样保留，实际执行 SHA `2be9490`。**FIELD 补充（非本轮 A/B）**：根因是本机 IPv6 出口不通，强制 IPv4 + TUNA 主索引后同一组 pin 装成，`pip check`、导入断言、`tools/pilot` 15 项全过，但仓库 `tests` 93 项有 1 项失败（`test_models.py:128` 的 `rtol=0,atol=0` 逐位相等断言，实测差 `2.4e-7`）；CUDA 记 `deferred_no_free_gpu`（18:06 四卡全有他人进程），未抢占、未占用 GPU |
 | ENV-004 | [L2S-20261016-004.md](L2S-20261016-004.md) | [S2L-20261016-004.md](S2L-20261016-004.md) | **COMPLETED / partial**（`cuda_smoke: deferred_no_free_gpu`）：A 一次通过——32 秒内内外 rc 均 0、`validation.json=COMPLETED`、`pip check` 无问题、95 项 tests OK、15 项旧审计 OK、CLI OK，pin 与 `association` 导入来源已核验，实际执行 SHA `6db0695`，未做任何环境修复。B 未执行——20 分钟前台等待 18 次检查，四卡 UUID 始终有他人 compute 进程，`free_cards` 全空，故未初始化 cuda 截止时间、未创建 `runs/`，未抢占、未后台轮询。**CUDA 通路仍无证据，`ready_for_native_profile` 未取得** |
 | ENV-005 | [L2S-20261016-005.md](L2S-20261016-005.md) | [S2L-20261016-005.md](S2L-20261016-005.md) | **COMPLETED / readiness `ready_for_native_profile`**（`cuda_smoke: completed_attempt_1_on_free_card`）：A 通过——39 秒／900 秒，内外 rc 0，`validation.json=COMPLETED`、五项 checks 全 0、95 项 tests 与 15 项旧审计 OK，新快照齐全，CPU 实际提交 `2af59d6`。B 于 10-17 13:01 用**本轮从未动用的 CUDA 预算**在空闲卡 GPU1 上 67 秒完成——内外 rc 0、`acceptance.json` 与 `pilot_run.json` 皆 COMPLETED、pilot 34.02 秒、峰值分配 18500096 B、UUID 绑定、report hash 一致；`allocation_status=free_at_prelaunch_check`，**故未使用 10-17 的共卡授权**。CUDA 实际提交 `ebc9522` ≠ CPU `2af59d6`（仅 HandOver 差异）而 `code_sha256` 相同，新契约按设计放行。**CUDA 尝试 1/2；首份真实 CUDA 通路证据已取得**（合成 smoke，不代表正式配置资源，不构成研究结论） |
-| GPU-POLICY-006 | [L2S-20261017-006.md](L2S-20261017-006.md) | 尚未领取 | **READY**：同步动态选卡/共卡授权；一次有界只读资源查询，不重复ENV-005环境验收，不启动新GPU负载 |
+| GPU-POLICY-006 | [L2S-20261017-006.md](L2S-20261017-006.md) | 本地未收到；服务器已有记录需保留回传 | 007承接未领取的查询与授权，不再重复；已领取006先收尾。旧请求保留，不预填执行结果 |
+| NATIVE-PROFILE-007 | [L2S-20261017-007.md](L2S-20261017-007.md) | 尚未领取 | **READY**：真实Level2准备与正式A0/CE/seed20最多200步成本探测，CPU/GPU各累计30分钟，允许动态共卡；完整训练另行决定 |
 
 本地复核 ENV-004 的 22:30 补记：整仓 HEAD 相等检查确实会阻止后续补跑，但不是已经发生的 CUDA 失败；从 CPU 提交到回执提交仅 HandOver 变化，旧 CPU 通过结论仍有效。ENV-005 已替换该检查，不再要求纯文档提交前后 HEAD 相同。等待日志实际跨度1167秒、含19/20秒两个短间隔，不能称全部至少60秒；离散采样不能证明四小时连续无空档，也没有 smoke 显存实测。原始服务器叙述保留在其 S2L，本地核验口径见 env_005_plan。
 

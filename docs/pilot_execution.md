@@ -4,7 +4,7 @@ These interfaces are implemented. They are **not** the current server task: read
 
 ## Reproducible inputs
 
-Run from the repository root, with a Python environment containing the CUDA-enabled PyTorch build selected for that server. `pyproject.toml` declares Python >=3.10, NumPy >=1.26,<3 and PyTorch >=2.5,<2.11; this is a compatibility range, not a tested version matrix. The local functional check used Python 3.12.14, NumPy 2.5.4 and PyTorch 2.10.0 on CPU. Every run records actual versions, device, Git commit/dirty state, Python source hashes, config and manifest hashes. A production handover must name an immutable code commit and approved environment.
+Run from the repository root, with a Python environment containing the CUDA-enabled PyTorch build selected for that server. `pyproject.toml` declares Python >=3.10, NumPy >=1.26,<3 and PyTorch >=2.5,<2.11; this is a compatibility range, not a tested version matrix. The local functional check used Python 3.12.14, NumPy 2.5.4 and PyTorch 2.10.0 on CPU. Model runs record actual versions, device, Git commit/dirty state, Python source hashes, config and manifest hashes. Preparation writes only manifest/audit files, so its execution wrapper must record versions, actual code commit, timing and exit status. A production handover must name an immutable code commit and approved environment.
 
 `configs/pilot.json` declares width128, 8 heads, 6 layers in each TCM encoder/decoder and TAM encoder, FF256, length64. It uses all eligible unordered pairs, including same-source positives; there is no GT-informed candidate gating or negative sampling. Quarantine, circular course interpolation, native velocity units and short-support registration are explicit in `data_contract.md`. Selected scene caps are 512/128/64/128 for T_core/T_head/V_select/T_test; all labels establish shared-A connected components before selection. Previously examined development components are forced to training. Scene caps do not move unused component members into another split.
 
@@ -18,10 +18,10 @@ Preparation writes immutable `manifest.json` and `audit.json`, checking training
 
 ## GPU cost gate before full training
 
-After environment and device allocation are confirmed, a bounded next handover should profile the production model first. Example below assumes physical GPU 2 has been allocated; within that process it is `cuda:0`.
+After environment and device allocation are confirmed, a bounded handover profiles the production model first. Examples below use `task_gpu_uuid` selected from current resources under the dynamic/shared-device policy; within that process it is `cuda:0`.
 
 ```bash
-CUDA_VISIBLE_DEVICES=2 python -m association.cli profile \
+CUDA_VISIBLE_DEVICES="$task_gpu_uuid" python -m association.cli profile \
   --archive /data/mtad/level2.zip --prepared runs/PREP-001 \
   --config configs/pilot.json --role A0 --branch ce --seed 20 \
   --steps 200 --max-minutes 30 --device cuda:0 \
@@ -33,7 +33,7 @@ This performs real Adam steps on the training scene with the most valid nodes. I
 ## Training and validation
 
 ```bash
-CUDA_VISIBLE_DEVICES=2 python -m association.cli train-reference \
+CUDA_VISIBLE_DEVICES="$task_gpu_uuid" python -m association.cli train-reference \
   --archive /data/mtad/level2.zip --prepared runs/PREP-001 \
   --config configs/pilot.json --role A0 --branch ce --seed 20 \
   --device cuda:0 --output runs/REFERENCES/seed20/A0/ce
@@ -50,7 +50,7 @@ Each complete reference writes `checkpoint.pt`, `history.json`, `summary.json`, 
 ## Complete pilot
 
 ```bash
-CUDA_VISIBLE_DEVICES=2 python -m association.cli run-pilot \
+CUDA_VISIBLE_DEVICES="$task_gpu_uuid" python -m association.cli run-pilot \
   --archive /data/mtad/level2.zip --prepared runs/PREP-001 \
   --config configs/pilot.json --device cuda:0 \
   --output runs/PILOT-001

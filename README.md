@@ -69,7 +69,7 @@ cd association-code
 
 已有 checkout 则同步后读取 `README.md`、`AGENTS.md` 和 `HandOver/Handover.md` 索引，再打开索引指向的状态为 `READY` 的 `L2S-*.md`。**只执行该交接列出的任务**，不要把 README 的示例当成另一轮任务，也不要重跑已有终态回执的轮次。
 
-ENV-005 已在服务器通过CPU与真实CUDA验收，readiness为ready_for_native_profile：合成pilot约34.02秒，进程峰值分配约17.6MiB，实际使用当时空闲的GPU1。该数字只属于极小合成模型，不能外推正式配置。2026-10-17的新授权允许动态选卡和共卡，详见[GPU策略说明](docs/gpu_policy_006.md)及[执行说明](docs/gpu_execution.md)。GPU-POLICY-006只同步规则并进行有界只读设备查询，不重复已成功CPU/CUDA。后续任务按各自预算自主选卡，资源故障可同配置换卡最多3次，不因换卡重置预算。实际执行以索引所指独立轮次为准；已通过的ENV-005保持成功，旧轮次不重复运行。
+ENV-005 已通过 CPU 与真实 CUDA 合成验收。当前 [NATIVE-PROFILE-007](HandOver/L2S-20261017-007.md) 下发真实 MTAD Level2 数据准备与正式配置 A0/CE/seed20 的最多200步成本探测；准备和GPU阶段各有累计30分钟预算，允许动态选卡、共卡及预算内资源重试，不再重复环境 smoke。未领取的 GPU-POLICY-006 查询由007承接；已有服务器回执照实保留。探测只提供训练阶段的部分成本证据，不自动授权完整训练；以索引和本轮请求为准。
 
 ## 已实现的模型与实验代码
 
