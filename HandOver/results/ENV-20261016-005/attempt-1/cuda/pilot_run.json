@@ -1,0 +1,27 @@
+{
+  "kind": "pilot",
+  "provenance": {
+    "python": "3.11.7",
+    "torch": "2.5.1+cu121",
+    "numpy": "1.26.4",
+    "device": "cuda:0",
+    "git_commit": "ebc9522780cd7769924bacbbd0289775738e1da2",
+    "git_dirty": true,
+    "code_sha256": "6f2a6142184e8f38eb62ad604860781404b220c17c5cd0361c05827661998549",
+    "cuda_build": "12.1",
+    "cuda_visible_devices": "GPU-6811d9c0-b8a4-b5fd-0175-790964d42afc",
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "total_memory_bytes": 25438126080
+  },
+  "seeds": [
+    20
+  ],
+  "manifest_sha256": "914efe1cd5406e1b80dff6650177afc500edef6a241087e53eba7bfb1727c95a",
+  "config_sha256": "684ce3881bc2b9e34d0c54f617b5bd8ff9e9ede7db5070320fd4aa4460b47854",
+  "reference_reuse": false,
+  "status": "COMPLETED",
+  "elapsed_seconds": 34.021967669948936,
+  "report_sha256": "013212b4ccf252fb3cd9a8e8d3f452f014b5412f9305d4476e24d5bbae206f92",
+  "cuda_process_peak_allocated_bytes": 18500096,
+  "cuda_process_peak_reserved_bytes": 23068672
+}

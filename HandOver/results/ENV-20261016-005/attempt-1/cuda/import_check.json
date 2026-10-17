@@ -1,0 +1,6 @@
+{
+  "torch": "2.5.1+cu121",
+  "cuda_build": "12.1",
+  "visible_gpu_count": 1,
+  "name": "NVIDIA GeForce RTX 3090"
+}

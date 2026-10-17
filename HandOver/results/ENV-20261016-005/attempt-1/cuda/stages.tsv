@@ -1,0 +1,15 @@
+2026-10-17T05:00:47Z	preflight	start
+2026-10-17T05:01:08Z	preflight	complete
+2026-10-17T05:01:08Z	pip_check	start
+2026-10-17T05:01:09Z	pip_check	complete
+2026-10-17T05:01:09Z	allocation	start
+2026-10-17T05:01:09Z	allocation	complete
+2026-10-17T05:01:09Z	environment_inventory	start
+2026-10-17T05:01:12Z	environment_inventory	complete
+2026-10-17T05:01:12Z	cuda_assertions	start
+2026-10-17T05:01:14Z	cuda_assertions	complete
+2026-10-17T05:01:14Z	smoke_command	start
+2026-10-17T05:01:52Z	smoke_command	complete
+2026-10-17T05:01:52Z	acceptance	start
+2026-10-17T05:01:54Z	acceptance	complete
+2026-10-17T05:01:54Z	acceptance	exit=0	signal=none
