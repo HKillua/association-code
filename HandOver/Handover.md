@@ -11,7 +11,7 @@
 - 单个 A0/CE/seed20：TCM100 → 冻结 TAM100 → joint20，累计上限6小时、一次尝试、重试0。复用007划分，完整 V_select 选模，T_test 封存。当前没有第二项 READY 任务。
 - **最新服务器快照：2026-10-17 20:31（提交 `1d44d60`）。** 已用60分50秒，TCM100/100、TAM100/100、joint10/20；运行在GPU0，报告进程累计峰值分配10.38GiB，GPU1当时空闲。这些是中期文字回执，尚未收到010原始结果文件或终态，不能当实时状态、独占性能或最终成绩。
 - **本地代码核对：** 验证字段位于 `history[*].selection`；完整已选指标也在 `progress.stages[*].starts_from_selection.validation`（joint阶段）及 checkpoint 的 selection 中。按冻结代码，进入joint意味着已完成冻结阶段完整验证并载入checkpoint；回执“验证条目0”不能由顶层字段缺失推出。终态按原010要求回传实际指标，不能仅据loss接近ln2判定模型随机。
-- **接下来：** 用户已确认新增最多12 GPU小时，并要求下一轮必须有独立baseline比较；优先TMTAFF风格CE参考与TSA-cTFER适配版各最多6小时，原拟contrastive作业延后。先收010终态；baseline实现可在隔离分支准备，尚未发布新配置/L2S、不得据此直接启动。见[下一轮方案](../docs/next_experiments_after_010.md)。
+- **接下来：** 用户明确要求baseline复现与创新验证并行：复用010缓存跑CDF1及机制对照，同时准备同数据A_full参考和独立TSA-cTFER适配，新增总预算仍≤12GPU小时。先收010终态；隔离分支可准备代码，尚无011或新作业。具体比较和预算见[下一阶段方案](../docs/next_experiments_after_010.md)。
 
 ## 必要约束
 
