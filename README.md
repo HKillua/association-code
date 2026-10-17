@@ -1,117 +1,44 @@
 # association-code
 
-MTAD 航迹关联与融合研究的执行代码仓库。**规范执行脚本、模型、配置、评价代码和依赖说明在本仓库版本化维护。** 已授权的临时现场包装器可在仓库外编写，按现场规则回传源码和实际命令；需长期复用时由本地纳入仓库。本地研究笔记和论文原件另存；每次执行所必需的协议与参数必须随代码提交，不能依赖服务器无法访问的本地文件。
+MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下，把补全、关联、融合一起做**：先完成TMTAFF的近似复现，再用同协议的候选预实验判断课题潜力。
 
-**2026-10-17当前阶段：** COMPARE-011运行中，TSA-cTFER离线适配已完成，CDF1/A_full尚无终态。两份完整V_select缓存本地复算一致：A0→TSA的macro-F1 .42624→.52055、micro-F1 .26058→.34005、P15.84%→21.86%，TSA净纠正3945条；但精确率仍低，未证明创新或实际可用。具体对比、共同适用子集、成本与服务器说明更正见[011阶段分析](docs/results/compare011_interim/README.md)。
+当前只完成两项真实关联短训，**TFM融合仍未实现**。`A_full`表示扩大关联训练池，不是完整论文系统；CDF1也不是预定的最终创新。模型、配置、执行入口和必要协议在本仓库维护，论文原件与研究笔记另存。
 
-既定总上限仍CDF1≤3小时＋A_full≤3小时＋TSA≤6小时，最多两单卡并发、各一次无重试；已完成项不重复，不转移剩余额度。当前不改在途代码/配置，不额外发新任务。复用007划分，完整V_select作开发比较，T_test继续封存。执行状态以[HandOver索引](HandOver/Handover.md)和各项真实回执为准；应用自动化每6小时跟进。
+## 从这里开始
 
-## 研究目标
-
-2026-10-17用户再次明确：**完成TMTAFF的补全—关联—融合近似复现，并用一个候选的同协议预实验判断课题潜力。** 当前仅有两个关联短训结果，TFM融合仍未实现，未达到该交付。011收尾的同时，本地下一项是补齐TFM、监督接口、完整轨迹和单源/简单融合对照；`A_full`只表示扩大关联训练池，不表示完整论文系统。最短路径见[研究目标与最近交付](docs/research_brief.md)。服务器按实时资源自主选卡，不固定GPU编号。
-
-简单距离基线和数据检查只负责验收流程，不能充当“有机会超过 TMTAFF”的证据。正式方法在本地完成文献、迁移条件和公平对照审查后下发；不预先限定全局关联、学习平滑或离线。具体边界见 [研究目标与比较原则](docs/research_brief.md)。
-
-**两端SHA要求已取消。** 2026-10-17用户明确要求不再进行SHA判别；新交接及执行程序不再用提交/文件hash或fingerprint作为门槛。旧历史记录不删，但其中旧检查要求已被此指示覆盖。完成状态、实际配置、划分、角色/种子和结果内容继续检查。
-
-## 谁负责什么
-
-| 角色 | 责任 |
+| 需要了解 | 入口 |
 | --- | --- |
-| **本地 AI（研究与开发）** | 检索/读论文、选择方法、设计实验、编写和测试代码、固定配置/评价协议；按授权定时跟进仓库，解释回执、修复常规问题并推进既定计划 |
-| **服务器 AI（执行与现场处置）** | 拉取并核对交接，在版本/研究约束与预算内自主处理传输、缓存、环境、设备选择、进程和日志，保存证据并回传 |
-| 用户 | 提供机器/数据访问条件、可用 GPU 与研究反馈；决定重大研究、采样、预算和测试集使用变更，有需要时协助获取论文 |
+| 当前任务、服务器回执、历史轮次 | [HandOver索引](HandOver/Handover.md) |
+| 研究目标、已完成与缺项、最近交付 | [研究说明](docs/research_brief.md) |
+| 双端协作、修改与执行权限 | [AGENTS](AGENTS.md)、[现场授权](docs/server_autonomy.md) |
+| 论文对应、实现差异与数据协议 | [模型说明](docs/model_conformance.md)、[TSA适配](docs/tsactfer_adaptation.md)、[数据契约](docs/data_contract.md) |
+| 实际比较结果及证据边界 | [011阶段分析](docs/results/compare011_interim/README.md)、[010结果](docs/first_fit_010_result.md) |
+| 命令说明与运行环境 | [执行协议](docs/pilot_execution.md)、[GPU执行](docs/gpu_execution.md) |
 
-**服务器 AI 负责执行全程；本地 AI 不通过SSH值守服务器、轮询日志或监控运行。** 用户于2026-10-17授权本地Codex应用定时跟进仓库更新（当前每6小时）：可自主分析常规问题、修复并验证后提交推送，以及推进既定计划内的有界诊断和后续交接。已配置的应用自动化为 `mtad`；不在服务器部署后台守护/定时轮询，不向其他线程发消息。Git推送本身不会唤醒服务器AI。
+**最近回执状态：COMPARE-011仍为RUNNING；TSA已完成，CDF1/A_full尚无终态回传。** 执行与预算以索引指向的独立交接为准，README不是运行任务。011收尾期间，本地在隔离分支补齐融合链路；当前没有新的融合训练授权。完整V_select用于开发比较，T_test继续封存。
 
-恢复既定行为的实现修复、路径/日志/包装器和证据校验问题可自主处理，不因修改代码就要求用户重新批准。改变研究目标、方法或对照、采样/划分、标签/指标/选模、测试集使用、精度策略，或明显扩大已批准的总训练规模与预算时，先提交具体方案请用户决定。定时跟进不重置旧轮预算，也不解除RUNNING期间冻结；完整边界见 [本地跟进授权](docs/server_autonomy.md#本地应用定时仓库跟进2026-10-17)。
-
-用户于 2026-10-16 授予服务器 AI 有限现场处置权，并于 **2026-10-17 直接扩大 GPU 授权：不固定某张卡，允许与他人共卡，以能够执行任务为准**。该授权覆盖旧 ENV-004/005 的空闲卡限制，完整规则见 **[现场授权边界](docs/server_autonomy.md)**。服务器可以在同版本和本轮预算内处理网络、缓存、环境与进程，按实时剩余显存/负载自主选卡、共卡和换卡；已有 compute 进程不构成否决条件。自动选择优先剩余显存最多、相同时利用率最低的兼容设备，不必逐项等待本地批准。每次操作、失败尝试与来源进入同轮回执，不另起 FIELD 任务。
-
-研究目标、模型/训练与数据代码、划分/标签、阈值/指标/选模、测试容差、依赖版本约束、精度策略、训练/场景/种子/时间预算由本地控制。服务器不能为了通过测试或缓解 OOM 擅自改这些内容；可以制作最小复现和修复建议。本地随后提交修复或新协议。正式执行代码保持冻结，服务器只可在仓库外编写可追踪的传输/启动包装器。
-
-## 唯一交接入口
-
-每轮先读 **[HandOver/Handover.md](HandOver/Handover.md)**，它只登记当前待处理和已有轮次；真正的任务与回执是各自独立的文件，一律用[模板](HandOver/TEMPLATE.md)的固定字段。一方一个文件、创建后不覆盖成别的轮次，状态演变由 Git 历史保留，不设 `history/` 副本目录。
-
-| direction | 谁给谁 | 主要内容 |
-| --- | --- | --- |
-| `LOCAL_TO_SERVER` | **本地 AI → 服务器 AI** | 决策、待执行代码提交、协议/配置、精确命令、资源预算、输出与停止条件 |
-| `SERVER_TO_LOCAL` | **服务器 AI → 本地 AI** | 实际代码提交、环境/命令、进程状态、退出码、结果、异常与执行偏差 |
-
-状态为 `READY`（可领取）、`RUNNING`（已领取运行中）、`COMPLETED`（已完成所列工作）、`FAILED`（执行失败）、`BLOCKED`（条件不足）。`COMPLETED` 不代表假设成立，也不代表 CUDA 可用；必须读具体结果。
-
-### 每轮如何交接
-
-1. **本地下发。** 先提交通过本地检查的代码，再新建 `HandOver/L2S-<YYYYMMDD>-<NNN>.md`，写 `LOCAL_TO_SERVER / READY`，并在 `HandOver/Handover.md` 索引登记该轮。版本由Git记录，交接使用`code_ref: main`即可；两端不再要求SHA判别。代码与交接分别提交，使任务内容清晰。命令、配置、预算和验收标准必须可在服务器直接理解。下发后本地不再修改这个文件。
-2. **服务器领取。** 拉取后读索引指向的 `L2S-*.md`，检查方向、状态、`handover_id`、实际配置、前置条件。同一任务已经完成则不重复运行。**不修改本地那份文件**（它本身就是存档，不再复制进 `history/`）；新建自己的 `HandOver/S2L-<YYYYMMDD>-<NNN>.md`，`SERVER_TO_LOCAL / RUNNING`，设置回执 ID 和 `in_reply_to`，更新索引并推送领取记录后再启动。
-3. **服务器执行与回传。** 保持本次代码不变，记录实际命令和执行版本（仅记录）。运行中由服务器 AI 监督；完成/失败后**只更新自己那份 `S2L-*.md`**为终态并同步索引，提交小型报告、指标和必要日志。输出用唯一 `run_id` 目录，保留首次失败，不能覆盖后重跑。重试仅限交接已明确允许的范围。
-4. **本地决策。** 收到终态回执后审阅证据，旧轮次文件原样留在 `HandOver/`，再**新建** `L2S-...-<下一个NNN>.md` 下发新任务并更新索引。未收到终态或双方明确取消前，不修改运行中的 `S2L-*.md`，也不默认开启下一实验。
-
-每次读取/写入前核对工作区并同步：
-
-```bash
-git status --short
-git pull --ff-only
-```
-
-若有未提交修改，先判断归属并保存，不直接拉取覆盖。若出现分叉、冲突、轮次已被另一方改变或发现实际代码/配置与任务不符，停止执行并报告，不能强推、`reset --hard` 或静默合并交接语义。每份 `L2S-*.md` 只由本地写、每份 `S2L-*.md` 只由服务器写，索引 `Handover.md` 是唯一双方都会追加登记的公共文件；写索引前先拉取再改，不删除对方登记的轮次。RUNNING期间本地可在隔离分支诊断、修复和测试，但不向 `main` 推送执行代码/配置变更，不修改已下发L2S或对方S2L，也不启动下一实验。收到终态或双方明确取消后，常规修复和既定计划内的新交接可自主提交推送。纯文档更新不要求整仓HEAD相同；执行前看实际任务与配置，不再以SHA/fingerprint判断。
-
-回传可以使用：
-
-```bash
-git add HandOver/S2L-<YYYYMMDD>-<NNN>.md HandOver/Handover.md HandOver/results
-git diff --cached --stat
-git commit -m "handover: return ENV-20261016-001 results"
-git push origin main
-```
-
-提交信息和输出路径按实际轮次修改。只提交已核对的小型产物；数据集、权重、完整大日志、缓存及凭据不进仓库，大产物回传服务器路径、大小。若没有推送权限，保留本地提交并请用户传回回执，不把“本地提交成功”称为“本地 AI 已收到”。
-
-## 服务器 AI 首次开始
-
-```bash
-git clone https://github.com/HKillua/association-code.git
-cd association-code
-```
-
-已有 checkout 则同步后读取 `README.md`、`AGENTS.md` 和 `HandOver/Handover.md` 索引，再打开索引指向的状态为 `READY` 的 `L2S-*.md`。**只执行该交接列出的任务**，不要把 README 的示例当成另一轮任务，也不要重跑已有终态回执的轮次。
-
-ENV-005 已通过 CPU 与真实 CUDA 合成验收；007 的真实 MTAD Level2 准备通过。008 的六步诊断原件已通过009补齐并经本地复核，约11.5GiB分配器峰值、六步零正例；该历史成本探测不再是待办。010已完成首轮真实训练—验证。首尾GPU快照不能证明全程无竞争，008的零正例也不能单独证明采样器bug。详见[008证据复核](docs/native_008_evidence_audit.md)。不重跑已完成阶段；执行以索引的新轮次为准。
-
-## 已实现的模型与实验代码
-
-已实现可训练的 **TMTAFF 风格 TCM + TAM 关联参考模型**（CE / contrastive 两个损失分支）、CDF1 单次上下文残差及机制对照，以及独立TSA-cTFER离线适配。010的A0/CE和011的TSA已完成真实验证；CDF1/A_full在途。它们是独立实现的关联预实验，尚未复现作者完整 TFM 融合系统，也没有“超过 TMTAFF”的结论。具体对应与差异见 [模型实现说明](docs/model_conformance.md)及[TSA适配说明](docs/tsactfer_adaptation.md)。
+## 代码导航
 
 | 路径 | 用途 |
 | --- | --- |
-| `association/data.py`、`dataset.py` | 原生 Level2 ZIP、A–B 身份标签、共享 A 组件隔离划分、异常记录与时间配准 |
-| `association/models.py`、`reference.py` | 实际 TCM/TAM 模型、梯度训练、验证选权重、保存与恢复、冻结分数缓存 |
-| `association/context.py`、`heads.py` | 单调校准、CDF1、EndpointMarginal / PairMLP / ScenePool / FixedRule / B_shuffle |
-| `association/metrics.py`、`pipeline.py` | 全部种子先完成验证选择，再读取测试量测；逐场景指标、组件 bootstrap、误桥与第三节点诊断 |
-| `association/cli.py`、`profile.py` | 数据准备、GPU 实测、单个参考训练、完整实验、合成流程检查 |
-| `baselines/tsactfer.py`、`tsactfer_data.py` | TSA-cTFER独立双头表征模型与明确的数据适配 |
-| `tools/experiments/` | CDF1验证入口、净纠错/新增错误及7臂完整V缓存；TSA有界首训入口 |
-| `configs/pilot.json`、`configs/smoke.json` | 正式规模候选配置与独立的小模型检查配置 |
-| `tests/` | 数据隔离、模型梯度、冻结选择、缓存、评价与失败路径测试 |
-| `tools/pilot/` | 原有环境检查与 ZIP 审计脚本，仍可仅用标准库运行 |
-| `HandOver/` | 按 `handover_id` 逐轮保存的请求与回执文件、交接索引和小型执行证据 |
+| `association/data.py`、`dataset.py` | 原生Level2 ZIP、A–B身份标签、共享A组件隔离、异常记录与时间配准 |
+| `association/models.py`、`reference.py` | TCM/TAM训练、验证选择、权重恢复与冻结分数缓存 |
+| `association/context.py`、`heads.py` | 校准、CDF1及机制对照 |
+| `association/metrics.py`、`pipeline.py` | 评价与完整pilot；后者包含测试阶段，不属于当前011任务 |
+| `association/cli.py`、`profile.py` | 数据准备、单参考训练、成本探测和合成检查 |
+| `baselines/tsactfer.py`、`tsactfer_data.py` | TSA-cTFER双头模型及离线数据适配 |
+| `tools/experiments/` | CDF1验证、错误迁移与缓存导出、TSA有界首训 |
+| `configs/`、`tests/`、`tools/pilot/` | 配置、测试、原有环境与ZIP审计工具 |
+| `HandOver/` | 每轮请求、回执与小型原始证据 |
 
-正式模型在服务器明确使用 **`--device cuda:0`**，它是 UUID 绑定后的进程内编号，不固定物理卡；CUDA 不可用会失败，不会自动退到 CPU。代码当前按单卡执行，并行任务数仍由每轮预算指定，不自动占满设备。允许共卡，但不得终止他人进程；回执记录硬件、资源快照和共卡情况，受竞争影响的耗时/显存不能作为独占 benchmark。数据读取、统计和指标计算在 CPU，神经网络前后向和优化在所选 GPU。
+## 本地接口与检查
 
-首次确定或改变 Python/PyTorch/CUDA 版本约束时，由本地依据服务器环境决定；已经批准的同 pin 环境修复由服务器在本轮预算内自主处理。不要根据 Mac 的 CPU 验证环境安装服务器 PyTorch。已有兼容 PyTorch 后可在仓库根目录执行 `python -m pip install -e .`。依赖范围见 `pyproject.toml`；实际 Python / PyTorch / CUDA 版本随运行报告记录。
-
-### 使用与检查
-
-以下是接口示例，不替代当前 HandOver 任务。完整命令与产物见 [执行协议](docs/pilot_execution.md) 和 [GPU 执行说明](docs/gpu_execution.md)。
+已有兼容依赖后可用 `python -m pip install -e .` 安装；依赖范围见 `pyproject.toml`，服务器版本约束与实际命令以交接为准。
 
 ```bash
 python -m association.cli --help
 python -m unittest discover -s tests
 python -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py'
-python -m association.cli smoke --output runs/SMOKE-unique --device cpu
 ```
 
-合成 smoke 会真实训练四个小参考模型和所有上下文对照，保存并重新载入权重，再生成测试报告；其分数没有科研意义，且该示例不是当前正式任务。ENV-005已通过合成CUDA smoke；010已有真实短训耗时、显存及开发验证结果，尚不能证明收敛。011的TSA已完成，CDF1/A_full仍在途。本地早期检查结果见 [验证记录](docs/verification-2026-10-16.md)，当前进展和下一步以 [交接索引](HandOver/Handover.md) 为准。
-
-所有输出使用新目录，已存在即拒绝覆盖；失败保留 `run.json`、已有曲线和缓存。数据、PDF、权重、大日志与 `runs/` 不进 Git。任何参数、划分或模型变更都由本地提交并在后续交接明确记录。
+这些是开发检查，不授权重跑已完成的环境验收、smoke或训练。历史回执保留原貌，旧规则与现行授权冲突时以[AGENTS](AGENTS.md)和用户最新指示为准。
