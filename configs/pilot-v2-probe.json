@@ -1,0 +1,63 @@
+{
+  "protocol": "MTAD-Level2-AB-identity-staged-training-v2-probe",
+  "model": {
+    "input_dim": 4,
+    "d_model": 128,
+    "nhead": 8,
+    "num_layers": 6,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "length": 64,
+    "margin": 1.0
+  },
+  "split_seed": 20261016,
+  "caps": {
+    "T_core": 512,
+    "T_head": 128,
+    "V_select": 64,
+    "T_test": 128
+  },
+  "seeds": [
+    20
+  ],
+  "reference": {
+    "schedule": "staged_updates_v2",
+    "purpose": "probe",
+    "tcm_updates": 8,
+    "tam_updates": 4,
+    "joint_updates": 2,
+    "batch_tracks": 64,
+    "pair_batch_size": 64,
+    "learning_rate": 0.002,
+    "weight_decay": 0.0,
+    "max_hours": 0.5,
+    "completion_weight": 0.1,
+    "gradient_clip": 1.0,
+    "validate_every_updates": 500,
+    "completion_cache_mib": 64
+  },
+  "heads": {
+    "epochs": 40,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "deltas": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "max_hours": 3,
+    "calibration_steps": 200
+  },
+  "evaluation": {
+    "bootstrap_samples": 2000,
+    "minimum_components": 10
+  },
+  "implementation_notes": {
+    "scope": "Training-only feasibility probe; not an eligible or converged reference.",
+    "authorization": "Requires a new indexed L2S after EVIDENCE-009 terminal review and dataset-usage audit; this file is not a server task.",
+    "data": "Reuse original Level2 prepared manifest; Level1/2 are not presumed independent train/test partitions.",
+    "stages": "Fixed-embedding TCM pretraining, frozen embedding+TCM TAM, then joint association+0.1 completion.",
+    "sampling": "Class-conditioned uniform scene then uniform within-scene pair; 32 positive and 32 negative; no same-source exclusion.",
+    "precision": "FP32; production model dimensions retained; no architecture reduction."
+  }
+}

@@ -1,5 +1,7 @@
 # CDF1 pilot execution protocol
 
+2026-10-17: the commands and epoch schedule below describe the preserved legacy protocol. The opt-in [v2 schedule](specs/staged-training-v2.md) adds `probe-training` and a separate update-bounded fit path. `configs/pilot-v2-probe.json` is ineligible for `train-reference`, `profile`, or `run-pilot`, and is not a server dispatch. The current task remains EVIDENCE-009. New native execution waits for its terminal review and the requested dataset-level usage audit; no full eight-fit campaign is authorized by the presence of implementation code.
+
 These interfaces are implemented. They are **not** the current server task: read the `HandOver/Handover.md` index and its selected round file before executing anything. The current handover names the authorized environment/preflight/experiment stage. The local AI makes research and implementation decisions; the server AI owns execution and monitoring.
 
 ## Reproducible inputs

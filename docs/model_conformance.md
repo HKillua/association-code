@@ -1,5 +1,7 @@
 # TMTAFF-style association reference: conformance and explicit choices
 
+2026-10-17 update: the historical epoch trainer below remains available unchanged. The opt-in `staged_updates_v2` trainer implements update-bounded TCM pretraining, frozen embedding+TCM TAM training, and a short joint stage, with class-balanced within-scene pairs. Frozen completion caches contain only TCM outputs, never learned TAM outputs. These are explicit new training choices described in [the v2 contract](specs/staged-training-v2.md), not newly discovered author-code details. No formal v2 native fit has run; Level1/Level2 paper usage and EVIDENCE-009 must be reviewed before new dispatch.
+
 This code is an independently implemented TCM + TAM **association reference**. It does not implement TFM, reproduce the authors' joint three-module training, or establish performance on the authors' unpublished preprocessing/split. The source examined is *Transformer-based Multi-target Track Association and Fusion Framework*, DOI [10.3390/app16147251](https://doi.org/10.3390/app16147251), especially PDF pp. 6–12 and 15–16. Source paper labels, official MTAD V4 labels, and this pilot's A–B identity protocol must not be conflated.
 
 ## Implemented correspondences

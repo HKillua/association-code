@@ -43,6 +43,8 @@ def profile_reference(archive_path, manifest, config, role, branch, seed, device
     if not math.isfinite(max_minutes) or not 0 < max_minutes <= 30:
         raise ValueError("profile max_minutes must be in (0, 30]")
     model_config, ref = _check_configuration(config, role, branch)
+    if ref.get("schedule", "legacy") == "staged_updates_v2":
+        raise ValueError("profile is for the legacy schedule; use probe-training with a v2 probe configuration")
     validate_manifest_config(manifest, config)
     device = torch.device(device)
     if device.type not in ("cpu", "cuda"):
