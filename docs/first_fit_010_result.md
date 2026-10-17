@@ -6,7 +6,7 @@
 
 原件在[010结果目录](../HandOver/results/FIRST-FIT-20261017-010)：command、exit_code=0、stdout完成、stderr空、run.json COMPLETED/eligible_reference=true。run中的实际配置与既定配置一致。19:29:56–21:31:08（北京时间），外层7272秒，训练入口7256.06秒；单次、单卡，峰值分配10.38GiB。GPU快照只支持启动时状态，不证明全程独占。
 
-本地没有完整summary/history及V_select分数。下面的混淆矩阵来自[服务器原回执](../HandOver/S2L-20261017-010.md)，本地已独立重算其算术；macro-F1与阈值仍为回执报告，待已有缓存到齐复算。按用户最新指示，本轮及后续不做SHA判别，不为缺hash追加取证。
+011已补回010的完整V_select分数、summary指标子集和两次history selection，本地完整缓存复算一致；大summary与checkpoint仍留服务器。下面保留010阶段的混淆矩阵与判读；后续独立复算及TSA比较集中在[011阶段分析](results/compare011_interim/README.md)。按用户最新指示，两端不做SHA判别。
 
 ## 指标与已更正的分母
 
@@ -27,14 +27,12 @@
 
 训练候选正例比例110733/18249384=0.6068%；32:32训练相对它的正例比例放大82.40倍，正负odds放大163.81倍。“比例约165倍”混淆了比例与odds。训练分布差异需要披露，不能只凭它解释全部效果或直接更改采样。
 
-joint的验证指标优于冻结阶段，而mini-batch损失没有清晰下降趋势；现有证据不足以作收敛或因果归因。当前尚无外部baseline或CDF1比较，不能据此宣称创新成功/优于论文。
+joint的验证指标优于冻结阶段，而mini-batch损失没有清晰下降趋势；现有证据不足以作收敛或因果归因。011已补回TSA离线适配比较，CDF1/A_full仍无终态回传；不能据此宣称创新成功或优于完整论文系统。
 
 ## 成本与直接下一步
 
 服务器报告preparation55.5秒、TCM304.5秒、冻结TAM2225.9秒、joint2411.5秒、final_caches2254秒。缓存约37.6分钟，占整轮约31%；这解释了训练更新结束后仍收尾较久。阶段时间包含其验证等工作，不能都当作纯训练步时。
 
-1. 下一轮直接复制已有summary中的完整validation/selected字段及两条history selection、完整V_select缓存。25.6MB summary不整份提交；不重跑010或做新GPU评估。
-2. CDF1/TSA代码已整合本地main，011待发布。正式READY交接后复用010的T_head/V_select缓存训练CDF1与全部现有机制对照≤3h；A_full同100/100/20≤3h；TSA独立离线适配≤6h。总新增≤12GPUh、最多两单卡同时、各一次无重试。
-3. 第一张表报告全量V_select与原论文适用共同子集、同源/跨源、净纠错与新增错误、成本和训练量。CDF1入口已提供7臂完整V_select缓存和实际纠错/新增错误边例，可在缓存到齐后直接复算共同子集。先固定的验证开发比较，T_test继续封存。
+010所需补充指标与完整V_select缓存已由011回传，不再重复取证或训练。CDF1/A_full仍按011原交接收尾；TSA结果及全量/共同子集比较见[011阶段分析](results/compare011_interim/README.md)，剩余比较范围见[011范围说明](next_experiments_after_010.md)。
 
-完整下一阶段范围见[实验计划](next_experiments_after_010.md)。缺原始指标只限制当前结论力度，不阻塞使用服务器已有完成产物推进已授权实验。
+全课题下一步集中在[研究说明](research_brief.md)：补齐不完整量测下的补全、关联、融合完整链路。010/011关联短训不等于完整TMTAFF复现；本页不另发训练任务，T_test继续封存。
