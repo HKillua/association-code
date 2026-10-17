@@ -177,6 +177,22 @@ class AssociationModel(nn.Module):
         for (start, end), members in groups.items():
             yield start, end, torch.tensor(members, dtype=torch.long, device=observed.device)
 
+    def _decode_causal_history(self, history: Tensor, memory: Tensor) -> Tensor:
+        """Use the same prefix visibility in teacher forcing and endpoint rollout.
+
+        Memory contains only the observed sequence. Once history grows with
+        generated points, cross attention is rectangular: observed prefix query
+        i can access memory j <= i, while generated queries can access all
+        observed memory. Earlier decoder queries must remain causal too, since
+        later decoder layers attend to their outputs.
+        """
+        mask = _causal_mask(history.shape[1], history.device)
+        memory_mask = (
+            torch.arange(memory.shape[1], device=history.device)[None, :]
+            > torch.arange(history.shape[1], device=history.device)[:, None]
+        )
+        return self.tcm_decoder(history, memory, tgt_mask=mask, memory_mask=memory_mask)
+
     def _teacher_predictions(self, history: Tensor) -> Tensor:
         """Predict each next embedding with access only to its historical prefix.
 
@@ -186,7 +202,7 @@ class AssociationModel(nn.Module):
         """
         mask = _causal_mask(history.shape[1], history.device)
         memory = self.tcm_encoder(history, mask=mask)
-        return self.tcm_decoder(history, memory, tgt_mask=mask, memory_mask=mask)
+        return self._decode_causal_history(history, memory)
 
     def completion_loss(self, values: Tensor, observed: Tensor) -> Tensor:
         """Bidirectional next-embedding MSE on observed points only.
@@ -217,14 +233,14 @@ class AssociationModel(nn.Module):
         """Predict future embeddings autoregressively from known context only."""
         if steps == 0:
             return sequence[:, :0]
-        # Encode the entire observed context (all of which is historical to the
-        # extrapolation). Decoder history grows with predictions, never targets.
-        memory = self.tcm_encoder(sequence)
+        # Match teacher forcing's prefix representations, including earlier
+        # memory tokens. Merely hiding future targets in the final decoder query
+        # would not make a multilayer decoder's training/rollout paths agree.
+        memory = self.tcm_encoder(sequence, mask=_causal_mask(sequence.shape[1], sequence.device))
         history = sequence
         predictions = []
         for _ in range(steps):
-            mask = _causal_mask(history.shape[1], history.device)
-            decoded = self.tcm_decoder(history, memory, tgt_mask=mask)
+            decoded = self._decode_causal_history(history, memory)
             prediction = decoded[:, -1:]
             predictions.append(prediction)
             history = torch.cat((history, prediction), dim=1)

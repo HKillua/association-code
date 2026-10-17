@@ -199,7 +199,7 @@ def align_reference_states(reference_scene, identity_id, query_times, *,
     report['valid_per_feature'] = dict(zip(STATE_FIELDS, valid.sum(axis=0).tolist()))
     report['fully_valid_queries'] = int(valid.all(axis=1).sum())
     report['unavailable_queries'] = int((~valid.any(axis=1)).sum())
-    return {'states': states, 'valid': valid, 'report': report}
+    return {'states': states, 'valid': valid, 'query_times': query.copy(), 'report': report}
 
 
 def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
@@ -312,3 +312,39 @@ def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
     }
     return {'pairs': pairs, 'identity_ids': identity_ids, 'query_times': query,
             'states': states, 'valid': valid, 'report': report}
+
+
+def build_scene_fusion_targets(prepared_scene, reference_scene, *, target_identity_ids,
+                               time_offset_seconds, max_gap_seconds):
+    """Build every explicitly declared scene target, including unavailable ones.
+
+    The caller supplies the complete task population from its frozen labels,
+    not only successfully associated pairs or identities found in reference CSVs.
+    Extra reference identities do not silently enlarge the task. All input node
+    identities must be present. The returned mapping fits the complete trainer's
+    ``fusion_targets`` field; no observation field is modified or synthesized.
+    Clock offset and maximum interpolation gap are mandatory, with no inference.
+    """
+    if not isinstance(prepared_scene, Mapping) or not isinstance(reference_scene, Mapping):
+        raise DataError('Already-read observation and reference scenes are required')
+    split = prepared_scene.get('split')
+    if split not in ALLOWED_SPLITS or reference_scene.get('split') != split:
+        raise DataError('Matching training/development splits required; T_test is sealed')
+    if not prepared_scene.get('scene_id') or prepared_scene['scene_id'] != reference_scene.get('scene_id'):
+        raise DataError('Observation and reference scene IDs must match')
+    if isinstance(target_identity_ids, (str, bytes)):
+        raise DataError('target_identity_ids must be an explicit complete sequence')
+    identities = list(target_identity_ids)
+    if (any(not isinstance(identity, str) or len(identity.split('-')) != 2
+            or not all(identity.split('-')) for identity in identities)
+            or len(identities) != len(set(identities))):
+        raise DataError('target identities must be distinct nonempty A-B identities')
+    if not set(prepared_scene['identities']).issubset(identities):
+        raise DataError('Every input identity requires a target row, including unavailable references')
+    # Validate query and alignment settings even for a truly empty scene.
+    if not identities:
+        align_reference_states(reference_scene, '__empty__-__validation__', prepared_scene['grid'],
+                               time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+    return {identity: align_reference_states(reference_scene, identity, prepared_scene['grid'],
+                        time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+            for identity in identities}
