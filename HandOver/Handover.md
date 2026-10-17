@@ -9,10 +9,10 @@
 | [L2S-20261017-010](L2S-20261017-010.md) | [S2L-20261017-010](S2L-20261017-010.md) | `d13ac65dc59b9c9b16b59a93f7044eb49aefb568` | SERVER_AI：完成当前运行并回传终态 |
 
 - 单个 A0/CE/seed20：TCM100 → 冻结 TAM100 → joint20，累计上限6小时、一次尝试、重试0。复用007划分，完整 V_select 选模，T_test 封存。当前没有第二项 READY 任务。
-- **最新服务器快照：2026-10-17 21:21。** 220/220 次更新已全部完成（TCM100、TAM_FROZEN100、JOINT20），当前在 `final_caches` 生成 T_head 分数缓存，`summary.json` 与原始结果文件尚未产出；峰值分配 10.38 GiB，已用约 111 分钟／360 分钟，GPU1 当时仍空闲。仍是中期文字回执，不是终态。
-- **服务器更正（前两份中期回执有错）：** 我在 20:31 与 21:21 写的"验证指标条目仍为 0"是**错误结论**——我只查了 `history` 条目的顶层字段。按本地的代码核对提示改查 `selection` 后确认验证早已存在，实测（`TAM_FROZEN@100` 在 V_select 64 场景、29,008 对）：阈值 `−3.997e−05`，**tp 3287 / fp 25540 / fn 10 / tn 171**，`micro_precision` 0.11403、`micro_recall` 0.99697、`micro_f1` 0.20464、`macro_f1` 0.34912、`p_fa` 0.88597，即该阈值下**接受了 99.4% 的候选对**。同集合正例先验为 3297/29008 = **11.366%**，与 `micro_precision` 11.403% 相差仅 0.3%，也就是接受集合的正例密度与随机基线无实质差异。同时接受本地提醒：**不能仅凭 loss 接近 ln2 判定随机**——上面这条是实测混淆矩阵而非 loss 推断，且 joint 结束的完整验证与 `summary.json` 才是终态依据。
-- **本地代码核对：** 验证字段位于 `history[*].selection`；完整已选指标也在 `progress.stages[*].starts_from_selection.validation`（joint阶段）及 checkpoint 的 selection 中。按冻结代码，进入joint意味着已完成冻结阶段完整验证并载入checkpoint；回执“验证条目0”不能由顶层字段缺失推出。终态按原010要求回传实际指标，不能仅据loss接近ln2判定模型随机。
-- **接下来：** 用户明确要求baseline复现与创新验证并行：复用010缓存跑CDF1及机制对照，同时准备同数据A_full参考和独立TSA-cTFER适配，新增总预算仍≤12GPU小时。先收010终态；隔离分支可准备代码，尚无011或新作业。具体比较和预算见[下一阶段方案](../docs/next_experiments_after_010.md)。
+- **最近已审服务器：`f19071c5c97e56c727797d58a5b66b5e5321af21`，21:21进度/21:30更正。** 报告220/220更新完成，仍在final_caches、约111分钟/360分钟；没有终态、原始JSON或完整缓存回传，不能提前视为合格reference。
+- 冻结TAM阶段服务器报告macro-F1=0.349116、micro-F1=0.204645，接受99.376%候选。根据其混淆矩阵重算，precision=11.4025%，正例占比=11.3658%，相差0.0367个百分点；全接受的micro-F1=0.204117。此选定阈值的区分效果很弱，但尚不能据此判断完整排序或joint最终表现；终态核原始分数，不用loss≈ln2直接判失败。
+- 服务器已更正“没有验证指标”的误报：字段在`history[*].selection`及joint的`starts_from_selection.validation`。完整细节保留在原S2L，不再复制到索引。
+- **本地已备好下一阶段代码：** 隔离分支`research/innovation-pilot-v1`的CDF1验证入口，以及TSA-cTFER独立离线适配，最新`8176ca34c5d81baa38dee36e0b8d766729aa91d6`，19项相关CPU测试通过。main执行代码未变；没有真实TSA/CDF1结果。010终态后整合并分别给确切code_commit、独立L2S和新路径，当前无011。新增预算仍CDF1≤3h＋A_full≤3h＋TSA≤6h、最多两作业并发；[下一阶段方案](../docs/next_experiments_after_010.md)。
 
 ## 必要约束
 

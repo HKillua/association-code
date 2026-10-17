@@ -9,7 +9,7 @@
 | 主要参考 | 010的TMTAFF风格TCM+TAM，以及同等可用训练数据的A_full参考 | A0在服务器运行；A_full尚未执行 |
 | 候选创新 | CDF1：用第三片段的共同支持/单侧矛盾，对原始成对分数做一次有界修正 | 模块和训练已实现，尚无真实实验；最小验证入口已在隔离分支完成并通过合成集成测试 |
 | 机制对照 | A_prime、EndpointMarginal、PairMLP、ScenePool、FixedRule、B_shuffle | 原heads接口已实现，和CDF1一起跑，不靠删对照制造收益 |
-| 独立文献baseline | TSA-cTFER表征/成对评分离线适配；后续补齐其他baseline | 已有全文，代码尚未实现；其开发与CDF1并行，不以CDF1先成功为前提 |
+| 独立文献baseline | TSA-cTFER表征/成对评分离线适配；后续补齐其他baseline | 独立模型、数据适配及有界训练入口已在隔离分支实现/测试；待010终态后整合与正式交接 |
 
 CE/contrastive是同底座的损失分支，不算两个独立文献baseline。ED/DTW是有价值的快速参照，但不能替代强baseline；原论文融合方法另属融合评价，不能与当前关联F1混排。
 
@@ -41,7 +41,13 @@ CE/contrastive是同底座的损失分支，不算两个独立文献baseline。E
 
 最多两个GPU作业并发，按就绪情况安排，不以某条研究线先成功作为另一条启动条件。各作业一次无重试，CPU线程4，加载/训练/验证/缓存/退出宽限计入各自上限；A_full原配置内6小时不能越过本轮外层3小时。它是短训练可行性参照，不宣称收敛。若时限不够，保留真实失败/部分结果并说明比较缺项，不静默扩预算或删对照。原拟额外CE500步和contrastive训练暂不启动，避免挤掉创新验证；后续依据曲线补强参考，而非故意保持弱对手。
 
-当前010仍RUNNING，最新已审服务器为1d44d60的20:31中期。CDF1验证入口已提交并push隔离分支 `research/innovation-pilot-v1` / `f5198a1959544d39ee2b0d9e5ca4b845e35b36db`；只新增tools入口/说明/两项测试，不改association代码，010 fingerprint保持不变。两个真实小合成集成测试通过：完成引用可在删除archive后训练所有heads并输出表；未完成引用会在head训练前拒绝，旧输出不覆盖。它尚未在真实MTAD上运行；TSA-cTFER实现仍待完成。终态后整合必要代码，再发独立L2S、确切已存在code_commit和新路径。**本页不是READY任务，目前没有011或上述新作业的执行证据。** 不调用现有run-pilot：它会扩为多参考训练并打开T_test，超出本轮范围。
+当前010仍RUNNING，最新已审服务器为`f19071c`：21:21报告220/220更新完成，仍在final_caches，21:30更正验证字段并报告冻结TAM指标。没有原始JSON/终态，不能提前启动后续任务。
+
+隔离分支`research/innovation-pilot-v1`已push：CDF1验证入口`f5198a1`；独立TSA-cTFER模型、数据适配、配置与入口`8176ca34c5d81baa38dee36e0b8d766729aa91d6`。17项TSA测试及2项CDF1集成测试通过，包含真实小合成双任务训练/验证/权重重载/缓存复算及测试集封存。association源码fingerprint仍699a669f8c6f9c50c6b1bb57a3fe27e0e2b985ba36a70d2f1379604f8ecade2a，不使010缓存失效。**这些是实现验证，没有真实TSA/CDF1成绩；代码未合入RUNNING的main。**
+
+TSA配置在分支的`configs/tsactfer-first-fit.json`，完整对应说明`docs/tsactfer_adaptation.md`。4层64维4头/FF256/128槽、双头InfoNCE温度0.07；共同scene64注册输入装入128槽，非原始最新128量测复现。仅T_core训练；按原文任务适用范围构正对，每批512互异AB身份，ITSA/MSTSA交替1000次optimizer调用（999次非零LR），LR1e-4、67步warmup后半余弦、每100步完整V_select；FP32/seed20/≤6h。未公开参数均列为适配选择，实际474,624参数，非作者0.674M精确复现；原生身份池不足不自动缩batch。首次结果需保留全候选主表，并对所有方法用相同论文适用子集与各自已选阈值重算补充表。
+
+终态后整合必要代码，再发独立L2S、确切已存在code_commit和新路径。**本页不是READY任务，目前没有011或上述新作业的执行证据。** 不调用现有run-pilot：它会扩为多参考训练并打开T_test，超出本轮范围。
 
 ## 给导师的最小证据包
 
