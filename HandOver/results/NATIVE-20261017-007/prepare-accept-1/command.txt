@@ -1,0 +1,1 @@
+env CUDA_VISIBLE_DEVICES= /home/wangguangjie/djs/mtad-field-20261016/bin/python - runs/PREP-NATIVE-20261017-007-attempt-1 

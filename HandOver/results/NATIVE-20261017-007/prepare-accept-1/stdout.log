@@ -1,0 +1,44 @@
+{
+  "status": "COMPLETED",
+  "prepared": "runs/PREP-NATIVE-20261017-007-attempt-1",
+  "manifest_sha256": "0b4df901d075776973c209e835ac6d2a7bd95dc978c7f88a718b6ea274ee354c",
+  "archive": {
+    "name": "\u6570\u636e\u96c6level2.zip",
+    "bytes": 924486019,
+    "sha256": "513d96e9d763544575ddec99c7e91f834aec43fc8da5a39494d2760f920d7e78"
+  },
+  "split_counts": {
+    "T_core": {
+      "assigned_scenes": 4014,
+      "selected_scenes": 512,
+      "assigned_components": 65,
+      "selected_components": 33,
+      "largest_selected_component_scenes": 234
+    },
+    "T_head": {
+      "assigned_scenes": 399,
+      "selected_scenes": 128,
+      "assigned_components": 45,
+      "selected_components": 27,
+      "largest_selected_component_scenes": 23
+    },
+    "V_select": {
+      "assigned_scenes": 426,
+      "selected_scenes": 64,
+      "assigned_components": 44,
+      "selected_components": 17,
+      "largest_selected_component_scenes": 28
+    },
+    "T_test": {
+      "assigned_scenes": 161,
+      "selected_scenes": 128,
+      "assigned_components": 44,
+      "selected_components": 38,
+      "largest_selected_component_scenes": 30
+    }
+  },
+  "files": {
+    "manifest.json": "fb83308d1747b21f55510eb2c5fc69730917fa8781f280a8c59d68f974aa7071",
+    "audit.json": "032cd85c1016488dd2203a36569c7d47958d464b54bdc7a75998b5b534754060"
+  }
+}

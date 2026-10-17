@@ -1,0 +1,11 @@
+{
+  "archive": "/home/wangguangjie/djs/data/mtad/\u6570\u636e\u96c6level2.zip",
+  "bytes": 924486019,
+  "md5": "8ddcea161a49b47ecdac72ae45804438",
+  "config_file_sha256": "d547497656b54ae0625725c26f610c9a3aaaa13e5cda6f6b038016e654a26cc6",
+  "python": "3.11.7",
+  "numpy": "1.26.4",
+  "torch": "2.5.1+cu121",
+  "cuda_build": "12.1",
+  "association_source": "/home/wangguangjie/djs/association-code/association/__init__.py"
+}
