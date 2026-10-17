@@ -15,7 +15,7 @@ import numpy as np
 import torch
 
 from .data import validate_manifest
-from .config import validate_manifest_config
+from .config import validate_config, validate_manifest_config
 from .dataset import load_split
 from .metrics import evaluate_scenes, select_threshold
 from .models import AssociationModel, ModelConfig
@@ -126,21 +126,11 @@ def cache_binding(summary, split):
 
 
 def _check_configuration(config, role, branch):
+    config = validate_config(config)
     if role not in ("A0", "A_full") or branch not in ("ce", "contrastive"):
         raise ValueError("reference requires role A0/A_full and branch ce/contrastive")
     model_config = ModelConfig(**config["model"])
     ref = config["reference"]
-    for key in ("tcm_epochs", "tam_epochs", "batch_tracks", "pair_batch_size"):
-        if not isinstance(ref[key], int) or isinstance(ref[key], bool) or ref[key] < 1:
-            raise ValueError(f"reference.{key} must be a positive integer")
-    if ref.get("warmup_epochs", 20) < 0:
-        raise ValueError("warmup_epochs cannot be negative")
-    for key in ("learning_rate", "max_hours"):
-        if not math.isfinite(ref[key]) or ref[key] <= 0:
-            raise ValueError(f"reference.{key} must be finite and positive")
-    for key in ("weight_decay", "completion_weight"):
-        if not math.isfinite(ref.get(key, 0)) or ref.get(key, 0) < 0:
-            raise ValueError(f"reference.{key} must be finite and nonnegative")
     return model_config, ref
 
 
@@ -194,6 +184,11 @@ def _coverage(scenes):
 def train_reference(archive_path, manifest, config, role, branch, seed, device, output):
     """Train one bounded reference fit; output must not exist, including failed runs."""
     model_config, ref = _check_configuration(config, role, branch)
+    if ref.get("schedule", "legacy") == "staged_updates_v2":
+        if ref["purpose"] != "fit":
+            raise ValueError("probe configuration requires probe-training; it is not an eligible reference")
+        from .staged import train_staged_reference
+        return train_staged_reference(archive_path, manifest, config, role, branch, seed, device, output)
     validate_manifest_config(manifest, config)
     device = torch.device(device)
     binding = _binding(manifest, config, role, branch, seed)
@@ -343,7 +338,9 @@ def train_reference(archive_path, manifest, config, role, branch, seed, device, 
 def load_reference(path, manifest, config, role, branch, seed, device):
     """Reject incomplete, modified, stale-code/config/manifest references."""
     path = Path(path)
-    model_config, _ = _check_configuration(config, role, branch)
+    model_config, ref = _check_configuration(config, role, branch)
+    if ref.get("schedule", "legacy") == "staged_updates_v2" and ref["purpose"] != "fit":
+        raise ValueError("probe configuration cannot load an eligible reference")
     validate_manifest_config(manifest, config)
     run = runtime.read_json(path / "run.json")
     if run.get("status") != "COMPLETED":

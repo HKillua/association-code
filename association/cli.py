@@ -19,7 +19,7 @@ def _parser():
     prepare.add_argument('--archive', required=True)
     prepare.add_argument('--config', default='configs/pilot.json')
     prepare.add_argument('--output', required=True)
-    for name in ('train-reference', 'run-pilot', 'profile'):
+    for name in ('train-reference', 'run-pilot', 'profile', 'probe-training'):
         command = sub.add_parser(name)
         command.add_argument('--archive', required=True)
         manifest = command.add_mutually_exclusive_group(required=True)
@@ -29,7 +29,7 @@ def _parser():
         command.add_argument('--output', required=True)
         command.add_argument('--device', required=True, help='Explicit cuda:0 on server; cpu for local checks')
         command.add_argument('--cpu-threads', type=int, default=4)
-        if name in ('train-reference', 'profile'):
+        if name in ('train-reference', 'profile', 'probe-training'):
             command.add_argument('--role', choices=['A0', 'A_full'], required=True)
             command.add_argument('--branch', choices=['ce', 'contrastive'], required=True)
             command.add_argument('--seed', type=int, required=True)
@@ -68,6 +68,16 @@ def main(argv=None):
     args = _parser().parse_args(argv)
     try:
         config = load_config(args.config)
+        reference = config['reference']
+        staged = reference.get('schedule', 'legacy') == 'staged_updates_v2'
+        if args.command == 'probe-training':
+            if not staged or reference['purpose'] != 'probe':
+                raise ValueError('probe-training requires staged_updates_v2 with purpose=probe')
+        elif staged:
+            if args.command == 'profile':
+                raise ValueError('profile is for the legacy schedule; use probe-training')
+            if reference['purpose'] == 'probe' and args.command in ('train-reference', 'run-pilot', 'smoke'):
+                raise ValueError('probe configuration requires probe-training; it cannot run a formal experiment')
         if args.command == 'prepare':
             from .dataset import prepare
             prepare(args.archive, config, args.output)
@@ -99,6 +109,10 @@ def main(argv=None):
                         from .reference import train_reference
                         train_reference(args.archive, manifest, config, args.role, args.branch,
                                         args.seed, device, args.output)
+                    elif args.command == 'probe-training':
+                        from .staged import train_staged_reference
+                        train_staged_reference(args.archive, manifest, config, args.role, args.branch,
+                                               args.seed, device, args.output)
                     else:
                         from .profile import profile_reference
                         profile_reference(args.archive, manifest, config, args.role, args.branch,

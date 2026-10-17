@@ -40,16 +40,37 @@ def validate_config(config):
     for seed in seeds:
         _number(seed, 'seed', integer=True, positive=False)
     reference, heads, evaluation = config['reference'], config['heads'], config['evaluation']
-    for name in ('tcm_epochs', 'tam_epochs', 'batch_tracks', 'pair_batch_size'):
+    schedule = reference.get('schedule', 'legacy')
+    if schedule not in ('legacy', 'staged_updates_v2'):
+        raise ValueError('Unknown reference.schedule')
+    for name in ('batch_tracks', 'pair_batch_size'):
         _number(reference[name], f'reference.{name}', integer=True)
-    _number(reference['warmup_epochs'], 'warmup_epochs', integer=True, positive=False)
-    if not isinstance(reference['joint_completion'], bool):
-        raise ValueError('joint_completion must be boolean')
+    if schedule == 'legacy':
+        for name in ('tcm_epochs', 'tam_epochs'):
+            _number(reference[name], f'reference.{name}', integer=True)
+        _number(reference['warmup_epochs'], 'warmup_epochs', integer=True, positive=False)
+        if not isinstance(reference['joint_completion'], bool):
+            raise ValueError('joint_completion must be boolean')
+    else:
+        if reference.get('purpose') not in ('probe', 'fit'):
+            raise ValueError('staged_updates_v2 requires reference.purpose probe or fit')
+        if reference['pair_batch_size'] < 2 or reference['pair_batch_size'] % 2:
+            raise ValueError('staged_updates_v2 pair_batch_size must be even and >=2')
+        for name in ('tcm_updates', 'tam_updates', 'validate_every_updates'):
+            _number(reference[name], f'reference.{name}', integer=True)
+        for name in ('joint_updates', 'completion_cache_mib'):
+            _number(reference[name], f'reference.{name}', integer=True, positive=False)
+        _number(reference.get('gradient_clip', 1.0), 'reference.gradient_clip')
     for name in ('learning_rate', 'max_hours'):
         _number(reference[name], f'reference.{name}')
         _number(heads[name], f'heads.{name}')
     for name in ('weight_decay', 'completion_weight'):
         _number(reference[name], f'reference.{name}', positive=False)
+    if schedule == 'staged_updates_v2' and reference['purpose'] == 'probe':
+        for name, limit in (('max_hours', .5), ('tcm_updates', 8),
+                            ('tam_updates', 4), ('joint_updates', 2)):
+            if reference[name] > limit:
+                raise ValueError(f'probe reference.{name} must be <= {limit}')
     _number(heads['weight_decay'], 'heads.weight_decay', positive=False)
     for name in ('epochs', 'calibration_steps'):
         _number(heads[name], f'heads.{name}', integer=True)

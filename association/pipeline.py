@@ -106,6 +106,8 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
     """
     validate_manifest(manifest)
     config = validate_config(config)
+    if config['reference'].get('purpose') == 'probe':
+        raise ValueError('probe configuration cannot run the full pilot; use probe-training')
     validate_manifest_config(manifest, config)
     device = torch.device(device)
     seeds = requested_seeds(config, seeds)
