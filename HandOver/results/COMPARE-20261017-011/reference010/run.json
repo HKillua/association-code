@@ -1,0 +1,87 @@
+{
+  "manifest_sha256": "0b4df901d075776973c209e835ac6d2a7bd95dc978c7f88a718b6ea274ee354c",
+  "config_hash": "2b863bb1f25ea02572758345998b3fc3d8849cff1fc9c5d47d05465382720643",
+  "code_fingerprint": "699a669f8c6f9c50c6b1bb57a3fe27e0e2b985ba36a70d2f1379604f8ecade2a",
+  "role": "A0",
+  "branch": "ce",
+  "seed": 20,
+  "kind": "association_reference",
+  "eligible_reference": true,
+  "config": {
+    "protocol": "MTAD-Level2-AB-identity-staged-v2-first-fit",
+    "model": {
+      "input_dim": 4,
+      "d_model": 128,
+      "nhead": 8,
+      "num_layers": 6,
+      "dim_feedforward": 256,
+      "dropout": 0.1,
+      "length": 64,
+      "margin": 1.0
+    },
+    "split_seed": 20261016,
+    "caps": {
+      "T_core": 512,
+      "T_head": 128,
+      "V_select": 64,
+      "T_test": 128
+    },
+    "seeds": [
+      20
+    ],
+    "reference": {
+      "schedule": "staged_updates_v2",
+      "purpose": "fit",
+      "tcm_updates": 100,
+      "tam_updates": 100,
+      "joint_updates": 20,
+      "batch_tracks": 64,
+      "pair_batch_size": 64,
+      "learning_rate": 0.002,
+      "weight_decay": 0.0,
+      "max_hours": 6,
+      "completion_weight": 0.1,
+      "gradient_clip": 1.0,
+      "validate_every_updates": 100,
+      "completion_cache_mib": 64
+    },
+    "heads": {
+      "epochs": 40,
+      "learning_rate": 0.001,
+      "weight_decay": 0.0001,
+      "deltas": [
+        0.5,
+        1.0,
+        2.0
+      ],
+      "max_hours": 3,
+      "calibration_steps": 200
+    },
+    "evaluation": {
+      "bootstrap_samples": 2000,
+      "minimum_components": 10
+    },
+    "implementation_notes": {
+      "scope": "First real A0/CE/seed20 training-validation experiment, not convergence or exact TMTAFF reproduction. Reuse the immutable 007 split; no test measurements. One fit, maximum 6 hours within the earlier 12-hour single-reference cap. No heads or multi-seed campaign."
+    }
+  },
+  "provenance": {
+    "python": "3.11.7",
+    "torch": "2.5.1+cu121",
+    "numpy": "1.26.4",
+    "device": "cuda:0",
+    "git_commit": "703569cda49c5c98d096abe1f9d714aa4e6442c7",
+    "git_dirty": true,
+    "code_sha256": "699a669f8c6f9c50c6b1bb57a3fe27e0e2b985ba36a70d2f1379604f8ecade2a",
+    "cuda_build": "12.1",
+    "cuda_visible_devices": "GPU-c5a00c37-f181-90b3-f220-be6e7457f473",
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "total_memory_bytes": 25438126080
+  },
+  "status": "COMPLETED",
+  "elapsed_seconds": 7256.058727182914,
+  "summary_sha256": "f48c91b16b09614fb930155ee2eb05ad2b96d56fb1242e8aeebe0bee62d7a4c5",
+  "checkpoint_sha256": "29982115bea2065f341e99fc49370396d10ef1369bd7269f4e1de33461bef3a3",
+  "cuda_process_peak_allocated_bytes": 11145768448,
+  "cuda_process_peak_reserved_bytes": 11293163520
+}

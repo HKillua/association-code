@@ -1,0 +1,75 @@
+{
+  "kind": "TSA-cTFER-offline-independent-adaptation-v1",
+  "binding": {
+    "scope": "TSA-cTFER-offline-independent-adaptation-v1",
+    "manifest_sha256": "0b4df901d075776973c209e835ac6d2a7bd95dc978c7f88a718b6ea274ee354c",
+    "protocol_config_sha256": "2b863bb1f25ea02572758345998b3fc3d8849cff1fc9c5d47d05465382720643",
+    "tsa_config_sha256": "92b9378c3efb4565cdb972fc6f14bfc98fa504ea8f2e14688243d2689a94cbd0",
+    "seed": 20,
+    "association_code_sha256": "d250ab12d6f370bee7ad1c2d75b82d65c7fc82045de4bc16edf7c55054dd5fc4",
+    "tsa_sources": {
+      "baselines/__init__.py": "60434be7840b967fce062d9c60646ffc62c6d6624b873a1c78b8180016ccab86",
+      "baselines/tsactfer.py": "cb95f4731cb3a76b4fb5781b59bee3dc55982c81d21906c9a3d91230652ec53b",
+      "baselines/tsactfer_data.py": "f70c8329265cc9628b077348a68cf3708eca5a47c5c23c2312864bcedd43be7d",
+      "tools/experiments/tsactfer_fit.py": "5458fa4ce9e516ed6ffb1af8a8ee96e5114353a0430a855b778dae97a144ad0a"
+    }
+  },
+  "config": {
+    "scope": "TSA-cTFER-offline-independent-adaptation-v1",
+    "seed": 20,
+    "model": {
+      "length": 128,
+      "d_model": 64,
+      "nhead": 4,
+      "num_layers": 4,
+      "dim_feedforward": 256,
+      "dropout": 0.1,
+      "time_bins": 4096
+    },
+    "data": {
+      "time_bin_seconds": 20.0,
+      "min_crop_fraction": 0.5
+    },
+    "training": {
+      "updates": 1000,
+      "warmup_updates": 67,
+      "pair_batch_size": 512,
+      "learning_rate": 0.0001,
+      "temperature": 0.07,
+      "gradient_clip": 1.0,
+      "validate_every_updates": 100,
+      "inference_batch_tracks": 256,
+      "max_hours": 6.0
+    }
+  },
+  "provenance": {
+    "python": "3.11.7",
+    "torch": "2.5.1+cu121",
+    "numpy": "1.26.4",
+    "device": "cuda:0",
+    "git_commit": "1b6da1ccfa4d467bc1b3562da6f6bf01337de00f",
+    "git_dirty": true,
+    "code_sha256": "d250ab12d6f370bee7ad1c2d75b82d65c7fc82045de4bc16edf7c55054dd5fc4",
+    "cuda_build": "12.1",
+    "cuda_visible_devices": "GPU-6811d9c0-b8a4-b5fd-0175-790964d42afc",
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "total_memory_bytes": 25438126080
+  },
+  "status": "COMPLETED",
+  "elapsed_seconds": 166.9424484120682,
+  "artifacts": {
+    "summary.json": "d2639adabfbb7953a9566c8847630badc60e359a41bc070ab3091efb59ecdf12",
+    "checkpoint.pt": "381daef1a9dffa39369cc9bb0c2d57b7fe9cd838438ea9bcc8c033f48d90f0fa",
+    "history.json": "256b324a6a164d2692d1937f85ca0cef9d4729d88cbefc475bb5a5ce1e5030ba",
+    "data_audit.json": "3bbd56d84ad0bfc5c6c25b4886d51f9e5569d34ebbee226cb5388c60f82f7914",
+    "V_select/index.json": "33a41183d079f4235c4a477976ed45a820d96ecd5e89f691e3571d02d15b04f2"
+  },
+  "phase_seconds": {
+    "data": 49.84150439593941,
+    "training": 110.66746465535834,
+    "validation": 3.0256046815775335,
+    "cache": 0.3629671158269048
+  },
+  "cuda_process_peak_allocated_bytes": 2776828416,
+  "cuda_process_peak_reserved_bytes": 2965372928
+}
