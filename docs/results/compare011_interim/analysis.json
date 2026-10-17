@@ -1,0 +1,916 @@
+{
+  "scope": "Interim, single-seed validation-selected comparison; CDF1/A_full not returned",
+  "sources": {
+    "A0": "HandOver/results/COMPARE-20261017-011/reference010",
+    "TSA": "HandOver/results/COMPARE-20261017-011/tsa/files"
+  },
+  "reproduces_both_reported_validation_dictionaries": true,
+  "thresholds": {
+    "A0": -2.7919209060200956e-06,
+    "TSA": 0.5529894828796387
+  },
+  "full": {
+    "A0": {
+      "scene_count": 64,
+      "pair_count": 29008,
+      "macro_f1": 0.42623722144897486,
+      "micro_f1": 0.2605793044040056,
+      "micro_precision": 0.1584080644105518,
+      "micro_recall": 0.7340006066120716,
+      "tp": 2420,
+      "fp": 12857,
+      "fn": 877,
+      "tn": 12854,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "fdr": 0.8415919355894482,
+      "fpr": 0.5000583407879896
+    },
+    "TSA": {
+      "scene_count": 64,
+      "pair_count": 29008,
+      "macro_f1": 0.5205464825878391,
+      "micro_f1": 0.34005258545135847,
+      "micro_precision": 0.21861997226074895,
+      "micro_recall": 0.764937822262663,
+      "tp": 2522,
+      "fp": 9014,
+      "fn": 775,
+      "tn": 16697,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "fdr": 0.7813800277392511,
+      "fpr": 0.35058924195869473
+    }
+  },
+  "by_source": {
+    "A0": {
+      "itsa": {
+        "scene_count": 64,
+        "pair_count": 14609,
+        "macro_f1": 0.4527442187540371,
+        "micro_f1": 0.26716738197424894,
+        "micro_precision": 0.15990238890315953,
+        "micro_recall": 0.8116036505867015,
+        "tp": 1245,
+        "fp": 6541,
+        "fn": 289,
+        "tn": 6534,
+        "negative_scene_count": 0,
+        "negative_scene_false_acceptance_rate": null,
+        "fdr": 0.8400976110968404,
+        "fpr": 0.5002676864244742
+      },
+      "mstsa": {
+        "scene_count": 64,
+        "pair_count": 14399,
+        "macro_f1": 0.3996444154640654,
+        "micro_f1": 0.2539442403285066,
+        "micro_precision": 0.15685489253771193,
+        "micro_recall": 0.6664775950085082,
+        "tp": 1175,
+        "fp": 6316,
+        "fn": 588,
+        "tn": 6320,
+        "negative_scene_count": 0,
+        "negative_scene_false_acceptance_rate": null,
+        "fdr": 0.8431451074622881,
+        "fpr": 0.4998417220639443
+      }
+    },
+    "TSA": {
+      "itsa": {
+        "scene_count": 64,
+        "pair_count": 14609,
+        "macro_f1": 0.5065101279930768,
+        "micro_f1": 0.30518129039325226,
+        "micro_precision": 0.18341013824884791,
+        "micro_recall": 0.9080834419817471,
+        "tp": 1393,
+        "fp": 6202,
+        "fn": 141,
+        "tn": 6873,
+        "negative_scene_count": 0,
+        "negative_scene_false_acceptance_rate": null,
+        "fdr": 0.8165898617511521,
+        "fpr": 0.47434034416826004
+      },
+      "mstsa": {
+        "scene_count": 64,
+        "pair_count": 14399,
+        "macro_f1": 0.541702207807383,
+        "micro_f1": 0.3958625525946704,
+        "micro_precision": 0.2864755138289774,
+        "micro_recall": 0.6403857061826432,
+        "tp": 1129,
+        "fp": 2812,
+        "fn": 634,
+        "tn": 9824,
+        "negative_scene_count": 0,
+        "negative_scene_false_acceptance_rate": null,
+        "fdr": 0.7135244861710226,
+        "fpr": 0.22253877809433364
+      }
+    }
+  },
+  "common_paper_scope_original_thresholds": {
+    "A0": {
+      "scene_count": 64,
+      "pair_count": 9710,
+      "macro_f1": 0.5208483446068877,
+      "micro_f1": 0.3753762793497893,
+      "micro_precision": 0.25695446115804654,
+      "micro_recall": 0.6962590731434952,
+      "tp": 1247,
+      "fp": 3606,
+      "fn": 544,
+      "tn": 4313,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "fdr": 0.7430455388419535,
+      "fpr": 0.4553605253188534
+    },
+    "TSA": {
+      "scene_count": 64,
+      "pair_count": 9710,
+      "macro_f1": 0.6797303604512421,
+      "micro_f1": 0.5141118810207875,
+      "micro_precision": 0.368637905962191,
+      "micro_recall": 0.8492462311557789,
+      "tp": 1521,
+      "fp": 2605,
+      "fn": 270,
+      "tn": 5314,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "fdr": 0.6313620940378091,
+      "fpr": 0.32895567622174515
+    }
+  },
+  "paper_scope_coverage": {
+    "itsa": {
+      "candidates": 14609,
+      "positives": 1534,
+      "paper_scope_candidates": 3299,
+      "paper_scope_positives": 917
+    },
+    "mstsa": {
+      "candidates": 14399,
+      "positives": 1763,
+      "paper_scope_candidates": 6411,
+      "paper_scope_positives": 874
+    }
+  },
+  "error_changes_A0_to_TSA": {
+    "wrong_to_right": 7908,
+    "right_to_wrong": 3963,
+    "corrected_fp": 7267,
+    "corrected_fn": 641,
+    "introduced_fp": 3424,
+    "introduced_fn": 539,
+    "net_corrected_edges": 3945,
+    "per_scene": [
+      {
+        "scene_id": "1671",
+        "wrong_to_right": 7,
+        "right_to_wrong": 37,
+        "corrected_fp": 3,
+        "corrected_fn": 4,
+        "introduced_fp": 37,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "2056",
+        "wrong_to_right": 162,
+        "right_to_wrong": 43,
+        "corrected_fp": 157,
+        "corrected_fn": 5,
+        "introduced_fp": 27,
+        "introduced_fn": 16
+      },
+      {
+        "scene_id": "290",
+        "wrong_to_right": 25,
+        "right_to_wrong": 114,
+        "corrected_fp": 9,
+        "corrected_fn": 16,
+        "introduced_fp": 113,
+        "introduced_fn": 1
+      },
+      {
+        "scene_id": "113",
+        "wrong_to_right": 20,
+        "right_to_wrong": 12,
+        "corrected_fp": 16,
+        "corrected_fn": 4,
+        "introduced_fp": 9,
+        "introduced_fn": 3
+      },
+      {
+        "scene_id": "2109",
+        "wrong_to_right": 93,
+        "right_to_wrong": 36,
+        "corrected_fp": 92,
+        "corrected_fn": 1,
+        "introduced_fp": 23,
+        "introduced_fn": 13
+      },
+      {
+        "scene_id": "1977",
+        "wrong_to_right": 158,
+        "right_to_wrong": 986,
+        "corrected_fp": 112,
+        "corrected_fn": 46,
+        "introduced_fp": 978,
+        "introduced_fn": 8
+      },
+      {
+        "scene_id": "2279",
+        "wrong_to_right": 8,
+        "right_to_wrong": 7,
+        "corrected_fp": 7,
+        "corrected_fn": 1,
+        "introduced_fp": 4,
+        "introduced_fn": 3
+      },
+      {
+        "scene_id": "4",
+        "wrong_to_right": 33,
+        "right_to_wrong": 21,
+        "corrected_fp": 25,
+        "corrected_fn": 8,
+        "introduced_fp": 12,
+        "introduced_fn": 9
+      },
+      {
+        "scene_id": "1456",
+        "wrong_to_right": 81,
+        "right_to_wrong": 22,
+        "corrected_fp": 72,
+        "corrected_fn": 9,
+        "introduced_fp": 12,
+        "introduced_fn": 10
+      },
+      {
+        "scene_id": "944",
+        "wrong_to_right": 322,
+        "right_to_wrong": 45,
+        "corrected_fp": 320,
+        "corrected_fn": 2,
+        "introduced_fp": 16,
+        "introduced_fn": 29
+      },
+      {
+        "scene_id": "1391",
+        "wrong_to_right": 2336,
+        "right_to_wrong": 348,
+        "corrected_fp": 2320,
+        "corrected_fn": 16,
+        "introduced_fp": 307,
+        "introduced_fn": 41
+      },
+      {
+        "scene_id": "4618",
+        "wrong_to_right": 71,
+        "right_to_wrong": 7,
+        "corrected_fp": 57,
+        "corrected_fn": 14,
+        "introduced_fp": 0,
+        "introduced_fn": 7
+      },
+      {
+        "scene_id": "1793",
+        "wrong_to_right": 71,
+        "right_to_wrong": 16,
+        "corrected_fp": 71,
+        "corrected_fn": 0,
+        "introduced_fp": 3,
+        "introduced_fn": 13
+      },
+      {
+        "scene_id": "3829",
+        "wrong_to_right": 12,
+        "right_to_wrong": 21,
+        "corrected_fp": 3,
+        "corrected_fn": 9,
+        "introduced_fp": 13,
+        "introduced_fn": 8
+      },
+      {
+        "scene_id": "4652",
+        "wrong_to_right": 36,
+        "right_to_wrong": 11,
+        "corrected_fp": 36,
+        "corrected_fn": 0,
+        "introduced_fp": 7,
+        "introduced_fn": 4
+      },
+      {
+        "scene_id": "4159",
+        "wrong_to_right": 39,
+        "right_to_wrong": 143,
+        "corrected_fp": 11,
+        "corrected_fn": 28,
+        "introduced_fp": 135,
+        "introduced_fn": 8
+      },
+      {
+        "scene_id": "1331",
+        "wrong_to_right": 59,
+        "right_to_wrong": 163,
+        "corrected_fp": 11,
+        "corrected_fn": 48,
+        "introduced_fp": 162,
+        "introduced_fn": 1
+      },
+      {
+        "scene_id": "2882",
+        "wrong_to_right": 8,
+        "right_to_wrong": 2,
+        "corrected_fp": 3,
+        "corrected_fn": 5,
+        "introduced_fp": 0,
+        "introduced_fn": 2
+      },
+      {
+        "scene_id": "3117",
+        "wrong_to_right": 32,
+        "right_to_wrong": 14,
+        "corrected_fp": 27,
+        "corrected_fn": 5,
+        "introduced_fp": 13,
+        "introduced_fn": 1
+      },
+      {
+        "scene_id": "2996",
+        "wrong_to_right": 9,
+        "right_to_wrong": 16,
+        "corrected_fp": 4,
+        "corrected_fn": 5,
+        "introduced_fp": 6,
+        "introduced_fn": 10
+      },
+      {
+        "scene_id": "1398",
+        "wrong_to_right": 32,
+        "right_to_wrong": 45,
+        "corrected_fp": 17,
+        "corrected_fn": 15,
+        "introduced_fp": 38,
+        "introduced_fn": 7
+      },
+      {
+        "scene_id": "330",
+        "wrong_to_right": 32,
+        "right_to_wrong": 37,
+        "corrected_fp": 0,
+        "corrected_fn": 32,
+        "introduced_fp": 37,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "3495",
+        "wrong_to_right": 23,
+        "right_to_wrong": 1,
+        "corrected_fp": 23,
+        "corrected_fn": 0,
+        "introduced_fp": 0,
+        "introduced_fn": 1
+      },
+      {
+        "scene_id": "4980",
+        "wrong_to_right": 99,
+        "right_to_wrong": 12,
+        "corrected_fp": 99,
+        "corrected_fn": 0,
+        "introduced_fp": 0,
+        "introduced_fn": 12
+      },
+      {
+        "scene_id": "211",
+        "wrong_to_right": 49,
+        "right_to_wrong": 5,
+        "corrected_fp": 47,
+        "corrected_fn": 2,
+        "introduced_fp": 0,
+        "introduced_fn": 5
+      },
+      {
+        "scene_id": "1447",
+        "wrong_to_right": 43,
+        "right_to_wrong": 8,
+        "corrected_fp": 43,
+        "corrected_fn": 0,
+        "introduced_fp": 1,
+        "introduced_fn": 7
+      },
+      {
+        "scene_id": "1893",
+        "wrong_to_right": 30,
+        "right_to_wrong": 13,
+        "corrected_fp": 14,
+        "corrected_fn": 16,
+        "introduced_fp": 13,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "3332",
+        "wrong_to_right": 29,
+        "right_to_wrong": 14,
+        "corrected_fp": 21,
+        "corrected_fn": 8,
+        "introduced_fp": 10,
+        "introduced_fn": 4
+      },
+      {
+        "scene_id": "870",
+        "wrong_to_right": 26,
+        "right_to_wrong": 6,
+        "corrected_fp": 0,
+        "corrected_fn": 26,
+        "introduced_fp": 6,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "2512",
+        "wrong_to_right": 20,
+        "right_to_wrong": 49,
+        "corrected_fp": 0,
+        "corrected_fn": 20,
+        "introduced_fp": 49,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "2995",
+        "wrong_to_right": 181,
+        "right_to_wrong": 63,
+        "corrected_fp": 179,
+        "corrected_fn": 2,
+        "introduced_fp": 63,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "875",
+        "wrong_to_right": 54,
+        "right_to_wrong": 19,
+        "corrected_fp": 51,
+        "corrected_fn": 3,
+        "introduced_fp": 14,
+        "introduced_fn": 5
+      },
+      {
+        "scene_id": "4038",
+        "wrong_to_right": 211,
+        "right_to_wrong": 43,
+        "corrected_fp": 209,
+        "corrected_fn": 2,
+        "introduced_fp": 8,
+        "introduced_fn": 35
+      },
+      {
+        "scene_id": "2345",
+        "wrong_to_right": 18,
+        "right_to_wrong": 37,
+        "corrected_fp": 0,
+        "corrected_fn": 18,
+        "introduced_fp": 21,
+        "introduced_fn": 16
+      },
+      {
+        "scene_id": "1587",
+        "wrong_to_right": 18,
+        "right_to_wrong": 0,
+        "corrected_fp": 16,
+        "corrected_fn": 2,
+        "introduced_fp": 0,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "3245",
+        "wrong_to_right": 53,
+        "right_to_wrong": 54,
+        "corrected_fp": 39,
+        "corrected_fn": 14,
+        "introduced_fp": 50,
+        "introduced_fn": 4
+      },
+      {
+        "scene_id": "2395",
+        "wrong_to_right": 82,
+        "right_to_wrong": 132,
+        "corrected_fp": 58,
+        "corrected_fn": 24,
+        "introduced_fp": 129,
+        "introduced_fn": 3
+      },
+      {
+        "scene_id": "3838",
+        "wrong_to_right": 129,
+        "right_to_wrong": 36,
+        "corrected_fp": 129,
+        "corrected_fn": 0,
+        "introduced_fp": 27,
+        "introduced_fn": 9
+      },
+      {
+        "scene_id": "519",
+        "wrong_to_right": 27,
+        "right_to_wrong": 14,
+        "corrected_fp": 27,
+        "corrected_fn": 0,
+        "introduced_fp": 11,
+        "introduced_fn": 3
+      },
+      {
+        "scene_id": "2715",
+        "wrong_to_right": 158,
+        "right_to_wrong": 34,
+        "corrected_fp": 156,
+        "corrected_fn": 2,
+        "introduced_fp": 27,
+        "introduced_fn": 7
+      },
+      {
+        "scene_id": "3964",
+        "wrong_to_right": 94,
+        "right_to_wrong": 39,
+        "corrected_fp": 75,
+        "corrected_fn": 19,
+        "introduced_fp": 34,
+        "introduced_fn": 5
+      },
+      {
+        "scene_id": "2261",
+        "wrong_to_right": 13,
+        "right_to_wrong": 29,
+        "corrected_fp": 1,
+        "corrected_fn": 12,
+        "introduced_fp": 28,
+        "introduced_fn": 1
+      },
+      {
+        "scene_id": "1457",
+        "wrong_to_right": 216,
+        "right_to_wrong": 88,
+        "corrected_fp": 213,
+        "corrected_fn": 3,
+        "introduced_fp": 72,
+        "introduced_fn": 16
+      },
+      {
+        "scene_id": "907",
+        "wrong_to_right": 167,
+        "right_to_wrong": 104,
+        "corrected_fp": 147,
+        "corrected_fn": 20,
+        "introduced_fp": 91,
+        "introduced_fn": 13
+      },
+      {
+        "scene_id": "1022",
+        "wrong_to_right": 26,
+        "right_to_wrong": 3,
+        "corrected_fp": 21,
+        "corrected_fn": 5,
+        "introduced_fp": 3,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "1206",
+        "wrong_to_right": 153,
+        "right_to_wrong": 43,
+        "corrected_fp": 143,
+        "corrected_fn": 10,
+        "introduced_fp": 22,
+        "introduced_fn": 21
+      },
+      {
+        "scene_id": "3879",
+        "wrong_to_right": 40,
+        "right_to_wrong": 13,
+        "corrected_fp": 34,
+        "corrected_fn": 6,
+        "introduced_fp": 12,
+        "introduced_fn": 1
+      },
+      {
+        "scene_id": "2211",
+        "wrong_to_right": 74,
+        "right_to_wrong": 15,
+        "corrected_fp": 72,
+        "corrected_fn": 2,
+        "introduced_fp": 12,
+        "introduced_fn": 3
+      },
+      {
+        "scene_id": "1058",
+        "wrong_to_right": 7,
+        "right_to_wrong": 9,
+        "corrected_fp": 7,
+        "corrected_fn": 0,
+        "introduced_fp": 4,
+        "introduced_fn": 5
+      },
+      {
+        "scene_id": "3527",
+        "wrong_to_right": 165,
+        "right_to_wrong": 55,
+        "corrected_fp": 161,
+        "corrected_fn": 4,
+        "introduced_fp": 38,
+        "introduced_fn": 17
+      },
+      {
+        "scene_id": "2708",
+        "wrong_to_right": 33,
+        "right_to_wrong": 157,
+        "corrected_fp": 0,
+        "corrected_fn": 33,
+        "introduced_fp": 157,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "270",
+        "wrong_to_right": 126,
+        "right_to_wrong": 80,
+        "corrected_fp": 101,
+        "corrected_fn": 25,
+        "introduced_fp": 70,
+        "introduced_fn": 10
+      },
+      {
+        "scene_id": "2960",
+        "wrong_to_right": 84,
+        "right_to_wrong": 10,
+        "corrected_fp": 67,
+        "corrected_fn": 17,
+        "introduced_fp": 7,
+        "introduced_fn": 3
+      },
+      {
+        "scene_id": "1089",
+        "wrong_to_right": 7,
+        "right_to_wrong": 0,
+        "corrected_fp": 7,
+        "corrected_fn": 0,
+        "introduced_fp": 0,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "1795",
+        "wrong_to_right": 17,
+        "right_to_wrong": 21,
+        "corrected_fp": 14,
+        "corrected_fn": 3,
+        "introduced_fp": 14,
+        "introduced_fn": 7
+      },
+      {
+        "scene_id": "1374",
+        "wrong_to_right": 15,
+        "right_to_wrong": 16,
+        "corrected_fp": 15,
+        "corrected_fn": 0,
+        "introduced_fp": 0,
+        "introduced_fn": 16
+      },
+      {
+        "scene_id": "1396",
+        "wrong_to_right": 1276,
+        "right_to_wrong": 323,
+        "corrected_fp": 1264,
+        "corrected_fn": 12,
+        "introduced_fp": 281,
+        "introduced_fn": 42
+      },
+      {
+        "scene_id": "3349",
+        "wrong_to_right": 16,
+        "right_to_wrong": 18,
+        "corrected_fp": 14,
+        "corrected_fn": 2,
+        "introduced_fp": 2,
+        "introduced_fn": 16
+      },
+      {
+        "scene_id": "1150",
+        "wrong_to_right": 20,
+        "right_to_wrong": 5,
+        "corrected_fp": 15,
+        "corrected_fn": 5,
+        "introduced_fp": 5,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "3330",
+        "wrong_to_right": 73,
+        "right_to_wrong": 33,
+        "corrected_fp": 67,
+        "corrected_fn": 6,
+        "introduced_fp": 21,
+        "introduced_fn": 12
+      },
+      {
+        "scene_id": "4429",
+        "wrong_to_right": 247,
+        "right_to_wrong": 40,
+        "corrected_fp": 245,
+        "corrected_fn": 2,
+        "introduced_fp": 19,
+        "introduced_fn": 21
+      },
+      {
+        "scene_id": "3589",
+        "wrong_to_right": 27,
+        "right_to_wrong": 100,
+        "corrected_fp": 0,
+        "corrected_fn": 27,
+        "introduced_fp": 100,
+        "introduced_fn": 0
+      },
+      {
+        "scene_id": "2025",
+        "wrong_to_right": 72,
+        "right_to_wrong": 41,
+        "corrected_fp": 58,
+        "corrected_fn": 14,
+        "introduced_fp": 27,
+        "introduced_fn": 14
+      },
+      {
+        "scene_id": "4676",
+        "wrong_to_right": 44,
+        "right_to_wrong": 35,
+        "corrected_fp": 42,
+        "corrected_fn": 2,
+        "introduced_fp": 24,
+        "introduced_fn": 11
+      }
+    ]
+  },
+  "scene_f1_TSA_win_tie_loss": [
+    49,
+    0,
+    15
+  ],
+  "cluster_uncertainty": {
+    "difference": 0.09430926113886423,
+    "difference_pp": 9.430926113886423,
+    "cluster_count": 17,
+    "scene_count": 64,
+    "seed": 20261017,
+    "replicates": 2000,
+    "ci95": [
+      0.04432201824854466,
+      0.12225814978629786
+    ],
+    "ci95_pp": [
+      4.432201824854467,
+      12.225814978629785
+    ],
+    "status": "exploratory_cluster_bootstrap",
+    "per_cluster": [
+      {
+        "component_id": "component-093434a3ee9e0a010bb2c2aa",
+        "scene_count": 1,
+        "mean_difference": 0.3482818870122306
+      },
+      {
+        "component_id": "component-10bcec41d71aa1c66c878ffd",
+        "scene_count": 3,
+        "mean_difference": 0.25287849377375543
+      },
+      {
+        "component_id": "component-472a3d4f21df6f4f6b9c0775",
+        "scene_count": 1,
+        "mean_difference": 0.06358930112165662
+      },
+      {
+        "component_id": "component-5084be93e49b2fa14e5ebc36",
+        "scene_count": 1,
+        "mean_difference": 0.11687709840639338
+      },
+      {
+        "component_id": "component-66d20379d86cb696e0cfe4b8",
+        "scene_count": 1,
+        "mean_difference": 0.015630624394295994
+      },
+      {
+        "component_id": "component-782c7ca25ee552931cd4513f",
+        "scene_count": 2,
+        "mean_difference": 0.0320153471086872
+      },
+      {
+        "component_id": "component-7ac707d2561c13885d8c9dc1",
+        "scene_count": 1,
+        "mean_difference": -0.016049138101842664
+      },
+      {
+        "component_id": "component-81988bc004bbcf214c39edbc",
+        "scene_count": 1,
+        "mean_difference": -0.05269868253293669
+      },
+      {
+        "component_id": "component-873bd5e10c28890f7e74992f",
+        "scene_count": 1,
+        "mean_difference": 0.013251454427925025
+      },
+      {
+        "component_id": "component-98203dd31f28ca84438009d5",
+        "scene_count": 1,
+        "mean_difference": 0.1333333333333333
+      },
+      {
+        "component_id": "component-9dfa5ad93cf3821d1032a1d2",
+        "scene_count": 3,
+        "mean_difference": 0.10065879777047941
+      },
+      {
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "scene_count": 8,
+        "mean_difference": 0.017342581796186547
+      },
+      {
+        "component_id": "component-a6f62faaa3eefe9d4e46e10c",
+        "scene_count": 1,
+        "mean_difference": 0.032579185520361986
+      },
+      {
+        "component_id": "component-bd7d0f58788057f9be8cb6e2",
+        "scene_count": 1,
+        "mean_difference": -0.07862068965517233
+      },
+      {
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "scene_count": 28,
+        "mean_difference": 0.11520609984609946
+      },
+      {
+        "component_id": "component-d05fc783deb1d56f79a8749b",
+        "scene_count": 2,
+        "mean_difference": -0.012829757583614154
+      },
+      {
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "scene_count": 8,
+        "mean_difference": 0.12451547940224215
+      }
+    ]
+  },
+  "all_accept": {
+    "scene_count": 64,
+    "pair_count": 29008,
+    "macro_f1": 0.34736237271173737,
+    "micro_f1": 0.20411700975081257,
+    "micro_precision": 0.11365830115830115,
+    "micro_recall": 1.0,
+    "tp": 3297,
+    "fp": 25711,
+    "fn": 0,
+    "tn": 0,
+    "negative_scene_count": 0,
+    "negative_scene_false_acceptance_rate": null,
+    "fdr": 0.8863416988416989,
+    "fpr": 1.0
+  },
+  "score_quantiles": {
+    "A0": {
+      "0": [
+        -0.042942263185977936,
+        -2.4755223421379924e-05,
+        -2.79157688964915e-06,
+        -5.860054557160765e-07,
+        1.963674367289059e-05
+      ],
+      "1": [
+        -0.04293769970536232,
+        -8.758261537877843e-06,
+        -1.4788350881644874e-06,
+        -2.3295468736250767e-07,
+        9.257986675947905e-06
+      ]
+    },
+    "TSA": {
+      "0": [
+        -0.7565041184425354,
+        -0.304217666387558,
+        0.36210256814956665,
+        0.861562192440033,
+        0.998479425907135
+      ],
+      "1": [
+        -0.5730386972427368,
+        0.3227312803268433,
+        0.7861312627792358,
+        0.9583235263824463,
+        0.9983019232749939
+      ]
+    }
+  },
+  "limits": [
+    "V_select selected weights and thresholds; interval is descriptive, not independent test inference",
+    "Single seed, unequal optimization schedules and validation selection counts",
+    "TSA is offline adaptation, not original online system; native checkpoints remain on server",
+    "No zero-positive scenes; no T_test read; no new training or threshold fitting"
+  ]
+}
