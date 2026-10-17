@@ -29,3 +29,11 @@ control differences. A_full and independent literature baselines such as
 TSA-cTFER are separate parallel jobs and are not included here. Results from
 this selected validation set are exploratory, not final test performance or
 proof of innovation. No model/data/metric code is changed by this entry point.
+
+# TSA-cTFER offline adaptation
+
+`tsactfer_fit.py` trains one independent dual-head contrastive encoder on T_core
+and selects on the complete V_select. It does not open T_test or run the online
+two-stage assignment. See [source correspondence and fixed adaptation rules](../../docs/tsactfer_adaptation.md)
+and `configs/tsactfer-first-fit.json`. This prepared code is not a READY task;
+execution requires the next independent handover after 010 reaches a terminal state.
