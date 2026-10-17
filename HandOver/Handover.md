@@ -29,6 +29,8 @@
 
 012原复制命令保持不变，六小时跟进继续。接下来复用012的007 manifest，核训练/开发reference时钟与监督覆盖，确定正式cap/time unit、CL尺度、TFM位置loss和训练量，并提交完整配置与成本方案；旧配置草案不可直接开跑。保留CDF负结果和所有历史产物，主线baseline与候选比较继续。这里没有新增训练READY或GPU授权。
 
+配置草案已改为[当前决策稿](../docs/tmtaff_complete_plan.md)：时间适配保持已批准状态；建议位置loss采用连续SmoothL1（待用户确认），CL保留原距离但margin须明确训练侧依据。一次四阶段各2更新、最多1GPU小时只是待审测量提案，不是批准额度或预计耗时；完整V融合成本已单独列出。先闭合损失/原manifest与对齐，不发布带占位值的训练配置。
+
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 
 ## 历史轮次摘要

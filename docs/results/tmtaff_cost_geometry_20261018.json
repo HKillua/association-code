@@ -1,0 +1,28 @@
+{
+  "scope": "read existing V_select caches and static sampler arithmetic only; no model/data ZIP/training/GPU",
+  "cache": "HandOver/results/COMPARE-20261017-011/reference010/V_select",
+  "counts": {
+    "scenes": 64,
+    "nodes": 1635,
+    "scene_identity_groups": 377,
+    "pairs": 29008,
+    "oracle_tfm_calls": 1258,
+    "predicted_tfm_call_upper_bound": 1571,
+    "combined_tfm_call_upper_bound": 2829
+  },
+  "formula": "each group of k nodes uses k-1 recursive pair fusions; oracle exact for cached identities, predicted upper bound assumes one group per nonempty scene",
+  "each_pair_fusion_autoregressive_steps": 64,
+  "each_pair_fusion_decoder_positions": 2080,
+  "sampling_example": {
+    "eligible_scenes_per_class": 512,
+    "note": "example S=512, not measured eligible pool; expectations are not guarantees or convergence",
+    "expected_fraction_seen": {
+      "100": 0.17757952140861422,
+      "500": 0.623756003014323,
+      "1000": 0.858440454732242,
+      "2356": 0.9900089148955147
+    },
+    "updates_for_99_percent_expected_coverage": 2356
+  },
+  "limits": "Historical 010 cache geometry, not timed-adapter full-population audit, observed runtime, or final predicted grouping; no hash checks."
+}
