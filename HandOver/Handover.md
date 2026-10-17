@@ -11,14 +11,14 @@
 - 单个 A0/CE/seed20：TCM100 → 冻结 TAM100 → joint20，累计上限6小时、一次尝试、重试0。复用007划分，完整 V_select 选模，T_test 封存。当前没有第二项 READY 任务。
 - **最新服务器快照：2026-10-17 20:31（提交 `1d44d60`）。** 已用60分50秒，TCM100/100、TAM100/100、joint10/20；运行在GPU0，报告进程累计峰值分配10.38GiB，GPU1当时空闲。这些是中期文字回执，尚未收到010原始结果文件或终态，不能当实时状态、独占性能或最终成绩。
 - **本地代码核对：** 验证字段位于 `history[*].selection`；完整已选指标也在 `progress.stages[*].starts_from_selection.validation`（joint阶段）及 checkpoint 的 selection 中。按冻结代码，进入joint意味着已完成冻结阶段完整验证并载入checkpoint；回执“验证条目0”不能由顶层字段缺失推出。终态按原010要求回传实际指标，不能仅据loss接近ln2判定模型随机。
-- **接下来：** 先读终态的验证P/R/F1、阈值、同源/跨源结果与曲线，再决定增加训练、比较已有contrastive分支或修复真实问题。并行候选与预算见[下一轮方案](../docs/next_experiments_after_010.md)，该文档不是执行授权。
+- **接下来：** 用户已确认新增最多12 GPU小时，并要求下一轮必须有独立baseline比较；优先TMTAFF风格CE参考与TSA-cTFER适配版各最多6小时，原拟contrastive作业延后。先收010终态；baseline实现可在隔离分支准备，尚未发布新配置/L2S、不得据此直接启动。见[下一轮方案](../docs/next_experiments_after_010.md)。
 
 ## 必要约束
 
 - GPU可动态选卡、允许共卡和交接预算内换卡，不要求整卡空闲、不终止他人进程；具体作业数与累计预算由当前L2S确定。
 - 010 RUNNING期间保持执行代码/配置固定，不修改已下发L2S或对方S2L，不启动下一轮；本次索引整理仅改文档。
 - 新轮次各写独立L2S/S2L，保留原件与失败产物；写公共索引前同步Git，不覆盖对方更新。具体分工见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)。
-- 不重做已成功的环境、prepare或旧诊断，不因009留痕缺口、缺SCTA-Net或Level逐级说明阻塞已批准实验。Git push不会自动唤醒服务器AI；本地应用定时任务当前PAUSED。
+- 不重做已成功的环境、prepare或旧诊断，不因009留痕缺口、缺SCTA-Net或Level逐级说明阻塞已批准实验。Git push不会自动唤醒服务器AI；本地应用定时跟进已恢复每10分钟；无变化保持安静。
 
 ## 历史轮次摘要
 
