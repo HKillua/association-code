@@ -1,0 +1,1 @@
+"""Independent literature baseline implementations."""

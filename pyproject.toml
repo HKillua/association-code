@@ -13,4 +13,4 @@ dependencies = ["numpy>=1.26,<3", "torch>=2.5,<2.11"]
 association-pilot = "association.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["association*"]
+include = ["association*", "baselines*"]

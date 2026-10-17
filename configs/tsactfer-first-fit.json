@@ -1,0 +1,28 @@
+{
+  "scope": "TSA-cTFER-offline-independent-adaptation-v1",
+  "seed": 20,
+  "model": {
+    "length": 128,
+    "d_model": 64,
+    "nhead": 4,
+    "num_layers": 4,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "time_bins": 4096
+  },
+  "data": {
+    "time_bin_seconds": 20.0,
+    "min_crop_fraction": 0.5
+  },
+  "training": {
+    "updates": 1000,
+    "warmup_updates": 67,
+    "pair_batch_size": 512,
+    "learning_rate": 0.0001,
+    "temperature": 0.07,
+    "gradient_clip": 1.0,
+    "validate_every_updates": 100,
+    "inference_batch_tracks": 256,
+    "max_hours": 6.0
+  }
+}
