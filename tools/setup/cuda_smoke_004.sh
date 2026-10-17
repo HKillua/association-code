@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# One server-selected free card only, under the current handover budget wrapper.
-# Arguments: <gpu> [attempt=1] [cpu_attempt=attempt] [run_id=ENV-20261016-004] [cpu_run_id=run_id]
+# One dynamically selected CUDA device; co-tenancy authorized by the user on 2026-10-17.
+# Arguments: <auto|index|GPU-UUID> [attempt=1] [cpu_attempt=attempt] [run_id=ENV-20261016-004] [cpu_run_id=run_id]
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 (( $# <= 5 )) || exit 2
-case "${1-}" in 0|1|2|3) task_gpu=$1 ;; *) exit 2 ;; esac
-case "${2-1}" in 1|2) task_attempt=${2-1} ;; *) exit 2 ;; esac
+task_gpu_request=${1-}
+[[ "$task_gpu_request" = auto || "$task_gpu_request" =~ ^[0-9]+$ || "$task_gpu_request" =~ ^GPU-[a-fA-F0-9-]+$ ]] || exit 2
+case "${2-1}" in 1|2|3) task_attempt=${2-1} ;; *) exit 2 ;; esac
 case "${3-$task_attempt}" in 1|2) task_cpu_attempt=${3-$task_attempt} ;; *) exit 2 ;; esac
 task_python=/home/wangguangjie/djs/mtad-field-20261016/bin/python
 task_run_id=${4-ENV-20261016-004}
@@ -48,27 +49,16 @@ task_done
 task_run_logged pip_check "$task_out/cuda/pip_check.txt" "$task_python" -m pip --disable-pip-version-check check
 
 task_begin allocation
-printf '%s\n' "$task_gpu" > "$task_out/cuda/physical_gpu.txt"
-task_gpu_uuid=$(timeout --signal=TERM --kill-after=2s 15s nvidia-smi -i "$task_gpu" --query-gpu=uuid --format=csv,noheader)
+printf '%s\n' "$task_gpu_request" > "$task_out/cuda/requested_gpu.txt"
+task_gpu_uuid=$("$task_python" tools/setup/gpu_allocation.py \
+  --device "$task_gpu_request" --output "$task_out/cuda/allocation.json")
 [[ "$task_gpu_uuid" =~ ^GPU-[a-fA-F0-9-]+$ ]]
 printf '%s\n' "$task_gpu_uuid" > "$task_out/cuda/physical_gpu_uuid.txt"
-timeout --signal=TERM --kill-after=2s 15s nvidia-smi -i "$task_gpu_uuid" \
-  --query-gpu=index,uuid,pci.bus_id,memory.used,utilization.gpu --format=csv > "$task_out/cuda/allocation_snapshot.csv"
-# Fail closed on unsupported/failed queries or any compute process on this UUID.
-task_query_rc=0
-timeout --signal=TERM --kill-after=2s 15s nvidia-smi -i "$task_gpu_uuid" \
-  --query-compute-apps=gpu_uuid,pid,process_name,used_gpu_memory --format=csv,noheader \
-  > "$task_out/cuda/compute_apps.csv" 2> "$task_out/cuda/compute_apps.stderr" || task_query_rc=$?
-printf '%s\n' "$task_query_rc" > "$task_out/cuda/compute_apps_exit_code.txt"
-if (( task_query_rc != 0 )); then
-  printf 'allocation_query_failed\n' > "$task_out/cuda/allocation_status.txt"
-  exit "$task_query_rc"
-fi
-if [[ -n "$(tr -d '[:space:]' < "$task_out/cuda/compute_apps.csv")" ]]; then
-  printf 'deferred_gpu_busy\n' > "$task_out/cuda/allocation_status.txt"
-  exit 3
-fi
-printf 'free_at_prelaunch_check\n' > "$task_out/cuda/allocation_status.txt"
+"$task_python" - "$task_out/cuda/allocation.json" <<'CHECK' > "$task_out/cuda/physical_gpu.txt"
+import json, sys
+print(json.load(open(sys.argv[1]))['selected']['index'])
+CHECK
+printf 'selected_with_sharing_allowed\n' > "$task_out/cuda/allocation_status.txt"
 task_done
 export CUDA_VISIBLE_DEVICES="$task_gpu_uuid"
 
@@ -82,9 +72,9 @@ assert torch.__version__ == '2.5.1+cu121'
 assert torch.version.cuda == '12.1'
 assert torch.cuda.is_available(), 'CUDA is unavailable; no CPU fallback'
 assert torch.cuda.device_count() == 1, 'Expected exactly the allocated GPU'
-assert '3090' in torch.cuda.get_device_name(0), torch.cuda.get_device_name(0)
 print(json.dumps({'torch': torch.__version__, 'cuda_build': torch.version.cuda,
-                  'visible_gpu_count': torch.cuda.device_count(), 'name': torch.cuda.get_device_name(0)}, indent=2))
+                  'visible_gpu_count': torch.cuda.device_count(), 'name': torch.cuda.get_device_name(0),
+                  'total_memory_bytes': torch.cuda.get_device_properties(0).total_memory}, indent=2))
 CHECK
 task_done
 task_run_logged smoke_command "$task_out/cuda/smoke_command.log" "$task_python" -m association.cli smoke --config configs/smoke.json --device cuda:0 --cpu-threads 1 --output "$task_run"
@@ -103,7 +93,9 @@ report_path = run / 'pilot' / 'report.json'
 assert digest(report_path) == metadata['report_sha256']
 assert json.loads(report_path.read_text())['protocol'] == 'synthetic-smoke-only-not-research-result'
 (out / 'acceptance.json').write_text(json.dumps({'status': 'COMPLETED', 'run': str(run),
-    'pilot_run_sha256': digest(run / 'pilot' / 'run.json'), 'report_sha256': digest(report_path)}, indent=2) + '\n')
+    'pilot_run_sha256': digest(run / 'pilot' / 'run.json'), 'report_sha256': digest(report_path),
+    'allocation_sha256': digest(out / 'allocation.json'), 'gpu_policy': 'sharing_allowed',
+    'performance_scope': 'concurrent_load_not_controlled'}, indent=2) + '\n')
 CHECK
 cp "$task_run/pilot/run.json" "$task_out/cuda/pilot_run.json"
 task_done
