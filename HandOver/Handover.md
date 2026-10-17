@@ -25,9 +25,9 @@
 
 ## 本地下一步与边界
 
-研究目标仍是**不完整量测下补全、关联、融合一起做**。用户2026-10-18已明确“可以的，写代码！”。本地已实现原生真实时间入口、TCM因果一致性、四阶段训练/完整checkpoint及全目标评价，详见[重构规格](../docs/specs/complete-training-refactor.md)。新完整训练内核仅接受实际时间、输入网格和监督query_times一致的显式数据；原生短轨到TCM共同时间轴的适配仍待确认，不能把旧错时scene64接回。真实训练尚未启动，不将CPU合成测试称为实验结果。
+研究目标仍是**不完整量测下补全、关联、融合一起做**。用户2026-10-18在解释后已批准TCM使用原始观测时间和下一预测时刻，名称明确为TMTAFF时间适配版。本地已实现原生ZIP/参考装配、时间条件TCM、四阶段训练/完整checkpoint及全目标评价，详见[重构记录](../docs/specs/complete-training-refactor.md)与[时间规格](../docs/specs/tmtaff-time-adaptation.md)。短轨即使在共同输出网格上无支撑点，仍提供至少两个原生观测；监督query_times严格等于共同输出时刻。真实训练尚未启动，不将CPU合成测试称为实验结果。
 
-012原复制命令保持不变，六小时跟进继续。新的query-time输入方式已向用户解释，目前尚未确认；预算仍须先给完整配置和成本，旧配置草案不可直接开跑。保留CDF负结果和所有历史产物，主线baseline与候选比较继续。
+012原复制命令保持不变，六小时跟进继续。接下来复用012的007 manifest，核训练/开发reference时钟与监督覆盖，确定正式cap/time unit、CL尺度、TFM位置loss和训练量，并提交完整配置与成本方案；旧配置草案不可直接开跑。保留CDF负结果和所有历史产物，主线baseline与候选比较继续。这里没有新增训练READY或GPU授权。
 
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 

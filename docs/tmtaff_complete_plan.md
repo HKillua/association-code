@@ -2,7 +2,7 @@
 
 2026-10-18。用户要求先看完整配置和成本估计，再决定新增预算。**本页是设计草案，不是可执行配置或READY；12/24 GPU小时均未获批准。** 011已结束，其剩余额度不转入本方案。目标仍是不完整量测下的补全、关联、融合完整近似参考与候选验证；当前CDF结果不支持继续增加其训练。
 
-**复审状态：以下旧草案保留供追溯，当前须先修订。** [数据/代码/论文综合审计](experiment_reaudit_20261018.md)已确认scene64输入与名义监督的时刻差异；还发现TCM注意力路径不一致、margin1未经尺度核验、本地paper_printed位置loss不连续、采样覆盖和完整选模缺口。表中scene64、margin1、位置loss及更新数不再作为可直接推进的默认建议。外层训练与全目标评价现已实现；原生TCM时间适配及正式配置仍待闭合，不沿此表启动训练。
+**复审状态：以下旧草案保留供追溯，当前须先修订。** [数据/代码/论文综合审计](experiment_reaudit_20261018.md)已确认scene64输入与名义监督的时刻差异；还发现TCM注意力路径不一致、margin1未经尺度核验、本地paper_printed位置loss不连续、采样覆盖和完整选模缺口。用户已批准且已实现[真实时间条件TCM适配](specs/tmtaff-time-adaptation.md)，原生ZIP装配、四阶段训练和全目标评价均已接通。正式cap/time unit、reference对齐、CL尺度、位置loss及更新数仍须形成具体配置；表中旧scene64与未经核准的数值不再是默认建议，不沿此表启动训练。
 
 ## 拟定参考配置
 
@@ -43,7 +43,7 @@
 ## 在申请预算前还要补齐
 
 1. 取回007原manifest，复用现有场景列表，不重建划分。核训练/开发参考时钟及监督覆盖，填出显式offset表和最大插值gap；已有53场景的规则只支持诊断，不能外推未审场景。当前不以预测误差大小挑offset或gap。
-2. 目标分组/FC递归、显式对齐的评价原语、TFM冻结及三loss-joint的有效batch更新已实现并通过CPU验证。单源/全目标对应、按点计数汇总、四阶段trainer与完整checkpoint现已实现，见[重构规格](specs/complete-training-refactor.md)。原生TCM时间入口尚未闭合。微批损失按各自全batch分母累计，loss四个权重已纳入optimizer；track_microbatch仅限制TCM辅助loss，配对前向最多处理2×pair_microbatch端点。实际microbatch值未选定。参考装配已接通合成prepare_scene→TCM→TFM→loss；尚非原生训练。
+2. 原生时间入口、目标分组/FC递归、全目标评价、四阶段trainer与完整checkpoint现已实现并通过CPU验证，见[重构规格](specs/complete-training-refactor.md)。微批损失按各自全batch分母累计，loss四个权重已纳入optimizer；track_microbatch仅限制TCM辅助loss，配对前向最多处理2×pair_microbatch端点。实际microbatch值未选定。合成ZIP→真实时刻输入→TCM/TAM/TFM→完整评价已连通，尚非真实原生训练结果。
 3. 提供与正式结构一致的有界成本探测命令及所需资源，单独呈现其上限供用户决定；不得先消耗新GPU预算再补批准。测量后才能给完整训练总额，不能自动把12/24小时当默认批准。
 4. 首个候选依据实际失败现象选择；CDF本轮负结果保留。候选配置和额外训练成本尚未确定，不把它虚填为0或声称本页已完成候选预算。已有代码/缓存可复用的比较尽量复用，独立文献baseline继续保留。
 

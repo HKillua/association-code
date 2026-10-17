@@ -2,9 +2,9 @@
 
 MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下，把补全、关联、融合一起做**：先完成TMTAFF的近似复现，再用同协议的候选预实验判断课题潜力。
 
-010的A0与011的CDF1、A_full、TSA-cTFER均已完成，真实结果仍是关联预实验。用户已授权开始重构：原生真实时间输入、TCM因果一致性修复、完整四阶段训练/checkpoint、全目标融合评价与TSA原生输入适配已实现。**原生观测到TCM共同输出时间轴的适配尚未确定，完整原生三模块实验尚未启动**；代码内核与CPU合成集成通过不等于真实实验完成。
+010的A0与011的CDF1、A_full、TSA-cTFER均已完成，真实结果仍是关联预实验。用户已批准并已实现**TMTAFF真实时间适配版**：原生观测时间与下一预测时刻进入TCM，保留原模型参数规模；真实ZIP/参考装配、四阶段训练/checkpoint、全目标融合评价与TSA原生输入适配已接通。完整原生三模块训练尚未启动，CPU合成集成通过不等于真实实验完成。
 
-`A_full`表示扩大关联训练池，不是完整论文系统；CDF1不是预定的最终创新。新路径拒绝旧scene64实际/名义时刻错位，不读取T_test。见[本轮规格与边界](docs/specs/complete-training-refactor.md)及[综合审计](docs/experiment_reaudit_20261018.md)。012既有文件回传和每六小时跟进继续；新增GPU实验仍须先给完整配置与成本。
+`A_full`表示扩大关联训练池，不是完整论文系统；CDF1不是预定的最终创新。新路径拒绝旧scene64实际/名义时刻错位，不读取T_test。时间适配改变了模型函数，明确作为近似参考；见[时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[重构记录](docs/specs/complete-training-refactor.md)及[综合审计](docs/experiment_reaudit_20261018.md)。012既有文件回传和每六小时跟进继续；新增GPU实验仍须先给完整配置与成本。
 
 ## 从这里开始
 
@@ -26,14 +26,15 @@ MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下�
 | --- | --- |
 | `association/data.py`、`dataset.py`、`native_inputs.py` | ZIP、身份标签与既有划分；新原生入口保留真实时间和全部有效片段，旧scene64仅供历史路径 |
 | `association/models.py`、`reference.py` | TCM/TAM训练、验证选择、权重恢复与冻结分数缓存 |
+| `association/timed_inputs.py`、`timed_models.py`、`timed_dataset.py` | 已批准的原生真实时间适配；短轨真实输入、显式查询时刻、既有划分与全目标参考装配 |
 | `association/reference_states.py`、`fusion_targets.py`、`fusion.py` | 训练/开发侧参考状态、显式对齐与正配对监督装配、可微成对TFM；[实现约定](docs/specs/tmtaff-fusion.md) |
 | `association/fusion_inference.py`、`fusion_metrics.py`、`fusion_training.py` | 显式分组/递归输出、已对齐轨迹与分组评价、精确归一化的有效batch更新；不自动启动原生训练 |
-| `association/complete_training.py`、`complete_evaluation.py`、`full_scene_evaluation.py` | 显式已配准数据的四阶段训练/恢复，完整V上的预测/oracle/单源/简单融合与覆盖；不是原生fit CLI |
+| `association/complete_training.py`、`complete_evaluation.py`、`full_scene_evaluation.py` | 四阶段训练/恢复，按原adapter恢复选定快照；完整V上的预测/oracle/单源/简单融合与覆盖 |
 | `association/context.py`、`heads.py` | 校准、CDF1及机制对照 |
 | `association/metrics.py`、`pipeline.py` | 既有关联评价与pilot；后者包含测试阶段，当前不执行 |
 | `association/cli.py`、`profile.py` | 数据准备、单参考训练、成本探测和合成检查 |
 | `baselines/tsactfer.py`、`tsactfer_data.py`、`tsactfer_native.py` | TSA-cTFER双头与离线适配；新入口直接取原生真实观测，显式128点上限，不经过scene64 |
-| `tools/experiments/` | CDF1验证、错误迁移与缓存导出、TSA有界首训 |
+| `tools/experiments/` | `tmtaff_complete_fit.py`原生检查/完整训练入口（须显式配置和reference时钟表）；CDF1与TSA工具保留 |
 | `configs/`、`tests/`、`tools/pilot/` | 配置、测试、原有环境与ZIP审计工具 |
 | `HandOver/` | 每轮请求、回执与小型原始证据 |
 
@@ -43,6 +44,7 @@ MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下�
 
 ```bash
 python -m association.cli --help
+python tools/experiments/tmtaff_complete_fit.py --help
 python -m unittest discover -s tests
 python -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py'
 ```
