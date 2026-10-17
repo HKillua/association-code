@@ -10,6 +10,10 @@
 
 适配复制数据，不更改reader或量测。有限时刻按身份排序；相同数值重复可用于一个监督时刻，冲突/无效属性逐特征屏蔽并计数，不静默挑第一行。lat/lon合法范围、非负native速度及0..360航向按已知数据契约校验；360归0仅在监督副本。缺失时刻不外推；仅在相邻原参考时刻且间隔≤max_gap、两端该特征有效时插值，不跨无效参考点桥接。航向按最短圆弧插值，恰好180度的方向歧义屏蔽；其他属性线性。速度不转换m/s或kn。无效输出用NaN并显式mask，不能当0真值。
 
+监督装配接口`build_fusion_targets(prepared_scene, reference_scene, pair_indices, *, split, nominal_grid, time_offset_seconds, max_gap_seconds)`只把调用方已选真配对接到上述接口，不采样、不读取文件、不决定正式offset/gap。核两份scene_id相同、reference split与显式split一致且只训练/开发；若prepared_scene含split也必须一致。pair_indices为现有candidate pairs的整数行索引（可重复，保留顺序和次数），每个所选对必须非自配对、标签为1且两端A-B身份相同；负对、身份/标签矛盾和越界直接报错，不自动筛选。nominal_grid显式传入，有限严格递增、长度与values/observed的L一致，且等于prepared_scene.grid；不使用observation_times代替。
+
+返回pairs、identity_ids、query_times、states[P,L,4]、valid[P,L,4]及覆盖报告。按唯一identity仅调用一次align后复制给对应pair；无监督仍保留NaN/false，不能删除pair或改采样权重；输入不可变。测试必须覆盖真实prepared_scene接口、正负对/场景/split/时间轴错接、重复抽样次序、部分/零监督及TCM→TFM→loss的合成连通。它是监督数据，不能并入模型观测。
+
 ## PairFusion模型
 
 `PairFusionConfig(fc_hidden=..., length=64,d_model=128,nhead=8,num_layers=6,dim_feedforward=256,dropout=.1)`，fc_hidden必填正整数，其余对应既有TCM配置。论文未披露两FC中间宽度，不伪造作者值；正式配置和总参数成本在训练方案中显式给出。

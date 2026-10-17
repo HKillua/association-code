@@ -200,3 +200,115 @@ def align_reference_states(reference_scene, identity_id, query_times, *,
     report['fully_valid_queries'] = int(valid.all(axis=1).sum())
     report['unavailable_queries'] = int((~valid.any(axis=1)).sum())
     return {'states': states, 'valid': valid, 'report': report}
+
+
+def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
+                         split, nominal_grid, time_offset_seconds, max_gap_seconds):
+    """Assemble supervision for caller-selected, same-identity candidate rows.
+
+    This does not sample or filter pairs. Repeated row indices keep their order
+    and multiplicity, including when supervision is entirely unavailable. The
+    explicit nominal grid must equal ``prepared_scene['grid']``; actual token
+    observation times are not a substitute. Outputs are copied targets, never
+    additions to the model's observed input. Split membership is supplied by the
+    caller/reader; this function does not open or infer a split manifest.
+    """
+    if not isinstance(prepared_scene, Mapping) or not isinstance(reference_scene, Mapping):
+        raise DataError('Fusion targets require prepared and already-read reference scenes')
+    if split not in ALLOWED_SPLITS or reference_scene.get('split') != split:
+        raise DataError('Fusion targets require matching training/development splits; T_test is sealed')
+    if 'split' in prepared_scene and prepared_scene['split'] != split:
+        raise DataError('Prepared scene split differs from the explicit split')
+    scene_id = prepared_scene.get('scene_id')
+    if not isinstance(scene_id, str) or not scene_id or reference_scene.get('scene_id') != scene_id:
+        raise DataError('Prepared and reference scene_id must match')
+    if tuple(reference_scene.get('state_fields', ())) != STATE_FIELDS:
+        raise DataError('Reference state fields must be lat/lon/vel/cou in reader order')
+    if not isinstance(reference_scene.get('rows'), (list, tuple)):
+        raise DataError('Reference scene must contain the reader rows')
+    for name, value in (('time_offset_seconds', time_offset_seconds),
+                        ('max_gap_seconds', max_gap_seconds)):
+        if not _numeric(value) or not math.isfinite(float(value)):
+            raise DataError(f'{name} must be an explicit finite number')
+    if max_gap_seconds < 0:
+        raise DataError('max_gap_seconds must be nonnegative')
+
+    values = np.asarray(prepared_scene.get('values'))
+    observed = np.asarray(prepared_scene.get('observed'))
+    if values.ndim != 3 or values.shape[2] != 4 or values.dtype.kind not in 'iuf':
+        raise DataError('Prepared values must have numeric shape [N,L,4]')
+    if observed.dtype.kind != 'b' or observed.shape != values.shape[:2]:
+        raise DataError('Prepared observed must have bool shape [N,L] matching values')
+    node_count, length = values.shape[:2]
+    query = np.asarray(nominal_grid)
+    prepared_grid = np.asarray(prepared_scene.get('grid'))
+    if (query.ndim != 1 or query.dtype.kind not in 'iuf' or len(query) != length
+            or prepared_grid.shape != query.shape or prepared_grid.dtype.kind not in 'iuf'):
+        raise DataError('nominal_grid and prepared grid must have numeric shape [L]')
+    query = query.astype(np.float64, copy=True)
+    if (not np.isfinite(query).all() or (query[1:] <= query[:-1]).any()
+            or not np.array_equal(query, prepared_grid)):
+        raise DataError('nominal_grid must be finite, strictly increasing and equal prepared grid')
+
+    candidates = np.asarray(prepared_scene.get('pairs'))
+    labels = np.asarray(prepared_scene.get('labels'))
+    identities = np.asarray(prepared_scene.get('identities'))
+    if candidates.ndim != 2 or candidates.shape[1] != 2 or candidates.dtype.kind not in 'iu':
+        raise DataError('Prepared candidate pairs must have integer shape [E,2]')
+    if labels.shape != (len(candidates),) or labels.dtype.kind not in 'iuf':
+        raise DataError('Prepared labels must have numeric shape [E] matching candidate pairs')
+    if identities.shape != (node_count,):
+        raise DataError('Prepared identities must match the node count')
+    selected = np.asarray(pair_indices)
+    # Empty Python lists have float dtype, but contain no noninteger index.
+    if selected.ndim != 1 or (selected.size and selected.dtype.kind not in 'iu'):
+        raise DataError('pair_indices must be a one-dimensional integer sequence')
+    if isinstance(pair_indices, (list, tuple)) and any(isinstance(i, (bool, np.bool_)) for i in pair_indices):
+        raise DataError('pair_indices cannot contain boolean indices')
+    if ((selected < 0) | (selected >= len(candidates))).any():
+        raise DataError('pair_indices are outside the prepared candidate rows')
+    selected = selected.astype(np.int64, copy=True)
+    pairs = candidates[selected].copy()
+    if ((pairs < 0) | (pairs >= node_count)).any():
+        raise DataError('Selected pair endpoints are outside the prepared nodes')
+    if (pairs[:, 0] == pairs[:, 1]).any():
+        raise DataError('Fusion targets cannot supervise self-pairs')
+    if not (labels[selected] == 1).all():
+        raise DataError('Every selected fusion pair must have label 1')
+    identity_ids = []
+    for left, right in pairs:
+        identity = identities[left]
+        if not isinstance(identity, str) or len(identity.split('-')) != 2 or not all(identity.split('-')):
+            raise DataError('Selected pair identity must use the A-B form')
+        if identity != identities[right]:
+            raise DataError('Selected positive label contradicts the endpoint identities')
+        identity_ids.append(str(identity))
+
+    aligned = {}
+    for identity in identity_ids:
+        if identity not in aligned:
+            aligned[identity] = align_reference_states(
+                reference_scene, identity, query, time_offset_seconds=time_offset_seconds,
+                max_gap_seconds=max_gap_seconds)
+    states = np.full((len(pairs), length, 4), np.nan, dtype=np.float64)
+    valid = np.zeros(states.shape, dtype=bool)
+    for index, identity in enumerate(identity_ids):
+        states[index] = aligned[identity]['states']
+        valid[index] = aligned[identity]['valid']
+    per_pair = valid.sum(axis=1)
+    report = {
+        'scene_id': scene_id, 'split': split, 'state_fields': list(STATE_FIELDS),
+        'time_offset_seconds': float(time_offset_seconds), 'max_gap_seconds': float(max_gap_seconds),
+        'query_count': length, 'pair_count': len(pairs), 'unique_identity_count': len(aligned),
+        'repeated_selection_count': len(selected) - len(set(selected.tolist())),
+        'valid_per_feature': dict(zip(STATE_FIELDS, valid.sum(axis=(0, 1)).tolist())),
+        'valid_per_pair_feature': per_pair.tolist(),
+        'fully_valid_queries_per_pair': valid.all(axis=2).sum(axis=1).tolist(),
+        'unavailable_pairs': int((~valid.any(axis=(1, 2))).sum()),
+        'missing_identity_ids': [identity for identity, item in aligned.items()
+                                 if item['report']['missing_identity']],
+        'per_identity': {identity: item['report'] for identity, item in aligned.items()},
+        'coverage_counts_include_repeated_selections': True,
+    }
+    return {'pairs': pairs, 'identity_ids': identity_ids, 'query_times': query,
+            'states': states, 'valid': valid, 'report': report}
