@@ -2,18 +2,19 @@
 
 这里只保留当前入口与历史摘要；执行命令、完整证据以各轮 L2S/S2L 为准。旧轮次不重复领取。
 
-## 当前：FIRST-FIT-010 / RUNNING
+## 当前：FIRST-FIT-010 / COMPLETED（待本地判读）
 
 | 请求 | 回执 | 代码版本 | 下一责任方 |
 | --- | --- | --- | --- |
-| [L2S-20261017-010](L2S-20261017-010.md) | [S2L-20261017-010](S2L-20261017-010.md) | `d13ac65dc59b9c9b16b59a93f7044eb49aefb568` | SERVER_AI：完成当前运行并回传终态 |
+| [L2S-20261017-010](L2S-20261017-010.md) | [S2L-20261017-010](S2L-20261017-010.md) | `d13ac65dc59b9c9b16b59a93f7044eb49aefb568` | LOCAL_AI：判读第一份真实结果 |
 
 - 单个 A0/CE/seed20：TCM100 → 冻结 TAM100 → joint20，累计上限6小时、一次尝试、重试0。复用007划分，完整 V_select 选模，T_test 封存。当前没有第二项 READY 任务。
+- **010 终态（服务器 21:31 回传，COMPLETED）**：外层与内层退出码均 0，220/220 更新完成，`run.json` 与 `progress.json` 均 COMPLETED；耗时 **7272 秒／21600 秒 = 33.7%**，其中 `final_caches` 占 2254 秒；峰值分配 **10.38 GiB**。两次完整验证（同一 V_select 64 场景、29,008 对）：`macro_f1` **0.34912 → 0.42624**，`micro_precision` **0.11403 → 0.15841**（正例先验 11.366%，约 1.39 倍），`micro_recall` 0.99697 → 0.73400，接受率 **99.4% → 52.7%**，`p_fa` 0.88598 → **0.84159**，tp/fp/fn/tn 由 3287/25540/10/171 变 2420/12857/877/12854。`test_opened = False`；`eligible_reference` 在 summary 为 true，但 `reference_status` 原文声明"convergence not automatically established"。joint 二十步关联损失仍贴 ln2 波动，改善来自排序与阈值而非训练损失下降。`checkpoint.pt` 实测 SHA 与 summary 内 `checkpoint_sha256` 一致；`progress/history/summary/checkpoint` 超 256 KiB 留服务器并在回执给出路径/字节/SHA256。
+
 - **最近已审服务器：`f19071c5c97e56c727797d58a5b66b5e5321af21`，21:21进度/21:30更正。** 报告220/220更新完成，仍在final_caches、约111分钟/360分钟；没有终态、原始JSON或完整缓存回传，不能提前视为合格reference。
 - 冻结TAM阶段服务器报告macro-F1=0.349116、micro-F1=0.204645，接受99.376%候选。根据其混淆矩阵重算，precision=11.4025%，正例占比=11.3658%，相差0.0367个百分点；全接受的micro-F1=0.204117。此选定阈值的区分效果很弱，但尚不能据此判断完整排序或joint最终表现；终态核原始分数，不用loss≈ln2直接判失败。
 - 服务器已更正“没有验证指标”的误报：字段在`history[*].selection`及joint的`starts_from_selection.validation`。完整细节保留在原S2L，不再复制到索引。
 - **本地已备好下一阶段代码：** 隔离分支`research/innovation-pilot-v1`的CDF1验证入口，以及TSA-cTFER独立离线适配，最新`8176ca34c5d81baa38dee36e0b8d766729aa91d6`，19项相关CPU测试通过。main执行代码未变；没有真实TSA/CDF1结果。010终态后整合并分别给确切code_commit、独立L2S和新路径，当前无011。新增预算仍CDF1≤3h＋A_full≤3h＋TSA≤6h、最多两作业并发；[下一阶段方案](../docs/next_experiments_after_010.md)。
-
 ## 必要约束
 
 - GPU可动态选卡、允许共卡和交接预算内换卡，不要求整卡空闲、不终止他人进程；具体作业数与累计预算由当前L2S确定。
