@@ -68,6 +68,30 @@ class RuntimeConfigTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 write_json(path/'bad.json', {'bad': float('nan')})
 
+    def test_cuda_telemetry_failure_preserves_terminal_failure_hash_and_previous_peaks(self):
+        for failed_query in ('is_available', 'max_memory_allocated', 'max_memory_reserved'):
+            with self.subTest(query=failed_query), tempfile.TemporaryDirectory() as tmp:
+                path = Path(tmp)/'run'
+                run = Run(path, {'provenance': {'device': 'cuda:0'},
+                                 'cuda_process_peak_allocated_bytes': 123,
+                                 'cuda_process_peak_reserved_bytes': 456})
+                with patch('torch.cuda.is_available', return_value=True), \
+                        patch('torch.cuda.max_memory_allocated', return_value=789), \
+                        patch('torch.cuda.max_memory_reserved', return_value=999), \
+                        patch('torch.cuda.' + failed_query, side_effect=RuntimeError('CUDA telemetry failed')):
+                    run.finish('FAILED', failure_type='ValueError', failure='original failure',
+                               profile_sha256='saved-profile-hash', completed_steps=1)
+                saved = read_json(path/'run.json')
+                self.assertEqual(saved['status'], 'FAILED')
+                self.assertEqual(saved['failure_type'], 'ValueError')
+                self.assertEqual(saved['failure'], 'original failure')
+                self.assertEqual(saved['profile_sha256'], 'saved-profile-hash')
+                self.assertEqual(saved['completed_steps'], 1)
+                self.assertIn('CUDA telemetry failed', saved['cuda_memory_measurement_error'])
+                self.assertEqual(saved['cuda_process_peak_allocated_bytes'],
+                                 789 if failed_query == 'max_memory_reserved' else 123)
+                self.assertEqual(saved['cuda_process_peak_reserved_bytes'], 456)
+
 
 if __name__ == '__main__':
     unittest.main()

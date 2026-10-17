@@ -119,11 +119,16 @@ class Run:
 
     def finish(self, status='COMPLETED', **extra):
         device_name = self.metadata.get('provenance', {}).get('device', '')
-        if device_name.startswith('cuda') and torch.cuda.is_available():
-            # CLI resets counters before the job; nested fits inherit process
-            # peaks. Do not mislabel this as an isolated per-fit measurement.
-            extra['cuda_process_peak_allocated_bytes'] = torch.cuda.max_memory_allocated(device_name)
-            extra['cuda_process_peak_reserved_bytes'] = torch.cuda.max_memory_reserved(device_name)
+        if device_name.startswith('cuda'):
+            try:
+                if torch.cuda.is_available():
+                    # Nested fits inherit process peaks, not isolated fit peaks.
+                    extra['cuda_process_peak_allocated_bytes'] = torch.cuda.max_memory_allocated(device_name)
+                    extra['cuda_process_peak_reserved_bytes'] = torch.cuda.max_memory_reserved(device_name)
+            except Exception as error:
+                # Optional telemetry must not suppress the original failure,
+                # artifact hashes or terminal state. Keep any earlier peaks.
+                extra['cuda_memory_measurement_error'] = f'{type(error).__name__}: {error}'
         self.metadata.update(status=status, elapsed_seconds=time.monotonic()-self.started, **extra)
         write_json(self.path/'run.json', self.metadata)
 
