@@ -2,7 +2,7 @@
 
 MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下，把补全、关联、融合一起做**：先完成TMTAFF的近似复现，再用同协议的候选预实验判断课题潜力。
 
-010的A0与011的CDF1、A_full、TSA-cTFER均已完成，现有真实结果仍是关联预实验。main已合入参考状态读取、时间对齐、正配对监督装配、成对TFM及融合损失；**完整融合trainer、轨迹输出/评价和原生融合训练尚未完成**。`A_full`表示扩大关联训练池，不是完整论文系统；CDF1也不是预定的最终创新。模型、配置、执行入口和必要协议在本仓库维护，论文原件与研究笔记另存。
+010的A0与011的CDF1、A_full、TSA-cTFER均已完成，现有真实结果仍是关联预实验。代码已有参考监督装配、成对TFM、分组/递归输出、轨迹误差与覆盖评价原语、TFM及joint有效batch更新；**完整四阶段trainer、全目标评价装配和原生融合训练尚未完成**。`A_full`表示扩大关联训练池，不是完整论文系统；CDF1也不是预定的最终创新。模型、配置、执行入口和必要协议在本仓库维护，论文原件与研究笔记另存。
 
 ## 从这里开始
 
@@ -25,6 +25,7 @@ MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下�
 | `association/data.py`、`dataset.py` | 原生Level2 ZIP、A–B身份标签、共享A组件隔离、异常记录与时间配准 |
 | `association/models.py`、`reference.py` | TCM/TAM训练、验证选择、权重恢复与冻结分数缓存 |
 | `association/reference_states.py`、`fusion_targets.py`、`fusion.py` | 训练/开发侧参考状态、显式对齐与正配对监督装配、可微成对TFM；[实现约定](docs/specs/tmtaff-fusion.md) |
+| `association/fusion_inference.py`、`fusion_metrics.py`、`fusion_training.py` | 显式分组/递归输出、已对齐轨迹与分组评价、精确归一化的有效batch更新；不自动启动原生训练 |
 | `association/context.py`、`heads.py` | 校准、CDF1及机制对照 |
 | `association/metrics.py`、`pipeline.py` | 既有关联评价与pilot；后者包含测试阶段，当前不执行 |
 | `association/cli.py`、`profile.py` | 数据准备、单参考训练、成本探测和合成检查 |

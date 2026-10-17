@@ -25,7 +25,7 @@
 
 ## 本地下一步与边界
 
-研究目标仍是**不完整量测下补全、关联、融合一起做**。011终态后，参考状态读取、显式对齐/配对监督、成对TFM及融合loss已整合main；合成测试接通三个模块，但尚无完整训练器、目标分组/递归输出、完整评价或原生融合训练结果。继续补这条链路，具体见[研究说明](../docs/research_brief.md)和[配置草案](../docs/tmtaff_complete_plan.md)。CDF负结果保留，不追加其训练。
+研究目标仍是**不完整量测下补全、关联、融合一起做**。参考监督、成对TFM、显式分组/递归输出、误差与覆盖评价原语、TFM/三loss-joint有效batch更新已实现，69项相关CPU测试通过。尚需四阶段外层trainer/完整checkpoint、原生时钟配置、单源对照及全目标评价装配；没有原生融合训练结果。继续补这条链路，见[研究说明](../docs/research_brief.md)和[配置草案](../docs/tmtaff_complete_plan.md)。本地代码更新不改变012复制命令或新增GPU授权；CDF负结果保留，不追加其训练。
 
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 
