@@ -1,4 +1,4 @@
-"""Four-stage training on explicitly registered, caller-supplied development data.
+"""Four-stage training on declared registered or native-time development data.
 
 No archive reader, resampling, split construction, CLI, or test-set evaluation.
 Selection is association macro-F1 only; it is not full-task optimality. A bounded
@@ -18,11 +18,11 @@ import torch
 
 from . import runtime
 from .complete_evaluation import evaluate_complete
-from .fusion import FusionLoss, PairFusion
+from .fusion import FusionLoss, PairFusion, PairFusionConfig
 from .fusion_metrics import _check_valid_states
 from .fusion_training import fusion_training_parameters, fusion_training_step
 from .metrics import evaluate_scenes, select_threshold
-from .models import AssociationModel
+from .models import AssociationModel, ModelConfig
 from .reference import fit_normalizer, normalize_scene, score_reference, _optimizer, _update
 from .sampling import BalancedScenePairSampler
 from .staged import FrozenCompletionCache, _pair_batch
@@ -75,10 +75,21 @@ def _scenes(train, validation, length):
     """Validate declared physical time semantics before constructing a run."""
     if not train or not validation:
         raise ValueError('nonempty training and V_select scenes are required')
+    adapters = {scene.get('input_adapter', 'registered_v1') for scene in [*train, *validation]}
+    if len(adapters) != 1 or not adapters.issubset({'registered_v1', 'native_time_v1'}):
+        raise ValueError('all train/validation scenes must use one explicit supported input adapter')
+    timed = adapters == {'native_time_v1'}
+    if timed:
+        from .timed_inputs import validate_timed_scene
+        policies = {(s['max_observations'], s['time_unit_seconds']) for s in [*train, *validation]}
+        if len(policies) != 1:
+            raise ValueError('native observation limit and time unit must agree across train/validation')
     contracts, seen, components = [], set(), []
     for population, allowed in ((train, {'T_core', 'T_head'}), (validation, {'V_select'})):
         population_contract, component_ids = [], set()
         for scene in population:
+            if timed:
+                validate_timed_scene(scene)
             sid, split = scene['scene_id'], scene['split']
             component = scene['component_id']
             if (not isinstance(sid, str) or not sid or not isinstance(component, str)
@@ -90,7 +101,7 @@ def _scenes(train, validation, length):
             grid, actual = np.asarray(scene['grid']), np.asarray(scene['observation_times'])
             if (values.ndim != 3 or values.shape[1:] != (length, 4)
                     or observed.shape != values.shape[:2] or observed.dtype != np.bool_
-                    or not observed.any(1).all() or not np.isfinite(values[observed]).all()):
+                    or (not timed and not observed.any(1).all()) or not np.isfinite(values[observed]).all()):
                 raise ValueError('invalid observations or an empty effective fragment')
             _check_valid_states(values, np.repeat(observed[..., None], 4, axis=-1), 'observations')
             if (grid.shape != (length,) or not np.isfinite(grid).all() or (np.diff(grid) <= 0).any()
@@ -99,6 +110,8 @@ def _scenes(train, validation, length):
                 raise ValueError('actual observation times must equal the physical grid at every observed slot')
             for mask in observed:
                 slots = np.flatnonzero(mask)
+                if timed and not len(slots):
+                    continue  # A short native fragment may have zero common-grid observations.
                 if slots[-1] - slots[0] + 1 != len(slots):
                     raise ValueError('internal support gaps are not endpoint completion')
             count = len(values)
@@ -137,11 +150,20 @@ def _scenes(train, validation, length):
                         or not np.isfinite(target[valid]).all() or (target[:, 2][valid[:, 2]] < 0).any()):
                     raise ValueError('invalid physical fusion target or feature mask')
                 _check_valid_states(target, valid, 'fusion target')
-            population_contract.append(dict(scene_id=sid, split=split, component_id=component,
+            row = dict(scene_id=sid, split=split, component_id=component,
                 grid=grid.tolist(), node_ids=list(map(str, scene['node_ids'])),
                 identities=list(map(str, identities)), sources=list(map(str, scene['sources'])),
                 pair_count=len(pairs), positive_count=int(labels.sum()), intervals=intervals.tolist(),
-                observed_counts=observed.sum(1).tolist(), target_ids=list(targets)))
+                observed_counts=observed.sum(1).tolist(), target_ids=list(targets),
+                input_adapter=scene.get('input_adapter', 'registered_v1'))
+            if timed:
+                row.update(max_observations=scene['max_observations'],
+                           time_unit_seconds=scene['time_unit_seconds'],
+                           time_origin_seconds=scene['time_origin_seconds'],
+                           native_observed_counts=np.asarray(scene['native_observed']).sum(1).tolist())
+            if 'reference_alignment' in scene:
+                row['reference_alignment'] = copy.deepcopy(scene['reference_alignment'])
+            population_contract.append(row)
         contracts.append(population_contract)
         components.append(component_ids)
     if components[0] & components[1]:
@@ -159,6 +181,40 @@ def _states(modules):
 def _restore(modules, states):
     for module, state in zip(modules, states):
         module.load_state_dict(state)
+
+
+def load_complete_snapshot(path, *, device='cpu', selected=True):
+    """Restore an explicit complete snapshot with its original input semantics.
+
+    The selected development snapshot is the default; ``selected=False`` loads
+    the last checkpoint weights for inspection, not an optimizer resume. The
+    trainer alone restores optimizer/RNG state and cumulative elapsed budget.
+    """
+    payload = torch.load(path, map_location='cpu', weights_only=True)
+    if payload.get('format_version') != 1:
+        raise ValueError('unsupported complete checkpoint format')
+    adapter = payload.get('input_adapter', 'registered_v1')
+    model_config = ModelConfig(**payload['model_config'])
+    if adapter == 'native_time_v1':
+        from .timed_models import TimedAssociationModel
+        model = TimedAssociationModel(model_config, payload['config']['branch'],
+                                     max_observations=payload['max_observations'])
+    elif adapter == 'registered_v1':
+        model = AssociationModel(model_config, payload['config']['branch'])
+    else:
+        raise ValueError('unsupported checkpoint input adapter')
+    fusion = PairFusion(PairFusionConfig(**payload['fusion_config']))
+    objective = FusionLoss(position_loss_mode=payload['config']['position_loss_mode'])
+    snapshot = payload['selected'] if selected else payload
+    if snapshot is None:
+        raise ValueError('checkpoint has no selected development snapshot yet')
+    _restore((model, fusion, objective), snapshot['states'])
+    for module in (model, fusion, objective):
+        module.to(device).eval()
+    return dict(model=model, fusion=fusion, objective=objective,
+                normalizer=payload['normalizer'], input_adapter=adapter,
+                selection=({key: value for key, value in snapshot.items() if key != 'states'}
+                           if selected else None))
 
 
 def _compatible_device(previous, requested):
@@ -222,8 +278,8 @@ def _targets(scenes, groups, device):
 
 def train_complete(train_scenes, validation_scenes, model_config, fusion_config, config,
                    output, *, device='cpu', resume_from=None, max_updates_this_call=None,
-                   evaluation_fn=None):
-    """Train supplied, already registered scenes; no native-data preparation.
+                   evaluation_fn=None, initial_elapsed_seconds=0.0):
+    """Train supplied physical scenes; native ZIP preparation is a separate caller.
 
     ``fusion_targets`` maps identity strings to states[L,4]/valid[L,4] and
     query_times[L], explicitly equal to the scene's physical grid.
@@ -237,6 +293,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     """
     started = time.monotonic()
     config = _configuration(config)
+    if (isinstance(initial_elapsed_seconds, bool) or not isinstance(initial_elapsed_seconds, (int, float))
+            or not math.isfinite(initial_elapsed_seconds) or initial_elapsed_seconds < 0):
+        raise ValueError('initial_elapsed_seconds must be finite and nonnegative')
     if max_updates_this_call is not None and (isinstance(max_updates_this_call, bool)
             or not isinstance(max_updates_this_call, int) or max_updates_this_call < 1):
         raise ValueError('max_updates_this_call must be a positive integer')
@@ -265,7 +324,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
             raise ValueError('resume configuration, registered scene contract, normalizer or device differs')
         spent_before = max(float(saved['elapsed_seconds']), float(previous_run['elapsed_seconds']))
-    if spent_before >= config['max_hours'] * 3600:
+    if spent_before + initial_elapsed_seconds >= config['max_hours'] * 3600:
         raise TimeoutError('cumulative training budget is exhausted')
     output.mkdir(parents=True, exist_ok=False)
     history = [] if saved is None else copy.deepcopy(saved['history'])
@@ -276,7 +335,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                if saved is None else copy.deepcopy(saved['coverage'])
     cursor = {'stage': 0, 'update': 0, 'completed_updates': 0} if saved is None else dict(saved['cursor'])
     selected = None if saved is None else saved['selected']
-    run = {'status': 'RUNNING', 'config': config, 'scope': 'registered-data training kernel; native adapter not included',
+    adapter = train_scenes[0].get('input_adapter', 'registered_v1')
+    run = {'status': 'RUNNING', 'config': config, 'input_adapter': adapter,
+           'scope': ('TMTAFF time-adapted approximate reference' if adapter == 'native_time_v1'
+                     else 'registered-data training kernel'),
            'selection_scope': 'association V_select macro-F1 only; not full-task optimality',
            'device': str(device),
            'resume_device_changed': saved is not None and saved['device'] != str(device),
@@ -287,7 +349,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'test_opened': False, 'resume_from': str(resume_from) if resume_from is not None else None}
 
     def elapsed():
-        return spent_before + time.monotonic() - started
+        return spent_before + initial_elapsed_seconds + time.monotonic() - started
 
     def check():
         if elapsed() >= config['max_hours'] * 3600:
@@ -302,7 +364,13 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         check()
         runtime.seed_everything(config['seed'])
         random.seed(config['seed'])
-        modules = (AssociationModel(model_config, config['branch']).to(device),
+        if adapter == 'native_time_v1':
+            from .timed_models import TimedAssociationModel
+            model = TimedAssociationModel(model_config, config['branch'],
+                                         max_observations=train_scenes[0]['max_observations'])
+        else:
+            model = AssociationModel(model_config, config['branch'])
+        modules = (model.to(device),
                    PairFusion(fusion_config).to(device),
                    FusionLoss(position_loss_mode=config['position_loss_mode']).to(device))
         model, fusion, objective = modules
@@ -323,6 +391,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         def checkpoint():
             check()
             payload = {'format_version': 1, 'config': config, 'model_config': asdict(model_config),
+                       'input_adapter': adapter,
+                       'max_observations': train_scenes[0].get('max_observations'),
                        'fusion_config': asdict(fusion_config), 'normalizer': normalizer,
                        'data_contract': contract, 'device': str(device), 'states': _states(modules),
                        'optimizer': optimizer.state_dict() if optimizer is not None else None,

@@ -73,8 +73,8 @@ def _read_rows(payload, member):
     return rows, issues
 
 
-def read_reference_states(archive_path, manifest, *, split, scene_ids):
-    """Return raw states and issues only for caller-listed training/validation scenes.
+def iter_reference_states(archive_path, manifest, *, split, scene_ids):
+    """Stream raw reference scenes, keeping only one scene's rows in memory.
 
     Each output scene contains ``rows`` in original CSV order, numeric ``time``
     and ``state=[lat,lon,vel,cou]``, original strings in ``raw``, and ``issues``.
@@ -110,10 +110,13 @@ def read_reference_states(archive_path, manifest, *, split, scene_ids):
             members[sid] = (info, name)
         if set(members) != set(requested):
             raise DataError("Missing requested reference scenes: " + ", ".join(sorted(set(requested) - set(members))))
-        result = []
         for sid in requested:
             info, name = members[sid]
             rows, issues = _read_rows(archive.read(info), name)
-            result.append({"scene_id": sid, "split": split, "member": name,
-                           "state_fields": list(STATE_FIELDS), "rows": rows, "issues": issues})
-        return result
+            yield {"scene_id": sid, "split": split, "member": name,
+                   "state_fields": list(STATE_FIELDS), "rows": rows, "issues": issues}
+
+
+def read_reference_states(archive_path, manifest, *, split, scene_ids):
+    """Compatibility list reader; use iter_reference_states for large splits."""
+    return list(iter_reference_states(archive_path, manifest, split=split, scene_ids=scene_ids))

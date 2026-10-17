@@ -1,4 +1,4 @@
-"""Complete development inference on explicitly registered physical scenes.
+"""Complete development inference on registered or native-time physical scenes.
 
 One TCM pass feeds both association and fusion. References enter only the
 evaluation call after predictions; this module does not register native tracks.
@@ -14,7 +14,7 @@ import torch
 from .full_scene_evaluation import evaluate_full_scene, simple_fusion_outputs, single_source_outputs
 from .fusion_inference import group_predicted_tracks, group_tracks_by_identity
 from .metrics import evaluate_scenes, select_threshold
-from .reference import normalize_scene
+from .reference import normalize_scene, stable_evaluation_parameters
 
 
 def aggregate_fusion_reports(reports):
@@ -46,6 +46,10 @@ def aggregate_fusion_reports(reports):
 def _registered(scene, length):
     if scene.get('split') != 'V_select':
         raise ValueError('complete development evaluation requires V_select; T_test is sealed')
+    timed = scene.get('input_adapter') == 'native_time_v1'
+    if timed:
+        from .timed_inputs import validate_timed_scene
+        validate_timed_scene(scene)
     values = np.asarray(scene['values'])
     observed = np.asarray(scene['observed'])
     grid = np.asarray(scene['grid'], dtype=np.float64)
@@ -55,7 +59,7 @@ def _registered(scene, length):
             or grid.shape != (length,) or actual.shape != observed.shape
             or not np.isfinite(grid).all() or (np.diff(grid) <= 0).any()):
         raise ValueError('invalid registered scene shape, mask or physical grid')
-    if len(values) and ((~observed.any(axis=1)).any() or not np.isfinite(values[observed]).all()):
+    if len(values) and ((not timed and (~observed.any(axis=1)).any()) or not np.isfinite(values[observed]).all()):
         raise ValueError('every valid fragment must supply finite observations')
     if not np.allclose(actual[observed], np.broadcast_to(grid, observed.shape)[observed], rtol=0, atol=1e-8):
         raise ValueError('observation time differs from physical grid; legacy scene64 registration is not accepted')
@@ -87,6 +91,7 @@ def _inference_device(device, model_device, fusion_device):
     return requested
 
 
+@stable_evaluation_parameters
 @torch.inference_mode()
 def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       batch_tracks, pair_batch_size, select_on_validation,
@@ -118,6 +123,9 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     scenes = list(scenes)
     if not scenes or len({str(s['scene_id']) for s in scenes}) != len(scenes):
         raise ValueError('a nonempty list of distinct validation scenes is required')
+    adapter = getattr(model, 'input_adapter', 'registered_v1')
+    if any(scene.get('input_adapter', 'registered_v1') != adapter for scene in scenes):
+        raise ValueError('all validation scenes must match the model input adapter')
     for scene in scenes:
         _registered(scene, model.config.length)
     device = _inference_device(device, next(model.parameters()).device, next(fusion.parameters()).device)

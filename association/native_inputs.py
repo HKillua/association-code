@@ -113,21 +113,30 @@ def _request(split, max_points):
     return _max_points(max_points)
 
 
-def load_native_split_from_archive(archive, manifest, split, *, max_points=None):
+def load_native_split_from_archive(archive, manifest, split, *, max_points=None, check=None):
     """Reuse an open archive and frozen manifest; read only this split's CSVs.
 
     Quarantined fragments retain their original diagnostics in each scene audit.
     Selected views and full canonical arrays are independent copies. Reference
     states are not read. No manifest or cache is created, and no hash is a gate.
+    Optional check is called before each scene read and after the selected split.
     """
     cap = _request(split, max_points)
     validate_archive(archive, manifest)
-    return [_record(archive.load_scene(sid), manifest['components'][sid], split, cap)
-            for sid in manifest['splits'][split]]
+    records = []
+    for sid in manifest['splits'][split]:
+        if check:
+            check()
+        records.append(_record(archive.load_scene(sid), manifest['components'][sid], split, cap))
+    if check:
+        check()
+    return records
 
 
-def load_native_split(archive_path, manifest, split, *, max_points=None):
+def load_native_split(archive_path, manifest, split, *, max_points=None, check=None):
     """Open the archive for an explicitly allowed existing split, without writes."""
     cap = _request(split, max_points)
+    if check:
+        check()
     with MTADArchive(archive_path) as archive:
-        return load_native_split_from_archive(archive, manifest, split, max_points=cap)
+        return load_native_split_from_archive(archive, manifest, split, max_points=cap, check=check)

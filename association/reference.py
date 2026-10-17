@@ -6,6 +6,7 @@ selects an epoch and threshold; this module never opens T_test measurements.
 from __future__ import annotations
 
 from dataclasses import asdict
+from functools import wraps
 import math
 import os
 from pathlib import Path
@@ -24,6 +25,10 @@ from . import runtime
 
 def fit_normalizer(prepared_scenes):
     """Population moments over training observed grid points, never padding."""
+    prepared_scenes = list(prepared_scenes)
+    if any(scene.get('input_adapter') == 'native_time_v1' for scene in prepared_scenes):
+        from .timed_inputs import fit_timed_normalizer
+        return fit_timed_normalizer(prepared_scenes)
     total = None
     squared = None
     count = 0
@@ -56,6 +61,9 @@ def fit_normalizer(prepared_scenes):
 
 
 def normalize_scene(scene, normalizer):
+    if scene.get('input_adapter') == 'native_time_v1':
+        from .timed_inputs import pack_timed_scene
+        return pack_timed_scene(scene, normalizer)
     values = np.asarray(scene["values"], dtype=np.float32)
     observed = np.asarray(scene["observed"], dtype=bool)
     mean = np.asarray(normalizer["mean"], dtype=np.float32)
@@ -72,6 +80,27 @@ def normalize_scene(scene, normalizer):
     return normalized, observed
 
 
+def stable_evaluation_parameters(function):
+    """Use one parameter-grad state for validation across frozen/joint stages.
+
+    Some inference kernels choose different FP32 paths from requires_grad even
+    inside inference_mode. A threshold chosen on a boundary score must not
+    drift merely because its checkpoint was restored in a different stage.
+    Restore each flag afterwards so validation cannot change training freezes.
+    """
+    @wraps(function)
+    def evaluate(model, *args, **kwargs):
+        flags = [(parameter, parameter.requires_grad) for parameter in model.parameters()]
+        try:
+            model.requires_grad_(False)
+            return function(model, *args, **kwargs)
+        finally:
+            for parameter, enabled in flags:
+                parameter.requires_grad_(enabled)
+    return evaluate
+
+
+@stable_evaluation_parameters
 def score_reference(model, normalizer, prepared_scenes, device, batch_tracks=64,
                     pair_batch_size=1024, check=None):
     """Raw symmetric CE logits / negative distances, with bounded pair memory."""
