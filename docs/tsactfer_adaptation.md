@@ -1,6 +1,6 @@
 # TSA-cTFER 离线表征与成对评分适配
 
-本实现用于已批准的下一阶段 baseline 比较，已整合到本地main，011待正式发布；本页不是 READY 交接，也不是作者原代码或完整在线系统复现。来源：*Contrastive Transformer Network for Track Segment Association with Two-Stage Online Method*, Remote Sensing 2024, 16, 3380，[全文](https://doi.org/10.3390/rs16183380)，主要依据 §3.4–3.5、§5.4、§6。本地已核过全文，不以当前 TCM/TAM contrastive 分支替代它。
+本实现用于已批准的下一阶段 baseline 比较，已整合到main，011已发布READY交接；本页不是 READY 交接，也不是作者原代码或完整在线系统复现。来源：*Contrastive Transformer Network for Track Segment Association with Two-Stage Online Method*, Remote Sensing 2024, 16, 3380，[全文](https://doi.org/10.3390/rs16183380)，主要依据 §3.4–3.5、§5.4、§6。本地已核过全文，不以当前 TCM/TAM contrastive 分支替代它。
 
 ## 保留的核心
 

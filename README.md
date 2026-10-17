@@ -4,7 +4,7 @@ MTAD 航迹关联与融合研究的执行代码仓库。**规范执行脚本、�
 
 **2026-10-17当前阶段：** FIRST-FIT-010已完成，220次更新、7272秒、退出码0；终选服务器报告macro-F1=0.42624，混淆矩阵重算micro-F1=0.26058。run/命令/退出码原件已审，完整指标与V_select缓存待直接复制回传。服务器已纠正误接受率的分母：`p_fa`为FDR=84.1592%，负例FPR=50.0058%；64个验证场景均有正例，零正例场景误接受率为null而非0，详见[010结果判读](docs/first_fit_010_result.md)。
 
-CDF1与TSA离线适配已整合本地main，011待正式发布；baseline复现和候选创新验证并行，新增预算CDF1≤3小时＋A_full≤3小时＋TSA≤6小时，总计≤12 GPU小时，最多两单卡并发、各一次无重试。复用007划分与010已完成缓存，完整V_select作开发比较，T_test继续封存；不重做已成功阶段。短训练不代表收敛或精确复现TMTAFF，当前也没有真实CDF1/TSA成绩。执行只以[HandOver索引](HandOver/Handover.md)指向的正式READY交接为准；应用自动化每6小时跟进。具体比较与边界见[下一轮方案](docs/next_experiments_after_010.md)。
+CDF1与TSA离线适配已整合main，011已发布READY交接；baseline复现和候选创新验证并行，新增预算CDF1≤3小时＋A_full≤3小时＋TSA≤6小时，总计≤12 GPU小时，最多两单卡并发、各一次无重试。复用007划分与010已完成缓存，完整V_select作开发比较，T_test继续封存；不重做已成功阶段。短训练不代表收敛或精确复现TMTAFF，当前也没有真实CDF1/TSA成绩。执行只以[HandOver索引](HandOver/Handover.md)指向的正式READY交接为准；应用自动化每6小时跟进。具体比较与边界见[下一轮方案](docs/next_experiments_after_010.md)。
 
 ## 研究目标
 

@@ -8,7 +8,7 @@ candidate pairs and labels. Historical hashes may be absent or stale; they do no
 gate reuse.
 
 010 is complete. The CDF1 and TSA implementations are integrated into local main;
-011 is being prepared. Only the formal READY handover authorizes execution. The
+The formal [011 READY handover](../../HandOver/L2S-20261017-011.md) authorizes execution. The
 following is an interface example:
 
 ```bash
