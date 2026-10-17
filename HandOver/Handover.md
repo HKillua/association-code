@@ -14,7 +14,7 @@
 
 | 文件 | direction | status | task_id | run_id | next_actor |
 | --- | --- | --- | --- | --- | --- |
-| [S2L-20261017-008.md](S2L-20261017-008.md) | SERVER_TO_LOCAL | **RUNNING** | PROFILE-DIAG-008 | PROFILE-DIAG-20261017-008 | SERVER_AI（执行中） |
+| [S2L-20261017-008.md](S2L-20261017-008.md) | SERVER_TO_LOCAL | **COMPLETED**（readiness: diagnostic_ready_for_local_review） | PROFILE-DIAG-008 | PROFILE-DIAG-20261017-008 | LOCAL_AI |
 
 用户于2026-10-17直接授权不固定哪张卡、允许共卡。服务器可按实时剩余显存/负载自主选卡，已有compute进程不再构成拒绝条件；后续任务可在各自预算内同配置换卡。无需逐卡请示，不终止他人进程，模型/数据/评价标准保持冻结，详见[现场授权](../docs/server_autonomy.md)。该授权覆盖历史轮次的空闲卡限制。
 
@@ -37,7 +37,7 @@ GPU-POLICY-006的授权与设备查询由007承接：若006尚未领取，不再
 | ENV-005 | [L2S-20261016-005.md](L2S-20261016-005.md) | [S2L-20261016-005.md](S2L-20261016-005.md) | **COMPLETED / readiness `ready_for_native_profile`**（`cuda_smoke: completed_attempt_1_on_free_card`）：A 通过——39 秒／900 秒，内外 rc 0，`validation.json=COMPLETED`、五项 checks 全 0、95 项 tests 与 15 项旧审计 OK，新快照齐全，CPU 实际提交 `2af59d6`。B 于 10-17 13:01 用**本轮从未动用的 CUDA 预算**在空闲卡 GPU1 上 67 秒完成——内外 rc 0、`acceptance.json` 与 `pilot_run.json` 皆 COMPLETED、pilot 34.02 秒、峰值分配 18500096 B、UUID 绑定、report hash 一致；`allocation_status=free_at_prelaunch_check`，**故未使用 10-17 的共卡授权**。CUDA 实际提交 `ebc9522` ≠ CPU `2af59d6`（仅 HandOver 差异）而 `code_sha256` 相同，新契约按设计放行。**CUDA 尝试 1/2；首份真实 CUDA 通路证据已取得**（合成 smoke，不代表正式配置资源，不构成研究结论） |
 | GPU-POLICY-006 | [L2S-20261017-006.md](L2S-20261017-006.md) | 本地未收到；服务器已有记录需保留回传 | 007承接未领取的查询与授权，不再重复；已领取006先收尾。旧请求保留，不预填执行结果 |
 | NATIVE-PROFILE-007 | [L2S-20261017-007.md](L2S-20261017-007.md) | [S2L-20261017-007.md](S2L-20261017-007.md) | **FAILED / prepare_ok_profile_timeout**：真实准备73秒通过，可复用；profile外层rc124、1784秒完成9/200步，均值184.85秒（warmup后181.17），原报告RUNNING保留，峰值unknown。启动快照无其他进程不代表全程无竞争；单场景TAM投影不作完整训练实测。008补齐分段成本与显存证据，详见本地审计 |
-| PROFILE-DIAG-008 | [L2S-20261017-008.md](L2S-20261017-008.md) | [S2L-20261017-008.md](S2L-20261017-008.md) | **RUNNING**（14:52 领取；冻结核对全通过，HEAD `1ce201f`、`fd594e4b` 为祖先且执行文件一致，两个新输出目录均不存在）：复用007成功prepared，同配置6步/累计GPU30分钟；逐步显存和分段耗时诊断。项目101项、setup32项、旧审计15项本地通过，真实CUDA效果待本轮；不自动授权完整训练 |
+| PROFILE-DIAG-008 | [L2S-20261017-008.md](L2S-20261017-008.md) | [S2L-20261017-008.md](S2L-20261017-008.md) | **COMPLETED / readiness `diagnostic_ready_for_local_review`**：四阶段 rc 全 0——prepared-check 3 秒核验并直接复用 007 原件（manifest/audit/config 三 SHA 相符，未重跑 prepare）；profile 974 秒／1800 秒完成 **6/6 步**；accept 与结束快照在 300 秒 review 内 3 秒通过。实测 `step_seconds` 均值 **152.6 秒/步**（低于 007 的 184.85，但分段同步使测量条件不同，不可直接比较）；`phase_seconds` 中 **optimization 915.9 秒占 95.0%**、data_loading 46.5 秒占 4.8%；步内约 **60% 反向+优化器、34% encode**（含 TCM 补全，不冒称 Decoder 单段）。**首次真实显存**：peak allocated **11,773 MiB**、reserved 11,810 MiB，六步快照齐全无误差字段。开始与结束两次查询该卡 compute 进程均为空 → **未共享、未换卡**，尝试 1/3。**异常待本地判断**：`step_positive_pair_counts` 六步全为 **0**（每步 pair 均为 64），losses/grads 与 007 前 6 步逐值一致，CE 分支这几步只从负例学习。`cost_projection` 的 TAM 外推 ≈1,084,213 小时、`full_reference_seconds` 保持 null。未改模型/采样/batch/精度/步数，未读测试与参考，无 checkpoint，未启动完整训练 |
 
 本地复核 ENV-004 的 22:30 补记：整仓 HEAD 相等检查确实会阻止后续补跑，但不是已经发生的 CUDA 失败；从 CPU 提交到回执提交仅 HandOver 变化，旧 CPU 通过结论仍有效。ENV-005 已替换该检查，不再要求纯文档提交前后 HEAD 相同。等待日志实际跨度1167秒、含19/20秒两个短间隔，不能称全部至少60秒；离散采样不能证明四小时连续无空档，也没有 smoke 显存实测。原始服务器叙述保留在其 S2L，本地核验口径见 env_005_plan。
 

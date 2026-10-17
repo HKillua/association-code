@@ -1,0 +1,1 @@
+/home/wangguangjie/djs/mtad-field-20261016/bin/python tools/setup/gpu_allocation.py --device GPU-6811d9c0-b8a4-b5fd-0175-790964d42afc --output HandOver/results/PROFILE-DIAG-20261017-008/allocation-end.json 
