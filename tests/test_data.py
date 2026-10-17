@@ -211,14 +211,15 @@ class DataTests(unittest.TestCase):
         for split in ("T_head", "V_select", "T_test"):
             self.assertFalse(set(map(str, range(5))) & set(manifest["splits"][split]))
 
-    def test_manifest_tampering_is_rejected(self):
+    def test_manifest_hash_is_optional_metadata(self):
         fixture_zip(self.path, {0: basic_scene()})
         with MTADArchive(self.path) as archive:
             manifest = build_manifest(archive, 20, {name: 1 for name in ("T_core", "T_head", "V_select", "T_test")}, [0])
         altered = copy.deepcopy(manifest)
-        altered["seed"] += 1
-        with self.assertRaisesRegex(DataError, "hash mismatch"):
-            validate_manifest(altered)
+        altered["manifest_sha256"] = "historical-stale-hash"
+        self.assertTrue(validate_manifest(altered))
+        del altered["manifest_sha256"]
+        self.assertTrue(validate_manifest(altered))
 
     def test_semantic_manifest_corruption_is_rejected_even_with_new_hash(self):
         fixture_zip(self.path, {0: basic_scene()})

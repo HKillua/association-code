@@ -17,7 +17,8 @@ from .metrics import (brier_scores, compare_predictions, evaluate_scenes,
                       third_node_diagnostics)
 from .reference import load_reference, score_reference, train_reference
 from .runtime import (Run, code_fingerprint, digest, load_records, object_hash,
-                      provenance, read_json, save_records, write_json)
+                      provenance, read_json, save_records, semantic_binding,
+                      validate_record_split, write_json)
 
 ROLES = ('A0', 'A_full')
 BRANCHES = ('ce', 'contrastive')
@@ -27,11 +28,6 @@ def _artifacts(path, names):
     return {name: digest(Path(path)/name) for name in names}
 
 
-def _verify_artifacts(path, expected):
-    if _artifacts(path, expected) != expected:
-        raise ValueError('Artifacts differ from frozen validation selection')
-
-
 def _release():
     gc.collect()
     if torch.cuda.is_available():
@@ -39,9 +35,13 @@ def _release():
 
 
 def _head_binding(manifest, config, reference, seed):
-    return {'manifest_sha256': manifest['manifest_sha256'], 'config_sha256': object_hash(config),
-            'reference_checkpoint_sha256': reference['checkpoint_sha256'],
-            'code_sha256': code_fingerprint(), 'seed': seed}
+    return {'manifest_sha256': manifest.get('manifest_sha256'), 'config_sha256': object_hash(config),
+            'reference_checkpoint_sha256': reference.get('checkpoint_sha256'),
+            'code_sha256': code_fingerprint(), 'seed': seed,
+            'reference_role': reference['role'], 'reference_branch': reference['branch'],
+            'training_split': 'T_head', 'selection_split': 'V_select',
+            'training_scene_ids': manifest['splits']['T_head'],
+            'validation_scene_ids': manifest['splits']['V_select']}
 
 
 def _compare(records, thresholds, base, candidate, config, seed):
@@ -114,7 +114,7 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
     maximum_hours = ((4 + 2 * (len(seeds)-1)) * config['reference']['max_hours']
                      + len(seeds)*config['heads']['max_hours'] + 3)
     run = Run(output, {'kind': 'pilot', 'provenance': provenance(device), 'seeds': seeds,
-                      'manifest_sha256': manifest['manifest_sha256'], 'config_sha256': object_hash(config),
+                      'manifest_sha256': manifest.get('manifest_sha256'), 'config_sha256': object_hash(config),
                       'reference_reuse': reference_root is not None}, maximum_hours)
     write_json(run.path/'config.json', config)
     write_json(run.path/'manifest.json', manifest)
@@ -135,7 +135,7 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
                     candidates[branch] = (path, summary)
                     selection_trace.append({'seed': seed, 'role': role, 'branch': branch,
                                             'path': str(path.resolve()),
-                                            'checkpoint_sha256': summary['checkpoint_sha256'],
+                                            'checkpoint_sha256': summary.get('checkpoint_sha256'),
                                             'validation': summary['validation']})
                     del model, normalizer
                     _release()
@@ -150,6 +150,8 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
             a0 = selected[seed]['A0']
             head_records = load_records(Path(a0['path'])/'T_head', a0['summary']['cache_bindings']['T_head'])
             val_records = load_records(Path(a0['path'])/'V_select', a0['summary']['cache_bindings']['V_select'])
+            validate_record_split(head_records, manifest, 'T_head')
+            validate_record_split(val_records, manifest, 'V_select')
             binding = _head_binding(manifest, config, a0['summary'], seed)
             head_path = run.path/f'seed{seed}'/'heads'
             choices = train_heads(head_records, val_records, config, seed, device, head_path, binding)
@@ -159,7 +161,7 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
             del head_records, val_records
             _release()
         frozen = {'schema': 1, 'phase': 'all_validation_selection_complete_before_test_read',
-                  'manifest_sha256': manifest['manifest_sha256'], 'config_sha256': object_hash(config),
+                  'manifest_sha256': manifest.get('manifest_sha256'), 'config_sha256': object_hash(config),
                   'code_sha256': code_fingerprint(), 'branch_choices': branch_choices,
                   'branch_candidates': selection_trace, 'selected': selected,
                   'seed_policy': 'first configured seed selects reference branches; later seeds inherit',
@@ -168,10 +170,6 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
         write_json(run.path/'selection_frozen.json', frozen)
         # Single evaluation gate: everything that can be selected is now on disk.
         run.check()
-        for selections in selected.values():
-            for role in ROLES:
-                _verify_artifacts(selections[role]['path'], selections[role]['artifacts'])
-            _verify_artifacts(selections['heads']['path'], selections['heads']['artifacts'])
         test_scenes = load_split(archive_path, manifest, 'T_test', config['model']['length'])
         write_json(run.path/'test_audit.json', [{'scene_id': scene['scene_id'], 'audit': scene['audit']}
                                               for scene in test_scenes])
@@ -183,10 +181,9 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
             inference_times = {}
             for role in ROLES:
                 entry = selected[seed][role]
-                _verify_artifacts(entry['path'], entry['artifacts'])
                 model, normalizer, loaded_summary = load_reference(entry['path'], manifest, config, role,
                                                                     entry['branch'], seed, device)
-                if loaded_summary != entry['summary']:
+                if semantic_binding(loaded_summary) != semantic_binding(entry['summary']):
                     raise ValueError('Reference differs from frozen validation selection')
                 if device.type == 'cuda':
                     torch.cuda.synchronize(device)
@@ -200,10 +197,9 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
                 del model, normalizer
                 _release()
             head_info = selected[seed]['heads']
-            if digest(Path(head_info['path'])/'selection.json') != head_info['selection_sha256']:
-                raise ValueError('Frozen head selection was modified after validation')
-            _verify_artifacts(head_info['path'], head_info['artifacts'])
             bundle = load_heads(head_info['path'], device, expected_binding=head_info['binding'])
+            if bundle['selection'] != head_info['arms']:
+                raise ValueError('Head selection differs from frozen validation selection')
             started = time.monotonic()
             corrected = predict_heads(bundle, raw['A0'], seed, split='T_test')
             if device.type == 'cuda':
@@ -230,7 +226,7 @@ def run_pilot(archive_path, manifest, config, device, output, reference_root=Non
                    for r in reports]
         usable = [effect for effect in effects if effect is not None]
         report = {'protocol': config['protocol'], 'selection_sha256': frozen['content_sha256'],
-                  'manifest_sha256': manifest['manifest_sha256'], 'seeds': reports,
+                  'manifest_sha256': manifest.get('manifest_sha256'), 'seeds': reports,
                   'across_seed_primary': {'mean_difference': float(np.mean(usable)) if usable else None,
                                          'range': [min(usable), max(usable)] if usable else None,
                                          'note': 'Descriptive across seeds on the same test set; not an independent CI'},

@@ -8,6 +8,7 @@ import torch
 
 from association.dataset import make_synthetic_archive, prepare
 from association.reference import train_reference
+from association.metrics import compare_predictions
 from association.runtime import load_records, read_json, write_json
 from tools.experiments.cdf1_validation import ARM_ORDER, main, run_validation
 
@@ -68,6 +69,16 @@ class CDF1ValidationEntryTests(unittest.TestCase):
         self.assertEqual(read_json(output / "run.json")["status"], "COMPLETED")
         self.assertEqual(read_json(output / "heads/run.json")["status"], "COMPLETED")
         self.assertIn("not held-out test results", (output / "validation.md").read_text())
+        a0 = load_records(self.reference / "V_select")
+        corrected = load_records(output / "V_select/B")
+        self.assertEqual(report["error_changes"]["A0"], compare_predictions(
+            a0, corrected, report["arms"]["A0"]["threshold"], report["arms"]["B"]["threshold"]))
+        self.assertEqual(set(report["error_changes"]), set(ARM_ORDER) - {"B"})
+        for kind, examples in report["A0_to_B_examples"].items():
+            self.assertLessEqual(len(examples), 5)
+            for example in examples:
+                self.assertNotEqual(example["old_prediction"], example["new_prediction"])
+                self.assertEqual(example["new_prediction"] == example["label"], kind == "corrected")
         with self.assertRaises(FileExistsError):
             run_validation(self.reference, self.manifest_path, self.config_path, "cpu", output)
 

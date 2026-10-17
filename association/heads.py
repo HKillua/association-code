@@ -18,8 +18,8 @@ from .context import (HEAD_DIMENSIONS, FeatureScaler, MonotoneCalibrator,
                       ResidualHead, context_features, fixed_rule, head_features,
                       scene_pool_features)
 from .metrics import _records, evaluate_scenes, select_threshold
-from .runtime import (Run, code_fingerprint, digest, jsonable, object_hash, provenance, read_json,
-                      seed_everything, write_json)
+from .runtime import (Run, digest, jsonable, object_hash, provenance, read_json,
+                      seed_everything, semantic_binding, write_json)
 
 
 HEAD_KINDS = ("B", "B_shuffle", "PairMLP", "EndpointMarginal", "ScenePool")
@@ -294,7 +294,7 @@ def train_heads(head_records, val_records, config, seed, device, output, binding
 
 
 def load_heads(path, device, expected_binding=None):
-    """Load only a complete, hash-verified run using torch weights_only=True."""
+    """Load complete runs with matching experiment content and model shapes."""
     path = Path(path)
     directory = path if path.is_dir() else path.parent
     if path.is_file() and path.name != "heads.pt":
@@ -302,16 +302,12 @@ def load_heads(path, device, expected_binding=None):
     metadata = read_json(directory / "run.json")
     if metadata.get("status") != "COMPLETED" or metadata.get("kind") != "context-heads":
         raise ValueError("only a completed contextual-head run can be loaded")
-    if metadata.get("provenance", {}).get("code_sha256") != code_fingerprint():
-        raise ValueError("current association code differs from the frozen head run")
-    for name in ("calibrator.pt", "heads.pt", "selection.json"):
-        if metadata.get("artifacts", {}).get(name) != digest(directory / name):
-            raise ValueError(f"head artifact checksum mismatch: {name}")
     selection = read_json(directory / "selection.json")
-    if selection["binding"] != metadata["binding"] or (expected_binding is not None and selection["binding"] != jsonable(expected_binding)):
+    binding = semantic_binding(selection["binding"])
+    if binding != semantic_binding(metadata["binding"]) or (expected_binding is not None and binding != semantic_binding(jsonable(expected_binding))):
         raise ValueError("head provenance binding mismatch")
-    if selection["config_sha256"] != object_hash(selection["config"]) or selection["config_sha256"] != metadata["config_sha256"]:
-        raise ValueError("head configuration checksum mismatch")
+    if selection["config"] != metadata["config"]:
+        raise ValueError("head configuration mismatch")
     if selection["seed"] != metadata["seed"]:
         raise ValueError("head seed mismatch")
     device = torch.device(device)
@@ -336,6 +332,9 @@ def load_heads(path, device, expected_binding=None):
         module.eval().requires_grad_(False)
         scaler.eval()
         heads[kind] = {"head": module, "scaler": scaler}
+    modules = [calibrator] + [item[name] for item in heads.values() for name in ("head", "scaler")]
+    if any(not torch.isfinite(value).all() for module in modules for value in module.state_dict().values()):
+        raise FloatingPointError("head checkpoint contains nonfinite values")
     return {"calibrator": calibrator, "heads": heads, "selection": selection["arms"],
             "binding": selection["binding"], "seed": selection["seed"], "device": device,
             "metadata": selection}

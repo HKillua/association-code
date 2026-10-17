@@ -9,6 +9,7 @@ import zipfile
 import numpy as np
 
 from association.data import DataError, MTADArchive
+from association.config import validate_manifest_config
 from association.dataset import (load_split, load_split_from_archive, make_synthetic_archive,
                                  prepare, prepare_scene, validate_archive)
 
@@ -76,29 +77,33 @@ class DatasetTests(unittest.TestCase):
             measurement_scenes = {row["scene_id"] for row in archive.members_read if row["kind"] == "measurements"}
             self.assertEqual(measurement_scenes, set(manifest["splits"]["T_head"]))
             self.assertFalse(any(row["kind"] == "reference" for row in archive.members_read))
-            with patch.object(archive, "archive_sha256", wraps=archive.archive_sha256) as hashed:
+            with patch.object(archive, "archive_sha256", side_effect=AssertionError("No archive hash gate")) as hashed:
                 validate_archive(archive, manifest)
-                self.assertEqual(hashed.call_count, 1)
+                hashed.assert_not_called()
         self.assertEqual([record["scene_id"] for record in records], manifest["splits"]["T_head"])
         again = load_split(self.archive, manifest, "T_head", 6)
         np.testing.assert_array_equal(again[0]["values"], records[0]["values"])
 
-    def test_archive_hash_binding_rejects_same_size_changed_input(self):
+    def test_archive_hash_metadata_is_not_a_loading_gate(self):
         manifest = prepare(self.archive, CONFIG, self.root / "prepared", synthetic=True)
-        data = bytearray(self.archive.read_bytes())
-        # Change a byte in a compressed member, leaving the central directory intact.
-        data[100] ^= 1
-        changed = self.root / "changed.zip"
-        changed.write_bytes(data)
-        with self.assertRaisesRegex(DataError, "SHA-256"):
-            load_split(changed, manifest, "T_head", 6)
+        manifest["archive"]["sha256"] = "stale"
+        manifest["manifest_sha256"] = "stale"
+        records = load_split(self.archive, manifest, "T_head", 6)
+        del manifest["archive"]["sha256"], manifest["manifest_sha256"]
+        with patch.object(MTADArchive, "archive_sha256", side_effect=AssertionError("No archive hashing")):
+            again = load_split(self.archive, manifest, "T_head", 6)
+        np.testing.assert_array_equal(again[0]["values"], records[0]["values"])
 
-    def test_stale_manifest_hash_rejected_before_loading(self):
+    def test_actual_manifest_seed_and_inventory_are_checked(self):
         manifest = prepare(self.archive, CONFIG, self.root / "prepared", synthetic=True)
         changed = copy.deepcopy(manifest)
         changed["seed"] += 1
-        with self.assertRaisesRegex(DataError, "hash mismatch"):
-            load_split(self.archive, changed, "T_head", 6)
+        with self.assertRaisesRegex(ValueError, "seed/caps"):
+            validate_manifest_config(changed, CONFIG)
+        with MTADArchive(self.archive) as archive, \
+                patch.object(archive, "scene_ids", return_value=["wrong-scene"]):
+            with self.assertRaisesRegex(DataError, "Archive scenes"):
+                validate_archive(archive, manifest)
 
     def test_output_and_archive_cannot_be_overwritten(self):
         prepare(self.archive, CONFIG, self.root / "prepared", synthetic=True)

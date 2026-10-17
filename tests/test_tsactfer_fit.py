@@ -12,7 +12,7 @@ import torch
 
 from association.data import MTADArchive
 from association.dataset import make_synthetic_archive, prepare, load_split_from_archive
-from association.runtime import BudgetExceeded, Run, load_records, read_json, write_json
+from association.runtime import BudgetExceeded, Run, load_records, read_json, semantic_binding, write_json
 from baselines.tsactfer import TSAConfig, TSActfer
 from baselines.tsactfer_data import pack_scene
 from tools.experiments.tsactfer_fit import (learning_rate, main, score_scenes, train,
@@ -75,6 +75,8 @@ class TSAFitTests(unittest.TestCase):
         protocol_path, config_path = self.root / "protocol.json", self.root / "tsa.json"
         write_json(protocol_path, self.protocol)
         write_json(config_path, self.config)
+        manifest_path = self.root / "without-hashes.json"
+        write_json(manifest_path, semantic_binding(self.manifest))
         seen = []
 
         def limited_load(archive, manifest, split, length):
@@ -82,8 +84,9 @@ class TSAFitTests(unittest.TestCase):
             seen.append(split)
             return load_split_from_archive(archive, manifest, split, length)
 
-        with patch("tools.experiments.tsactfer_fit.load_split_from_archive", side_effect=limited_load):
-            result = main(["--archive", str(self.archive), "--manifest", str(self.root / "prepared/manifest.json"),
+        with patch("tools.experiments.tsactfer_fit.load_split_from_archive", side_effect=limited_load), \
+                patch.object(MTADArchive, "archive_sha256", side_effect=AssertionError("No archive hash gate")):
+            result = main(["--archive", str(self.archive), "--manifest", str(manifest_path),
                            "--protocol-config", str(protocol_path), "--tsa-config", str(config_path),
                            "--device", "cpu", "--cpu-threads", "1", "--output", str(output)])
         self.assertEqual(result, 0)

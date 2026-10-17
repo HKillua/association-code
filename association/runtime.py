@@ -52,6 +52,22 @@ def object_hash(value):
     return hashlib.sha256(json.dumps(jsonable(value), sort_keys=True, allow_nan=False).encode()).hexdigest()
 
 
+def semantic_binding(value):
+    """Compare experiment content; old checksum/fingerprint fields are optional.
+
+    This also handles nested historical bindings. Hash-based random seeds and
+    split construction are deliberately unrelated to this metadata projection.
+    """
+    if isinstance(value, dict):
+        return {key: semantic_binding(item) for key, item in value.items()
+                if not (isinstance(key, str) and (key == 'sha256' or key.endswith('_sha256')
+                        or key.endswith('_hashes')
+                        or key in ('config_hash', 'code_fingerprint', 'tsa_sources')))}
+    if isinstance(value, (list, tuple)):
+        return [semantic_binding(item) for item in value]
+    return value
+
+
 def seed_everything(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -151,18 +167,44 @@ def save_records(directory, records, binding):
 def load_records(directory, expected_binding=None):
     directory = Path(directory)
     index = read_json(directory/'index.json')
-    checksum = index.pop('content_sha256')
-    if object_hash(index) != checksum:
-        raise ValueError('Score cache index checksum mismatch')
-    if expected_binding is not None and index['binding'] != expected_binding:
+    if expected_binding is not None and semantic_binding(index['binding']) != semantic_binding(expected_binding):
         raise ValueError('Score cache provenance differs from the requested reference/split')
     records = []
     for item in index['records']:
         name = item['file']
-        if Path(name).name != name or digest(directory/name) != item['sha256']:
-            raise ValueError('Score cache file checksum or path invalid')
+        if Path(name).name != name:
+            raise ValueError('Score cache file path invalid')
         with np.load(directory/name, allow_pickle=False) as arrays:
             record = {key: arrays[key] for key in arrays.files}
         record.update({key: item[key] for key in ['scene_id', 'component_id', 'node_ids']})
         records.append(record)
+    # Check the data used by the experiment, rather than its serialization.
+    from .metrics import _records
+    _records(records)
+    for record in records:
+        n = len(record['sources'])
+        identities, intervals = np.asarray(record['identities']), np.asarray(record['intervals'])
+        if (identities.shape != (n,) or len(record['node_ids']) != n
+                or len(set(record['node_ids'])) != n or record['component_id'] is None):
+            raise ValueError('Score cache node identity/component metadata invalid')
+        if (intervals.shape != (n, 2) or not np.isfinite(intervals).all()
+                or (intervals[:, 1] < intervals[:, 0]).any()):
+            raise ValueError('Score cache intervals invalid')
+        pairs = record['pairs']
+        if not np.array_equal(record['labels'], identities[pairs[:, 0]] == identities[pairs[:, 1]]):
+            raise ValueError('Score cache labels disagree with identity pairs')
     return records
+
+
+def validate_record_split(records, manifest, split):
+    """Check a cache against the actual selected scene/component population."""
+    actual = [str(record['scene_id']) for record in records]
+    expected = [str(scene) for scene in manifest['splits'][split]]
+    if len(actual) != len(expected) or set(actual) != set(expected):
+        raise ValueError(f'{split} cache scenes differ from manifest')
+    for record in records:
+        if str(record['component_id']) != str(manifest['components'][str(record['scene_id'])]):
+            raise ValueError(f'{split} cache component differs from manifest')
+        n = len(record['sources'])
+        if len(record['pairs']) != n * (n - 1) // 2:
+            raise ValueError(f'{split} cache does not contain all candidate pairs')

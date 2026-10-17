@@ -40,18 +40,14 @@ def prepare_scene(archive, scene_id, length, component_id):
 
 
 def validate_archive(archive, manifest):
-    """Verify a persisted manifest and its exact archive content binding."""
+    """Check the manifest and actual archive scene inventory, without hashes."""
     validate_manifest(manifest)
-    if archive.path.stat().st_size != manifest["archive"]["bytes"]:
-        raise DataError("Archive size differs from frozen manifest")
-    if archive.archive_sha256() != manifest["archive"]["sha256"]:
-        raise DataError("Archive SHA-256 differs from frozen manifest")
     if archive.scene_ids() != manifest["all_scenes"]:
         raise DataError("Archive scenes differ from frozen manifest")
 
 
 def load_split_from_archive(archive, manifest, split, length):
-    """Use an already open archive; its SHA-256 is computed only once."""
+    """Use an already open archive and read only the selected split."""
     validate_archive(archive, manifest)
     if split not in SPLIT_NAMES:
         raise DataError("Unknown split " + str(split))

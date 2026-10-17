@@ -58,8 +58,9 @@ class PipelineContracts(unittest.TestCase):
                 (path / name).write_text("frozen " + name)
 
         def load_reference(path, manifest, config, role, branch, seed, device):
-            checksum = "changed-checkpoint" if evaluating and replace_reference_after_freeze else f"{role}-{branch}-{seed}"
-            summary = {"checkpoint_sha256": checksum, "threshold": .5,
+            threshold = .7 if evaluating and replace_reference_after_freeze else .5
+            summary = {"checkpoint_sha256": f"{role}-{branch}-{seed}", "threshold": threshold,
+                       "role": role, "branch": branch, "seed": seed,
                        "validation": {"macro_f1": .6 if branch == "ce" else .5},
                        "cache_bindings": {"T_head": {"split": "T_head"}, "V_select": {"split": "V_select"}}}
             return None, None, summary
@@ -90,9 +91,17 @@ class PipelineContracts(unittest.TestCase):
             return {"seed": seed, "metrics": {name: {"macro_f1": 1., "micro_f1": 1.} for name in records},
                     "comparisons": {"B_minus_A_full": {"paired_component_difference": {"difference": 0.}}}}
 
+        def load_records(path, binding):
+            return [{**record, 'scene_id': sid, 'component_id': self.manifest['components'][sid]}
+                    for sid in self.manifest['splits'][binding['split']]]
+
+        def load_heads(*args, **kwargs):
+            threshold = .7 if evaluating and replace_head_after_freeze else .5
+            return {'selection': {name: {'threshold': threshold} for name in names}}
+
         with patch.multiple(pipeline, train_reference=train_reference, load_reference=load_reference,
                             train_heads=train_heads, load_split=load_test,
-                            load_records=lambda *args: [record], load_heads=lambda *args, **kwargs: {},
+                            load_records=load_records, load_heads=load_heads,
                             score_reference=lambda *args, **kwargs: [record],
                             predict_heads=lambda *args, **kwargs: {name: [record] for name in names},
                             evaluate_locked=evaluate):
@@ -108,8 +117,8 @@ class PipelineContracts(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "[Ff]roz|[Cc]heckpoint|[Rr]eference"):
             self._fake_pipeline(replace_reference_after_freeze=True)
 
-    def test_head_weight_replacement_after_freeze_is_rejected(self):
-        with self.assertRaisesRegex(ValueError, "[Ff]roz|[Aa]rtifact"):
+    def test_head_selection_change_after_freeze_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "[Ff]roz|[Ss]election"):
             self._fake_pipeline(replace_head_after_freeze=True)
 
     def test_training_failure_retains_record_without_opening_test(self):

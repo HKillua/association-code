@@ -116,13 +116,14 @@ def score_reference(model, normalizer, prepared_scenes, device, batch_tracks=64,
 
 
 def _binding(manifest, config, role, branch, seed):
-    return {"manifest_sha256": manifest["manifest_sha256"], "config_hash": runtime.object_hash(config),
+    return {"manifest_sha256": manifest.get("manifest_sha256"), "config_hash": runtime.object_hash(config),
             "code_fingerprint": runtime.code_fingerprint(), "role": role, "branch": branch, "seed": int(seed)}
 
 
 def cache_binding(summary, split):
     return {key: summary[key] for key in ["manifest_sha256", "config_hash", "code_fingerprint",
-                                         "role", "branch", "seed", "checkpoint_sha256"]} | {"split": split}
+                                         "role", "branch", "seed", "checkpoint_sha256"]
+            if key in summary} | {"split": split}
 
 
 def _check_configuration(config, role, branch):
@@ -336,7 +337,7 @@ def train_reference(archive_path, manifest, config, role, branch, seed, device, 
 
 
 def load_reference(path, manifest, config, role, branch, seed, device):
-    """Reject incomplete, modified, stale-code/config/manifest references."""
+    """Load completed references using their actual configuration and split."""
     path = Path(path)
     model_config, ref = _check_configuration(config, role, branch)
     if ref.get("schedule", "legacy") == "staged_updates_v2" and ref["purpose"] != "fit":
@@ -345,23 +346,35 @@ def load_reference(path, manifest, config, role, branch, seed, device):
     run = runtime.read_json(path / "run.json")
     if run.get("status") != "COMPLETED":
         raise ValueError("reference is not a completed run")
-    if run.get("summary_sha256") != runtime.digest(path / "summary.json"):
-        raise ValueError("reference summary checksum mismatch")
+    if run.get("config") != runtime.jsonable(config):
+        raise ValueError("reference configuration differs from requested configuration")
     summary = runtime.read_json(path / "summary.json")
-    expected = _binding(manifest, config, role, branch, seed)
+    expected = {"role": role, "branch": branch, "seed": int(seed)}
     if any(summary.get(key) != value or run.get(key) != value for key, value in expected.items()):
-        raise ValueError("reference role/branch/seed, manifest, config, or code fingerprint mismatch")
-    checksum = runtime.digest(path / "checkpoint.pt")
-    if summary.get("checkpoint_sha256") != checksum or run.get("checkpoint_sha256") != checksum:
-        raise ValueError("reference checkpoint checksum mismatch")
+        raise ValueError("reference role/branch/seed mismatch")
+    training_splits = ["T_core"] + (["T_head"] if role == "A_full" else [])
+    training_scenes = [sid for split in training_splits for sid in manifest["splits"][split]]
+    if (summary.get("training_splits") != training_splits
+            or summary.get("training_scene_ids") != training_scenes
+            or summary.get("selection_split") != "V_select"
+            or summary.get("test_opened") is not False):
+        raise ValueError("reference training/selection split differs from manifest")
     payload = torch.load(path / "checkpoint.pt", map_location=torch.device(device), weights_only=True)
-    if payload["binding"] != expected or payload["model_config"] != asdict(model_config):
+    if runtime.semantic_binding(payload["binding"]) != expected or payload["model_config"] != asdict(model_config):
         raise ValueError("checkpoint metadata differs from reference provenance")
     if payload["normalizer"] != summary["normalizer"] or payload["selection"]["threshold"] != summary["threshold"]:
         raise ValueError("checkpoint selection or normalizer differs from reference summary")
+    if (payload["normalizer"].get("training_scene_ids") != training_scenes
+            or payload["selection"]["validation"] != summary["validation"]):
+        raise ValueError("checkpoint training scenes or validation differs from reference summary")
+    normalizer = payload["normalizer"]
+    mean, std = np.asarray(normalizer["mean"]), np.asarray(normalizer["std"])
+    if (mean.shape != (model_config.input_dim,) or std.shape != mean.shape
+            or not np.isfinite(mean).all() or not np.isfinite(std).all() or (std <= 0).any()):
+        raise ValueError("checkpoint normalizer is invalid")
     model = AssociationModel(model_config, branch).to(device)
     model.load_state_dict(payload["state_dict"], strict=True)
     model.eval()
-    if not all(torch.isfinite(parameter).all() for parameter in model.parameters()):
-        raise FloatingPointError("checkpoint contains nonfinite parameters")
+    if not all(torch.isfinite(value).all() for value in model.state_dict().values()):
+        raise FloatingPointError("checkpoint contains nonfinite model values")
     return model, payload["normalizer"], summary

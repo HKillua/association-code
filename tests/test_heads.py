@@ -12,6 +12,7 @@ from torch.nn import functional as F
 
 from association.heads import train_heads, load_heads, predict_heads
 from association.metrics import evaluate_scenes
+from association.runtime import read_json, semantic_binding, write_json
 
 
 def scene(scene_id, n=4):
@@ -38,7 +39,8 @@ class HeadTrainingTests(unittest.TestCase):
         cls.test_records = [scene("test-a"), scene("test-b", n=2)]
         cls.config = {"epochs": 2, "calibration_steps": 3, "deltas": [.5, 1.],
                       "learning_rate": .01, "max_hours": .1}
-        cls.binding = {"reference_sha256": "synthetic-reference", "manifest_sha256": "synthetic-manifest"}
+        cls.binding = {"reference_sha256": "synthetic-reference", "manifest_sha256": "synthetic-manifest",
+                       "seed": 20, "training_split": "T_head", "selection_split": "V_select"}
         cls.selection = train_heads(cls.head_records, cls.val_records, cls.config, 20,
                                     "cpu", cls.output, cls.binding)
 
@@ -97,7 +99,7 @@ class HeadTrainingTests(unittest.TestCase):
 
     def test_integrity_wrong_binding_and_inference_overlap_fail(self):
         with self.assertRaises(ValueError):
-            load_heads(self.output, "cpu", {"reference_sha256": "other"})
+            load_heads(self.output, "cpu", {**self.binding, "seed": 21})
         bundle = load_heads(self.output, "cpu")
         with self.assertRaises(ValueError):
             predict_heads(bundle, self.test_records, 21)
@@ -105,9 +107,33 @@ class HeadTrainingTests(unittest.TestCase):
             predict_heads(bundle, self.head_records, 20, split="T_test")
         target = Path(self.temporary.name) / "corrupted"
         shutil.copytree(self.output, target)
-        with (target / "heads.pt").open("ab") as handle:
-            handle.write(b"corruption")
-        with self.assertRaisesRegex(ValueError, "checksum"):
+        payload = torch.load(target / "heads.pt", weights_only=True)
+        payload["heads"]["B"]["delta"] += 1
+        torch.save(payload, target / "heads.pt")
+        with self.assertRaisesRegex(ValueError, "residual bound"):
+            load_heads(target, "cpu")
+
+    def test_hashes_are_optional_but_actual_config_and_seed_must_match(self):
+        target = Path(self.temporary.name) / "hashes-optional"
+        shutil.copytree(self.output, target)
+        for name in ("run.json", "selection.json"):
+            write_json(target / name, semantic_binding(read_json(target / name)))
+        metadata = read_json(target / "run.json")
+        metadata["artifacts"] = {"heads.pt": "stale"}
+        metadata["provenance"]["code_sha256"] = "changed-code"
+        write_json(target / "run.json", metadata)
+        with patch("association.runtime.code_fingerprint", side_effect=AssertionError("No code hash gate")), \
+                patch("association.heads.digest", side_effect=AssertionError("No file hash gate")):
+            load_heads(target, "cpu", {**self.binding, "reference_sha256": "different"})
+        selection = read_json(target / "selection.json")
+        original = copy.deepcopy(selection)
+        selection["config"]["learning_rate"] *= 2
+        write_json(target / "selection.json", selection)
+        with self.assertRaisesRegex(ValueError, "configuration mismatch"):
+            load_heads(target, "cpu")
+        original["seed"] = 21
+        write_json(target / "selection.json", original)
+        with self.assertRaisesRegex(ValueError, "seed mismatch"):
             load_heads(target, "cpu")
 
     def test_one_class_overlap_and_budget_failures_keep_reports(self):

@@ -144,7 +144,7 @@ def train(archive_path, manifest, protocol_config, config, device, output):
         raise ValueError("TSA slots cannot truncate the common registered input")
     device = torch.device(device)
     training = config["training"]
-    binding = {"scope": config["scope"], "manifest_sha256": manifest["manifest_sha256"],
+    binding = {"scope": config["scope"], "manifest_sha256": manifest.get("manifest_sha256"),
                "protocol_config_sha256": runtime.object_hash(protocol_config),
                "tsa_config_sha256": runtime.object_hash(config), "seed": config["seed"],
                "association_code_sha256": runtime.code_fingerprint(),
@@ -220,7 +220,8 @@ def train(archive_path, manifest, protocol_config, config, device, output):
                             "validation": evaluate_scenes(records, selection["threshold"])}
                     payload = {"state_dict": {k: v.detach().cpu().clone() for k, v in model.state_dict().items()},
                                "model_config": asdict(model_config), "normalizer": normalizer,
-                               "binding": binding, "selection": best}
+                               "binding": binding, "selection": best,
+                               "config": config, "protocol_config": protocol_config}
                     temporary = checkpoint.with_suffix(".pt.tmp")
                     torch.save(payload, temporary)
                     temporary.replace(checkpoint)
@@ -233,8 +234,11 @@ def train(archive_path, manifest, protocol_config, config, device, output):
         run.check()
         start = time.monotonic()
         payload = torch.load(checkpoint, map_location=device, weights_only=True)
-        if payload["binding"] != binding:
+        if runtime.semantic_binding(payload["binding"]) != runtime.semantic_binding(binding):
             raise ValueError("TSA checkpoint binding mismatch")
+        if (payload["model_config"] != asdict(model_config) or payload["config"] != config
+                or payload["protocol_config"] != protocol_config or payload["normalizer"] != normalizer):
+            raise ValueError("TSA checkpoint configuration/normalizer mismatch")
         model.load_state_dict(payload["state_dict"])
         records = score_scenes(model, valid_scenes, device, training["inference_batch_tracks"], run.check)
         measured = evaluate_scenes(records, best["threshold"])

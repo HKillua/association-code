@@ -10,7 +10,7 @@ import torch
 from association.dataset import make_synthetic_archive, prepare, load_split
 from association.reference import (fit_normalizer, load_reference, score_reference,
                                    train_reference)
-from association.runtime import BudgetExceeded, load_records, read_json
+from association.runtime import BudgetExceeded, load_records, read_json, semantic_binding, write_json
 
 
 class ReferenceTests(unittest.TestCase):
@@ -76,18 +76,57 @@ class ReferenceTests(unittest.TestCase):
         self.assertEqual(normalizer["mean"], [2., 4.])
         self.assertEqual(normalizer["std"], [1., 2.])
 
-    def test_stale_config_code_and_corrupt_checkpoint_rejected(self):
+    def test_actual_config_role_seed_and_training_split_are_checked_without_hashes(self):
         self.fit()
         changed = copy.deepcopy(self.config)
         changed["reference"]["learning_rate"] *= 2
-        with self.assertRaisesRegex(ValueError, "fingerprint mismatch"):
+        with self.assertRaisesRegex(ValueError, "configuration differs"):
             load_reference(self.root / "fit", self.manifest, changed, "A0", "ce", 20, "cpu")
-        with patch("association.runtime.code_fingerprint", return_value="changed-code"):
-            with self.assertRaisesRegex(ValueError, "fingerprint mismatch"):
-                load_reference(self.root / "fit", self.manifest, self.config, "A0", "ce", 20, "cpu")
-        with (self.root / "fit" / "checkpoint.pt").open("ab") as handle:
-            handle.write(b"modified")
-        with self.assertRaisesRegex(ValueError, "checkpoint checksum"):
+        for role, branch, seed in (("A_full", "ce", 20), ("A0", "contrastive", 20), ("A0", "ce", 21)):
+            with self.subTest(role=role, branch=branch, seed=seed), self.assertRaisesRegex(ValueError, "role/branch/seed"):
+                load_reference(self.root / "fit", self.manifest, self.config, role, branch, seed, "cpu")
+        with patch("association.runtime.code_fingerprint", side_effect=AssertionError("No code hash gate")), \
+                patch("association.runtime.digest", side_effect=AssertionError("No file hash gate")):
+            load_reference(self.root / "fit", self.manifest, self.config, "A0", "ce", 20, "cpu")
+        summary = read_json(self.root / "fit/summary.json")
+        summary["training_scene_ids"] = self.manifest["splits"]["T_head"]
+        write_json(self.root / "fit/summary.json", summary)
+        with self.assertRaisesRegex(ValueError, "training/selection split"):
+            load_reference(self.root / "fit", self.manifest, self.config, "A0", "ce", 20, "cpu")
+
+    def test_missing_or_stale_hashes_allow_reference_and_cache_reuse(self):
+        self.fit()
+        path = self.root / "fit"
+        for name in ("run.json", "summary.json", "T_head/index.json", "V_select/index.json"):
+            write_json(path / name, semantic_binding(read_json(path / name)))
+        payload = torch.load(path / "checkpoint.pt", weights_only=True)
+        payload["binding"] = semantic_binding(payload["binding"])
+        torch.save(payload, path / "checkpoint.pt")
+        manifest = semantic_binding(self.manifest)
+        with patch("association.runtime.code_fingerprint", side_effect=AssertionError("No code hash gate")), \
+                patch("association.runtime.digest", side_effect=AssertionError("No file hash gate")):
+            _, _, summary = load_reference(path, manifest, self.config, "A0", "ce", 20, "cpu")
+            load_records(path / "V_select", summary["cache_bindings"]["V_select"])
+        payload["binding"]["code_fingerprint"] = "different-old-code"
+        torch.save(payload, path / "checkpoint.pt")
+        metadata = read_json(path / "run.json")
+        metadata.update(checkpoint_sha256="stale-checkpoint", summary_sha256="stale-summary")
+        write_json(path / "run.json", metadata)
+        load_reference(path, manifest, self.config, "A0", "ce", 20, "cpu")
+
+    def test_checkpoint_shape_and_nonfinite_parameters_are_rejected(self):
+        self.fit()
+        checkpoint = self.root / "fit/checkpoint.pt"
+        payload = torch.load(checkpoint, weights_only=True)
+        key = next(iter(payload["state_dict"]))
+        original = payload["state_dict"][key].clone()
+        payload["state_dict"][key] = torch.zeros(0)
+        torch.save(payload, checkpoint)
+        with self.assertRaisesRegex(RuntimeError, "size mismatch"):
+            load_reference(self.root / "fit", self.manifest, self.config, "A0", "ce", 20, "cpu")
+        payload["state_dict"][key] = original.fill_(float("nan"))
+        torch.save(payload, checkpoint)
+        with self.assertRaisesRegex(FloatingPointError, "nonfinite"):
             load_reference(self.root / "fit", self.manifest, self.config, "A0", "ce", 20, "cpu")
 
     def test_budget_failure_preserves_terminal_run_and_cannot_be_loaded_or_overwritten(self):

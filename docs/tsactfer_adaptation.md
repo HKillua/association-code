@@ -1,6 +1,6 @@
 # TSA-cTFER 离线表征与成对评分适配
 
-本实现用于已批准的下一阶段 baseline 比较，不是 READY 交接，也不是作者原代码或完整在线系统复现。来源：*Contrastive Transformer Network for Track Segment Association with Two-Stage Online Method*, Remote Sensing 2024, 16, 3380，[全文](https://doi.org/10.3390/rs16183380)，主要依据 §3.4–3.5、§5.4、§6。本地已核过全文，不以当前 TCM/TAM contrastive 分支替代它。
+本实现用于已批准的下一阶段 baseline 比较，已整合到本地main，011待正式发布；本页不是 READY 交接，也不是作者原代码或完整在线系统复现。来源：*Contrastive Transformer Network for Track Segment Association with Two-Stage Online Method*, Remote Sensing 2024, 16, 3380，[全文](https://doi.org/10.3390/rs16183380)，主要依据 §3.4–3.5、§5.4、§6。本地已核过全文，不以当前 TCM/TAM contrastive 分支替代它。
 
 ## 保留的核心
 
@@ -36,7 +36,7 @@
 
 ## 入口与可观察验收
 
-`tools/experiments/tsactfer_fit.py`接受archive、007 manifest、原protocol-config、独立tsa-config、显式device及全新output。沿用现有数据、指标、Run与缓存工具；baseline源码另作hash绑定，association源码不改，避免使010缓存失效。
+`tools/experiments/tsactfer_fit.py`接受archive、007 manifest、原protocol-config、独立tsa-config、显式device及全新output。沿用现有数据、指标、Run与缓存工具。两端不再用SHA或fingerprint判别执行资格；旧hash字段仅为历史元数据，缺失或变化不阻塞。实际配置、划分、角色/种子、模型与缓存内容继续检查，010的已完成缓存可直接复用。
 
 | 行为 | 验证 |
 | --- | --- |
@@ -45,4 +45,4 @@
 | 能实际训练并选模 | 小型原生格式合成archive的双任务更新、完整验证、checkpoint重载和缓存复算 |
 | 数据与失败边界 | 只加载T_core/V_select；旧输出拒绝；不足身份不降规模；超时/失败保留产物且不标完成 |
 
-首训累计最多6小时，加载/训练/验证/缓存/退出均包含；正式L2S需给外层总时限。一次尝试、无重试，不追加参数搜索。010终态前仅隔离开发，不部署main或启动新训练。通过合成测试不代表真实MTAD/CUDA实验成功。
+首训累计最多6小时，加载/训练/验证/缓存/退出均包含；正式L2S给出外层总时限。一次尝试、无重试，不追加参数搜索。与CDF1≤3小时、A_full≤3小时共享新增12 GPU小时总上限，最多两个单卡作业并发。010已完成；下一步按正式READY交接执行，T_test继续封存。通过合成测试不代表真实MTAD/CUDA实验成功。

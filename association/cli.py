@@ -56,8 +56,6 @@ def _manifest(args, config):
         manifest = read_json(directory/'manifest.json')
         if audit.get('length') != config['model']['length']:
             raise ValueError('Prepared registration length differs from config.model.length')
-        if audit.get('manifest_sha256') != manifest.get('manifest_sha256'):
-            raise ValueError('Preparation audit and manifest do not match')
     else:
         manifest = read_json(args.manifest)
     validate_manifest(manifest)
