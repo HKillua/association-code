@@ -30,6 +30,26 @@ from .staged import FrozenCompletionCache, _pair_batch
 STAGES = ('TCM', 'TAM_FROZEN', 'TFM_FROZEN', 'JOINT')
 
 
+def _synchronize(device):
+    if device.type == 'cuda':
+        torch.cuda.synchronize(device)
+
+
+def _record_cuda_peaks(run, device):
+    """Optional allocator telemetry must not replace a training exception."""
+    if device.type != 'cuda' or not run['cuda_peak_reset_completed']:
+        return
+    for key, reader in (
+            ('cuda_process_peak_allocated_bytes', torch.cuda.max_memory_allocated),
+            ('cuda_process_peak_reserved_bytes', torch.cuda.max_memory_reserved)):
+        try:
+            run[key] = int(reader(device))
+        except Exception as error:
+            # Keep any earlier readable value; one failed counter must not
+            # prevent reading the other. No retry or synchronization here.
+            run.setdefault('cuda_memory_measurement_errors', {})[key] = f'{type(error).__name__}: {error}'
+
+
 def _configuration(config):
     config = copy.deepcopy(config)
     required = {'updates', 'learning_rates', 'seed', 'branch', 'batch_tracks',
@@ -346,7 +366,15 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'sampling': {'association': sampler.describe(),
                         'tcm': 'uniform over training fragments with at least two observed points',
                         'tfm': 'uniform positive-eligible scene, then uniform positive pair; replacement iff necessary'},
-           'test_opened': False, 'resume_from': str(resume_from) if resume_from is not None else None}
+           'test_opened': False, 'resume_from': str(resume_from) if resume_from is not None else None,
+           'validation_timings': [],
+           'validation_timing_scope': 'current invocation; full scoring, threshold selection and selected snapshot CPU copy/metrics; excludes checkpoint I/O',
+           'final_evaluation_seconds': None, 'final_evaluation_status': 'NOT_STARTED',
+           'final_evaluation_scope': 'selected state restore, full association/fusion evaluation and threshold consistency check; excludes summary I/O',
+           'timing_note': 'successful CUDA boundaries synchronize; failed timings stop at exception without waiting for outstanding CUDA work',
+           'cuda_process_peak_allocated_bytes': None, 'cuda_process_peak_reserved_bytes': None,
+           'cuda_peak_reset_completed': False if device.type == 'cuda' else None,
+           'cuda_memory_scope': 'current invocation, selected device, process PyTorch allocator peak since pre-model reset; includes existing live allocations/cache; not model-only, whole-device usage or cumulative across resume'}
 
     def elapsed():
         return spent_before + initial_elapsed_seconds + time.monotonic() - started
@@ -356,6 +384,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             raise TimeoutError('cumulative training budget exceeded')
 
     def write_run(status, **extra):
+        _record_cuda_peaks(run, device)
         run.update(status=status, elapsed_seconds=elapsed(), cursor=dict(cursor), **extra)
         runtime.write_json(output / 'run.json', run)
 
@@ -364,6 +393,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         check()
         runtime.seed_everything(config['seed'])
         random.seed(config['seed'])
+        if device.type == 'cuda':
+            _synchronize(device)
+            torch.cuda.reset_peak_memory_stats(device)
+            run['cuda_peak_reset_completed'] = True
         if adapter == 'native_time_v1':
             from .timed_models import TimedAssociationModel
             model = TimedAssociationModel(model_config, config['branch'],
@@ -491,14 +524,25 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 item[name] = sorted({train_scenes[s]['scene_id'] for s, i in item['pairs']
                                      if train_scenes[s]['labels'][i] == label})
             if phase in ('TAM_FROZEN', 'JOINT') and (update % config['validate_every_updates'] == 0 or update == total_updates):
-                records = score_reference(model, normalizer, validation_scenes, device,
-                    config['validation_batches']['tracks'], config['validation_batches']['pairs'], check=check)
-                selection = select_threshold(records)
-                row['selection'] = selection
-                if selected is None or selection['macro_f1'] > selected['macro_f1'] + 1e-12:
-                    selected = {'macro_f1': selection['macro_f1'], 'threshold': selection['threshold'],
-                                'stage': phase, 'update': update, 'states': _states(modules),
-                                'validation': evaluate_scenes(records, selection['threshold'])}
+                _synchronize(device)
+                validation_started = time.monotonic()
+                timing = {'stage': phase, 'update': update, 'status': 'FAILED',
+                          'seconds': None, 'selected_snapshot_copied': False}
+                run['validation_timings'].append(timing)
+                try:
+                    records = score_reference(model, normalizer, validation_scenes, device,
+                        config['validation_batches']['tracks'], config['validation_batches']['pairs'], check=check)
+                    selection = select_threshold(records)
+                    row['selection'] = selection
+                    if selected is None or selection['macro_f1'] > selected['macro_f1'] + 1e-12:
+                        selected = {'macro_f1': selection['macro_f1'], 'threshold': selection['threshold'],
+                                    'stage': phase, 'update': update, 'states': _states(modules),
+                                    'validation': evaluate_scenes(records, selection['threshold'])}
+                        timing['selected_snapshot_copied'] = True
+                    _synchronize(device)
+                    timing['status'] = 'COMPLETED'
+                finally:
+                    row['validation_seconds'] = timing['seconds'] = time.monotonic() - validation_started
             if phase == 'TFM_FROZEN' and update == total_updates:
                 selected = {**selected, 'states': _states(modules), 'fusion_stage': phase, 'fusion_update': update}
             history.append(row)
@@ -510,24 +554,33 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 if not (phase == 'JOINT' and update == total_updates):
                     write_run('INTERRUPTED')
                     return run
-        _restore(modules, selected['states'])
-        model.eval()
-        fusion.eval()
-        evaluator = evaluate_complete if evaluation_fn is None else evaluation_fn
-        evaluation = evaluator(model, fusion, normalizer, validation_scenes, device=device,
-            batch_tracks=config['validation_batches']['tracks'],
-            pair_batch_size=config['validation_batches']['pairs'],
-            select_on_validation=True, threshold=None,
-            singleton_policy=config['singleton_policy'], check=check)
-        final_threshold, saved_threshold = evaluation['threshold'], selected['threshold']
-        if ((final_threshold is None) != (saved_threshold is None)
-                or (final_threshold is not None and not math.isclose(
-                    final_threshold, saved_threshold, rel_tol=0, abs_tol=1e-7))):
-            raise ValueError('selected snapshot final threshold differs from its saved validation threshold')
+        _synchronize(device)
+        evaluation_started = time.monotonic()
+        run['final_evaluation_status'] = 'FAILED'
+        try:
+            _restore(modules, selected['states'])
+            model.eval()
+            fusion.eval()
+            evaluator = evaluate_complete if evaluation_fn is None else evaluation_fn
+            evaluation = evaluator(model, fusion, normalizer, validation_scenes, device=device,
+                batch_tracks=config['validation_batches']['tracks'],
+                pair_batch_size=config['validation_batches']['pairs'],
+                select_on_validation=True, threshold=None,
+                singleton_policy=config['singleton_policy'], check=check)
+            final_threshold, saved_threshold = evaluation['threshold'], selected['threshold']
+            if ((final_threshold is None) != (saved_threshold is None)
+                    or (final_threshold is not None and not math.isclose(
+                        final_threshold, saved_threshold, rel_tol=0, abs_tol=1e-7))):
+                raise ValueError('selected snapshot final threshold differs from its saved validation threshold')
+            _synchronize(device)
+            run['final_evaluation_status'] = 'COMPLETED'
+        finally:
+            run['final_evaluation_seconds'] = time.monotonic() - evaluation_started
         check()
         runtime.write_json(output / 'summary.json', {
             'selection': {k: v for k, v in selected.items() if k != 'states'},
             'selection_scope': run['selection_scope'], 'evaluation': evaluation,
+            'evaluation_seconds': run['final_evaluation_seconds'],
             'normalizer': normalizer, 'coverage': coverage, 'test_opened': False})
         check()
         write_run('COMPLETED')

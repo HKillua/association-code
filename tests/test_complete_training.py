@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from association import runtime
-from association.complete_training import STAGES, _compatible_device, train_complete
+from association.complete_training import STAGES, _compatible_device, _record_cuda_peaks, train_complete
 from association.fusion import PairFusionConfig
 from association.models import ModelConfig
 
@@ -106,6 +106,143 @@ class CompleteTrainingTests(unittest.TestCase):
         self.assertEqual(summary['selection']['threshold'], summary['evaluation']['threshold'])
         self.assertEqual(saved['normalizer']['training_scene_ids'], ['train-a', 'train-b'])
         self.assertIn('not full-task optimality', summary['selection_scope'])
+
+    def test_cost_timings_separate_updates_validation_snapshots_and_final_evaluation(self):
+        from association import complete_training as training
+        clock = [0.]
+
+        def costing(function, seconds):
+            def call(*args, **kwargs):
+                result = function(*args, **kwargs)
+                clock[0] += seconds
+                return result
+            return call
+
+        self.config['max_hours'] = 1
+        # CPU work is real; only time and forbidden CUDA telemetry are mocked.
+        with (patch.object(training.time, 'monotonic', side_effect=lambda: clock[0]),
+              patch.object(training, '_update', side_effect=costing(training._update, 2)),
+              patch.object(training, 'fusion_training_step', side_effect=costing(training.fusion_training_step, 3)),
+              patch.object(training, 'score_reference', side_effect=costing(training.score_reference, 5)),
+              patch.object(training, 'select_threshold', side_effect=costing(training.select_threshold, 7)),
+              patch.object(training, '_states', side_effect=costing(training._states, 11)),
+              patch.object(training, 'evaluate_scenes', side_effect=costing(training.evaluate_scenes, 13)),
+              patch.object(training, '_restore', side_effect=costing(training._restore, 17)),
+              patch.object(training.torch, 'save', side_effect=costing(training.torch.save, 29)),
+              patch.object(runtime, 'write_json', side_effect=costing(runtime.write_json, 23)),
+              patch.object(torch.cuda, 'synchronize', side_effect=AssertionError('CPU must not synchronize CUDA')),
+              patch.object(torch.cuda, 'reset_peak_memory_stats', side_effect=AssertionError('CPU must not reset CUDA')),
+              patch.object(torch.cuda, 'max_memory_allocated', side_effect=AssertionError('CPU must not read CUDA')),
+              patch.object(torch.cuda, 'max_memory_reserved', side_effect=AssertionError('CPU must not read CUDA'))):
+            result = self.fit('timed', evaluation_fn=costing(training.evaluate_complete, 19))
+        history = self.checkpoint('timed')['history']
+        for row in history:
+            self.assertEqual(row['seconds'], 2 if row['stage'] in ('TCM', 'TAM_FROZEN') else 3)
+        timed_rows = [row for row in history if 'validation_seconds' in row]
+        self.assertEqual(len(timed_rows), 4)
+        self.assertTrue(any(item['selected_snapshot_copied'] for item in result['validation_timings']))
+        for row, timing in zip(timed_rows, result['validation_timings']):
+            expected = 12 + (24 if timing['selected_snapshot_copied'] else 0)
+            self.assertEqual(timing['status'], 'COMPLETED')
+            self.assertEqual(timing['seconds'], expected)
+            self.assertEqual(row['validation_seconds'], expected)
+        self.assertEqual(result['final_evaluation_seconds'], 36)
+        self.assertEqual(result['final_evaluation_status'], 'COMPLETED')
+        summary = runtime.read_json(self.root / 'timed' / 'summary.json')
+        self.assertEqual(summary['evaluation_seconds'], 36)
+        self.assertIsNone(result['cuda_process_peak_allocated_bytes'])
+        self.assertIsNone(result['cuda_process_peak_reserved_bytes'])
+        self.assertIsNone(result['cuda_peak_reset_completed'])
+
+    def test_failed_validation_retains_partial_time_and_original_exception(self):
+        self.config['updates'] = dict.fromkeys(STAGES, 1)
+        clock = [0.]
+        original = RuntimeError('validation scoring failed')
+
+        def fail(*args, **kwargs):
+            clock[0] += 5
+            raise original
+
+        with (patch('association.complete_training.time.monotonic', side_effect=lambda: clock[0]),
+              patch('association.complete_training.score_reference', side_effect=fail)):
+            with self.assertRaises(RuntimeError) as caught:
+                self.fit('failed-validation')
+        self.assertIs(caught.exception, original)
+        run = runtime.read_json(self.root / 'failed-validation' / 'run.json')
+        self.assertEqual(run['status'], 'FAILED')
+        self.assertEqual(run['validation_timings'], [dict(stage='TAM_FROZEN', update=1,
+            status='FAILED', seconds=5., selected_snapshot_copied=False)])
+        self.assertIsNone(run['final_evaluation_seconds'])
+        self.assertEqual(run['final_evaluation_status'], 'NOT_STARTED')
+        self.assertIsNone(run['cuda_process_peak_allocated_bytes'])
+        self.assertIsNone(run['cuda_process_peak_reserved_bytes'])
+
+    def test_cuda_peak_read_failure_does_not_replace_model_failure(self):
+        original = RuntimeError('model construction failed')
+        events = []
+
+        def fail_model(*args, **kwargs):
+            events.append('model')
+            raise original
+
+        # No CUDA model or tensors are constructed: fail immediately after the
+        # mocked pre-model reset, then exercise the real failure-recording path.
+        with (patch.object(torch.cuda, 'is_available', return_value=True),
+              patch.object(runtime, 'seed_everything'),
+              patch.object(torch.cuda, 'synchronize', side_effect=lambda device: events.append('sync')) as sync,
+              patch.object(torch.cuda, 'reset_peak_memory_stats', side_effect=lambda device: events.append('reset')) as reset,
+              patch('association.complete_training.AssociationModel', side_effect=fail_model),
+              patch.object(torch.cuda, 'max_memory_allocated', side_effect=RuntimeError('counter unavailable')) as allocated,
+              patch.object(torch.cuda, 'max_memory_reserved', return_value=456) as reserved):
+            with self.assertRaises(RuntimeError) as caught:
+                self.fit('failed-model', device='cuda:2')
+        self.assertIs(caught.exception, original)
+        self.assertEqual(events, ['sync', 'reset', 'model'])
+        for operation in (sync, reset, allocated, reserved):
+            operation.assert_called_once_with(torch.device('cuda:2'))
+        run = runtime.read_json(self.root / 'failed-model' / 'run.json')
+        self.assertEqual(run['failure'], str(original))
+        self.assertTrue(run['cuda_peak_reset_completed'])
+        self.assertIsNone(run['cuda_process_peak_allocated_bytes'])
+        self.assertEqual(run['cuda_process_peak_reserved_bytes'], 456)
+        self.assertIn('counter unavailable', run['cuda_memory_measurement_errors']['cuda_process_peak_allocated_bytes'])
+        self.assertFalse((self.root / 'failed-model' / 'checkpoint.pt').exists())
+
+    def test_cuda_partial_counter_failure_preserves_previous_readable_value(self):
+        run = dict(cuda_peak_reset_completed=True,
+                   cuda_process_peak_allocated_bytes=123, cuda_process_peak_reserved_bytes=456)
+        with (patch.object(torch.cuda, 'max_memory_allocated', side_effect=RuntimeError('read failed')),
+              patch.object(torch.cuda, 'max_memory_reserved', return_value=789),
+              patch.object(torch.cuda, 'synchronize', side_effect=AssertionError('telemetry must not synchronize'))):
+            _record_cuda_peaks(run, torch.device('cuda:2'))
+        self.assertEqual(run['cuda_process_peak_allocated_bytes'], 123)
+        self.assertEqual(run['cuda_process_peak_reserved_bytes'], 789)
+
+    def test_resume_cuda_measurement_is_new_invocation_not_previous_peak(self):
+        self.fit('first-cost', max_updates_this_call=3)
+        previous = runtime.read_json(self.root / 'first-cost' / 'run.json')
+        previous.update(device='cuda:0', cuda_process_peak_allocated_bytes=9999,
+                        cuda_process_peak_reserved_bytes=19999)
+        runtime.write_json(self.root / 'first-cost' / 'run.json', previous)
+        saved = self.checkpoint('first-cost')
+        saved['device'] = 'cuda:0'
+        torch.save(saved, self.root / 'first-cost' / 'checkpoint.pt')
+        with (patch.object(torch.cuda, 'is_available', return_value=True),
+              patch.object(runtime, 'seed_everything'),
+              patch.object(torch.cuda, 'synchronize'),
+              patch.object(torch.cuda, 'reset_peak_memory_stats') as reset,
+              patch('association.complete_training.AssociationModel', side_effect=RuntimeError('stop before CUDA tensors')),
+              patch.object(torch.cuda, 'max_memory_allocated', return_value=128),
+              patch.object(torch.cuda, 'max_memory_reserved', return_value=256)):
+            with self.assertRaisesRegex(RuntimeError, 'before CUDA tensors'):
+                self.fit('resumed-cost', resume_from=self.root / 'first-cost', device='cuda:2')
+        reset.assert_called_once_with(torch.device('cuda:2'))
+        run = runtime.read_json(self.root / 'resumed-cost' / 'run.json')
+        self.assertEqual(run['cuda_process_peak_allocated_bytes'], 128)
+        self.assertEqual(run['cuda_process_peak_reserved_bytes'], 256)
+        self.assertEqual(run['validation_timings'], [])
+        self.assertTrue(previous['validation_timings'])
+        self.assertGreaterEqual(run['elapsed_seconds'], previous['elapsed_seconds'])
 
     def test_exact_resume_including_dropout_optimizer_rng_and_selected_state(self):
         self.fit('full')
@@ -264,13 +401,19 @@ class CompleteTrainingTests(unittest.TestCase):
 
     def test_final_evaluation_failure_is_not_completion(self):
         self.config['updates'] = dict.fromkeys(STAGES, 1)
+        clock = [0.]
         def fail(*args, **kwargs):
             kwargs['check']()
+            clock[0] += 7
             raise TimeoutError('full evaluation budget exhausted')
-        with self.assertRaisesRegex(TimeoutError, 'evaluation budget'):
-            self.fit('failed-eval', evaluation_fn=fail)
+        with patch('association.complete_training.time.monotonic', side_effect=lambda: clock[0]):
+            with self.assertRaisesRegex(TimeoutError, 'evaluation budget'):
+                self.fit('failed-eval', evaluation_fn=fail)
         self.assertEqual(self.checkpoint('failed-eval')['cursor']['completed_updates'], 4)
-        self.assertEqual(runtime.read_json(self.root / 'failed-eval' / 'run.json')['status'], 'FAILED')
+        run = runtime.read_json(self.root / 'failed-eval' / 'run.json')
+        self.assertEqual(run['status'], 'FAILED')
+        self.assertEqual(run['final_evaluation_status'], 'FAILED')
+        self.assertEqual(run['final_evaluation_seconds'], 7)
         self.assertFalse((self.root / 'failed-eval' / 'summary.json').exists())
 
     def test_resume_preserves_budget_semantics_and_output_immutability(self):

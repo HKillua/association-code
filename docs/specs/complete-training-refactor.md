@@ -40,3 +40,15 @@ TFM FC宽度、位置loss解释、CL margin、更新数都必须显式给出。�
 - [真实时间输入检查](../results/timed_native_input_check_20261018.json)：原53锚点2887轨全部保留，25条零查询支撑、121条单查询支撑仍有原生输入；FP32未改变支撑归属或合并时刻。9个已知T_core锚点通过公共输入API，未为其余44个伪造角色。正式cap/time unit仍须随配置公开。
 - checkpoint记录adapter、time unit/cap、原点/网格、参考对齐与采样状态；`load_complete_snapshot`按原adapter恢复选定快照。中断续训接续累计耗时，不把旧参数形状兼容当作旧权重已学会时间条件。
 - 验证时临时统一association参数的requires_grad=False，退出（含异常）恢复原阶段标志。本地PyTorch2.10的matmul `should_fold`可按权重requires_grad选择mm或bmm，即使已进入inference_mode；相同权重曾出现2.38e-7阈值漂移。统一计算状态后冻结/解冻验证逐位一致，没有放宽断言、改阈值或改精度；历史回执不重写。
+
+## 成本记录补充：行为与验收
+
+只补充`complete_training.py`已有运行记录，不改变配置、采样、选模、预算、RNG或精度，不启动GPU/真实数据实验。`history[*].seconds`继续只统计训练更新；TAM/joint每次完整验证另记`validation_seconds`，范围含评分、阈值选择、必要的selected快照CPU复制及其指标计算，不含checkpoint写盘。`run.json`保留本次调用的逐次验证计时，失败验证也记录截至异常的耗时；恢复后的历史更新保留原计时，但本次调用记录不拼接旧调用。
+
+最终评价另记总秒数，含selected状态恢复、完整关联/融合评价与阈值一致性检查，不含summary写盘；未开始为null，失败保留已用秒数。成功计时在CUDA工作边界同步，异常路径不为补计时再次同步或覆盖原异常，因此失败秒数可能不含尚未完成的CUDA工作。
+
+`run.json`的CUDA峰值只来自本进程在选定设备的PyTorch allocator：建模前同步并reset一次，记录allocated/reserved字节；包含reset时仍存活的分配/缓存，不是模型独占增量、整卡用量或跨resume累计峰值。CPU及尚未成功reset时为null。成功、显式中断、失败均尽力采集；单项读取失败保留先前可读值并记录错误，不覆盖训练异常或触发重试。
+
+验收仅运行相关CPU测试：用可控时钟区分训练/验证/快照/最终评价范围；检查CPU null、异常计时与错误保留；mock CUDA计数器验证一次reset、设备归属、部分读取失败和恢复调用不继承旧峰值。既有精确续训/选定状态测试继续约束行为不变；不把mock计数器当作GPU实测。
+
+本次相关CPU验证：`test_complete_training.py` 19项、`test_complete_snapshot.py` 3项、`test_timed_pipeline.py` 6项全部通过；`git diff --check`通过。未运行GPU或真实原生数据模型推理。
