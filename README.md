@@ -2,7 +2,7 @@
 
 MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全、关联、融合**，以TMTAFF时间适配近似参考和自有候选的真实比较，判断课题潜力。
 
-完整参考与当前候选均已实现。**018已完成600更新/四臂完整评价，2371秒，退出0；[本地复核](docs/results/cooperative018_local_review/README.md)确认物理误差较短训下降，但关联总体仍弱、基础恢复误差大，效用尚无稳定专属收益。** 017仍独立运行：最新原件TCM100+TAM100+TFM20，关联选中macro-F1 .432985，尚无完整物理终评。用户要求三个阶段都精进，对应[新研究方案](docs/proposals/tri_stage_support/README.md)未实现，不改017或挪用018额度。实际入口见[交接索引](HandOver/Handover.md)。
+完整参考与当前候选均已实现。**018已完成600更新/四臂完整评价，2371秒，退出0；[本地复核](docs/results/cooperative018_local_review/README.md)确认物理误差较短训下降，但关联总体仍弱、基础恢复误差大，效用尚无稳定专属收益。** 017仍独立运行：最新原件TCM100+TAM100+TFM60，关联选中macro-F1 .432985，尚无完整物理终评。用户要求三个阶段都精进，对应[新研究方案](docs/proposals/tri_stage_support/README.md)已结合数据复审具体化为[本地实现规格](docs/proposals/candidate_revision_after018/README.md)，待方法确认、未实现，不改017或挪用018额度。实际入口见[交接索引](HandOver/Handover.md)。
 
 **CDF1本轮无专属机制收益，活动训练实现已退役；负结果、原缓存、历史交接与Git历史保留。** TSA保留为独立关联诊断对照，不充当完整融合baseline，也不自动启动新训练。旧A0、A_full和TSA关联分数不与新时间适配实验混排；`A_full`不代表完整TMTAFF。见[研究说明](docs/research_brief.md)与[退役及后续路线](docs/decisions/retire_cdf1_and_focus.md)。
 
