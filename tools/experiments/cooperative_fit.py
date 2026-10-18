@@ -19,12 +19,12 @@ if __package__ in (None, ''):
 import numpy as np
 import torch
 
-from association import runtime
-from association.cooperative import CooperativeConfig, CooperativeModel
-from association.cooperative_training import (fit_support_time_scaling, resolve_device,
+from association.utils import runtime
+from association.models.cooperative import CooperativeConfig, CooperativeModel
+from association.training.cooperative import (fit_support_time_scaling, resolve_device,
                                               train_cooperative, training_configuration)
-from association.cooperative_inputs import fit_cooperative_normalizer, normalize_cooperative_scene
-from association.timed_inputs import prepare_timed_scene
+from association.data.cooperative import fit_cooperative_normalizer, normalize_cooperative_scene
+from association.data.timed import prepare_timed_scene
 
 
 def synthetic_scenes(model_config):
@@ -179,7 +179,7 @@ def main(argv=None):
                 def check():
                     if time.monotonic()-started >= training['max_seconds']:
                         raise TimeoutError('candidate budget exhausted during preparation')
-                from association.timed_dataset import load_timed_dataset
+                from association.data.dataset import load_timed_dataset
                 dataset = load_timed_dataset(args.archive, runtime.read_json(args.manifest),
                     train_splits=['T_core'], data_config=dict(length=model.length,
                         max_observations=model.max_observations, **config['data']),

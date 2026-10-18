@@ -2,13 +2,13 @@
 import sys,json,gzip,time,math,collections
 from pathlib import Path
 import numpy as np
-REPO=Path('/Users/a1/Projects/association-code');sys.path.insert(0,str(REPO))
-from association.data import MTADArchive
-from association.native_inputs import _record
-from association.timed_inputs import prepare_timed_scene,pack_timed_scene
-from association.reference_states import iter_reference_states
-from association.fusion_targets import build_scene_fusion_targets
-from association.full_scene_evaluation import simple_fusion_outputs,single_source_outputs,evaluate_full_scene
+REPO=Path(__file__).resolve().parents[3];sys.path.insert(0,str(REPO))
+from association.data.archive import MTADArchive
+from association.data.native import _record
+from association.data.timed import prepare_timed_scene,pack_timed_scene
+from association.data.reference_states import iter_reference_states
+from association.data.targets import build_scene_fusion_targets
+from association.evaluation.scene import simple_fusion_outputs,single_source_outputs,evaluate_full_scene
 OUT=Path(__file__).parent;ZIP=Path('/Users/a1/Downloads/数据集level2.zip');t0=time.monotonic()
 manifest=json.loads((REPO/'HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json').read_text())
 align=json.loads((REPO/'configs/tmtaff-time-reference-alignment.json').read_text())

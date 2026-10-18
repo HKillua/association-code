@@ -15,11 +15,11 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 sys.path.insert(0, str(ROOT))
-from association.complete_training import _configuration
-from association.cooperative import CooperativeConfig
-from association.cooperative_training import training_configuration
-from association.fusion import PairFusionConfig
-from association.models import ModelConfig
+from association.training.tmtaff import _configuration
+from association.models.cooperative import CooperativeConfig
+from association.training.cooperative import training_configuration
+from association.models.fusion import PairFusionConfig
+from association.models.tmtaff import ModelConfig
 
 
 def read(path):

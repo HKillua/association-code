@@ -3,8 +3,8 @@ import json,gzip,math,sys
 from pathlib import Path
 import numpy as np
 import torch
-REPO=Path('/Users/a1/Projects/association-code');sys.path.insert(0,str(REPO))
-from association.fusion import FusionLoss
+REPO=Path(__file__).resolve().parents[3];sys.path.insert(0,str(REPO))
+from association.models.fusion import FusionLoss
 p=REPO/'HandOver/results/COOPERATIVE-DEVELOPMENT-20261018-018/files'
 run=json.loads(gzip.decompress((p/'run.json.gz').read_bytes()))
 history=json.loads((p/'history.json').read_text())

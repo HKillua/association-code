@@ -16,10 +16,10 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.fusion import FusionLoss, PairFusion, PairFusionConfig
-from association.fusion_metrics import evaluate_aligned_fusion
-from association.models import ModelConfig
-from association.timed_models import TimedAssociationModel
+from association.models.fusion import FusionLoss, PairFusion, PairFusionConfig
+from association.evaluation.physical import evaluate_aligned_fusion
+from association.models.tmtaff import ModelConfig
+from association.models.timed import TimedAssociationModel
 
 
 def metric(prediction, target):

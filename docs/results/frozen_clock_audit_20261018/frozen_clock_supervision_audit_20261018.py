@@ -13,13 +13,13 @@ import time
 
 import numpy as np
 
-REPO = Path('/Users/a1/Projects/association-code')
+REPO = Path(__file__).resolve().parents[3]
 ROOT = Path(__file__).parent
 ARCHIVE = Path('/Users/a1/Downloads/数据集level2.zip')
 sys.path.insert(0, str(REPO))
-from association.data import MTADArchive, _name
-from association.fusion_targets import align_reference_states
-from association.reference_states import _read_rows
+from association.data.archive import MTADArchive, _name
+from association.data.targets import align_reference_states
+from association.data.reference_states import _read_rows
 
 
 def finite(value):

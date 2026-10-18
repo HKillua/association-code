@@ -7,8 +7,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.runtime import load_records
-from association.metrics import evaluate_scenes, compare_predictions, paired_cluster_bootstrap
+from association.utils.runtime import load_records
+from association.evaluation.association import evaluate_scenes, compare_predictions, paired_cluster_bootstrap
 from tools.experiments.tsactfer_fit import paper_scope_coverage
 
 SOURCE = ROOT / "HandOver/results/COMPARE-20261017-011"

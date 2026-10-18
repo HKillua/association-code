@@ -15,12 +15,12 @@ import time
 import numpy as np
 
 ROOT = Path(__file__).parent
-REPO = Path('/Users/a1/Projects/association-code')
+REPO = Path(__file__).resolve().parents[3]
 ARCHIVE = Path('/Users/a1/Downloads/数据集level2.zip')
 sys.path.insert(0, str(REPO))
-from association.data import MTADArchive, _name
-from association.reference_states import _read_rows, STATE_FIELDS
-from association.fusion_targets import align_reference_states, _numeric
+from association.data.archive import MTADArchive, _name
+from association.data.reference_states import _read_rows, STATE_FIELDS
+from association.data.targets import align_reference_states, _numeric
 
 REASONS = (
     'valid_exact', 'valid_interpolated', 'identity_has_no_reference_rows',
@@ -291,7 +291,7 @@ def main():
                 previous_audit='frozen_clock_supervision_audit_20261018.json',
                 previous_scene_audit='frozen_clock_supervision_scenes_20261018.jsonl',
                 allowlist='frozen_scene_lists_20261018.json',per_scene_output=incremental.name,
-                production_rules='association/fusion_targets.py:align_reference_states',
+                production_rules='association/data/targets.py:align_reference_states',
                 partition_policy='First matching production branch: exact; outside reference time support; gap exceeded; endpoint invalid/conflict (combined if opposite endpoints); heading 180; valid interpolation. Categories are exclusive per feature/query.',
                 support_policy='Actual numeric reference timestamps after the prior fixed offset; no inferred lifetime is used.',
                 validation='Every identity at both gaps: reason-valid mask equals production align mask; every scene gap600 counts equal previous audit; every feature has exactly one reason.')

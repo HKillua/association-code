@@ -11,8 +11,8 @@ from numbers import Integral, Real
 
 import numpy as np
 
-from association.data import DataError
-from association.native_inputs import SELECTION_POLICY, uniform_observation_indices
+from association.data.archive import DataError
+from association.data.native import SELECTION_POLICY, uniform_observation_indices
 from .tsactfer_data import (build_positive_pools as _build_positive_pools,
                            fit_normalizer as _fit_normalizer,
                            pack_scene as _pack_scene)

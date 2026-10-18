@@ -18,10 +18,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.complete_evaluation import aggregate_fusion_reports
-from association.fusion_inference import group_predicted_tracks, group_tracks_by_identity
-from association.fusion_metrics import group_membership_diagnostics
-from association.metrics import evaluate_scenes
+from association.evaluation.tmtaff import aggregate_fusion_reports
+from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
+from association.evaluation.physical import group_membership_diagnostics
+from association.evaluation.association import evaluate_scenes
 
 spec = importlib.util.spec_from_file_location(
     'analysis014', ROOT / 'docs/results/tmtaff014_local_review/numeric_analysis.py')
@@ -175,7 +175,7 @@ def main():
                         'extra_tied_entries': int((counts - 1).sum()),
                         'threshold_candidates': len(unique) + 1,
                         'formula': 'distinct finite score values + one all-reject threshold',
-                        'source': 'association/metrics.py select_threshold; this is not candidate pair count'},
+                        'source': 'association/evaluation/association.py select_threshold; this is not candidate pair count'},
                     'rejected_pairs': rejected,
                     'all_accept_descriptive_fixed_rule': old_analysis.compact(all_accept),
                     'component_bootstrap': old_analysis.component_bootstrap(association['per_scene'])}

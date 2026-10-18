@@ -15,9 +15,9 @@ if __package__ in (None, ''):
 
 import numpy as np
 
-from association.complete_evaluation import aggregate_fusion_reports
-from association.full_scene_evaluation import _regions
-from association.prediction_artifacts import load_scene_prediction
+from association.evaluation.tmtaff import aggregate_fusion_reports
+from association.evaluation.scene import _regions
+from association.evaluation.artifacts import load_scene_prediction
 
 
 def _read(path):

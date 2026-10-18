@@ -9,7 +9,7 @@ venv/
 .env.*
 !.env.example
 .DS_Store
-data/
+/data/
 datasets/
 outputs/
 runs/

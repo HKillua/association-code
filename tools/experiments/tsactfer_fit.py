@@ -16,12 +16,12 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 
-from association.config import load_config, validate_manifest_config
-from association.data import MTADArchive
-from association.dataset import load_split_from_archive
-from association.metrics import evaluate_scenes, select_threshold
-from association.reference import _update
-from association import runtime
+from association.utils.config import load_config, validate_manifest_config
+from association.data.archive import MTADArchive
+from association.data.legacy_dataset import load_split_from_archive
+from association.evaluation.association import evaluate_scenes, select_threshold
+from association.training.common import _update
+from association.utils import runtime
 from baselines.tsactfer import TSAConfig, TSActfer, symmetric_info_nce
 from baselines.tsactfer_data import (build_positive_pools, fit_normalizer,
                                     pack_scene, sample_batch)

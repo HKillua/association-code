@@ -9,7 +9,7 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.cooperative import CooperativeConfig, CooperativeModel
+from association.models.cooperative import CooperativeConfig, CooperativeModel
 
 
 def main():

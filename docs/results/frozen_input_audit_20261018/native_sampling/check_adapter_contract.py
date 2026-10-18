@@ -8,7 +8,7 @@ path=Path(__file__).with_name('audit_native_sampling.py')
 spec=importlib.util.spec_from_file_location('native_sampling_audit',path)
 module=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(module)
-from association.data import Scene, Track
+from association.data.archive import Scene, Track
 
 tracks=[Track('fixture:9001:0','9001','0','a-b','a',np.array([0.,5.,10.]),
               np.array([[10.,20.,1.,30.],[10.1,20.1,1.,30.],[10.2,20.2,1.,30.]])),

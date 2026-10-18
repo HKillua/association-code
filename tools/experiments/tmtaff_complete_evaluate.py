@@ -20,8 +20,8 @@ if __package__ in (None, ''):
 
 def _source_settings(saved, manifest, alignment):
     """Compare saved semantics directly, without a source/hash/version gate."""
-    from association.complete_training import STAGES, _configuration
-    from association.data import validate_manifest
+    from association.training.tmtaff import STAGES, _configuration
+    from association.data.archive import validate_manifest
 
     if saved.get('format_version') != 1 or saved.get('input_adapter') != 'native_time_v1':
         raise ValueError('an explicit native_time_v1 complete checkpoint is required')
@@ -131,10 +131,10 @@ def main(argv=None):
         owns_output = True
         write_run('RUNNING')
         import torch
-        from association import runtime
-        from association.complete_training import _scenes, load_complete_snapshot
-        from association.complete_evaluation import evaluate_complete
-        from association.timed_dataset import load_timed_dataset
+        from association.utils import runtime
+        from association.training.tmtaff import _scenes, load_complete_snapshot
+        from association.evaluation.tmtaff import evaluate_complete
+        from association.data.dataset import load_timed_dataset
         check()
         torch.set_num_threads(args.cpu_threads)
         saved = torch.load(args.checkpoint, map_location='cpu', weights_only=True)

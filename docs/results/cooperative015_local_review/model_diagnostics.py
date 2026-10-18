@@ -13,7 +13,7 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.cooperative import CooperativeModel, CooperativeConfig
+from association.models.cooperative import CooperativeModel, CooperativeConfig
 
 SOURCE = ROOT / 'HandOver/results/COOPERATIVE-COST-20261018-015/files'
 

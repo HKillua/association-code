@@ -16,7 +16,7 @@ import time
 
 import numpy as np
 
-REPO = Path('/Users/a1/Projects/association-code')
+REPO = Path(__file__).resolve().parents[4]
 ROOT = Path(__file__).parent
 if len(sys.argv) == 3 and sys.argv[1] == '--output':
     ROOT = Path(sys.argv[2])
@@ -24,10 +24,10 @@ if len(sys.argv) == 3 and sys.argv[1] == '--output':
 ARCHIVE = Path('/Users/a1/Downloads/数据集level2.zip')
 LISTS = REPO/'docs/results/frozen_clock_audit_20261018/frozen_scene_lists_20261018.json'
 sys.path.insert(0, str(REPO))
-from association.data import MTADArchive
-from association.native_inputs import uniform_observation_indices
-from association.timed_inputs import prepare_timed_scene
-from association.sampling import BalancedScenePairSampler
+from association.data.archive import MTADArchive
+from association.data.native import uniform_observation_indices
+from association.data.timed import prepare_timed_scene
+from association.training.sampling import BalancedScenePairSampler
 
 CAPS = (64, 128, 256, None)
 Q = (0, .01, .05, .5, .9, .95, .99, 1)

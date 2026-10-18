@@ -12,7 +12,7 @@ if __package__ in (None, ''):
 
 import numpy as np
 
-from association.prediction_artifacts import load_scene_prediction
+from association.evaluation.artifacts import load_scene_prediction
 from tools.analysis.compare_physical_predictions import _completed, compare
 
 ARMS = ('plain', 'identity', 'utility', 'learned')

@@ -14,7 +14,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.prediction_artifacts import load_scene_prediction
+from association.evaluation.artifacts import load_scene_prediction
 from tools.analysis.compare_physical_predictions import _validate_pair
 
 SOURCE = ROOT / 'HandOver/results/COOPERATIVE-ARRAYS-20261018-016/files'

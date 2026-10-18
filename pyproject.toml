@@ -9,8 +9,5 @@ description = "MTAD trajectory completion, association and fusion research"
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.26,<3", "torch>=2.5,<2.11"]
 
-[project.scripts]
-association-pilot = "association.cli:main"
-
 [tool.setuptools.packages.find]
 include = ["association*", "baselines*"]

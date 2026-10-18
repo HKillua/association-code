@@ -16,10 +16,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
-from association.complete_evaluation import aggregate_fusion_reports
-from association.fusion_inference import group_predicted_tracks, group_tracks_by_identity
-from association.fusion_metrics import group_membership_diagnostics
-from association.metrics import evaluate_scenes
+from association.evaluation.tmtaff import aggregate_fusion_reports
+from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
+from association.evaluation.physical import group_membership_diagnostics
+from association.evaluation.association import evaluate_scenes
 
 SOURCE = ROOT / 'HandOver/results/TMTAFF-TIME-EVAL-20261018-014/files/summary.json.gz'
 OUTPUT = Path(__file__).with_suffix('.json')

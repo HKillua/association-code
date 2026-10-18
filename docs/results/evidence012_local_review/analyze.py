@@ -19,8 +19,8 @@ sys.path.insert(0, str(ROOT))
 spec = importlib.util.spec_from_file_location('prior_011_analysis', ROOT/'docs/results/compare011_interim/analyze.py')
 prior = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(prior)
-from association.runtime import load_records, validate_record_split
-from association.metrics import evaluate_scenes, compare_predictions
+from association.utils.runtime import load_records, validate_record_split
+from association.evaluation.association import evaluate_scenes, compare_predictions
 
 
 def read(path):

@@ -1,7 +1,7 @@
 import json,sys,pathlib,collections,csv,io,math
 import numpy as np
-sys.path.insert(0,'/Users/a1/Projects/association-code')
-from association.data import MTADArchive,_name
+sys.path.insert(0,str(pathlib.Path(__file__).resolve().parents[3]))
+from association.data.archive import MTADArchive,_name
 ROOT=pathlib.Path('/Users/a1/Projects/biye-ronghe/docs/reviews/2026-10-18_dataset_followup_018');ROOT.mkdir(exist_ok=True)
 splits=json.loads(pathlib.Path('/Users/a1/Projects/biye-ronghe/docs/reviews/2026-10-18_experiment_reaudit/frozen_scene_lists_20261018.json').read_text())['scene_ids']
 S=['2606','1622','1759','4349','4','270','1587','2211'];fields=['time','lat','lon','vel','cou'];out={'scope':{'scenes':{s:next(k for k,v in splits.items() if s in v) for s in S},'T_test_reads':0,'selection':'first four frozen T_core; four previously audited V cases; not representative or random','additional_preview':'scene0 first3 measurement/first2 label rows inspected before subset check; scene0 is previously inspected development anchor, not newly exposed; no reference inspected in this step','units':'official paper kn conflicts official guide m/s; no conversion applied'},'scenes':{},'aggregate':{},'examples':[]}

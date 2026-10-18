@@ -14,10 +14,10 @@ import time
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from association import runtime
-from association.fusion import PairFusionConfig
-from association.models import ModelConfig
-from association.timed_dataset import load_timed_dataset
+from association.utils import runtime
+from association.models.fusion import PairFusionConfig
+from association.models.tmtaff import ModelConfig
+from association.data.dataset import load_timed_dataset
 
 
 def main(argv=None):
@@ -64,8 +64,8 @@ def main(argv=None):
         data_config = {**config['data'], 'length': model.length}
         # Inspection validates the same complete configuration as a fit before
         # opening the archive; it still constructs no model or training run.
-        from association.complete_training import _configuration
-        from association.margin_calibration import MARGIN_POLICY
+        from association.training.tmtaff import _configuration
+        from association.training.calibration import MARGIN_POLICY
         training = _configuration(config['training'])
         if training['margin_policy'] == MARGIN_POLICY and (
                 model.contrastive_positive_power != 1 or config['train_splits'] != ['T_core']):
@@ -97,7 +97,7 @@ def main(argv=None):
             runtime.write_json(output / 'preparation.json', preparation)
             print(f'INSPECTED native-time inputs: {output.resolve()}', flush=True)
         else:
-            from association.complete_training import train_complete
+            from association.training.tmtaff import train_complete
             training_error = None
             try:
                 result = train_complete(dataset['train'], dataset['validation'], model, fusion,
