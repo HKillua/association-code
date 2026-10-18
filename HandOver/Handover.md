@@ -27,9 +27,9 @@
 
 研究目标仍是**不完整量测下补全、关联、融合一起做**。用户2026-10-18在解释后已批准TCM使用原始观测时间和下一预测时刻，名称明确为TMTAFF时间适配版。本地已实现原生ZIP/参考装配、时间条件TCM、四阶段训练/完整checkpoint及全目标评价，详见[重构记录](../docs/specs/complete-training-refactor.md)与[时间规格](../docs/specs/tmtaff-time-adaptation.md)。短轨即使在共同输出网格上无支撑点，仍提供至少两个原生观测；监督query_times严格等于共同输出时刻。真实训练尚未启动，不将CPU合成测试称为实验结果。
 
-012原复制命令保持不变，六小时跟进继续。接下来复用012的007 manifest，核训练/开发reference时钟与监督覆盖，确定正式cap/time unit、CL尺度、TFM位置loss和训练量，并提交完整配置与成本方案；旧配置草案不可直接开跑。保留CDF负结果和所有历史产物，主线baseline与候选比较继续。这里没有新增训练READY或GPU授权。
+012原复制命令保持不变，六小时跟进继续。接下来复用012的007 manifest，核训练/开发reference时钟与监督覆盖，确定正式cap/time unit、CL尺度和训练量，并提交完整配置与成本方案；旧配置草案不可直接开跑。保留CDF负结果和所有历史产物，主线baseline与候选比较继续。这里没有新增训练READY或GPU授权。
 
-配置草案已改为[当前决策稿](../docs/tmtaff_complete_plan.md)：时间适配保持已批准状态；建议位置loss采用连续SmoothL1（待用户确认），CL保留原距离但margin须明确训练侧依据。一次四阶段各2更新、最多1GPU小时只是待审测量提案，不是批准额度或预计耗时；完整V融合成本已单独列出。先闭合损失/原manifest与对齐，不发布带占位值的训练配置。
+配置草案已改为[当前决策稿](../docs/tmtaff_complete_plan.md)：时间适配保持已批准状态；用户2026-10-18已批准位置loss采用`standard_smooth_l1(beta=.001)`，作为印刷公式的解释性修正，既有代码已满足，不再请示。CL保留原距离但margin须明确训练侧依据。一次四阶段各2更新、最多1GPU小时只是待审测量提案，不是批准额度或预计耗时；完整V融合成本已单独列出。先闭合CL规则/原manifest与对齐，不发布带占位值的训练配置。
 
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 

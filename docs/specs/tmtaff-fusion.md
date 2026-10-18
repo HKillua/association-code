@@ -1,6 +1,6 @@
 # TMTAFF融合组件实现约定
 
-2026-10-18。目标：让既有TCM补全输出进入TFM，接通监督、分组输出、评价和训练更新。011已结束，当前012只补回文件；新增功能只做CPU软件验证，不下发原生训练或据此确定新的评价/选模协议。正式配置和预算另见[草案](../tmtaff_complete_plan.md)。原文§2.4–2.5；论文未公开处如下明示。
+2026-10-18。目标：让既有TCM补全输出进入TFM，接通监督、分组输出、评价和训练更新。组件及完整外层现已接通，验证记录见[完整训练重构](complete-training-refactor.md)。011已结束，当前012只补回文件；目前只有CPU软件验证，不据此声称真实训练完成或研究协议有效。正式配置和预算另见[草案](../tmtaff_complete_plan.md)。原文§2.4–2.5；论文未公开处如下明示。
 
 ## 数据接口
 
@@ -30,7 +30,7 @@
 
 ## FusionLoss
 
-`FusionLoss(position_loss_mode=...)`显式选择`paper_printed`或`standard_smooth_l1`；mode无默认。前者按Eq20字面阈值.001、二次0.5e²/线性|e|-.0005，保留不连续疑义；后者显式用SmoothL1 beta=.001，明确属于解释性修正，不冒称原公式。
+`FusionLoss(position_loss_mode=...)`显式选择`paper_printed`或`standard_smooth_l1`；mode无默认。用户2026-10-18已批准`standard_smooth_l1(beta=.001)`，作为Eq20的明确解释性修正；lat/lon仍以原生度逐维计算，不冒称作者精确公式。`paper_printed`按本地科学记数解释采用阈值.001、二次0.5e²/线性|e|-.0005，仅保留兼容与历史用途，不将该记号解释认作作者已确认含义。此决定不包含CL margin规则或GPU预算。
 
 `forward(prediction,target,valid)`的mask是[B,L,4]bool。只对有效监督取值，不把无效NaN送进log/乘零掩盖；逐特征均值，任何特征全无监督明确失败。有效prediction/target必须有限，负速度拒绝。
 
@@ -48,7 +48,7 @@
 
 `evaluate_aligned_fusion`接完整、由调用方显式对齐的预测/真值[N,L,4]、两份逐特征mask及[N,L]区域mask。位置按球半径6371000米的haversine距离，速度保留native单位，航向按最短圆周度差；分别给MAE/MSE/RMSE、可评真值数、预测交集数、缺预测数、点及轨迹覆盖。漏预测留在真值分母；零交集误差null，零真值覆盖null。非法声明为有效的值报错，不能以region mask隐藏。已观测/缺失区间由调用方分别明确mask。
 
-`group_membership_diagnostics`在同一完整节点人口上计算拆分/错误合并的配对数及受影响组数；未分组节点单独计数，不把None聚为同一目标。它不选择轨迹真值匹配、不做Hungarian、不生成新综合惩罚分数。上层全目标对应、单源轨迹装配和最终汇总/选模仍须固定；该原语通过不等于完整评价完成。
+`group_membership_diagnostics`在同一完整节点人口上计算拆分/错误合并的配对数及受影响组数；未分组节点单独计数，不把None聚为同一目标。它不选择轨迹真值匹配、不做Hungarian、不生成新综合惩罚分数。上层全目标对应、单源轨迹装配和汇总已接入完整评价；正式运行的配置与选模约定仍以当前决策稿为准，CPU验证不等于原生评价已执行。
 
 ## 三模块训练更新
 
@@ -56,7 +56,7 @@
 
 关联微批均值乘本微批配对数/全batch配对数；TCM辅助仅对全batch唯一端点，按`2*d_model*Σmax(observed_count−1,0)`分配监督元素权重；融合损失按每维全batch有效数，正则只在第一个正对微批加一次。先核全batch监督和optimizer完整参数集合，再反传；一次清梯度、裁剪、step。异常/已有run deadline中断清除部分梯度且不step，不跳过并补抽。
 
-`pair_microbatch`的TCM前向最多含其2倍端点；`track_microbatch`只限制TCM辅助loss前向，不能声称控制所有TCM显存。每个配对微批内TCM结果共享给TAM/TFM，跨微批重算以释放反向图。开启dropout会改变随机mask实现，精确梯度等价只在dropout=0下验证；默认精度/模型规模不因此修改。原生监督装配、四阶段外层loop、完整checkpoint（association/fusion/loss及配置）、选择与输出入口尚未完成。
+`pair_microbatch`的TCM前向最多含其2倍端点；`track_microbatch`只限制TCM辅助loss前向，不能声称控制所有TCM显存。每个配对微批内TCM结果共享给TAM/TFM，跨微批重算以释放反向图。开启dropout会改变随机mask实现，精确梯度等价只在dropout=0下验证；默认精度/模型规模不因此修改。原生监督装配、四阶段外层loop、完整checkpoint（association/fusion/loss及配置）、选择与输出入口已完成CPU集成验证，不能按这里的组件规格直接启动未批准的原生训练。
 
 ## 必须验证
 
@@ -71,4 +71,4 @@
 | 微批不改损失分母、冻结正确、未丢loss权重 | CE/contrastive独立整批梯度对照，重复pair/缺局部监督/纯负微批，dropout有限反传，超时无部分step |
 | 活动行为不回归 | 新模块测试＋已有模型/数据/原始reader测试；不跑原生数据或GPU训练 |
 
-合成通过只说明接口和数值路径可用；参考时钟/网格的原生配置、单源与全目标评价装配、正式完整训练入口及预算仍未完成。没有“完整TMTAFF已复现”的结论。
+合成通过只说明接口和数值路径可用；单源与全目标评价装配、完整训练入口已实现，正式训练/开发参考时钟映射、完整配置及新增预算仍待闭合。没有“完整TMTAFF已复现”的结论。
