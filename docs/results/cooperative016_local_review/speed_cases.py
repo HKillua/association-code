@@ -118,6 +118,8 @@ def main(plot=False):
         handles,labels=axes[0,1].get_legend_handles_labels();fig.legend(handles,labels,loc='outside lower center',ncol=7)
         fig.suptitle('015 saved outputs: four fixed cases, same target/time, correct identity grouping\nCase selection: most improved / most worsened / lower median / smallest scene ID; first stored target shown',fontsize=12)
         fig.savefig(OUT/'fixed_cases.png',dpi=160);fig.savefig(OUT/'fixed_cases.svg');plt.close(fig)
+        svg = OUT/'fixed_cases.svg'
+        svg.write_text('\n'.join(line.rstrip() for line in svg.read_text().splitlines()) + '\n')
     print(json.dumps({c['scene_id']:c['summary']['utility'] for c in cases},indent=2))
 
 
