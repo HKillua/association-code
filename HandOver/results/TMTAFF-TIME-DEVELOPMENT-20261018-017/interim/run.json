@@ -25249,10 +25249,10 @@
   "cuda_process_peak_reserved_bytes": 1241513984,
   "cuda_peak_reset_completed": true,
   "cuda_memory_scope": "current invocation, selected device, process PyTorch allocator peak since pre-model reset; includes existing live allocations/cache; not model-only, whole-device usage or cumulative across resume",
-  "elapsed_seconds": 9105.994538825937,
+  "elapsed_seconds": 13890.713262239005,
   "cursor": {
     "stage": 2,
-    "update": 20,
-    "completed_updates": 220
+    "update": 60,
+    "completed_updates": 260
   }
 }
