@@ -1,0 +1,154 @@
+{
+ "run_output_root": {
+  "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1",
+  "total_files": 534,
+  "total_bytes": 352433847
+ },
+ "checkpoints_not_uploaded": [
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/teacher.pt",
+   "bytes": 24903196,
+   "stage": "teacher",
+   "route": "plain",
+   "completed_updates": 100
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/utility.pt",
+   "bytes": 9503840,
+   "stage": "utility",
+   "route": "plain",
+   "completed_updates": 100
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/adapt-plain.pt",
+   "bytes": 18340612,
+   "stage": "adapt",
+   "route": "plain",
+   "completed_updates": 100
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/adapt-identity.pt",
+   "bytes": 18342259,
+   "stage": "adapt",
+   "route": "identity",
+   "completed_updates": 100
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/adapt-utility.pt",
+   "bytes": 18341710,
+   "stage": "adapt",
+   "route": "utility",
+   "completed_updates": 100
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/adapt-learned.pt",
+   "bytes": 18613822,
+   "stage": "adapt",
+   "route": "learned",
+   "completed_updates": 100
+  }
+ ],
+ "predictions_npz_not_uploaded": [
+  {
+   "route": "plain",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/plain-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9740453,
+   "metadata_json_files": 64,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  },
+  {
+   "route": "identity",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/identity-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9736908,
+   "metadata_json_files": 64,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  },
+  {
+   "route": "utility",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/utility-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9720911,
+   "metadata_json_files": 64,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  },
+  {
+   "route": "learned",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/learned-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9720222,
+   "metadata_json_files": 64,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  }
+ ],
+ "large_json_not_uploaded": [
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/run.json",
+   "bytes": 11135152,
+   "gz_returned": "HandOver/results/COOPERATIVE-DEVELOPMENT-20261018-018/files/run.json.gz",
+   "gz_bytes": 1247069,
+   "verified": "gzip -dc | cmp -> IDENTICAL"
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/plain-evaluation.json",
+   "bytes": 17303410,
+   "gz_returned": "HandOver/results/COOPERATIVE-DEVELOPMENT-20261018-018/files/plain-evaluation.json.gz",
+   "gz_bytes": 714827,
+   "verified": "gzip -dc | cmp -> IDENTICAL"
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/identity-evaluation.json",
+   "bytes": 17303542,
+   "gz_returned": "HandOver/results/COOPERATIVE-DEVELOPMENT-20261018-018/files/identity-evaluation.json.gz",
+   "gz_bytes": 714709,
+   "verified": "gzip -dc | cmp -> IDENTICAL"
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/utility-evaluation.json",
+   "bytes": 17303109,
+   "gz_returned": "HandOver/results/COOPERATIVE-DEVELOPMENT-20261018-018/files/utility-evaluation.json.gz",
+   "gz_bytes": 714620,
+   "verified": "gzip -dc | cmp -> IDENTICAL"
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/learned-evaluation.json",
+   "bytes": 17302122,
+   "gz_returned": "HandOver/results/COOPERATIVE-DEVELOPMENT-20261018-018/files/learned-evaluation.json.gz",
+   "gz_bytes": 714773,
+   "verified": "gzip -dc | cmp -> IDENTICAL"
+  }
+ ],
+ "execution_json": {
+  "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-DEVELOPMENT-20261018-018-attempt-1/execution.json",
+  "bytes": 122491418
+ },
+ "npz_totals": {
+  "files": 256,
+  "bytes": 38918494
+ }
+}
