@@ -24,7 +24,7 @@
 
 [015独立报告](../docs/results/cooperative015_local_review/README.md)已逐对复算：四臂同一身份分数，AUC .505779、AP .113462≈正例率 .113658；TP3297/FP25705/FN0/TN6，64场景各成一个组，377目标仅64有匹配输出。有效位置点3191/18364，全部输入轨迹仍保留。candidate_count=29007是唯一阈值数加全拒绝项，并无漏一对。
 
-Oracle位置MAE plain198.86、identity182.23、utility170.39、learned198.88公里；utility相对plain低14.31%，但速度MAE高17.09%。仅两步、绝对误差仍大，不能称机制成立。真实oracle辅助轨约70%身份先验权重恰为floor；未缩放手工时间特征存在可复现的巨大logit路径，具体输入表示修改尚待审阅。模型/标签/门控未偷改。teacher loss分项日志已补，21相关CPU测试与修改前后数值等价核验通过。
+Oracle位置MAE plain198.86、identity182.23、utility170.39、learned198.88公里；utility相对plain低14.31%，但速度MAE高17.09%。仅两步、绝对误差仍大，不能称机制成立。真实oracle辅助轨约70%身份先验权重恰为floor；未缩放手工时间特征存在可复现的巨大logit路径，对应训练侧固定缩放已获批并实现于018。teacher loss分项日志已补，相关核验已完成，不重复检查或阻塞018。
 
 [014报告](../docs/results/tmtaff014_local_review/README.md)：退出0、1902秒，终评1757.91秒；selected仅TAM2+TFM2、不含joint。raw多轨oracle误差千万米级；已实现仅lat/lon使用T_core固定mean/std的train_position_affine，保留旧raw行为，433全仓＋15审计CPU通过。称“TMTAFF时间与输出尺度适配近似参考”，不是作者精确实现，无修正后真实成绩。
 
