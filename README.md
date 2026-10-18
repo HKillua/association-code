@@ -2,7 +2,7 @@
 
 MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全、关联、融合**，以TMTAFF时间适配近似参考和自有候选的真实比较，判断课题潜力。
 
-完整参考与候选均已实现。014定位的参考位置输出尺度问题已修正并通过CPU验证，但尚未有修正后真实训练结果。015完成候选12更新与四臂评价、实际292秒；[分析](docs/results/cooperative015_local_review/README.md)确认身份近随机、位置相对改善伴随速度退化，尚不能认定机制有效。用户已批准[方案A](docs/proposals/parallel_after015/README.md)及新增最多10 GPU小时，017参考100/100/100/20在隔离worktree独立执行；016候选继续做零GPU数组诊断。两项均READY、尚无领取回执，详见[交接索引](HandOver/Handover.md)；候选新训练尚未批准。
+完整参考与候选均已实现。017正在独立worktree执行已批准的参考100/100/100/20训练（最多10GPU小时）；服务器报告TCM100＋TAM20，尚未回传中期验证指标或终态结果。016已用34秒零GPU分析核实015候选的速度严重偏大、正确分组下仍有百公里位置误差；[016分析](docs/results/cooperative016_local_review/README.md)未发现据此中止017的确定理由。当前先补齐017已有中期日志，不增加评价计算；候选新数值配置和训练预算尚未批准。实际入口见[交接索引](HandOver/Handover.md)。
 
 **CDF1本轮无专属机制收益，活动训练实现已退役；负结果、原缓存、历史交接与Git历史保留。** TSA保留为独立关联诊断对照，不充当完整融合baseline，也不自动启动新训练。旧A0、A_full和TSA关联分数不与新时间适配实验混排；`A_full`不代表完整TMTAFF。见[研究说明](docs/research_brief.md)与[退役及后续路线](docs/decisions/retire_cdf1_and_focus.md)。
 
@@ -16,7 +16,7 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 | 原生时间、数据与参考监督 | [时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[数据契约](docs/data_contract.md)、[综合审计](docs/experiment_reaudit_20261018.md) |
 | 完整参考与候选实现 | [参考重构](docs/specs/complete-training-refactor.md)、[候选规格](docs/specs/cooperative-completion-fusion.md)、[候选核验](docs/results/cooperative_local_20261018/README.md) |
 | 既有实测与成本 | [012完整复算](docs/results/evidence012_local_review/README.md)、[013诊断](docs/results/tmtaff013_decisions/analysis.md)、[后续成本方案](docs/proposals/tmtaff_after013/README.md) |
-| 下一轮配置、覆盖与费用提案 | [完整任务比较方案](docs/proposals/first_full_comparison/README.md)：015测量已完成并关闭；[新并行配置与成本](docs/proposals/parallel_after015/README.md)待决定 |
+| 下一轮配置、覆盖与费用提案 | [完整任务比较方案](docs/proposals/first_full_comparison/README.md)：015测量已完成并关闭；[并行配置与成本](docs/proposals/parallel_after015/README.md)：参考017已批，候选待决定 |
 | 当前执行入口 | [实验工具](tools/experiments/README.md)、[旧pilot说明](docs/pilot_execution.md) |
 
 014只评价短训参考，015是候选两步成本测量，均不代表充分训练。完整参考与候选的正式训练量、选模配置和总预算仍待确定；旧轮次额度关闭，T_test封存。TMTAFF时间适配改变了模型函数，明确称为近似参考，不能声称作者精确实现或把测试通过当作研究有效。
