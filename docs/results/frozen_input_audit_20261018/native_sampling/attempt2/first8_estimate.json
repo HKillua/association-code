@@ -1,0 +1,15 @@
+{
+  "first_scene_ids": [
+    "2606",
+    "1622",
+    "1759",
+    "4349",
+    "820",
+    "4997",
+    "1739",
+    "1030"
+  ],
+  "seconds": 0.41776474996004254,
+  "projected_full_scan_seconds": 30.079061997123063,
+  "note": "First eight frozen scenes in existing order; not representative sampling or runtime guarantee"
+}

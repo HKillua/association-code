@@ -1,0 +1,12 @@
+COMPLETED validation-only /private/var/folders/9p/wc8gfp115lnckg50wh00rqyw0000gn/T/tmps908ty98/validation
+FAILED ValueError: --device must be explicit for fit
+COMPLETED TMTAFF-time-adapted-v1: /private/var/folders/9p/wc8gfp115lnckg50wh00rqyw0000gn/T/tmpfqtadqbr/cli-fit
+INSPECTED native-time inputs: /private/var/folders/9p/wc8gfp115lnckg50wh00rqyw0000gn/T/tmpkqa5eunu/inspect
+FAILED FileExistsError: Output already exists: /var/folders/9p/wc8gfp115lnckg50wh00rqyw0000gn/T/tmpkqa5eunu/inspect
+TSA update=2 loss=0.184182 V_macro_F1=0.535714
+TSA update=4 loss=1.020423 V_macro_F1=0.535714
+COMPLETED TSA offline fit /private/var/folders/9p/wc8gfp115lnckg50wh00rqyw0000gn/T/tmpjjyv5kh_/fit
+----------------------------------------------------------------------
+Ran 371 tests in 16.242s
+
+OK

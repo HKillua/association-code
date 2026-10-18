@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/Users/a1/Projects/biye-ronghe/docs/reviews/2026-10-18_experiment_reaudit/native_sampling_audit/audit_native_sampling.py", line 388, in <module>
+    main()
+  File "/Users/a1/Projects/biye-ronghe/docs/reviews/2026-10-18_experiment_reaudit/native_sampling_audit/audit_native_sampling.py", line 353, in main
+    row=audit_scene(archive,split,sid,accum[split])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1/Projects/biye-ronghe/docs/reviews/2026-10-18_experiment_reaudit/native_sampling_audit/audit_native_sampling.py", line 179, in audit_scene
+    timed = prepare_timed_scene(native, length=64, max_observations=128, time_unit_seconds=20)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/a1/Projects/association-code/association/timed_inputs.py", line 172, in prepare_timed_scene
+    validate_timed_scene(result)
+  File "/Users/a1/Projects/association-code/association/timed_inputs.py", line 221, in validate_timed_scene
+    if not np.array_equal(np.asarray(scene['intervals']), expected_intervals):
+                                     ~~~~~^^^^^^^^^^^^^
+KeyError: 'intervals'

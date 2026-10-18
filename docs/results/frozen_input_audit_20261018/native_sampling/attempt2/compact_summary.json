@@ -1,0 +1,1072 @@
+{
+  "status": "COMPLETED",
+  "completed_scenes": 576,
+  "scan_seconds": 28.69759208295727,
+  "elapsed_seconds": 40.54316766595002,
+  "member_reads": {
+    "labels": 576,
+    "measurements": 576
+  },
+  "cpu_thread_limit": 2,
+  "time_unit_seconds": 20,
+  "query_length": 64,
+  "fixture_check": "PASS: compact rank-select, 200 public-sampler batch comparisons and final RNG states",
+  "splits": {
+    "T_core": {
+      "counts": {
+        "scenes": 512,
+        "valid_tracks": 54792,
+        "canonical_points": 2938785,
+        "quarantined_tracks": 1873,
+        "candidate_pairs": 18249384,
+        "positive_pairs": 110733,
+        "negative_pairs": 18138651,
+        "scene_identities": 12650,
+        "positive_eligible_scenes": 512,
+        "negative_eligible_scenes": 512,
+        "positive_eligible_tracks": 54120,
+        "negative_eligible_tracks": 54792,
+        "positive_eligible_identities": 11978,
+        "negative_eligible_identities": 12650,
+        "public_timed_adapter_scenes": 512,
+        "query_float32_nonincreasing_steps": 0,
+        "zero_query_support_tracks": 567,
+        "one_query_support_tracks": 1798,
+        "float32_support_changed_tracks": 0,
+        "float32_support_changed_points": 0
+      },
+      "native_points_per_track": {
+        "count": 54792,
+        "min": 2.0,
+        "p01": 2.0,
+        "p05": 3.0,
+        "median": 27.0,
+        "p90": 122.0,
+        "p95": 186.0,
+        "p99": 403.0,
+        "max": 2177.0
+      },
+      "duration_seconds": {
+        "count": 54792,
+        "min": 3.250999927520752,
+        "p01": 60.34113991975783,
+        "p05": 187.0,
+        "median": 1472.0,
+        "p90": 3912.5346000909813,
+        "p95": 6786.449999999997,
+        "p99": 7152.0,
+        "max": 7200.0
+      },
+      "query_support_points": {
+        "count": 54792,
+        "min": 0.0,
+        "p01": 0.0,
+        "p05": 2.0,
+        "median": 13.0,
+        "p90": 34.0,
+        "p95": 59.0,
+        "p99": 62.0,
+        "max": 64.0
+      },
+      "query_grid_step_seconds": {
+        "count": 512,
+        "min": 49.34920634920635,
+        "p01": 80.49936507936509,
+        "p05": 110.26587301587303,
+        "median": 113.96825396825396,
+        "p90": 114.26984126984127,
+        "p95": 114.28571428571429,
+        "p99": 114.28571428571429,
+        "max": 114.28571428571429
+      },
+      "native_delta_seconds_by_source": {
+        "9001": {
+          "count": 1064297,
+          "min": 1.0,
+          "p01": 5.0,
+          "p05": 10.0,
+          "median": 30.0,
+          "p90": 120.0,
+          "p95": 180.0,
+          "p99": 351.0,
+          "max": 600.0
+        },
+        "9002": {
+          "count": 1819696,
+          "min": 0.40000009536743164,
+          "p01": 2.4189999103546143,
+          "p05": 3.3440001010894775,
+          "median": 15.721999883651733,
+          "p90": 54.66000008583069,
+          "p95": 86.96099996566772,
+          "p99": 166.09909998178492,
+          "max": 355.9279999732971
+        }
+      },
+      "caps": {
+        "64": {
+          "counts": {
+            "selected_points": 1785622,
+            "affected_tracks": 12829,
+            "omitted_points": 1153163,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 0,
+            "native_query_false_equal_tracks": 0,
+            "point_retention_fraction": 0.6076055240516064,
+            "affected_track_fraction": 0.2341400204409403
+          },
+          "retained_delta_seconds": {
+            "count": 1730830,
+            "min": 0.40000009536743164,
+            "p01": 6.0,
+            "p05": 12.025000095367432,
+            "median": 38.47199988365173,
+            "p90": 122.0,
+            "p95": 180.0,
+            "p99": 322.69970983028406,
+            "max": 1432.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 54792,
+            "min": 3.250999927520752,
+            "p01": 24.870829977989196,
+            "p05": 44.78045001029969,
+            "median": 177.0,
+            "p90": 390.0,
+            "p95": 482.0,
+            "p99": 575.0,
+            "max": 1432.0
+          },
+          "per_track_retention_fraction": {
+            "count": 54792,
+            "min": 0.02939825447864033,
+            "p01": 0.1588089330024814,
+            "p05": 0.34408602150537637,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 54792,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014448165893554688,
+            "p90": 0.00028705596923828125,
+            "p95": 0.00029778480529785156,
+            "p99": 0.0003037452697753906,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": []
+        },
+        "128": {
+          "counts": {
+            "selected_points": 2310515,
+            "affected_tracks": 5074,
+            "omitted_points": 628270,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 1,
+            "native_query_false_equal_tracks": 1,
+            "point_retention_fraction": 0.7862143709049828,
+            "affected_track_fraction": 0.09260475981895167
+          },
+          "retained_delta_seconds": {
+            "count": 2255723,
+            "min": 0.40000009536743164,
+            "p01": 4.663000106811523,
+            "p05": 9.683000087738037,
+            "median": 30.0,
+            "p90": 92.0,
+            "p95": 143.0,
+            "p99": 270.0,
+            "max": 909.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 54792,
+            "min": 3.250999927520752,
+            "p01": 21.119200053215025,
+            "p05": 38.91455003023148,
+            "median": 164.20499992370605,
+            "p90": 364.0,
+            "p95": 450.0,
+            "p99": 554.0,
+            "max": 909.0
+          },
+          "per_track_retention_fraction": {
+            "count": 54792,
+            "min": 0.05879650895728066,
+            "p01": 0.3176178660049628,
+            "p05": 0.6881720430107527,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 54792,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014591217041015625,
+            "p90": 0.00029015541076660156,
+            "p95": 0.00029969215393066406,
+            "p99": 0.0003046989440917969,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": [
+            {
+              "scene_id": "3641",
+              "node_id": "3641:9002:23",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            }
+          ]
+        },
+        "256": {
+          "counts": {
+            "selected_points": 2671005,
+            "affected_tracks": 1508,
+            "omitted_points": 267780,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 3,
+            "native_query_false_equal_tracks": 3,
+            "point_retention_fraction": 0.9088807109060377,
+            "affected_track_fraction": 0.027522266024237116
+          },
+          "retained_delta_seconds": {
+            "count": 2616213,
+            "min": 0.40000009536743164,
+            "p01": 3.690000057220459,
+            "p05": 5.5940001010894775,
+            "median": 28.0,
+            "p90": 84.58599996566772,
+            "p95": 126.72340002059927,
+            "p99": 250.0,
+            "max": 770.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 54792,
+            "min": 3.250999927520752,
+            "p01": 20.0,
+            "p05": 36.24789998531342,
+            "median": 160.0605000257492,
+            "p90": 361.0,
+            "p95": 447.0,
+            "p99": 551.0,
+            "max": 770.0
+          },
+          "per_track_retention_fraction": {
+            "count": 54792,
+            "min": 0.11759301791456132,
+            "p01": 0.6352357320099256,
+            "p05": 1.0,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 54792,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014638900756835938,
+            "p90": 0.00029206275939941406,
+            "p95": 0.0003008842468261719,
+            "p99": 0.0003046989440917969,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": [
+            {
+              "scene_id": "1142",
+              "node_id": "1142:9002:87",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            },
+            {
+              "scene_id": "1494",
+              "node_id": "1494:9002:11",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            },
+            {
+              "scene_id": "3641",
+              "node_id": "3641:9002:23",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            }
+          ]
+        },
+        "full": {
+          "counts": {
+            "selected_points": 2938785,
+            "affected_tracks": 0,
+            "omitted_points": 0,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 3,
+            "native_query_false_equal_tracks": 3,
+            "point_retention_fraction": 1.0,
+            "affected_track_fraction": 0.0
+          },
+          "retained_delta_seconds": {
+            "count": 2883993,
+            "min": 0.40000009536743164,
+            "p01": 2.5490000247955322,
+            "p05": 4.289999961853027,
+            "median": 21.0,
+            "p90": 77.94779996871976,
+            "p95": 120.0,
+            "p99": 241.0,
+            "max": 600.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 54792,
+            "min": 3.250999927520752,
+            "p01": 19.010819931030273,
+            "p05": 35.86254994869232,
+            "median": 158.90599989891052,
+            "p90": 361.0,
+            "p95": 447.0,
+            "p99": 551.0,
+            "max": 600.0
+          },
+          "per_track_retention_fraction": {
+            "count": 54792,
+            "min": 1.0,
+            "p01": 1.0,
+            "p05": 1.0,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 54792,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014638900756835938,
+            "p90": 0.00029206275939941406,
+            "p95": 0.0003008842468261719,
+            "p99": 0.0003046989440917969,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": [
+            {
+              "scene_id": "1142",
+              "node_id": "1142:9002:87",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            },
+            {
+              "scene_id": "1494",
+              "node_id": "1494:9002:11",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            },
+            {
+              "scene_id": "3641",
+              "node_id": "3641:9002:23",
+              "native_time_collisions": 0,
+              "query_aliases": 1,
+              "support_changed_points": 0
+            }
+          ]
+        }
+      }
+    },
+    "V_select": {
+      "counts": {
+        "scenes": 64,
+        "valid_tracks": 1635,
+        "canonical_points": 47303,
+        "quarantined_tracks": 51,
+        "candidate_pairs": 29008,
+        "positive_pairs": 3297,
+        "negative_pairs": 25711,
+        "scene_identities": 377,
+        "positive_eligible_scenes": 64,
+        "negative_eligible_scenes": 64,
+        "positive_eligible_tracks": 1616,
+        "negative_eligible_tracks": 1635,
+        "positive_eligible_identities": 358,
+        "negative_eligible_identities": 377,
+        "public_timed_adapter_scenes": 64,
+        "query_float32_nonincreasing_steps": 0,
+        "zero_query_support_tracks": 8,
+        "one_query_support_tracks": 62,
+        "float32_support_changed_tracks": 0,
+        "float32_support_changed_points": 0
+      },
+      "native_points_per_track": {
+        "count": 1635,
+        "min": 2.0,
+        "p01": 2.0,
+        "p05": 3.0,
+        "median": 19.0,
+        "p90": 64.0,
+        "p95": 91.0,
+        "p99": 165.64000000000033,
+        "max": 243.0
+      },
+      "duration_seconds": {
+        "count": 1635,
+        "min": 16.0,
+        "p01": 85.22874001026153,
+        "p05": 185.9544000148773,
+        "median": 1421.0,
+        "p90": 3849.8,
+        "p95": 6552.699999999999,
+        "p99": 7094.64,
+        "max": 7185.0
+      },
+      "query_support_points": {
+        "count": 1635,
+        "min": 0.0,
+        "p01": 1.0,
+        "p05": 2.0,
+        "median": 13.0,
+        "p90": 34.0,
+        "p95": 58.0,
+        "p99": 63.0,
+        "max": 64.0
+      },
+      "query_grid_step_seconds": {
+        "count": 64,
+        "min": 60.34920634920635,
+        "p01": 68.90920634920634,
+        "p05": 97.92380952380952,
+        "median": 113.48412698412699,
+        "p90": 114.0904761904762,
+        "p95": 114.11111111111111,
+        "p99": 114.20396825396826,
+        "max": 114.25396825396825
+      },
+      "native_delta_seconds_by_source": {
+        "9001": {
+          "count": 17203,
+          "min": 1.0,
+          "p01": 10.0,
+          "p05": 26.0,
+          "median": 67.0,
+          "p90": 183.0,
+          "p95": 247.0,
+          "p99": 419.97999999999956,
+          "max": 599.0
+        },
+        "9002": {
+          "count": 28465,
+          "min": 0.41100001335144043,
+          "p01": 4.256559915542603,
+          "p05": 10.267799949645998,
+          "median": 34.003000020980835,
+          "p90": 92.29140005111697,
+          "p95": 119.69760007858267,
+          "p99": 207.67315994262702,
+          "max": 351.7520000934601
+        }
+      },
+      "caps": {
+        "64": {
+          "counts": {
+            "selected_points": 41037,
+            "affected_tracks": 161,
+            "omitted_points": 6266,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 0,
+            "native_query_false_equal_tracks": 0,
+            "point_retention_fraction": 0.8675348286578018,
+            "affected_track_fraction": 0.09847094801223241
+          },
+          "retained_delta_seconds": {
+            "count": 39402,
+            "min": 0.4119999408721924,
+            "p01": 6.0,
+            "p05": 20.12785009145737,
+            "median": 60.0,
+            "p90": 154.60680007934582,
+            "p95": 193.0,
+            "p99": 359.0,
+            "max": 599.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 1635,
+            "min": 16.0,
+            "p01": 38.32103999137878,
+            "p05": 59.14359996318817,
+            "median": 183.760999917984,
+            "p90": 410.60000000000014,
+            "p95": 500.5999999999999,
+            "p99": 571.6600000000001,
+            "max": 599.0
+          },
+          "per_track_retention_fraction": {
+            "count": 1635,
+            "min": 0.26337448559670784,
+            "p01": 0.3864310642518644,
+            "p05": 0.7032967032967034,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 1635,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014162063598632812,
+            "p90": 0.00028190612792968763,
+            "p95": 0.00029587745666503906,
+            "p99": 0.0003037452697753906,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": []
+        },
+        "128": {
+          "counts": {
+            "selected_points": 46051,
+            "affected_tracks": 29,
+            "omitted_points": 1252,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 0,
+            "native_query_false_equal_tracks": 0,
+            "point_retention_fraction": 0.9735323341014313,
+            "affected_track_fraction": 0.017737003058103974
+          },
+          "retained_delta_seconds": {
+            "count": 44416,
+            "min": 0.4119999408721924,
+            "p01": 5.0,
+            "p05": 15.635749995708466,
+            "median": 55.0,
+            "p90": 134.0,
+            "p95": 182.0,
+            "p99": 335.90294998884104,
+            "max": 599.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 1635,
+            "min": 16.0,
+            "p01": 38.32103999137878,
+            "p05": 58.02099997997284,
+            "median": 181.0,
+            "p90": 385.60000000000014,
+            "p95": 491.5999999999999,
+            "p99": 571.0,
+            "max": 599.0
+          },
+          "per_track_retention_fraction": {
+            "count": 1635,
+            "min": 0.5267489711934157,
+            "p01": 0.7728621285037288,
+            "p05": 1.0,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 1635,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014209747314453125,
+            "p90": 0.0002841949462890625,
+            "p95": 0.0002968311309814453,
+            "p99": 0.0003037452697753906,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": []
+        },
+        "256": {
+          "counts": {
+            "selected_points": 47303,
+            "affected_tracks": 0,
+            "omitted_points": 0,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 0,
+            "native_query_false_equal_tracks": 0,
+            "point_retention_fraction": 1.0,
+            "affected_track_fraction": 0.0
+          },
+          "retained_delta_seconds": {
+            "count": 45668,
+            "min": 0.41100001335144043,
+            "p01": 4.68133996963501,
+            "p05": 13.0,
+            "median": 50.962000012397766,
+            "p90": 131.0,
+            "p95": 181.0,
+            "p99": 332.33000000000175,
+            "max": 599.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 1635,
+            "min": 16.0,
+            "p01": 38.32103999137878,
+            "p05": 57.858400034904484,
+            "median": 180.1470000743866,
+            "p90": 385.60000000000014,
+            "p95": 491.5999999999999,
+            "p99": 571.0,
+            "max": 599.0
+          },
+          "per_track_retention_fraction": {
+            "count": 1635,
+            "min": 1.0,
+            "p01": 1.0,
+            "p05": 1.0,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 1635,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014209747314453125,
+            "p90": 0.00028514862060546875,
+            "p95": 0.00029711723327636714,
+            "p99": 0.0003037452697753906,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": []
+        },
+        "full": {
+          "counts": {
+            "selected_points": 47303,
+            "affected_tracks": 0,
+            "omitted_points": 0,
+            "endpoints_lost": 0,
+            "native_float32_nonincreasing_steps": 0,
+            "native_float32_affected_tracks": 0,
+            "native_query_false_equal_points": 0,
+            "native_query_false_equal_tracks": 0,
+            "point_retention_fraction": 1.0,
+            "affected_track_fraction": 0.0
+          },
+          "retained_delta_seconds": {
+            "count": 45668,
+            "min": 0.41100001335144043,
+            "p01": 4.68133996963501,
+            "p05": 13.0,
+            "median": 50.962000012397766,
+            "p90": 131.0,
+            "p95": 181.0,
+            "p99": 332.33000000000175,
+            "max": 599.0
+          },
+          "per_track_max_gap_seconds": {
+            "count": 1635,
+            "min": 16.0,
+            "p01": 38.32103999137878,
+            "p05": 57.858400034904484,
+            "median": 180.1470000743866,
+            "p90": 385.60000000000014,
+            "p95": 491.5999999999999,
+            "p99": 571.0,
+            "max": 599.0
+          },
+          "per_track_retention_fraction": {
+            "count": 1635,
+            "min": 1.0,
+            "p01": 1.0,
+            "p05": 1.0,
+            "median": 1.0,
+            "p90": 1.0,
+            "p95": 1.0,
+            "p99": 1.0,
+            "max": 1.0
+          },
+          "per_track_max_float32_time_rounding_seconds": {
+            "count": 1635,
+            "min": 0.0,
+            "p01": 7.62939453125e-06,
+            "p05": 3.0517578125e-05,
+            "median": 0.00014209747314453125,
+            "p90": 0.00028514862060546875,
+            "p95": 0.00029711723327636714,
+            "p99": 0.0003037452697753906,
+            "max": 0.0003046989440917969
+          },
+          "collision_examples": []
+        }
+      }
+    }
+  },
+  "sampling": {
+    "seed": 20,
+    "tfm_seed": 21,
+    "batch_tracks": 64,
+    "pair_batch_size": 64,
+    "policy": "exact current sampler distribution and RNG call order; no model or training",
+    "eligible_scene_counts": {
+      "1": 512,
+      "0": 512
+    },
+    "required_updates_for_expected_coverage": {
+      "0.9": {
+        "TCM": 1971,
+        "positive_scene": 1178,
+        "negative_scene": 1178
+      },
+      "0.95": {
+        "TCM": 2564,
+        "positive_scene": 1533,
+        "negative_scene": 1533
+      },
+      "0.99": {
+        "TCM": 3941,
+        "positive_scene": 2356,
+        "negative_scene": 2356
+      }
+    },
+    "warning": "Candidates illustrate sampling coverage, not convergence or an approved training plan. Joint sampler continues after TAM.",
+    "plans": {
+      "current_cost_measurement_proposal": {
+        "stages": {
+          "TCM": {
+            "updates": 2,
+            "actual": {
+              "unique_scenes": 88,
+              "unique_tracks": 127,
+              "unique_scene_identities": 127,
+              "unique_global_AB_identities": 125,
+              "unique_pairs": 0,
+              "positive_presentations": 0,
+              "negative_presentations": 0,
+              "positive_scenes": 0,
+              "negative_scenes": 0
+            },
+            "expected_track_fraction": 0.0023347431114258965
+          },
+          "TAM_FROZEN": {
+            "updates": 2,
+            "actual": {
+              "unique_scenes": 4,
+              "unique_tracks": 99,
+              "unique_scene_identities": 38,
+              "unique_global_AB_identities": 38,
+              "unique_pairs": 110,
+              "positive_presentations": 64,
+              "negative_presentations": 64,
+              "positive_scenes": 2,
+              "negative_scenes": 2
+            },
+            "expected_positive_scene_fraction": 0.003902435302734375,
+            "expected_negative_scene_fraction": 0.003902435302734375
+          },
+          "TFM_FROZEN": {
+            "updates": 2,
+            "actual": {
+              "unique_scenes": 2,
+              "unique_tracks": 67,
+              "unique_scene_identities": 14,
+              "unique_global_AB_identities": 14,
+              "unique_pairs": 96,
+              "positive_presentations": 128,
+              "negative_presentations": 0,
+              "positive_scenes": 2,
+              "negative_scenes": 0
+            },
+            "expected_positive_scene_fraction": 0.003902435302734375
+          },
+          "JOINT": {
+            "updates": 2,
+            "actual": {
+              "unique_scenes": 4,
+              "unique_tracks": 130,
+              "unique_scene_identities": 39,
+              "unique_global_AB_identities": 39,
+              "unique_pairs": 128,
+              "positive_presentations": 64,
+              "negative_presentations": 64,
+              "positive_scenes": 2,
+              "negative_scenes": 2
+            },
+            "expected_positive_scene_fraction": 0.003902435302734375,
+            "expected_negative_scene_fraction": 0.003902435302734375
+          }
+        },
+        "all_pair_stages_cumulative": {
+          "unique_scenes": 10,
+          "unique_tracks": 296,
+          "unique_scene_identities": 91,
+          "unique_global_AB_identities": 91,
+          "unique_pairs": 334,
+          "positive_presentations": 256,
+          "negative_presentations": 128,
+          "positive_scenes": 6,
+          "negative_scenes": 4
+        }
+      },
+      "coverage_90_candidate_not_authorized": {
+        "stages": {
+          "TCM": {
+            "updates": 1971,
+            "actual": {
+              "unique_scenes": 512,
+              "unique_tracks": 49390,
+              "unique_scene_identities": 12576,
+              "unique_global_AB_identities": 9270,
+              "unique_pairs": 0,
+              "positive_presentations": 0,
+              "negative_presentations": 0,
+              "positive_scenes": 0,
+              "negative_scenes": 0
+            },
+            "expected_track_fraction": 0.9000993929874179
+          },
+          "TAM_FROZEN": {
+            "updates": 1178,
+            "actual": {
+              "unique_scenes": 506,
+              "unique_tracks": 30855,
+              "unique_scene_identities": 9197,
+              "unique_global_AB_identities": 7076,
+              "unique_pairs": 53680,
+              "positive_presentations": 37696,
+              "negative_presentations": 37696,
+              "positive_scenes": 458,
+              "negative_scenes": 464
+            },
+            "expected_positive_scene_fraction": 0.9000445844164241,
+            "expected_negative_scene_fraction": 0.9000445844164241
+          },
+          "TFM_FROZEN": {
+            "updates": 1178,
+            "actual": {
+              "unique_scenes": 462,
+              "unique_tracks": 28121,
+              "unique_scene_identities": 7252,
+              "unique_global_AB_identities": 5789,
+              "unique_pairs": 34326,
+              "positive_presentations": 75392,
+              "negative_presentations": 0,
+              "positive_scenes": 462,
+              "negative_scenes": 0
+            },
+            "expected_positive_scene_fraction": 0.9000445844164241
+          },
+          "JOINT": {
+            "updates": 1178,
+            "actual": {
+              "unique_scenes": 510,
+              "unique_tracks": 30484,
+              "unique_scene_identities": 9166,
+              "unique_global_AB_identities": 7025,
+              "unique_pairs": 54512,
+              "positive_presentations": 37696,
+              "negative_presentations": 37696,
+              "positive_scenes": 467,
+              "negative_scenes": 458
+            },
+            "expected_positive_scene_fraction": 0.9000445844164241,
+            "expected_negative_scene_fraction": 0.9000445844164241
+          }
+        },
+        "all_pair_stages_cumulative": {
+          "unique_scenes": 512,
+          "unique_tracks": 42020,
+          "unique_scene_identities": 11080,
+          "unique_global_AB_identities": 8270,
+          "unique_pairs": 105710,
+          "positive_presentations": 150784,
+          "negative_presentations": 75392,
+          "positive_scenes": 512,
+          "negative_scenes": 507
+        }
+      },
+      "coverage_95_candidate_not_authorized": {
+        "stages": {
+          "TCM": {
+            "updates": 2564,
+            "actual": {
+              "unique_scenes": 512,
+              "unique_tracks": 52076,
+              "unique_scene_identities": 12613,
+              "unique_global_AB_identities": 9292,
+              "unique_pairs": 0,
+              "positive_presentations": 0,
+              "negative_presentations": 0,
+              "positive_scenes": 0,
+              "negative_scenes": 0
+            },
+            "expected_track_fraction": 0.9500453769306771
+          },
+          "TAM_FROZEN": {
+            "updates": 1533,
+            "actual": {
+              "unique_scenes": 510,
+              "unique_tracks": 33901,
+              "unique_scene_identities": 9740,
+              "unique_global_AB_identities": 7433,
+              "unique_pairs": 66296,
+              "positive_presentations": 49056,
+              "negative_presentations": 49056,
+              "positive_scenes": 486,
+              "negative_scenes": 491
+            },
+            "expected_positive_scene_fraction": 0.9500667618754317,
+            "expected_negative_scene_fraction": 0.9500667618754317
+          },
+          "TFM_FROZEN": {
+            "updates": 1533,
+            "actual": {
+              "unique_scenes": 483,
+              "unique_tracks": 31211,
+              "unique_scene_identities": 7932,
+              "unique_global_AB_identities": 6224,
+              "unique_pairs": 39368,
+              "positive_presentations": 98112,
+              "negative_presentations": 0,
+              "positive_scenes": 483,
+              "negative_scenes": 0
+            },
+            "expected_positive_scene_fraction": 0.9500667618754317
+          },
+          "JOINT": {
+            "updates": 1533,
+            "actual": {
+              "unique_scenes": 512,
+              "unique_tracks": 33410,
+              "unique_scene_identities": 9949,
+              "unique_global_AB_identities": 7570,
+              "unique_pairs": 66966,
+              "positive_presentations": 49056,
+              "negative_presentations": 49056,
+              "positive_scenes": 487,
+              "negative_scenes": 486
+            },
+            "expected_positive_scene_fraction": 0.9500667618754317,
+            "expected_negative_scene_fraction": 0.9500667618754317
+          }
+        },
+        "all_pair_stages_cumulative": {
+          "unique_scenes": 512,
+          "unique_tracks": 44263,
+          "unique_scene_identities": 11476,
+          "unique_global_AB_identities": 8544,
+          "unique_pairs": 124929,
+          "positive_presentations": 196224,
+          "negative_presentations": 98112,
+          "positive_scenes": 512,
+          "negative_scenes": 511
+        }
+      },
+      "coverage_99_candidate_not_authorized": {
+        "stages": {
+          "TCM": {
+            "updates": 3941,
+            "actual": {
+              "unique_scenes": 512,
+              "unique_tracks": 54245,
+              "unique_scene_identities": 12643,
+              "unique_global_AB_identities": 9309,
+              "unique_pairs": 0,
+              "positive_presentations": 0,
+              "negative_presentations": 0,
+              "positive_scenes": 0,
+              "negative_scenes": 0
+            },
+            "expected_track_fraction": 0.9900081977566332
+          },
+          "TAM_FROZEN": {
+            "updates": 2356,
+            "actual": {
+              "unique_scenes": 512,
+              "unique_tracks": 38349,
+              "unique_scene_identities": 10693,
+              "unique_global_AB_identities": 8039,
+              "unique_pairs": 91588,
+              "positive_presentations": 75392,
+              "negative_presentations": 75392,
+              "positive_scenes": 506,
+              "negative_scenes": 507
+            },
+            "expected_positive_scene_fraction": 0.9900089148955147,
+            "expected_negative_scene_fraction": 0.9900089148955147
+          },
+          "TFM_FROZEN": {
+            "updates": 2356,
+            "actual": {
+              "unique_scenes": 505,
+              "unique_tracks": 36972,
+              "unique_scene_identities": 9098,
+              "unique_global_AB_identities": 7013,
+              "unique_pairs": 49659,
+              "positive_presentations": 150784,
+              "negative_presentations": 0,
+              "positive_scenes": 505,
+              "negative_scenes": 0
+            },
+            "expected_positive_scene_fraction": 0.9900089148955147
+          },
+          "JOINT": {
+            "updates": 2356,
+            "actual": {
+              "unique_scenes": 512,
+              "unique_tracks": 38513,
+              "unique_scene_identities": 10824,
+              "unique_global_AB_identities": 8146,
+              "unique_pairs": 92198,
+              "positive_presentations": 75392,
+              "negative_presentations": 75392,
+              "positive_scenes": 507,
+              "negative_scenes": 507
+            },
+            "expected_positive_scene_fraction": 0.9900089148955147,
+            "expected_negative_scene_fraction": 0.9900089148955147
+          }
+        },
+        "all_pair_stages_cumulative": {
+          "unique_scenes": 512,
+          "unique_tracks": 47996,
+          "unique_scene_identities": 11983,
+          "unique_global_AB_identities": 8868,
+          "unique_pairs": 164381,
+          "positive_presentations": 301568,
+          "negative_presentations": 150784,
+          "positive_scenes": 512,
+          "negative_scenes": 512
+        }
+      }
+    }
+  },
+  "metadata": {
+    "raw_bytes": 14192288,
+    "gzip_bytes": 1447335,
+    "original_path": "/Users/a1/Projects/biye-ronghe/docs/reviews/2026-10-18_experiment_reaudit/native_sampling_audit/attempt2/scene_metadata.jsonl"
+  }
+}

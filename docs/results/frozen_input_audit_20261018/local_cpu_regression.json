@@ -1,0 +1,13 @@
+{
+  "status": "PASSED",
+  "exit_code": 0,
+  "test_count": 371,
+  "seconds": 16.242,
+  "command": "OPENBLAS_NUM_THREADS=2 OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 VECLIB_MAXIMUM_THREADS=2 /Users/a1/Projects/association-code/.venv/bin/python -m unittest discover -s tests -q",
+  "working_directory": "/Users/a1/Projects/association-code-v2",
+  "scope": "synthetic CPU tests; includes native format pipeline and margin calibration; CUDA telemetry/RNG mocked only",
+  "real_data_model_calls": 0,
+  "gpu_experiment_started": false,
+  "original_full_manifest_cli_run": false,
+  "expected_failure_messages": "Tests explicitly exercise refusal paths; overall unittest exits 0"
+}

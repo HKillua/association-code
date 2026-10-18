@@ -27,9 +27,11 @@
 
 研究目标仍是**不完整量测下补全、关联、融合一起做**。用户2026-10-18在解释后已批准TCM使用原始观测时间和下一预测时刻，名称明确为TMTAFF时间适配版。本地已实现原生ZIP/参考装配、时间条件TCM、四阶段训练/完整checkpoint及全目标评价，详见[重构记录](../docs/specs/complete-training-refactor.md)与[时间规格](../docs/specs/tmtaff-time-adaptation.md)。短轨即使在共同输出网格上无支撑点，仍提供至少两个原生观测；监督query_times严格等于共同输出时刻。真实训练尚未启动，不将CPU合成测试称为实验结果。
 
-012原复制命令保持不变，六小时跟进继续。本地已从旧产物交叉核回完整T_core512/V_select64名单，并完成576场景CPU时钟/监督审计，详见[新证据](../docs/results/frozen_clock_audit_20261018/README.md)；**本地数据分析无需等待012**。正式manifest元数据仍待原件，不拼造；接下来细分监督覆盖、固定cap/time unit、CL规则及训练量，提交完整配置与成本。保留CDF负结果和所有历史产物，这里没有新增训练READY或GPU授权。
+012原复制命令保持不变，六小时跟进继续。本地已完成冻结T_core512/V_select64的[时钟审计](../docs/results/frozen_clock_audit_20261018/README.md)和[输入/监督/覆盖审计](../docs/results/frozen_input_audit_20261018/README.md)，不重复扫描。约23%查询缺监督绝大多数因超出该身份实际参考时间范围；训练cap128保点78.62%，全部有效短轨保留原生输入；场景访问比例不能替代轨迹/身份覆盖。完整manifest及CDF七臂缓存仍待012原件，本地不拼造；服务器已有原manifest，无须重prepare。
 
-配置草案已改为[当前决策稿](../docs/tmtaff_complete_plan.md)：时间适配和连续SmoothL1（beta=.001、印刷公式解释性修正）已批准，不再请示。CL的训练侧seed21、64×64配对、负距离中位数规则已具体列明，尚未批准/实现；不默认margin1。一次四阶段各2更新、最多1GPU小时仍只是待审提案，若采用校准须把64批前向也计入，完整V融合成本同计。成本日志已补齐并通过相关CPU测试，不代表GPU测量已执行。
+**用户已确认方法和数据配置：** 时间条件TCM、连续SmoothL1 beta=.001、TCM后seed21独立64×64训练负距离中位数一次校准、cap128/time_unit20/已核offset/gap600。校准已实现，checkpoint保存有效m、恢复不重校准；普通参考装配重复扫描和CLI配置预检已修复。全仓371项CPU测试通过，含合成原生四阶段/校准/完整评价/精确恢复；独立review通过。真实完整模型尚未训练，CPU测试不表示方法效果。
+
+[具体成本方案](../docs/proposals/tmtaff_first_cost_measurement/README.md)、[CLI配置](../configs/tmtaff-time-cost-probe.json)、[576场景对齐参数](../configs/tmtaff-time-reference-alignment.json)均已配齐并静态核对。四阶段各2更新＋64批校准＋完整V/融合评价，单次最多1GPU小时仍为**未批准资源提案**，不是预计耗时或训练充分性证据；没有新的训练READY。正式训练更新量和预算待测量后再决定。没有原件或新决定、无确定代码欠项时安静，不制造任务。
 
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 

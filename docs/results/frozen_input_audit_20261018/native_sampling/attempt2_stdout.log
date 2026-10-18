@@ -1,0 +1,11 @@
+{"first8": {"first_scene_ids": ["2606", "1622", "1759", "4349", "820", "4997", "1739", "1030"], "seconds": 0.41776474996004254, "projected_full_scan_seconds": 30.079061997123063, "note": "First eight frozen scenes in existing order; not representative sampling or runtime guarantee"}}
+{"completed_scenes": 64, "seconds": 3.422724957985338}
+{"completed_scenes": 128, "seconds": 7.321857790986542}
+{"completed_scenes": 192, "seconds": 9.304920999973547}
+{"completed_scenes": 256, "seconds": 14.09765166597208}
+{"completed_scenes": 320, "seconds": 17.136600540950894}
+{"completed_scenes": 384, "seconds": 19.250288082985207}
+{"completed_scenes": 448, "seconds": 24.0084725409979}
+{"completed_scenes": 512, "seconds": 28.009087707963772}
+{"completed_scenes": 576, "seconds": 28.690383665962145}
+{"status": "COMPLETED", "completed_scenes": 576, "elapsed_seconds": 40.54316766595002}
