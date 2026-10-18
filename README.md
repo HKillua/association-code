@@ -4,6 +4,8 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 
 完整参考与候选均已实现。014完成短训参考的完整评价并定位位置输出尺度问题，修正已通过CPU验证但尚未真实训练。015完成候选12次更新与四臂评价，实际292秒；[独立分析](docs/results/cooperative015_local_review/README.md)确认身份近随机、几乎全场合并，效用有短训位置改善但速度退化，尚不能认定机制有效。两条线按[并行方案](docs/proposals/parallel_after015/README.md)分别推进；新GPU训练量与预算尚未批准。当前只读CPU补件入口见[交接索引](HandOver/Handover.md)。
 
+**最新决定：用户已批准方案A及最多10 GPU小时。** 修正参考100/100/100/20开发训练以017独立发布，候选016继续做零GPU数组诊断；候选新训练预算仍未批准。参考使用隔离执行checkout，两个任务可独立领取，详情以交接索引为准。
+
 **CDF1本轮无专属机制收益，活动训练实现已退役；负结果、原缓存、历史交接与Git历史保留。** TSA保留为独立关联诊断对照，不充当完整融合baseline，也不自动启动新训练。旧A0、A_full和TSA关联分数不与新时间适配实验混排；`A_full`不代表完整TMTAFF。见[研究说明](docs/research_brief.md)与[退役及后续路线](docs/decisions/retire_cdf1_and_focus.md)。
 
 ## 从这里开始
