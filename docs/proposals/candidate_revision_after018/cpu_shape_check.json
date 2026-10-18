@@ -1,0 +1,31 @@
+{
+  "status": "CHECKED",
+  "scope": "synthetic full-shape forward/backward only",
+  "device": "cpu",
+  "model_config": {
+    "length": 64,
+    "max_observations": 128,
+    "d_model": 128,
+    "nhead": 8,
+    "num_layers": 6,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "head_hidden": 64,
+    "gate_floor": 0.001,
+    "support_time_policy": "train_absmax_v1",
+    "model_variant": "support_residual_v2"
+  },
+  "parameters": 2190735,
+  "visible_counts": [
+    2,
+    128
+  ],
+  "output_shape": [
+    64,
+    4
+  ],
+  "elapsed_seconds": 0.3199249170029361,
+  "actual_optimizer_updates": 0,
+  "native_MTAD_opened": false,
+  "test_opened": false
+}

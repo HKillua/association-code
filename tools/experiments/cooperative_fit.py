@@ -21,8 +21,9 @@ import torch
 
 from association import runtime
 from association.cooperative import CooperativeConfig, CooperativeModel
-from association.cooperative_training import resolve_device, train_cooperative, training_configuration
-from association.reference import fit_normalizer, normalize_scene
+from association.cooperative_training import (fit_support_time_scaling, resolve_device,
+                                              train_cooperative, training_configuration)
+from association.cooperative_inputs import fit_cooperative_normalizer, normalize_cooperative_scene
 from association.timed_inputs import prepare_timed_scene
 
 
@@ -59,21 +60,26 @@ def synthetic_scenes(model_config):
     return [scenes[0]], [scenes[1]]
 
 
-def synthetic_configuration():
+def synthetic_configuration(model_variant='legacy'):
+    routes = (['plain', 'scalar-u', 'attribute-u', 'learned-attribute']
+              if model_variant == 'support_residual_v2' else ['plain', 'identity', 'utility', 'learned'])
     return dict(seed=20, batch_size=2, teacher_updates=1, utility_updates=1, adapt_updates=1,
                 learning_rate=1e-4, gradient_clip=1., endpoint_fraction=.25, utility_epsilon=1e-3,
-                error_scale_policy='training_native_std', routes=['plain', 'identity', 'utility', 'learned'],
+                error_scale_policy='training_native_std', routes=routes,
                 max_seconds=300., batch_tracks=2, pair_batch_size=3)
 
 
-def production_shape_check(device, output):
+def production_shape_check(device, output, model_variant='legacy'):
     """One full-shape finite forward/backward, no optimization or dataset access."""
-    cfg = CooperativeConfig()
+    cfg = CooperativeConfig(model_variant=model_variant,
+        support_time_policy='train_absmax_v1' if model_variant == 'support_residual_v2' else 'legacy')
     training, _ = synthetic_scenes(cfg)
-    normalizer = fit_normalizer(training)
+    normalizer = fit_cooperative_normalizer(training, cfg)
+    packed, mask = normalize_cooperative_scene(training[0], normalizer, cfg)
+    scale = (fit_support_time_scaling(training, [(packed, mask)], cfg.max_observations)['scale_tau']
+             if cfg.support_time_policy == 'train_absmax_v1' else 1.)
     torch.manual_seed(20)
-    model = CooperativeModel(cfg, normalizer).to(device).train()
-    packed, mask = normalize_scene(training[0], normalizer)
+    model = CooperativeModel(cfg, normalizer, support_time_scale=scale).to(device).train()
     values = torch.as_tensor(packed[:2], device=device)
     observed = torch.as_tensor(mask[:2], device=device)
     started = time.monotonic()
@@ -81,7 +87,8 @@ def production_shape_check(device, output):
     pair = torch.tensor([[0, 1]], device=device)
     utility = model.utility(encoded, pair)
     logits = model.score_pairs(encoded, pair)
-    states = model.decode_group(encoded, [0, 1], routing='utility', identity_logits=logits,
+    routing = 'attribute-u' if model_variant == 'support_residual_v2' else 'utility'
+    states = model.decode_group(encoded, [0, 1], routing=routing, identity_logits=logits,
                                 utility=utility[:, 0])
     loss = states.square().mean() + utility.square().mean() + logits.square().mean()
     loss.backward()
@@ -108,6 +115,8 @@ def main(argv=None):
     parser.add_argument('--device', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--model-variant', choices=('legacy', 'support_residual_v2'),
+                        help='Synthetic checks only; native fit reads the explicit model variant from config')
     parser.add_argument('--save-predictions', action='store_true',
                         help='Save per-scene physical predictions and valid masks for each comparison arm')
     for name in ('archive', 'manifest', 'alignment', 'config'):
@@ -129,26 +138,40 @@ def main(argv=None):
             raise FileExistsError(f'Output already exists: {output}')
         if args.mode != 'fit' and any(getattr(args, key) for key in ('archive', 'manifest', 'alignment', 'config')):
             raise ValueError('synthetic checks do not accept native dataset/config paths')
+        if args.mode == 'fit' and args.model_variant is not None:
+            raise ValueError('fit takes its model_variant only from config')
+        variant = args.model_variant or 'legacy'
         if args.mode == 'shape-check':
-            report = production_shape_check(device, output)
+            report = production_shape_check(device, output, variant)
         else:
             preparation = None
             if args.mode == 'check':
                 model = CooperativeConfig(length=4, max_observations=4, d_model=8, nhead=2,
-                                          num_layers=1, dim_feedforward=16, head_hidden=8, dropout=.1)
-                training = synthetic_configuration()
+                    num_layers=1, dim_feedforward=16, head_hidden=8, dropout=.1,
+                    model_variant=variant,
+                    support_time_policy='train_absmax_v1' if variant == 'support_residual_v2' else 'legacy')
+                training = synthetic_configuration(variant)
                 train, validation = synthetic_scenes(model)
             else:
                 if not all(getattr(args, key) for key in ('archive', 'manifest', 'alignment', 'config')):
                     raise ValueError('fit requires explicit archive, manifest, alignment and config')
                 config = runtime.read_json(args.config)
                 if (set(config) != {'scope', 'model', 'training', 'data', 'train_splits'}
-                        or config['scope'] != 'cooperative-physical-v1'
+                        or config['scope'] not in ('cooperative-physical-v1', 'cooperative-physical-v2')
                         or config['train_splits'] != ['T_core']
                         or set(config['data']) != {'time_unit_seconds'}):
-                    raise ValueError('explicit cooperative-physical-v1 T_core configuration required')
+                    raise ValueError('explicit cooperative-physical v1/v2 T_core configuration required')
                 model = CooperativeConfig(**config['model'])
+                expected_scope = ('cooperative-physical-v2' if model.model_variant == 'support_residual_v2'
+                                  else 'cooperative-physical-v1')
+                if config['scope'] != expected_scope:
+                    raise ValueError('configuration scope and model_variant disagree')
                 training = training_configuration(config['training'])
+                expected_routes = synthetic_configuration(model.model_variant)['routes']
+                if (model.model_variant == 'support_residual_v2' and training['routes'] != expected_routes
+                        or model.model_variant == 'legacy' and
+                        any(route not in (*expected_routes, 'support') for route in training['routes'])):
+                    raise ValueError('configuration routes and model_variant disagree')
                 def check():
                     if time.monotonic()-started >= training['max_seconds']:
                         raise TimeoutError('candidate budget exhausted during preparation')

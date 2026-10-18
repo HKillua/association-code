@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-19",
+  "status": "LOCAL_IMPLEMENTATION_COMPLETE_GPU_NOT_AUTHORIZED",
+  "gpu_hours_authorized": 0,
+  "ready_published": false,
+  "test_opened": false,
+  "real_MTAD_training": false,
+  "checks": [
+    {
+      "command": "python -m unittest discover -s tests",
+      "tests": 468,
+      "exit_code": 0,
+      "elapsed_seconds": 20.152
+    },
+    {
+      "command": "python -m unittest discover -s tools/pilot -p test_audit_mtad_level2.py",
+      "tests": 15,
+      "exit_code": 0
+    },
+    {
+      "command": "python tools/experiments/cooperative_fit.py check --model-variant support_residual_v2 --device cpu --cpu-threads 1 --save-predictions --output <new-synthetic-output>",
+      "exit_code": 0,
+      "optimizer_updates": 6,
+      "evidence": "cpu_e2e_summary.json"
+    },
+    {
+      "command": "python tools/experiments/cooperative_fit.py shape-check --model-variant support_residual_v2 --device cpu --cpu-threads 4 --output <new-synthetic-output>",
+      "exit_code": 0,
+      "optimizer_updates": 0,
+      "evidence": "cpu_shape_check.json"
+    }
+  ],
+  "legacy_equivalence": "legacy_equivalence.json",
+  "independent_review": {
+    "model_and_representation": "passed",
+    "training_and_evaluation": "passed after v2 physical statistics checkpoint fix",
+    "cli": "passed; 12 legacy/new CLI tests"
+  },
+  "new_tests_included_in_full_suite": 24,
+  "limitations": [
+    "CPU and synthetic data only",
+    "CUDA hardware unavailable locally; no CUDA runtime claim",
+    "No new MTAD efficacy result",
+    "Draft training budget remains null"
+  ]
+}

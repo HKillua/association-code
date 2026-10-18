@@ -21,6 +21,14 @@ from .reference import fit_normalizer, normalize_scene
 from .sampling import BalancedScenePairSampler
 
 
+_LEGACY_ROUTES = ('plain', 'identity', 'utility', 'support', 'learned')
+_V2_ROUTES = ('plain', 'scalar-u', 'attribute-u', 'learned-attribute')
+
+
+def _is_v2(model_config):
+    return getattr(model_config, 'model_variant', 'legacy') == 'support_residual_v2'
+
+
 def resolve_device(name):
     """Fail explicitly if the requested accelerator is unavailable."""
     device = torch.device(name)
@@ -139,15 +147,19 @@ def stage_parameters(model, stage, *, routing='plain'):
     if stage == 'teacher':
         names = ['input_projection', 'encoder', 'decoder', 'state_projection',
                  'role_embedding', 'identity_base']
+        if _is_v2(model.config):
+            names += ['support_projection', 'query_pool', 'local_identity', 'fusion_projection']
     elif stage == 'utility':
-        names = ['query_pool', 'utility_head']
+        names = ['utility_head'] if _is_v2(model.config) else ['query_pool', 'utility_head']
     elif stage == 'identity':
         names = ['identity_with_utility']
     elif stage == 'adapt':
-        if routing not in ('plain', 'identity', 'utility', 'support', 'learned'):
+        if routing not in (_V2_ROUTES if _is_v2(model.config) else _LEGACY_ROUTES):
             raise ValueError('unknown fusion route')
         names = ['decoder', 'state_projection', 'role_embedding']
-        if routing == 'learned':
+        if _is_v2(model.config):
+            names.append('fusion_projection')
+        if routing in ('learned', 'learned-attribute'):
             names.append('ordinary_gate')
     else:
         raise ValueError('stage must be teacher, utility, identity or adapt')
@@ -332,9 +344,15 @@ def training_configuration(config):
         raise ValueError('endpoint_fraction must be in [0,1)')
     if cfg['error_scale_policy'] != 'training_native_std':
         raise ValueError('first candidate explicitly uses fixed training_native_std error scales')
-    if (not isinstance(cfg['routes'], list) or not cfg['routes'] or len(set(cfg['routes'])) != len(cfg['routes'])
-            or any(x not in ('plain', 'identity', 'utility', 'support', 'learned') for x in cfg['routes'])
-            or not {'plain', 'utility'}.issubset(cfg['routes'])):
+    routes = cfg['routes']
+    if (not isinstance(routes, list) or not routes
+            or any(not isinstance(route, str) for route in routes)
+            or len(set(routes)) != len(routes)):
+        raise ValueError('comparison routes must be a nonempty unique string list')
+    if any(route in _V2_ROUTES[1:] for route in routes):
+        if set(routes) != set(_V2_ROUTES):
+            raise ValueError('v2 comparison requires plain, scalar-u, attribute-u and learned-attribute')
+    elif any(route not in _LEGACY_ROUTES for route in routes) or not {'plain', 'utility'}.issubset(routes):
         raise ValueError('unique comparison routes must include plain and utility')
     return cfg
 
@@ -387,22 +405,35 @@ def _snapshot(model, objective, optimizer, normalizer, config, *, stage, route, 
         if isinstance(state, (list, tuple)):
             return type(state)(cpu(v) for v in state)
         return state
-    return dict(format='cooperative-physical-v1', model_config=asdict(model.config),
+    result = dict(format='cooperative-physical-v2' if _is_v2(model.config) else 'cooperative-physical-v1',
+                model_config=asdict(model.config),
                 model_state=cpu(model.state_dict()), objective_state=cpu(objective.state_dict()),
                 support_time_scale_tau=float(model.support_time_scale),
                 optimizer_state=cpu(optimizer.state_dict()), normalizer=normalizer,
                 training=config, stage=stage, route=route, completed_updates=updates,
                 selection_policy='predetermined stage endpoint; no fusion selection on unchanged F1',
                 resume_supported=False)
+    if _is_v2(model.config):
+        result.update(model_variant=model.config.model_variant,
+                      representation_version=normalizer['cooperative_representation']['version'])
+    return result
 
 
 def load_cooperative_checkpoint(path, *, device):
     """Restore an inference snapshot; this is not an optimizer-resume API."""
     from .cooperative import CooperativeConfig, CooperativeModel
     payload = torch.load(path, map_location='cpu', weights_only=True)
-    if payload.get('format') != 'cooperative-physical-v1':
+    if payload.get('format') not in ('cooperative-physical-v1', 'cooperative-physical-v2'):
         raise ValueError('unsupported cooperative checkpoint')
-    model = CooperativeModel(CooperativeConfig(**payload['model_config']), payload['normalizer'],
+    config = CooperativeConfig(**payload['model_config'])
+    if _is_v2(config):
+        if (payload['format'] != 'cooperative-physical-v2'
+                or payload.get('model_variant') != config.model_variant
+                or payload.get('representation_version') != config.model_variant):
+            raise ValueError('v2 checkpoint format, model and representation versions must agree')
+    elif payload['format'] != 'cooperative-physical-v1':
+        raise ValueError('legacy model requires a v1 cooperative checkpoint')
+    model = CooperativeModel(config, payload['normalizer'],
                              support_time_scale=payload.get('support_time_scale_tau'))
     model.load_state_dict(payload['model_state'], strict=True)
     if any(not torch.isfinite(p).all() for p in model.parameters()):
@@ -428,6 +459,9 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     from .cooperative_evaluation import evaluate_cooperative, score_cooperative
     from .metrics import select_threshold
     cfg = training_configuration(training_config)
+    if (_is_v2(model_config) and set(cfg['routes']) != set(_V2_ROUTES)
+            or not _is_v2(model_config) and any(route not in _LEGACY_ROUTES for route in cfg['routes'])):
+        raise ValueError('comparison routes do not match the cooperative model variant')
     if not isinstance(save_predictions, bool):
         raise ValueError('save_predictions must be boolean')
     device = resolve_device(device)
@@ -457,6 +491,7 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             raise TimeoutError('cumulative candidate budget exhausted')
     output.mkdir(parents=True, exist_ok=False)
     run = dict(status='RUNNING', device=str(device), training=cfg, model_config=asdict(model_config),
+               model_variant=getattr(model_config, 'model_variant', 'legacy'),
                scope='fixed identity candidate development comparison', test_opened=False,
                save_predictions=save_predictions,
                scene_contract=contract, completed_updates=0, completed_routes=[],
@@ -510,8 +545,17 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
         runtime.write_json(output / 'run.json', run)
         bounded()
         torch.manual_seed(cfg['seed'])
-        normalizer = fit_normalizer(train_scenes)
-        packed = [normalize_scene(scene, normalizer) for scene in train_scenes]
+        if _is_v2(model_config):
+            from .cooperative_inputs import fit_cooperative_normalizer, normalize_cooperative_scene
+            normalizer = fit_cooperative_normalizer(train_scenes, model_config, check=bounded)
+            packed = []
+            for scene in train_scenes:
+                bounded()
+                packed.append(normalize_cooperative_scene(scene, normalizer, model_config))
+            run['cooperative_representation'] = copy.deepcopy(normalizer['cooperative_representation'])
+        else:
+            normalizer = fit_normalizer(train_scenes)
+            packed = [normalize_scene(scene, normalizer) for scene in train_scenes]
         if model_config.support_time_policy == 'train_absmax_v1':
             scaling = fit_support_time_scaling(train_scenes, packed, model_config.max_observations, check=bounded)
         else:
@@ -526,6 +570,11 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             target_objective.requires_grad_(stage in ('teacher', 'adapt'))
             if stage in ('teacher', 'adapt'):
                 parameters += list(target_objective.parameters())
+            names = ['model.' + name for name, value in target_model.named_parameters() if value.requires_grad]
+            names += ['objective.' + name for name, value in target_objective.named_parameters() if value.requires_grad]
+            run.setdefault('training_parameters', {})[stage + (':' + route if stage == 'adapt' else '')] = dict(
+                names=names, parameter_count=sum(parameter.numel() for parameter in parameters),
+                seed=seed, updates=steps)
             optimizer = torch.optim.Adam(parameters, lr=cfg['learning_rate'])
             sampler = BalancedScenePairSampler(train_scenes, seed)
             view_rng = np.random.default_rng(seed + 100)
@@ -558,25 +607,34 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                 runtime.write_json(output / 'history.json', history)
                 report_progress('update_completed', update=step+1)
             return sampler.describe()
+        def select_identity():
+            # In v2, only u is trained after this fixed teacher endpoint. Legacy
+            # keeps its historical post-utility order and RNG stream unchanged.
+            begin_phase('identity_scoring_selection')
+            records = score_cooperative(model, normalizer, validation_scenes, device=device,
+                batch_tracks=cfg['batch_tracks'], pair_batch_size=cfg['pair_batch_size'],
+                use_utility_identity=False, check=bounded, progress=evaluation_progress)
+            report_progress('threshold_selection')
+            selection = select_threshold(records)
+            run['threshold'] = selection['threshold']
+            run['identity_selection'] = selection
+            run['identity_selection_phase'] = ('teacher_endpoint_before_utility' if _is_v2(model_config)
+                                               else 'after_utility')
+            report_progress('threshold_selected', threshold=selection['threshold'], selection=selection)
+            finish_phase()
+            return records, selection['threshold']
+
         begin_phase('teacher', total_updates=cfg['teacher_updates'])
         fit_stage(model, objective, 'teacher', cfg['teacher_updates'], cfg['seed'])
         finish_phase()
+        if _is_v2(model_config):
+            records, threshold = select_identity()
         begin_phase('utility', total_updates=cfg['utility_updates'])
         teacher = copy.deepcopy(model).eval().requires_grad_(False)
         fit_stage(model, objective, 'utility', cfg['utility_updates'], cfg['seed']+1)
         finish_phase()
-        # Base identity never reads the newly learned utility branch.
-        begin_phase('identity_scoring_selection')
-        records = score_cooperative(model, normalizer, validation_scenes, device=device,
-            batch_tracks=cfg['batch_tracks'], pair_batch_size=cfg['pair_batch_size'],
-            use_utility_identity=False, check=bounded, progress=evaluation_progress)
-        report_progress('threshold_selection')
-        selection = select_threshold(records)
-        threshold = selection['threshold']
-        run['threshold'] = threshold
-        run['identity_selection'] = selection
-        report_progress('threshold_selected', threshold=threshold, selection=selection)
-        finish_phase()
+        if not _is_v2(model_config):
+            records, threshold = select_identity()
         for route in cfg['routes']:
             bounded()
             begin_phase('adapt', route=route, total_updates=cfg['adapt_updates'])
@@ -610,8 +668,10 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                    parameter_count=sum(p.numel() for p in model.parameters()), threshold=threshold,
                    error_scales=normalizer['std'], elapsed_seconds=initial_elapsed_seconds+time.monotonic()-started,
                    identity_policy='fixed s0 and one full-V threshold for every arm',
-                   ordinary_gate_features='same frozen utility-trained query pool; fresh ordinary gate, no gain outputs',
-                   controls_missing_for_utility_attribution=[x for x in ('identity', 'learned') if x not in cfg['routes']],
+                   ordinary_gate_features=('same frozen teacher-trained query pool; fresh ordinary attribute gate, no gain outputs'
+                       if _is_v2(model_config) else 'same frozen utility-trained query pool; fresh ordinary gate, no gain outputs'),
+                   controls_missing_for_utility_attribution=(['identity-only'] if _is_v2(model_config)
+                       else [x for x in ('identity', 'learned') if x not in cfg['routes']]),
                    selection_policy='predetermined final updates', resume_supported=False)
         runtime.write_json(output / 'progress.json', dict(run['last_progress'], status='COMPLETED',
                            completed_routes=list(completed), elapsed_seconds=run['elapsed_seconds']))

@@ -22,6 +22,11 @@ from .reference import normalize_scene, stable_evaluation_parameters
 _METADATA = ('scene_id', 'component_id', 'node_ids', 'identities', 'sources', 'intervals', 'labels')
 _ENCODED = ('memory', 'observed', 'times', 'queries', 'pooled')
 _ROUTES = ('plain', 'identity', 'utility', 'support', 'learned')
+_V2_ROUTES = ('plain', 'scalar-u', 'attribute-u', 'learned-attribute')
+
+
+def _is_v2(model):
+    return getattr(model.config, 'model_variant', 'legacy') == 'support_residual_v2'
 
 
 def _validate(model, scenes, device, batch_tracks, pair_batch_size, use_utility_identity):
@@ -85,7 +90,8 @@ def _fixed_records(scenes, records):
 
 def _take(encoded, nodes, device):
     indices = torch.as_tensor(nodes, dtype=torch.long)
-    return {key: encoded[key].index_select(0, indices).to(device) for key in _ENCODED}
+    keys = _ENCODED + (('native_positions',) if 'native_positions' in encoded else ())
+    return {key: encoded[key].index_select(0, indices).to(device) for key in keys}
 
 
 def _finite_tensor(value, shape, name):
@@ -102,6 +108,15 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
         expected = torch.as_tensor(normalizer[key], dtype=torch.float32).to(dtype=buffer.dtype)
         if not torch.equal(buffer.detach().cpu(), expected):
             raise ValueError('evaluation normalizer differs from model physical-state moments')
+    if _is_v2(model):
+        from .cooperative_inputs import normalize_cooperative_scene, validate_cooperative_representation
+        representation = validate_cooperative_representation(normalizer, model.config)
+        for key in ('log_speed_mean', 'log_speed_std', 'speed_bias'):
+            buffer = getattr(model, key)
+            expected = torch.as_tensor(representation[key], dtype=torch.float32).to(dtype=buffer.dtype)
+            if not torch.equal(buffer.detach().cpu(), expected):
+                raise ValueError('evaluation representation differs from frozen model buffers')
+    encoded_keys = _ENCODED + (('native_positions',) if _is_v2(model) else ())
     records, cached = [], []
     stage = 'encoding_fixed_identity' if fixed is not None else 'association_scoring'
     def report(completed, scene_id=None):
@@ -113,8 +128,9 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
         report(scene_index, str(scene['scene_id']))
         if check:
             check()
-        values, observed = normalize_scene(scene, normalizer)
-        chunks = {key: [] for key in _ENCODED}
+        values, observed = (normalize_cooperative_scene(scene, normalizer, model.config) if _is_v2(model)
+                            else normalize_scene(scene, normalizer))
+        chunks = {key: [] for key in encoded_keys}
         for offset in range(0, len(values), batch_tracks):
             if check:
                 check()
@@ -123,7 +139,7 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
                                    torch.as_tensor(observed[offset:stop], device=device))
             n = len(values[offset:stop])
             m, q, d = model.config.max_observations, model.config.length, model.config.d_model
-            if not isinstance(encoded, dict) or any(key not in encoded for key in _ENCODED):
+            if not isinstance(encoded, dict) or any(key not in encoded for key in encoded_keys):
                 raise ValueError('encode must return the complete native encoding dictionary')
             for key, shape in (('memory', (n, m, d)), ('queries', (n, q)), ('pooled', (n, d))):
                 _finite_tensor(encoded[key], shape, key)
@@ -132,7 +148,9 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
                 raise ValueError('encoded native mask/times have invalid shapes')
             if not torch.isfinite(encoded['times'][encoded['observed']]).all():
                 raise FloatingPointError('nonfinite observed native times')
-            for key in _ENCODED:
+            if _is_v2(model):
+                _finite_tensor(encoded['native_positions'], (n, m, 2), 'native_positions')
+            for key in encoded_keys:
                 chunks[key].append(encoded[key].detach().cpu())
         # Empty input scenes retain targets and metric denominators, with no model call.
         cached_scene = {key: torch.cat(rows, dim=0) for key, rows in chunks.items()} if len(values) else None
@@ -226,7 +244,7 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
     An optional prediction_writer receives full-population physical artifacts
     after scoring; it never supplies training inputs or changes the metrics.
     """
-    if routing not in _ROUTES:
+    if routing not in (_V2_ROUTES if _is_v2(model) else _ROUTES):
         raise ValueError('unknown cooperative routing policy')
     if not isinstance(select_on_validation, bool):
         raise ValueError('select_on_validation must be boolean')
@@ -276,9 +294,9 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
                 if check:
                     check()
                 logits = (_anchor_logits(record, members, node_count, device, dtype)
-                          if routing in ('identity', 'utility') else None)
+                          if routing in ('identity', 'utility', 'scalar-u', 'attribute-u', 'learned-attribute') else None)
                 utility = (_anchor_utility(model, encoded, members, device, dtype, pair_batch_size, check)
-                           if routing == 'utility' else None)
+                           if routing in ('utility', 'scalar-u', 'attribute-u') else None)
                 states = model.decode_group(_take(encoded, members, device), list(range(len(members))),
                                             routing=routing, identity_logits=logits, utility=utility)
                 _finite_tensor(states, (model.config.length, 4), 'decoded physical states')
@@ -331,6 +349,9 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
                 region_definition='union of original native time support over all fragments of each true identity',
                 elapsed_seconds=time.monotonic()-started, fusion_forward_count=decode_count,
                 test_opened=False, scope='V_select development; oracle, simple-fusion and single-source are diagnostics')
+    if _is_v2(model):
+        result.update(model_variant=model.config.model_variant,
+                      representation_version=normalizer['cooperative_representation']['version'])
     notify(dict(stage='completed', completed_scenes=len(scenes), total_scenes=len(scenes),
                 scene_id=None, fusion_forward_count=decode_count))
     return result

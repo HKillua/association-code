@@ -6,7 +6,7 @@
   "plan_version": "candidate-revision-after018-v1",
   "created_at": "2026-10-19",
   "status": "exploration",
-  "execution_status": "AWAITING_LOCAL_IMPLEMENTATION_APPROVAL",
+  "execution_status": "LOCAL_IMPLEMENTATION_COMPLETE_GPU_NOT_AUTHORIZED",
   "is_executable_training_config": false,
   "source_matrix_id": "MC-MTAD-SUPPORT-ATTR-20261018-v2",
   "selected_C_id": "C2",
@@ -100,7 +100,8 @@
     "gate_floor": 0.001,
     "estimated_instance_parameters": 2190735,
     "local_token_pairs_per_direction_max": 4,
-    "local_identity_symmetry": "average both directional feature summaries before shared head"
+    "local_identity_symmetry": "average both directional feature summaries before shared head",
+    "instance_parameters": 2190735
   },
   "training_draft": {
     "approved": false,
@@ -147,10 +148,15 @@
   "adaptation_vs_method_attribution": "位置底座与速度/航向尺度属于条件适配；支撑query、局部身份、属性效用是待检验整体方法。四臂仅归因路由，其他模块单独贡献尚未知。",
   "evidence_status": "partial",
   "missing_evidence": [
-    "new implementation CPU/CUDA validation",
+    "CUDA runtime validation",
     "new model real training results",
     "017 final evaluation",
     "novelty not exhaustive"
   ],
-  "next_skill": "record-experiment after implementation and authorized execution"
+  "next_skill": "record-experiment after implementation and authorized execution",
+  "local_implementation_approval": {
+    "date": "2026-10-19",
+    "scope": "complete approved specification, local code and CPU verification",
+    "gpu_authorized": false
+  }
 }
