@@ -85,6 +85,8 @@ decoder 使用 `H_k + PE_d(tau(next-times))`，返回最后一个槽作为 `z(a_
 
 ## Trainer / evaluation 接入
 
+CLI 的 `--inspect-only` 在读取 ZIP 之前执行与 fit 相同的静态配置检查（含完整 training 键、更新数、loss 枚举及校准策略的 p=1/T_core 约束）；无效配置返回非零，不输出 INSPECTED。检查仍只装配数据，不构造模型、不训练，也不授予预算。对应 `tests/test_complete_cli.py` 的缺键、无效更新数/loss及校准策略错配案例。
+
 原生适配场景需显式标识输入布局；trainer/evaluator 根据声明选择新模型路径，不能凭最后一维是 5 猜测或静默把旧 scene64 当原生。训练 checkpoint/config 必须记录适配版本、time unit、原点/查询规则、选点 cap 和插值规则。可复用参数形状不代表旧 checkpoint 自动具有新语义或已训练过时间条件。
 
 TCM loss 与 association encode/complete 必须用同一套时间输入。TAM/TFM 接收相同 Q 的输出；pair label 与候选始终来自原 frozen population。参考对齐显式使用已声明的 reference offset 和最大插值 gap；每目标的 query_times 必须等于场景 Q，缺参考保留目标行和无效 mask。reference 只进入 TFM 监督与开发评价，不能进入 `complete/encode_tracks`。

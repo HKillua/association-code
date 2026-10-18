@@ -56,10 +56,16 @@ def main(argv=None):
         if set(config['data']) != {'max_observations', 'time_unit_seconds'}:
             raise ValueError('data requires explicit max_observations/time_unit_seconds')
         data_config = {**config['data'], 'length': model.length}
+        # Inspection validates the same complete configuration as a fit before
+        # opening the archive; it still constructs no model or training run.
+        from association.complete_training import _configuration
+        from association.margin_calibration import MARGIN_POLICY
+        training = _configuration(config['training'])
+        if training['margin_policy'] == MARGIN_POLICY and (
+                model.contrastive_positive_power != 1 or config['train_splits'] != ['T_core']):
+            raise ValueError('training margin calibration requires p=1 and only T_core scenes')
         check = None
         if not args.inspect_only:
-            from association.complete_training import _configuration
-            training = _configuration(config['training'])
             spent = 0.
             if args.resume:
                 prior = runtime.read_json(Path(args.resume) / 'run.json')

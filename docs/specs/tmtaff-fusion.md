@@ -14,6 +14,10 @@
 
 返回pairs、identity_ids、query_times、states[P,L,4]、valid[P,L,4]及覆盖报告。按唯一identity仅调用一次align后复制给对应pair；无监督仍保留NaN/false，不能删除pair或改采样权重；输入不可变。测试必须覆盖真实prepared_scene接口、正负对/场景/split/时间轴错接、重复抽样次序、部分/零监督及TCM→TFM→loss的合成连通。它是监督数据，不能并入模型观测。
 
+`build_scene_fusion_targets`的整场装配按显式目标身份顺序保留全部目标，包括缺参考身份。2026-10-18普通效率修复只减少重复过滤：首个目标仍经公开对齐入口完整校验，成功后在本次调用内按身份分组一次，其余目标只处理各自的原顺序行；非字符串reader身份保持原入口兼容路径。不在reference字典中加入或相信可由调用方伪造的索引/缓存，不按属性有效性丢行。公开`align_reference_states`签名、监督数值/NaN/mask/query、issue顺序、整scene的`reference_rows`/`source_issue_count`、缺身份与非法行/状态的错误行为均不变；空目标场景仍执行原校验。复杂度由每身份重扫全scene，降为首身份校验、一次分组和各身份相关行处理，不声称免除首次全scene校验。
+
+此优化验收：合成多身份数据逐值/逐mask/逐report对比公开入口，含重复同刻冲突、坏属性/时间、缺身份和额外无关行；非法行/状态及参数报错保持；输入/返回值不别名；用可计数行列表确认全scene遍历次数不随身份数增加。只跑CPU合成测试，不扫描原生CSV或改变正式gap/offset。
+
 ## PairFusion模型
 
 `PairFusionConfig(fc_hidden=..., length=64,d_model=128,nhead=8,num_layers=6,dim_feedforward=256,dropout=.1)`，fc_hidden必填正整数，其余对应既有TCM配置。论文未披露两FC中间宽度，不伪造作者值；正式配置和总参数成本在训练方案中显式给出。

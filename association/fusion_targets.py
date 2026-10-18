@@ -40,6 +40,14 @@ def align_reference_states(reference_scene, identity_id, query_times, *,
     and source_issue_count, which describe the supplied reader scene. Unlocatable
     timestamps are reported and never used. The reader object is never modified.
     """
+    return _align_reference_rows(reference_scene, identity_id, query_times,
+                                time_offset_seconds=time_offset_seconds,
+                                max_gap_seconds=max_gap_seconds)
+
+
+def _align_reference_rows(reference_scene, identity_id, query_times, *,
+                          time_offset_seconds, max_gap_seconds, identity_rows=None):
+    """Shared alignment; an optional row group is owned by this module only."""
     if not isinstance(reference_scene, Mapping):
         raise DataError('reference_scene must be an already-read reference scene')
     if reference_scene.get('split') not in ALLOWED_SPLITS:
@@ -84,7 +92,7 @@ def align_reference_states(reference_scene, identity_id, query_times, *,
         'ambiguous_heading_queries': 0, 'issues': [],
     }
     groups = defaultdict(list)
-    for row in rows:
+    for row in rows if identity_rows is None else identity_rows:
         if not isinstance(row, Mapping):
             raise DataError('Reference rows must retain the reader mapping structure')
         if row.get('identity_id') != identity_id:
@@ -345,6 +353,28 @@ def build_scene_fusion_targets(prepared_scene, reference_scene, *, target_identi
     if not identities:
         align_reference_states(reference_scene, '__empty__-__validation__', prepared_scene['grid'],
                                time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
-    return {identity: align_reference_states(reference_scene, identity, prepared_scene['grid'],
-                        time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
-            for identity in identities}
+        return {}
+    # The first public call retains whole-scene validation and the original
+    # error order, including malformed unrelated rows. Later calls may then
+    # reuse an internal group without trusting an index supplied in the input.
+    first = identities[0]
+    aligned = {first: align_reference_states(reference_scene, first, prepared_scene['grid'],
+                           time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)}
+    if len(identities) == 1:
+        return aligned
+    rows_by_identity = defaultdict(list)
+    for row in reference_scene['rows']:
+        identity = row.get('identity_id')
+        if not isinstance(identity, str):
+            # The raw reader emits strings; unusual caller mappings retain the
+            # public comparison behavior rather than gaining hash constraints.
+            aligned.update({target: align_reference_states(reference_scene, target, prepared_scene['grid'],
+                                time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+                            for target in identities[1:]})
+            return aligned
+        rows_by_identity[identity].append(row)
+    for identity in identities[1:]:
+        aligned[identity] = _align_reference_rows(
+            reference_scene, identity, prepared_scene['grid'], identity_rows=rows_by_identity.get(identity, ()),
+            time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+    return aligned

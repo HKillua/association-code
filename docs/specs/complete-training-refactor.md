@@ -52,3 +52,27 @@ TFM FC宽度、位置loss解释、CL margin、更新数都必须显式给出。�
 验收仅运行相关CPU测试：用可控时钟区分训练/验证/快照/最终评价范围；检查CPU null、异常计时与错误保留；mock CUDA计数器验证一次reset、设备归属、部分读取失败和恢复调用不继承旧峰值。既有精确续训/选定状态测试继续约束行为不变；不把mock计数器当作GPU实测。
 
 本次相关CPU验证：`test_complete_training.py` 19项、`test_complete_snapshot.py` 3项、`test_timed_pipeline.py` 6项全部通过；`git diff --check`通过。未运行GPU或真实原生数据模型推理。
+
+## 已批准的一次训练侧CL margin校准
+
+用户现已批准固定规则的代码实现，未批准新增GPU实验。`training.margin_policy`缺省或`fixed`保留原数值；显式`train_negative_median_v1`仅用于CL、正项一次距离和仅T_core的训练池。它在TCM结束、TAM首次更新之前执行一次：独立BalancedScenePairSampler seed21，固定64批×64对，保留2048正、2048负呈现及重复，不去重、补抽或读V/T_test。批大小/种子不是新增调参接口。
+
+TCM冻结、eval并复用当前TAM缓存；TAM使用train/dropout，端点去重及分块与TAM_FROZEN相同，整个校准no_grad。保存恢复CPU和所选CUDA的Torch RNG，不触碰其他GPU或正式track/pair/TFM采样器；退出包含异常时恢复原模块模式。负距离用原flatten欧氏距离，对2048值取NumPy中位数（偶数中央两值均值）；非有限/负距离、类别或数量不符、m非正/非有限均失败，不回退m=1。m确定后在TAM及joint保持固定。
+
+记录每批场景/原候选索引、标签及距离呈现、全局和逐批重复、正负分位、严格d<m及ties、分项loss和对distance解析导数。解析导数注明单例loss及64批均值口径，不称为参数梯度；不额外反传。64批前向、首次缓存填充与统计全部计入累计预算，缓存前后计数及本次耗时保留，后续TAM已预热。该样本并非全部训练池，ties不保证50%激活，joint分布也可能变化。
+
+数学中位数以float64保存，原训练仍为FP32。额外记录训练dtype中的margin表示；实际hinge/ties、loss与distance导数按训练dtype的减法计算，数学中位数的严格激活/ties并列记录。相邻FP32值的中央均值可能舍入到端点，不能将数学比较的50%冒称实际激活率。该诊断不改变median规则或训练精度，诊断汇总使用float64，不保证与训练批次浮点归约逐位相同。
+
+请求的ModelConfig与有效margin分开保存。校准完成后、TAM首个更新前写完整安全checkpoint；checkpoint、selected快照与快照加载器均保存/恢复有效m和校准来源。INTERRUPTED恢复若已完成校准则不重做；TCM安全边界尚未校准则接续一次。校准失败/预算到期不保存半完成结果作可恢复成功状态，保留此前完整checkpoint并标FAILED。旧fixed配置和旧checkpoint缺新增字段仍兼容；数据/模型语义不一致不能冒充旧checkpoint续训。
+
+CPU验收覆盖真实tiny模型中位数与训练前向、RNG/模式/参数隔离、非法距离/数量/预算异常、一次校准、阶段边界中断续训、selected有效m重载及旧fixed兼容。合成结果不表示真实数据距离尺度或GPU成本。
+
+本次已运行`tests.test_margin_calibration` 13项，加既有完整训练/快照/时间适配集成28项，共**41项CPU通过（8.339秒）**；`git diff --check`通过。其中native_time_v1使用真实tiny四阶段更新、dropout=.1和完整开发评价，TAM末中断后各模块/optimizer/RNG/loss与连续运行逐值一致。所选CUDA RNG用mock检查设备归属，不是CUDA运行；没有真实原生数据模型推理、GPU训练或新增READY。
+
+## 2026-10-18本地收尾验证
+
+用户已确认训练侧一次CL校准和cap128/time_unit20/已核显式offset/gap600。最终全仓 `python -m unittest discover -s tests -q` **371项CPU测试通过，16.242秒，退出0**；覆盖已校准原生四阶段流程、选定/末状态有效margin、含dropout精确恢复、旧fixed checkpoint兼容、预算/RNG/模式隔离以及连续位置loss。CUDA设备RNG/计数器仅mock，不是GPU实测。CLI无效训练参数及校准p=1/T_core跨配置约束在ZIP读取前拒绝。
+
+普通参考装配效率修复减少按身份重复全scene扫描，数值、mask、报告和异常语义与公开旧入口一致；见融合规格及5项新增测试。root和独立agent复核完成；371项包含13项margin、5项分组装配和1项CLI（含5个错误配置子例）新增测试。最后一轮还覆盖数学中位数与FP32实际margin表示的相邻浮点反例，不修改中位数规则或训练精度。
+
+静态检查实际CLI配置、576个显式对齐条目与既有offset完全一致，41个相关文档链接有效。原生真实输入审计和CPU采样模拟另见[证据](../results/frozen_input_audit_20261018/README.md)。原manifest尚未复制回本地，故没有声称真实完整CLI装配/训练通过；服务器原件路径已知。具体成本测量配置已备好，但GPU测量及正式训练预算均未批准。

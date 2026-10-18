@@ -9,7 +9,9 @@ import numpy as np
 
 from association.data import DataError, Scene, Track
 from association.dataset import prepare_scene
-from association.fusion_targets import align_reference_states, build_fusion_targets
+from association.fusion_targets import (
+    align_reference_states, build_fusion_targets, build_scene_fusion_targets,
+)
 
 
 def scene(rows, split='T_core'):
@@ -394,6 +396,110 @@ class FusionTargetAssemblyTests(unittest.TestCase):
                 self.assertTrue(all(p.grad is None for p in association.tam_encoder.parameters()))
         finally:
             torch.set_num_threads(previous_threads)
+
+
+class SceneFusionTargetGroupingTests(unittest.TestCase):
+    def prepared(self, identities):
+        return {'scene_id': 'synthetic', 'split': 'T_core',
+                'identities': list(identities), 'grid': np.asarray([0., 5., 10., 15., 20.])}
+
+    def build(self, data, identities, **overrides):
+        options = {'time_offset_seconds': 100, 'max_gap_seconds': 10}
+        options.update(overrides)
+        return build_scene_fusion_targets(self.prepared(identities), data,
+                                         target_identity_ids=identities, **options)
+
+    def assert_matches_public(self, data, identities):
+        query = self.prepared(identities)['grid']
+        expected = {identity: align_reference_states(data, identity, query,
+                    time_offset_seconds=100, max_gap_seconds=10) for identity in identities}
+        actual = self.build(data, identities)
+        self.assertEqual(list(actual), identities)
+        for identity in identities:
+            for key in ('states', 'valid', 'query_times'):
+                np.testing.assert_array_equal(actual[identity][key], expected[identity][key])
+            self.assertEqual(actual[identity]['report'], expected[identity]['report'])
+        return actual
+
+    def test_grouped_scene_matches_public_values_masks_reports_and_issue_order(self):
+        data = scene([('other-0', 120, [30, 40, 7, 190]),
+                      ('ship-0', 110, [10, 20, None, 0]),
+                      ('other-0', 100, [10, 20, 3, 350]),
+                      ('ship-0', 100, [0, 10, 2, 360]),
+                      ('ship-0', 110, [10, 21, 4, 360]),
+                      ('other-0', 110, [20, 30, 5, 10]),
+                      ('ship-0', None, [91, 22, -1, 370]),
+                      ('unrequested-0', 100, [1, 2, 3, 4])])
+        # An unrequested malformed state was historically ignored, not repaired.
+        data['rows'][-1]['state'] = ['malformed']
+        data['issues'] = [{'code': 'original-first'}, {'code': 'original-second'}]
+        before = json.dumps(data, sort_keys=True)
+        actual = self.assert_matches_public(data, ['missing-0', 'ship-0', 'other-0'])
+        for item in actual.values():
+            self.assertEqual(item['report']['reference_rows'], 8)
+            self.assertEqual(item['report']['source_issue_count'], 2)
+        self.assertTrue(actual['missing-0']['report']['missing_identity'])
+        self.assertGreater(len(actual['ship-0']['report']['issues']), 4)
+        actual['ship-0']['states'][:] = -999
+        actual['ship-0']['report']['issues'].clear()
+        actual['other-0']['query_times'][:] = -1
+        self.assertEqual(json.dumps(data, sort_keys=True), before)
+        np.testing.assert_array_equal(actual['missing-0']['query_times'], [0, 5, 10, 15, 20])
+
+    def test_whole_reference_scan_count_is_independent_of_target_count(self):
+        class CountedRows(list):
+            iterations = 0
+
+            def __iter__(self):
+                self.iterations += 1
+                return super().__iter__()
+
+        identities = [f'ship-{index}' for index in range(8)]
+        data = scene([(identity, 100, [1, 2, 3, 4]) for identity in identities])
+        data['rows'] = CountedRows(data['rows'])
+        result = self.build(data, identities)
+        self.assertEqual(len(result), 8)
+        self.assertEqual(data['rows'].iterations, 2)
+        self.assertTrue(all(item['valid'][0].all() for item in result.values()))
+
+    def test_illegal_rows_and_states_keep_public_error_order_and_ignore_forged_index(self):
+        examples = []
+        malformed_first = scene([('ship-0', 100, [1, 2, 3, 4])])
+        malformed_first['rows'][0]['state'] = [1]
+        malformed_first['rows'].append(None)
+        examples.append(malformed_first)
+        nonmapping_first = scene([('ship-0', 100, [1, 2, 3, 4])])
+        nonmapping_first['rows'].insert(0, None)
+        examples.append(nonmapping_first)
+        malformed_later_target = scene([('ship-0', 100, [1, 2, 3, 4]),
+                                        ('other-0', 100, [1, 2, 3, 4])])
+        malformed_later_target['rows'][1]['state'] = [1]
+        examples.append(malformed_later_target)
+        for data in examples:
+            data['rows_by_identity'] = {'ship-0': [], 'other-0': []}
+            with self.subTest(data=data):
+                with self.assertRaises(DataError) as expected:
+                    for identity in ('ship-0', 'other-0'):
+                        align(data, [0, 5, 10, 15, 20], identity=identity, offset=100)
+                with self.assertRaises(DataError) as actual:
+                    self.build(data, ['ship-0', 'other-0'])
+                self.assertEqual(str(actual.exception), str(expected.exception))
+
+    def test_unusual_reader_identity_values_preserve_public_comparison_behavior(self):
+        data = scene([('ship-0', 100, [1, 2, 3, 4]),
+                      (['unhashable'], 100, [1, 2, 3, 4]),
+                      (np.asarray('other-0'), 100, [5, 6, 7, 8])])
+        actual = self.assert_matches_public(data, ['ship-0', 'other-0', 'missing-0'])
+        self.assertTrue(actual['other-0']['valid'][0].all())
+
+    def test_empty_scene_still_checks_reference_rows_and_alignment_policy(self):
+        data = scene([])
+        self.assertEqual(self.build(data, []), {})
+        with self.assertRaisesRegex(DataError, 'max_gap_seconds'):
+            self.build(data, [], max_gap_seconds=-1)
+        data['rows'].append(None)
+        with self.assertRaisesRegex(DataError, 'mapping structure'):
+            self.build(data, [])
 
 
 if __name__ == '__main__':

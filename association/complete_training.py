@@ -7,7 +7,7 @@ INTERRUPTED run can resume into a new directory without resetting elapsed cost.
 from __future__ import annotations
 
 import copy
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import math
 from pathlib import Path
 import random
@@ -22,6 +22,7 @@ from .fusion import FusionLoss, PairFusion, PairFusionConfig
 from .fusion_metrics import _check_valid_states
 from .fusion_training import fusion_training_parameters, fusion_training_step
 from .metrics import evaluate_scenes, select_threshold
+from .margin_calibration import MARGIN_POLICY, calibrate_training_margin
 from .models import AssociationModel, ModelConfig
 from .reference import fit_normalizer, normalize_scene, score_reference, _optimizer, _update
 from .sampling import BalancedScenePairSampler
@@ -52,11 +53,12 @@ def _record_cuda_peaks(run, device):
 
 def _configuration(config):
     config = copy.deepcopy(config)
+    config.setdefault('margin_policy', 'fixed')
     required = {'updates', 'learning_rates', 'seed', 'branch', 'batch_tracks',
                 'pair_batch_size', 'pair_microbatch', 'track_microbatch',
                 'completion_weight', 'gradient_clip', 'max_hours',
                 'validate_every_updates', 'completion_cache_mib',
-                'position_loss_mode', 'lr_schedule', 'singleton_policy', 'validation_batches'}
+                'position_loss_mode', 'lr_schedule', 'singleton_policy', 'validation_batches', 'margin_policy'}
     if set(config) != required:
         raise ValueError(f'config requires exactly {sorted(required)}')
     for field in ('updates', 'learning_rates'):
@@ -78,6 +80,10 @@ def _configuration(config):
             raise ValueError(f'{name} must be finite and positive (completion_weight may be zero)')
     if config['branch'] not in ('ce', 'contrastive'):
         raise ValueError('branch must be ce or contrastive')
+    if config['margin_policy'] not in ('fixed', MARGIN_POLICY):
+        raise ValueError('unsupported margin_policy')
+    if config['margin_policy'] == MARGIN_POLICY and config['branch'] != 'contrastive':
+        raise ValueError('training margin calibration requires the contrastive branch')
     if config['position_loss_mode'] not in ('paper_printed', 'standard_smooth_l1'):
         raise ValueError('position_loss_mode must be explicit')
     if config['lr_schedule'] not in ('constant', 'quarter_cosine'):
@@ -214,7 +220,14 @@ def load_complete_snapshot(path, *, device='cpu', selected=True):
     if payload.get('format_version') != 1:
         raise ValueError('unsupported complete checkpoint format')
     adapter = payload.get('input_adapter', 'registered_v1')
+    snapshot = payload['selected'] if selected else payload
+    if snapshot is None:
+        raise ValueError('checkpoint has no selected development snapshot yet')
+    if (payload['config'].get('margin_policy', 'fixed') == MARGIN_POLICY
+            and selected and 'effective_margin' not in snapshot):
+        raise ValueError('calibrated selected snapshot is missing its effective margin')
     model_config = ModelConfig(**payload['model_config'])
+    model_config = replace(model_config, margin=snapshot.get('effective_margin', model_config.margin))
     if adapter == 'native_time_v1':
         from .timed_models import TimedAssociationModel
         model = TimedAssociationModel(model_config, payload['config']['branch'],
@@ -225,9 +238,6 @@ def load_complete_snapshot(path, *, device='cpu', selected=True):
         raise ValueError('unsupported checkpoint input adapter')
     fusion = PairFusion(PairFusionConfig(**payload['fusion_config']))
     objective = FusionLoss(position_loss_mode=payload['config']['position_loss_mode'])
-    snapshot = payload['selected'] if selected else payload
-    if snapshot is None:
-        raise ValueError('checkpoint has no selected development snapshot yet')
     _restore((model, fusion, objective), snapshot['states'])
     for module in (model, fusion, objective):
         module.to(device).eval()
@@ -322,6 +332,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     if (model_config.length, model_config.d_model) != (fusion_config.length, fusion_config.d_model):
         raise ValueError('association and fusion length/dimension must agree')
     contract = _scenes(train_scenes, validation_scenes, model_config.length)
+    calibrating = config['margin_policy'] == MARGIN_POLICY
+    if calibrating and (model_config.contrastive_positive_power != 1
+                        or any(scene['split'] != 'T_core' for scene in train_scenes)):
+        raise ValueError('training margin calibration requires p=1 and only T_core scenes')
     normalizer = fit_normalizer(train_scenes)
     sampler = BalancedScenePairSampler(train_scenes, config['seed'])
     device = torch.device(device)
@@ -339,10 +353,22 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         if previous_run.get('status') != 'INTERRUPTED':
             raise ValueError('only an INTERRUPTED run can resume; failed runs are not automatic retries')
         saved = torch.load(previous / 'checkpoint.pt', map_location='cpu', weights_only=True)
-        if (saved['config'] != config or saved['model_config'] != asdict(model_config)
+        if (_configuration(saved['config']) != config or saved['model_config'] != asdict(model_config)
                 or saved['fusion_config'] != asdict(fusion_config) or saved['data_contract'] != contract
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
             raise ValueError('resume configuration, registered scene contract, normalizer or device differs')
+        if calibrating:
+            calibration = saved.get('margin_calibration')
+            done = calibration is not None and calibration.get('status') == 'COMPLETED'
+            if done:
+                if (calibration.get('policy') != MARGIN_POLICY
+                        or calibration.get('effective_margin') != saved.get('effective_margin')):
+                    raise ValueError('resume margin calibration disagrees with effective margin')
+            elif calibration is not None:
+                raise ValueError('resume checkpoint contains incomplete margin calibration')
+            elif (saved['cursor']['stage'] > 1
+                  or (saved['cursor']['stage'] == 1 and saved['cursor']['update'] > 0)):
+                raise ValueError('cannot resume trained TAM without its completed margin calibration')
         spent_before = max(float(saved['elapsed_seconds']), float(previous_run['elapsed_seconds']))
     if spent_before + initial_elapsed_seconds >= config['max_hours'] * 3600:
         raise TimeoutError('cumulative training budget is exhausted')
@@ -355,8 +381,12 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                if saved is None else copy.deepcopy(saved['coverage'])
     cursor = {'stage': 0, 'update': 0, 'completed_updates': 0} if saved is None else dict(saved['cursor'])
     selected = None if saved is None else saved['selected']
+    calibration = None if saved is None else copy.deepcopy(saved.get('margin_calibration'))
+    effective_margin = model_config.margin if saved is None else saved.get('effective_margin', model_config.margin)
     adapter = train_scenes[0].get('input_adapter', 'registered_v1')
     run = {'status': 'RUNNING', 'config': config, 'input_adapter': adapter,
+           'requested_model_config': asdict(model_config), 'effective_margin': effective_margin,
+           'margin_calibration': calibration,
            'scope': ('TMTAFF time-adapted approximate reference' if adapter == 'native_time_v1'
                      else 'registered-data training kernel'),
            'selection_scope': 'association V_select macro-F1 only; not full-task optimality',
@@ -399,10 +429,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             run['cuda_peak_reset_completed'] = True
         if adapter == 'native_time_v1':
             from .timed_models import TimedAssociationModel
-            model = TimedAssociationModel(model_config, config['branch'],
+            model = TimedAssociationModel(replace(model_config, margin=effective_margin), config['branch'],
                                          max_observations=train_scenes[0]['max_observations'])
         else:
-            model = AssociationModel(model_config, config['branch'])
+            model = AssociationModel(replace(model_config, margin=effective_margin), config['branch'])
         modules = (model.to(device),
                    PairFusion(fusion_config).to(device),
                    FusionLoss(position_loss_mode=config['position_loss_mode']).to(device))
@@ -424,6 +454,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         def checkpoint():
             check()
             payload = {'format_version': 1, 'config': config, 'model_config': asdict(model_config),
+                       'effective_margin': effective_margin, 'margin_calibration': calibration,
                        'input_adapter': adapter,
                        'max_observations': train_scenes[0].get('max_observations'),
                        'fusion_config': asdict(fusion_config), 'normalizer': normalizer,
@@ -460,6 +491,18 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             if phase == 'TAM_FROZEN' and cache is None:
                 cache = FrozenCompletionCache(model, normalized, device,
                     config['completion_cache_mib'] * 1024 * 1024, config['batch_tracks'], check)
+            if phase == 'TAM_FROZEN' and calibrating and calibration is None:
+                if cursor['update'] != 0:
+                    raise ValueError('margin calibration must precede the first TAM update')
+                calibration = {}
+                run['margin_calibration'] = calibration
+                effective_margin = calibrate_training_margin(model, train_scenes, normalized, cache,
+                    device=device, batch_tracks=config['batch_tracks'], check=check, report=calibration)
+                model.config = replace(model_config, margin=effective_margin)
+                run['effective_margin'] = effective_margin
+                # Durable boundary: a later interruption resumes the same m,
+                # before any main pair-sampler draw or TAM parameter update.
+                checkpoint()
             check()
             update = cursor['update'] + 1
             plateau = max(1, math.ceil(total_updates / 4))
@@ -536,6 +579,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                     row['selection'] = selection
                     if selected is None or selection['macro_f1'] > selected['macro_f1'] + 1e-12:
                         selected = {'macro_f1': selection['macro_f1'], 'threshold': selection['threshold'],
+                                    'effective_margin': effective_margin,
+                                    'margin_policy': config['margin_policy'],
                                     'stage': phase, 'update': update, 'states': _states(modules),
                                     'validation': evaluate_scenes(records, selection['threshold'])}
                         timing['selected_snapshot_copied'] = True
