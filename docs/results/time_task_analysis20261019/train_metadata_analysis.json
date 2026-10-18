@@ -1,0 +1,790 @@
+{
+  "status": "COMPLETED",
+  "split": "T_core",
+  "scope": "Endpoint-only training analysis; no ZIP/reference/model/T_test reads; V rows skipped before track analysis.",
+  "sources": {
+    "metadata": "/Users/a1/Projects/association-code/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz",
+    "prior_audit": "/Users/a1/Projects/association-code/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/results.json"
+  },
+  "split_rows_seen": {
+    "T_core": 512,
+    "V_select": 64
+  },
+  "excluded_split_rows": {
+    "V_select": 64
+  },
+  "counts": {
+    "scenes": 512,
+    "tracks": 54792,
+    "canonical_points": 2938785,
+    "query_support_counts_matched": 54792,
+    "zero_query_support_tracks": 567,
+    "one_query_support_tracks": 1798,
+    "positive_pairs": 110733,
+    "scene_identities": 12650,
+    "identities_with_internal_union_gap": 6403,
+    "identity_union_intervals": 22930,
+    "identity_internal_union_gaps": 10280
+  },
+  "seconds": {
+    "scene_span": {
+      "count": 512,
+      "min": 3109.0,
+      "p01": 5071.46,
+      "p05": 6946.75,
+      "p25": 7144.0,
+      "median": 7180.0,
+      "p75": 7195.0,
+      "p90": 7199.0,
+      "p95": 7200.0,
+      "p99": 7200.0,
+      "max": 7200.0
+    },
+    "scene_query64_spacing": {
+      "count": 512,
+      "min": 49.34920634920635,
+      "p01": 80.49936507936509,
+      "p05": 110.26587301587303,
+      "p25": 113.39682539682539,
+      "median": 113.96825396825396,
+      "p75": 114.2063492063492,
+      "p90": 114.26984126984127,
+      "p95": 114.28571428571429,
+      "p99": 114.28571428571429,
+      "max": 114.28571428571429
+    },
+    "track_support_duration": {
+      "count": 54792,
+      "min": 3.250999927520752,
+      "p01": 60.34113991975783,
+      "p05": 187.0,
+      "p25": 776.0622499585152,
+      "median": 1472.0,
+      "p75": 2367.0,
+      "p90": 3912.5346000909813,
+      "p95": 6786.449999999997,
+      "p99": 7152.0,
+      "max": 7200.0
+    },
+    "track_support_duration_by_source": {
+      "9001": {
+        "count": 29947,
+        "min": 10.0,
+        "p01": 60.0,
+        "p05": 185.0,
+        "p25": 781.0,
+        "median": 1477.0,
+        "p75": 2396.0,
+        "p90": 3939.4000000000015,
+        "p95": 6951.699999999997,
+        "p99": 7169.540000000001,
+        "max": 7200.0
+      },
+      "9002": {
+        "count": 24845,
+        "min": 3.250999927520752,
+        "p01": 62.11960000038147,
+        "p05": 189.76200003623964,
+        "p25": 765.654000043869,
+        "median": 1466.0,
+        "p75": 2339.0,
+        "p90": 3879.926799964905,
+        "p95": 6632.0,
+        "p99": 7090.560000000001,
+        "max": 7184.0
+      }
+    },
+    "per_track_mean_native_gap_by_source": {
+      "9001": {
+        "count": 29947,
+        "min": 6.0,
+        "p01": 13.765782912739434,
+        "p05": 19.377634432519606,
+        "p25": 43.89087301587301,
+        "median": 70.33333333333333,
+        "p75": 119.0,
+        "p90": 183.91428571428594,
+        "p95": 221.98333333333318,
+        "p99": 315.0,
+        "max": 570.0
+      },
+      "9002": {
+        "count": 24845,
+        "min": 2.8333333333333335,
+        "p01": 6.1309617551859095,
+        "p05": 8.947863845660663,
+        "p25": 21.94753086419753,
+        "median": 35.50865957584787,
+        "p75": 60.93957142829895,
+        "p90": 95.25865020678388,
+        "p95": 114.92705714362008,
+        "p99": 168.70191999181134,
+        "max": 347.5680000782013
+      }
+    },
+    "identity_envelope_duration": {
+      "count": 12650,
+      "min": 30.0,
+      "p01": 450.98,
+      "p05": 1250.0,
+      "p25": 4210.75,
+      "median": 6953.0,
+      "p75": 7128.0,
+      "p90": 7170.0,
+      "p95": 7180.0,
+      "p99": 7192.51,
+      "max": 7200.0
+    },
+    "identity_union_support_duration": {
+      "count": 12650,
+      "min": 30.0,
+      "p01": 295.99589000940324,
+      "p05": 1011.45,
+      "p25": 3833.478250026703,
+      "median": 6165.714499950409,
+      "p75": 6995.0,
+      "p90": 7141.0,
+      "p95": 7170.0,
+      "p99": 7190.0,
+      "max": 7200.0
+    },
+    "identity_internal_union_gap_duration": {
+      "count": 10280,
+      "min": 2.749000072479248,
+      "p01": 30.0,
+      "p05": 75.96699991226197,
+      "p25": 200.0,
+      "median": 363.0,
+      "p75": 640.1362500786781,
+      "p90": 930.0,
+      "p95": 1104.0092000007628,
+      "p99": 1403.2099999999991,
+      "max": 4210.0
+    },
+    "track_head_to_identity_envelope": {
+      "count": 54792,
+      "min": 0.0,
+      "p01": 0.0,
+      "p05": 0.0,
+      "p25": 20.0,
+      "median": 1638.0,
+      "p75": 3768.0,
+      "p90": 5241.0,
+      "p95": 5840.0,
+      "p99": 6460.0,
+      "max": 7102.0
+    },
+    "track_tail_to_identity_envelope": {
+      "count": 54792,
+      "min": 0.0,
+      "p01": 0.0,
+      "p05": 0.0,
+      "p25": 21.0,
+      "median": 1334.0,
+      "p75": 3185.0,
+      "p90": 4663.970399928093,
+      "p95": 5211.789350056647,
+      "p99": 5739.800709908008,
+      "max": 6240.0
+    },
+    "track_head_to_identity_envelope_positive_only": {
+      "count": 41709,
+      "min": 2.0,
+      "p01": 13.079999999999984,
+      "p05": 30.0,
+      "p25": 678.0,
+      "median": 2657.0,
+      "p75": 4289.0,
+      "p90": 5521.0,
+      "p95": 5983.539600038527,
+      "p99": 6531.0,
+      "max": 7102.0
+    },
+    "track_tail_to_identity_envelope_positive_only": {
+      "count": 41798,
+      "min": 2.0,
+      "p01": 16.0,
+      "p05": 30.0,
+      "p25": 553.25,
+      "median": 2137.1019999980927,
+      "p75": 3714.35824996233,
+      "p90": 4934.0,
+      "p95": 5339.0,
+      "p99": 5785.0,
+      "max": 6240.0
+    },
+    "track_head_by_source": {
+      "9001": {
+        "count": 29947,
+        "min": 0.0,
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 1652.0,
+        "p75": 3785.0,
+        "p90": 5276.4000000000015,
+        "p95": 5891.699999999997,
+        "p99": 6501.540000000001,
+        "max": 7102.0
+      },
+      "9002": {
+        "count": 24845,
+        "min": 0.0,
+        "p01": 0.0,
+        "p05": 19.0,
+        "p25": 72.0,
+        "median": 1619.0,
+        "p75": 3732.4639999866486,
+        "p90": 5197.348399925233,
+        "p95": 5761.139200019837,
+        "p99": 6405.0,
+        "max": 7078.0
+      }
+    },
+    "track_tail_by_source": {
+      "9001": {
+        "count": 29947,
+        "min": 0.0,
+        "p01": 0.0,
+        "p05": 0.0,
+        "p25": 0.0,
+        "median": 1345.0,
+        "p75": 3212.0,
+        "p90": 4693.4000000000015,
+        "p95": 5240.0,
+        "p99": 5776.540000000001,
+        "max": 6240.0
+      },
+      "9002": {
+        "count": 24845,
+        "min": 0.0,
+        "p01": 0.0,
+        "p05": 19.0,
+        "p25": 73.0,
+        "median": 1320.0,
+        "p75": 3156.5199999809265,
+        "p90": 4614.442199993136,
+        "p95": 5161.953999996185,
+        "p99": 5673.4076799583445,
+        "max": 6003.891000032425
+      }
+    }
+  },
+  "identity_union_support_fraction_of_envelope": {
+    "count": 12650,
+    "min": 0.10481099656357389,
+    "p01": 0.4746349243439838,
+    "p05": 0.669661397837076,
+    "p25": 0.8869993914787068,
+    "median": 0.9915872099168064,
+    "p75": 1.0,
+    "p90": 1.0,
+    "p95": 1.0,
+    "p99": 1.0,
+    "max": 1.0
+  },
+  "same_identity_unordered_pairs": {
+    "all": {
+      "counts": {
+        "disjoint": 78871,
+        "strict_overlap": 31121,
+        "touching": 741
+      },
+      "denominator": 110733,
+      "disjoint_gap_seconds": {
+        "count": 78871,
+        "min": 2.749000072479248,
+        "p01": 87.13600001335145,
+        "p05": 173.0,
+        "p25": 494.0,
+        "median": 989.0,
+        "p75": 2178.7319999933243,
+        "p90": 3284.0,
+        "p95": 3929.0,
+        "p99": 4772.0,
+        "max": 5917.0
+      }
+    },
+    "same_source": {
+      "counts": {
+        "disjoint": 52060
+      },
+      "denominator": 52060,
+      "disjoint_gap_seconds": {
+        "count": 52060,
+        "min": 29.0,
+        "p01": 105.37464005231858,
+        "p05": 180.0,
+        "p25": 469.08674997091293,
+        "median": 901.0,
+        "p75": 2138.8972499370575,
+        "p90": 3292.0206000089643,
+        "p95": 3980.0,
+        "p99": 4831.091400022501,
+        "max": 5917.0
+      }
+    },
+    "cross_source": {
+      "counts": {
+        "strict_overlap": 31121,
+        "disjoint": 26811,
+        "touching": 741
+      },
+      "denominator": 58673,
+      "disjoint_gap_seconds": {
+        "count": 26811,
+        "min": 2.749000072479248,
+        "p01": 53.35250000953674,
+        "p05": 150.0,
+        "p25": 568.5870000123978,
+        "median": 1230.0,
+        "p75": 2247.0,
+        "p90": 3269.773999929428,
+        "p95": 3837.228500008583,
+        "p99": 4665.8596999883675,
+        "max": 5791.528000116348
+      }
+    }
+  },
+  "full_scene_q64_fragment_geometry": {
+    "denominator": 3506688,
+    "outside_self_denominator": 2596157,
+    "categories": {
+      "self_support": {
+        "count": 910531,
+        "fraction_of_all": 0.2596555496240327,
+        "fraction_of_outside_self": null,
+        "scene_macro_fraction": 0.25351338505336274
+      },
+      "other_same_identity_support": {
+        "count": 1627966,
+        "fraction_of_all": 0.46424603500511025,
+        "fraction_of_outside_self": 0.6270676234141463,
+        "scene_macro_fraction": 0.4521510628981132
+      },
+      "identity_internal_union_gap": {
+        "count": 190745,
+        "fraction_of_all": 0.05439463105927873,
+        "fraction_of_outside_self": 0.07347205889320253,
+        "scene_macro_fraction": 0.054500417333486775
+      },
+      "outside_identity_envelope": {
+        "count": 777446,
+        "fraction_of_all": 0.22170378431157833,
+        "fraction_of_outside_self": 0.2994603176926511,
+        "scene_macro_fraction": 0.2398351347150373
+      }
+    },
+    "outside_self_distance_to_own_span_seconds": {
+      "other_same_identity_support": {
+        "count": 1627966,
+        "min": 0.01587301587278489,
+        "p01": 32.93539679201829,
+        "p05": 182.0,
+        "p25": 911.0,
+        "median": 1798.4285714285716,
+        "p75": 3001.234055492613,
+        "p90": 4133.571428571428,
+        "p95": 4740.139357158116,
+        "p99": 5611.319047619056,
+        "max": 7102.0
+      },
+      "identity_internal_union_gap": {
+        "count": 190745,
+        "min": 0.01587301587278489,
+        "p01": 9.857142857142508,
+        "p05": 50.57142857142844,
+        "p25": 261.8571428571422,
+        "median": 648.5555555555557,
+        "p75": 1896.9894762152717,
+        "p90": 2990.4285714285716,
+        "p95": 3639.425396825396,
+        "p99": 4445.51746031746,
+        "max": 5773.857142857143
+      },
+      "outside_identity_envelope": {
+        "count": 777446,
+        "min": 0.03174603174603874,
+        "p01": 18.0,
+        "p05": 144.18650793650778,
+        "p25": 1589.5714285714284,
+        "median": 3003.7142857142862,
+        "p75": 4403.7360714929455,
+        "p90": 5433.551634962597,
+        "p95": 5900.107142857143,
+        "p99": 6547.321428571439,
+        "max": 7175.0
+      }
+    },
+    "outside_self_distance_thresholds_seconds": {
+      "other_same_identity_support": {
+        "60": {
+          "count_le": 28948,
+          "denominator": 1627966,
+          "fraction_le": 0.017781698143573024
+        },
+        "300": {
+          "count_le": 130604,
+          "denominator": 1627966,
+          "fraction_le": 0.08022526268976134
+        },
+        "600": {
+          "count_le": 261942,
+          "denominator": 1627966,
+          "fraction_le": 0.16090139474657333
+        },
+        "1260": {
+          "count_le": 573977,
+          "denominator": 1627966,
+          "fraction_le": 0.3525730881357473
+        },
+        "1800": {
+          "count_le": 814695,
+          "denominator": 1627966,
+          "fraction_le": 0.500437355571308
+        },
+        "3600": {
+          "count_le": 1365892,
+          "denominator": 1627966,
+          "fraction_le": 0.8390175224789707
+        }
+      },
+      "identity_internal_union_gap": {
+        "60": {
+          "count_le": 11437,
+          "denominator": 190745,
+          "fraction_le": 0.059959631969383205
+        },
+        "300": {
+          "count_le": 53760,
+          "denominator": 190745,
+          "fraction_le": 0.2818422501245118
+        },
+        "600": {
+          "count_le": 90870,
+          "denominator": 190745,
+          "fraction_le": 0.47639518729193425
+        },
+        "1260": {
+          "count_le": 126289,
+          "denominator": 190745,
+          "fraction_le": 0.6620828855277989
+        },
+        "1800": {
+          "count_le": 140187,
+          "denominator": 190745,
+          "fraction_le": 0.7349445594904191
+        },
+        "3600": {
+          "count_le": 180706,
+          "denominator": 190745,
+          "fraction_le": 0.947369524758185
+        }
+      },
+      "outside_identity_envelope": {
+        "60": {
+          "count_le": 22241,
+          "denominator": 777446,
+          "fraction_le": 0.02860777468788829
+        },
+        "300": {
+          "count_le": 58660,
+          "denominator": 777446,
+          "fraction_le": 0.07545218574666279
+        },
+        "600": {
+          "count_le": 88156,
+          "denominator": 777446,
+          "fraction_le": 0.11339179827280609
+        },
+        "1260": {
+          "count_le": 155728,
+          "denominator": 777446,
+          "fraction_le": 0.20030715959693662
+        },
+        "1800": {
+          "count_le": 221072,
+          "denominator": 777446,
+          "fraction_le": 0.28435672702670023
+        },
+        "3600": {
+          "count_le": 474309,
+          "denominator": 777446,
+          "fraction_le": 0.6100861024431279
+        }
+      }
+    }
+  },
+  "full_scene_q64_identity_geometry": {
+    "denominator": 809600,
+    "categories": {
+      "some_fragment_support": {
+        "count": 578459,
+        "fraction": 0.7144997529644269
+      },
+      "internal_union_gap": {
+        "count": 41253,
+        "fraction": 0.050954792490118576
+      },
+      "outside_identity_envelope": {
+        "count": 189888,
+        "fraction": 0.23454545454545456
+      }
+    }
+  },
+  "threshold_descriptions": {
+    "track_support_duration": "Fraction with full native endpoint span <= h; NOT actual sliding-window retention.",
+    "disjoint_same_identity_pair_gap": "Necessary, not sufficient, for both disjoint supports to intersect one h-span window; not actual pair coverage.",
+    "identity_internal_union_gap": "Endpoint union internal hole <= h; does not assert reference truth or sample-level observation.",
+    "track_head_tail": "Difference to same-identity observed envelope; not legal missing-target label."
+  },
+  "thresholds_seconds": {
+    "track_support_duration": {
+      "60": {
+        "count_le": 547,
+        "denominator": 54792,
+        "fraction_le": 0.009983209227624471
+      },
+      "300": {
+        "count_le": 4715,
+        "denominator": 54792,
+        "fraction_le": 0.08605270842458754
+      },
+      "600": {
+        "count_le": 10372,
+        "denominator": 54792,
+        "fraction_le": 0.18929770769455395
+      },
+      "1260": {
+        "count_le": 23236,
+        "denominator": 54792,
+        "fraction_le": 0.4240765075193459
+      },
+      "1800": {
+        "count_le": 33528,
+        "denominator": 54792,
+        "fraction_le": 0.6119141480508103
+      },
+      "3600": {
+        "count_le": 48394,
+        "denominator": 54792,
+        "fraction_le": 0.8832311286319171
+      }
+    },
+    "disjoint_same_identity_pair_gap": {
+      "60": {
+        "count_le": 367,
+        "denominator": 78871,
+        "fraction_le": 0.004653167831015202
+      },
+      "300": {
+        "count_le": 10439,
+        "denominator": 78871,
+        "fraction_le": 0.13235536508983023
+      },
+      "600": {
+        "count_le": 24609,
+        "denominator": 78871,
+        "fraction_le": 0.31201582330641175
+      },
+      "1260": {
+        "count_le": 47241,
+        "denominator": 78871,
+        "fraction_le": 0.5989653991961558
+      },
+      "1800": {
+        "count_le": 54388,
+        "denominator": 78871,
+        "fraction_le": 0.6895817220524654
+      },
+      "3600": {
+        "count_le": 73147,
+        "denominator": 78871,
+        "fraction_le": 0.9274257965538665
+      }
+    },
+    "identity_internal_union_gap": {
+      "60": {
+        "count_le": 348,
+        "denominator": 10280,
+        "fraction_le": 0.03385214007782101
+      },
+      "300": {
+        "count_le": 4208,
+        "denominator": 10280,
+        "fraction_le": 0.4093385214007782
+      },
+      "600": {
+        "count_le": 7448,
+        "denominator": 10280,
+        "fraction_le": 0.7245136186770428
+      },
+      "1260": {
+        "count_le": 10092,
+        "denominator": 10280,
+        "fraction_le": 0.9817120622568093
+      },
+      "1800": {
+        "count_le": 10249,
+        "denominator": 10280,
+        "fraction_le": 0.9969844357976654
+      },
+      "3600": {
+        "count_le": 10278,
+        "denominator": 10280,
+        "fraction_le": 0.9998054474708171
+      }
+    },
+    "track_head_to_identity_envelope": {
+      "60": {
+        "count_le": 17731,
+        "denominator": 54792,
+        "fraction_le": 0.3236056358592495
+      },
+      "300": {
+        "count_le": 22095,
+        "denominator": 54792,
+        "fraction_le": 0.40325229960578185
+      },
+      "600": {
+        "count_le": 23282,
+        "denominator": 54792,
+        "fraction_le": 0.42491604613812234
+      },
+      "1260": {
+        "count_le": 25763,
+        "denominator": 54792,
+        "fraction_le": 0.47019637903343553
+      },
+      "1800": {
+        "count_le": 28201,
+        "denominator": 54792,
+        "fraction_le": 0.5146919258285881
+      },
+      "3600": {
+        "count_le": 40134,
+        "denominator": 54792,
+        "fraction_le": 0.7324791940429259
+      }
+    },
+    "track_tail_to_identity_envelope": {
+      "60": {
+        "count_le": 17587,
+        "denominator": 54792,
+        "fraction_le": 0.32097751496568844
+      },
+      "300": {
+        "count_le": 22048,
+        "denominator": 54792,
+        "fraction_le": 0.4023945101474668
+      },
+      "600": {
+        "count_le": 23649,
+        "denominator": 54792,
+        "fraction_le": 0.4316141042487954
+      },
+      "1260": {
+        "count_le": 26894,
+        "denominator": 54792,
+        "fraction_le": 0.4908380785516134
+      },
+      "1800": {
+        "count_le": 31018,
+        "denominator": 54792,
+        "fraction_le": 0.5661045408088772
+      },
+      "3600": {
+        "count_le": 43702,
+        "denominator": 54792,
+        "fraction_le": 0.7975981895167178
+      }
+    }
+  },
+  "reused_prior_native_gap_audit": {
+    "provenance": "Verbatim saved T_core quantiles from prior raw-point audit; only counts rechecked from metadata.",
+    "native_gap_denominator_by_source_recomputed": {
+      "9001": 1064297,
+      "9002": 1819696
+    },
+    "native_delta_seconds": {
+      "count": 2883993,
+      "min": 0.40000009536743164,
+      "p01": 2.5490000247955322,
+      "p05": 4.289999961853027,
+      "median": 21.0,
+      "p90": 77.94779996871976,
+      "p95": 120.0,
+      "p99": 241.0,
+      "max": 600.0
+    },
+    "native_delta_seconds_by_source": {
+      "9001": {
+        "count": 1064297,
+        "min": 1.0,
+        "p01": 5.0,
+        "p05": 10.0,
+        "median": 30.0,
+        "p90": 120.0,
+        "p95": 180.0,
+        "p99": 351.0,
+        "max": 600.0
+      },
+      "9002": {
+        "count": 1819696,
+        "min": 0.40000009536743164,
+        "p01": 2.4189999103546143,
+        "p05": 3.3440001010894775,
+        "median": 15.721999883651733,
+        "p90": 54.66000008583069,
+        "p95": 86.96099996566772,
+        "p99": 166.09909998178492,
+        "max": 355.9279999732971
+      }
+    },
+    "native_per_track_max_gap_seconds": {
+      "count": 54792,
+      "min": 3.250999927520752,
+      "p01": 19.010819931030273,
+      "p05": 35.86254994869232,
+      "median": 158.90599989891052,
+      "p90": 361.0,
+      "p95": 447.0,
+      "p99": 551.0,
+      "max": 600.0
+    },
+    "cap128_retained_delta_seconds": {
+      "count": 2255723,
+      "min": 0.40000009536743164,
+      "p01": 4.663000106811523,
+      "p05": 9.683000087738037,
+      "median": 30.0,
+      "p90": 92.0,
+      "p95": 143.0,
+      "p99": 270.0,
+      "max": 909.0
+    },
+    "cap128_counts": {
+      "selected_points": 2310515,
+      "affected_tracks": 5074,
+      "omitted_points": 628270,
+      "endpoints_lost": 0,
+      "native_float32_nonincreasing_steps": 0,
+      "native_float32_affected_tracks": 0,
+      "native_query_false_equal_points": 1,
+      "native_query_false_equal_tracks": 1,
+      "point_retention_fraction": 0.7862143709049828,
+      "affected_track_fraction": 0.09260475981895167
+    }
+  },
+  "limitations": [
+    "Support means inclusive first-to-last fragment interval, not an actual native sample at each query; internal sampling gaps remain.",
+    "Identity envelope and union use input fragments only, not reference lifespan; outside-envelope queries may have no target truth.",
+    "Same-identity grouping uses existing labels for analysis; does not grant oracle identities to the model.",
+    "No per-point timestamps/reference coverage in metadata: cannot compute actual per-window native counts, reference-supervised horizons, maneuvers, or proposed window coverage.",
+    "Unordered-pair counts weight identities with more fragments quadratically; fragment-query counts weight identities by fragment count; not the scene-uniform balanced training sampler.",
+    "20 seconds encoding unit is not sensor period; raw gap median 21 seconds is not evidence for a 21-minute window.",
+    "Endpoint quantiles cannot select an optimal window, prove long extrapolation caused poor metrics, estimate speed, or change the approved protocol."
+  ],
+  "verification": "All training counts, every track Q64 support count, duration/query-spacing prior quantiles, native-gap denominators, and category partitions matched.",
+  "elapsed_seconds": 1.5964084590013954
+}

@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "scenes": 512,
+  "tracks": 54792,
+  "positive_pairs": 110733,
+  "geometry_counts": {
+    "self_support": 910531,
+    "other_same_identity_support": 1627966,
+    "identity_internal_union_gap": 190745,
+    "outside_identity_envelope": 777446
+  },
+  "window_retained_pairs": [
+    38621,
+    49497,
+    69223
+  ],
+  "window_track_copies": [
+    771542,
+    415638,
+    236587
+  ],
+  "window_nonempty_counts": [
+    23772,
+    11662,
+    5555
+  ],
+  "method": "independent boolean query/track and window/track matrices; no imported study routines; first 512 T_core cached metadata records only",
+  "zip_opened": false,
+  "reference_opened": false,
+  "test_opened": false,
+  "gpu_used": false,
+  "elapsed_seconds": 0.536146791997453
+}

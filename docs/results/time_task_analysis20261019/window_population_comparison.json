@@ -1,0 +1,527 @@
+{
+  "original": {
+    "scenes": 512,
+    "valid_tracks": 54792,
+    "positive_pairs": 110733,
+    "negative_pairs": 18138651,
+    "pair_strata": {
+      "positive": {
+        "same_source__overlap": 0,
+        "same_source__nonoverlap": 52060,
+        "cross_source__overlap": 31862,
+        "cross_source__nonoverlap": 26811
+      },
+      "negative": {
+        "same_source__overlap": 4380560,
+        "same_source__nonoverlap": 4775793,
+        "cross_source__overlap": 4290974,
+        "cross_source__nonoverlap": 4691324
+      }
+    }
+  },
+  "schemes": [
+    {
+      "width_seconds": 300,
+      "step_seconds": 150,
+      "scheduled_windows": 23865,
+      "nonempty_windows": 23772,
+      "empty_windows": 93,
+      "window_count_per_scene": {
+        "count": 512,
+        "min": 14,
+        "p05": 45.0,
+        "median": 47.0,
+        "p95": 47.0,
+        "max": 47,
+        "mean": 46.4296875
+      },
+      "original_tracks_with_window": 54792,
+      "track_copies": 771542,
+      "track_copy_multiplier": 14.081289239305008,
+      "per_original_track_window_count": {
+        "count": 54792,
+        "min": 1,
+        "p05": 3.0,
+        "median": 11.0,
+        "p95": 46.0,
+        "max": 47,
+        "mean": 14.081289239305008
+      },
+      "per_window_tracks": {
+        "count": 23772,
+        "min": 1,
+        "p05": 2.0,
+        "median": 10.0,
+        "p95": 115.0,
+        "max": 854,
+        "mean": 32.45591452128554
+      },
+      "per_window_positive_pairs": {
+        "count": 23772,
+        "min": 0,
+        "p05": 1.0,
+        "median": 4.0,
+        "p95": 48.0,
+        "max": 387,
+        "mean": 13.188751472320376
+      },
+      "per_window_negative_pairs": {
+        "count": 23772,
+        "min": 0,
+        "p05": 0.0,
+        "median": 41.0,
+        "p95": 6515.450000000001,
+        "max": 363844,
+        "mean": 3438.8311879522125
+      },
+      "windows_with_no_positive_pairs": 830,
+      "windows_with_no_negative_pairs": 1366,
+      "repeated_positive_pairs": 313523,
+      "repeated_negative_pairs": 81747895,
+      "repeated_pair_strata": {
+        "positive": {
+          "same_source__overlap": 0,
+          "same_source__nonoverlap": 4786,
+          "cross_source__overlap": 305832,
+          "cross_source__nonoverlap": 2905
+        },
+        "negative": {
+          "same_source__overlap": 40858109,
+          "same_source__nonoverlap": 463594,
+          "cross_source__overlap": 39963823,
+          "cross_source__nonoverlap": 462369
+        }
+      },
+      "unique_original_positive_pairs": 110733,
+      "positive_pairs_co_window_at_least_once": 38621,
+      "positive_pairs_excluded": 72112,
+      "positive_pair_retention_fraction": 0.34877588433438994,
+      "positive_pair_exclusion_fraction": 0.65122411566561,
+      "positive_pair_retention_scene_equal_mean": 0.35841448352913713,
+      "positive_pair_retention_scene_equal_population": 512,
+      "positive_pair_retention_per_scene": {
+        "count": 512,
+        "min": 0.13333333333333333,
+        "p05": 0.2485,
+        "median": 0.3468941845960687,
+        "p95": 0.5244238046095631,
+        "max": 0.6923076923076923,
+        "mean": 0.35841448352913713
+      },
+      "positive_retention_by_stratum": {
+        "same_source__overlap": {
+          "original": 0,
+          "co_window_at_least_once": 0,
+          "excluded_from_local_task": 0,
+          "retained_fraction": null,
+          "repeated_window_presentations": 0
+        },
+        "same_source__nonoverlap": {
+          "original": 52060,
+          "co_window_at_least_once": 4405,
+          "excluded_from_local_task": 47655,
+          "retained_fraction": 0.0846139070303496,
+          "repeated_window_presentations": 4786
+        },
+        "cross_source__overlap": {
+          "original": 31862,
+          "co_window_at_least_once": 31862,
+          "excluded_from_local_task": 0,
+          "retained_fraction": 1.0,
+          "repeated_window_presentations": 305832
+        },
+        "cross_source__nonoverlap": {
+          "original": 26811,
+          "co_window_at_least_once": 2354,
+          "excluded_from_local_task": 24457,
+          "retained_fraction": 0.08779978367088136,
+          "repeated_window_presentations": 2905
+        }
+      },
+      "positive_pair_window_multiplicity": {
+        "0": 72112,
+        "1": 5976,
+        "2": 2965,
+        "3": 2890,
+        "4": 2594,
+        "5": 2466,
+        "6": 2234,
+        "7": 2148,
+        "8": 1988,
+        "9": 2029,
+        "10": 1869,
+        "11": 1767,
+        "12": 1636,
+        "13": 1396,
+        "14": 1169,
+        "15": 957,
+        "16": 766,
+        "17": 610,
+        "18": 557,
+        "19": 444,
+        "20": 324,
+        "21": 329,
+        "22": 181,
+        "23": 146,
+        "24": 143,
+        "25": 113,
+        "26": 125,
+        "27": 100,
+        "28": 73,
+        "29": 91,
+        "30": 59,
+        "31": 48,
+        "32": 24,
+        "33": 3,
+        "34": 5,
+        "35": 4,
+        "36": 5,
+        "37": 11,
+        "38": 2,
+        "39": 4,
+        "40": 6,
+        "41": 8,
+        "42": 10,
+        "43": 15,
+        "44": 15,
+        "45": 24,
+        "46": 50,
+        "47": 242
+      },
+      "window_row_columns": [
+        "start",
+        "stop",
+        "track_count",
+        "positive_pairs",
+        "negative_pairs"
+      ]
+    },
+    {
+      "width_seconds": 600,
+      "step_seconds": 300,
+      "scheduled_windows": 11692,
+      "nonempty_windows": 11662,
+      "empty_windows": 30,
+      "window_count_per_scene": {
+        "count": 512,
+        "min": 7,
+        "p05": 23.0,
+        "median": 23.0,
+        "p95": 23.0,
+        "max": 23,
+        "mean": 22.77734375
+      },
+      "original_tracks_with_window": 54792,
+      "track_copies": 415638,
+      "track_copy_multiplier": 7.585742444152431,
+      "per_original_track_window_count": {
+        "count": 54792,
+        "min": 1,
+        "p05": 2.0,
+        "median": 6.0,
+        "p95": 23.0,
+        "max": 23,
+        "mean": 7.585742444152431
+      },
+      "per_window_tracks": {
+        "count": 11662,
+        "min": 1,
+        "p05": 2.0,
+        "median": 11.0,
+        "p95": 126.94999999999891,
+        "max": 888,
+        "mean": 35.64037043388784
+      },
+      "per_window_positive_pairs": {
+        "count": 11662,
+        "min": 0,
+        "p05": 1.0,
+        "median": 5.0,
+        "p95": 60.0,
+        "max": 782,
+        "mean": 16.795746870176643
+      },
+      "per_window_negative_pairs": {
+        "count": 11662,
+        "min": 0,
+        "p05": 0.0,
+        "median": 51.0,
+        "p95": 7933.299999999876,
+        "max": 393378,
+        "mean": 4135.177413822672
+      },
+      "windows_with_no_positive_pairs": 201,
+      "windows_with_no_negative_pairs": 587,
+      "repeated_positive_pairs": 195872,
+      "repeated_negative_pairs": 48224439,
+      "repeated_pair_strata": {
+        "positive": {
+          "same_source__overlap": 0,
+          "same_source__nonoverlap": 14618,
+          "cross_source__overlap": 174582,
+          "cross_source__nonoverlap": 6672
+        },
+        "negative": {
+          "same_source__overlap": 23435533,
+          "same_source__nonoverlap": 913267,
+          "cross_source__overlap": 22968158,
+          "cross_source__nonoverlap": 907481
+        }
+      },
+      "unique_original_positive_pairs": 110733,
+      "positive_pairs_co_window_at_least_once": 49497,
+      "positive_pairs_excluded": 61236,
+      "positive_pair_retention_fraction": 0.4469941209937417,
+      "positive_pair_exclusion_fraction": 0.5530058790062583,
+      "positive_pair_retention_scene_equal_mean": 0.46015958133069923,
+      "positive_pair_retention_scene_equal_population": 512,
+      "positive_pair_retention_per_scene": {
+        "count": 512,
+        "min": 0.18421052631578946,
+        "p05": 0.32432432432432434,
+        "median": 0.4487882076324833,
+        "p95": 0.6323684210526316,
+        "max": 0.8653846153846154,
+        "mean": 0.46015958133069923
+      },
+      "positive_retention_by_stratum": {
+        "same_source__overlap": {
+          "original": 0,
+          "co_window_at_least_once": 0,
+          "excluded_from_local_task": 0,
+          "retained_fraction": null,
+          "repeated_window_presentations": 0
+        },
+        "same_source__nonoverlap": {
+          "original": 52060,
+          "co_window_at_least_once": 12374,
+          "excluded_from_local_task": 39686,
+          "retained_fraction": 0.23768728390318863,
+          "repeated_window_presentations": 14618
+        },
+        "cross_source__overlap": {
+          "original": 31862,
+          "co_window_at_least_once": 31862,
+          "excluded_from_local_task": 0,
+          "retained_fraction": 1.0,
+          "repeated_window_presentations": 174582
+        },
+        "cross_source__nonoverlap": {
+          "original": 26811,
+          "co_window_at_least_once": 5261,
+          "excluded_from_local_task": 21550,
+          "retained_fraction": 0.196225429860878,
+          "repeated_window_presentations": 6672
+        }
+      },
+      "positive_pair_window_multiplicity": {
+        "0": 61236,
+        "1": 14551,
+        "2": 7501,
+        "3": 5285,
+        "4": 4738,
+        "5": 4376,
+        "6": 3867,
+        "7": 2989,
+        "8": 2034,
+        "9": 1306,
+        "10": 902,
+        "11": 557,
+        "12": 316,
+        "13": 242,
+        "14": 189,
+        "15": 154,
+        "16": 84,
+        "17": 10,
+        "18": 9,
+        "19": 13,
+        "20": 10,
+        "21": 16,
+        "22": 23,
+        "23": 325
+      },
+      "window_row_columns": [
+        "start",
+        "stop",
+        "track_count",
+        "positive_pairs",
+        "negative_pairs"
+      ]
+    },
+    {
+      "width_seconds": 1260,
+      "step_seconds": 640,
+      "scheduled_windows": 5564,
+      "nonempty_windows": 5555,
+      "empty_windows": 9,
+      "window_count_per_scene": {
+        "count": 512,
+        "min": 4,
+        "p05": 10.0,
+        "median": 11.0,
+        "p95": 11.0,
+        "max": 11,
+        "mean": 10.849609375
+      },
+      "original_tracks_with_window": 54792,
+      "track_copies": 236587,
+      "track_copy_multiplier": 4.3179113739232005,
+      "per_original_track_window_count": {
+        "count": 54792,
+        "min": 1,
+        "p05": 2.0,
+        "median": 4.0,
+        "p95": 11.0,
+        "max": 11,
+        "mean": 4.3179113739232005
+      },
+      "per_window_tracks": {
+        "count": 5555,
+        "min": 1,
+        "p05": 3.0,
+        "median": 14.0,
+        "p95": 151.0,
+        "max": 1055,
+        "mean": 42.58991899189919
+      },
+      "per_window_positive_pairs": {
+        "count": 5555,
+        "min": 0,
+        "p05": 1.0,
+        "median": 9.0,
+        "p95": 101.30000000000018,
+        "max": 1624,
+        "mean": 28.107290729072908
+      },
+      "per_window_negative_pairs": {
+        "count": 5555,
+        "min": 0,
+        "p05": 2.0,
+        "median": 81.0,
+        "p95": 11206.700000000008,
+        "max": 555055,
+        "mean": 5882.171557155715
+      },
+      "windows_with_no_positive_pairs": 29,
+      "windows_with_no_negative_pairs": 226,
+      "repeated_positive_pairs": 156136,
+      "repeated_negative_pairs": 32675463,
+      "repeated_pair_strata": {
+        "positive": {
+          "same_source__overlap": 0,
+          "same_source__nonoverlap": 33950,
+          "cross_source__overlap": 108244,
+          "cross_source__nonoverlap": 13942
+        },
+        "negative": {
+          "same_source__overlap": 14646093,
+          "same_source__nonoverlap": 1846807,
+          "cross_source__overlap": 14355082,
+          "cross_source__nonoverlap": 1827481
+        }
+      },
+      "unique_original_positive_pairs": 110733,
+      "positive_pairs_co_window_at_least_once": 69223,
+      "positive_pairs_excluded": 41510,
+      "positive_pair_retention_fraction": 0.625134332132246,
+      "positive_pair_exclusion_fraction": 0.374865667867754,
+      "positive_pair_retention_scene_equal_mean": 0.6415377912050705,
+      "positive_pair_retention_scene_equal_population": 512,
+      "positive_pair_retention_per_scene": {
+        "count": 512,
+        "min": 0.40540540540540543,
+        "p05": 0.5,
+        "median": 0.625,
+        "p95": 0.8205128205128205,
+        "max": 1.0,
+        "mean": 0.6415377912050705
+      },
+      "positive_retention_by_stratum": {
+        "same_source__overlap": {
+          "original": 0,
+          "co_window_at_least_once": 0,
+          "excluded_from_local_task": 0,
+          "retained_fraction": null,
+          "repeated_window_presentations": 0
+        },
+        "same_source__nonoverlap": {
+          "original": 52060,
+          "co_window_at_least_once": 26660,
+          "excluded_from_local_task": 25400,
+          "retained_fraction": 0.5121014214368037,
+          "repeated_window_presentations": 33950
+        },
+        "cross_source__overlap": {
+          "original": 31862,
+          "co_window_at_least_once": 31862,
+          "excluded_from_local_task": 0,
+          "retained_fraction": 1.0,
+          "repeated_window_presentations": 108244
+        },
+        "cross_source__nonoverlap": {
+          "original": 26811,
+          "co_window_at_least_once": 10701,
+          "excluded_from_local_task": 16110,
+          "retained_fraction": 0.3991272239006378,
+          "repeated_window_presentations": 13942
+        }
+      },
+      "positive_pair_window_multiplicity": {
+        "0": 41510,
+        "1": 27607,
+        "2": 18470,
+        "3": 11047,
+        "4": 6935,
+        "5": 3073,
+        "6": 1009,
+        "7": 502,
+        "8": 176,
+        "9": 21,
+        "10": 35,
+        "11": 348
+      },
+      "window_row_columns": [
+        "start",
+        "stop",
+        "track_count",
+        "positive_pairs",
+        "negative_pairs"
+      ]
+    }
+  ],
+  "status": "COMPLETED",
+  "scope": "T_core interval-only proposal population comparison",
+  "source_metadata": "/Users/a1/Projects/association-code/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz",
+  "parsed_metadata_records": 512,
+  "source_record_policy": "first 512 records only, all asserted T_core; no next record requested",
+  "original_zip_opened": false,
+  "reference_opened": false,
+  "validation_records_parsed": 0,
+  "test_opened": false,
+  "optimizer_updates": 0,
+  "gpu_used": false,
+  "self_checks": {
+    "status": "PASS",
+    "hand_checks": 9,
+    "cases": [
+      "one window",
+      "first covering final window",
+      "closed endpoint intersection",
+      "non-cooccurring positive",
+      "repeated windows",
+      "negative start floor",
+      "touching intervals overlap",
+      "empty window accounting",
+      "sweep vs five-track enumeration"
+    ]
+  },
+  "closed_interval_inclusion": true,
+  "elapsed_cpu_wall_seconds": 2.8894110419969365,
+  "limits": [
+    "no pointwise times",
+    "no reference availability",
+    "not GPU cost",
+    "not a training configuration"
+  ],
+  "detail_policy": "Aggregate output; per-window rows omitted from Git report."
+}
