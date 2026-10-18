@@ -2,16 +2,17 @@
 
 这里保留当前入口与历史摘要。独立轮次文件保存命令与原始回执；旧轮次不重复领取。
 
-## 当前：TMTAFF-TIME-COST-013 / FAILED（超时，待本地判读）
+## 当前：013成本测量已结束；012取件继续
 
 | 请求 | 回执 | 下一责任方 |
 | --- | --- | --- |
-| [L2S-20261018-013](L2S-20261018-013.md) | [S2L-20261018-013](S2L-20261018-013.md)（13:24 领取，14:31 终态） | LOCAL_AI：判读成本账，决定如何在预算内跑完整流程（含最终融合评价） |
+| [L2S-20261018-013](L2S-20261018-013.md) | [S2L-20261018-013](S2L-20261018-013.md)（13:24 领取，14:31 终态） | LOCAL_AI：已核终态；整理正式配置与预算，未授权补跑 |
 | [L2S-20261018-012](L2S-20261018-012.md) | 仍待原件回传 | SERVER_AI：013 已收尾，可按其原请求单独领取；不重复领取、不训练、不挪用额度 |
 
 用户已明确批准013：单作业一次，选卡、数据准备、64批margin校准、四阶段各2更新、完整V/融合评价和失败费用均计入1小时；正式训练预算未批。012仍为独立GPU0/CPU≤10分钟取件，不将其额度转给013，也不要求先将manifest复制到本地才能使用服务器原件。若服务器已领取其中一轮，按原记录收尾后才开始另一轮，不同时开两个执行闭环。推送不代表服务器已经开始执行。
 
-- **013 服务器终态（14:31，FAILED）**：外层退出码 **124**、`elapsed 3579 秒／3570 秒`；`run.json status=FAILED`、`final_evaluation_status=FAILED`、`cursor={stage:4, update:0, completed_updates:8}`。**已取得**：准备 `PREPARED` 98.96 秒，576 场景（labels/measurements 各 576、reference 576），划分与 007 原件逐项吻合（T_core 512 场景／54,792 节点／18,249,384 候选／110,733 正例、融合目标 12,699；V_select 64／1,635／29,008／3,297、融合目标 377），`test_opened=False`；margin 校准 **COMPLETED**，`effective_margin = 72.64158630371094`（正且有限；配置默认 `model.margin=1.0` 不等于实际生效值）、64/64 批、4,096 次呈现、`duplicate_pair_count=169`、耗时 **1498.10 秒**；四阶段 **8/8 更新完成**（TCM 3.31/1.41 秒、TAM_FROZEN 11.64/24.39、TFM_FROZEN 146.44/149.72、JOINT 207.95/205.76，TFM 首步 gradient_norm 76,648.34 原样上报）；两次完整关联验证 **552.95 / 559.94 秒**；CUDA 峰值 allocated **1.02 GiB**、reserved 1.37 GiB。**未取得**：最终完整融合评价（`NOT_STARTED → FAILED`），故融合耗时与预测/oracle/单源/简单融合的全部指标**未知，不估算**。**成本账**：校准 42.4% + 两次验证 31.6% + 八步更新 21.3% + 准备 2.8% ≈ 3460.6 秒——校准与验证吃掉 74%，训练本身只占两成，这是 1 小时跑不完整流程的直接原因。进程树已退出、GPU0 已释放、未触碰他人进程；`preparation.json` 122,492,140 B 与 `checkpoint.pt` 56,831,568 B 留服务器（路径/字节已记），`run/history/coverage.json` 已入 Git。无重试、未改精度/batch/规模/配置、未删阶段。
+- **013原件核验：** 外层退出124、3579秒；四阶段共8更新与两次完整V关联验证完成，实际margin72.641586。最终评价已进入79.38秒后中断，物理融合是否已开始无细粒度证据；没有完整融合指标。校准1498.10秒、训练750.62秒、关联验证1112.89秒。完整核查及回执纠正见[本地审阅](../docs/results/tmtaff013_local_review/README.md)。该1小时预算关闭，不自动重跑或缩校准/改采样。
+- **候选实现已完成：** 用户授权review后本地实现CPU/GPU。共享原生E/D完成物理补全/融合，独立身份/效用头；首版固定身份的普通、身份、效用、普通学习门控四臂。410项全仓＋15项审计CPU测试通过，CPU/MPS合成全流程与完整规模前反向通过，CUDA本地无设备未实测。见[代码与核验](../docs/results/cooperative_local_20261018/README.md)。未发布候选READY，未做真实MTAD候选训练；无新增服务器预算。
 
 ## 011已完成与本地判读
 
@@ -28,13 +29,13 @@
 
 ## 本地下一步与边界
 
-研究目标仍是**不完整量测下补全、关联、融合一起做**。用户2026-10-18在解释后已批准TCM使用原始观测时间和下一预测时刻，名称明确为TMTAFF时间适配版。本地已实现原生ZIP/参考装配、时间条件TCM、四阶段训练/完整checkpoint及全目标评价，详见[重构记录](../docs/specs/complete-training-refactor.md)与[时间规格](../docs/specs/tmtaff-time-adaptation.md)。短轨即使在共同输出网格上无支撑点，仍提供至少两个原生观测；监督query_times严格等于共同输出时刻。真实训练尚未启动，不将CPU合成测试称为实验结果。
+研究目标仍是**不完整量测下补全、关联、融合一起做**。用户2026-10-18在解释后已批准TCM使用原始观测时间和下一预测时刻，名称明确为TMTAFF时间适配版。本地已实现原生ZIP/参考装配、时间条件TCM、四阶段训练/完整checkpoint及全目标评价，详见[重构记录](../docs/specs/complete-training-refactor.md)与[时间规格](../docs/specs/tmtaff-time-adaptation.md)。短轨即使在共同输出网格上无支撑点，仍提供至少两个原生观测；监督query_times严格等于共同输出时刻。013仅已做四阶段各2更新的成本测量，完整训练尚未完成，不将CPU合成测试称为实验结果。
 
 012原复制命令保持不变，六小时跟进继续。本地已完成冻结T_core512/V_select64的[时钟审计](../docs/results/frozen_clock_audit_20261018/README.md)和[输入/监督/覆盖审计](../docs/results/frozen_input_audit_20261018/README.md)，不重复扫描。约23%查询缺监督绝大多数因超出该身份实际参考时间范围；训练cap128保点78.62%，全部有效短轨保留原生输入；场景访问比例不能替代轨迹/身份覆盖。完整manifest及CDF七臂缓存仍待012原件，本地不拼造；服务器已有原manifest，无须重prepare。
 
-**用户已确认方法和数据配置：** 时间条件TCM、连续SmoothL1 beta=.001、TCM后seed21独立64×64训练负距离中位数一次校准、cap128/time_unit20/已核offset/gap600。校准已实现，checkpoint保存有效m、恢复不重校准；普通参考装配重复扫描和CLI配置预检已修复。全仓371项CPU测试通过，含合成原生四阶段/校准/完整评价/精确恢复；独立review通过。真实完整模型尚未训练，CPU测试不表示方法效果。
+**用户已确认方法和数据配置：** 时间条件TCM、连续SmoothL1 beta=.001、TCM后seed21独立64×64训练负距离中位数一次校准、cap128/time_unit20/已核offset/gap600。校准已实现，checkpoint保存有效m、恢复不重校准；普通参考装配重复扫描和CLI配置预检已修复。全仓371项CPU测试通过，含合成原生四阶段/校准/完整评价/精确恢复；独立review通过。013已进行完整尺寸的8次成本更新，CPU测试不表示方法效果。
 
-[具体成本方案](../docs/proposals/tmtaff_first_cost_measurement/README.md)、[CLI配置](../configs/tmtaff-time-cost-probe.json)、[576场景对齐参数](../configs/tmtaff-time-reference-alignment.json)均已配齐并静态核对。四阶段各2更新＋64批校准＋完整V/融合评价，单次最多1GPU小时已获批准，013已READY；不是预计耗时或训练充分性证据。正式训练更新量和预算待测量后再决定。没有原件或新决定、无确定代码欠项时安静，不制造任务。
+[具体成本方案](../docs/proposals/tmtaff_first_cost_measurement/README.md)、[CLI配置](../configs/tmtaff-time-cost-probe.json)、[576场景对齐参数](../configs/tmtaff-time-reference-alignment.json)均已配齐并静态核对。四阶段各2更新＋64批校准＋完整V/融合评价，013单次最多1GPU小时已执行并关闭，最终评价未完成；8次更新不表示训练充分。正式训练更新量和预算须根据本地核查另行决定。没有原件或新决定、无确定代码欠项时安静，不制造任务。
 
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 

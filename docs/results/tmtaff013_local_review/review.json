@@ -1,0 +1,257 @@
+{
+  "review_date": "2026-10-18",
+  "scope": "read-only returned evidence and executed-version source; no data/model execution",
+  "source_root": "HandOver/results/TMTAFF-TIME-COST-20261018-013",
+  "actual_commit_record_only": "f25958a7c9786bdebc794a0b91d0e0e616a86b34",
+  "exit_code": 124,
+  "outer_elapsed_seconds": 3579,
+  "run_elapsed_seconds": 3567.7104976051487,
+  "cursor": {
+    "stage": 4,
+    "update": 0,
+    "completed_updates": 8
+  },
+  "test_opened_reported": false,
+  "stage_updates_and_coverage": {
+    "TCM": {
+      "updates": [
+        1,
+        2
+      ],
+      "seconds": [
+        3.3055409658700228,
+        1.4099284131079912
+      ],
+      "seconds_total": 4.715469378978014,
+      "losses": [
+        1.0281217098236084,
+        0.9708174467086792
+      ],
+      "gradient_norms_before_clipping": [
+        0.39025384187698364,
+        0.3393247425556183
+      ],
+      "coverage": {
+        "track_presentations": 128,
+        "pair_presentations": 0,
+        "positive_pair_presentations": 0,
+        "unique_scene_count": 88,
+        "unique_track_count": 127,
+        "unique_pair_count": 0
+      }
+    },
+    "TAM_FROZEN": {
+      "updates": [
+        1,
+        2
+      ],
+      "seconds": [
+        11.637902947608382,
+        24.389792821835726
+      ],
+      "seconds_total": 36.02769576944411,
+      "losses": [
+        23.270675659179688,
+        35.39971160888672
+      ],
+      "gradient_norms_before_clipping": [
+        209.82032775878906,
+        335.8480224609375
+      ],
+      "coverage": {
+        "track_presentations": 99,
+        "pair_presentations": 128,
+        "positive_pair_presentations": 64,
+        "unique_scene_count": 4,
+        "unique_track_count": 99,
+        "unique_pair_count": 110
+      }
+    },
+    "TFM_FROZEN": {
+      "updates": [
+        1,
+        2
+      ],
+      "seconds": [
+        146.4384768716991,
+        149.724383873865
+      ],
+      "seconds_total": 296.1628607455641,
+      "losses": [
+        84.61626076698303,
+        79.33288100361824
+      ],
+      "gradient_norms_before_clipping": [
+        76648.34375,
+        74.159423828125
+      ],
+      "coverage": {
+        "track_presentations": 67,
+        "pair_presentations": 128,
+        "positive_pair_presentations": 128,
+        "unique_scene_count": 2,
+        "unique_track_count": 67,
+        "unique_pair_count": 96
+      }
+    },
+    "JOINT": {
+      "updates": [
+        1,
+        2
+      ],
+      "seconds": [
+        207.9526792736724,
+        205.761514429003
+      ],
+      "seconds_total": 413.7141937026754,
+      "losses": [
+        120.9590242136328,
+        106.14118197773932
+      ],
+      "gradient_norms_before_clipping": [
+        493.99591064453125,
+        339.2653503417969
+      ],
+      "coverage": {
+        "track_presentations": 130,
+        "pair_presentations": 128,
+        "positive_pair_presentations": 64,
+        "unique_scene_count": 4,
+        "unique_track_count": 130,
+        "unique_pair_count": 128
+      }
+    }
+  },
+  "validation_logged_selection": [
+    {
+      "stage": "TAM_FROZEN",
+      "update": 2,
+      "threshold": -62.44205093383789,
+      "macro_f1": 0.37077052529632837,
+      "candidate_count": 28989,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    },
+    {
+      "stage": "JOINT",
+      "update": 2,
+      "threshold": -98.66802215576172,
+      "macro_f1": 0.3628350200715334,
+      "candidate_count": 28982,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    }
+  ],
+  "validation_per_edge_scores_returned": false,
+  "final_evaluation": {
+    "status": "FAILED",
+    "seconds_before_interruption": 79.3845950262621,
+    "scope": "selected state restore, full association/fusion evaluation and threshold consistency check; excludes summary I/O",
+    "entered": true,
+    "physical_fusion_decode_started": "unknown; no subphase/progress evidence",
+    "summary_returned": false
+  },
+  "margin_recomputed": {
+    "batches": 64,
+    "pair_presentations": 4096,
+    "positive_presentations": 2048,
+    "negative_presentations": 2048,
+    "unique_pairs": 3927,
+    "duplicates": 169,
+    "unique_scenes": 116,
+    "negative_median": 72.64158630371094,
+    "strict_active_hinges": 1024,
+    "hinge_ties": 0
+  },
+  "cost_seconds": {
+    "margin_calibration": 1498.0977249098942,
+    "eight_updates": 750.6202195966616,
+    "two_validations": 1112.8872226248495,
+    "incomplete_final_evaluation": 79.3845950262621,
+    "run_unattributed_including_preparation_and_io": 126.72073544748127,
+    "outside_run_timer": 11.289502394851297
+  },
+  "cost_fraction_of_outer_elapsed": {
+    "margin_calibration": 0.41857997343109643,
+    "eight_updates": 0.20972903593089176,
+    "two_validations": 0.31094921000973724,
+    "incomplete_final_evaluation": 0.022180663600520286,
+    "run_unattributed_including_preparation_and_io": 0.035406743628801696,
+    "outside_run_timer": 0.003154373398952584
+  },
+  "calibration_and_validation_fraction_of_outer": 0.7295291834408336,
+  "preparation_seconds_receipt_only": 98.96,
+  "preparation_json_returned": false,
+  "alignment_executed_version": {
+    "scene_count": 576,
+    "zero_offset_count": 503,
+    "nonzero_offset_count": 73,
+    "maximum_offset_seconds": 2453.0,
+    "max_gap_values_seconds": [
+      600.0
+    ],
+    "nonzero_examples": {
+      "1030": {
+        "time_offset_seconds": 273.0,
+        "max_gap_seconds": 600.0
+      },
+      "2505": {
+        "time_offset_seconds": 26.0,
+        "max_gap_seconds": 600.0
+      },
+      "14": {
+        "time_offset_seconds": 6.0,
+        "max_gap_seconds": 600.0
+      },
+      "1761": {
+        "time_offset_seconds": 18.0,
+        "max_gap_seconds": 600.0
+      },
+      "331": {
+        "time_offset_seconds": 37.0,
+        "max_gap_seconds": 600.0
+      }
+    },
+    "actual_runtime_per_scene_alignment": "not independently available without preparation.json"
+  },
+  "training_sampling_report": {
+    "strategy": "balanced_scene_then_pair_v1",
+    "seed": 20,
+    "scene_count": 512,
+    "pair_count": 18249384,
+    "positive_pair_count": 110733,
+    "negative_pair_count": 18138651
+  },
+  "cuda_allocator": {
+    "allocated_bytes": 1097789952,
+    "allocated_gib": 1.0223965644836426,
+    "reserved_bytes": 1468006400,
+    "reserved_gib": 1.3671875,
+    "scope": "current invocation, selected device, process PyTorch allocator peak since pre-model reset; includes existing live allocations/cache; not model-only, whole-device usage or cumulative across resume"
+  },
+  "local_returned_file_bytes": {
+    "started_at.txt": 21,
+    "stderr.log": 77,
+    "launch_stderr.log": 0,
+    "gpu_uuid.txt": 41,
+    "elapsed_seconds.txt": 5,
+    "exit_code.txt": 4,
+    "ended_at.txt": 21,
+    "gpu_stderr.log": 0,
+    "stdout.log": 0,
+    "launch_stdout.log": 0,
+    "gpu.json": 2818,
+    "actual_commit.txt": 41,
+    "command.txt": 537,
+    "files/history.json": 10165,
+    "files/coverage.json": 35174,
+    "files/run.json": 542088
+  },
+  "claims_not_independently_verified": [
+    "preparation elapsed 98.96s and complete target population table",
+    "server-only preparation.json/checkpoint.pt byte sizes",
+    "end-of-run process tree and GPU release",
+    "full validation micro-F1/precision/recall or edge-level macro recomputation",
+    "physical fusion subphase start and all fusion metrics"
+  ]
+}
