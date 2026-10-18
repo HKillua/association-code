@@ -1,0 +1,135 @@
+{
+ "run_output_root": {
+  "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1",
+  "total_bytes": 351435421,
+  "total_files": 534
+ },
+ "checkpoints_not_uploaded": [
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/teacher.pt",
+   "bytes": 24902686
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/utility.pt",
+   "bytes": 9503394
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/adapt-plain.pt",
+   "bytes": 18340226
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/adapt-identity.pt",
+   "bytes": 18341870
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/adapt-utility.pt",
+   "bytes": 18341322
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/adapt-learned.pt",
+   "bytes": 18613434
+  }
+ ],
+ "predictions_npz_not_uploaded": [
+  {
+   "route": "plain",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/plain-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9829006,
+   "metadata_json_files": 64,
+   "metadata_json_bytes": 250536,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "arrays_per_scene_sample": 83,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  },
+  {
+   "route": "identity",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/identity-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9818848,
+   "metadata_json_files": 64,
+   "metadata_json_bytes": 250536,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "arrays_per_scene_sample": 83,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  },
+  {
+   "route": "utility",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/utility-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9824495,
+   "metadata_json_files": 64,
+   "metadata_json_bytes": 250536,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "arrays_per_scene_sample": 83,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  },
+  {
+   "route": "learned",
+   "directory": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/learned-predictions",
+   "npz_files": 64,
+   "npz_bytes": 9831794,
+   "metadata_json_files": 64,
+   "metadata_json_bytes": 250536,
+   "index_scenes_declared": 64,
+   "index_test_opened": false,
+   "index_format": "scene_physical_predictions_v1",
+   "all_declared_npz_present": true,
+   "all_declared_metadata_present": true,
+   "arrays_per_scene_sample": 83,
+   "index_json_returned_in_git": true,
+   "metadata_json_returned_in_git": true
+  }
+ ],
+ "large_json_not_uploaded": [
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/run.json",
+   "bytes": 11134688,
+   "gz_returned": "/home/wangguangjie/djs/association-code/HandOver/results/COOPERATIVE-COST-20261018-015/files/run.json.gz",
+   "gz_bytes": 1246915
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/plain-evaluation.json",
+   "bytes": 17167815,
+   "gz_returned": "/home/wangguangjie/djs/association-code/HandOver/results/COOPERATIVE-COST-20261018-015/files/plain-evaluation.json.gz",
+   "gz_bytes": 705561
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/identity-evaluation.json",
+   "bytes": 17169631,
+   "gz_returned": "/home/wangguangjie/djs/association-code/HandOver/results/COOPERATIVE-COST-20261018-015/files/identity-evaluation.json.gz",
+   "gz_bytes": 705425
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/utility-evaluation.json",
+   "bytes": 17169286,
+   "gz_returned": "/home/wangguangjie/djs/association-code/HandOver/results/COOPERATIVE-COST-20261018-015/files/utility-evaluation.json.gz",
+   "gz_bytes": 705554
+  },
+  {
+   "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/learned-evaluation.json",
+   "bytes": 17167895,
+   "gz_returned": "/home/wangguangjie/djs/association-code/HandOver/results/COOPERATIVE-COST-20261018-015/files/learned-evaluation.json.gz",
+   "gz_bytes": 705254
+  }
+ ],
+ "execution_json": {
+  "path": "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-COST-20261018-015-attempt-1/execution.json",
+  "bytes": 122491364
+ }
+}

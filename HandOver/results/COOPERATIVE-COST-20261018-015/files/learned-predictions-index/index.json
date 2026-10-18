@@ -1,0 +1,392 @@
+{
+  "format": "scene_physical_predictions_v1",
+  "scenes": [
+    {
+      "scene_index": 0,
+      "scene_id": "1671",
+      "npz": "000000.npz",
+      "metadata": "000000.json"
+    },
+    {
+      "scene_index": 1,
+      "scene_id": "2056",
+      "npz": "000001.npz",
+      "metadata": "000001.json"
+    },
+    {
+      "scene_index": 2,
+      "scene_id": "290",
+      "npz": "000002.npz",
+      "metadata": "000002.json"
+    },
+    {
+      "scene_index": 3,
+      "scene_id": "113",
+      "npz": "000003.npz",
+      "metadata": "000003.json"
+    },
+    {
+      "scene_index": 4,
+      "scene_id": "2109",
+      "npz": "000004.npz",
+      "metadata": "000004.json"
+    },
+    {
+      "scene_index": 5,
+      "scene_id": "1977",
+      "npz": "000005.npz",
+      "metadata": "000005.json"
+    },
+    {
+      "scene_index": 6,
+      "scene_id": "2279",
+      "npz": "000006.npz",
+      "metadata": "000006.json"
+    },
+    {
+      "scene_index": 7,
+      "scene_id": "4",
+      "npz": "000007.npz",
+      "metadata": "000007.json"
+    },
+    {
+      "scene_index": 8,
+      "scene_id": "1456",
+      "npz": "000008.npz",
+      "metadata": "000008.json"
+    },
+    {
+      "scene_index": 9,
+      "scene_id": "944",
+      "npz": "000009.npz",
+      "metadata": "000009.json"
+    },
+    {
+      "scene_index": 10,
+      "scene_id": "1391",
+      "npz": "000010.npz",
+      "metadata": "000010.json"
+    },
+    {
+      "scene_index": 11,
+      "scene_id": "4618",
+      "npz": "000011.npz",
+      "metadata": "000011.json"
+    },
+    {
+      "scene_index": 12,
+      "scene_id": "1793",
+      "npz": "000012.npz",
+      "metadata": "000012.json"
+    },
+    {
+      "scene_index": 13,
+      "scene_id": "3829",
+      "npz": "000013.npz",
+      "metadata": "000013.json"
+    },
+    {
+      "scene_index": 14,
+      "scene_id": "4652",
+      "npz": "000014.npz",
+      "metadata": "000014.json"
+    },
+    {
+      "scene_index": 15,
+      "scene_id": "4159",
+      "npz": "000015.npz",
+      "metadata": "000015.json"
+    },
+    {
+      "scene_index": 16,
+      "scene_id": "1331",
+      "npz": "000016.npz",
+      "metadata": "000016.json"
+    },
+    {
+      "scene_index": 17,
+      "scene_id": "2882",
+      "npz": "000017.npz",
+      "metadata": "000017.json"
+    },
+    {
+      "scene_index": 18,
+      "scene_id": "3117",
+      "npz": "000018.npz",
+      "metadata": "000018.json"
+    },
+    {
+      "scene_index": 19,
+      "scene_id": "2996",
+      "npz": "000019.npz",
+      "metadata": "000019.json"
+    },
+    {
+      "scene_index": 20,
+      "scene_id": "1398",
+      "npz": "000020.npz",
+      "metadata": "000020.json"
+    },
+    {
+      "scene_index": 21,
+      "scene_id": "330",
+      "npz": "000021.npz",
+      "metadata": "000021.json"
+    },
+    {
+      "scene_index": 22,
+      "scene_id": "3495",
+      "npz": "000022.npz",
+      "metadata": "000022.json"
+    },
+    {
+      "scene_index": 23,
+      "scene_id": "4980",
+      "npz": "000023.npz",
+      "metadata": "000023.json"
+    },
+    {
+      "scene_index": 24,
+      "scene_id": "211",
+      "npz": "000024.npz",
+      "metadata": "000024.json"
+    },
+    {
+      "scene_index": 25,
+      "scene_id": "1447",
+      "npz": "000025.npz",
+      "metadata": "000025.json"
+    },
+    {
+      "scene_index": 26,
+      "scene_id": "1893",
+      "npz": "000026.npz",
+      "metadata": "000026.json"
+    },
+    {
+      "scene_index": 27,
+      "scene_id": "3332",
+      "npz": "000027.npz",
+      "metadata": "000027.json"
+    },
+    {
+      "scene_index": 28,
+      "scene_id": "870",
+      "npz": "000028.npz",
+      "metadata": "000028.json"
+    },
+    {
+      "scene_index": 29,
+      "scene_id": "2512",
+      "npz": "000029.npz",
+      "metadata": "000029.json"
+    },
+    {
+      "scene_index": 30,
+      "scene_id": "2995",
+      "npz": "000030.npz",
+      "metadata": "000030.json"
+    },
+    {
+      "scene_index": 31,
+      "scene_id": "875",
+      "npz": "000031.npz",
+      "metadata": "000031.json"
+    },
+    {
+      "scene_index": 32,
+      "scene_id": "4038",
+      "npz": "000032.npz",
+      "metadata": "000032.json"
+    },
+    {
+      "scene_index": 33,
+      "scene_id": "2345",
+      "npz": "000033.npz",
+      "metadata": "000033.json"
+    },
+    {
+      "scene_index": 34,
+      "scene_id": "1587",
+      "npz": "000034.npz",
+      "metadata": "000034.json"
+    },
+    {
+      "scene_index": 35,
+      "scene_id": "3245",
+      "npz": "000035.npz",
+      "metadata": "000035.json"
+    },
+    {
+      "scene_index": 36,
+      "scene_id": "2395",
+      "npz": "000036.npz",
+      "metadata": "000036.json"
+    },
+    {
+      "scene_index": 37,
+      "scene_id": "3838",
+      "npz": "000037.npz",
+      "metadata": "000037.json"
+    },
+    {
+      "scene_index": 38,
+      "scene_id": "519",
+      "npz": "000038.npz",
+      "metadata": "000038.json"
+    },
+    {
+      "scene_index": 39,
+      "scene_id": "2715",
+      "npz": "000039.npz",
+      "metadata": "000039.json"
+    },
+    {
+      "scene_index": 40,
+      "scene_id": "3964",
+      "npz": "000040.npz",
+      "metadata": "000040.json"
+    },
+    {
+      "scene_index": 41,
+      "scene_id": "2261",
+      "npz": "000041.npz",
+      "metadata": "000041.json"
+    },
+    {
+      "scene_index": 42,
+      "scene_id": "1457",
+      "npz": "000042.npz",
+      "metadata": "000042.json"
+    },
+    {
+      "scene_index": 43,
+      "scene_id": "907",
+      "npz": "000043.npz",
+      "metadata": "000043.json"
+    },
+    {
+      "scene_index": 44,
+      "scene_id": "1022",
+      "npz": "000044.npz",
+      "metadata": "000044.json"
+    },
+    {
+      "scene_index": 45,
+      "scene_id": "1206",
+      "npz": "000045.npz",
+      "metadata": "000045.json"
+    },
+    {
+      "scene_index": 46,
+      "scene_id": "3879",
+      "npz": "000046.npz",
+      "metadata": "000046.json"
+    },
+    {
+      "scene_index": 47,
+      "scene_id": "2211",
+      "npz": "000047.npz",
+      "metadata": "000047.json"
+    },
+    {
+      "scene_index": 48,
+      "scene_id": "1058",
+      "npz": "000048.npz",
+      "metadata": "000048.json"
+    },
+    {
+      "scene_index": 49,
+      "scene_id": "3527",
+      "npz": "000049.npz",
+      "metadata": "000049.json"
+    },
+    {
+      "scene_index": 50,
+      "scene_id": "2708",
+      "npz": "000050.npz",
+      "metadata": "000050.json"
+    },
+    {
+      "scene_index": 51,
+      "scene_id": "270",
+      "npz": "000051.npz",
+      "metadata": "000051.json"
+    },
+    {
+      "scene_index": 52,
+      "scene_id": "2960",
+      "npz": "000052.npz",
+      "metadata": "000052.json"
+    },
+    {
+      "scene_index": 53,
+      "scene_id": "1089",
+      "npz": "000053.npz",
+      "metadata": "000053.json"
+    },
+    {
+      "scene_index": 54,
+      "scene_id": "1795",
+      "npz": "000054.npz",
+      "metadata": "000054.json"
+    },
+    {
+      "scene_index": 55,
+      "scene_id": "1374",
+      "npz": "000055.npz",
+      "metadata": "000055.json"
+    },
+    {
+      "scene_index": 56,
+      "scene_id": "1396",
+      "npz": "000056.npz",
+      "metadata": "000056.json"
+    },
+    {
+      "scene_index": 57,
+      "scene_id": "3349",
+      "npz": "000057.npz",
+      "metadata": "000057.json"
+    },
+    {
+      "scene_index": 58,
+      "scene_id": "1150",
+      "npz": "000058.npz",
+      "metadata": "000058.json"
+    },
+    {
+      "scene_index": 59,
+      "scene_id": "3330",
+      "npz": "000059.npz",
+      "metadata": "000059.json"
+    },
+    {
+      "scene_index": 60,
+      "scene_id": "4429",
+      "npz": "000060.npz",
+      "metadata": "000060.json"
+    },
+    {
+      "scene_index": 61,
+      "scene_id": "3589",
+      "npz": "000061.npz",
+      "metadata": "000061.json"
+    },
+    {
+      "scene_index": 62,
+      "scene_id": "2025",
+      "npz": "000062.npz",
+      "metadata": "000062.json"
+    },
+    {
+      "scene_index": 63,
+      "scene_id": "4676",
+      "npz": "000063.npz",
+      "metadata": "000063.json"
+    }
+  ],
+  "completion_scope": "listed scenes only; consult enclosing run and summary for evaluation completion",
+  "row_semantics": "all declared targets first; duplicate predictions appended without assigned truth",
+  "test_opened": false
+}
