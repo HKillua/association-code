@@ -1,6 +1,13 @@
 {
-  "status": "PROPOSED_NOT_AUTHORIZED",
-  "current_authorized_task": "HandOver/L2S-20261018-014.md",
+  "status": "APPROVED_WAITING_014",
+  "current_ready_task": "HandOver/L2S-20261018-014.md",
+  "approval": {
+    "date": "2026-10-18",
+    "user_reply": "批准该配置及最多2 GPU小时（推荐）",
+    "scope": "Candidate first cost measurement configuration and <=2 GPU-hour single-attempt budget only",
+    "start_condition": "After 014 reaches a verified terminal state and a separate READY handover is published",
+    "ready_handover": null
+  },
   "new_request": {
     "purpose": "Candidate-only first native CUDA cost measurement; not a performance comparison",
     "config": "candidate-cost-proposal.json",
@@ -15,8 +22,7 @@
     "save_predictions": true
   },
   "pending": [
-    "Candidate first-run configuration including LR/endpoint masking/optimizer and fixed-final-state selection",
-    "Candidate-only new <=2 GPU-hour budget",
+    "014 terminal receipt and independent candidate READY handover",
     "Reference/candidate development update counts and selection protocol",
     "Both development budgets after measured costs"
   ],
