@@ -24,6 +24,7 @@
     "endpoint_fraction": 0.25,
     "utility_epsilon": 0.001,
     "error_scale_policy": "training_native_std",
+    "longitude_loss_mode": "shortest_arc",
     "routes": [
       "plain",
       "scalar-u",
@@ -35,7 +36,8 @@
     "pair_batch_size": 1024
   },
   "data": {
-    "time_unit_seconds": 20.0
+    "time_unit_seconds": 20.0,
+    "reference_longitude_policy": "shortest_arc"
   },
   "train_splits": [
     "T_core"

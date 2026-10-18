@@ -326,9 +326,12 @@ def training_configuration(config):
     required = {'seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates',
                 'learning_rate', 'gradient_clip', 'endpoint_fraction', 'utility_epsilon',
                 'error_scale_policy', 'routes', 'max_seconds', 'batch_tracks', 'pair_batch_size'}
-    if set(config) != required:
+    if not required.issubset(config) or set(config) - required - {'longitude_loss_mode'}:
         raise ValueError('candidate training config must explicitly contain ' + ', '.join(sorted(required)))
     cfg = dict(config)
+    cfg.setdefault('longitude_loss_mode', 'linear')
+    if cfg['longitude_loss_mode'] not in ('linear', 'shortest_arc'):
+        raise ValueError('longitude_loss_mode must be linear or shortest_arc')
     for key in ('seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates', 'batch_tracks', 'pair_batch_size'):
         value = cfg[key]
         if isinstance(value, bool) or not isinstance(value, int) or value < (0 if key == 'seed' else 1):
@@ -562,7 +565,8 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             scaling = dict(policy='legacy', scale_tau=1., scope='historical unscaled hand-crafted tau features')
         run['support_time_scaling'] = scaling
         model = CooperativeModel(model_config, normalizer, support_time_scale=scaling['scale_tau']).to(device)
-        objective = FusionLoss(position_loss_mode='standard_smooth_l1').to(device)
+        objective = FusionLoss(position_loss_mode='standard_smooth_l1',
+                               longitude_loss_mode=cfg['longitude_loss_mode']).to(device)
         teacher = None
         finish_phase()
         def fit_stage(target_model, target_objective, stage, steps, seed, route='plain'):

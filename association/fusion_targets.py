@@ -21,7 +21,7 @@ def _numeric(value):
 
 
 def align_reference_states(reference_scene, identity_id, query_times, *,
-                           time_offset_seconds, max_gap_seconds):
+                           time_offset_seconds, max_gap_seconds, longitude_policy='linear'):
     """Return ``states[L,4]``, ``valid[L,4]`` and an alignment ``report``.
 
     The result is a dictionary. States are float64 in lat/lon/native-velocity/
@@ -42,14 +42,17 @@ def align_reference_states(reference_scene, identity_id, query_times, *,
     """
     return _align_reference_rows(reference_scene, identity_id, query_times,
                                 time_offset_seconds=time_offset_seconds,
-                                max_gap_seconds=max_gap_seconds)
+                                max_gap_seconds=max_gap_seconds, longitude_policy=longitude_policy)
 
 
 def _align_reference_rows(reference_scene, identity_id, query_times, *,
-                          time_offset_seconds, max_gap_seconds, identity_rows=None):
+                          time_offset_seconds, max_gap_seconds, identity_rows=None,
+                          longitude_policy='linear'):
     """Shared alignment; an optional row group is owned by this module only."""
     if not isinstance(reference_scene, Mapping):
         raise DataError('reference_scene must be an already-read reference scene')
+    if longitude_policy not in ('linear', 'shortest_arc'):
+        raise DataError('longitude_policy must be linear or shortest_arc')
     if reference_scene.get('split') not in ALLOWED_SPLITS:
         raise DataError('Reference alignment permits only training/development splits; T_test is sealed')
     if tuple(reference_scene.get('state_fields', ())) != STATE_FIELDS:
@@ -81,6 +84,7 @@ def _align_reference_rows(reference_scene, identity_id, query_times, *,
         'time_offset_seconds': offset, 'max_gap_seconds': max_gap,
         'time_policy': 'aligned_reference_time = raw_reference_time - time_offset_seconds',
         'velocity_units': 'native; no conversion', 'reference_rows': len(rows),
+        'longitude_policy': longitude_policy,
         'source_issue_count': len(reference_scene.get('issues', [])),
         'identity_rows': 0, 'invalid_identity_rows': 0, 'unlocatable_time_rows': 0,
         'reference_times': 0, 'duplicate_time_groups': 0, 'duplicate_extra_rows': 0,
@@ -200,6 +204,9 @@ def _align_reference_rows(reference_scene, identity_id, query_times, *,
                                              'reference_times': [float(times[left]), float(times[right])]})
                     continue
                 value = (a + fraction * delta) % 360.0
+            elif column == 1 and longitude_policy == 'shortest_arc' and abs(b - a) > 180.0:
+                delta = (b - a + 180.0) % 360.0 - 180.0
+                value = (a + fraction * delta + 180.0) % 360.0 - 180.0
             else:
                 value = (1.0 - fraction) * a + fraction * b
             states[index, column] = value
@@ -211,7 +218,8 @@ def _align_reference_rows(reference_scene, identity_id, query_times, *,
 
 
 def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
-                         split, nominal_grid, time_offset_seconds, max_gap_seconds):
+                         split, nominal_grid, time_offset_seconds, max_gap_seconds,
+                         longitude_policy='linear'):
     """Assemble supervision for caller-selected, same-identity candidate rows.
 
     This does not sample or filter pairs. Repeated row indices keep their order
@@ -223,6 +231,8 @@ def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
     """
     if not isinstance(prepared_scene, Mapping) or not isinstance(reference_scene, Mapping):
         raise DataError('Fusion targets require prepared and already-read reference scenes')
+    if longitude_policy not in ('linear', 'shortest_arc'):
+        raise DataError('longitude_policy must be linear or shortest_arc')
     if split not in ALLOWED_SPLITS or reference_scene.get('split') != split:
         raise DataError('Fusion targets require matching training/development splits; T_test is sealed')
     if 'split' in prepared_scene and prepared_scene['split'] != split:
@@ -297,7 +307,7 @@ def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
         if identity not in aligned:
             aligned[identity] = align_reference_states(
                 reference_scene, identity, query, time_offset_seconds=time_offset_seconds,
-                max_gap_seconds=max_gap_seconds)
+                max_gap_seconds=max_gap_seconds, longitude_policy=longitude_policy)
     states = np.full((len(pairs), length, 4), np.nan, dtype=np.float64)
     valid = np.zeros(states.shape, dtype=bool)
     for index, identity in enumerate(identity_ids):
@@ -307,6 +317,7 @@ def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
     report = {
         'scene_id': scene_id, 'split': split, 'state_fields': list(STATE_FIELDS),
         'time_offset_seconds': float(time_offset_seconds), 'max_gap_seconds': float(max_gap_seconds),
+        'longitude_policy': longitude_policy,
         'query_count': length, 'pair_count': len(pairs), 'unique_identity_count': len(aligned),
         'repeated_selection_count': len(selected) - len(set(selected.tolist())),
         'valid_per_feature': dict(zip(STATE_FIELDS, valid.sum(axis=(0, 1)).tolist())),
@@ -323,7 +334,7 @@ def build_fusion_targets(prepared_scene, reference_scene, pair_indices, *,
 
 
 def build_scene_fusion_targets(prepared_scene, reference_scene, *, target_identity_ids,
-                               time_offset_seconds, max_gap_seconds):
+                               time_offset_seconds, max_gap_seconds, longitude_policy='linear'):
     """Build every explicitly declared scene target, including unavailable ones.
 
     The caller supplies the complete task population from its frozen labels,
@@ -335,6 +346,8 @@ def build_scene_fusion_targets(prepared_scene, reference_scene, *, target_identi
     """
     if not isinstance(prepared_scene, Mapping) or not isinstance(reference_scene, Mapping):
         raise DataError('Already-read observation and reference scenes are required')
+    if longitude_policy not in ('linear', 'shortest_arc'):
+        raise DataError('longitude_policy must be linear or shortest_arc')
     split = prepared_scene.get('split')
     if split not in ALLOWED_SPLITS or reference_scene.get('split') != split:
         raise DataError('Matching training/development splits required; T_test is sealed')
@@ -352,14 +365,16 @@ def build_scene_fusion_targets(prepared_scene, reference_scene, *, target_identi
     # Validate query and alignment settings even for a truly empty scene.
     if not identities:
         align_reference_states(reference_scene, '__empty__-__validation__', prepared_scene['grid'],
-                               time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+                               time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds,
+                               longitude_policy=longitude_policy)
         return {}
     # The first public call retains whole-scene validation and the original
     # error order, including malformed unrelated rows. Later calls may then
     # reuse an internal group without trusting an index supplied in the input.
     first = identities[0]
     aligned = {first: align_reference_states(reference_scene, first, prepared_scene['grid'],
-                           time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)}
+                           time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds,
+                           longitude_policy=longitude_policy)}
     if len(identities) == 1:
         return aligned
     rows_by_identity = defaultdict(list)
@@ -369,12 +384,14 @@ def build_scene_fusion_targets(prepared_scene, reference_scene, *, target_identi
             # The raw reader emits strings; unusual caller mappings retain the
             # public comparison behavior rather than gaining hash constraints.
             aligned.update({target: align_reference_states(reference_scene, target, prepared_scene['grid'],
-                                time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+                                time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds,
+                                longitude_policy=longitude_policy)
                             for target in identities[1:]})
             return aligned
         rows_by_identity[identity].append(row)
     for identity in identities[1:]:
         aligned[identity] = _align_reference_rows(
             reference_scene, identity, prepared_scene['grid'], identity_rows=rows_by_identity.get(identity, ()),
-            time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds)
+            time_offset_seconds=time_offset_seconds, max_gap_seconds=max_gap_seconds,
+            longitude_policy=longitude_policy)
     return aligned

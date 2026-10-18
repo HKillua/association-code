@@ -57,8 +57,10 @@ def main(argv=None):
         model, fusion = ModelConfig(**config['model']), PairFusionConfig(**config['fusion'])
         if (model.length, model.d_model) != (fusion.length, fusion.d_model):
             raise ValueError('Model and fusion length/dimension must agree')
-        if set(config['data']) != {'max_observations', 'time_unit_seconds'}:
-            raise ValueError('data requires explicit max_observations/time_unit_seconds')
+        if (not {'max_observations', 'time_unit_seconds'}.issubset(config['data'])
+                or set(config['data']) - {'max_observations', 'time_unit_seconds', 'reference_longitude_policy'}):
+            raise ValueError('data requires explicit max_observations/time_unit_seconds; '
+                             'only reference_longitude_policy is optional')
         data_config = {**config['data'], 'length': model.length}
         # Inspection validates the same complete configuration as a fit before
         # opening the archive; it still constructs no model or training run.

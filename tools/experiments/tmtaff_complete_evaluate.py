@@ -60,6 +60,13 @@ def _source_settings(saved, manifest, alignment):
     contract = saved['data_contract']
     if not isinstance(contract, list) or len(contract) != 2 or not all(contract):
         raise ValueError('checkpoint must retain its full training and validation data contract')
+    longitude_policies = {row['reference_alignment'].get('longitude_policy', 'linear')
+                          for population in contract for row in population}
+    if len(longitude_policies) != 1 or not longitude_policies.issubset({'linear', 'shortest_arc'}):
+        raise ValueError('checkpoint reference longitude policies must agree across all scenes')
+    longitude_policy = next(iter(longitude_policies))
+    if longitude_policy != 'linear':
+        data['reference_longitude_policy'] = longitude_policy
     validate_manifest(manifest)
     for rows, splits in zip(contract, (train_splits, ['V_select'])):
         ids = [sid for split in splits for sid in manifest['splits'][split]]

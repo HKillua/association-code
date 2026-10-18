@@ -54,11 +54,13 @@ def _record_cuda_peaks(run, device):
 def _configuration(config):
     config = copy.deepcopy(config)
     config.setdefault('margin_policy', 'fixed')
+    config.setdefault('longitude_loss_mode', 'linear')
     required = {'updates', 'learning_rates', 'seed', 'branch', 'batch_tracks',
                 'pair_batch_size', 'pair_microbatch', 'track_microbatch',
                 'completion_weight', 'gradient_clip', 'max_hours',
                 'validate_every_updates', 'completion_cache_mib',
-                'position_loss_mode', 'lr_schedule', 'singleton_policy', 'validation_batches', 'margin_policy'}
+                'position_loss_mode', 'longitude_loss_mode', 'lr_schedule', 'singleton_policy',
+                'validation_batches', 'margin_policy'}
     if set(config) != required:
         raise ValueError(f'config requires exactly {sorted(required)}')
     for field in ('updates', 'learning_rates'):
@@ -86,6 +88,8 @@ def _configuration(config):
         raise ValueError('training margin calibration requires the contrastive branch')
     if config['position_loss_mode'] not in ('paper_printed', 'standard_smooth_l1'):
         raise ValueError('position_loss_mode must be explicit')
+    if config['longitude_loss_mode'] not in ('linear', 'shortest_arc'):
+        raise ValueError('longitude_loss_mode must be linear or shortest_arc')
     if config['lr_schedule'] not in ('constant', 'quarter_cosine'):
         raise ValueError('lr_schedule must be constant or quarter_cosine')
     if config['singleton_policy'] not in ('observed', 'missing'):
@@ -237,7 +241,8 @@ def load_complete_snapshot(path, *, device='cpu', selected=True):
     else:
         raise ValueError('unsupported checkpoint input adapter')
     fusion = PairFusion(PairFusionConfig(**payload['fusion_config']), payload['normalizer'])
-    objective = FusionLoss(position_loss_mode=payload['config']['position_loss_mode'])
+    objective = FusionLoss(position_loss_mode=payload['config']['position_loss_mode'],
+                           longitude_loss_mode=payload['config'].get('longitude_loss_mode', 'linear'))
     _restore((model, fusion, objective), snapshot['states'])
     for module in (model, fusion, objective):
         module.to(device).eval()
@@ -445,7 +450,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             model = AssociationModel(replace(model_config, margin=effective_margin), config['branch'])
         modules = (model.to(device),
                    PairFusion(fusion_config, normalizer).to(device),
-                   FusionLoss(position_loss_mode=config['position_loss_mode']).to(device))
+                   FusionLoss(position_loss_mode=config['position_loss_mode'],
+                              longitude_loss_mode=config['longitude_loss_mode']).to(device))
         model, fusion, objective = modules
         normalized = [normalize_scene(scene, normalizer) for scene in train_scenes]
         track_rng, tfm_rng = np.random.default_rng(config['seed']), np.random.default_rng(config['seed'] + 1)

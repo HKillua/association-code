@@ -191,11 +191,14 @@ class FusionLoss(nn.Module):
 
     feature_names = ("lat", "lon", "vel", "cou")
 
-    def __init__(self, *, position_loss_mode: str):
+    def __init__(self, *, position_loss_mode: str, longitude_loss_mode: str = 'linear'):
         super().__init__()
         if position_loss_mode not in ("paper_printed", "standard_smooth_l1"):
             raise ValueError("position_loss_mode must be paper_printed or standard_smooth_l1")
         self.position_loss_mode = position_loss_mode
+        if longitude_loss_mode not in ('linear', 'shortest_arc'):
+            raise ValueError('longitude_loss_mode must be linear or shortest_arc')
+        self.longitude_loss_mode = longitude_loss_mode
         self.log_variance = nn.Parameter(torch.zeros(4))
 
     def _position_loss(self, prediction: Tensor, target: Tensor) -> Tensor:
@@ -250,7 +253,15 @@ class FusionLoss(nn.Module):
             if not torch.isfinite(pred).all() or not torch.isfinite(truth).all():
                 raise ValueError(f"valid prediction and target must be finite for {name}")
             if index < 2:
-                loss = self._position_loss(pred, truth)
+                if index == 1 and self.longitude_loss_mode == 'shortest_arc':
+                    error = pred - truth
+                    # Keep ordinary differences and their gradients unchanged;
+                    # +/-180 ties keep the existing signed difference.
+                    error = torch.where(error.abs() > 180.,
+                                        torch.remainder(error + 180., 360.) - 180., error)
+                    loss = self._position_loss(error, torch.zeros_like(error))
+                else:
+                    loss = self._position_loss(pred, truth)
             elif index == 2:
                 if (pred < 0).any() or (truth < 0).any():
                     raise ValueError("valid speeds must be nonnegative")

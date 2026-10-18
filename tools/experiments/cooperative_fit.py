@@ -63,10 +63,13 @@ def synthetic_scenes(model_config):
 def synthetic_configuration(model_variant='legacy'):
     routes = (['plain', 'scalar-u', 'attribute-u', 'learned-attribute']
               if model_variant == 'support_residual_v2' else ['plain', 'identity', 'utility', 'learned'])
-    return dict(seed=20, batch_size=2, teacher_updates=1, utility_updates=1, adapt_updates=1,
+    config = dict(seed=20, batch_size=2, teacher_updates=1, utility_updates=1, adapt_updates=1,
                 learning_rate=1e-4, gradient_clip=1., endpoint_fraction=.25, utility_epsilon=1e-3,
                 error_scale_policy='training_native_std', routes=routes,
                 max_seconds=300., batch_tracks=2, pair_batch_size=3)
+    if model_variant == 'support_residual_v2':
+        config['longitude_loss_mode'] = 'shortest_arc'
+    return config
 
 
 def production_shape_check(device, output, model_variant='legacy'):
@@ -159,7 +162,8 @@ def main(argv=None):
                 if (set(config) != {'scope', 'model', 'training', 'data', 'train_splits'}
                         or config['scope'] not in ('cooperative-physical-v1', 'cooperative-physical-v2')
                         or config['train_splits'] != ['T_core']
-                        or set(config['data']) != {'time_unit_seconds'}):
+                        or 'time_unit_seconds' not in config['data']
+                        or set(config['data']) - {'time_unit_seconds', 'reference_longitude_policy'}):
                     raise ValueError('explicit cooperative-physical v1/v2 T_core configuration required')
                 model = CooperativeConfig(**config['model'])
                 expected_scope = ('cooperative-physical-v2' if model.model_variant == 'support_residual_v2'

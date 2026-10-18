@@ -126,6 +126,56 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         self.assertIsNone(result['threshold'])
         self.assertTrue(all(value['tp'] == value['fp'] == 0 for value in result['association']['per_scene']))
 
+    def test_legacy_checkpoint_without_longitude_fields_keeps_exact_contract(self):
+        self.saved['config'].pop('longitude_loss_mode', None)
+        self.assertTrue(all('longitude_policy' not in row['reference_alignment']
+                            for population in self.saved['data_contract'] for row in population))
+        torch.save(self.saved, self.checkpoint)
+        restored = load_complete_snapshot(self.checkpoint)
+        self.assertEqual(restored['objective'].longitude_loss_mode, 'linear')
+        dataset = self.fixture.load()
+        self.assertEqual(_scenes(dataset['train'], dataset['validation'], 4), self.saved['data_contract'])
+        self.assertEqual(self.invoke(self.args('legacy-longitude')), 0)
+        run = self.assert_status('legacy-longitude', 'COMPLETED')
+        self.assertNotIn('reference_longitude_policy', run['data'])
+
+    def test_shortest_checkpoint_reuses_actual_dateline_targets_during_evaluation(self):
+        from association.complete_evaluation import evaluate_complete
+        original_csv = native_fixture.csv_bytes
+        def dateline_csv(header, rows):
+            rows = copy.deepcopy(rows)
+            if header[0] == 'batch':
+                for row in rows:
+                    if row[2] == 30:
+                        row[2] = 29  # query 29/3 lies between reference t=0 and t=10.
+            elif header[0] == 'MMSI':
+                for row in rows:
+                    row[3] = 179. if row[1] < 1010. else -179.
+            return original_csv(header, rows)
+        with patch.object(native_fixture, 'csv_bytes', side_effect=dateline_csv):
+            self.fixture.write_zip()
+        dataset = self.fixture.load(data_config=dict(self.fixture.data, reference_longitude_policy='shortest_arc'))
+        self.saved['normalizer'] = fit_normalizer(dataset['train'])
+        self.saved['data_contract'] = _scenes(dataset['train'], dataset['validation'], 4)
+        self.saved['config']['longitude_loss_mode'] = 'shortest_arc'
+        torch.save(self.saved, self.checkpoint)
+        restored = load_complete_snapshot(self.checkpoint)
+        self.assertEqual(restored['objective'].longitude_loss_mode, 'shortest_arc')
+        captured = []
+        def checked_evaluation(model, fusion, normalizer, scenes, **kwargs):
+            target = scenes[0]['fusion_targets']['target2a-0']
+            expected = 179. + (29./3.)/10.*2. - 360.
+            self.assertAlmostEqual(target['states'][1, 1], expected)
+            self.assertTrue(target['valid'][1, 1])
+            captured.append(scenes[0]['reference_alignment']['longitude_policy'])
+            return evaluate_complete(model, fusion, normalizer, scenes, **kwargs)
+        with patch('association.complete_evaluation.evaluate_complete', side_effect=checked_evaluation):
+            self.assertEqual(self.invoke(self.args('shortest-longitude')), 0)
+        self.assertEqual(captured, ['shortest_arc'])
+        run = self.assert_status('shortest-longitude', 'COMPLETED')
+        self.assertEqual(run['data']['reference_longitude_policy'], 'shortest_arc')
+        self.assertEqual(self.saved['data_contract'], _scenes(dataset['train'], dataset['validation'], 4))
+
     def test_changed_manifest_alignment_and_incomplete_updates_fail_before_archive(self):
         for case in ('manifest', 'alignment', 'updates', 'time_unit', 'no_threshold', 'missing_fusion'):
             with self.subTest(case=case):

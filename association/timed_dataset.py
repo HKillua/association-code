@@ -24,9 +24,13 @@ def _request(manifest, train_splits, data_config, alignment_by_scene):
     if not isinstance(train_splits, (tuple, list)) or tuple(train_splits) not in (
             ('T_core',), ('T_core', 'T_head')):
         raise DataError('train_splits must explicitly be T_core or T_core+T_head in that order')
-    if set(data_config) != {'length', 'max_observations', 'time_unit_seconds'}:
-        raise DataError('data_config requires exactly length/max_observations/time_unit_seconds')
-    _settings(**data_config)
+    required = {'length', 'max_observations', 'time_unit_seconds'}
+    if not required.issubset(data_config) or set(data_config) - required - {'reference_longitude_policy'}:
+        raise DataError('data_config requires length/max_observations/time_unit_seconds; '
+                        'only reference_longitude_policy is optional')
+    _settings(**{key: data_config[key] for key in required})
+    if data_config.get('reference_longitude_policy', 'linear') not in ('linear', 'shortest_arc'):
+        raise DataError('reference_longitude_policy must be linear or shortest_arc')
     splits = [*train_splits, 'V_select']
     requested = [sid for split in splits for sid in manifest['splits'][split]]
     if not manifest['splits']['T_core'] or not manifest['splits']['V_select']:
@@ -57,6 +61,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
     """
     started = time.monotonic()
     splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene)
+    input_config = {key: data_config[key] for key in ('length', 'max_observations', 'time_unit_seconds')}
+    longitude_policy = data_config.get('reference_longitude_policy', 'linear')
     scenes, populations = {}, {}
     if check:
         check()
@@ -79,7 +85,7 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                     if stop <= start:
                         raise DataError(f'Scene {sid}: empty scene label range must have positive duration')
                     query = np.linspace(start, stop, data_config['length'])
-                prepared = prepare_timed_scene(native, **data_config, query_times=query)
+                prepared = prepare_timed_scene(native, **input_config, query_times=query)
                 # The capped native arrays are sufficient for training. Keep
                 # canonical point/selection diagnostics, not duplicate raw tracks.
                 prepared.pop('tracks', None)
@@ -90,6 +96,10 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                     'query_grid_policy': prepared['timed_input_audit']['grid_policy'],
                     'clock_mapping_source': 'explicit caller per-scene alignment',
                 }
+                # Absence meant linear in old checkpoints. Preserve those exact
+                # data contracts so evaluation-only and resume remain usable.
+                if longitude_policy != 'linear':
+                    prepared['reference_alignment']['longitude_policy'] = longitude_policy
                 populations[split].append(prepared)
                 scenes[sid] = prepared
             del native_scenes
@@ -112,7 +122,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                     raise DataError('Reference iterator changed the requested scene order')
                 scene = scenes[sid]
                 scene['fusion_targets'] = build_scene_fusion_targets(scene, reference,
-                    target_identity_ids=scene['target_identity_ids'], **policies[sid])
+                    target_identity_ids=scene['target_identity_ids'], longitude_policy=longitude_policy,
+                    **policies[sid])
                 references_read.append({'scene_id': sid, 'split': split, 'member': reference['member'],
                                         'raw_row_count': len(reference['rows']), 'issue_count': len(reference['issues'])})
                 # Do not retain raw reference rows in the scene, report or closure.
@@ -137,7 +148,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
             input_audit=scene['timed_input_audit'], quarantine_audit=scene['audit']))
     report = dict(scope='TMTAFF-time-adapted-v1', training_splits=list(train_splits), selection_split='V_select',
         training_scene_ids=[s['scene_id'] for s in training], validation_scene_ids=[s['scene_id'] for s in validation],
-        data_config=dict(data_config), scenes=scene_reports, observation_members_read=archive_members,
+        data_config=dict(data_config), reference_longitude_policy=longitude_policy,
+        scenes=scene_reports, observation_members_read=archive_members,
         reference_members_read=references_read, reference_loading='stream by scene; retain aligned L-by-4 targets only',
         test_opened=False, resampled_with_legacy_scene64=False, elapsed_seconds=time.monotonic()-started)
     return dict(train=training, validation=validation, report=report)

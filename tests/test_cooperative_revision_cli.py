@@ -34,7 +34,7 @@ class CooperativeRevisionCLITests(unittest.TestCase):
             model=asdict(CooperativeConfig(length=4, max_observations=4, d_model=8,
                 nhead=2, num_layers=1, dim_feedforward=16, head_hidden=8, dropout=0.,
                 model_variant='support_residual_v2', support_time_policy='train_absmax_v1')),
-            data={'time_unit_seconds': 10.}, train_splits=['T_core'],
+            data={'time_unit_seconds': 10., 'reference_longitude_policy': 'shortest_arc'}, train_splits=['T_core'],
             training=synthetic_configuration('support_residual_v2'))
 
     def test_public_synthetic_v2_runs_and_reloads_all_arms_with_one_identity(self):
@@ -46,12 +46,14 @@ class CooperativeRevisionCLITests(unittest.TestCase):
         self.assertEqual(run['completed_updates'], 6)
         self.assertEqual(run['completed_routes'], ['plain', 'scalar-u', 'attribute-u', 'learned-attribute'])
         self.assertEqual(run['identity_selection_phase'], 'teacher_endpoint_before_utility')
+        self.assertEqual(run['training']['longitude_loss_mode'], 'shortest_arc')
         first = None
         for route in run['completed_routes']:
             model, payload = load_cooperative_checkpoint(output/('adapt-'+route+'.pt'), device='cpu')
             self.assertEqual(model.config.model_variant, 'support_residual_v2')
             self.assertEqual(payload['format'], 'cooperative-physical-v2')
             self.assertEqual(payload['completed_updates'], 1)
+            self.assertEqual(payload['training']['longitude_loss_mode'], 'shortest_arc')
             with np.load(output/(route+'-scores.npz')) as arrays:
                 scores = arrays['scores_0'].copy()
                 if first is None:
@@ -75,7 +77,11 @@ class CooperativeRevisionCLITests(unittest.TestCase):
         output = fixture.root/'v2'
         run = runtime.read_json(output/'run.json')
         self.assertEqual(run['completed_updates'], 6)
-        self.assertFalse(runtime.read_json(output/'execution.json')['preparation']['test_opened'])
+        preparation = runtime.read_json(output/'execution.json')['preparation']
+        self.assertFalse(preparation['test_opened'])
+        self.assertEqual(preparation['reference_longitude_policy'], 'shortest_arc')
+        self.assertTrue(all(scene['reference_alignment']['longitude_policy'] == 'shortest_arc'
+                            for population in run['scene_contract'] for scene in population))
         for route in run['completed_routes']:
             report = runtime.read_json(output/(route+'-evaluation.json'))
             self.assertEqual(len(report['per_scene']), 2)
