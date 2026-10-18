@@ -1,0 +1,29 @@
+{
+  "status": "CHECKED",
+  "scope": "synthetic full-shape forward/backward only",
+  "device": "cpu",
+  "model_config": {
+    "length": 64,
+    "max_observations": 128,
+    "d_model": 128,
+    "nhead": 8,
+    "num_layers": 6,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "head_hidden": 64,
+    "gate_floor": 0.001
+  },
+  "parameters": 2156814,
+  "visible_counts": [
+    2,
+    128
+  ],
+  "output_shape": [
+    64,
+    4
+  ],
+  "elapsed_seconds": 0.6085972909932025,
+  "actual_optimizer_updates": 0,
+  "native_MTAD_opened": false,
+  "test_opened": false
+}

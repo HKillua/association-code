@@ -1,0 +1,202 @@
+{
+  "status": "COMPLETED",
+  "device": "cpu",
+  "training": {
+    "seed": 20,
+    "batch_size": 2,
+    "teacher_updates": 1,
+    "utility_updates": 1,
+    "adapt_updates": 1,
+    "learning_rate": 0.0001,
+    "gradient_clip": 1.0,
+    "endpoint_fraction": 0.25,
+    "utility_epsilon": 0.001,
+    "error_scale_policy": "training_native_std",
+    "routes": [
+      "plain",
+      "identity",
+      "utility",
+      "learned"
+    ],
+    "max_seconds": 300.0,
+    "batch_tracks": 2,
+    "pair_batch_size": 3
+  },
+  "model_config": {
+    "length": 4,
+    "max_observations": 4,
+    "d_model": 8,
+    "nhead": 2,
+    "num_layers": 1,
+    "dim_feedforward": 16,
+    "dropout": 0.1,
+    "head_hidden": 8,
+    "gate_floor": 0.001
+  },
+  "scope": "fixed identity candidate development comparison",
+  "test_opened": false,
+  "scene_contract": [
+    [
+      {
+        "scene_id": "synthetic-train",
+        "split": "T_core",
+        "component_id": "synthetic-train-component",
+        "grid": [
+          0.0,
+          10.0,
+          20.0,
+          30.0
+        ],
+        "node_ids": [
+          "synthetic-train:0",
+          "synthetic-train:1",
+          "synthetic-train:2",
+          "synthetic-train:3"
+        ],
+        "identities": [
+          "synthetic-train-A",
+          "synthetic-train-A",
+          "synthetic-train-B",
+          "synthetic-train-B"
+        ],
+        "sources": [
+          "9001",
+          "9002",
+          "9001",
+          "9002"
+        ],
+        "pair_count": 6,
+        "positive_count": 2,
+        "intervals": [
+          [
+            12.0,
+            13.0
+          ],
+          [
+            0.0,
+            30.0
+          ],
+          [
+            2.0,
+            27.0
+          ],
+          [
+            3.0,
+            29.0
+          ]
+        ],
+        "observed_counts": [
+          0,
+          4,
+          2,
+          2
+        ],
+        "target_ids": [
+          "synthetic-train-A",
+          "synthetic-train-B"
+        ],
+        "input_adapter": "native_time_v1",
+        "max_observations": 4,
+        "time_unit_seconds": 20.0,
+        "time_origin_seconds": 0.0,
+        "native_observed_counts": [
+          2,
+          4,
+          2,
+          2
+        ]
+      }
+    ],
+    [
+      {
+        "scene_id": "synthetic-validation",
+        "split": "V_select",
+        "component_id": "synthetic-validation-component",
+        "grid": [
+          0.0,
+          10.0,
+          20.0,
+          30.0
+        ],
+        "node_ids": [
+          "synthetic-validation:0",
+          "synthetic-validation:1",
+          "synthetic-validation:2",
+          "synthetic-validation:3"
+        ],
+        "identities": [
+          "synthetic-validation-A",
+          "synthetic-validation-A",
+          "synthetic-validation-B",
+          "synthetic-validation-B"
+        ],
+        "sources": [
+          "9001",
+          "9002",
+          "9001",
+          "9002"
+        ],
+        "pair_count": 6,
+        "positive_count": 2,
+        "intervals": [
+          [
+            12.0,
+            13.0
+          ],
+          [
+            0.0,
+            30.0
+          ],
+          [
+            2.0,
+            27.0
+          ],
+          [
+            3.0,
+            29.0
+          ]
+        ],
+        "observed_counts": [
+          0,
+          4,
+          2,
+          2
+        ],
+        "target_ids": [
+          "synthetic-validation-A",
+          "synthetic-validation-B"
+        ],
+        "input_adapter": "native_time_v1",
+        "max_observations": 4,
+        "time_unit_seconds": 20.0,
+        "time_origin_seconds": 0.0,
+        "native_observed_counts": [
+          2,
+          4,
+          2,
+          2
+        ]
+      }
+    ]
+  ],
+  "completed_routes": [
+    "plain",
+    "identity",
+    "utility",
+    "learned"
+  ],
+  "parameter_count": 3094,
+  "threshold": 1.9062421321868896,
+  "error_scales": [
+    0.0050679779005049636,
+    0.0021581473536331987,
+    0.15480310074413883,
+    1.5480310074413883
+  ],
+  "elapsed_seconds": 1.0631818750407547,
+  "identity_policy": "fixed s0 and one full-V threshold for every arm",
+  "ordinary_gate_features": "same frozen utility-trained query pool; fresh ordinary gate, no gain outputs",
+  "controls_missing_for_utility_attribution": [],
+  "selection_policy": "predetermined final updates",
+  "resume_supported": false
+}
