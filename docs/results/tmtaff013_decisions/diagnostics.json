@@ -1,0 +1,593 @@
+{
+  "schema": "tmtaff013_decision_diagnostics_v1",
+  "provenance": {
+    "source_directory": "HandOver/results/TMTAFF-TIME-COST-20261018-013",
+    "execution_version_record": "f25958a7c9786bdebc794a0b91d0e0e616a86b34",
+    "source_fields": [
+      "run.json",
+      "history.json",
+      "coverage.json",
+      "elapsed_seconds.txt",
+      "exit_code.txt"
+    ],
+    "procedure": "NumPy/stdlib arithmetic only; no model, ZIP, reference, checkpoint or T_test reads",
+    "source_status": "FAILED",
+    "source_exit_code": 124,
+    "test_opened": false
+  },
+  "calibration": {
+    "source_fields": [
+      "run.margin_calibration.samples",
+      "run.requested_model_config.margin"
+    ],
+    "scope": "T_core after TCM, before any TAM update; train/dropout TAM, eval frozen TCM; no_grad",
+    "before_requested_margin": {
+      "margin": 1.0,
+      "training_dtype_margin": 1.0,
+      "negative_strict_active_count": 0,
+      "negative_strict_active_fraction": 0.0,
+      "negative_ties_count": 0,
+      "positive_class_loss_mean": 35.86918849404901,
+      "negative_class_loss_mean": 0.0,
+      "positive_loss_contribution": 17.934594247024506,
+      "negative_loss_contribution": 0.0,
+      "total_loss_mean": 17.934594247024506,
+      "positive_dloss_dd_mean": 0.5,
+      "negative_dloss_dd_mean": -0.0,
+      "active_negative_dloss_dd_mean": null,
+      "negative_abs_to_positive_abs_derivative_ratio": 0.0,
+      "derivative_scope": "per-example d loss / d distance, not parameter gradient; batch mean divides by 64"
+    },
+    "after_calibrated_margin": {
+      "margin": 72.64158630371094,
+      "training_dtype_margin": 72.64158630371094,
+      "negative_strict_active_count": 1024,
+      "negative_strict_active_fraction": 0.5,
+      "negative_ties_count": 0,
+      "positive_class_loss_mean": 35.86918849404901,
+      "negative_class_loss_mean": 11.830892938418618,
+      "positive_loss_contribution": 17.934594247024506,
+      "negative_loss_contribution": 5.915446469209309,
+      "total_loss_mean": 23.850040716233813,
+      "positive_dloss_dd_mean": 0.5,
+      "negative_dloss_dd_mean": -3.065329099074006,
+      "active_negative_dloss_dd_mean": -6.130658198148012,
+      "negative_abs_to_positive_abs_derivative_ratio": 6.130658198148012,
+      "derivative_scope": "per-example d loss / d distance, not parameter gradient; batch mean divides by 64"
+    },
+    "distance_quantiles": {
+      "positive": {
+        "min": 59.599327087402344,
+        "p05": 61.59856548309326,
+        "p25": 64.53810119628906,
+        "median": 68.83987045288086,
+        "p75": 76.60988998413086,
+        "p95": 90.69665374755857,
+        "max": 115.15217590332031
+      },
+      "negative": {
+        "min": 59.377220153808594,
+        "p05": 62.4276216506958,
+        "p25": 66.42856025695801,
+        "median": 72.64158630371094,
+        "p75": 82.57422256469727,
+        "p95": 98.41464538574218,
+        "max": 131.0630645751953
+      }
+    },
+    "presentations": 4096,
+    "unique_pairs": 3927,
+    "duplicate_presentations": 169,
+    "unique_scenes": 116,
+    "positive_below_margin_fraction": 0.638671875,
+    "negative_below_positive_median_fraction": 0.37060546875,
+    "interpretation": "same pre-TAM-update distances under two margins; no before/after representation-performance comparison"
+  },
+  "population": {
+    "scenes": 512,
+    "valid_tracks": 54792,
+    "track_count_derivation": "sum n from each full canonical candidate count n*(n-1)/2 in run.sampling.association.scenes",
+    "all_candidate_pairs": 18249384,
+    "positive_pairs": 110733,
+    "negative_pairs": 18138651
+  },
+  "stage_coverage": {
+    "TCM": {
+      "unique_scenes": 88,
+      "scene_percent": 17.1875,
+      "unique_tracks": 127,
+      "track_percent_all_valid": 0.23178566214045845,
+      "unique_pairs": 0,
+      "all_candidate_percent": 0.0,
+      "unique_positive_pairs": 0,
+      "positive_pool_percent": 0.0,
+      "unique_negative_pairs": 0,
+      "track_presentations": 128,
+      "pair_presentations": 0,
+      "positive_pair_presentations": 0
+    },
+    "TAM_FROZEN": {
+      "unique_scenes": 4,
+      "scene_percent": 0.78125,
+      "unique_tracks": 99,
+      "track_percent_all_valid": 0.18068331143232588,
+      "unique_pairs": 110,
+      "all_candidate_percent": 0.0006027600712440486,
+      "unique_positive_pairs": 46,
+      "positive_pool_percent": 0.0415413652660002,
+      "unique_negative_pairs": 64,
+      "track_presentations": 99,
+      "pair_presentations": 128,
+      "positive_pair_presentations": 64
+    },
+    "TFM_FROZEN": {
+      "unique_scenes": 2,
+      "scene_percent": 0.390625,
+      "unique_tracks": 67,
+      "track_percent_all_valid": 0.1222806249087458,
+      "unique_pairs": 96,
+      "all_candidate_percent": 0.0005260451530857152,
+      "unique_positive_pairs": 96,
+      "positive_pool_percent": 0.0866950231638265,
+      "unique_negative_pairs": 0,
+      "track_presentations": 67,
+      "pair_presentations": 128,
+      "positive_pair_presentations": 128
+    },
+    "JOINT": {
+      "unique_scenes": 4,
+      "scene_percent": 0.78125,
+      "unique_tracks": 130,
+      "track_percent_all_valid": 0.2372609140020441,
+      "unique_pairs": 128,
+      "all_candidate_percent": 0.0007013935374476202,
+      "unique_positive_pairs": 64,
+      "positive_pool_percent": 0.057796682109217665,
+      "unique_negative_pairs": 64,
+      "track_presentations": 130,
+      "pair_presentations": 128,
+      "positive_pair_presentations": 64
+    }
+  },
+  "combined_coverage": {
+    "any_stage_unique_scenes": 96,
+    "any_stage_unique_tracks": 422,
+    "any_stage_track_percent": 0.7701854285297124,
+    "tcm_or_joint_gradient_unique_tracks": 256,
+    "tcm_or_joint_gradient_track_percent": 0.4672214921886407,
+    "association_gradient_unique_pairs": 238,
+    "association_gradient_all_candidate_percent": 0.0013041536086916686,
+    "fusion_gradient_unique_positive_pairs": 160,
+    "fusion_gradient_positive_pool_percent": 0.14449170527304417,
+    "all_stage_pair_presentations": 384,
+    "fusion_positive_pair_presentations": 192
+  },
+  "stage_diagnostics": [
+    {
+      "stage": "TCM",
+      "update": 1,
+      "loss": 1.0281217098236084,
+      "gradient_norm_pre_clip": 0.39025384187698364,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 1.0,
+      "seconds": 3.3055409658700228,
+      "learning_rate": 0.002
+    },
+    {
+      "stage": "TCM",
+      "update": 2,
+      "loss": 0.9708174467086792,
+      "gradient_norm_pre_clip": 0.3393247425556183,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 1.0,
+      "seconds": 1.4099284131079912,
+      "learning_rate": 0.002
+    },
+    {
+      "stage": "TAM_FROZEN",
+      "update": 1,
+      "loss": 23.270675659179688,
+      "gradient_norm_pre_clip": 209.82032775878906,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 0.004765982428469108,
+      "seconds": 11.637902947608382,
+      "learning_rate": 0.002
+    },
+    {
+      "stage": "TAM_FROZEN",
+      "update": 2,
+      "loss": 35.39971160888672,
+      "gradient_norm_pre_clip": 335.8480224609375,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 0.002977537249422908,
+      "seconds": 24.389792821835726,
+      "learning_rate": 0.002,
+      "selection": {
+        "threshold": -62.44205093383789,
+        "macro_f1": 0.37077052529632837,
+        "candidate_count": 28989,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      }
+    },
+    {
+      "stage": "TFM_FROZEN",
+      "update": 1,
+      "loss": 84.61626076698303,
+      "gradient_norm_pre_clip": 76648.34375,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 1.3046596326315969e-05,
+      "seconds": 146.4384768716991,
+      "learning_rate": 0.002,
+      "positive_pair_presentations": 64,
+      "query_positions_per_feature": 4096,
+      "valid_query_positions_per_feature": [
+        3988,
+        3988,
+        3988,
+        3988
+      ],
+      "supervision_percent_per_feature": [
+        97.36328125,
+        97.36328125,
+        97.36328125,
+        97.36328125
+      ],
+      "unique_endpoints": 19,
+      "completion_target_elements": 210176,
+      "fusion_component_losses": {
+        "lat": 20.03957787156105,
+        "lon": 131.22295796871185,
+        "vel": 11.386294454336166,
+        "cou": 1.0385118881240487
+      },
+      "loss_terms": {
+        "association": 0.0,
+        "weighted_completion": 0.0,
+        "fusion": 84.61626076698303
+      },
+      "scalar_loss_percent": {
+        "association": 0.0,
+        "weighted_completion": 0.0,
+        "fusion": 100.0
+      },
+      "raw_completion_loss": 0.0
+    },
+    {
+      "stage": "TFM_FROZEN",
+      "update": 2,
+      "loss": 79.33288100361824,
+      "gradient_norm_pre_clip": 74.159423828125,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 0.013484462727666,
+      "seconds": 149.724383873865,
+      "learning_rate": 0.002,
+      "positive_pair_presentations": 64,
+      "query_positions_per_feature": 4096,
+      "valid_query_positions_per_feature": [
+        2407,
+        2407,
+        2407,
+        2407
+      ],
+      "supervision_percent_per_feature": [
+        58.7646484375,
+        58.7646484375,
+        58.7646484375,
+        58.7646484375
+      ],
+      "unique_endpoints": 48,
+      "completion_target_elements": 203008,
+      "fusion_component_losses": {
+        "lat": 20.217136174440384,
+        "lon": 128.68199616670609,
+        "vel": 3.3168463557958603,
+        "cou": 1.2021351070143282
+      },
+      "loss_terms": {
+        "association": 0.0,
+        "weighted_completion": 0.0,
+        "fusion": 79.33288100361824
+      },
+      "scalar_loss_percent": {
+        "association": 0.0,
+        "weighted_completion": 0.0,
+        "fusion": 100.0
+      },
+      "raw_completion_loss": 0.0
+    },
+    {
+      "stage": "JOINT",
+      "update": 1,
+      "loss": 120.9590242136328,
+      "gradient_norm_pre_clip": 493.99591064453125,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 0.002024308251197792,
+      "seconds": 207.9526792736724,
+      "learning_rate": 0.0002,
+      "positive_pair_presentations": 32,
+      "query_positions_per_feature": 2048,
+      "valid_query_positions_per_feature": [
+        1262,
+        1262,
+        1262,
+        1262
+      ],
+      "supervision_percent_per_feature": [
+        61.62109375,
+        61.62109375,
+        61.62109375,
+        61.62109375
+      ],
+      "unique_endpoints": 77,
+      "completion_target_elements": 719360,
+      "fusion_component_losses": {
+        "lat": 15.405736029148102,
+        "lon": 126.41748297214508,
+        "vel": 2.1887988769449294,
+        "cou": 0.9995120763778687
+      },
+      "loss_terms": {
+        "association": 45.83496161783114,
+        "weighted_completion": 0.09360497994930483,
+        "fusion": 75.03045761585236
+      },
+      "scalar_loss_percent": {
+        "association": 37.89296575084744,
+        "weighted_completion": 0.07738569367423435,
+        "fusion": 62.029648555478325
+      },
+      "raw_completion_loss": 0.9360497994930483
+    },
+    {
+      "stage": "JOINT",
+      "update": 2,
+      "loss": 106.14118197773932,
+      "gradient_norm_pre_clip": 339.2653503417969,
+      "gradient_clip": 1.0,
+      "nominal_clip_factor": 0.0029475453241688044,
+      "seconds": 205.761514429003,
+      "learning_rate": 0.0002,
+      "positive_pair_presentations": 32,
+      "query_positions_per_feature": 2048,
+      "valid_query_positions_per_feature": [
+        1605,
+        1605,
+        1605,
+        1605
+      ],
+      "supervision_percent_per_feature": [
+        78.369140625,
+        78.369140625,
+        78.369140625,
+        78.369140625
+      ],
+      "unique_endpoints": 53,
+      "completion_target_elements": 340736,
+      "fusion_component_losses": {
+        "lat": 13.608965158462524,
+        "lon": 125.06630003452301,
+        "vel": 1.8498019110411406,
+        "cou": 1.0058142393827438
+      },
+      "loss_terms": {
+        "association": 32.76346320845187,
+        "weighted_completion": 0.09517892477451824,
+        "fusion": 73.28253984451294
+      },
+      "scalar_loss_percent": {
+        "association": 30.867814544710132,
+        "weighted_completion": 0.08967200383587196,
+        "fusion": 69.042513451454
+      },
+      "raw_completion_loss": 0.9517892477451824,
+      "selection": {
+        "threshold": -98.66802215576172,
+        "macro_f1": 0.3628350200715334,
+        "candidate_count": 28982,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      }
+    }
+  ],
+  "timing": {
+    "outer_seconds": 3579.0,
+    "run_seconds": 3567.7104976051487,
+    "calibration_seconds": 1498.0977249098942,
+    "training_seconds": 750.6202195966616,
+    "validation_seconds": 1112.8872226248495,
+    "failed_final_seconds": 79.3845950262621,
+    "run_unitemized_seconds": 126.72073544748127,
+    "outside_run_seconds": 11.289502394851297,
+    "calibration_plus_validation_percent_outer": 72.95291834408337,
+    "measured_seconds_by_stage": {
+      "TCM": [
+        3.3055409658700228,
+        1.4099284131079912
+      ],
+      "TAM_FROZEN": [
+        11.637902947608382,
+        24.389792821835726
+      ],
+      "TFM_FROZEN": [
+        146.4384768716991,
+        149.724383873865
+      ],
+      "JOINT": [
+        207.9526792736724,
+        205.761514429003
+      ]
+    },
+    "training_percent_outer": 20.972903593089175
+  },
+  "arithmetic_scenarios": {
+    "100_100_100_20": {
+      "updates": {
+        "TCM": 100,
+        "TAM_FROZEN": 100,
+        "TFM_FROZEN": 100,
+        "JOINT": 20
+      },
+      "training_seconds_by_stage": {
+        "TCM": [
+          140.99284131079912,
+          330.5540965870023
+        ],
+        "TAM_FROZEN": [
+          1163.7902947608382,
+          2438.9792821835726
+        ],
+        "TFM_FROZEN": [
+          14643.84768716991,
+          14972.4383873865
+        ],
+        "JOINT": [
+          4115.23028858006,
+          4159.053585473448
+        ]
+      },
+      "training_only_hours": [
+        5.57329475328378,
+        6.083618153230701
+      ],
+      "training_plus_single_measured_calibration_hours": [
+        5.989433010203195,
+        6.499756410150116
+      ],
+      "calibration_seconds_per_planned_update": 4.681555390343419,
+      "expected_access_percent": {
+        "TCM_tracks": 11.030239503296857,
+        "TAM_FROZEN_per_class_scenes": 17.75795214086142,
+        "TFM_FROZEN_per_class_scenes": 17.75795214086142,
+        "JOINT_per_class_scenes": 3.834613111588936
+      },
+      "validation_scenarios": {
+        "2": {
+          "frequency": 2,
+          "validation_passes": 60,
+          "validation_only_hours": [
+            9.215798818265709,
+            9.332321558815117
+          ],
+          "training_calibration_validation_hours": [
+            15.205231828468904,
+            15.832077968965233
+          ]
+        },
+        "20": {
+          "frequency": 20,
+          "validation_passes": 6,
+          "validation_only_hours": [
+            0.9215798818265709,
+            0.9332321558815116
+          ],
+          "training_calibration_validation_hours": [
+            6.911012892029766,
+            7.432988566031628
+          ]
+        },
+        "100": {
+          "frequency": 100,
+          "validation_passes": 2,
+          "validation_only_hours": [
+            0.3071932939421903,
+            0.3110773852938372
+          ],
+          "training_calibration_validation_hours": [
+            6.296626304145385,
+            6.810833795443953
+          ]
+        }
+      }
+    },
+    "90pct_expected_access_ladder": {
+      "updates": {
+        "TCM": 1971,
+        "TAM_FROZEN": 1178,
+        "TFM_FROZEN": 1178,
+        "JOINT": 1178
+      },
+      "training_seconds_by_stage": {
+        "TCM": [
+          2778.9689022358507,
+          6515.221243729815
+        ],
+        "TAM_FROZEN": [
+          13709.449672282673,
+          28731.175944122486
+        ],
+        "TFM_FROZEN": [
+          172504.52575486153,
+          176375.32420341298
+        ],
+        "JOINT": [
+          242387.06399736553,
+          244968.2561843861
+        ]
+      },
+      "training_only_hours": [
+        119.82778009076266,
+        126.83054932656982
+      ],
+      "training_plus_single_measured_calibration_hours": [
+        120.24391834768208,
+        127.24668758348923
+      ],
+      "calibration_seconds_per_planned_update": 0.27213400997454934,
+      "expected_access_percent": {
+        "TCM_tracks": 90.0099392987418,
+        "TAM_FROZEN_per_class_scenes": 90.00445844164241,
+        "TFM_FROZEN_per_class_scenes": 90.00445844164241,
+        "JOINT_per_class_scenes": 90.00445844164241
+      },
+      "validation_scenarios": {
+        "2": {
+          "frequency": 2,
+          "validation_passes": 1178,
+          "validation_only_hours": [
+            180.93685013195008,
+            183.22457993807012
+          ],
+          "training_calibration_validation_hours": [
+            301.18076847963215,
+            310.47126752155935
+          ]
+        },
+        "20": {
+          "frequency": 20,
+          "validation_passes": 118,
+          "validation_only_hours": [
+            18.124404342589227,
+            18.353565732336396
+          ],
+          "training_calibration_validation_hours": [
+            138.3683226902713,
+            145.60025331582563
+          ]
+        },
+        "100": {
+          "frequency": 100,
+          "validation_passes": 24,
+          "validation_only_hours": [
+            3.6863195273062836,
+            3.7329286235260466
+          ],
+          "training_calibration_validation_hours": [
+            123.93023787498836,
+            130.97961620701528
+          ]
+        }
+      }
+    }
+  },
+  "scenario_limitations": [
+    "Two observed, different-batch step times provide arithmetic endpoints, not confidence/prediction intervals.",
+    "Uses the original 013 implementation, hardware/load and microbatch configuration; no claimed speedup from future caches.",
+    "One measured calibration is amortized once; recalibration is not multiplied by training updates.",
+    "Final complete fusion/association evaluation cost is unknown; failed 79-second partial pass is not its total cost.",
+    "Preparation, IO/checkpoints and resource contention are excluded; arithmetic totals are not approved budgets.",
+    "Changing update counts or validation frequency changes training/selection protocol and needs an explicit plan.",
+    "90% ladder concerns expected TCM-track or per-class-scene access, not 90% pair coverage or convergence."
+  ],
+  "script_elapsed_seconds": 0.015071834030095488
+}

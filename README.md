@@ -2,9 +2,9 @@
 
 MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下，把补全、关联、融合一起做**：先完成TMTAFF的近似复现，再用同协议的候选预实验判断课题潜力。
 
-010的A0与011的CDF1、A_full、TSA-cTFER均已完成，真实结果仍是关联预实验。用户已批准并已实现**TMTAFF真实时间适配版**：原生观测时间与下一预测时刻进入TCM，保留原模型参数规模；真实ZIP/参考装配、四阶段训练/checkpoint、全目标融合评价与TSA原生输入适配已接通。完整原生三模块训练尚未启动，CPU合成集成通过不等于真实实验完成。
+010的A0与011的CDF1、A_full、TSA-cTFER均已完成，已有完整性能结果仍是关联预实验。用户已批准并已实现**TMTAFF真实时间适配版**：原生观测时间与下一预测时刻进入TCM，保留原模型参数规模；真实ZIP/参考装配、四阶段训练/checkpoint、全目标融合评价与TSA原生输入适配已接通。013已在真实数据上完成四阶段各2次更新，但在最终评价中超时，没有完整融合结果，也不是充分训练。
 
-`A_full`表示扩大关联训练池，不是完整论文系统；CDF1不是预定的最终创新。新路径拒绝旧scene64实际/名义时刻错位，不读取T_test。时间适配改变了模型函数，明确作为近似参考；见[时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[重构记录](docs/specs/complete-training-refactor.md)及[综合审计](docs/experiment_reaudit_20261018.md)。本地371项CPU测试通过；用户已确认方法/数据配置，并批准013单次最多1GPU小时成本测量。012原件回传和每六小时跟进继续。
+`A_full`表示扩大关联训练池，不是完整论文系统；CDF1不是预定的最终创新。新路径拒绝旧scene64实际/名义时刻错位，不读取T_test。时间适配改变了模型函数，明确作为近似参考；见[时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[重构记录](docs/specs/complete-training-refactor.md)及[综合审计](docs/experiment_reaudit_20261018.md)。自有共享补全/融合候选已实现并做CPU/MPS合成核验，未做真实候选训练。013的1小时额度已关闭；012原件已回传，每六小时跟进保持。
 
 ## 从这里开始
 
@@ -15,10 +15,10 @@ MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下�
 | 双端协作、修改与执行权限 | [AGENTS](AGENTS.md)、[现场授权](docs/server_autonomy.md) |
 | 论文对应、实现差异与数据协议 | [模型说明](docs/model_conformance.md)、[TSA适配](docs/tsactfer_adaptation.md)、[数据契约](docs/data_contract.md) |
 | 实际比较结果及证据边界 | [011结果分析](docs/results/compare011_interim/README.md)、[010结果](docs/first_fit_010_result.md) |
-| 完整配置与成本 | [配置与成本](docs/tmtaff_complete_plan.md)、[013已授权测量](HandOver/L2S-20261018-013.md)；正式训练预算未批 |
+| 完整配置与成本 | [013诊断](docs/results/tmtaff013_decisions/analysis.md)、[下一步具体方案](docs/proposals/tmtaff_after013/README.md)、[完整配置](docs/tmtaff_complete_plan.md)；新评价及正式训练预算待批 |
 | 命令说明与运行环境 | [执行协议](docs/pilot_execution.md)、[GPU执行](docs/gpu_execution.md) |
 
-**COMPARE-011三项均已完成。** A0/TSA/A_full的完整V_select分数已复算；CDF1汇总未显示收益，七臂逐边缓存仍待补回。012只复制既有CDF缓存、007 manifest和010完整history。013是用户新批准的单作业一次≤1GPU小时测量，含准备/校准/完整评价，失败不重试、不转正式训练；具体任务以[交接索引](HandOver/Handover.md)为准。发布不表示服务器已开跑，完整V_select用于开发比较，T_test继续封存。
+**COMPARE-011三项均已完成。** A0/TSA/A_full的完整V_select分数已复算；CDF1汇总未显示收益，012已补回七臂逐边缓存、007 manifest和010完整history。013已终态FAILED/124，最终评价运行79.38秒后中断；本地已实现冻结TFM步内补全复用与只加载选中检查点评价的入口，未授权补跑。具体状态以[交接索引](HandOver/Handover.md)为准。发布不表示服务器已开跑，完整V_select用于开发比较，T_test继续封存。
 
 ## 代码导航
 
@@ -34,7 +34,7 @@ MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下�
 | `association/metrics.py`、`pipeline.py` | 既有关联评价与pilot；后者包含测试阶段，当前不执行 |
 | `association/cli.py`、`profile.py` | 数据准备、单参考训练、成本探测和合成检查 |
 | `baselines/tsactfer.py`、`tsactfer_data.py`、`tsactfer_native.py` | TSA-cTFER双头与离线适配；新入口直接取原生真实观测，显式128点上限，不经过scene64 |
-| `tools/experiments/` | `tmtaff_complete_fit.py`原生检查/完整训练入口（须显式配置和reference时钟表）；CDF1与TSA工具保留 |
+| `tools/experiments/` | `tmtaff_complete_fit.py`完整训练、`tmtaff_complete_evaluate.py`仅评价已选检查点、`cooperative_fit.py`自有候选；均须遵守各自预算与数据范围；CDF1与TSA工具保留 |
 | `configs/`、`tests/`、`tools/pilot/` | 配置、测试、原有环境与ZIP审计工具 |
 | `HandOver/` | 每轮请求、回执与小型原始证据 |
 
