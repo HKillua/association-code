@@ -12,7 +12,7 @@ gap600下，训练和V缺监督查询分别有99.4657%/99.8439%来自查询超�
 
 训练正负eligible场景各512，但抽到场景不等于抽到全部轨迹。按原采样器做99%预期场景覆盖候选时，TFM实际仅见36,972/54,120条可正配对轨（68.31%）。模拟只解释抽样，不判断收敛或授权更新数。
 
-root独立核验576明细数、每feature互斥原因和有效计数加总、每cap保留＋省去点数、正负候选与轨迹求和，均一致。没有重新扫描CSV。用户已确认cap128/time_unit20/已核offset/gap600；新GPU额度仍待确认，见[完整决策稿](../../tmtaff_complete_plan.md)和[具体参数提案](../../proposals/tmtaff_first_cost_measurement/README.md)。
+root独立核验576明细数、每feature互斥原因和有效计数加总、每cap保留＋省去点数、正负候选与轨迹求和，均一致。没有重新扫描CSV。用户已确认cap128/time_unit20/已核offset/gap600；用户随后另批013单次最多1GPU小时测量，正式训练预算未批，见[完整决策稿](../../tmtaff_complete_plan.md)和[具体参数提案](../../proposals/tmtaff_first_cost_measurement/README.md)。
 
 本目录脚本保存实际分析来源，依赖其记录的原研究路径和先前时钟审计；不是新增服务器工具或重跑指令。首次失败日志保留，不覆盖旧回执/结果。
 

@@ -1,17 +1,18 @@
 {
-  "status": "CONFIGURED_NOT_AUTHORIZED",
+  "status": "AUTHORIZED_SINGLE_COST_RUN",
   "approved": [
     "native query-time TCM adaptation",
     "continuous SmoothL1 beta=0.001",
     "one-time training negative median margin policy",
-    "native cap128/time_unit20/fixed audited offsets/gap600 feature-wise reference mask"
+    "native cap128/time_unit20/fixed audited offsets/gap600 feature-wise reference mask",
+    "single job, one attempt, no retry, maximum one GPU-hour including preparation/calibration/validation/final evaluation and failures"
   ],
   "pending": [
-    "one attempt at most one GPU-hour including preparation/calibration/full validation/final fusion"
+    "full training update count and GPU budget after this measurement"
   ],
   "margin_placeholder_note": "model.margin=1 is constructor compatibility only; approved policy must replace it with the calibrated median before any TAM update; invalid calibration fails without fallback",
   "manifest_source": "runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json on the server; original full manifest not yet returned locally",
-  "execution_note": "Data and method parameters approved. Config files prepared for review; no READY, GPU authorization or real-input CLI run. Use the existing original manifest, not a reconstructed one.",
+  "execution_note": "Execute only from HandOver/L2S-20261018-013.md after server claims it. Use the existing original manifest. No real-input CLI or GPU measurement has run locally.",
   "resource_limit": {
     "gpu_hours": 1,
     "cpu_threads": 4,
@@ -22,7 +23,8 @@
     "timeout_kill_grace_seconds": 30,
     "shared_gpu_allowed": true
   },
-  "cost_note": "Maximum authorized allocation is still zero; 1 GPU-hour is a proposed cap, not predicted completion time. No full training duration estimate exists before measurement.",
+  "cost_note": "One GPU-hour is the approved maximum for this single attempt, not predicted completion time or a full training budget.",
   "configuration_file": "../../../configs/tmtaff-time-cost-probe.json",
-  "alignment_file": "../../../configs/tmtaff-time-reference-alignment.json"
+  "alignment_file": "../../../configs/tmtaff-time-reference-alignment.json",
+  "handover": "../../../HandOver/L2S-20261018-013.md"
 }

@@ -2,13 +2,14 @@
 
 这里保留当前入口与历史摘要。独立轮次文件保存命令与原始回执；旧轮次不重复领取。
 
-## 当前：EVIDENCE-012 / READY，仅回传已有文件
+## 当前：TMTAFF-TIME-COST-013 / READY
 
 | 请求 | 回执 | 下一责任方 |
 | --- | --- | --- |
-| [L2S-20261018-012](L2S-20261018-012.md) | 待服务器领取 | SERVER_AI：复制既有CDF缓存、007划分与010完整history |
+| [L2S-20261018-013](L2S-20261018-013.md) | 待服务器领取 | SERVER_AI：完整尺寸首次成本测量，单次累计≤1GPU小时，无重试 |
+| [L2S-20261018-012](L2S-20261018-012.md) | 仍待原件回传 | SERVER_AI：原取件请求保持有效，不重复领取、不训练 |
 
-本轮GPU预算0、CPU收集/核对最多10分钟，无重试；不训练、不重新推理、不prepare、不打开T_test量测/参考。完整融合计划仍为[配置与成本草案](../docs/tmtaff_complete_plan.md)，用户要求先看具体配置与成本再决定新增预算，12/24 GPU小时均未获批准。推送交接不代表服务器已经开始执行。
+用户已明确批准013：单作业一次，选卡、数据准备、64批margin校准、四阶段各2更新、完整V/融合评价和失败费用均计入1小时；正式训练预算未批。012仍为独立GPU0/CPU≤10分钟取件，不将其额度转给013，也不要求先将manifest复制到本地才能使用服务器原件。若服务器已领取其中一轮，按原记录收尾后才开始另一轮，不同时开两个执行闭环。推送不代表服务器已经开始执行。
 
 ## 011已完成与本地判读
 
@@ -31,7 +32,7 @@
 
 **用户已确认方法和数据配置：** 时间条件TCM、连续SmoothL1 beta=.001、TCM后seed21独立64×64训练负距离中位数一次校准、cap128/time_unit20/已核offset/gap600。校准已实现，checkpoint保存有效m、恢复不重校准；普通参考装配重复扫描和CLI配置预检已修复。全仓371项CPU测试通过，含合成原生四阶段/校准/完整评价/精确恢复；独立review通过。真实完整模型尚未训练，CPU测试不表示方法效果。
 
-[具体成本方案](../docs/proposals/tmtaff_first_cost_measurement/README.md)、[CLI配置](../configs/tmtaff-time-cost-probe.json)、[576场景对齐参数](../configs/tmtaff-time-reference-alignment.json)均已配齐并静态核对。四阶段各2更新＋64批校准＋完整V/融合评价，单次最多1GPU小时仍为**未批准资源提案**，不是预计耗时或训练充分性证据；没有新的训练READY。正式训练更新量和预算待测量后再决定。没有原件或新决定、无确定代码欠项时安静，不制造任务。
+[具体成本方案](../docs/proposals/tmtaff_first_cost_measurement/README.md)、[CLI配置](../configs/tmtaff-time-cost-probe.json)、[576场景对齐参数](../configs/tmtaff-time-reference-alignment.json)均已配齐并静态核对。四阶段各2更新＋64批校准＋完整V/融合评价，单次最多1GPU小时已获批准，013已READY；不是预计耗时或训练充分性证据。正式训练更新量和预算待测量后再决定。没有原件或新决定、无确定代码欠项时安静，不制造任务。
 
 两端取消SHA/hash/fingerprint判别；动态选择兼容GPU、允许共卡。新训练只从正式READY领取；当前012只回传文件。本地每6小时跟进，服务器负责现场监督。权限与流程见[AGENTS](../AGENTS.md)、[现场授权](../docs/server_autonomy.md)和[模板](TEMPLATE.md)。
 
