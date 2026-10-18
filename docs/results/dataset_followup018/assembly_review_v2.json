@@ -1,0 +1,586 @@
+{
+  "scope": "3 fixed V scenes only; raw native/reference CPU audit; no training/model/GPU/test",
+  "archive": "/Users/a1/Downloads/数据集level2.zip",
+  "selected_scenes": [
+    "1671",
+    "4038",
+    "4676"
+  ],
+  "test_opened": false,
+  "observation_members_read": [
+    {
+      "kind": "labels",
+      "scene_id": "1671",
+      "member": "数据集level2/关联表/关联结果-1671.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1671",
+      "member": "数据集level2/量测场景/场景-1671.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4038",
+      "member": "数据集level2/关联表/关联结果-4038.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4038",
+      "member": "数据集level2/量测场景/场景-4038.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4676",
+      "member": "数据集level2/关联表/关联结果-4676.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4676",
+      "member": "数据集level2/量测场景/场景-4676.csv"
+    }
+  ],
+  "reference_members_read": [
+    "数据集level2/真实场景/场景-1671.csv",
+    "数据集level2/真实场景/场景-4038.csv",
+    "数据集level2/真实场景/场景-4676.csv"
+  ],
+  "elapsed_seconds": 0.5773212500007503,
+  "self_extrapolation": {
+    "fragment_query_count": 3762,
+    "inside_count": 1243,
+    "outside_count": 2519,
+    "outside_fraction": 0.6695906432748538,
+    "over_10min_fraction": 0.5372142477405635,
+    "over_30min_fraction": 0.3176501860712387,
+    "over_60min_fraction": 0.1063264221158958,
+    "p50_p95_max_seconds": [
+      792.3174603174602,
+      4415.993650793651,
+      6354.278746010766
+    ],
+    "outside_only_p50_p95_max_seconds": [
+      1694.5238095238092,
+      4748.695238095237,
+      6354.278746010766
+    ]
+  },
+  "reports": [
+    {
+      "scene_id": "1671",
+      "selection": "fixed V indices 0,32,63",
+      "offset_seconds": 0.0,
+      "native_nodes": 18,
+      "canonical_points": 484,
+      "selected_points": 457,
+      "target_identities": [
+        "563116600-0",
+        "636020551-0",
+        "477276200-0",
+        "414053000-0"
+      ],
+      "reference_member": "数据集level2/真实场景/场景-1671.csv",
+      "reference_rows": 185,
+      "reference_issues": [],
+      "matches_and_points": {
+        "9001_points": 174,
+        "9001_exact_four_state_matches": 174,
+        "9001_matched_at_config_offset": 174,
+        "9002_points": 310
+      },
+      "exact_state_candidate_offsets": {
+        "0.0": 174
+      },
+      "input_contract_matches_018": true,
+      "reference_manual": {
+        "max_feature_difference": 2.842170943040401e-14,
+        "max_haversine_difference_m": 3.0606530689808945e-09,
+        "queries": {
+          "exact": 3,
+          "interior": 188,
+          "outside": 65
+        }
+      },
+      "packing_roundtrip": {
+        "normalizer_source": "014/013 saved same-protocol normalizer, std exactly equals018 error_scales; not018 checkpoint read",
+        "max_abs_state_error": [
+          2.903693641087557e-08,
+          3.334542952870834e-08,
+          6.095735992417417e-06,
+          6.209572505966321e-06
+        ],
+        "max_position_error_metres": 0.004438992618638915,
+        "max_native_time_error_seconds": 0.00029397010803222656,
+        "max_query_time_error_seconds": 0.0002983940976264421,
+        "query_observation_mask_all_false": true
+      },
+      "controls": {
+        "simple_fusion_oracle": {
+          "position": {
+            "available_target_count": 191,
+            "available_prediction_count": 188,
+            "intersection_count": 188,
+            "missing_prediction_count": 3,
+            "prediction_without_target_count": 0,
+            "coverage": 0.9842931937172775,
+            "available_target_trajectory_count": 4,
+            "covered_target_trajectory_count": 4,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 1736.7557050165456,
+            "mse": 3727615.939548017,
+            "rmse": 1930.703483072431,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 1736.7557050165456
+        },
+        "single_source:9001": {
+          "position": {
+            "available_target_count": 191,
+            "available_prediction_count": 177,
+            "intersection_count": 177,
+            "missing_prediction_count": 14,
+            "prediction_without_target_count": 0,
+            "coverage": 0.9267015706806283,
+            "available_target_trajectory_count": 4,
+            "covered_target_trajectory_count": 4,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 1.68834365759699e-09,
+            "mse": 6.011523366702051e-18,
+            "rmse": 2.4518408118599485e-09,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 1.68834365759699e-09
+        },
+        "single_source:9002": {
+          "position": {
+            "available_target_count": 191,
+            "available_prediction_count": 162,
+            "intersection_count": 162,
+            "missing_prediction_count": 29,
+            "prediction_without_target_count": 0,
+            "coverage": 0.8481675392670157,
+            "available_target_trajectory_count": 4,
+            "covered_target_trajectory_count": 4,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 3785.6418902037785,
+            "mse": 14600746.30040519,
+            "rmse": 3821.0922915319893,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 3785.6418902037785
+        }
+      },
+      "control_metric_max_difference_to_018": 2.523884177207947e-07,
+      "observed_semantics": {
+        "reference_valid_observed_identity_queries": 188,
+        "at_any_exact_canonical_native_time": 3,
+        "nearest_any_native_time_seconds_p50_p95_max": [
+          15.928571428571786,
+          61.90149368350472,
+          89.20634920634893
+        ],
+        "max_canonical_interpoint_gap": 379.0
+      },
+      "native_value_ranges_by_source": {
+        "9001": {
+          "min": [
+            19.367038,
+            131.258435,
+            0.577453,
+            1.233353
+          ],
+          "max": [
+            19.583493,
+            131.61698,
+            118.288204,
+            357.618907
+          ]
+        },
+        "9002": {
+          "min": [
+            19.345481,
+            131.236764,
+            2.038614,
+            1.558791
+          ],
+          "max": [
+            19.566622,
+            131.606394,
+            195.378341,
+            359.915773
+          ]
+        }
+      },
+      "self_extrapolation": {
+        "fragment_query_count": 770,
+        "inside_count": 339,
+        "outside_count": 431,
+        "outside_fraction": 0.5597402597402598,
+        "over_10min_fraction": 0.4155844155844156,
+        "over_30min_fraction": 0.17142857142857143,
+        "over_60min_fraction": 0.02987012987012987,
+        "p50_p95_max_seconds": [
+          223.30236512895618,
+          3104.622222222222,
+          5380.0
+        ],
+        "outside_only_p50_p95_max_seconds": [
+          1215.126984126984,
+          3687.166666666666,
+          5380.0
+        ]
+      }
+    },
+    {
+      "scene_id": "4038",
+      "selection": "fixed V indices 0,32,63",
+      "offset_seconds": 0.0,
+      "native_nodes": 31,
+      "canonical_points": 898,
+      "selected_points": 881,
+      "target_identities": [
+        "247293100-2",
+        "247580000-2",
+        "247388600-1",
+        "247086200-0",
+        "636018068-1",
+        "247185400-1"
+      ],
+      "reference_member": "数据集level2/真实场景/场景-4038.csv",
+      "reference_rows": 564,
+      "reference_issues": [],
+      "matches_and_points": {
+        "9001_points": 353,
+        "9001_exact_four_state_matches": 353,
+        "9001_matched_at_config_offset": 353,
+        "9002_points": 545
+      },
+      "exact_state_candidate_offsets": {
+        "0.0": 353
+      },
+      "input_contract_matches_018": true,
+      "reference_manual": {
+        "max_feature_difference": 2.842170943040401e-14,
+        "max_haversine_difference_m": 2.9989241728251833e-09,
+        "queries": {
+          "exact": 2,
+          "interior": 342,
+          "outside": 40
+        }
+      },
+      "packing_roundtrip": {
+        "normalizer_source": "014/013 saved same-protocol normalizer, std exactly equals018 error_scales; not018 checkpoint read",
+        "max_abs_state_error": [
+          2.637208851297146e-08,
+          3.448161578489817e-08,
+          1.2098134448024211e-05,
+          6.236484935584485e-06
+        ],
+        "max_position_error_metres": 0.004607851697980927,
+        "max_native_time_error_seconds": 0.00029778480529785156,
+        "max_query_time_error_seconds": 0.0002906436011471669,
+        "query_observation_mask_all_false": true
+      },
+      "controls": {
+        "simple_fusion_oracle": {
+          "position": {
+            "available_target_count": 344,
+            "available_prediction_count": 319,
+            "intersection_count": 319,
+            "missing_prediction_count": 25,
+            "prediction_without_target_count": 0,
+            "coverage": 0.9273255813953488,
+            "available_target_trajectory_count": 6,
+            "covered_target_trajectory_count": 6,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 1856.7725409659438,
+            "mse": 5570140.6023932425,
+            "rmse": 2360.114531626218,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 1856.7725409659438
+        },
+        "single_source:9001": {
+          "position": {
+            "available_target_count": 344,
+            "available_prediction_count": 273,
+            "intersection_count": 273,
+            "missing_prediction_count": 71,
+            "prediction_without_target_count": 0,
+            "coverage": 0.7936046511627907,
+            "available_target_trajectory_count": 6,
+            "covered_target_trajectory_count": 6,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 1.5034474989084196e-09,
+            "mse": 5.182714084561405e-18,
+            "rmse": 2.27655750741364e-09,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 1.5034474989084192e-09
+        },
+        "single_source:9002": {
+          "position": {
+            "available_target_count": 344,
+            "available_prediction_count": 220,
+            "intersection_count": 220,
+            "missing_prediction_count": 124,
+            "prediction_without_target_count": 0,
+            "coverage": 0.6395348837209303,
+            "available_target_trajectory_count": 6,
+            "covered_target_trajectory_count": 5,
+            "missing_target_trajectory_count": 1,
+            "trajectory_coverage": 0.8333333333333334,
+            "mae": 4463.383452418345,
+            "mse": 20049912.681245144,
+            "rmse": 4477.712885083762,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 4463.383452418345
+        }
+      },
+      "control_metric_max_difference_to_018": 4.0046870708465576e-07,
+      "observed_semantics": {
+        "reference_valid_observed_identity_queries": 319,
+        "at_any_exact_canonical_native_time": 2,
+        "nearest_any_native_time_seconds_p50_p95_max": [
+          14.142857142856883,
+          79.29841269841253,
+          229.87301587301585
+        ],
+        "max_canonical_interpoint_gap": 564.0
+      },
+      "native_value_ranges_by_source": {
+        "9001": {
+          "min": [
+            19.439796,
+            130.232701,
+            1.285851,
+            0.514476
+          ],
+          "max": [
+            20.166488,
+            131.734602,
+            200.69708,
+            357.98866
+          ]
+        },
+        "9002": {
+          "min": [
+            19.479924,
+            130.583198,
+            1.182665,
+            0.922093
+          ],
+          "max": [
+            20.204594,
+            131.75789,
+            959.044545,
+            359.677025
+          ]
+        }
+      },
+      "self_extrapolation": {
+        "fragment_query_count": 1788,
+        "inside_count": 493,
+        "outside_count": 1295,
+        "outside_fraction": 0.7242729306487695,
+        "over_10min_fraction": 0.598434004474273,
+        "over_30min_fraction": 0.37583892617449666,
+        "over_60min_fraction": 0.14093959731543623,
+        "p50_p95_max_seconds": [
+          1114.2142857142858,
+          4696.358683307963,
+          6354.278746010766
+        ],
+        "outside_only_p50_p95_max_seconds": [
+          1895.3174603174605,
+          4984.320131739737,
+          6354.278746010766
+        ]
+      }
+    },
+    {
+      "scene_id": "4676",
+      "selection": "fixed V indices 0,32,63",
+      "offset_seconds": 28.0,
+      "native_nodes": 25,
+      "canonical_points": 497,
+      "selected_points": 497,
+      "target_identities": [
+        "247319800-0",
+        "229490000-0",
+        "247183200-0",
+        "319015900-0",
+        "372123000-0",
+        "247296800-0"
+      ],
+      "reference_member": "数据集level2/真实场景/场景-4676.csv",
+      "reference_rows": 324,
+      "reference_issues": [],
+      "matches_and_points": {
+        "9001_points": 204,
+        "9001_exact_four_state_matches": 204,
+        "9001_matched_at_config_offset": 204,
+        "9002_points": 293
+      },
+      "exact_state_candidate_offsets": {
+        "28.0": 204
+      },
+      "input_contract_matches_018": true,
+      "reference_manual": {
+        "max_feature_difference": 2.842170943040401e-14,
+        "max_haversine_difference_m": 2.9991860285124366e-09,
+        "queries": {
+          "exact": 2,
+          "interior": 283,
+          "outside": 99
+        }
+      },
+      "packing_roundtrip": {
+        "normalizer_source": "014/013 saved same-protocol normalizer, std exactly equals018 error_scales; not018 checkpoint read",
+        "max_abs_state_error": [
+          1.4452353980232147e-08,
+          1.532006876914238e-08,
+          6.11605508993307e-06,
+          6.213565058033055e-06
+        ],
+        "max_position_error_metres": 0.0019244616502928152,
+        "max_native_time_error_seconds": 0.0002655982971191406,
+        "max_query_time_error_seconds": 0.0002906436011471669,
+        "query_observation_mask_all_false": true
+      },
+      "controls": {
+        "simple_fusion_oracle": {
+          "position": {
+            "available_target_count": 285,
+            "available_prediction_count": 256,
+            "intersection_count": 256,
+            "missing_prediction_count": 29,
+            "prediction_without_target_count": 0,
+            "coverage": 0.8982456140350877,
+            "available_target_trajectory_count": 6,
+            "covered_target_trajectory_count": 6,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 2104.7906602909316,
+            "mse": 7047711.112173291,
+            "rmse": 2654.752551966622,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 2104.790660290932
+        },
+        "single_source:9001": {
+          "position": {
+            "available_target_count": 285,
+            "available_prediction_count": 231,
+            "intersection_count": 231,
+            "missing_prediction_count": 54,
+            "prediction_without_target_count": 0,
+            "coverage": 0.8105263157894737,
+            "available_target_trajectory_count": 6,
+            "covered_target_trajectory_count": 6,
+            "missing_target_trajectory_count": 0,
+            "trajectory_coverage": 1.0,
+            "mae": 1.6009202072094628e-09,
+            "mse": 5.6399995329974164e-18,
+            "rmse": 2.374868319085801e-09,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 1.6009202072094626e-09
+        },
+        "single_source:9002": {
+          "position": {
+            "available_target_count": 285,
+            "available_prediction_count": 180,
+            "intersection_count": 180,
+            "missing_prediction_count": 105,
+            "prediction_without_target_count": 0,
+            "coverage": 0.631578947368421,
+            "available_target_trajectory_count": 6,
+            "covered_target_trajectory_count": 5,
+            "missing_target_trajectory_count": 1,
+            "trajectory_coverage": 0.8333333333333334,
+            "mae": 5225.4975984834755,
+            "mse": 27506730.56150252,
+            "rmse": 5244.685935449569,
+            "unit": "metres",
+            "earth_radius_metres": 6371000.0
+          },
+          "independent_haversine_mae": 5225.4975984834755
+        }
+      },
+      "control_metric_max_difference_to_018": 4.5821070671081543e-07,
+      "observed_semantics": {
+        "reference_valid_observed_identity_queries": 256,
+        "at_any_exact_canonical_native_time": 2,
+        "nearest_any_native_time_seconds_p50_p95_max": [
+          19.095238095238358,
+          77.2857142857141,
+          167.28571428571422
+        ],
+        "max_canonical_interpoint_gap": 532.0
+      },
+      "native_value_ranges_by_source": {
+        "9001": {
+          "min": [
+            19.519807,
+            130.603579,
+            0.170837,
+            1.696625
+          ],
+          "max": [
+            20.338788,
+            131.206567,
+            413.688702,
+            359.487529
+          ]
+        },
+        "9002": {
+          "min": [
+            19.590771,
+            130.845441,
+            0.105753,
+            0.313988
+          ],
+          "max": [
+            20.325683,
+            131.24295,
+            149.938663,
+            359.702391
+          ]
+        }
+      },
+      "self_extrapolation": {
+        "fragment_query_count": 1204,
+        "inside_count": 411,
+        "outside_count": 793,
+        "outside_fraction": 0.6586378737541528,
+        "over_10min_fraction": 0.5240863787375415,
+        "over_30min_fraction": 0.32475083056478404,
+        "over_60min_fraction": 0.10382059800664452,
+        "p50_p95_max_seconds": [
+          741.3017381486438,
+          4297.240476190476,
+          6099.380952380952
+        ],
+        "outside_only_p50_p95_max_seconds": [
+          1759.7619047619046,
+          4634.390476190476,
+          6099.380952380952
+        ]
+      }
+    }
+  ]
+}
