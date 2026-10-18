@@ -1,0 +1,144 @@
+{
+  "status": "PROPOSAL_CPU_EVIDENCE_ONLY",
+  "training_scene_count": 512,
+  "training_track_count": 54792,
+  "scale_tau": 360.0,
+  "scale_rule": "max(1, absolute maximum of valid native/query FP32 tau on T_core)",
+  "endpoint_maximum_equivalence": "native times monotone; cap retains first/last; queries included explicitly",
+  "time_unit_seconds": 20.0,
+  "count_quantiles": [
+    2.0,
+    27.0,
+    128.0
+  ],
+  "native_span_tau_quantiles": [
+    0.162567138671875,
+    73.59999465942383,
+    195.62673034667972,
+    360.0
+  ],
+  "synthetic_initial_head_comparison": [
+    {
+      "span_tau": 1.0,
+      "legacy": {
+        "identity_logit": 0.2060762345790863,
+        "identity_sigmoid": 0.5513375401496887,
+        "utility_min": -0.08476956933736801,
+        "utility_max": 0.1163160428404808,
+        "ordinary_logit_min": -0.005396369844675064,
+        "ordinary_logit_max": 0.1475851833820343
+      },
+      "proposed": {
+        "identity_logit": 0.08266468346118927,
+        "identity_sigmoid": 0.5206544399261475,
+        "utility_min": -0.10166167467832565,
+        "utility_max": 0.13963913917541504,
+        "ordinary_logit_min": -0.007033267989754677,
+        "ordinary_logit_max": 0.07596665620803833
+      }
+    },
+    {
+      "span_tau": 10.0,
+      "legacy": {
+        "identity_logit": 7.997054100036621,
+        "identity_sigmoid": 0.9996637105941772,
+        "utility_min": -1.3030478954315186,
+        "utility_max": 1.216435194015503,
+        "ordinary_logit_min": -0.10738644003868103,
+        "ordinary_logit_max": 1.9887700080871582
+      },
+      "proposed": {
+        "identity_logit": 0.0832238718867302,
+        "identity_sigmoid": 0.5207939743995667,
+        "utility_min": -0.10115254670381546,
+        "utility_max": 0.1376100331544876,
+        "ordinary_logit_min": -0.007023368030786514,
+        "ordinary_logit_max": 0.07722118496894836
+      }
+    },
+    {
+      "span_tau": 100.0,
+      "legacy": {
+        "identity_logit": 744.766357421875,
+        "identity_sigmoid": 1.0,
+        "utility_min": -13.409772872924805,
+        "utility_max": 11.71674919128418,
+        "ordinary_logit_min": -0.5971298217773438,
+        "ordinary_logit_max": 20.643177032470703
+      },
+      "proposed": {
+        "identity_logit": 0.09604673832654953,
+        "identity_sigmoid": 0.5239932537078857,
+        "utility_min": -0.0963091105222702,
+        "utility_max": 0.11688703298568726,
+        "ordinary_logit_min": -0.006832348182797432,
+        "ordinary_logit_max": 0.09132182598114014
+      }
+    },
+    {
+      "span_tau": 350.0,
+      "legacy": {
+        "identity_logit": 9089.744140625,
+        "identity_sigmoid": 1.0,
+        "utility_min": -47.19569778442383,
+        "utility_max": 40.97646713256836,
+        "ordinary_logit_min": -2.3967061042785645,
+        "ordinary_logit_max": 72.36251831054688
+      },
+      "proposed": {
+        "identity_logit": 0.1999019980430603,
+        "identity_sigmoid": 0.5498097538948059,
+        "utility_min": -0.08514832705259323,
+        "utility_max": 0.11328060925006866,
+        "ordinary_logit_min": -0.005473729223012924,
+        "ordinary_logit_max": 0.1450067013502121
+      }
+    },
+    {
+      "span_tau": 360.0,
+      "legacy": {
+        "identity_logit": 9616.193359375,
+        "identity_sigmoid": 1.0,
+        "utility_min": -48.54505920410156,
+        "utility_max": 42.14413070678711,
+        "ordinary_logit_min": -2.4677047729492188,
+        "ordinary_logit_max": 74.43109130859375
+      },
+      "proposed": {
+        "identity_logit": 0.2060762345790863,
+        "identity_sigmoid": 0.5513375401496887,
+        "utility_min": -0.08476956933736801,
+        "utility_max": 0.1163160428404808,
+        "ordinary_logit_min": -0.005396369844675064,
+        "ordinary_logit_max": 0.1475851833820343
+      }
+    },
+    {
+      "span_tau": 720.0,
+      "legacy": {
+        "identity_logit": 38437.9296875,
+        "identity_sigmoid": 1.0,
+        "utility_min": -97.15620422363281,
+        "utility_max": 84.17578125,
+        "ordinary_logit_min": -5.009006500244141,
+        "ordinary_logit_max": 148.87625122070312
+      },
+      "proposed": {
+        "identity_logit": 0.5165033340454102,
+        "identity_sigmoid": 0.626329779624939,
+        "utility_min": -0.2544216513633728,
+        "utility_max": 0.22813068330287933,
+        "ordinary_logit_min": -0.0017760545015335083,
+        "ordinary_logit_max": 0.2608364224433899
+      }
+    }
+  ],
+  "unchanged": "log1p(count); real temporal encoding; physical timestamps; speed output; losses; sampling",
+  "no_gpu_training_or_actual_model_inference": true,
+  "validation_or_test_used_for_scale": false,
+  "limitations": [
+    "Not fitted weights or real encoder features.",
+    "Reduced raw-time magnitude does not establish better accuracy or convergence.",
+    "Production model/config/CLI are not changed or authorized by this proposal."
+  ]
+}
