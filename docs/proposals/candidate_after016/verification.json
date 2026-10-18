@@ -1,0 +1,48 @@
+{
+  "status": "PASSED_CPU_ONLY",
+  "full_suite": {
+    "command": "python -m unittest discover -s tests -q",
+    "tests": 444,
+    "seconds": 16.284,
+    "exit_code": 0
+  },
+  "data_audit": {
+    "command": "python -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py' -q",
+    "tests": 15,
+    "seconds": 0.041,
+    "exit_code": 0
+  },
+  "new_time_scaling_tests": {
+    "tests": 8,
+    "seconds": 1.299,
+    "exit_code": 0,
+    "includes": "synthetic native ZIP full CLI fit, all four routes, prediction export and inference checkpoint load"
+  },
+  "production_shape_cpu": {
+    "parameters": 2156814,
+    "shape": [
+      64,
+      4
+    ],
+    "support_time_scaling": {
+      "policy": "train_absmax_v1",
+      "scale_tau": 1.5,
+      "fit_splits": [
+        "T_core"
+      ],
+      "training_scene_count": 1,
+      "training_track_count": 4,
+      "valid_native_time_count": 236,
+      "query_time_count": 256,
+      "scope": "packed FP32 input times only; fixed across all stages, arms and evaluation"
+    },
+    "gradient_tensors": 197,
+    "finite": true,
+    "seconds": 0.4217235410005742,
+    "optimizer_updates": 0
+  },
+  "independent_review": "implementation_review.md",
+  "server_command": "bash -n exit 0; not executed",
+  "cuda_executed_locally": false,
+  "real_MTAD_training_or_new_performance_result": false
+}

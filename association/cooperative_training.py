@@ -339,6 +339,45 @@ def training_configuration(config):
     return cfg
 
 
+def fit_support_time_scaling(train_scenes, packed, max_observations, check=None):
+    """Fit the declared MLP-only scale once from packed T_core FP32 times.
+
+    Physical states, labels, reference values and masked native padding never
+    enter the statistic. All query times are inputs, even outside native support.
+    This function neither modifies packed arrays nor normalizes encoder time.
+    """
+    if (not train_scenes or len(train_scenes) != len(packed)
+            or any(scene.get('split') != 'T_core' for scene in train_scenes)
+            or len({scene['scene_id'] for scene in train_scenes}) != len(train_scenes)):
+        raise ValueError('support time scale requires unique nonempty T_core scenes only')
+    if isinstance(max_observations, bool) or not isinstance(max_observations, int) or max_observations < 2:
+        raise ValueError('max_observations must be an integer >=2')
+    scale, tracks, native_count, query_count = 1., 0, 0, 0
+    for values, observed in packed:
+        if check:
+            check()
+        values, observed = np.asarray(values), np.asarray(observed)
+        if (values.dtype != np.float32 or values.ndim != 3 or values.shape[-1] != 5
+                or not len(values) or values.shape[1] <= max_observations
+                or observed.shape != values.shape[:2] or observed.dtype != np.bool_):
+            raise ValueError('support time scale requires packed FP32 values and boolean observation masks')
+        mask = observed[:, :max_observations]
+        if (mask.sum(1) < 2).any() or observed[:, max_observations:].any():
+            raise ValueError('support time scale requires >=2 native points and no observed query rows')
+        native_times = values[:, :max_observations, 4][mask]
+        query_times = values[:, max_observations:, 4]
+        if not np.isfinite(native_times).all() or not np.isfinite(query_times).all():
+            raise ValueError('support time scale requires finite valid native/query times')
+        scale = max(scale, float(np.abs(native_times).max()), float(np.abs(query_times).max()))
+        tracks += len(values)
+        native_count += native_times.size
+        query_count += query_times.size
+    return dict(policy='train_absmax_v1', scale_tau=scale, fit_splits=['T_core'],
+                training_scene_count=len(train_scenes), training_track_count=tracks,
+                valid_native_time_count=native_count, query_time_count=query_count,
+                scope='packed FP32 input times only; fixed across all stages, arms and evaluation')
+
+
 def _snapshot(model, objective, optimizer, normalizer, config, *, stage, route, updates):
     def cpu(state):
         if isinstance(state, torch.Tensor):
@@ -350,6 +389,7 @@ def _snapshot(model, objective, optimizer, normalizer, config, *, stage, route, 
         return state
     return dict(format='cooperative-physical-v1', model_config=asdict(model.config),
                 model_state=cpu(model.state_dict()), objective_state=cpu(objective.state_dict()),
+                support_time_scale_tau=float(model.support_time_scale),
                 optimizer_state=cpu(optimizer.state_dict()), normalizer=normalizer,
                 training=config, stage=stage, route=route, completed_updates=updates,
                 selection_policy='predetermined stage endpoint; no fusion selection on unchanged F1',
@@ -362,7 +402,8 @@ def load_cooperative_checkpoint(path, *, device):
     payload = torch.load(path, map_location='cpu', weights_only=True)
     if payload.get('format') != 'cooperative-physical-v1':
         raise ValueError('unsupported cooperative checkpoint')
-    model = CooperativeModel(CooperativeConfig(**payload['model_config']), payload['normalizer'])
+    model = CooperativeModel(CooperativeConfig(**payload['model_config']), payload['normalizer'],
+                             support_time_scale=payload.get('support_time_scale_tau'))
     model.load_state_dict(payload['model_state'], strict=True)
     if any(not torch.isfinite(p).all() for p in model.parameters()):
         raise ValueError('nonfinite model checkpoint')
@@ -471,7 +512,12 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
         torch.manual_seed(cfg['seed'])
         normalizer = fit_normalizer(train_scenes)
         packed = [normalize_scene(scene, normalizer) for scene in train_scenes]
-        model = CooperativeModel(model_config, normalizer).to(device)
+        if model_config.support_time_policy == 'train_absmax_v1':
+            scaling = fit_support_time_scaling(train_scenes, packed, model_config.max_observations, check=bounded)
+        else:
+            scaling = dict(policy='legacy', scale_tau=1., scope='historical unscaled hand-crafted tau features')
+        run['support_time_scaling'] = scaling
+        model = CooperativeModel(model_config, normalizer, support_time_scale=scaling['scale_tau']).to(device)
         objective = FusionLoss(position_loss_mode='standard_smooth_l1').to(device)
         teacher = None
         finish_phase()

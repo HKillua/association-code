@@ -26,6 +26,7 @@ class CooperativeConfig:
     dropout: float = .1
     head_hidden: int = 64
     gate_floor: float = 1e-3
+    support_time_policy: str = 'legacy'
 
     def __post_init__(self):
         for name in ('length', 'max_observations', 'd_model', 'nhead',
@@ -39,6 +40,8 @@ class CooperativeConfig:
             raise ValueError('dropout must be in [0,1)')
         if not math.isfinite(self.gate_floor) or not 0 < self.gate_floor < 1:
             raise ValueError('gate_floor must be in (0,1)')
+        if self.support_time_policy not in ('legacy', 'train_absmax_v1'):
+            raise ValueError('support_time_policy must be legacy or train_absmax_v1')
 
 
 def _head(inputs, hidden, outputs):
@@ -49,7 +52,7 @@ def _head(inputs, hidden, outputs):
 class CooperativeModel(nn.Module):
     input_adapter = 'native_time_v1'
 
-    def __init__(self, config: CooperativeConfig, normalizer: dict):
+    def __init__(self, config: CooperativeConfig, normalizer: dict, *, support_time_scale=None):
         super().__init__()
         self.config = config
         mean = torch.as_tensor(normalizer['mean'], dtype=torch.float32)
@@ -59,6 +62,19 @@ class CooperativeModel(nn.Module):
             raise ValueError('normalizer needs four finite means and positive scales')
         self.register_buffer('state_mean', mean.clone())
         self.register_buffer('state_std', scale.clone())
+        scaled_support = config.support_time_policy == 'train_absmax_v1'
+        if support_time_scale is None and not scaled_support:
+            support_time_scale = 1.
+        if (isinstance(support_time_scale, bool)
+                or not isinstance(support_time_scale, (int, float))
+                or not math.isfinite(support_time_scale) or support_time_scale < 1
+                or support_time_scale > torch.finfo(torch.float32).max
+                or (not scaled_support and support_time_scale != 1)):
+            raise ValueError('support_time_scale must be explicit finite >=1 for train_absmax_v1, or 1 for legacy')
+        # No new persistent key for historical checkpoints. The buffer carries
+        # no learnable parameters, consumes no RNG, and moves with the model.
+        self.register_buffer('support_time_scale', torch.tensor(support_time_scale, dtype=torch.float32),
+                             persistent=scaled_support)
         d = config.d_model
         self.input_projection = nn.Linear(4, d)
         self.encoder = nn.TransformerEncoder(nn.TransformerEncoderLayer(
@@ -71,7 +87,8 @@ class CooperativeModel(nn.Module):
         self.role_embedding = nn.Embedding(2, d)
         self.query_pool = nn.MultiheadAttention(d, config.nhead, dropout=0., batch_first=True)
         # Target/helper summaries, product, signed difference, and 4 support
-        # features per track. Support times are in the declared physical tau.
+        # features per track. Only these MLP features use the optional training
+        # scale; encoded physical tau and temporal sin/cos inputs stay intact.
         self.utility_head = _head(4 * d + 8, config.head_hidden, 4)
         self.ordinary_gate = _head(4 * d + 8, config.head_hidden, 4)
         identity_width = 2 * d + 8 + 4
@@ -89,6 +106,18 @@ class CooperativeModel(nn.Module):
                     nn.init.xavier_uniform_(module.in_proj_weight)
                 if module.in_proj_bias is not None:
                     nn.init.zeros_(module.in_proj_bias)
+
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        if self.config.support_time_policy == 'train_absmax_v1':
+            incoming = state_dict.get(prefix + 'support_time_scale')
+            expected = self.support_time_scale
+            if (not isinstance(incoming, Tensor) or incoming.shape != ()
+                    or not incoming.is_floating_point() or not torch.isfinite(incoming).all()
+                    or not torch.equal(incoming.to(expected), expected)):
+                raise ValueError('checkpoint support_time_scale disagrees with its declared training scale')
+        super()._load_from_state_dict(state_dict, prefix, local_metadata, strict,
+                                     missing_keys, unexpected_keys, error_msgs)
 
     def _validate_inputs(self, values: Tensor, observed: Tensor):
         m, q = self.config.max_observations, self.config.length
@@ -159,6 +188,8 @@ class CooperativeModel(nn.Module):
     def _query_support(self, encoded):
         first, last, count = self._support(encoded)
         queries = encoded['queries']
+        if self.config.support_time_policy == 'train_absmax_v1':
+            first, last, queries = (value / self.support_time_scale for value in (first, last, queries))
         return torch.stack((queries - first[:, None], last[:, None] - queries,
                             (last - first)[:, None].expand_as(queries),
                             count.log1p()[:, None].expand_as(queries)), dim=-1)
@@ -187,6 +218,8 @@ class CooperativeModel(nn.Module):
         pairs = self._pairs(encoded, pairs)
         left, right = encoded['pooled'][pairs[:, 0]], encoded['pooled'][pairs[:, 1]]
         first, last, count = self._support(encoded)
+        if self.config.support_time_policy == 'train_absmax_v1':
+            first, last = first / self.support_time_scale, last / self.support_time_scale
         support = torch.stack((first, last, last - first, count.log1p()), dim=-1)
         sl, sr = support[pairs[:, 0]], support[pairs[:, 1]]
         base = torch.cat(((left - right).abs(), left * right, (sl - sr).abs(), sl * sr), dim=-1)

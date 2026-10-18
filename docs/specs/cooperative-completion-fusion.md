@@ -1,5 +1,41 @@
 # Identity/utility candidate: local implementation contract
 
+## Approved amendment: train-only MLP time scaling (2026-10-18)
+
+The user approved the concrete [after016 proposal](../proposals/candidate_after016/README.md)
+and one new candidate run of at most 2 GPU hours, independent of baseline017.
+This amendment supersedes the initial implementation-only budget paragraph below
+for that single new run. It does not authorize retries or changes to baseline017.
+
+`CooperativeConfig.support_time_policy` defaults to `legacy`. Explicit
+`train_absmax_v1` computes `S=max(1,max(abs(tau)))` once on all valid native and
+query FP32 input times of T_core. Padding, four-state values, labels, reference
+and V do not fit S. Native/query times, sin/cos, support masks and physics stay
+unchanged; only hand-crafted MLP time coordinates are divided by S before
+differences/products. Count/log-count is unchanged; no clipping is introduced.
+
+The constructor takes keyword-only `support_time_scale`; the scaled policy
+requires a finite value >=1 and persists its scalar buffer. Run metadata stores
+`support_time_scaling`, checkpoint metadata stores `support_time_scale_tau`, and
+the loader checks the scalar buffer agrees before restoring weights. All frozen
+teachers and four arms share S by copying the model, never refitting on views or
+validation. Legacy snapshots without new fields retain unscaled behavior and
+their original state-dict keys. Invalid/missing/mismatched scaled metadata fails
+explicitly. Restoration remains inference-only; this does not add resume support.
+
+| Acceptance | Observable verification |
+| --- | --- |
+| S fitted only once on valid training input times | Counterfactual states/reference/padding; reject V; include all query times |
+| Only MLP temporal features change | Identical encoded times/semantics, summaries, physical support and plain decode at equal weights |
+| Old behavior retained | Missing-policy legacy checkpoint reload and old formula outputs |
+| Same S across teacher, utility and four arms | Tiny full pipeline snapshots/run metadata and restoration |
+| New metadata cannot silently disagree | Missing/nonfinite/mismatched scalar load failures |
+| Real entry point accepts approved policy | Synthetic native ZIP CLI fit with exported four-arm predictions |
+| No baseline changes | Production diff limited to candidate modules; full CPU regression suite |
+
+These checks establish software behavior, not a true MTAD improvement or a CUDA
+throughput measurement. The remaining sections describe the original contract.
+
 2026-10-18. User requested review followed by local CPU/GPU implementation. This authorizes the candidate implementation and bounded synthetic verification, not a new native-data/server training budget. Existing TMTAFF execution code/configuration and active 013 remain unchanged. Research rationale and sources: `/Users/a1/Projects/biye-ronghe/docs/plans/2026-10-18_complete_method_design/README.md`.
 
 ## Scope and behavior
