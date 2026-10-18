@@ -217,6 +217,8 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
 
     Pair streaming does not resample or discard supervision. Denominators are
     computed over the full batch before any backward/optimizer update.
+    Detached loss components are diagnostic sums: physical includes its
+    original variance regularizer; identity_bce and utility are separate.
     """
     if not items or not math.isfinite(gradient_clip) or gradient_clip <= 0:
         raise ValueError('nonempty batch and positive gradient clip required')
@@ -243,6 +245,7 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
         raise ValueError('no supervision for an effective-batch attribute; no resampling')
     optimizer.zero_grad(set_to_none=True)
     total, regularized, used = 0., False, 0
+    components = dict(physical=0., identity_bce=0., utility=0.)
     try:
         for item in items:
             if check:
@@ -252,13 +255,16 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
             if stage == 'adapt' and item['label'] != 1:
                 continue  # Same preselected positive batch for every fusion arm.
             encoded = model.encode(x, mask)
+            item_components = dict.fromkeys(components, None)
             if stage == 'utility':
                 e0, e1 = teacher_error_pair(teacher, x, mask, target, valid, scales=error_scales)
                 u = model.utility(encoded, pair)[0]
                 loss = utility_objective(u, e0, e1, valid, epsilon=utility_epsilon, normalization_counts=counts)
+                item_components['utility'] = loss
             elif stage == 'identity':
                 score = model.score_pairs(encoded, pair, use_utility=True)
                 loss = F.binary_cross_entropy_with_logits(score, score.new_tensor([item['label']])) / len(items)
+                item_components['identity_bce'] = loss
             else:
                 predicted, truths, masks = [], [], []
                 if stage == 'teacher':
@@ -271,13 +277,23 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
                                   normalization_counts=counts, regularizer_weight=0. if regularized else 1.)
                 regularized = True
                 loss = stats['total']
+                item_components['physical'] = loss
                 if stage == 'teacher':
                     score = model.score_pairs(encoded, pair, use_utility=False)
-                    loss = loss + F.binary_cross_entropy_with_logits(score, score.new_tensor([item['label']])) / len(items)
+                    identity_loss = F.binary_cross_entropy_with_logits(score, score.new_tensor([item['label']])) / len(items)
+                    loss = loss + identity_loss
+                    item_components['identity_bce'] = identity_loss
             if not torch.isfinite(loss):
                 raise FloatingPointError('nonfinite candidate objective')
             loss.backward()
-            total += float(loss.detach().cpu())
+            # One host transfer replaces the existing scalar loss transfer; no
+            # additional forward, RNG draw, backward or device synchronization.
+            detached = [loss.detach()] + [value.detach() if value is not None else loss.new_zeros(())
+                                         for value in item_components.values()]
+            values = torch.stack(detached).cpu().tolist()
+            total += values[0]
+            for key, value in zip(components, values[1:]):
+                components[key] += value
             used += 1
         if not used:
             raise ValueError('no effective training items')
@@ -288,7 +304,8 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
     except BaseException:
         optimizer.zero_grad(set_to_none=True)
         raise
-    return dict(stage=stage, routing=routing, loss=total, valid_counts=counts.cpu().tolist(),
+    return dict(stage=stage, routing=routing, loss=total, loss_components=components,
+                valid_counts=counts.cpu().tolist(),
                 gradient_norm=float(norm.detach().cpu()), sampled_pairs=len(items), used_pairs=used,
                 removed_observations=sum(sum(x['removed']) for x in items))
 

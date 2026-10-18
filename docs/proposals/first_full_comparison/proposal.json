@@ -1,6 +1,6 @@
 {
-  "status": "APPROVED_READY_015",
-  "current_ready_task": "HandOver/L2S-20261018-015.md",
+  "status": "COMPLETED_015_CLOSED",
+  "current_ready_task": null,
   "approval": {
     "date": "2026-10-18",
     "user_reply": "批准该配置及最多2 GPU小时（推荐）",
@@ -23,20 +23,34 @@
     "save_predictions": true
   },
   "pending": [
-    "015 server claim and measured candidate costs/results",
-    "Reference/candidate development update counts and selection protocol",
-    "Both development budgets after measured costs"
+    "Zero-GPU saved-array diagnosis and candidate numerical design review",
+    "Independent reference development update/selection/budget decision",
+    "Independent candidate development design/update/budget decision"
   ],
   "templates": {
     "reference": "reference-development.template.json",
     "candidate": "candidate-development.template.json"
   },
   "template_policy": "Budgets intentionally null; native CLI rejects before data. Reference now explicitly uses train_position_affine; old raw 100/100/100/20 proposal withdrawn after 014 diagnosis. Update counts remain unapproved discussion quantities.",
-  "cost_policy": "014 final evaluation measured 1757.91 s, total job 1902 s. Not a bound for new model/grouping; candidate CUDA cost still unmeasured. No old budget carried forward.",
+  "cost_policy": "015 measured 292 s. Candidate 600-update arithmetic 0.613–0.824 h, not a bound; reference known items 7.399–7.921 h plus preparation/IO. Proposed caps 2 h and 10 h unapproved; no old budget transferred.",
   "reference_output_correction": {
     "authorization": "User: 分析实验…如果你觉得找到了问题及直接改代码",
     "mode": "train_position_affine",
     "scope": "Local implementation/CPU verification only. Latitude/longitude conditioned with frozen training observation moments. Raw historical behavior remains. Candidate config unchanged.",
     "training_budget_approved": false
-  }
+  },
+  "completion": {
+    "exit_code": 0,
+    "elapsed_seconds": 292,
+    "completed_updates": 12,
+    "completed_routes": [
+      "plain",
+      "identity",
+      "utility",
+      "learned"
+    ],
+    "review": "../../results/cooperative015_local_review/README.md",
+    "unused_budget_transfers": false
+  },
+  "parallel_proposal": "../parallel_after015/README.md"
 }

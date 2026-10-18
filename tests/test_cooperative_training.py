@@ -171,10 +171,15 @@ class CooperativeTrainingTests(unittest.TestCase):
                 targets.append(item['target'][index % 2]); masks.append(item['valid'][index % 2])
             score = expected.score_pairs(encoded, [[0, 1]])
             identity.append(F.binary_cross_entropy_with_logits(score, score.new_tensor([item['label']])))
-        objective = expected_loss(torch.stack(predictions), torch.stack(targets), torch.stack(masks))['total']
-        objective = objective + torch.stack(identity).mean()
+        physical = expected_loss(torch.stack(predictions), torch.stack(targets), torch.stack(masks))['total']
+        identity_bce = torch.stack(identity).mean()
+        objective = physical + identity_bce
         ref_optimizer.zero_grad(set_to_none=True); objective.backward(); ref_optimizer.step()
         self.assertAlmostEqual(report['loss'], float(objective.detach()), places=5)
+        self.assertAlmostEqual(report['loss_components']['physical'], float(physical.detach()), places=5)
+        self.assertAlmostEqual(report['loss_components']['identity_bce'], float(identity_bce.detach()), places=5)
+        self.assertEqual(report['loss_components']['utility'], 0.)
+        self.assertAlmostEqual(sum(report['loss_components'].values()), report['loss'], places=5)
         self.assertEqual(report['valid_counts'], torch.stack(masks).sum((0, 1)).tolist())
         for name, value in actual.state_dict().items():
             torch.testing.assert_close(value, expected.state_dict()[name], rtol=2e-5, atol=2e-7)
@@ -189,8 +194,9 @@ class CooperativeTrainingTests(unittest.TestCase):
         with torch.no_grad():
             score_before = self.model.score_pairs(self.model.encode(item['values'], item['observed']), [[0, 1]])
         optimizer = self.optimizer(self.model, self.objective, 'utility')
-        train_batch(self.model, self.objective, optimizer, self.items(), stage='utility',
-                    teacher=teacher, error_scales=self.normalizer['std'])
+        report = train_batch(self.model, self.objective, optimizer, self.items(), stage='utility',
+                             teacher=teacher, error_scales=self.normalizer['std'])
+        self.assertEqual(report['loss_components'], dict(physical=0., identity_bce=0., utility=report['loss']))
         changed = []
         for key, value in self.model.state_dict().items():
             if not torch.equal(value, model_before[key]):
@@ -238,6 +244,11 @@ class CooperativeTrainingTests(unittest.TestCase):
                 run = train_cooperative([self.scene], [self.validation], self.config, self.fit_config(), out, device='cpu')
             self.assertEqual(run['status'], 'COMPLETED')
             self.assertEqual(run['completed_routes'], ['plain', 'utility', 'learned'])
+            history = json.loads((out / 'history.json').read_text())
+            for item in history:
+                self.assertAlmostEqual(sum(item['loss_components'].values()), item['loss'], places=5)
+                if item['stage'] == 'adapt':
+                    self.assertEqual(item['loss_components'], dict(physical=item['loss'], identity_bce=0., utility=0.))
             for route in ('utility', 'learned'):
                 self.assertEqual(sequences['plain'], sequences[route])
                 for key, value in initial['plain'].items():

@@ -2,7 +2,7 @@
 
 MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全、关联、融合**，以TMTAFF时间适配近似参考和自有候选的真实比较，判断课题潜力。
 
-完整参考与候选均已实现。014已经完成013短训检查点的完整评价；[独立分析](docs/results/tmtaff014_local_review/README.md)确认关联大量误并，并定位TFM原始坐标输出与短训量的尺度障碍。按用户最新授权加入[显式输出尺度修正](docs/specs/tmtaff-output-conditioning.md)，保留旧raw检查点行为。候选首次真实成本配置及最多2 GPU小时已批准，执行入口见[交接索引](HandOver/Handover.md)。目前没有充分训练的完整baseline或候选效果结论。
+完整参考与候选均已实现。014完成短训参考的完整评价并定位位置输出尺度问题，修正已通过CPU验证但尚未真实训练。015完成候选12次更新与四臂评价，实际292秒；[独立分析](docs/results/cooperative015_local_review/README.md)确认身份近随机、几乎全场合并，效用有短训位置改善但速度退化，尚不能认定机制有效。两条线按[并行方案](docs/proposals/parallel_after015/README.md)分别推进；新GPU训练量与预算尚未批准。当前只读CPU补件入口见[交接索引](HandOver/Handover.md)。
 
 **CDF1本轮无专属机制收益，活动训练实现已退役；负结果、原缓存、历史交接与Git历史保留。** TSA保留为独立关联诊断对照，不充当完整融合baseline，也不自动启动新训练。旧A0、A_full和TSA关联分数不与新时间适配实验混排；`A_full`不代表完整TMTAFF。见[研究说明](docs/research_brief.md)与[退役及后续路线](docs/decisions/retire_cdf1_and_focus.md)。
 
@@ -16,10 +16,10 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 | 原生时间、数据与参考监督 | [时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[数据契约](docs/data_contract.md)、[综合审计](docs/experiment_reaudit_20261018.md) |
 | 完整参考与候选实现 | [参考重构](docs/specs/complete-training-refactor.md)、[候选规格](docs/specs/cooperative-completion-fusion.md)、[候选核验](docs/results/cooperative_local_20261018/README.md) |
 | 既有实测与成本 | [012完整复算](docs/results/evidence012_local_review/README.md)、[013诊断](docs/results/tmtaff013_decisions/analysis.md)、[后续成本方案](docs/proposals/tmtaff_after013/README.md) |
-| 下一轮配置、覆盖与费用提案 | [完整任务比较方案](docs/proposals/first_full_comparison/README.md)：候选首次配置与≤2GPU小时已批准，014终态已核实；正式训练量/预算仍待确认 |
+| 下一轮配置、覆盖与费用提案 | [完整任务比较方案](docs/proposals/first_full_comparison/README.md)：015测量已完成并关闭；[新并行配置与成本](docs/proposals/parallel_after015/README.md)待决定 |
 | 当前执行入口 | [实验工具](tools/experiments/README.md)、[旧pilot说明](docs/pilot_execution.md) |
 
-014只评价短训模型，不代表充分训练。完整参考与候选的正式训练量、选模配置和总预算仍待确定；旧轮次额度关闭，T_test封存。TMTAFF时间适配改变了模型函数，明确称为近似参考，不能声称作者精确实现或把测试通过当作研究有效。
+014只评价短训参考，015是候选两步成本测量，均不代表充分训练。完整参考与候选的正式训练量、选模配置和总预算仍待确定；旧轮次额度关闭，T_test封存。TMTAFF时间适配改变了模型函数，明确称为近似参考，不能声称作者精确实现或把测试通过当作研究有效。
 
 ## 代码导航
 

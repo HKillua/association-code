@@ -1,0 +1,124 @@
+{
+  "scope": "independent CPU-only audit of existing 015/013/014 artifacts; no inference, raw ZIP or T_test access",
+  "source": "HandOver/results/COOPERATIVE-COST-20261018-015",
+  "exit_code": 0,
+  "outer_seconds": 292,
+  "outer_single_gpu_wall_hours": 0.0811111111111111,
+  "config_exact_content_match": true,
+  "history_updates": 12,
+  "stage_phase_count": 13,
+  "phase_seconds_sum": 279.00326308840886,
+  "run_elapsed_seconds": 279.00407301448286,
+  "phase_sum_residual_seconds": 0.0008099260739982128,
+  "phase_training_seconds": 54.544619797728956,
+  "history_training_seconds": 42.10064701316878,
+  "fixed_outer_remainder_seconds": 237.45538020227104,
+  "six_training_phases_overhead_seconds": 12.443972784560174,
+  "all_sampled64_used_teacher_utility64_adapt32": true,
+  "finite_losses_gradients": true,
+  "arms": {
+    "plain": {
+      "evaluation_seconds": 16.238967624958605,
+      "scene_count": 64,
+      "predictions_index_count": 64,
+      "metadata_count": 64,
+      "physical_npz_present_locally": 0,
+      "fusion_forward_count": 441
+    },
+    "identity": {
+      "evaluation_seconds": 17.087387692183256,
+      "scene_count": 64,
+      "predictions_index_count": 64,
+      "metadata_count": 64,
+      "physical_npz_present_locally": 0,
+      "fusion_forward_count": 441
+    },
+    "utility": {
+      "evaluation_seconds": 18.764454741962254,
+      "scene_count": 64,
+      "predictions_index_count": 64,
+      "metadata_count": 64,
+      "physical_npz_present_locally": 0,
+      "fusion_forward_count": 441
+    },
+    "learned": {
+      "evaluation_seconds": 16.382454961072654,
+      "scene_count": 64,
+      "predictions_index_count": 64,
+      "metadata_count": 64,
+      "physical_npz_present_locally": 0,
+      "fusion_forward_count": 441
+    }
+  },
+  "development600_estimate": {
+    "kind": "two-observation linear arithmetic, not confidence interval, cost upper bound, sufficient training or authorization",
+    "history_step_seconds": {
+      "teacher": {
+        "min": 6.662656622938812,
+        "mean": 7.80980583303608,
+        "max": 8.956955043133348
+      },
+      "utility": {
+        "min": 3.8517336947843432,
+        "mean": 3.8577184232417494,
+        "max": 3.8637031516991556
+      },
+      "adapt:plain": {
+        "min": 2.1559150707907975,
+        "mean": 2.216016130289063,
+        "max": 2.2761171897873282
+      },
+      "adapt:identity": {
+        "min": 2.0201040161773562,
+        "mean": 2.1494542420841753,
+        "max": 2.2788044679909945
+      },
+      "adapt:utility": {
+        "min": 2.4678638270124793,
+        "mean": 2.4906465159729123,
+        "max": 2.5134292049333453
+      },
+      "adapt:learned": {
+        "min": 2.4050747570581734,
+        "mean": 2.526682361960411,
+        "max": 2.6482899668626487
+      }
+    },
+    "formula": "outer_fixed_remainder + six_phase_overhead + 100 * sum(stage_step_seconds)",
+    "low_seconds": 2206.2341518630274,
+    "mean_seconds": 2354.9317036452703,
+    "high_seconds": 2503.6292554275133,
+    "whole_phase_scaled_seconds": 2964.686370088719
+  },
+  "reference320_old_timing_arithmetic": {
+    "updates": [
+      100,
+      100,
+      100,
+      20
+    ],
+    "stage_validation_count": 6,
+    "margin_calibration_once_seconds": 1498.0977249098942,
+    "training_calibration_stage_validation_seconds": [
+      24879.646411307156,
+      26758.75883771386
+    ],
+    "old014_final_evaluation_seconds": 1757.907114319969,
+    "including_old014_final_eval_hours": [
+      7.399320423785312,
+      7.921296097787175
+    ],
+    "omits": "preparation, checkpoint/report IO, startup/competition and changed-code effects; not candidate timings"
+  },
+  "retained_physical_npz": {
+    "count": 256,
+    "bytes": 39304143,
+    "source": "server_retained_inventory (server existence claim; arrays not locally inspectable)"
+  },
+  "new_budget_recommendation_only": {
+    "candidate_hours": 2,
+    "reference_hours": 10,
+    "total_gpu_hours": 12,
+    "approved": false
+  }
+}

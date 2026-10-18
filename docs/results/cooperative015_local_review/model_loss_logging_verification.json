@@ -1,0 +1,62 @@
+{
+  "scope": "CPU synthetic exact equivalence against source captured before logging-only change",
+  "tests": [
+    {
+      "stage": "teacher",
+      "route": "plain",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    },
+    {
+      "stage": "utility",
+      "route": "plain",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    },
+    {
+      "stage": "identity",
+      "route": "plain",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    },
+    {
+      "stage": "adapt",
+      "route": "plain",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    },
+    {
+      "stage": "adapt",
+      "route": "identity",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    },
+    {
+      "stage": "adapt",
+      "route": "utility",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    },
+    {
+      "stage": "adapt",
+      "route": "learned",
+      "updates": 2,
+      "dropout": 0.3,
+      "loss_and_original_report_exact": true,
+      "parameters_gradients_optimizer_rng_exact": true
+    }
+  ],
+  "new_real_training": false
+}
