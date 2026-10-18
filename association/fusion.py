@@ -24,6 +24,7 @@ class PairFusionConfig:
     num_layers: int = 6
     dim_feedforward: int = 256
     dropout: float = 0.1
+    output_parameterization: str = "raw"
 
     def __post_init__(self):
         for name in ("fc_hidden", "length", "d_model", "nhead", "num_layers",
@@ -35,6 +36,8 @@ class PairFusionConfig:
             raise ValueError("d_model must be divisible by nhead")
         if not math.isfinite(self.dropout) or not 0 <= self.dropout < 1:
             raise ValueError("dropout must be finite and in [0, 1)")
+        if self.output_parameterization not in ("raw", "train_position_affine"):
+            raise ValueError("output_parameterization must be raw or train_position_affine")
 
 
 class PairFusion(nn.Module):
@@ -44,12 +47,28 @@ class PairFusion(nn.Module):
     learned, initially zero BOS starts the decoder; subsequent inputs are its
     own latent outputs. There is no reference/teacher-forcing input. The state
     projection emits ``lat, lon, vel, cou`` in native units, using softplus for
-    nonnegative speed. This output constraint is an explicit adaptation.
+    nonnegative speed. Explicit train_position_affine maps only latitude/longitude
+    through fixed training input moments. Speed/heading retain the raw mapping.
+    These output choices are disclosed adaptations.
     """
 
-    def __init__(self, config: PairFusionConfig):
+    def __init__(self, config: PairFusionConfig, normalizer=None):
         super().__init__()
         self.config = config
+        if config.output_parameterization == "train_position_affine":
+            if not isinstance(normalizer, dict) or not {"mean", "std"}.issubset(normalizer):
+                raise ValueError("train_position_affine requires the training normalizer mean/std")
+            try:
+                mean = torch.as_tensor(normalizer["mean"], dtype=torch.float32, device="cpu").detach().clone()
+                std = torch.as_tensor(normalizer["std"], dtype=torch.float32, device="cpu").detach().clone()
+            except (TypeError, ValueError, RuntimeError, OverflowError) as error:
+                raise ValueError("train_position_affine requires four finite means and positive scales") from error
+            if (mean.shape != (4,) or std.shape != (4,) or not torch.isfinite(mean).all()
+                    or not torch.isfinite(std).all() or (std <= 0).any()):
+                raise ValueError("train_position_affine requires four finite means and positive scales")
+            # Raw checkpoints deliberately have no new state_dict keys.
+            self.register_buffer("position_mean", mean[:2].clone())
+            self.register_buffer("position_std", std[:2].clone())
 
         def encoder():
             layer = nn.TransformerEncoderLayer(
@@ -87,6 +106,25 @@ class PairFusion(nn.Module):
                 if module.in_proj_bias is not None:
                     nn.init.zeros_(module.in_proj_bias)
 
+    def validate_output_statistics(self, state_dict, *, prefix=""):
+        """Check a saved snapshot against the constructor's training moments."""
+        if self.config.output_parameterization == "train_position_affine":
+            # Normalizer metadata constructs the authoritative fixed statistics.
+            # Reject a contradictory snapshot before it can overwrite them.
+            for name in ("position_mean", "position_std"):
+                incoming = state_dict.get(prefix + name)
+                expected = getattr(self, name)
+                if (not isinstance(incoming, Tensor) or incoming.shape != (2,)
+                        or not incoming.is_floating_point() or not torch.isfinite(incoming).all()
+                        or not torch.equal(incoming.to(expected), expected)):
+                    raise ValueError(f"train_position_affine checkpoint {name} disagrees with its normalizer")
+
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        self.validate_output_statistics(state_dict, prefix=prefix)
+        super()._load_from_state_dict(state_dict, prefix, local_metadata, strict,
+                                     missing_keys, unexpected_keys, error_msgs)
+
     def _validate_features(self, values: Tensor):
         expected = (self.config.length, self.config.d_model)
         if values.ndim != 3 or tuple(values.shape[1:]) != expected:
@@ -122,6 +160,8 @@ class PairFusion(nn.Module):
             if step + 1 < self.config.length:
                 history = torch.cat((history, latent), dim=1)
         raw = self.state_projection(self.output_dropout(torch.cat(generated, dim=1)))
+        if self.config.output_parameterization == "train_position_affine":
+            raw = torch.cat((raw[..., :2] * self.position_std + self.position_mean, raw[..., 2:]), dim=-1)
         states = torch.cat((raw[..., :2], F.softplus(raw[..., 2:3]), raw[..., 3:]), dim=-1)
         if not torch.isfinite(states).all() or not torch.isfinite(memory).all():
             raise ValueError("fusion produced non-finite output")

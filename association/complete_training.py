@@ -236,7 +236,7 @@ def load_complete_snapshot(path, *, device='cpu', selected=True):
         model = AssociationModel(model_config, payload['config']['branch'])
     else:
         raise ValueError('unsupported checkpoint input adapter')
-    fusion = PairFusion(PairFusionConfig(**payload['fusion_config']))
+    fusion = PairFusion(PairFusionConfig(**payload['fusion_config']), payload['normalizer'])
     objective = FusionLoss(position_loss_mode=payload['config']['position_loss_mode'])
     _restore((model, fusion, objective), snapshot['states'])
     for module in (model, fusion, objective):
@@ -360,7 +360,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             raise ValueError('only an INTERRUPTED run can resume; failed runs are not automatic retries')
         saved = torch.load(previous / 'checkpoint.pt', map_location='cpu', weights_only=True)
         if (_configuration(saved['config']) != config or saved['model_config'] != asdict(model_config)
-                or saved['fusion_config'] != asdict(fusion_config) or saved['data_contract'] != contract
+                or asdict(PairFusionConfig(**saved['fusion_config'])) != asdict(fusion_config)
+                or saved['data_contract'] != contract
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
             raise ValueError('resume configuration, registered scene contract, normalizer or device differs')
         if calibrating:
@@ -393,8 +394,11 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     run = {'status': 'RUNNING', 'config': config, 'input_adapter': adapter,
            'requested_model_config': asdict(model_config), 'effective_margin': effective_margin,
            'margin_calibration': calibration,
-           'scope': ('TMTAFF time-adapted approximate reference' if adapter == 'native_time_v1'
+           'scope': (('TMTAFF time/output-scale-adapted approximate reference'
+                      if fusion_config.output_parameterization == 'train_position_affine'
+                      else 'TMTAFF time-adapted approximate reference') if adapter == 'native_time_v1'
                      else 'registered-data training kernel'),
+           'fusion_output_parameterization': fusion_config.output_parameterization,
            'selection_scope': 'association V_select macro-F1 only; not full-task optimality',
            'device': str(device),
            'resume_device_changed': saved is not None and saved['device'] != str(device),
@@ -440,7 +444,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         else:
             model = AssociationModel(replace(model_config, margin=effective_margin), config['branch'])
         modules = (model.to(device),
-                   PairFusion(fusion_config).to(device),
+                   PairFusion(fusion_config, normalizer).to(device),
                    FusionLoss(position_loss_mode=config['position_loss_mode']).to(device))
         model, fusion, objective = modules
         normalized = [normalize_scene(scene, normalizer) for scene in train_scenes]
@@ -449,6 +453,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                        for t, mask in enumerate(masks) if mask.sum() >= 2]
         optimizer, cache, parameters = None, None, None
         if saved is not None:
+            if selected is not None:
+                # A selected snapshot may not be loaded until final evaluation.
+                # Validate it before resuming any optimizer updates as well.
+                fusion.validate_output_statistics(selected['states'][1])
             _restore(modules, saved['states'])
             if cursor['stage'] < len(STAGES):
                 phase = STAGES[cursor['stage']]

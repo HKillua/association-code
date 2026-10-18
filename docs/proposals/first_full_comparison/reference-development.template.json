@@ -18,7 +18,8 @@
     "nhead": 8,
     "num_layers": 6,
     "dim_feedforward": 256,
-    "dropout": 0.1
+    "dropout": 0.1,
+    "output_parameterization": "train_position_affine"
   },
   "training": {
     "updates": {
