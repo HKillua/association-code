@@ -25231,6 +25231,13 @@
       "status": "COMPLETED",
       "seconds": 517.5531701180153,
       "selected_snapshot_copied": false
+    },
+    {
+      "stage": "TAM_FROZEN",
+      "update": 100,
+      "status": "COMPLETED",
+      "seconds": 520.7484567384236,
+      "selected_snapshot_copied": true
     }
   ],
   "validation_timing_scope": "current invocation; full scoring, threshold selection and selected snapshot CPU copy/metrics; excludes checkpoint I/O",
@@ -25242,10 +25249,10 @@
   "cuda_process_peak_reserved_bytes": 1241513984,
   "cuda_peak_reset_completed": true,
   "cuda_memory_scope": "current invocation, selected device, process PyTorch allocator peak since pre-model reset; includes existing live allocations/cache; not model-only, whole-device usage or cumulative across resume",
-  "elapsed_seconds": 5768.340215393808,
+  "elapsed_seconds": 9105.994538825937,
   "cursor": {
-    "stage": 1,
-    "update": 80,
-    "completed_updates": 180
+    "stage": 2,
+    "update": 20,
+    "completed_updates": 220
   }
 }
