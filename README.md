@@ -1,65 +1,40 @@
 # association-code
 
-MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全、关联、融合**，以TMTAFF时间适配近似参考和自有候选的真实比较，判断课题潜力。
+MTAD不完整量测下的**补全、关联、融合**研究。完整TMTAFF时间/输出尺度适配近似参考与自有候选并行验证，目标是得到可信的实验比较。
 
-完整参考与当前候选均已实现。**018已完成600更新/四臂完整评价，2371秒，退出0；[本地复核](docs/results/cooperative018_local_review/README.md)确认物理误差较短训下降，但关联总体仍弱、基础恢复误差大，效用尚无稳定专属收益。** 017仍独立运行：最新原件TCM100+TAM100+TFM60，关联选中macro-F1 .432985，尚无完整物理终评。用户要求三个阶段都精进，对应[新研究方案](docs/proposals/tri_stage_support/README.md)已结合数据复审具体化为[本地实现规格](docs/proposals/candidate_revision_after018/README.md)，用户已批准并完成本地实现与CPU验证（见[实现记录](docs/proposals/candidate_revision_after018/implementation.md)），尚无新GPU授权/READY，不改017或挪用018额度。实际入口见[交接索引](HandOver/Handover.md)。
+**首要目标是推进实验，弄清结果。** 不以代码量、测试数或文档量代替研究进展；必要正确性检查通过即推进已批实验，不反复增加框架与准备轮次。长期约定见[AGENTS](AGENTS.md)。
 
-**CDF1本轮无专属机制收益，活动训练实现已退役；负结果、原缓存、历史交接与Git历史保留。** TSA保留为独立关联诊断对照，不充当完整融合baseline，也不自动启动新训练。旧A0、A_full和TSA关联分数不与新时间适配实验混排；`A_full`不代表完整TMTAFF。见[研究说明](docs/research_brief.md)与[退役及后续路线](docs/decisions/retire_cdf1_and_focus.md)。
+## 当前状态
 
+- **017参考仍在执行**：最近回传260/320更新，关联macro-F1 .432985；尚无完整物理终评。活动独立目录冻结，实际状态以[交接索引](HandOver/Handover.md)及新回执为准。
+- **018候选已完成**：600更新、2371秒；基础恢复及关联仍弱，效用无稳定专属收益。见[实测分析](docs/results/cooperative018_local_review/README.md)。
+- **候选修正版已完成本地实现**：观测底座＋位置残差、log速度/圆周航向、支撑补全、局部关联与四臂属性残差融合；[规格与下一轮草案](docs/proposals/candidate_revision_after018/README.md)。尚无新GPU授权/READY，不把CPU检查当效果。
+- CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和原始交接保留。21分钟窗口未采用，当前先验证已实现修正版。
 
-实际输入支撑评价已接入两套完整流程：[实现与验证](docs/specs/input-support-evaluation.md)。候选修正版及本轮收尾通过491全仓＋15审计CPU测试；新统计不改主指标、不追加模型调用。新增GPU预算仍未批准，无新READY；017继续冻结任务。
+## 代码与资料
 
-
-## 从这里开始
-
-10月19日新增[外部MTAD公开处理对照](docs/results/external_mtad_processing20261019/README.md)：核了公开代码与论文时间任务。整场景Q64是我们的适配选择，缺少作者确切窗口依据；尚未证明读错原始数据，未据此改协议或开训。
-
-随后按用户要求落实[经度边界修复](docs/specs/longitude-boundaries.md)：参考插值和位置损失支持最短圆弧，新候选草案显式启用，旧配置保留原行为。仅合成边界复现，不能解释018实际低分。[训练侧时间分析](docs/results/time_task_analysis20261019/README.md)已完成：21分钟窗将排除37.49%原同身份片段对，当前推荐保留原任务验证已实现v2，不把切窗重构设为前置。[局部窗草案](docs/proposals/local_time_windows/README.md)保留为未采用备选，未改时间任务或发布新GPU任务。
-
-10月19日[数据与训练任务定点复审](docs/results/dataset_followup018/README.md)：查明速度字段/官方单位冲突、长时外推的任务条件及候选训练尺度风险；未发现需要立刻修改017的装配错误。分析保留原始标签和全部人口，没有新增实验。
-
-| 需要了解 | 入口 |
+| 目录 | 内容 |
 | --- | --- |
-| 当前任务与服务器回执 | [HandOver索引](HandOver/Handover.md) |
-| 研究目标、方法角色与下一步 | [研究说明](docs/research_brief.md)、[CDF1退役与路线](docs/decisions/retire_cdf1_and_focus.md) |
-| 双端协作与现场权限 | [AGENTS](AGENTS.md)、[现场授权](docs/server_autonomy.md)、[GPU说明](docs/gpu_execution.md) |
-| 原生时间、数据与参考监督 | [时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[数据契约](docs/data_contract.md)、[综合审计](docs/experiment_reaudit_20261018.md) |
-| 完整参考与候选实现 | [参考重构](docs/specs/complete-training-refactor.md)、[候选规格](docs/specs/cooperative-completion-fusion.md)、[候选核验](docs/results/cooperative_local_20261018/README.md) |
-| 既有实测与成本 | [012完整复算](docs/results/evidence012_local_review/README.md)、[013诊断](docs/results/tmtaff013_decisions/analysis.md)、[后续成本方案](docs/proposals/tmtaff_after013/README.md) |
-| 当前配置、覆盖与费用提案 | [完整任务比较方案](docs/proposals/first_full_comparison/README.md)：015测量已完成并关闭；[并行配置与成本](docs/proposals/parallel_after015/README.md)：017运行中，018已完成并关闭 |
-| 当前执行入口 | [实验工具](tools/experiments/README.md)、[旧pilot说明](docs/pilot_execution.md) |
+| `association/data/` | 原包读取、划分、原生时间输入、参考监督与候选输入 |
+| `association/models/` | TMTAFF、真实时间适配、物理融合与候选网络 |
+| `association/training/` | 两套完整训练、校准、采样和共享优化 |
+| `association/evaluation/` | 关联/物理指标、分组、人口覆盖、输入支撑和预测导出 |
+| `association/utils/` | 配置与运行产物处理 |
+| `baselines/` | TSA-cTFER独立关联适配 |
+| `tools/experiments/` | [四个实验入口](tools/experiments/README.md) |
+| `tests/` | 按数据、模型、训练、评价、集成分组的科研正确性检查 |
+| `configs/`、`HandOver/` | 实验配置、当前交接及原始回执/结果 |
 
-014只评价短训参考，015是候选两步成本测量，均不代表充分训练。完整参考与候选的正式训练量、选模配置和总预算仍待确定；旧轮次额度关闭，T_test封存。TMTAFF时间适配改变了模型函数，明确称为近似参考，不能声称作者精确实现或把测试通过当作研究有效。
+数据和方法从[数据契约](docs/data_contract.md)、[参考时间适配](docs/specs/tmtaff-time-adaptation.md)、[候选实现](docs/proposals/candidate_revision_after018/implementation.md)开始。当前结论与下一步见[研究说明](docs/research_brief.md)。清理前旧入口可在Git历史中追溯，不继续维护废弃执行路径。
 
-## 代码导航
-
-| 路径 | 用途 |
-| --- | --- |
-| `association/data.py`、`dataset.py`、`native_inputs.py` | 原包读取、身份隔离与既有划分；旧scene64只服务历史关联路径 |
-| `association/timed_inputs.py`、`timed_models.py`、`timed_dataset.py` | 已批准的原生真实时间输入、短轨保留和显式参考装配 |
-| `association/models.py`、`reference.py`、`staged.py` | TCM/TAM共享模型与既有关联训练、验证和缓存 |
-| `association/reference_states.py`、`fusion_targets.py`、`fusion.py`、`fusion_training.py` | 对齐参考、正配对监督、物理TFM及有效batch更新 |
-| `association/fusion_inference.py`、`fusion_metrics.py`、`full_scene_evaluation.py` | 分组与递归融合、物理误差、全目标及覆盖评价 |
-| `association/complete_training.py`、`complete_evaluation.py` | 完整参考四阶段训练/恢复与预测、真实分组、单源、简单融合评价 |
-| `association/cooperative.py`、`cooperative_training.py`、`cooperative_evaluation.py` | 共享补全/融合候选与固定身份的四臂机制比较 |
-| `association/prediction_artifacts.py`、`tools/analysis/compare_physical_predictions.py` | 可选保存实际物理预测；离线比较完整人口覆盖与共同有效点误差，保留改善/恶化案例索引 |
-| `association/metrics.py`、`runtime.py`、`sampling.py` | 共享指标、设备/产物处理与采样；保留历史结果只读复算能力 |
-| `association/cli.py`、`profile.py` | 保留prepare、train-reference、profile、probe-training；CDF run-pilot/smoke已移除 |
-| `baselines/tsactfer*.py` | TSA-cTFER离线关联适配与原生输入支持 |
-| `tools/experiments/` | 完整参考训练、仅评价、候选训练与TSA关联入口 |
-| `configs/`、`tests/`、`tools/pilot/`、`HandOver/` | 配置、测试、原生数据审计和独立轮次证据 |
-
-## 本地接口与检查
-
-安装项目依赖后可从仓库根查看接口并运行CPU测试：
+## 使用
 
 ```bash
-python -m association.cli --help
 python tools/experiments/tmtaff_complete_fit.py --help
 python tools/experiments/tmtaff_complete_evaluate.py --help
 python tools/experiments/cooperative_fit.py --help
+python tools/experiments/tsactfer_fit.py --help
 python -m unittest discover -s tests
-python -m unittest discover -s tools/pilot -p 'test_audit_mtad_level2.py'
 ```
 
-这些命令不授权真实训练或重跑已完成任务。历史交接保留原貌，旧预算、SHA准入或空闲整卡限制与现行授权冲突时，以用户最新指示和[AGENTS](AGENTS.md)为准。
+正式实验按[交接索引](HandOver/Handover.md)中的READY及已批预算运行。历史配置和回执用于追溯，不是重跑授权；T_test继续封存。

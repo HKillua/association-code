@@ -1,40 +1,54 @@
-# CDF1 data and registration contract
+# MTAD数据、时间与监督契约
 
-This is an independent **MTAD-Level2 A-B identity-pair pilot**. It is not the official MTAD V4 output protocol or a claim to reproduce every undocumented TMTAFF preprocessing choice.
+2026-10-19。当前完整参考与候选使用**Level2原生量测、显式reference监督及冻结划分**；它是已公开适配的开发协议，不是官方V4输出协议或作者未公开预处理的精确复现。执行入口与预算见[交接索引](../HandOver/Handover.md)，本文不授权训练。
 
-## Native data and identities
+## 原包、节点和标签
 
-`association/data.py` opens the native ZIP directly. It recognizes UTF-8 and legacy GBK member names and UTF-8-BOM/GB18030 CSV content. It rejects unsafe names, repeated ZIP members, ambiguous scene aliases, incompatible headers, and unequal label/measurement scene sets. Nothing is extracted. **Reference CSV members are never opened.** The archive's binary SHA-256 is computed for input provenance without parsing reference content.
+`association/data/archive.py`直接读取ZIP，支持UTF-8/GBK成员名和UTF-8 BOM/GB18030 CSV；拒绝不安全路径、重复成员、歧义场景、错误列及关联/量测场景集合不符，不解压原包。此关联reader不打开reference；完整流程通过独立的显式reference接口读取已指定训练/开发场景。
 
-A node is `(scene, source, batch)`. Exactly one full `A-B-C` label identity must describe the node; conflicting full labels quarantine it even if they share A-B. The supervised identity is **A-B**, and **A** is used for cross-scene leakage grouping. Full labels remain in audit records. Same-source fragments may be positive pairs. Source, batch, identity, label interval, and reference state are not motion features. Labels do not crop measurements to their interval: out-of-label-interval observations are a diagnostic count only.
+节点为`(scene, source, batch)`。每节点须有唯一完整A-B-C标签，冲突即隔离，即使A-B相同也不合并。监督身份为A-B；跨场景隔离用更宽的A。source、batch、identity、标签区间及reference不是运动特征。标签不裁切量测时间范围，同源不同片段可以为正对；完整候选为有效节点全部`i<j`，不按真值误差或时间难度删边。
 
-| Field | Declared representation | Validation / conversion |
-| --- | --- | --- |
-| time | Native elapsed seconds | Finite, at least two distinct timestamps per node; sorted |
-| lat / lon | Degrees | Finite, latitude within ±90 and longitude within ±180; no geodesic conversion |
-| vel | Native MTAD velocity | Finite and nonnegative; **no assertion or conversion to m/s or knots** |
-| cou | Degrees | -1 is missing; accepted range 0–360, 360 becomes 0; circular interpolation |
+| 字段 | 当前解释与清洗 |
+| --- | --- |
+| time | 原生秒，有限；排序后每轨至少两个不同真实时刻 |
+| lat / lon | 度，纬度±90、经度±180；不隐式改为米坐标 |
+| vel | 有限非负原值；输入、监督、输出评价均保留native单位，不单边换算 |
+| cou | 度；−1视为缺失，合法0—360，清洗后360转0；圆周语义 |
 
-Velocity's physical scale is not used to extrapolate positions or form a physics gate. All branches receive the same native value followed by their training-side normalizer. Physical fusion needs separately verified velocity units before it can be added.
+任一量测非数值/非有限、非法坐标/速度/航向、缺失或歧义标签、同刻冲突，会隔离整个节点。完全相同数值重复去除；只剩一个时刻不足以保留。冲突检查先于航向canonical化，同刻0/360不静默合并。隔离原因、原行、身份与正对覆盖变化保留；未知量测或缺节点不能不记账。
 
-Any nonfinite/nonnumeric measurement, negative velocity, missing/out-of-range course, invalid coordinates, missing/ambiguous label, or conflicting values at the same timestamp quarantines the **whole node**. Exactly repeated numeric observations are removed. A single remaining timestamp is insufficient. Same-time 0° and 360° observations are not silently merged: conflict checking precedes angular canonicalization. Quarantine records retain all applicable reasons, affected rows/identities, and positive identity-edge coverage before/after. Unknown measurements or missing measurement nodes are reported rather than silently omitted.
+官方指南与原论文的速度单位相冲突；8固定场景几何差分支持vel更接近节，但不是全库统一物理单位证明。当前没有量测/reference单边换算错误证据，速度尾部不自动删除，也不把速度直接用于未经核验单位的运动学门限。见[数据复查](results/dataset_followup018/README.md)。
 
-## Split isolation and provenance
+## 冻结划分与已知数据暴露
 
-`build_manifest(archive, seed, caps, development_scenes)` reads every association table and connects any two scenes sharing **A**, transitively. Components containing one of the 71 development anchors are assigned to `T_core`. The remaining components are sorted by SHA-256 of `seed:comma-separated-numerically-sorted-scene-ids`, then cyclically assigned to `T_core`, `T_head`, `V_select`, `T_test`. Components cannot be split to increase evaluation sample counts.
+继续复用007原manifest：T_core512、T_head128、V_select64、T_test128；当前完整任务只装配T_core/V_select。任何两场景若共享A，按传递连通组件归同一角色，不能拆组件增加验证量。组件/场景用既有seed排序和cap选择，未选场景不迁移。历史hash排序是原划分算法的一部分；保存的SHA/hash/fingerprint仅为旧来源字段，**不设匹配准入门槛**。核真实角色、组件、场景和内容，缺hash不拒绝。
 
-Within each side, scenes are sorted by SHA-256 of `seed:scene-id` and limited by its cap. Unselected scenes remain assigned to that side; they cannot migrate to another split. Development components are always training-side, though a hash cap may leave individual previously seen scenes unselected. The manifest saves all component membership and assignment, selected IDs, component counts and largest selected component size, every label member's SHA-256, archive SHA-256, portable archive basename, units, registration policy, and its own canonical-content SHA-256. `validate_manifest` checks the actual split/component structure and rejects assignment inconsistencies. SHA/hash/fingerprint fields are historical provenance metadata, not admission or validation gates; missing or changed hashes do not reject otherwise valid data. The seeded hash sorting used to reproduce the existing split is unchanged. Build-time coverage is all labels only; selected input/node/edge coverage must be recorded during preprocessing, not invented from labels.
+开发锚点共71个：原53个`0,1,2,100,200,…,4900,4999`，加Level1 scene0初次预览所关联的18个Level2场景：`133,878,938,1174,1214,1372,1443,1853,1929,2052,2244,2697,3048,3670,3839,4576,4682,4731`。其共享A组件保守归训练。预览暴露已记录，旧缺锚点manifest不能作为新实验冻结划分；历史结果不改写。
 
-The original 53 development scenes are `0,1,2,100,200,…,4900,4999`. The additional 18 Level2 anchors share A identities with Level1 scene 0, previewed during intake; their provenance and exact IDs are in [Level1 intake](level1_intake.md). These 18 Level2 scenes were not themselves opened as measurement/reference data. Their entire connected component is nevertheless forced to training. A pre-intake manifest omitting these anchors is rejected by `validate_manifest_config`; create a new manifest/output rather than editing old results. Labels themselves are allowed for split construction; no measurements from unselected test scenes are inspected by manifest creation. A-B identity groups necessarily remain within the broader shared-A components.
+两level均5000场景，关联标签中26,221个A跨level共享，同编号场景A集合不相同；level名称不证明难度、独立性或训练/测试角色。Level1分卷需作为一个ZIP读取，不分卷独立解压；当前不授权合并level。原始统计见[Level1摘要](level1_intake_summary.json)、[隔离复核](level1_isolation_verification.json)。T_test量测、reference和预测继续封存；构建/核对隔离所需标签元数据不等于打开其模型评价。
 
-## Explicit 64-token temporal registration
+## 原生输入与共同物理时间
 
-Policy name: **`scene64-quantized-endpoints-in-support-v1`**.
+`native_inputs.py`保留有效片段真实点；`timed_inputs.py`按显式cap均匀选原点，保首尾，不先投共同64格。当前cap128，保留全部54,792条训练有效轨，但只保留78.62%原始训练点；“保轨”不等于“保全部点”。短轨在Q64无/仅一个支撑时刻仍保留至少两个真实native点。
 
-A common nominal scene grid runs from the earliest to latest valid measurement. For each track, its support start/end map to the floor/ceil nominal-grid positions; at least two distinct slots are reserved. Actual sample times are then spaced uniformly **within that track's actual support**, with both endpoints exact, and assigned to those contiguous slots. Lat/lon/velocity use linear interpolation. Course is unwrapped along the shortest angular arc before interpolation and wrapped to [0°,360°) afterward. No coordinate is extrapolated beyond observed support.
+当前共同Q64为场景全部有效canonical片段最早/最晚观测间的linspace，原点为最早观测；不使用reference可用性决定窗口。`tau=(t-origin)/20`中的20秒是编码尺度，不是原采样周期或固定查询步长。实际query、原生点、reference监督统一物理时钟，位置和mask按真实时刻计算。原生物理状态先插值再归一化；训练统计仅从训练侧可见native点拟合，V不重fit。
 
-This is an explicit temporal quantization/time-warp approximation. `observed=True` means “this token contains a real or interpolated **in-support value**”; it **does not mean** the value occurred at the nominal slot's timestamp. `observation_times[N,L]` records actual sampling times, with NaN outside support slots. The nominal `grid[L]` is separate. Inputs outside the support slots are zero placeholders for embedding-space completion; the observed mask controls their use.
+TCM显式接收原生时间与下一预测时刻，共同query支持内插值、支持外双向递推。详见[时间适配规格](specs/tmtaff-time-adaptation.md)。整场景窗口是我们的工程适配，论文未公开可还原窗长；[时间分析](results/time_task_analysis20261019/README.md)没有证明它最优，也不将21分钟切窗作为当前前置。
 
-The policy retains short fragments that would otherwise have zero/one samples on a fixed 64-point scene grid. Each retained track has at least two true endpoint anchors, without extending its actual temporal support. The audit records per-track endpoints and occupied slots, number of nominal points inside actual support, maximum absolute actual-versus-nominal time displacement, and the number of short-support tracks. The model consumes quantized positions; actual times are diagnostic metadata, not an additional model feature in v1. All reference branches and correction arms share exactly this policy. It is a pragmatic implementation interpretation, **not an author-verified TMTAFF registration**.
+旧`scene64-quantized-endpoints-in-support-v1`只服务历史A0/A_full/CDF/TSA产物：每轨按自身首尾内插值，放在量化后的名义槽，实际与名义时刻可能不同，旧模型不读实际时刻。不得把旧缓存直接接作当前严格时间监督，或混排新旧分数。失配证据与修正经过见[历史摘要](history/README.md)。
 
-The normalizer must fit only observed values in the applicable reference's training material (`T_core`, or `T_core ∪ T_head` for `A_full`), then remain frozen. Evaluation data never determines its moments. The resampler performs no normalization itself.
+## 显式reference与合法监督
+
+`reference_states.read_reference_states`只读调用方明确列出的T_core/T_head/V_select场景，拒绝T_test和跨划分请求；原列为`MMSI,time,lat,lon,vel,cou`。保留原行序、行号、字段字符串和问题记录，不在reader中移动时钟、插值、造量测或自动修复冲突。完整trainer现已接入该接口，原“未接入CLI”状态已过时。
+
+`align_reference_states`用显式`raw_time - offset`对齐；576个场景offset已逐场景核验并固化，不能由运行时预测误差重新选。每个query按身份/属性独立mask：精确时刻合法才监督；否则只在相邻参考时刻gap≤600且两端属性均合法、无冲突时插值。不外推真值，不跨无效端点，不因缺监督删身份或重抽配对。航向最短弧、180°歧义无效；经度默认历史linear与新显式shortest_arc分别记录，见[经度边界](specs/longitude-boundaries.md)，017不自动改变。
+
+gap600是用户已批准的首轮规则，可能平滑转弯，不是作者参数或“真实运动必线性”的证明。训练监督覆盖76.7648%、V76.1107%（lat/lon/vel）；约23%缺口绝大多数是query超出该身份实际reference支撑，而非整份真值缺失。目标总人口仍包含无有效节点/参考的标签身份，漏预测留在覆盖分母。完整[时钟/输入/监督证据](results/frozen_input_audit_20261018/README.md)已完成，无须重复扫描。
+
+reference只用于监督、开发评价和已披露离线审计，不进模型forward、推理分组或门控。9001在已审576场景的1,112,337个唯一匹配点四状态与reference相同，限制已有观测降噪主张；不是网络预测成绩或全库无噪声结论。
+
+## 评价与结论边界
+
+预测分组只用实际分数/阈值，不用真实身份修补；oracle、单源、简单融合单独标明。全人口覆盖与共同有效点误差同时报告，已观测/缺失主指标不变；[新增输入支撑/距离诊断](specs/input-support-evaluation.md)只看实际cap后可见输入及组成员，不参与选模。
+
+mPCA为场景平均召回；当前p_fa是1−precision，不是FP/(FP+TN)。V仅开发，不能将论文原表数字与不同协议混排。新增表示/训练分布、划分标签、指标选模或测试使用的改变按用户决定；本文与CPU审计不扩大预算。

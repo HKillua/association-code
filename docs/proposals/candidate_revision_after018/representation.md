@@ -1,6 +1,6 @@
 # 候选修正版：可见观测底座与输入／输出表示规格
 
-2026-10-19。状态：**用户已批准并完成本地实现；未进行真实训练，无新增GPU授权。** 本文件只固定表示和物理输出，与主方案的支撑查询、局部身份残差、属性路由融合合并。既有017与历史018均不修改。依据是当前 `association/cooperative.py`、`cooperative_training.py`、`cooperative_evaluation.py`、`fusion.py` 与 `docs/results/dataset_followup018/README.md`；不新增文献检索或原ZIP扫描。
+2026-10-19。状态：**用户已批准并完成本地实现；未进行真实训练，无新增GPU授权。** 本文件只固定表示和物理输出，与主方案的支撑查询、局部身份残差、属性路由融合合并。既有017与历史018均不修改。依据是当前 `association/models/cooperative.py`、`cooperative_training.py`、`cooperative_evaluation.py`、`fusion.py` 与 `docs/results/dataset_followup018/README.md`；不新增文献检索或原ZIP扫描。
 
 ## 1. 一套最小而完整的推荐
 
@@ -90,9 +90,9 @@
 
 | 文件 | 所需变化 |
 |---|---|
-| `association/cooperative.py` | representation版本字段；候选打包helper；五维输入；可见位置底座；新速度buffer／输出；按行初始化；checkpoint旧新分支 |
-| `association/cooperative_training.py` | 已加载训练native拟合log统计；候选打包；保存统计／版本；新结构参数白名单；teacher与四臂保持相同初始化与统计 |
-| `association/cooperative_evaluation.py` | 调用同一候选打包helper；检查保存的表示统计，V不refit；物理输出、mask及指标不变 |
+| `association/models/cooperative.py` | representation版本字段；候选打包helper；五维输入；可见位置底座；新速度buffer／输出；按行初始化；checkpoint旧新分支 |
+| `association/training/cooperative.py` | 已加载训练native拟合log统计；候选打包；保存统计／版本；新结构参数白名单；teacher与四臂保持相同初始化与统计 |
+| `association/evaluation/cooperative.py` | 调用同一候选打包helper；检查保存的表示统计，V不refit；物理输出、mask及指标不变 |
 | 现有cooperative模型／训练／评价／CLI测试与规格 | 补以下行为测试；保存旧legacy模式与checkpoint读取测试 |
 
 不需要修改 `FusionLoss`、原生ZIP装配、reference插值、共享TMTAFF模型或017配置。候选表示新增可学习参数只有input_projection从4→5维的**D=128个**；状态输出维仍4，底座及统计无可学习参数。018的2,156,814基准对应2,156,942（仅此表示改动的算术估计）。三阶段支撑query另+640，融合W_c另+16,384；局部身份支路由主方案单独计数，不混称已实测总参数／GPU耗时。

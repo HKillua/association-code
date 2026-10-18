@@ -1,6 +1,6 @@
 # TSA-cTFER 离线表征与成对评分适配
 
-本实现已完成011离线baseline首训，完整V分数已复算；本页记录当时适配，不是新的READY交接，也不是作者原代码或完整在线系统复现。来源：*Contrastive Transformer Network for Track Segment Association with Two-Stage Online Method*, Remote Sensing 2024, 16, 3380，[全文](https://doi.org/10.3390/rs16183380)，主要依据 §3.4–3.5、§5.4、§6。本地已核过全文，不以当前 TCM/TAM contrastive 分支替代它。最新比较边界与下一轮输入协议问题见[2026-10-18审计](experiment_reaudit_20261018.md)。
+本实现已完成011离线baseline首训，完整V分数已复算；本页记录当时适配，不是新的READY交接，也不是作者原代码或完整在线系统复现。来源：*Contrastive Transformer Network for Track Segment Association with Two-Stage Online Method*, Remote Sensing 2024, 16, 3380，[全文](https://doi.org/10.3390/rs16183380)，主要依据 §3.4–3.5、§5.4、§6。本地已核过全文，不以当前 TCM/TAM contrastive 分支替代它。最新比较边界与下一轮输入协议问题见[当前数据契约](data_contract.md)与[历史审计摘要](history/README.md)。
 
 ## 保留的核心
 
@@ -45,4 +45,4 @@
 | 能实际训练并选模 | 小型原生格式合成archive的双任务更新、完整验证、checkpoint重载和缓存复算 |
 | 数据与失败边界 | 只加载T_core/V_select；旧输出拒绝；不足身份不降规模；超时/失败保留产物且不标完成 |
 
-011已完成：TSA外层170秒、退出0，1000次更新；macro-F1 .520546、micro-F1 .340053、precision .218620。此前6小时单项/12小时总额度属于已关闭011，结余不转移、不重跑。完整结果及共同适用子集见[011分析](results/compare011_interim/README.md)。T_test继续封存，新训练须有新协议和预算；一次有界开发结果不证明作者150epochs/在线系统复现或收敛。
+011已完成：TSA外层170秒、退出0，1000次更新；macro-F1 .520546、micro-F1 .340053、precision .218620。此前6小时单项/12小时总额度属于已关闭011，结余不转移、不重跑。完整结果及共同适用子集见[012最终复算](results/evidence012_local_review/README.md)。T_test继续封存，新训练须有新协议和预算；一次有界开发结果不证明作者150epochs/在线系统复现或收敛。

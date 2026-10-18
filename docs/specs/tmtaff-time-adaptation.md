@@ -1,6 +1,6 @@
 # TMTAFF 真实时间条件适配：行为与数学规格
 
-2026-10-18。用户已确认保留所有有效片段的真实观测输入，并批准本页的真实时间输入与 next-query TCM 适配。新增 GPU 实验预算尚未批准；本页授权范围是实现、CPU 验证与后续配置/成本准备。
+2026-10-18。用户已确认保留所有有效片段的真实观测输入，并批准本页的真实时间输入与 next-query TCM 适配。该适配已用于013/014和当前017；本页记录行为而非新执行授权，任务状态/预算以[交接索引](../../HandOver/Handover.md)为准。
 
 ## 定位与不变项
 
@@ -108,18 +108,18 @@ TCM loss 与 association encode/complete 必须用同一套时间输入。TAM/TF
 | 插值角度与边界 | 359/1、179/-179、正负 180 tie、端点、支持外及两点短轨；不由 reference 决定 |
 | TCM loss 范围 | 只对 raw transitions；改 query 与 reference 不改 TCM loss，mask/count 不计插值点 |
 | 跨层路由正确 | tiny CPU 实际 TCM→TAM→TFM；native trainer/eval 选同模型路径，错时/query/旧布局明确拒绝 |
-| 不伪称训练结果 | 只报告 CPU 合成/真实输入诊断；未跑 GPU、未打开 T_test、未声称效果提升 |
+| 不伪称训练结果 | 本地软件验收只报告CPU合成/输入诊断；真实GPU结果另据原件解释，T_test保持封存 |
 
 ## 设计预审与剩余不确定性
 
 按本页可见性与 next-time 规则，数学因果性可闭合；“目标时间已知”与“目标状态已知”必须分别处理。最容易出错的是 decoder 第二步重写前面槽位的 next-time、逆向只翻值不翻时刻、支持内在归一化 heading 上直线插值，以及 trainer 用新输入而 evaluator 仍走旧归一化路径。
 
-原生 teacher 只监督已有片段内部的相邻转移，不能保证对远超训练间隔的 query 外推可靠。确定性 sinusoidal 时间编码也不保证消除长 gap 外推失败。原生序列最多 M 与 rollout 增长 history 会增加 attention/decoder 计算；旧 64 格步时不能直接作为成本。以上是需要后续配置与有界成本测量回答的问题，不通过扩大预算、缩模型或删长 gap 来掩盖。
+原生 teacher 只监督已有片段内部的相邻转移，不能保证对远超训练间隔的 query 外推可靠。确定性 sinusoidal 时间编码也不保证消除长 gap 外推失败。原生序列最多 M 与 rollout 增长 history 会增加 attention/decoder 计算；旧 64 格步时不能直接作为成本。013/014已经测得部分真实成本，当前017继续已批准开发训练；长gap效果仍待实际结果解释，不为本页重开测量、扩大预算、缩模型或删长gap。
 
 本适配解决“真实短轨如何进入模型且共同输出具有明确时刻”的输入语义缺口。是否优于原先近似实现、是否优于强 baseline、能否支持课题创新，仍需同协议真实实验；本页不预设必须涨分。
 
-## 本轮独立验证记录
+## 最初实现独立验证记录（历史）
 
 `tests/test_timed_pipeline.py` 的 6 项跨层检查已通过：含真实小型 CPU 四阶段参数更新、最终完整评价、原生零 query-support 短轨、整体时间平移、reference 隔离、双向多步 next-time 独立公式核对与 float32 支持碰撞拒绝。连同 timed model/input 和完整 trainer/evaluator 的针对性回归，共 57 项通过；这不是 GPU 成本或 MTAD 性能结果。
 
-独立预审发现的 float32 raw/query 相对次序缺口已由数据 adapter 增加支持一致性检查，并由跨层反例验证。当前未发现剩余阻断的数学因果性或 trainer/eval dispatch 缺陷；真实数据效果与计算成本仍未知。
+独立预审发现的 float32 raw/query 相对次序缺口已由数据 adapter 增加支持一致性检查，并由跨层反例验证。当时未发现剩余阻断的数学因果性或trainer/eval dispatch缺陷。后续真实成本、失败与017进度见[历史摘要](../history/README.md)及交接，不再将已完成的原生装配/测量列为待办。

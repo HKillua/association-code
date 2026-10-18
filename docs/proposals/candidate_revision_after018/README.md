@@ -1,6 +1,6 @@
-# 018之后：可进入本地实现的候选修正版
+# 当前候选v2：已完成的本地实现与待批训练
 
-2026-10-19，状态：**用户已批准本地实现；代码、CPU验证与独立复核已完成；GPU预算未批准，不是READY。** 本文将[数据复审](../../results/dataset_followup018/README.md)与[三阶段方案](../tri_stage_support/README.md)合成一个明确版本。沿用用户指定research-workflow，复用已有来源与Mode C连接C2；不重新检索论文或扩建诊断框架。017继续已批任务，018结束。
+2026-10-19，状态：**用户已批准本地实现；代码、CPU验证与独立复核已完成；GPU预算未批准，不是READY。** 本文将[数据复审](../../results/dataset_followup018/README.md)与已讨论的三阶段改进合成一个明确版本；来源与迁移边界见本页末。沿用用户指定research-workflow，复用已有来源与Mode C连接C2；不重新检索论文或扩建诊断框架。017继续已批任务，018结束。
 
 ## 已确认的本地范围
 
@@ -82,3 +82,19 @@ teacher终点选定，不看V挑更新数；一次完整V选身份阈值，四�
 已完成本地实现与独立复核；具体行为、验证证据及设备限制见[实现记录](implementation.md)。[完整训练配置草案](config.draft.json)固定teacher1000、utility200、四臂各300；`max_seconds=null`，CLI在打开数据前拒绝。它不是服务器执行任务。
 
 CPU检查与合成原生ZIP只证明代码行为；新方法尚无真实MTAD训练结果。剩余需要决定的是GPU资源与正式开跑，当前不发布READY、不启动成本测量、不挪用018额度。017运行配置不受本地候选变更影响。
+
+## 7. 机制来源与海上任务适配
+
+这是跨领域机制的有动机组合与海上适配，不要求每个模块原创；是否有效仍由完整实验与同结构四臂回答。来源定点核验来自已完成research-workflow，不因文档清理重新泛搜。
+
+| 已读来源 | 借鉴与本版具体改动 |
+| --- | --- |
+| [GRU-D作者稿](https://arxiv.org/pdf/1606.01865)，§2—2.1 | 使用缺测标记/距观测的时间。这里改为离线查询左右真实点距离与存在标记，条件化Transformer查询；不搬医疗变量向总体均值衰减的假设。 |
+| [CroCo](https://arxiv.org/html/2210.10716v1)，§3 Eq1—2、附录C.2 | 可见自身＋辅助视图恢复被遮内容，改为真实时间、首尾连续留出和四物理属性；不将生成内容伪装为真实量测。 |
+| [SUSHI](https://arxiv.org/html/2212.03038)，§4.2/附录A.1 | 全局表征之外加入最近端点、时间差与运动线索。这里用海上跨源重叠/断段接续的真实局部token，保留全部候选；不搬视觉外观、层级图或硬排除不重叠边。 |
+| [Gekko](https://arxiv.org/html/2609.01530v1)，§3—4 Eq3/8 | self/cross恢复误差差值和停止梯度监督，改成有方向、逐query、四属性物理效用；推理不读reference，不用效用代替身份。 |
+| [MMoE作者页](https://research.google/pubs/modeling-task-relationships-in-multi-task-learning-with-multi-gate-mixture-of-experts/)（官方摘要）、[MTAN作者稿](https://arxiv.org/pdf/1803.10704) §3.1—3.2 | 共享表示、任务专属选择。这里将任务变为物理属性，信息源变为可变数量辅助片段，以身份和效用路由残差；没有复制固定专家库或多层图像mask，不称精确复现。 |
+
+海上近邻[Traj-PathFormer作者仓库](https://github.com/YongshuoLiu/Traj-PathFormer)已有跨源补全、时间查询、局部门控与物理预测，[PTFM](https://doi.org/10.3390/electronics14173461)已有已关联输入的门控/残差融合。候选差异在异步缺段下身份、实际时刻支撑与属性恢复效用的分工，不能称注意力、门控或残差在海上首次。来源借鉴不是迁移有效性的证据。
+
+新self＋摘要残差结构本身可能有收益，因此四臂全部采用同一新结构；scalar-u与attribute-u回答属性路由，learned-attribute用于排除普通门控/容量解释。新teacher生成自己的效用标签，不复用018旧标签冒充适配。没有加入零floor拒绝、额外风险头或额外完整self/cross双解码；更多模块归因等整体信号后考虑。

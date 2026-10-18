@@ -1,11 +1,10 @@
-# Identity/utility candidate: local implementation contract
+# 共享补全/融合候选：legacy合同与当前版本入口
+
+2026-10-19：下文保存015/018的legacy行为，服务旧checkpoint解释与兼容；当前v2已实现的结构、表示、四臂和训练草案分别见[当前规格](../proposals/candidate_revision_after018/README.md)、[表示](../proposals/candidate_revision_after018/representation.md)、[训练](../proposals/candidate_revision_after018/training.md)。v2尚无新GPU预算；本文旧授权不转移或重开。
 
 ## Approved amendment: train-only MLP time scaling (2026-10-18)
 
-The user approved the concrete [after016 proposal](../proposals/candidate_after016/README.md)
-and one new candidate run of at most 2 GPU hours, independent of baseline017.
-This amendment supersedes the initial implementation-only budget paragraph below
-for that single new run. It does not authorize retries or changes to baseline017.
+The train-only scaling amendment was approved and executed in run018 (at most 2 GPU hours). Run018 is now closed; see the [result](../results/cooperative018_local_review/README.md). This historical contract does not authorize a retry, a new run, or changes to baseline017.
 
 `CooperativeConfig.support_time_policy` defaults to `legacy`. Explicit
 `train_absmax_v1` computes `S=max(1,max(abs(tau)))` once on all valid native and
@@ -36,7 +35,7 @@ explicitly. Restoration remains inference-only; this does not add resume support
 These checks establish software behavior, not a true MTAD improvement or a CUDA
 throughput measurement. The remaining sections describe the original contract.
 
-2026-10-18. User requested review followed by local CPU/GPU implementation. This authorizes the candidate implementation and bounded synthetic verification, not a new native-data/server training budget. Existing TMTAFF execution code/configuration and active 013 remain unchanged. Research rationale and sources: `/Users/a1/Projects/biye-ronghe/docs/plans/2026-10-18_complete_method_design/README.md`.
+2026-10-18. User requested review followed by local CPU/GPU implementation. This authorizes the candidate implementation and bounded synthetic verification, not a new native-data/server training budget. This was the implementation scope before run015; its original authorization does not extend to new training. Research rationale and sources: `/Users/a1/Projects/biye-ronghe/docs/plans/2026-10-18_complete_method_design/README.md`.
 
 ## Scope and behavior
 
@@ -55,7 +54,7 @@ throughput measurement. The remaining sections describe the original contract.
 3. Train only query-pooling/utility head using Huber(`sg(e0-e1)-sg(max(e0,epsilon))*u`). Source: Gekko error comparison, adapted to visible-only physical trajectory input. No identity gradient updates the frozen utility module.
 4. First comparison fixes base identity scores/groups. From identical teacher decoder states, adapt plain/utility/support/ordinary-gate decoders with identical sampled positive pairs and update counts. Encoder/base identity/utility freeze. Ordinary gate uses the same frozen utility-trained query-pooling features as the utility arm but a separate trainable gate without predicted gain inputs, a strong matched-feature control; shared feature training cost is disclosed. Save predetermined final update, not a nonexistent identity-F1 improvement. Optional final identity head training is separate, after utility; keep it out of first fixed-identity comparison.
 
-All losses expose valid counts; reference NaNs masked before arithmetic. No silent resampling if supervision is unavailable. Stages, sampler seeds, optimizer state, normalizer, scale and route stored in checkpoint. Checkpoint reload is inference-only; optimizer resume is explicitly unsupported by this minimal first implementation. The fixed utility error scale is the four training-native normalizer standard deviations (same declared constant-feature floor), with shortest longitude/course residuals; it is not fitted on V. First local executable supports explicit counts/config and seeded synthetic check; no default native training schedule or READY dispatch. Formal config/epochs/cost remains separate.
+All losses expose valid counts; reference NaNs masked before arithmetic. No silent resampling if supervision is unavailable. Stages, sampler seeds, optimizer state, normalizer, scale and route stored in checkpoint. Checkpoint reload is inference-only; optimizer resume is explicitly unsupported by this minimal first implementation. The fixed utility error scale is the four training-native normalizer standard deviations (same declared constant-feature floor), with shortest longitude/course residuals; it is not fitted on V. First local executable supports explicit counts/config and seeded synthetic check; no default native training schedule or READY dispatch. The executed 015/018 configs and their closed budgets remain historical evidence; current v2 configuration is separate.
 
 ## Verification
 
