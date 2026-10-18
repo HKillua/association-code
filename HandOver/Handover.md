@@ -2,12 +2,12 @@
 
 这里只保留当前入口、必要约束和历史摘要；原始L2S/S2L及结果保留，不重复领取结束轮次。
 
-## 当前：017参考开发训练RUNNING（独立worktree）；016候选CPU诊断RUNNING
+## 当前：017参考开发训练RUNNING（独立worktree，TCM已完成）；016候选CPU诊断COMPLETED
 
 | 请求 | 回执/状态 | 下一责任方 |
 | --- | --- | --- |
-| [L2S-017](L2S-20261018-017.md) | [S2L-017](S2L-20261018-017.md)，RUNNING（20:40 首次领取，HEAD `4aab53b`） | SERVER_AI：独立执行worktree `../association-code-run017`（detached，运行期不改），参考100/100/100/20共320更新、每20步验证、完整终评及预测导出，外层35970秒TERM＋30秒清理（总36000秒）、CPU4、一次无重试、不resume；不等016或候选好结果。**已提前记录风险**：约10小时预算远长于以往各轮，作业是本会话子进程，若会话终止作业可能一并终止，届时按实际退出码与原件判为INTERRUPTED/FAILED并保留全部产物，不重开额度 |
-| [L2S-016](L2S-20261018-016.md) | [S2L-016](S2L-20261018-016.md)，RUNNING（20:40 首次领取） | SERVER_AI：只读015已有数组（256份NPZ全在，未删未重建），`CUDA_VISIBLE_DEVICES=`空、纯CPU、累计≤600秒、一次无重试；六份共同点比较、四臂速度分布和固定规则≤4场景原件；不加载模型/推理/训练/prepare/重校准/重选阈值/读T_test |
+| [L2S-017](L2S-20261018-017.md) | [S2L-017](S2L-20261018-017.md)，RUNNING（`started_at` 12:42:56Z，外层限时 35970 秒 → TERM 约 22:42:26Z） | SERVER_AI：worktree `../association-code-run017` 已从 **`dd54873`** detached 创建（**更正**：不是 pull 时的 `4aab53b`，两者仅差 handover 文件、执行代码与配置无差异）；选卡 GPU0 `GPU-c5a00c37…`，选定时刻 24,247 MiB 空闲、无他人进程；PID 1812036、`stderr.log` 0 字节。**TCM 100 步已完成**（作业内 340.3 秒，末条 loss 0.3735／grad 0.1789），`effective_margin` 仍为占位 1.0、`margin_calibration = null`、`validation_timings = []`——按配置校准在 TCM 之后，属预期而非缺项。`test_opened=false`、`resume_from=null`、`fusion_output_parameterization=train_position_affine`。**已提前记录风险**：约 10 小时预算远长于以往各轮，作业是本会话子进程，若会话终止作业可能一并终止，届时按实际退出码与原件判为 INTERRUPTED/FAILED 并保留全部产物，不 resume、不重开额度 |
+| [L2S-016](L2S-20261018-016.md) | [S2L-016](S2L-20261018-016.md)，COMPLETED（12:43:07Z→12:43:41Z，**34 秒**／600 秒上限） | LOCAL_AI：退出 0、inspection/progress 均 COMPLETED、`scene_count=64`、`comparison_count=6`、`test_opened=false`；纯 CPU 只读，未加载模型/推理/训练/prepare/重校准/重选阈值/读 T_test，015 原目录 534 文件未改。回传 47 文件 / 14,411,293 B（无单文件超 2 MiB，故直接复制未 gzip）：六份 comparison.json、inspection.json、progress.json、4 案例场景 × 4 臂 = 16 NPZ + 16 metadata。**关键结构性事实：六份报告的 `original` 与 `common` 三区数值逐项完全相同**（predicted 交集 3191、oracle 18364），即四臂预测支撑点一致、共同点未缩小人口，臂间差异只来自适配权重。**速度分布**：参考 p50 19.076／mean 28.906，而四臂预测最小值 252.4–496.1、p50 781–1211、mean 779–1095，predicted 4096 行与 oracle 24128 行**全部 >100**，两侧分布无重叠（预测最小值高于参考 99 分位 138.73）；负值/近零/非有限计数均为 0。案例含恶化场景 270（+4,299.71 m），未手动替换。服务器**不推断病因、不建议改采样/单位/门控** |
 | [L2S-015](L2S-20261018-015.md) | [S2L-015](S2L-20261018-015.md)，COMPLETED | 已独立分析，退出0、292秒、12更新和四臂完整V完成；旧2小时额度关闭、不转移 |
 | [L2S-014](L2S-20261018-014.md) | [S2L-014](S2L-20261018-014.md)，COMPLETED | 参考短训终评已分析；原raw位置输出问题已修正，修正后尚未真实训练 |
 

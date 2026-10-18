@@ -1,0 +1,1 @@
+env CUDA_VISIBLE_DEVICES= OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 /home/wangguangjie/djs/mtad-field-20261016/bin/python tools/analysis/inspect_cooperative015_arrays.py --run runs/COOPERATIVE-COST-20261018-015-attempt-1 --output HandOver/results/COOPERATIVE-ARRAYS-20261018-016/files 
