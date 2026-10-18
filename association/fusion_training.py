@@ -56,6 +56,13 @@ def fusion_training_step(model, fusion, objective, optimizer, *, stage, values,
     ``track_microbatch`` limits only auxiliary TCM loss forwards. The pair path
     completes up to ``2 * pair_microbatch`` endpoints at once. Optional ``check``
     lets the run's existing deadline abort between chunks and before a step.
+
+    TFM_FROZEN lazily reuses deterministic eval completions within this update.
+    Detached entries live on CPU, bounded by this batch's unique endpoints;
+    the device only receives the current chunk. No cache survives the call.
+    Fusion chunks/dropout draws and the effective-batch objective are unchanged.
+    Missing-only completion batches can differ in floating-point rounding from
+    recomputing full chunks; this does not promise cross-layout bitwise parity.
     """
     _positive_integer(pair_microbatch, "pair_microbatch")
     _positive_integer(track_microbatch, "track_microbatch")
@@ -112,6 +119,10 @@ def fusion_training_step(model, fusion, objective, optimizer, *, stage, values,
               "completion_loss": 0.0, "fusion_loss": 0.0,
               "fusion_component_losses": dict.fromkeys(objective.feature_names, 0.0),
               "microbatches": 0}
+    frozen_cache = {} if stage == "TFM_FROZEN" else None
+    if frozen_cache is not None:
+        report["completion_cache"] = dict(scope="step_local_cpu", hits=0, misses=0,
+            forward_calls=0, max_forward_tracks=0, peak_entries=0, peak_bytes=0)
     optimizer.zero_grad(set_to_none=True)
     try:
         if stage == "JOINT" and completion_weight and total_transitions:
@@ -133,8 +144,22 @@ def fusion_training_step(model, fusion, objective, optimizer, *, stage, values,
             nodes, inverse = torch.unique(pairs[start:end], return_inverse=True)
             local_pairs = inverse.reshape(-1, 2)
             if stage == "TFM_FROZEN":
-                with torch.no_grad():
-                    completed = model.complete(values[nodes], observed[nodes])
+                keys = nodes.tolist()
+                missing = [key for key in keys if key not in frozen_cache]
+                stats = report["completion_cache"]
+                stats["hits"] += len(keys) - len(missing)
+                stats["misses"] += len(missing)
+                if missing:
+                    with torch.no_grad():
+                        fresh = model.complete(values[missing], observed[missing])
+                    for index, key in enumerate(missing):
+                        frozen_cache[key] = fresh[index].detach().to(device="cpu", copy=True)
+                    stats["forward_calls"] += 1
+                    stats["max_forward_tracks"] = max(stats["max_forward_tracks"], len(missing))
+                    stats["peak_entries"] = len(frozen_cache)
+                    stats["peak_bytes"] = len(frozen_cache) * fresh[0].numel() * fresh.element_size()
+                    del fresh  # Do not retain device storage via cached tensor views.
+                completed = torch.stack([frozen_cache[key] for key in keys]).to(values.device)
             else:
                 completed = model.complete(values[nodes], observed[nodes])
             loss = None
@@ -165,6 +190,9 @@ def fusion_training_step(model, fusion, objective, optimizer, *, stage, values,
     except BaseException:
         optimizer.zero_grad(set_to_none=True)
         raise
+    finally:
+        if frozen_cache is not None:
+            frozen_cache.clear()
     report["gradient_norm"] = float(norm)
     report["loss"] = (report["association_loss"] + completion_weight * report["completion_loss"]
                       + report["fusion_loss"])

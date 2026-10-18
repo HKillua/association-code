@@ -95,7 +95,7 @@ def _inference_device(device, model_device, fusion_device):
 @torch.inference_mode()
 def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       batch_tracks, pair_batch_size, select_on_validation,
-                      threshold, singleton_policy, check=None):
+                      threshold, singleton_policy, check=None, progress=None):
     """Return full-V association plus predicted/oracle/simple/single-source fusion.
 
     ``singleton_policy`` is explicitly 'missing' or 'observed'. The latter
@@ -108,6 +108,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     Model modes are set to eval and left there. Training must explicitly restore
     its current stage. Cached latents live on CPU only for this call. Threshold
     fitting uses all supplied V scenes together, never per scene or on T_test.
+    Optional progress receives small stage/scene records, never arrays; a caller
+    can preserve the last completed boundary even if evaluation is interrupted.
     """
     for value in (batch_tracks, pair_batch_size):
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
@@ -133,10 +135,16 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     if next(fusion.parameters()).dtype != dtype:
         raise ValueError('association and fusion dtype must agree')
     started = time.monotonic()
+    def report_progress(stage, completed_scenes, scene_id=None, **details):
+        if progress is not None:
+            progress(dict(stage=stage, completed_scenes=completed_scenes,
+                          total_scenes=len(scenes), scene_id=scene_id,
+                          elapsed_seconds=time.monotonic()-started, **details))
     model.eval()
     fusion.eval()
     records, cached = [], []
-    for scene in scenes:
+    for scene_index, scene in enumerate(scenes):
+        report_progress('association_scoring', scene_index, str(scene['scene_id']))
         if check:
             check()
         x, mask = normalize_scene(scene, normalizer)
@@ -169,6 +177,7 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         record.update(pairs=pairs, scores=np.concatenate(scores) if scores else np.empty(0))
         records.append(record)
         cached.append(latents)
+        report_progress('association_scoring', scene_index+1)
     selection = select_threshold(records) if select_on_validation else None
     if selection is not None:
         threshold = selection['threshold']
@@ -178,7 +187,9 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                + ['single_source:' + source for source in sources]}
     per_scene = []
     fusion_steps = 0
-    for scene, record, latent in zip(scenes, records, cached):
+    for scene_index, (scene, record, latent) in enumerate(zip(scenes, records, cached)):
+        report_progress('physical_fusion', scene_index, str(scene['scene_id']),
+                        fusion_forward_count=fusion_steps)
         targets = scene['fusion_targets']
         target_ids = list(targets)
         # Empty scenes still belong to the declared development population.
@@ -225,10 +236,15 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         for key, report in outputs.items():
             methods[key].append(report)
         per_scene.append(dict(scene_id=str(scene['scene_id']), methods=outputs))
+        report_progress('physical_fusion', scene_index+1, fusion_forward_count=fusion_steps)
     if check:
         check()
+    fusion_report = {key: aggregate_fusion_reports(reports) for key, reports in methods.items()}
+    if check:
+        check()
+    report_progress('completed', len(scenes), fusion_forward_count=fusion_steps)
     return dict(association=association, selection=selection, threshold=threshold, records=records,
-                fusion={key: aggregate_fusion_reports(reports) for key, reports in methods.items()},
+                fusion=fusion_report,
                 per_scene=per_scene, singleton_policy=singleton_policy, feedback_policy='fc_memory',
                 grouping_policy='anchor_direct', correspondence_policy='anchor_identity_first',
                 elapsed_seconds=time.monotonic()-started, fusion_forward_count=fusion_steps,

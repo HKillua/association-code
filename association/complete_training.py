@@ -607,11 +607,15 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             model.eval()
             fusion.eval()
             evaluator = evaluate_complete if evaluation_fn is None else evaluation_fn
+            def evaluation_progress(item):
+                run['final_evaluation_progress'] = item
+                runtime.write_json(output / 'evaluation-progress.json', item)
             evaluation = evaluator(model, fusion, normalizer, validation_scenes, device=device,
                 batch_tracks=config['validation_batches']['tracks'],
                 pair_batch_size=config['validation_batches']['pairs'],
                 select_on_validation=True, threshold=None,
-                singleton_policy=config['singleton_policy'], check=check)
+                singleton_policy=config['singleton_policy'], check=check,
+                **({'progress': evaluation_progress} if evaluation_fn is None else {}))
             final_threshold, saved_threshold = evaluation['threshold'], selected['threshold']
             if ((final_threshold is None) != (saved_threshold is None)
                     or (final_threshold is not None and not math.isclose(

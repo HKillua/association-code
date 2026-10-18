@@ -80,6 +80,44 @@ class CompleteEvaluationTests(unittest.TestCase):
                                  batch_tracks=2, pair_batch_size=2, select_on_validation=select,
                                  threshold=threshold, singleton_policy=singleton, **kwargs)
 
+    def test_progress_separates_scoring_and_fusion_without_changing_results(self):
+        examples = [scene(), empty_scene(with_target=True)]
+        baseline = self.evaluate(examples)
+        events = []
+        actual = self.evaluate(examples, progress=events.append)
+        self.assertEqual(actual['association'], baseline['association'])
+        self.assertEqual(actual['fusion'], baseline['fusion'])
+        for left, right in zip(actual['records'], baseline['records']):
+            np.testing.assert_array_equal(left['scores'], right['scores'])
+        self.assertEqual([e['stage'] for e in events],
+                         ['association_scoring']*4 + ['physical_fusion']*4 + ['completed'])
+        self.assertEqual(events[-1]['completed_scenes'], 2)
+        self.assertEqual(events[-1]['fusion_forward_count'], actual['fusion_forward_count'])
+        self.assertTrue(all(e['elapsed_seconds'] >= 0 for e in events))
+
+    def test_progress_retains_stage_when_fusion_is_interrupted(self):
+        events = []
+        def progress(item):
+            events.append(item)
+            if item['stage'] == 'physical_fusion':
+                raise TimeoutError('external evaluation deadline')
+        with patch.object(self.fusion, 'forward', wraps=self.fusion.forward) as forward:
+            with self.assertRaisesRegex(TimeoutError, 'external evaluation deadline'):
+                self.evaluate([scene()], progress=progress)
+            forward.assert_not_called()
+        self.assertEqual(events[-1]['stage'], 'physical_fusion')
+        self.assertEqual(events[-1]['fusion_forward_count'], 0)
+        self.assertNotIn('completed', [event['stage'] for event in events])
+
+    def test_failed_metric_aggregation_does_not_report_completed(self):
+        events = []
+        with patch('association.complete_evaluation.aggregate_fusion_reports',
+                   side_effect=TimeoutError('aggregation deadline')):
+            with self.assertRaisesRegex(TimeoutError, 'aggregation deadline'):
+                self.evaluate([scene()], progress=events.append)
+        self.assertEqual(events[-1]['stage'], 'physical_fusion')
+        self.assertNotIn('completed', [event['stage'] for event in events])
+
     def test_actual_tcm_tam_tfm_chain_reuses_completion_and_retains_wrong_groups(self):
         example = scene(include_missing_target=True)
         seen = {'encoder': 0, 'decoder': 0, 'tam': 0, 'tfm': 0}
