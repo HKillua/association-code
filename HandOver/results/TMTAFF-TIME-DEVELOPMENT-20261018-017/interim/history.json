@@ -1,0 +1,5084 @@
+[
+  {
+    "loss": 1.0281217098236084,
+    "gradient_norm": 0.39025384187698364,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 1,
+    "learning_rate": 0.002,
+    "seconds": 3.902916710358113
+  },
+  {
+    "loss": 0.9708174467086792,
+    "gradient_norm": 0.3393247425556183,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 2,
+    "learning_rate": 0.002,
+    "seconds": 1.641620078124106
+  },
+  {
+    "loss": 0.9309465885162354,
+    "gradient_norm": 0.30485671758651733,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 3,
+    "learning_rate": 0.002,
+    "seconds": 1.9200907163321972
+  },
+  {
+    "loss": 0.9265480041503906,
+    "gradient_norm": 0.26045265793800354,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 4,
+    "learning_rate": 0.002,
+    "seconds": 2.0631975601427257
+  },
+  {
+    "loss": 0.8940312266349792,
+    "gradient_norm": 0.27120402455329895,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 5,
+    "learning_rate": 0.002,
+    "seconds": 2.0055816005915403
+  },
+  {
+    "loss": 0.891248345375061,
+    "gradient_norm": 0.28078022599220276,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 6,
+    "learning_rate": 0.002,
+    "seconds": 1.9566340008750558
+  },
+  {
+    "loss": 0.8766671419143677,
+    "gradient_norm": 0.2577964961528778,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 7,
+    "learning_rate": 0.002,
+    "seconds": 2.0082893413491547
+  },
+  {
+    "loss": 0.8661460876464844,
+    "gradient_norm": 0.234377920627594,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 8,
+    "learning_rate": 0.002,
+    "seconds": 1.7294899970293045
+  },
+  {
+    "loss": 0.8710088729858398,
+    "gradient_norm": 0.23782455921173096,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 9,
+    "learning_rate": 0.002,
+    "seconds": 1.9320716471411288
+  },
+  {
+    "loss": 0.8670123815536499,
+    "gradient_norm": 0.23145529627799988,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 10,
+    "learning_rate": 0.002,
+    "seconds": 1.9052170729264617
+  },
+  {
+    "loss": 0.8552664518356323,
+    "gradient_norm": 0.2508748471736908,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 11,
+    "learning_rate": 0.002,
+    "seconds": 1.7878643050789833
+  },
+  {
+    "loss": 0.852168619632721,
+    "gradient_norm": 0.2534008026123047,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 12,
+    "learning_rate": 0.002,
+    "seconds": 1.9403140526264906
+  },
+  {
+    "loss": 0.8415578007698059,
+    "gradient_norm": 0.23798087239265442,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 13,
+    "learning_rate": 0.002,
+    "seconds": 2.0182231492362916
+  },
+  {
+    "loss": 0.8082354068756104,
+    "gradient_norm": 0.23582148551940918,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 14,
+    "learning_rate": 0.002,
+    "seconds": 1.8214504471980035
+  },
+  {
+    "loss": 0.8317497372627258,
+    "gradient_norm": 0.2321244776248932,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 15,
+    "learning_rate": 0.002,
+    "seconds": 1.994319895748049
+  },
+  {
+    "loss": 0.8356438279151917,
+    "gradient_norm": 0.2367241382598877,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 16,
+    "learning_rate": 0.002,
+    "seconds": 1.9716153456829488
+  },
+  {
+    "loss": 0.8050328493118286,
+    "gradient_norm": 0.2371867299079895,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 17,
+    "learning_rate": 0.002,
+    "seconds": 2.018166468013078
+  },
+  {
+    "loss": 0.9015339612960815,
+    "gradient_norm": 0.2299269586801529,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 18,
+    "learning_rate": 0.002,
+    "seconds": 1.9443920669145882
+  },
+  {
+    "loss": 0.7808328866958618,
+    "gradient_norm": 0.24748285114765167,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 19,
+    "learning_rate": 0.002,
+    "seconds": 2.0250103999860585
+  },
+  {
+    "loss": 0.7845378518104553,
+    "gradient_norm": 0.23562896251678467,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 20,
+    "learning_rate": 0.002,
+    "seconds": 2.038726234808564
+  },
+  {
+    "loss": 0.7923383712768555,
+    "gradient_norm": 0.24876053631305695,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 21,
+    "learning_rate": 0.002,
+    "seconds": 1.947173637803644
+  },
+  {
+    "loss": 0.7885698676109314,
+    "gradient_norm": 0.24927209317684174,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 22,
+    "learning_rate": 0.002,
+    "seconds": 2.0399950980208814
+  },
+  {
+    "loss": 0.7894311547279358,
+    "gradient_norm": 0.23474253714084625,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 23,
+    "learning_rate": 0.002,
+    "seconds": 2.059140294790268
+  },
+  {
+    "loss": 0.7598562836647034,
+    "gradient_norm": 0.22582046687602997,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 24,
+    "learning_rate": 0.002,
+    "seconds": 2.053076151292771
+  },
+  {
+    "loss": 0.7682874798774719,
+    "gradient_norm": 0.2524651288986206,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 25,
+    "learning_rate": 0.002,
+    "seconds": 2.1927521931938827
+  },
+  {
+    "loss": 0.7569890022277832,
+    "gradient_norm": 0.22171038389205933,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 26,
+    "learning_rate": 0.002,
+    "seconds": 1.811069999821484
+  },
+  {
+    "loss": 0.7283118367195129,
+    "gradient_norm": 0.22327926754951477,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 27,
+    "learning_rate": 0.002,
+    "seconds": 1.7585066040046513
+  },
+  {
+    "loss": 0.7462314963340759,
+    "gradient_norm": 0.22737132012844086,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 28,
+    "learning_rate": 0.002,
+    "seconds": 1.8251477731391788
+  },
+  {
+    "loss": 0.7349672913551331,
+    "gradient_norm": 0.23498603701591492,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 29,
+    "learning_rate": 0.002,
+    "seconds": 2.2796611450612545
+  },
+  {
+    "loss": 0.7194567322731018,
+    "gradient_norm": 0.2219264954328537,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 30,
+    "learning_rate": 0.002,
+    "seconds": 1.97463352791965
+  },
+  {
+    "loss": 0.7190574407577515,
+    "gradient_norm": 0.22123096883296967,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 31,
+    "learning_rate": 0.002,
+    "seconds": 1.9414245109073818
+  },
+  {
+    "loss": 0.7164735794067383,
+    "gradient_norm": 0.21921955049037933,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 32,
+    "learning_rate": 0.002,
+    "seconds": 2.163547814823687
+  },
+  {
+    "loss": 0.729112982749939,
+    "gradient_norm": 0.23555569350719452,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 33,
+    "learning_rate": 0.002,
+    "seconds": 1.8906156551092863
+  },
+  {
+    "loss": 0.671618640422821,
+    "gradient_norm": 0.2268083393573761,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 34,
+    "learning_rate": 0.002,
+    "seconds": 2.2658107238821685
+  },
+  {
+    "loss": 0.7179006934165955,
+    "gradient_norm": 0.22677552700042725,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 35,
+    "learning_rate": 0.002,
+    "seconds": 2.155837532132864
+  },
+  {
+    "loss": 0.7035771608352661,
+    "gradient_norm": 0.2242221087217331,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 36,
+    "learning_rate": 0.002,
+    "seconds": 1.941677016671747
+  },
+  {
+    "loss": 0.7020894289016724,
+    "gradient_norm": 0.2239065021276474,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 37,
+    "learning_rate": 0.002,
+    "seconds": 1.8134581232443452
+  },
+  {
+    "loss": 0.6670185923576355,
+    "gradient_norm": 0.21962454915046692,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 38,
+    "learning_rate": 0.002,
+    "seconds": 1.8581612897105515
+  },
+  {
+    "loss": 0.6757397651672363,
+    "gradient_norm": 0.2142307162284851,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 39,
+    "learning_rate": 0.002,
+    "seconds": 1.7776340888813138
+  },
+  {
+    "loss": 0.6917523145675659,
+    "gradient_norm": 0.23658542335033417,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 40,
+    "learning_rate": 0.002,
+    "seconds": 1.7564241671934724
+  },
+  {
+    "loss": 0.6816002726554871,
+    "gradient_norm": 0.21611061692237854,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 41,
+    "learning_rate": 0.002,
+    "seconds": 1.8619339694269001
+  },
+  {
+    "loss": 0.6553803086280823,
+    "gradient_norm": 0.2316412329673767,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 42,
+    "learning_rate": 0.002,
+    "seconds": 1.8261111532337964
+  },
+  {
+    "loss": 0.6639308929443359,
+    "gradient_norm": 0.2145584374666214,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 43,
+    "learning_rate": 0.002,
+    "seconds": 2.071257724892348
+  },
+  {
+    "loss": 0.6454229950904846,
+    "gradient_norm": 0.20743466913700104,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 44,
+    "learning_rate": 0.002,
+    "seconds": 2.1339813373051584
+  },
+  {
+    "loss": 0.6463847160339355,
+    "gradient_norm": 0.2170356959104538,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 45,
+    "learning_rate": 0.002,
+    "seconds": 1.8599423058331013
+  },
+  {
+    "loss": 0.6461410522460938,
+    "gradient_norm": 0.21186169981956482,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 46,
+    "learning_rate": 0.002,
+    "seconds": 2.0831401981413364
+  },
+  {
+    "loss": 0.6217142939567566,
+    "gradient_norm": 0.20673198997974396,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 47,
+    "learning_rate": 0.002,
+    "seconds": 2.1902377330698073
+  },
+  {
+    "loss": 0.6332167387008667,
+    "gradient_norm": 0.21188676357269287,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 48,
+    "learning_rate": 0.002,
+    "seconds": 2.07900709239766
+  },
+  {
+    "loss": 0.6398259401321411,
+    "gradient_norm": 0.21270926296710968,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 49,
+    "learning_rate": 0.002,
+    "seconds": 2.036723759956658
+  },
+  {
+    "loss": 0.6302481889724731,
+    "gradient_norm": 0.21181009709835052,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 50,
+    "learning_rate": 0.002,
+    "seconds": 2.230947053991258
+  },
+  {
+    "loss": 0.6246292591094971,
+    "gradient_norm": 0.21720458567142487,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 51,
+    "learning_rate": 0.002,
+    "seconds": 1.8227014793083072
+  },
+  {
+    "loss": 0.6057090163230896,
+    "gradient_norm": 0.20432451367378235,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 52,
+    "learning_rate": 0.002,
+    "seconds": 1.802735636010766
+  },
+  {
+    "loss": 0.612605094909668,
+    "gradient_norm": 0.20989477634429932,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 53,
+    "learning_rate": 0.002,
+    "seconds": 1.8064343873411417
+  },
+  {
+    "loss": 0.5923673510551453,
+    "gradient_norm": 0.20163170993328094,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 54,
+    "learning_rate": 0.002,
+    "seconds": 1.813812619075179
+  },
+  {
+    "loss": 0.5965004563331604,
+    "gradient_norm": 0.20417474210262299,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 55,
+    "learning_rate": 0.002,
+    "seconds": 1.8085791892372072
+  },
+  {
+    "loss": 0.5870788097381592,
+    "gradient_norm": 0.20373889803886414,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 56,
+    "learning_rate": 0.002,
+    "seconds": 1.928601804189384
+  },
+  {
+    "loss": 0.5732888579368591,
+    "gradient_norm": 0.19825541973114014,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 57,
+    "learning_rate": 0.002,
+    "seconds": 1.9953276542946696
+  },
+  {
+    "loss": 0.5794798731803894,
+    "gradient_norm": 0.20245316624641418,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 58,
+    "learning_rate": 0.002,
+    "seconds": 1.79247089009732
+  },
+  {
+    "loss": 0.5803276896476746,
+    "gradient_norm": 0.20340228080749512,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 59,
+    "learning_rate": 0.002,
+    "seconds": 1.8880204209126532
+  },
+  {
+    "loss": 0.5728127360343933,
+    "gradient_norm": 0.2009926736354828,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 60,
+    "learning_rate": 0.002,
+    "seconds": 1.97095071291551
+  },
+  {
+    "loss": 0.5538257360458374,
+    "gradient_norm": 0.1995614916086197,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 61,
+    "learning_rate": 0.002,
+    "seconds": 2.1075317710638046
+  },
+  {
+    "loss": 0.5664310455322266,
+    "gradient_norm": 0.22386856377124786,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 62,
+    "learning_rate": 0.002,
+    "seconds": 1.979631019756198
+  },
+  {
+    "loss": 0.6691574454307556,
+    "gradient_norm": 0.19725430011749268,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 63,
+    "learning_rate": 0.002,
+    "seconds": 1.7862835889682174
+  },
+  {
+    "loss": 0.5527426600456238,
+    "gradient_norm": 0.21021735668182373,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 64,
+    "learning_rate": 0.002,
+    "seconds": 2.088907848112285
+  },
+  {
+    "loss": 0.5208874344825745,
+    "gradient_norm": 0.19103866815567017,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 65,
+    "learning_rate": 0.002,
+    "seconds": 1.7228956948965788
+  },
+  {
+    "loss": 0.5319046974182129,
+    "gradient_norm": 0.1878684163093567,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 66,
+    "learning_rate": 0.002,
+    "seconds": 1.756006675772369
+  },
+  {
+    "loss": 0.5322691202163696,
+    "gradient_norm": 0.20077422261238098,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 67,
+    "learning_rate": 0.002,
+    "seconds": 1.8128676642663777
+  },
+  {
+    "loss": 0.542044997215271,
+    "gradient_norm": 0.2018279731273651,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 68,
+    "learning_rate": 0.002,
+    "seconds": 1.6819465961307287
+  },
+  {
+    "loss": 0.5236619710922241,
+    "gradient_norm": 0.2135898321866989,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 69,
+    "learning_rate": 0.002,
+    "seconds": 1.9822266260161996
+  },
+  {
+    "loss": 0.5785764455795288,
+    "gradient_norm": 0.2072974294424057,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 70,
+    "learning_rate": 0.002,
+    "seconds": 1.93358922470361
+  },
+  {
+    "loss": 0.5119611620903015,
+    "gradient_norm": 0.19514048099517822,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 71,
+    "learning_rate": 0.002,
+    "seconds": 1.950723045039922
+  },
+  {
+    "loss": 0.5201972126960754,
+    "gradient_norm": 0.20074498653411865,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 72,
+    "learning_rate": 0.002,
+    "seconds": 2.13892222288996
+  },
+  {
+    "loss": 0.49987515807151794,
+    "gradient_norm": 0.19362327456474304,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 73,
+    "learning_rate": 0.002,
+    "seconds": 1.9438712941482663
+  },
+  {
+    "loss": 0.5058383941650391,
+    "gradient_norm": 0.19589920341968536,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 74,
+    "learning_rate": 0.002,
+    "seconds": 2.4892516573891044
+  },
+  {
+    "loss": 0.49209991097450256,
+    "gradient_norm": 0.19300483167171478,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 75,
+    "learning_rate": 0.002,
+    "seconds": 1.9006164288148284
+  },
+  {
+    "loss": 0.4843066930770874,
+    "gradient_norm": 0.18934348225593567,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 76,
+    "learning_rate": 0.002,
+    "seconds": 1.7818090207874775
+  },
+  {
+    "loss": 0.4854868948459625,
+    "gradient_norm": 0.19231387972831726,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 77,
+    "learning_rate": 0.002,
+    "seconds": 1.768256242852658
+  },
+  {
+    "loss": 0.4850073754787445,
+    "gradient_norm": 0.1889360249042511,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 78,
+    "learning_rate": 0.002,
+    "seconds": 1.8705960996448994
+  },
+  {
+    "loss": 0.4774670898914337,
+    "gradient_norm": 0.1928916573524475,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 79,
+    "learning_rate": 0.002,
+    "seconds": 1.661835031118244
+  },
+  {
+    "loss": 0.47127407789230347,
+    "gradient_norm": 0.19535931944847107,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 80,
+    "learning_rate": 0.002,
+    "seconds": 2.1002323431894183
+  },
+  {
+    "loss": 0.4609994888305664,
+    "gradient_norm": 0.18797874450683594,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 81,
+    "learning_rate": 0.002,
+    "seconds": 1.7785024708136916
+  },
+  {
+    "loss": 0.45664480328559875,
+    "gradient_norm": 0.18505015969276428,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 82,
+    "learning_rate": 0.002,
+    "seconds": 1.7420860980637372
+  },
+  {
+    "loss": 0.4608175754547119,
+    "gradient_norm": 0.18892525136470795,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 83,
+    "learning_rate": 0.002,
+    "seconds": 2.000281867571175
+  },
+  {
+    "loss": 0.4574528634548187,
+    "gradient_norm": 0.18447764217853546,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 84,
+    "learning_rate": 0.002,
+    "seconds": 1.9093593750149012
+  },
+  {
+    "loss": 0.4476329982280731,
+    "gradient_norm": 0.18466044962406158,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 85,
+    "learning_rate": 0.002,
+    "seconds": 1.6808134238235652
+  },
+  {
+    "loss": 0.44401833415031433,
+    "gradient_norm": 0.18705348670482635,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 86,
+    "learning_rate": 0.002,
+    "seconds": 1.7106635188683867
+  },
+  {
+    "loss": 0.43541622161865234,
+    "gradient_norm": 0.18267282843589783,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 87,
+    "learning_rate": 0.002,
+    "seconds": 1.8097219299525023
+  },
+  {
+    "loss": 0.4301320016384125,
+    "gradient_norm": 0.18178847432136536,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 88,
+    "learning_rate": 0.002,
+    "seconds": 1.6702397717162967
+  },
+  {
+    "loss": 0.4252530634403229,
+    "gradient_norm": 0.17878328263759613,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 89,
+    "learning_rate": 0.002,
+    "seconds": 1.6814171820878983
+  },
+  {
+    "loss": 0.42160534858703613,
+    "gradient_norm": 0.18394017219543457,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 90,
+    "learning_rate": 0.002,
+    "seconds": 1.9683365179225802
+  },
+  {
+    "loss": 0.4166434407234192,
+    "gradient_norm": 0.1799786537885666,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 91,
+    "learning_rate": 0.002,
+    "seconds": 1.9063688581809402
+  },
+  {
+    "loss": 0.4148494005203247,
+    "gradient_norm": 0.17883218824863434,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 92,
+    "learning_rate": 0.002,
+    "seconds": 1.9928216324187815
+  },
+  {
+    "loss": 0.41602712869644165,
+    "gradient_norm": 0.1856124848127365,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 93,
+    "learning_rate": 0.002,
+    "seconds": 2.0595537810586393
+  },
+  {
+    "loss": 0.41865652799606323,
+    "gradient_norm": 0.18391725420951843,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 94,
+    "learning_rate": 0.002,
+    "seconds": 2.197086688131094
+  },
+  {
+    "loss": 0.3986118733882904,
+    "gradient_norm": 0.18054518103599548,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 95,
+    "learning_rate": 0.002,
+    "seconds": 1.7738263988867402
+  },
+  {
+    "loss": 0.40029823780059814,
+    "gradient_norm": 0.18338914215564728,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 96,
+    "learning_rate": 0.002,
+    "seconds": 2.079763586167246
+  },
+  {
+    "loss": 0.3957422971725464,
+    "gradient_norm": 0.18279534578323364,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 97,
+    "learning_rate": 0.002,
+    "seconds": 1.7878270647488534
+  },
+  {
+    "loss": 0.38989558815956116,
+    "gradient_norm": 0.18168134987354279,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 98,
+    "learning_rate": 0.002,
+    "seconds": 1.7477068318985403
+  },
+  {
+    "loss": 0.376102477312088,
+    "gradient_norm": 0.1825428605079651,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 99,
+    "learning_rate": 0.002,
+    "seconds": 1.767688686028123
+  },
+  {
+    "loss": 0.3734888434410095,
+    "gradient_norm": 0.17885375022888184,
+    "track_presentations": 64,
+    "stage": "TCM",
+    "update": 100,
+    "learning_rate": 0.002,
+    "seconds": 1.6679048454388976
+  },
+  {
+    "loss": 18.883289337158203,
+    "association_loss": 18.883289337158203,
+    "gradient_norm": 71.5114974975586,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3501",
+        "2843"
+      ],
+      "groups": [
+        {
+          "scene_index": 456,
+          "scene_id": "3501",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 193,
+          "scene_id": "2843",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 1,
+    "learning_rate": 0.002,
+    "seconds": 12.772103144787252
+  },
+  {
+    "loss": 136.85787963867188,
+    "association_loss": 136.85787963867188,
+    "gradient_norm": 735.4736328125,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 46,
+      "duplicate_pair_count": 18,
+      "scene_ids": [
+        "2776",
+        "4838"
+      ],
+      "groups": [
+        {
+          "scene_index": 463,
+          "scene_id": "2776",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 377,
+          "scene_id": "4838",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 14,
+          "duplicate_pair_count": 18,
+          "duplicate_pair_indices": [
+            1,
+            8,
+            24,
+            25,
+            30,
+            34,
+            35,
+            53
+          ],
+          "duplicate_pair_counts": [
+            5,
+            2,
+            4,
+            4,
+            3,
+            4,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 2,
+    "learning_rate": 0.002,
+    "seconds": 26.67675648070872
+  },
+  {
+    "loss": 46.71076965332031,
+    "association_loss": 46.71076965332031,
+    "gradient_norm": 468.2829284667969,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2011",
+        "792"
+      ],
+      "groups": [
+        {
+          "scene_index": 206,
+          "scene_id": "2011",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 137,
+          "scene_id": "792",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 3,
+    "learning_rate": 0.002,
+    "seconds": 30.00835843011737
+  },
+  {
+    "loss": 48.63833236694336,
+    "association_loss": 48.63833236694336,
+    "gradient_norm": 527.484130859375,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4054",
+        "4706"
+      ],
+      "groups": [
+        {
+          "scene_index": 58,
+          "scene_id": "4054",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 95,
+          "scene_id": "4706",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 4,
+    "learning_rate": 0.002,
+    "seconds": 21.249340606853366
+  },
+  {
+    "loss": 21.167634963989258,
+    "association_loss": 21.167634963989258,
+    "gradient_norm": 53.56189727783203,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4313",
+        "4466"
+      ],
+      "groups": [
+        {
+          "scene_index": 294,
+          "scene_id": "4313",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 479,
+          "scene_id": "4466",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 5,
+    "learning_rate": 0.002,
+    "seconds": 17.34717004513368
+  },
+  {
+    "loss": 18.05719566345215,
+    "association_loss": 18.05719566345215,
+    "gradient_norm": 9.984131813049316,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 44,
+      "duplicate_pair_count": 20,
+      "scene_ids": [
+        "2040",
+        "1604"
+      ],
+      "groups": [
+        {
+          "scene_index": 365,
+          "scene_id": "2040",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 471,
+          "scene_id": "1604",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 12,
+          "duplicate_pair_count": 20,
+          "duplicate_pair_indices": [
+            2,
+            3,
+            6,
+            8,
+            9,
+            15,
+            16,
+            18,
+            25
+          ],
+          "duplicate_pair_counts": [
+            2,
+            6,
+            3,
+            2,
+            5,
+            3,
+            2,
+            3,
+            3
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 6,
+    "learning_rate": 0.002,
+    "seconds": 8.053096259012818
+  },
+  {
+    "loss": 36.44425964355469,
+    "association_loss": 36.44425964355469,
+    "gradient_norm": 390.1158752441406,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1857",
+        "3594"
+      ],
+      "groups": [
+        {
+          "scene_index": 301,
+          "scene_id": "1857",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 457,
+          "scene_id": "3594",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 7,
+    "learning_rate": 0.002,
+    "seconds": 38.164960420224816
+  },
+  {
+    "loss": 19.218555450439453,
+    "association_loss": 19.218555450439453,
+    "gradient_norm": 29.439943313598633,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "51",
+        "4515"
+      ],
+      "groups": [
+        {
+          "scene_index": 428,
+          "scene_id": "51",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 387,
+          "scene_id": "4515",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 8,
+    "learning_rate": 0.002,
+    "seconds": 25.363868887070566
+  },
+  {
+    "loss": 22.56709861755371,
+    "association_loss": 22.56709861755371,
+    "gradient_norm": 187.22975158691406,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 56,
+      "duplicate_pair_count": 8,
+      "scene_ids": [
+        "158",
+        "1300"
+      ],
+      "groups": [
+        {
+          "scene_index": 353,
+          "scene_id": "158",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 24,
+          "duplicate_pair_count": 8,
+          "duplicate_pair_indices": [
+            18,
+            28,
+            33,
+            35,
+            36,
+            54,
+            58
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 475,
+          "scene_id": "1300",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 9,
+    "learning_rate": 0.002,
+    "seconds": 28.17219068016857
+  },
+  {
+    "loss": 18.08679962158203,
+    "association_loss": 18.08679962158203,
+    "gradient_norm": 16.68499183654785,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4626",
+        "1142"
+      ],
+      "groups": [
+        {
+          "scene_index": 286,
+          "scene_id": "4626",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 105,
+          "scene_id": "1142",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 10,
+    "learning_rate": 0.002,
+    "seconds": 37.0468382188119
+  },
+  {
+    "loss": 23.28146743774414,
+    "association_loss": 23.28146743774414,
+    "gradient_norm": 169.34371948242188,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 47,
+      "duplicate_pair_count": 17,
+      "scene_ids": [
+        "3152",
+        "118"
+      ],
+      "groups": [
+        {
+          "scene_index": 290,
+          "scene_id": "3152",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 15,
+          "duplicate_pair_count": 17,
+          "duplicate_pair_indices": [
+            1,
+            11,
+            13,
+            14,
+            18,
+            28,
+            29,
+            31,
+            44,
+            46
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            3,
+            2,
+            2,
+            2,
+            3,
+            3,
+            6,
+            2
+          ]
+        },
+        {
+          "scene_index": 182,
+          "scene_id": "118",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 11,
+    "learning_rate": 0.002,
+    "seconds": 9.171225320082158
+  },
+  {
+    "loss": 18.628063201904297,
+    "association_loss": 18.628063201904297,
+    "gradient_norm": 57.84049987792969,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4479",
+        "1812"
+      ],
+      "groups": [
+        {
+          "scene_index": 236,
+          "scene_id": "4479",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 437,
+          "scene_id": "1812",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 12,
+    "learning_rate": 0.002,
+    "seconds": 22.06545007135719
+  },
+  {
+    "loss": 20.174091339111328,
+    "association_loss": 20.174091339111328,
+    "gradient_norm": 21.666988372802734,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "882",
+        "4826"
+      ],
+      "groups": [
+        {
+          "scene_index": 76,
+          "scene_id": "882",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 334,
+          "scene_id": "4826",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 13,
+    "learning_rate": 0.002,
+    "seconds": 22.429973633028567
+  },
+  {
+    "loss": 19.789356231689453,
+    "association_loss": 19.789356231689453,
+    "gradient_norm": 20.19507598876953,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4458",
+        "3280"
+      ],
+      "groups": [
+        {
+          "scene_index": 123,
+          "scene_id": "4458",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 270,
+          "scene_id": "3280",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 14,
+    "learning_rate": 0.002,
+    "seconds": 14.553678157739341
+  },
+  {
+    "loss": 18.272560119628906,
+    "association_loss": 18.272560119628906,
+    "gradient_norm": 29.558767318725586,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4428",
+        "3067"
+      ],
+      "groups": [
+        {
+          "scene_index": 222,
+          "scene_id": "4428",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 218,
+          "scene_id": "3067",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 15,
+    "learning_rate": 0.002,
+    "seconds": 18.364579766988754
+  },
+  {
+    "loss": 18.500755310058594,
+    "association_loss": 18.500755310058594,
+    "gradient_norm": 46.44232940673828,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 35,
+      "duplicate_pair_count": 29,
+      "scene_ids": [
+        "1629",
+        "2072"
+      ],
+      "groups": [
+        {
+          "scene_index": 511,
+          "scene_id": "1629",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 14,
+          "duplicate_pair_count": 18,
+          "duplicate_pair_indices": [
+            1,
+            32,
+            33,
+            41,
+            42,
+            51,
+            60,
+            61,
+            62,
+            64
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            4,
+            4,
+            3,
+            2,
+            2,
+            3,
+            2,
+            4
+          ]
+        },
+        {
+          "scene_index": 214,
+          "scene_id": "2072",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 21,
+          "duplicate_pair_count": 11,
+          "duplicate_pair_indices": [
+            5,
+            6,
+            9,
+            12,
+            20,
+            36,
+            39,
+            40
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            5,
+            2,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 16,
+    "learning_rate": 0.002,
+    "seconds": 8.091010755859315
+  },
+  {
+    "loss": 18.87696075439453,
+    "association_loss": 18.87696075439453,
+    "gradient_norm": 17.495607376098633,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 49,
+      "duplicate_pair_count": 15,
+      "scene_ids": [
+        "589",
+        "1826"
+      ],
+      "groups": [
+        {
+          "scene_index": 379,
+          "scene_id": "589",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 17,
+          "duplicate_pair_count": 15,
+          "duplicate_pair_indices": [
+            11,
+            24,
+            25,
+            27,
+            33,
+            43,
+            44,
+            51
+          ],
+          "duplicate_pair_counts": [
+            2,
+            4,
+            2,
+            3,
+            3,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "scene_index": 39,
+          "scene_id": "1826",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 17,
+    "learning_rate": 0.002,
+    "seconds": 23.256440076977015
+  },
+  {
+    "loss": 18.609848022460938,
+    "association_loss": 18.609848022460938,
+    "gradient_norm": 16.78424072265625,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4466",
+        "2082"
+      ],
+      "groups": [
+        {
+          "scene_index": 479,
+          "scene_id": "4466",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 368,
+          "scene_id": "2082",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 18,
+    "learning_rate": 0.002,
+    "seconds": 15.247517291922122
+  },
+  {
+    "loss": 18.387710571289062,
+    "association_loss": 18.387710571289062,
+    "gradient_norm": 49.39651870727539,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3711",
+        "2757"
+      ],
+      "groups": [
+        {
+          "scene_index": 279,
+          "scene_id": "3711",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 324,
+          "scene_id": "2757",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 19,
+    "learning_rate": 0.002,
+    "seconds": 7.595493743661791
+  },
+  {
+    "loss": 19.485977172851562,
+    "association_loss": 19.485977172851562,
+    "gradient_norm": 66.36800384521484,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2082",
+        "459"
+      ],
+      "groups": [
+        {
+          "scene_index": 368,
+          "scene_id": "2082",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 72,
+          "scene_id": "459",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 20,
+    "learning_rate": 0.002,
+    "seconds": 1.4750381372869015,
+    "selection": {
+      "threshold": -10.935664176940918,
+      "macro_f1": 0.40980538977734565,
+      "candidate_count": 29004,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    },
+    "validation_seconds": 587.6868258998729
+  },
+  {
+    "loss": 18.062313079833984,
+    "association_loss": 18.062313079833984,
+    "gradient_norm": 12.732446670532227,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 51,
+      "duplicate_pair_count": 13,
+      "scene_ids": [
+        "858",
+        "4741"
+      ],
+      "groups": [
+        {
+          "scene_index": 84,
+          "scene_id": "858",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 19,
+          "duplicate_pair_count": 13,
+          "duplicate_pair_indices": [
+            5,
+            28,
+            64,
+            95,
+            219,
+            265,
+            274
+          ],
+          "duplicate_pair_counts": [
+            2,
+            4,
+            4,
+            3,
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 102,
+          "scene_id": "4741",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 21,
+    "learning_rate": 0.002,
+    "seconds": 19.999870006926358
+  },
+  {
+    "loss": 17.878021240234375,
+    "association_loss": 17.878021240234375,
+    "gradient_norm": 24.03510093688965,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3641",
+        "4591"
+      ],
+      "groups": [
+        {
+          "scene_index": 451,
+          "scene_id": "3641",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 140,
+          "scene_id": "4591",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 22,
+    "learning_rate": 0.002,
+    "seconds": 43.62762470729649
+  },
+  {
+    "loss": 16.96957015991211,
+    "association_loss": 16.96957015991211,
+    "gradient_norm": 17.789573669433594,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4190",
+        "4256"
+      ],
+      "groups": [
+        {
+          "scene_index": 427,
+          "scene_id": "4190",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 161,
+          "scene_id": "4256",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 23,
+    "learning_rate": 0.002,
+    "seconds": 27.392041742801666
+  },
+  {
+    "loss": 34.74469757080078,
+    "association_loss": 34.74469757080078,
+    "gradient_norm": 402.3864440917969,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "249",
+        "858"
+      ],
+      "groups": [
+        {
+          "scene_index": 152,
+          "scene_id": "249",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 84,
+          "scene_id": "858",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 24,
+    "learning_rate": 0.002,
+    "seconds": 7.113788350019604
+  },
+  {
+    "loss": 28.086685180664062,
+    "association_loss": 28.086685180664062,
+    "gradient_norm": 66.25776672363281,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3562",
+        "2325"
+      ],
+      "groups": [
+        {
+          "scene_index": 443,
+          "scene_id": "3562",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 242,
+          "scene_id": "2325",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 25,
+    "learning_rate": 0.002,
+    "seconds": 35.18609972856939
+  },
+  {
+    "loss": 17.15329360961914,
+    "association_loss": 17.15329360961914,
+    "gradient_norm": 9.66539192199707,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1591",
+        "4190"
+      ],
+      "groups": [
+        {
+          "scene_index": 507,
+          "scene_id": "1591",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 427,
+          "scene_id": "4190",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 26,
+    "learning_rate": 0.002,
+    "seconds": 5.783372336998582
+  },
+  {
+    "loss": 20.071834564208984,
+    "association_loss": 20.071834564208984,
+    "gradient_norm": 68.35067749023438,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4989",
+        "4428"
+      ],
+      "groups": [
+        {
+          "scene_index": 12,
+          "scene_id": "4989",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 222,
+          "scene_id": "4428",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 27,
+    "learning_rate": 0.002,
+    "seconds": 31.00352280633524
+  },
+  {
+    "loss": 21.039337158203125,
+    "association_loss": 21.039337158203125,
+    "gradient_norm": 78.42401885986328,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2757",
+        "2523"
+      ],
+      "groups": [
+        {
+          "scene_index": 324,
+          "scene_id": "2757",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 347,
+          "scene_id": "2523",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 28,
+    "learning_rate": 0.002,
+    "seconds": 0.4727297849021852
+  },
+  {
+    "loss": 17.976181030273438,
+    "association_loss": 17.976181030273438,
+    "gradient_norm": 2.159621000289917,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 49,
+      "duplicate_pair_count": 15,
+      "scene_ids": [
+        "3948",
+        "830"
+      ],
+      "groups": [
+        {
+          "scene_index": 145,
+          "scene_id": "3948",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 17,
+          "duplicate_pair_count": 15,
+          "duplicate_pair_indices": [
+            0,
+            5,
+            7,
+            15,
+            18,
+            36,
+            43,
+            44,
+            56,
+            65
+          ],
+          "duplicate_pair_counts": [
+            3,
+            3,
+            2,
+            2,
+            2,
+            3,
+            2,
+            4,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 97,
+          "scene_id": "830",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 29,
+    "learning_rate": 0.002,
+    "seconds": 22.47039582999423
+  },
+  {
+    "loss": 20.062435150146484,
+    "association_loss": 20.062435150146484,
+    "gradient_norm": 13.104345321655273,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 48,
+      "duplicate_pair_count": 16,
+      "scene_ids": [
+        "1927",
+        "4842"
+      ],
+      "groups": [
+        {
+          "scene_index": 252,
+          "scene_id": "1927",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 16,
+          "duplicate_pair_count": 16,
+          "duplicate_pair_indices": [
+            0,
+            2,
+            7,
+            10,
+            11,
+            12,
+            15,
+            20,
+            21,
+            24
+          ],
+          "duplicate_pair_counts": [
+            2,
+            3,
+            3,
+            3,
+            3,
+            4,
+            2,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 391,
+          "scene_id": "4842",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 30,
+    "learning_rate": 0.002,
+    "seconds": 14.291284092701972
+  },
+  {
+    "loss": 18.072046279907227,
+    "association_loss": 18.072046279907227,
+    "gradient_norm": 10.400825500488281,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2169",
+        "4479"
+      ],
+      "groups": [
+        {
+          "scene_index": 156,
+          "scene_id": "2169",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 236,
+          "scene_id": "4479",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 31,
+    "learning_rate": 0.002,
+    "seconds": 24.806522681377828
+  },
+  {
+    "loss": 23.004520416259766,
+    "association_loss": 23.004520416259766,
+    "gradient_norm": 109.33793640136719,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "882",
+        "1286"
+      ],
+      "groups": [
+        {
+          "scene_index": 76,
+          "scene_id": "882",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 423,
+          "scene_id": "1286",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 32,
+    "learning_rate": 0.002,
+    "seconds": 18.336772565264255
+  },
+  {
+    "loss": 23.891860961914062,
+    "association_loss": 23.891860961914062,
+    "gradient_norm": 108.88740539550781,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1461",
+        "2725"
+      ],
+      "groups": [
+        {
+          "scene_index": 296,
+          "scene_id": "1461",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 278,
+          "scene_id": "2725",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 33,
+    "learning_rate": 0.002,
+    "seconds": 35.75680423760787
+  },
+  {
+    "loss": 19.373531341552734,
+    "association_loss": 19.373531341552734,
+    "gradient_norm": 59.298152923583984,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "134",
+        "4249"
+      ],
+      "groups": [
+        {
+          "scene_index": 238,
+          "scene_id": "134",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 68,
+          "scene_id": "4249",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 34,
+    "learning_rate": 0.002,
+    "seconds": 33.541190028656274
+  },
+  {
+    "loss": 25.420085906982422,
+    "association_loss": 25.420085906982422,
+    "gradient_norm": 17.628986358642578,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 50,
+      "duplicate_pair_count": 14,
+      "scene_ids": [
+        "2997",
+        "1789"
+      ],
+      "groups": [
+        {
+          "scene_index": 20,
+          "scene_id": "2997",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 18,
+          "duplicate_pair_count": 14,
+          "duplicate_pair_indices": [
+            2,
+            6,
+            17,
+            19,
+            22,
+            23,
+            24,
+            31,
+            34,
+            43
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            3,
+            4,
+            3,
+            2,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 107,
+          "scene_id": "1789",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 35,
+    "learning_rate": 0.002,
+    "seconds": 21.993176688905805
+  },
+  {
+    "loss": 18.63190460205078,
+    "association_loss": 18.63190460205078,
+    "gradient_norm": 14.552016258239746,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 49,
+      "duplicate_pair_count": 15,
+      "scene_ids": [
+        "1188",
+        "2720"
+      ],
+      "groups": [
+        {
+          "scene_index": 374,
+          "scene_id": "1188",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 17,
+          "duplicate_pair_count": 15,
+          "duplicate_pair_indices": [
+            3,
+            6,
+            7,
+            15,
+            23,
+            39,
+            41,
+            45,
+            48,
+            63,
+            72,
+            76
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 195,
+          "scene_id": "2720",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 36,
+    "learning_rate": 0.002,
+    "seconds": 26.49984218319878
+  },
+  {
+    "loss": 17.986656188964844,
+    "association_loss": 17.986656188964844,
+    "gradient_norm": 13.109821319580078,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "594",
+        "1336"
+      ],
+      "groups": [
+        {
+          "scene_index": 85,
+          "scene_id": "594",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 51,
+          "scene_id": "1336",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 37,
+    "learning_rate": 0.002,
+    "seconds": 22.951997148804367
+  },
+  {
+    "loss": 22.825864791870117,
+    "association_loss": 22.825864791870117,
+    "gradient_norm": 99.66850280761719,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4313",
+        "1349"
+      ],
+      "groups": [
+        {
+          "scene_index": 294,
+          "scene_id": "4313",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 364,
+          "scene_id": "1349",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 38,
+    "learning_rate": 0.002,
+    "seconds": 19.584948937874287
+  },
+  {
+    "loss": 24.67551040649414,
+    "association_loss": 24.67551040649414,
+    "gradient_norm": 112.20805358886719,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3377",
+        "3441"
+      ],
+      "groups": [
+        {
+          "scene_index": 448,
+          "scene_id": "3377",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 75,
+          "scene_id": "3441",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 39,
+    "learning_rate": 0.002,
+    "seconds": 14.78870044508949
+  },
+  {
+    "loss": 20.08005142211914,
+    "association_loss": 20.08005142211914,
+    "gradient_norm": 65.5661849975586,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1476",
+        "2370"
+      ],
+      "groups": [
+        {
+          "scene_index": 59,
+          "scene_id": "1476",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 402,
+          "scene_id": "2370",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 40,
+    "learning_rate": 0.002,
+    "seconds": 30.11776189180091,
+    "selection": {
+      "threshold": -0.12437852472066879,
+      "macro_f1": 0.39137366191275896,
+      "candidate_count": 28975,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    },
+    "validation_seconds": 548.9499337919988
+  },
+  {
+    "loss": 18.095972061157227,
+    "association_loss": 18.095972061157227,
+    "gradient_norm": 11.75194263458252,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2688",
+        "223"
+      ],
+      "groups": [
+        {
+          "scene_index": 157,
+          "scene_id": "2688",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 495,
+          "scene_id": "223",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 41,
+    "learning_rate": 0.002,
+    "seconds": 26.702810207847506
+  },
+  {
+    "loss": 18.286298751831055,
+    "association_loss": 18.286298751831055,
+    "gradient_norm": 12.9742431640625,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 46,
+      "duplicate_pair_count": 18,
+      "scene_ids": [
+        "1879",
+        "1138"
+      ],
+      "groups": [
+        {
+          "scene_index": 354,
+          "scene_id": "1879",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 14,
+          "duplicate_pair_count": 18,
+          "duplicate_pair_indices": [
+            1,
+            8,
+            14,
+            15,
+            16,
+            22,
+            24,
+            25,
+            26,
+            27
+          ],
+          "duplicate_pair_counts": [
+            3,
+            3,
+            2,
+            4,
+            4,
+            2,
+            2,
+            4,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 503,
+          "scene_id": "1138",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 42,
+    "learning_rate": 0.002,
+    "seconds": 12.78317400533706
+  },
+  {
+    "loss": 17.85411834716797,
+    "association_loss": 17.85411834716797,
+    "gradient_norm": 4.777626991271973,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3122",
+        "97"
+      ],
+      "groups": [
+        {
+          "scene_index": 38,
+          "scene_id": "3122",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 303,
+          "scene_id": "97",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 43,
+    "learning_rate": 0.002,
+    "seconds": 10.863105080556124
+  },
+  {
+    "loss": 18.054088592529297,
+    "association_loss": 18.054088592529297,
+    "gradient_norm": 2.1002445220947266,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 50,
+      "duplicate_pair_count": 14,
+      "scene_ids": [
+        "45",
+        "3983"
+      ],
+      "groups": [
+        {
+          "scene_index": 191,
+          "scene_id": "45",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 18,
+          "duplicate_pair_count": 14,
+          "duplicate_pair_indices": [
+            14,
+            33,
+            40,
+            61,
+            102,
+            115,
+            122,
+            129,
+            151
+          ],
+          "duplicate_pair_counts": [
+            2,
+            4,
+            2,
+            2,
+            2,
+            2,
+            5,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 375,
+          "scene_id": "3983",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 44,
+    "learning_rate": 0.002,
+    "seconds": 21.430317237973213
+  },
+  {
+    "loss": 18.576824188232422,
+    "association_loss": 18.576824188232422,
+    "gradient_norm": 29.777904510498047,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1603",
+        "4928"
+      ],
+      "groups": [
+        {
+          "scene_index": 481,
+          "scene_id": "1603",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 239,
+          "scene_id": "4928",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 45,
+    "learning_rate": 0.002,
+    "seconds": 22.75452798884362
+  },
+  {
+    "loss": 18.310291290283203,
+    "association_loss": 18.310291290283203,
+    "gradient_norm": 8.879843711853027,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1886",
+        "1427"
+      ],
+      "groups": [
+        {
+          "scene_index": 308,
+          "scene_id": "1886",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 388,
+          "scene_id": "1427",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 46,
+    "learning_rate": 0.002,
+    "seconds": 34.4308692952618
+  },
+  {
+    "loss": 18.65923500061035,
+    "association_loss": 18.65923500061035,
+    "gradient_norm": 13.337059020996094,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 45,
+      "duplicate_pair_count": 19,
+      "scene_ids": [
+        "2020",
+        "4282"
+      ],
+      "groups": [
+        {
+          "scene_index": 424,
+          "scene_id": "2020",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 13,
+          "duplicate_pair_count": 19,
+          "duplicate_pair_indices": [
+            2,
+            22,
+            31,
+            37,
+            41,
+            48,
+            58,
+            64,
+            66,
+            68,
+            77
+          ],
+          "duplicate_pair_counts": [
+            4,
+            2,
+            3,
+            2,
+            3,
+            4,
+            3,
+            2,
+            2,
+            2,
+            3
+          ]
+        },
+        {
+          "scene_index": 415,
+          "scene_id": "4282",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 47,
+    "learning_rate": 0.002,
+    "seconds": 0.4755923552438617
+  },
+  {
+    "loss": 18.505416870117188,
+    "association_loss": 18.505416870117188,
+    "gradient_norm": 13.272334098815918,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1485",
+        "4282"
+      ],
+      "groups": [
+        {
+          "scene_index": 122,
+          "scene_id": "1485",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 415,
+          "scene_id": "4282",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 48,
+    "learning_rate": 0.002,
+    "seconds": 8.867185359820724
+  },
+  {
+    "loss": 18.229732513427734,
+    "association_loss": 18.229732513427734,
+    "gradient_norm": 2.115915060043335,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4741",
+        "176"
+      ],
+      "groups": [
+        {
+          "scene_index": 102,
+          "scene_id": "4741",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 127,
+          "scene_id": "176",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 49,
+    "learning_rate": 0.002,
+    "seconds": 13.228775802999735
+  },
+  {
+    "loss": 21.109304428100586,
+    "association_loss": 21.109304428100586,
+    "gradient_norm": 73.59378051757812,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "193",
+        "1788"
+      ],
+      "groups": [
+        {
+          "scene_index": 465,
+          "scene_id": "193",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 274,
+          "scene_id": "1788",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 50,
+    "learning_rate": 0.002,
+    "seconds": 37.98630468081683
+  },
+  {
+    "loss": 20.00916290283203,
+    "association_loss": 20.00916290283203,
+    "gradient_norm": 77.27386474609375,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 47,
+      "duplicate_pair_count": 17,
+      "scene_ids": [
+        "4920",
+        "2812"
+      ],
+      "groups": [
+        {
+          "scene_index": 325,
+          "scene_id": "4920",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 15,
+          "duplicate_pair_count": 17,
+          "duplicate_pair_indices": [
+            15,
+            34,
+            58,
+            59,
+            60,
+            63,
+            95,
+            99,
+            104
+          ],
+          "duplicate_pair_counts": [
+            3,
+            2,
+            2,
+            3,
+            2,
+            2,
+            5,
+            5,
+            2
+          ]
+        },
+        {
+          "scene_index": 492,
+          "scene_id": "2812",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 51,
+    "learning_rate": 0.002,
+    "seconds": 9.972760349046439
+  },
+  {
+    "loss": 19.13143539428711,
+    "association_loss": 19.13143539428711,
+    "gradient_norm": 42.732276916503906,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3344",
+        "654"
+      ],
+      "groups": [
+        {
+          "scene_index": 178,
+          "scene_id": "3344",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 159,
+          "scene_id": "654",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 52,
+    "learning_rate": 0.002,
+    "seconds": 37.808384891133755
+  },
+  {
+    "loss": 18.169708251953125,
+    "association_loss": 18.169708251953125,
+    "gradient_norm": 12.395376205444336,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 51,
+      "duplicate_pair_count": 13,
+      "scene_ids": [
+        "2712",
+        "2997"
+      ],
+      "groups": [
+        {
+          "scene_index": 187,
+          "scene_id": "2712",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 20,
+          "scene_id": "2997",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 19,
+          "duplicate_pair_count": 13,
+          "duplicate_pair_indices": [
+            16,
+            18,
+            25,
+            27,
+            32,
+            36,
+            39,
+            44
+          ],
+          "duplicate_pair_counts": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            3,
+            2,
+            4
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 53,
+    "learning_rate": 0.002,
+    "seconds": 6.156125504989177
+  },
+  {
+    "loss": 18.456771850585938,
+    "association_loss": 18.456771850585938,
+    "gradient_norm": 12.698513984680176,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3948",
+        "1327"
+      ],
+      "groups": [
+        {
+          "scene_index": 145,
+          "scene_id": "3948",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 421,
+          "scene_id": "1327",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 54,
+    "learning_rate": 0.002,
+    "seconds": 10.37673257663846
+  },
+  {
+    "loss": 16.142330169677734,
+    "association_loss": 16.142330169677734,
+    "gradient_norm": 4.758942604064941,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 48,
+      "duplicate_pair_count": 16,
+      "scene_ids": [
+        "1477",
+        "1139"
+      ],
+      "groups": [
+        {
+          "scene_index": 174,
+          "scene_id": "1477",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 16,
+          "duplicate_pair_count": 16,
+          "duplicate_pair_indices": [
+            31,
+            35,
+            37,
+            46,
+            53,
+            58,
+            65,
+            74
+          ],
+          "duplicate_pair_counts": [
+            3,
+            2,
+            2,
+            4,
+            3,
+            5,
+            2,
+            3
+          ]
+        },
+        {
+          "scene_index": 26,
+          "scene_id": "1139",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 55,
+    "learning_rate": 0.002,
+    "seconds": 25.85228552063927
+  },
+  {
+    "loss": 19.208581924438477,
+    "association_loss": 19.208581924438477,
+    "gradient_norm": 44.31882095336914,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1612",
+        "1749"
+      ],
+      "groups": [
+        {
+          "scene_index": 170,
+          "scene_id": "1612",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 259,
+          "scene_id": "1749",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 56,
+    "learning_rate": 0.002,
+    "seconds": 17.50829282682389
+  },
+  {
+    "loss": 18.671964645385742,
+    "association_loss": 18.671964645385742,
+    "gradient_norm": 34.45322799682617,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "183",
+        "1404"
+      ],
+      "groups": [
+        {
+          "scene_index": 251,
+          "scene_id": "183",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 21,
+          "scene_id": "1404",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 57,
+    "learning_rate": 0.002,
+    "seconds": 29.564518481958658
+  },
+  {
+    "loss": 18.211200714111328,
+    "association_loss": 18.211200714111328,
+    "gradient_norm": 1.8142075538635254,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 46,
+      "duplicate_pair_count": 18,
+      "scene_ids": [
+        "1661",
+        "3641"
+      ],
+      "groups": [
+        {
+          "scene_index": 86,
+          "scene_id": "1661",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 14,
+          "duplicate_pair_count": 18,
+          "duplicate_pair_indices": [
+            4,
+            7,
+            14,
+            22,
+            35,
+            41,
+            42,
+            49,
+            54
+          ],
+          "duplicate_pair_counts": [
+            3,
+            2,
+            4,
+            2,
+            2,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "scene_index": 451,
+          "scene_id": "3641",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 58,
+    "learning_rate": 0.002,
+    "seconds": 22.336843435186893
+  },
+  {
+    "loss": 18.44190216064453,
+    "association_loss": 18.44190216064453,
+    "gradient_norm": 12.561172485351562,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1386",
+        "1476"
+      ],
+      "groups": [
+        {
+          "scene_index": 276,
+          "scene_id": "1386",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 59,
+          "scene_id": "1476",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 59,
+    "learning_rate": 0.002,
+    "seconds": 12.120398412458599
+  },
+  {
+    "loss": 18.11605453491211,
+    "association_loss": 18.11605453491211,
+    "gradient_norm": 11.996807098388672,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 45,
+      "duplicate_pair_count": 19,
+      "scene_ids": [
+        "331",
+        "2108"
+      ],
+      "groups": [
+        {
+          "scene_index": 45,
+          "scene_id": "331",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 28,
+          "scene_id": "2108",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 13,
+          "duplicate_pair_count": 19,
+          "duplicate_pair_indices": [
+            3,
+            4,
+            5,
+            13,
+            14,
+            25,
+            33,
+            34,
+            35,
+            53
+          ],
+          "duplicate_pair_counts": [
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            2,
+            3,
+            3,
+            4
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 60,
+    "learning_rate": 0.002,
+    "seconds": 8.850348342675716,
+    "selection": {
+      "threshold": -0.05101440101861954,
+      "macro_f1": 0.3963487324353993,
+      "candidate_count": 28956,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    },
+    "validation_seconds": 544.818806597963
+  },
+  {
+    "loss": 18.645112991333008,
+    "association_loss": 18.645112991333008,
+    "gradient_norm": 35.01793670654297,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4096",
+        "2475"
+      ],
+      "groups": [
+        {
+          "scene_index": 459,
+          "scene_id": "4096",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 83,
+          "scene_id": "2475",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 61,
+    "learning_rate": 0.002,
+    "seconds": 15.652224354911596
+  },
+  {
+    "loss": 19.424734115600586,
+    "association_loss": 19.424734115600586,
+    "gradient_norm": 48.62037658691406,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "884",
+        "4458"
+      ],
+      "groups": [
+        {
+          "scene_index": 510,
+          "scene_id": "884",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 123,
+          "scene_id": "4458",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 62,
+    "learning_rate": 0.002,
+    "seconds": 22.527214947156608
+  },
+  {
+    "loss": 18.04541015625,
+    "association_loss": 18.04541015625,
+    "gradient_norm": 2.428696393966675,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "820",
+        "1461"
+      ],
+      "groups": [
+        {
+          "scene_index": 4,
+          "scene_id": "820",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 296,
+          "scene_id": "1461",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 63,
+    "learning_rate": 0.002,
+    "seconds": 0.8871026406995952
+  },
+  {
+    "loss": 18.597637176513672,
+    "association_loss": 18.597637176513672,
+    "gradient_norm": 13.42740535736084,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1812",
+        "820"
+      ],
+      "groups": [
+        {
+          "scene_index": 437,
+          "scene_id": "1812",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 4,
+          "scene_id": "820",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 64,
+    "learning_rate": 0.002,
+    "seconds": 12.83274532482028
+  },
+  {
+    "loss": 18.60791778564453,
+    "association_loss": 18.60791778564453,
+    "gradient_norm": 12.782240867614746,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1476",
+        "1113"
+      ],
+      "groups": [
+        {
+          "scene_index": 59,
+          "scene_id": "1476",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 412,
+          "scene_id": "1113",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 65,
+    "learning_rate": 0.002,
+    "seconds": 21.77431037928909
+  },
+  {
+    "loss": 18.03963279724121,
+    "association_loss": 18.03963279724121,
+    "gradient_norm": 5.068869113922119,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "51",
+        "1796"
+      ],
+      "groups": [
+        {
+          "scene_index": 428,
+          "scene_id": "51",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 46,
+          "scene_id": "1796",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 66,
+    "learning_rate": 0.002,
+    "seconds": 7.481167884077877
+  },
+  {
+    "loss": 18.221961975097656,
+    "association_loss": 18.221961975097656,
+    "gradient_norm": 8.155325889587402,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4278",
+        "3441"
+      ],
+      "groups": [
+        {
+          "scene_index": 472,
+          "scene_id": "4278",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 75,
+          "scene_id": "3441",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 67,
+    "learning_rate": 0.002,
+    "seconds": 4.992904452141374
+  },
+  {
+    "loss": 18.41775894165039,
+    "association_loss": 18.41775894165039,
+    "gradient_norm": 12.657271385192871,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4096",
+        "2668"
+      ],
+      "groups": [
+        {
+          "scene_index": 459,
+          "scene_id": "4096",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 203,
+          "scene_id": "2668",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 68,
+    "learning_rate": 0.002,
+    "seconds": 13.793624602723867
+  },
+  {
+    "loss": 17.996566772460938,
+    "association_loss": 17.996566772460938,
+    "gradient_norm": 10.29088306427002,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 53,
+      "duplicate_pair_count": 11,
+      "scene_ids": [
+        "2606",
+        "2909"
+      ],
+      "groups": [
+        {
+          "scene_index": 0,
+          "scene_id": "2606",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 21,
+          "duplicate_pair_count": 11,
+          "duplicate_pair_indices": [
+            4,
+            5,
+            30,
+            36,
+            44,
+            91,
+            94,
+            97,
+            100
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 483,
+          "scene_id": "2909",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 69,
+    "learning_rate": 0.002,
+    "seconds": 21.69135697511956
+  },
+  {
+    "loss": 18.355104446411133,
+    "association_loss": 18.355104446411133,
+    "gradient_norm": 21.222246170043945,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3067",
+        "1789"
+      ],
+      "groups": [
+        {
+          "scene_index": 218,
+          "scene_id": "3067",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 107,
+          "scene_id": "1789",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 70,
+    "learning_rate": 0.002,
+    "seconds": 1.57257782202214
+  },
+  {
+    "loss": 18.554454803466797,
+    "association_loss": 18.554454803466797,
+    "gradient_norm": 30.907413482666016,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4192",
+        "2575"
+      ],
+      "groups": [
+        {
+          "scene_index": 345,
+          "scene_id": "4192",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 504,
+          "scene_id": "2575",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 71,
+    "learning_rate": 0.002,
+    "seconds": 13.086988258175552
+  },
+  {
+    "loss": 18.111774444580078,
+    "association_loss": 18.111774444580078,
+    "gradient_norm": 7.910952568054199,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "402",
+        "2680"
+      ],
+      "groups": [
+        {
+          "scene_index": 60,
+          "scene_id": "402",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 310,
+          "scene_id": "2680",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 72,
+    "learning_rate": 0.002,
+    "seconds": 29.877693278249353
+  },
+  {
+    "loss": 20.08447265625,
+    "association_loss": 20.08447265625,
+    "gradient_norm": 5.600113868713379,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "713",
+        "963"
+      ],
+      "groups": [
+        {
+          "scene_index": 346,
+          "scene_id": "713",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 358,
+          "scene_id": "963",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 73,
+    "learning_rate": 0.002,
+    "seconds": 15.751546397805214
+  },
+  {
+    "loss": 19.459484100341797,
+    "association_loss": 19.459484100341797,
+    "gradient_norm": 45.738807678222656,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 45,
+      "duplicate_pair_count": 19,
+      "scene_ids": [
+        "2566",
+        "2378"
+      ],
+      "groups": [
+        {
+          "scene_index": 404,
+          "scene_id": "2566",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 329,
+          "scene_id": "2378",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 13,
+          "duplicate_pair_count": 19,
+          "duplicate_pair_indices": [
+            2,
+            7,
+            10,
+            14,
+            15,
+            19,
+            27,
+            28,
+            31,
+            42
+          ],
+          "duplicate_pair_counts": [
+            3,
+            2,
+            5,
+            2,
+            3,
+            3,
+            3,
+            3,
+            3,
+            2
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 74,
+    "learning_rate": 0.002,
+    "seconds": 7.024593404028565
+  },
+  {
+    "loss": 17.701515197753906,
+    "association_loss": 17.701515197753906,
+    "gradient_norm": 10.105423927307129,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4965",
+        "4515"
+      ],
+      "groups": [
+        {
+          "scene_index": 160,
+          "scene_id": "4965",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 387,
+          "scene_id": "4515",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 75,
+    "learning_rate": 0.002,
+    "seconds": 24.48346853815019
+  },
+  {
+    "loss": 17.795896530151367,
+    "association_loss": 17.795896530151367,
+    "gradient_norm": 2.8426706790924072,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 49,
+      "duplicate_pair_count": 15,
+      "scene_ids": [
+        "229",
+        "3486"
+      ],
+      "groups": [
+        {
+          "scene_index": 151,
+          "scene_id": "229",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 289,
+          "scene_id": "3486",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 17,
+          "duplicate_pair_count": 15,
+          "duplicate_pair_indices": [
+            12,
+            13,
+            16,
+            42,
+            51,
+            53,
+            67,
+            75,
+            82,
+            86
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            4,
+            3,
+            2,
+            4,
+            2,
+            2
+          ]
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 76,
+    "learning_rate": 0.002,
+    "seconds": 8.059633080847561
+  },
+  {
+    "loss": 18.02236557006836,
+    "association_loss": 18.02236557006836,
+    "gradient_norm": 8.809741020202637,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3762",
+        "427"
+      ],
+      "groups": [
+        {
+          "scene_index": 349,
+          "scene_id": "3762",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 482,
+          "scene_id": "427",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 77,
+    "learning_rate": 0.002,
+    "seconds": 10.146282938774675
+  },
+  {
+    "loss": 18.336273193359375,
+    "association_loss": 18.336273193359375,
+    "gradient_norm": 24.468345642089844,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3826",
+        "265"
+      ],
+      "groups": [
+        {
+          "scene_index": 508,
+          "scene_id": "3826",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 30,
+          "scene_id": "265",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 78,
+    "learning_rate": 0.002,
+    "seconds": 27.36169851385057
+  },
+  {
+    "loss": 18.13727569580078,
+    "association_loss": 18.13727569580078,
+    "gradient_norm": 21.527620315551758,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2819",
+        "58"
+      ],
+      "groups": [
+        {
+          "scene_index": 234,
+          "scene_id": "2819",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 321,
+          "scene_id": "58",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 79,
+    "learning_rate": 0.002,
+    "seconds": 26.074255703017116
+  },
+  {
+    "loss": 18.266040802001953,
+    "association_loss": 18.266040802001953,
+    "gradient_norm": 4.055487155914307,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3501",
+        "2868"
+      ],
+      "groups": [
+        {
+          "scene_index": 456,
+          "scene_id": "3501",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 77,
+          "scene_id": "2868",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    },
+    "pair_count": 64,
+    "positive_pairs": 32,
+    "stage": "TAM_FROZEN",
+    "update": 80,
+    "learning_rate": 0.002,
+    "seconds": 4.128392959013581,
+    "selection": {
+      "threshold": -0.042965203523635864,
+      "macro_f1": 0.39728403495990466,
+      "candidate_count": 28985,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    },
+    "validation_seconds": 517.5531701180153
+  }
+]
