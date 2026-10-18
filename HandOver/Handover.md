@@ -2,7 +2,7 @@
 
 这里只保留当前入口、必要约束和历史摘要；原始L2S/S2L及结果保留，不重复领取结束轮次。
 
-## 当前：候选修正版本地交付，GPU未授权；017最新回执260/320，018关闭
+## 当前：经度边界修复完成，时间任务待讨论；017最新回执260/320，018关闭
 
 **数据追加复审已完成（10月19日）：** [定点证据与处理建议](../docs/results/dataset_followup018/README.md)。8场景原包支持vel为节、vel/cou为位置前向差分，官方指南与原论文单位冲突；3固定V场景未发现身份/offset/列/packing错误，但单片段合法query约67%在自身支撑外，约32%外推超过30分钟。候选输出尺度与冻结弱身份存在设计风险，尚无单一确定根因。两端原值保留，无本轮新发现的换算错配，**017不变，不因此停训或新开诊断/训练**。018关闭；用户已批准下述候选修正版本地实现，不删异常或远query提分，未授权新GPU。
 
@@ -34,7 +34,9 @@ Oracle位置MAE plain198.86、identity182.23、utility170.39、learned198.88公�
 
 [014报告](../docs/results/tmtaff014_local_review/README.md)：退出0、1902秒，终评1757.91秒；selected仅TAM2+TFM2、不含joint。raw多轨oracle误差千万米级；已实现仅lat/lon使用T_core固定mean/std的train_position_affine，保留旧raw行为，433全仓＋15审计CPU通过。称“TMTAFF时间与输出尺度适配近似参考”，不是作者精确实现，无修正后真实成绩。
 
-**下一步只剩资源决定与远端实验：** [完整配置草案](../docs/proposals/candidate_revision_after018/config.draft.json)固定teacher1000/u200/四臂各300，max_seconds=null；CLI打开archive前拒绝。018机械外推3.11h、4h仅待决定建议，新增GPU授权0，没有新READY，不能据本次push开跑。不再询问已批准的方法/本地实现，不另开成本探测，不挪旧额度。017仍按原任务等待新回执。
+**下一步先确认时间任务，再决定资源：** 已批准的候选实现保持完成；[完整配置草案](../docs/proposals/candidate_revision_after018/config.draft.json)给出teacher1000/u200/四臂各300，max_seconds=null，CLI打开archive前拒绝。新增[共同局部窗讨论稿](../docs/proposals/local_time_windows/README.md)待用户决定：约21分钟共同窗、保留全部有效短轨、长时任务另报；没有修改当前时间轴、采样或指标。018机械外推3.11h、4h仅待决定建议，不能作为新窗口配置成本承诺。新增GPU授权0，无新READY，不重复询问已批准的模型实现，不另开成本探测、不挪旧额度。017等待原任务新回执。
+
+**能确定的实现修复已单独处理：** [经度边界约定](../docs/specs/longitude-boundaries.md)。经度179→−179的参考插值不应穿过0°，+180与−180的损失不应算360°；新候选草案显式启用shortest_arc，旧轮次默认linear兼容。480全仓＋15审计CPU通过，独立审查通过。没有真实MTAD触发证据，不据此归因018低分；不改017正式配置、活动checkout、历史回执或结果。用户追问文献一般做法，尚未批准局部窗；21分钟不是通行标准，时间窗口选择与GPU预算仍待决定。
 
 **外部处理对照（10月19日）已完成：** [公开代码/论文/本地实现对照](../docs/results/external_mtad_processing20261019/README.md)。DTW-CM按重叠段匹配；CNN-BiMamba从reference重仿真，且存在划分前拟合统计问题，不能直接替换。TMTAFF未公开具体窗口时长，整场景Q64是我们的适配假设，长外推是待验证风险；018已有支撑内仍差，不能全归于窗口。新GPU前建议先明确时间任务；本轮没有修改已批准代码、采样/标签/预算或017任务，不重扫数据、不再重复泛搜。
 
