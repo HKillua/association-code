@@ -2,11 +2,11 @@
 
 这里保留当前入口与历史摘要。独立轮次文件保存命令与原始回执；旧轮次不重复领取。
 
-## 当前：014 独立评价 RUNNING；候选首次2小时测量已批，待014终态
+## 当前：014 独立评价 COMPLETED（首份完整融合评价已回传）；候选首次2小时测量已批，可另建新轮
 
 | 请求 | 回执 | 下一责任方 |
 | --- | --- | --- |
-| [L2S-20261018-014](L2S-20261018-014.md) | [S2L-20261018-014](S2L-20261018-014.md)（16:23 首次领取，机器记录 started_at 08:23:53Z） | SERVER_AI：执行中——单作业、一次、无重试、外层 3570 秒；只读 013 的 `selected` 快照做完整 V_select 关联与物理融合评价，不 fit／不 resume／不重选阈值／不重校准，单次≤1GPU小时 |
+| [L2S-20261018-014](L2S-20261018-014.md) | [S2L-20261018-014](S2L-20261018-014.md)（COMPLETED：16:23 领取，16:55 终态，机器记录 started_at 08:23:53Z／ended_at 08:55:35Z） | LOCAL_AI：外层退出 0、1902／3570 秒、一次无重试；五项不变量全部满足（`optimizer_updates=0`、`normalizer_refit=false`、`margin_recalibrated=false`、`threshold_reselected=false`、`test_opened=false`），人口与原口径一致。关联 macro-F1 **0.37077**（与 013 记录交叉核对一致）；**首份完整物理融合评价**已回传（`run.json`／`evaluation-progress.json` 原件、`summary.json` 无损 gz 1.09 MiB、preparation 摘要）。融合量级异常需本地判定归因，详见回执 |
 | [L2S-20261018-013](L2S-20261018-013.md) | [S2L-20261018-013](S2L-20261018-013.md)（FAILED/124，尾部含更正） | LOCAL_AI：诊断与修复已完成，旧任务关闭；014为独立评价。**服务器在 014 前置核查中发现并更正了本回执里 `checkpoint.pt` 的字节数**——实际 146,160,847 B（mtime 14:29:58，早于 14:31:27 终止），先前误记的 56,831,568 B 取自 13:37 运行中途的目录列表；只读核查确认 `selected`／`normalizer`／`effective_margin=72.6416` 均在，权重未被修改，详见该回执「服务器更正二」 |
 | [L2S-20261018-012](L2S-20261018-012.md) | [S2L-20261018-012](S2L-20261018-012.md)（COMPLETED） | LOCAL_AI：三项457件已齐，CDF七臂逐边、原manifest与010完整history已[复核](../docs/results/evidence012_local_review/README.md)；不重复取件 |
 
@@ -16,6 +16,7 @@
 
 **2026-10-18路线整理：CDF1活动训练已退役。** 用户要求对无帮助的旧方案留结论并清理代码；本轮删除CDF特征/头/编排、专用入口与旧smoke启动脚本，原结果、配置原件及历史交接保留。398项主测试、15项原生审计、39项环境工具CPU测试通过，011/012原缓存复算结果保持相同，独立review完成。TSA保留为关联诊断，主线为完整TMTAFF时间适配参考与共享补全/融合候选；候选内四臂验证机制，不再追加CDF训练或扩建TSA融合管线。详见[退役决定与后续路线](../docs/decisions/retire_cdf1_and_focus.md)。014执行入口/配置未改，本次整理不新发GPU任务。
 
+- **014终态（服务器执行记录）：** 外层退出 0、1902 秒／3570 秒、一次无重试；`run.json` = COMPLETED／`mode = selected_snapshot_evaluation_only`／`resume_from = None`／`singleton_policy = observed`／`source_cursor = {stage:3, update:2, completed_updates:8}`。五项不变量全部满足，`test_opened = false`（run 与 summary 双侧）。选卡 `--device auto` → index 0／UUID `GPU-c5a00c37…`，选定时刻 24,247 MiB 空闲且无他人计算进程（**未共卡**；运行期间未逐分钟监控，故不声称全程独占），结束后 GPU0 已释放、无残留进程。013 的 `checkpoint.pt` 只读加载、未修改。**关联**：阈值沿用 013 选中值 `−62.44205093383789`，macro-F1 `0.3707705252963268`（与 013 记录 `0.37077052529632837` 交叉核对一致）、micro-F1 0.23146、precision 0.13549（正例先验 11.3658% 的 1.19 倍）、recall 0.79345、tp/fp/fn/tn = 2616/16691/681/9020、接受率 66.6%、FPR 64.9%、ITSA 0.34550、MSTSA 0.39259；`negative_scene_count = 0`，零正例场景误触发率仍**不可测（null）**。**融合**（`fusion_forward_count = 2750`，评价 1757.91 秒）：predicted all = position MAE 1.223e7 m／RMSE 1.286e7／speed 19.95／heading 80.14°／轨迹覆盖 0.3448（377 条中 130 条，漏预测 12,180、无对应目标的预测 2,349）；oracle all = 1.290e7 m／21.30／87.63°／覆盖 1.0；`simple_fusion_oracle` = 1,797 m／12.02／22.35°；`single_source:9001` = 0.348 m／0.0227／0.0534°；`single_source:9002` = 4,357 m／28.77／54.17°。**需本地判定**：oracle 用真实身份却与 predicted 同量级（1.290e7 vs 1.223e7 m、87.63° vs 80.14°），故该量级误差**不能归因于关联错误**；非学习型对照好 4–7 个数量级；heading MAE 80–88° 接近随机（两随机角度平均绝对差 ≈90°）。最可能解释是融合头仅经 TFM 2 + JOINT 2 次更新、**基本未被训练**，但服务器不下定论（亦可能为坐标框架／单位解码缺陷），未改代码、未重跑。**产物**：`files/run.json`（34,498 B）、`files/evaluation-progress.json`（168 B）直接入库；`summary.json` 原件 21,840,613 B → `gzip -9` 为 `files/summary.json.gz` 1,143,855 B，已用解压后 `cmp` 验证逐字节一致，完整逐场景指标与关联 records 未截断；`preparation.json` 122,490,617 B 留服务器原路径，另提取 `files/preparation_extract.json`（576 场景／训练 512／验证 64、`test_opened = false`、顶层 132.22 秒）。无单文件超过 2 MiB 进入 Git。
 - **013原件核验：** 外层退出124、3579秒；四阶段共8更新与两次完整V关联验证完成，实际margin72.641586。最终评价已进入79.38秒后中断，物理融合是否已开始无细粒度证据；没有完整融合指标。校准1498.10秒、训练750.62秒、关联验证1112.89秒。完整核查及回执纠正见[本地审阅](../docs/results/tmtaff013_local_review/README.md)。该1小时预算关闭，不自动重跑或缩校准/改采样。
 - **013分析与修复：** [诊断](../docs/results/tmtaff013_decisions/analysis.md)表明校准恢复负hinge信号但不等于距离学好；全流程物理梯度仅覆盖160独立正对，selected仅TFM2步96对，不能判断充分训练效果。冻结TFM步内补全缓存、selected独立评价与细分进度已实现；427项主测试＋15项审计测试通过，[实现与复核](../docs/results/tmtaff013_decisions/implementation.md)。没有新GPU执行。
 - **候选实现已完成：** 用户授权review后本地实现CPU/GPU。共享原生E/D完成物理补全/融合，独立身份/效用头；首版固定身份的普通、身份、效用、普通学习门控四臂。410项全仓＋15项审计CPU测试通过，CPU/MPS合成全流程与完整规模前反向通过，CUDA本地无设备未实测。见[代码与核验](../docs/results/cooperative_local_20261018/README.md)。目前仍未做真实MTAD候选训练；首次测量配置与预算已批，领取条件见顶部。

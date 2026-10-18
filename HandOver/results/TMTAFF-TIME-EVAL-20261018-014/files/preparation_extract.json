@@ -1,0 +1,42 @@
+{
+ "_extracted_from": "runs/TMTAFF-TIME-EVAL-20261018-014-attempt-1/preparation.json",
+ "_note": "提取自 122,490,617 B 的 preparation.json；原件保留在服务器，未截断、未重新推理",
+ "data_config": {
+  "length": 64,
+  "max_observations": 128,
+  "time_unit_seconds": 20.0
+ },
+ "elapsed_seconds": 109.52912055561319,
+ "observation_members_read_count": 1152,
+ "reference_loading": "stream by scene; retain aligned L-by-4 targets only",
+ "reference_members_read_count": 576,
+ "resampled_with_legacy_scene64": false,
+ "scenes_count": 576,
+ "scope": "TMTAFF-time-adapted-v1",
+ "selection_split": "V_select",
+ "splits_aggregated": {
+  "T_core": {
+   "candidate_count": 0,
+   "node_count": 0,
+   "positive_count": 0,
+   "scenes": 512,
+   "target_count": 0,
+   "target_without_input_count": 0,
+   "target_without_reference_count": 0
+  },
+  "V_select": {
+   "candidate_count": 0,
+   "node_count": 0,
+   "positive_count": 0,
+   "scenes": 64,
+   "target_count": 0,
+   "target_without_input_count": 0,
+   "target_without_reference_count": 0
+  }
+ },
+ "test_opened": false,
+ "training_pool_purpose": "original data-contract comparison only; no refit, calibration or optimization",
+ "training_scene_ids_count": 512,
+ "training_splits_count": 1,
+ "validation_scene_ids_count": 64
+}
