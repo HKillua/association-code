@@ -39,6 +39,10 @@ python -m unittest discover -s tests
 python -m unittest discover -s tools/pilot -p test_audit_mtad_level2.py
 ```
 
+## 输入支撑评价收尾
+
+用户随后要求立即完成代码。01f706b已将实际输入支撑/距离分层接入baseline与候选正式评价、场景汇总和预测导出，未改训练任务/原指标；见[规格与验证](../../specs/input-support-evaluation.md)。491全仓＋15审计CPU通过、两路独立复核通过；包含新增11项及合成原生ZIP正式CLI。v2正式模型入口有界复核没有新的可复现实现bug，不为凑改动重写已完成组件。
+
 ## 剩余事项
 
 本次授权的本地工作已完成。[完整配置草案](config.draft.json)给出teacher1000、utility200、四臂各300，共2400更新，`max_seconds=null`；CLI会在打开archive之前拒绝，不能凭本地代码已完成直接开训。新预算由用户另行决定，再生成独立READY和累计时限。

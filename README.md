@@ -6,6 +6,10 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 
 **CDF1本轮无专属机制收益，活动训练实现已退役；负结果、原缓存、历史交接与Git历史保留。** TSA保留为独立关联诊断对照，不充当完整融合baseline，也不自动启动新训练。旧A0、A_full和TSA关联分数不与新时间适配实验混排；`A_full`不代表完整TMTAFF。见[研究说明](docs/research_brief.md)与[退役及后续路线](docs/decisions/retire_cdf1_and_focus.md)。
 
+
+实际输入支撑评价已接入两套完整流程：[实现与验证](docs/specs/input-support-evaluation.md)。候选修正版及本轮收尾通过491全仓＋15审计CPU测试；新统计不改主指标、不追加模型调用。新增GPU预算仍未批准，无新READY；017继续冻结任务。
+
+
 ## 从这里开始
 
 10月19日新增[外部MTAD公开处理对照](docs/results/external_mtad_processing20261019/README.md)：核了公开代码与论文时间任务。整场景Q64是我们的适配选择，缺少作者确切窗口依据；尚未证明读错原始数据，未据此改协议或开训。
