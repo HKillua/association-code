@@ -10,7 +10,7 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 
 10月19日新增[外部MTAD公开处理对照](docs/results/external_mtad_processing20261019/README.md)：核了公开代码与论文时间任务。整场景Q64是我们的适配选择，缺少作者确切窗口依据；尚未证明读错原始数据，未据此改协议或开训。
 
-随后按用户要求落实[经度边界修复](docs/specs/longitude-boundaries.md)：参考插值和位置损失支持最短圆弧，新候选草案显式启用，旧配置保留原行为。仅合成边界复现，不能解释018实际低分。[共同局部窗方案](docs/proposals/local_time_windows/README.md)仍待讨论，未改时间任务或发布新GPU任务。
+随后按用户要求落实[经度边界修复](docs/specs/longitude-boundaries.md)：参考插值和位置损失支持最短圆弧，新候选草案显式启用，旧配置保留原行为。仅合成边界复现，不能解释018实际低分。[训练侧时间分析](docs/results/time_task_analysis20261019/README.md)已完成：21分钟窗将排除37.49%原同身份片段对，当前推荐保留原任务验证已实现v2，不把切窗重构设为前置。[局部窗草案](docs/proposals/local_time_windows/README.md)保留为未采用备选，未改时间任务或发布新GPU任务。
 
 10月19日[数据与训练任务定点复审](docs/results/dataset_followup018/README.md)：查明速度字段/官方单位冲突、长时外推的任务条件及候选训练尺度风险；未发现需要立刻修改017的装配错误。分析保留原始标签和全部人口，没有新增实验。
 
