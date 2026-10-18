@@ -78,6 +78,13 @@ class ReferenceTests(unittest.TestCase):
 
     def test_actual_config_role_seed_and_training_split_are_checked_without_hashes(self):
         self.fit()
+        run_path = self.root / 'fit/run.json'
+        historical = read_json(run_path)
+        historical['config']['heads'] = {'epochs': 40, 'deltas': [.5, 1., 2.]}
+        historical['config']['evaluation'] = {'bootstrap_samples': 2000}
+        historical['config']['implementation_notes']['seed_policy'] = 'Retired CDF pilot branch selection'
+        write_json(run_path, historical)
+        load_reference(self.root / 'fit', self.manifest, self.config, 'A0', 'ce', 20, 'cpu')
         changed = copy.deepcopy(self.config)
         changed["reference"]["learning_rate"] *= 2
         with self.assertRaisesRegex(ValueError, "configuration differs"):

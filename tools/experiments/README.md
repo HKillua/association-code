@@ -1,49 +1,16 @@
-# CDF1 validation comparison
+# 当前实验入口
 
-`cdf1_validation.py` reuses a **completed A0/CE/seed20 reference** and its
-`T_head`/`V_select` score caches. It loads no dataset archive and never opens
-`T_test`. Use the reference's original configuration: the loader checks completion,
-actual configuration, role/branch/seed, model contents, and cache scenes/components,
-candidate pairs and labels. Historical hashes may be absent or stale; they do not
-gate reuse.
+这些脚本提供接口，**不是服务器执行授权**。服务器仅领取[交接索引](../../HandOver/Handover.md)指向的独立READY，按其中数据、配置、累计预算与重试次数执行；push不会启动任务。
 
-010 is complete. The CDF1 and TSA implementations are integrated into local main;
-The formal [011 READY handover](../../HandOver/L2S-20261017-011.md) authorizes execution. The
-following is an interface example:
+| 入口 | 用途与边界 |
+| --- | --- |
+| `tmtaff_complete_fit.py` | TMTAFF时间适配近似参考：原生输入、四阶段训练、保存/恢复、完整关联及物理融合评价。正式训练需另有明确配置和预算。 |
+| `tmtaff_complete_evaluate.py` | 仅加载已有选中检查点完成评价；不训练、不重新拟合normalizer、不重校准margin、不重选阈值。014已授权单次最多1GPU小时，实际状态见当前索引。 |
+| `cooperative_fit.py` | 共享补全/融合候选；首轮固定身份比较普通、仅身份、身份×效用和普通可学习门控四臂。已有合成检查，尚无真实MTAD训练授权或效果。 |
+| `tsactfer_fit.py` | TSA-cTFER独立离线关联适配，不含原在线两阶段指派，也不是完整补全/融合系统。代码保留，无新增训练任务。 |
 
-```bash
-python tools/experiments/cdf1_validation.py \
-  --reference runs/FIRST-FIT-20261017-010-attempt-1 \
-  --manifest runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json \
-  --config configs/first-fit-v2.json \
-  --device cuda:0 --cpu-threads 4 \
-  --output runs/CDF1-VALIDATION-unique-attempt-1
-```
+在仓库根使用`python tools/experiments/<入口>.py --help`查看必需参数；正式数据运行采用交接中的完整命令、显式设备和新输出目录。CPU/MPS合成核验不等于真实数据训练，也不能替代CUDA成本测量。
 
-The new output contains `heads/` (existing training artifacts), `validation.json`,
-`validation.md`, and full `V_select/<arm>/` score caches for the seven fitted or
-rule-based head arms. A0 uses the original 010 cache. It trains all five learned arms using the unchanged head
-schedule: 40 epochs for each delta `[0.5, 1, 2]`, at most 3 hours inside
-`train_heads`; the handover must bound total time including artifact loading and
-reporting. Existing output directories are refused; failures retain their files.
+CDF1活动实现及`cdf1_validation.py`已退役；共享CLI的`run-pilot`与CDF `smoke`也已移除。原结果、分数缓存和只读复算保留，详见[退役决策](../../docs/decisions/retire_cdf1_and_focus.md)和[012复核](../../docs/results/evidence012_local_review/README.md)。不重新领取旧011任务。
 
-The table includes A0, calibrated A_prime, CDF1 B, EndpointMarginal, PairMLP,
-ScenePool, FixedRule and B_shuffle. Each uses the same validation candidates,
-with its own validation-selected threshold. It also reports descriptive B-minus-
-control differences, corrected and newly wrong edges and their net change, plus
-up to five actual corrected and five newly wrong A0-to-B examples in cache order.
-These complete caches support later common-subset comparisons without training again.
-A_full and independent literature baselines such as
-TSA-cTFER are separate parallel jobs and are not included here. Results from
-this selected validation set are exploratory, not final test performance or
-proof of innovation. No model/data/metric code is changed by this entry point.
-
-# TSA-cTFER offline adaptation
-
-`tsactfer_fit.py` trains one independent dual-head contrastive encoder on T_core
-and selects on the complete V_select. It does not open T_test or run the online
-two-stage assignment. See [source correspondence and fixed adaptation rules](../../docs/tsactfer_adaptation.md)
-and `configs/tsactfer-first-fit.json`. Execution requires the formal independent
-L2S handover; this README is not a READY task. The authorized additional budget
-is CDF1 3 hours + A_full 3 hours + TSA 6 hours, with at most two concurrent
-single-GPU jobs, one attempt each and no retries. T_test remains sealed.
+数据划分及T_test封存规则保持。当前重点是[完整参考与候选的两张比较表](../../docs/research_brief.md)，既有TSA/关联旧分数不与新原生时间结果直接混排。配置、数据范围、实际完成状态和结果内容用于核验，不设SHA/hash/fingerprint准入门槛。

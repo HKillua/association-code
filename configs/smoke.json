@@ -5,7 +5,5 @@
   "caps": {"T_core": 8, "T_head": 4, "V_select": 4, "T_test": 4},
   "seeds": [20],
   "reference": {"tcm_epochs": 1, "tam_epochs": 1, "batch_tracks": 8, "pair_batch_size": 8, "learning_rate": 0.002, "weight_decay": 0.0, "max_hours": 0.1, "warmup_epochs": 20, "joint_completion": true, "completion_weight": 0.1},
-  "heads": {"epochs": 2, "learning_rate": 0.01, "weight_decay": 0.0001, "deltas": [0.5, 1.0, 2.0], "max_hours": 0.1, "calibration_steps": 20},
-  "evaluation": {"bootstrap_samples": 20, "minimum_components": 10},
   "implementation_notes": {"use": "CPU contract and gradient smoke only; never compare these results to paper scores"}
 }

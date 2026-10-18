@@ -1,43 +1,24 @@
-# GPU execution notes
+# GPU执行规则
 
-**This page contains examples, not a READY task.** The current execution authority is the separate round file pointed to by `HandOver/Handover.md`. The commands below are examples; the current handover identifies the authorized stage and frozen code.
+本页规定资源行为，不授权实验。服务器仅从[交接索引](../HandOver/Handover.md)指向的独立READY领取任务，使用该轮次的配置、输出路径、总预算和重试限制。仓库push不会启动任务；本地负责实现、研究协议和结果分析，服务器负责执行监督、限时与回执。
 
-The local AI writes and tests code, fixes defects, chooses protocols, and interprets results. The server AI executes an authorized frozen request, monitors processes/resources/logs, enforces its stop conditions, and returns evidence. A Git push does not start a run or transfer monitoring responsibility to the local AI.
+## 设备与并发
 
-## Device selection
+- 按实时显存和负载选择任意兼容GPU，允许共卡，不要求空闲整卡，也不固定型号或物理编号。优先剩余显存最多、相同时负载较低的设备，启动前再次确认。
+- 每个作业使用一张卡；不默认启用多卡训练或占用全部可见卡。多个独立作业能否并发、最多几个，以当前READY为准。不得终止他人进程。
+- 选定设备后可通过`CUDA_VISIBLE_DEVICES`绑定，进程内的`cuda:0`是逻辑编号。正式CUDA请求不可静默回退CPU；本地CPU/MPS合成检查使用其明确声明的设备。
+- 预算内允许更换兼容设备，但换卡不自动增加重试次数或重置预算。不为适配设备擅自缩模型、改batch、精度、数据、依赖或研究配置；需要此类改变时回传证据。
 
-The user's direct authorization on **2026-10-17** permits dynamic GPU selection and sharing with other users. It supersedes the idle-only/no-sharing restrictions in historical ENV-004/005 instructions. The server selects a compatible visible device using current free memory and load; existing compute processes do not veto selection. Prefer the candidate with the most free memory, breaking ties by lowest utilization. No GPU model or physical GPU index is fixed. Recheck the candidate before starting and bind its UUID for that attempt.
+## 累计预算与产物
 
-Formal model execution must explicitly request CUDA. The following is a later training interface example, using the UUID selected at runtime; it does not authorize training during environment verification:
+没有全局“三次重试”等默认额度。准备、等待/选卡、训练、验证、结果写盘、失败尝试及终止清理是否发生，都在当前交接明确的累计资源上限内处理；内部限时不是额外额度。已结束轮次不重开，不将剩余额度转入下一轮。每次尝试使用新输出目录，失败证据保留。
 
-```bash
-CUDA_VISIBLE_DEVICES="$task_gpu_uuid" python -m association.cli run-pilot \
-  --archive /data/mtad/level2.zip \
-  --prepared runs/PREP-001 \
-  --config configs/pilot.json \
-  --output runs/PILOT-001 \
-  --device cuda:0
-```
+回执记录实际命令、退出码、起止时间、完成状态、配置/划分、设备型号与可见映射、共享情况、软件环境及小型结果；可记录Git版本用于协作，但不设置SHA/hash/fingerprint匹配门槛。复用产物直接检查状态、实际配置、场景/数组/标签和指标内容。进程显存分配与整卡占用要区分，共卡耗时不能当作独占硬件benchmark。
 
-Within that process, `cuda:0` refers to the first visible GPU identified by `task_gpu_uuid`, not a fixed physical index. CUDA absence is an execution failure; the formal run must not silently fall back to CPU. Record the actual device model/UUID, visible-device mapping, free memory/load, sharing status, PyTorch/CUDA versions, code SHA, config/manifest hashes, elapsed time, and the process's peak allocated memory. Distinguish process allocation from whole-device occupancy; measurements under contention are not exclusive-device benchmarks.
+大数据、权重和完整日志留在服务器，小型报告与可核对路径通过独立S2L回传。服务器不得为通过验收而改变研究语义；本地不通过SSH值守、不创建服务器后台守护、不从push推断任务已开始。
 
-The implementation runs on one selected GPU per job and does **not** default to DistributedDataParallel or occupying every visible card. Sharing a card is allowed; independent parallel jobs still require the current handover's job-count and aggregate budget. Preserve separate output paths and never terminate other users' processes. Resource failures may trigger a different candidate within the same budget and attempt limit, without changing the model, batch, precision, dependencies, or data protocol.
+## 当前入口与检查边界
 
-ENV-005 has already passed CPU and CUDA verification on the server. GPU-POLICY-006 only synchronizes this policy and performs one bounded, read-only device query; it does not repeat that verification. Later GPU tasks supply their own execution and waiting budgets. Resource failures may use up to 3 attempts within the current task's explicit limit, including termination grace, without resetting its deadline. The separate READY request supplies executable commands and any required CPU evidence source.
+完整参考、独立评价、候选和TSA关联接口见[实验工具](../tools/experiments/README.md)。CDF1的`run-pilot/smoke/cdf1_validation`已退役。014按已发布的单次最多1GPU小时仅评价013选中检查点；实际领取/终态以当前索引为准，正式参考与候选训练仍需新的具体配置及预算。
 
-## Preparation and local verification
-
-Data preparation performs no GPU computation. A later authorized request may use:
-
-```bash
-python -m association.cli prepare \
-  --archive /data/mtad/level2.zip \
-  --config configs/pilot.json \
-  --output runs/PREP-001
-```
-
-The output directory must be new. Preparation hashes the archive, creates the shared-A component manifest, checks training/validation coverage, and defers held-out test measurements until frozen evaluation. Training must use that saved manifest rather than generate a different split opportunistically.
-
-Local unit tests and synthetic CPU smoke runs validate interfaces, gradients, caching, and report generation. They **do not** establish that CUDA training succeeds, provide runtime or memory estimates on the selected GPU, validate the real-data reference model, or measure research performance. The server must first satisfy the actual environment handover and then receive a separate bounded training request.
-
-Keep data, weights, caches, and full logs on the server. Return small reports and artifact paths/hashes through the HandOver protocol. Preserve failed run directories; do not overwrite them or retry with a changed model/split/config without a new local decision.
+已有manifest按既定划分复用，不为例行检查重复准备数据。CPU单元测试和合成GPU检查验证软件行为，不证明真实MTAD效果、CUDA硬件可用或正式总成本。环境验证通过后也不会自动产生训练授权。其他权限及协作边界见[AGENTS](../AGENTS.md)和[现场授权](server_autonomy.md)。

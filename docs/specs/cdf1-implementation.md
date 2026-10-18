@@ -1,5 +1,7 @@
 # CDF1 implementation contract
 
+> 2026-10-18已退役，仅保留历史规格。当前判断与路线见[CDF1退役决定](../decisions/retire_cdf1_and_focus.md)；旧代码及启动脚本可从[清理前版本](https://github.com/HKillua/association-code/tree/7766b86)恢复。本文不授权执行。
+
 Scope: executable MTAD ZIP ingestion, identity-isolated split, TMTAFF-style TCM+TAM association reference (CE and contrastive branches), frozen-score contextual correction and required controls, validation-only selection and held-out evaluation. This is an association pilot, not the full TMTAFF/TFM system or official MTAD V4 scorer. Source design: IDEA-CDF1-20261016-v1.1, TMTAFF DOI 10.3390/app16147251; author implementation is unavailable. Implementation choices and differences must be recorded in the run configuration.
 
 ## Shared module interfaces

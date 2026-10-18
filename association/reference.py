@@ -375,7 +375,19 @@ def load_reference(path, manifest, config, role, branch, seed, device):
     run = runtime.read_json(path / "run.json")
     if run.get("status") != "COMPLETED":
         raise ValueError("reference is not a completed run")
-    if run.get("config") != runtime.jsonable(config):
+    recorded_config = run.get("config")
+    requested_config = runtime.jsonable(config)
+    # CDF heads were downstream of this reference, not part of its fit. Old
+    # checkpoints can retain those retired settings while current configs omit them.
+    def without_retired_cdf_fields(value):
+        if not isinstance(value, dict):
+            return value
+        value = {key: item for key, item in value.items() if key not in ("heads", "evaluation")}
+        if isinstance(value.get("implementation_notes"), dict):
+            value["implementation_notes"] = {key: item for key, item in value["implementation_notes"].items()
+                                             if key != "seed_policy"}
+        return value
+    if without_retired_cdf_fields(recorded_config) != without_retired_cdf_fields(requested_config):
         raise ValueError("reference configuration differs from requested configuration")
     summary = runtime.read_json(path / "summary.json")
     expected = {"role": role, "branch": branch, "seed": int(seed)}

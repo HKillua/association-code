@@ -19,7 +19,7 @@ def _parser():
     prepare.add_argument('--archive', required=True)
     prepare.add_argument('--config', default='configs/pilot.json')
     prepare.add_argument('--output', required=True)
-    for name in ('train-reference', 'run-pilot', 'profile', 'probe-training'):
+    for name in ('train-reference', 'profile', 'probe-training'):
         command = sub.add_parser(name)
         command.add_argument('--archive', required=True)
         manifest = command.add_mutually_exclusive_group(required=True)
@@ -29,21 +29,12 @@ def _parser():
         command.add_argument('--output', required=True)
         command.add_argument('--device', required=True, help='Explicit cuda:0 on server; cpu for local checks')
         command.add_argument('--cpu-threads', type=int, default=4)
-        if name in ('train-reference', 'profile', 'probe-training'):
-            command.add_argument('--role', choices=['A0', 'A_full'], required=True)
-            command.add_argument('--branch', choices=['ce', 'contrastive'], required=True)
-            command.add_argument('--seed', type=int, required=True)
-        if name == 'run-pilot':
-            command.add_argument('--seeds', nargs='+', type=int, help='Nonempty prefix of declared config seeds')
-            command.add_argument('--reference-root', help='Reuse a complete verified reference tree; missing fits fail')
+        command.add_argument('--role', choices=['A0', 'A_full'], required=True)
+        command.add_argument('--branch', choices=['ce', 'contrastive'], required=True)
+        command.add_argument('--seed', type=int, required=True)
         if name == 'profile':
             command.add_argument('--steps', type=int, default=200)
             command.add_argument('--max-minutes', type=float, default=30)
-    smoke = sub.add_parser('smoke', help='Synthetic end-to-end functional check; never a research result')
-    smoke.add_argument('--output', required=True)
-    smoke.add_argument('--device', required=True)
-    smoke.add_argument('--config', default='configs/smoke.json')
-    smoke.add_argument('--cpu-threads', type=int, default=1)
     return parser
 
 
@@ -74,7 +65,7 @@ def main(argv=None):
         elif staged:
             if args.command == 'profile':
                 raise ValueError('profile is for the legacy schedule; use probe-training')
-            if reference['purpose'] == 'probe' and args.command in ('train-reference', 'run-pilot', 'smoke'):
+            if reference['purpose'] == 'probe' and args.command == 'train-reference':
                 raise ValueError('probe configuration requires probe-training; it cannot run a formal experiment')
         if args.command == 'prepare':
             from .dataset import prepare
@@ -84,38 +75,22 @@ def main(argv=None):
                 raise ValueError('--cpu-threads must be positive')
             torch.set_num_threads(args.cpu_threads)
             device = device_from_string(args.device)
-            if args.command == 'smoke':
-                from .dataset import make_synthetic_archive, prepare
-                from .pipeline import run_pilot
-                if config['protocol'] != 'synthetic-smoke-only-not-research-result':
-                    raise ValueError('smoke requires an explicitly synthetic smoke config')
-                root = Path(args.output)
-                root.mkdir(parents=True, exist_ok=False)
-                archive = make_synthetic_archive(root/'fixture.zip')
-                manifest = prepare(archive, config, root/'prepared', synthetic=True)
-                run_pilot(archive, manifest, config, device, root/'pilot')
+            manifest = _manifest(args, config)
+            if args.seed not in config['seeds']:
+                raise ValueError('--seed must be declared in config.seeds')
+            if args.command == 'train-reference':
+                from .reference import train_reference
+                train_reference(args.archive, manifest, config, args.role, args.branch,
+                                args.seed, device, args.output)
+            elif args.command == 'probe-training':
+                from .staged import train_staged_reference
+                train_staged_reference(args.archive, manifest, config, args.role, args.branch,
+                                       args.seed, device, args.output)
             else:
-                manifest = _manifest(args, config)
-                if args.command == 'run-pilot':
-                    from .pipeline import run_pilot
-                    run_pilot(args.archive, manifest, config, device, args.output,
-                              reference_root=args.reference_root, seeds=args.seeds)
-                else:
-                    if args.seed not in config['seeds']:
-                        raise ValueError('--seed must be declared in config.seeds')
-                    if args.command == 'train-reference':
-                        from .reference import train_reference
-                        train_reference(args.archive, manifest, config, args.role, args.branch,
-                                        args.seed, device, args.output)
-                    elif args.command == 'probe-training':
-                        from .staged import train_staged_reference
-                        train_staged_reference(args.archive, manifest, config, args.role, args.branch,
-                                               args.seed, device, args.output)
-                    else:
-                        from .profile import profile_reference
-                        profile_reference(args.archive, manifest, config, args.role, args.branch,
-                                          args.seed, device, args.output, steps=args.steps,
-                                          max_minutes=args.max_minutes)
+                from .profile import profile_reference
+                profile_reference(args.archive, manifest, config, args.role, args.branch,
+                                  args.seed, device, args.output, steps=args.steps,
+                                  max_minutes=args.max_minutes)
         print(f'COMPLETED {Path(args.output).resolve()}', flush=True)
         return 0
     except (Exception, KeyboardInterrupt) as exc:

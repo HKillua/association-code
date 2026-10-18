@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from association.config import load_config, requested_seeds, validate_config
+from association.config import load_config, validate_config
 from association.runtime import (Run, device_from_string, load_records, read_json,
                                  save_records, semantic_binding, write_json)
 
@@ -21,12 +21,11 @@ class RuntimeConfigTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             device_from_string('mps')
 
-    def test_seed_prefix_and_budget_validation(self):
+    def test_seeds_and_budget_validation(self):
         config = load_config(ROOT/'configs/pilot.json')
-        self.assertEqual(requested_seeds(config, [20]), [20])
-        for seeds in ([], [21], [20, 22], [20, 21, 22, 23]):
-            with self.assertRaises(ValueError):
-                requested_seeds(config, seeds)
+        for seeds in ([], [20, 20], [True], [-1], [1.5]):
+            with self.subTest(seeds=seeds), self.assertRaises(ValueError):
+                validate_config(dict(config, seeds=seeds))
         config['reference']['max_hours'] = float('nan')
         with self.assertRaises(ValueError):
             validate_config(config)

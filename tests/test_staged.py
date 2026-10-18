@@ -122,12 +122,6 @@ class StagedTrainingTests(unittest.TestCase):
         self.assertEqual(report['status'],'FAILED')
         self.assertEqual(read_json(self.root/'fit'/'run.json')['status'],'FAILED')
 
-    def test_probe_cannot_enter_pipeline(self):
-        from association.pipeline import run_pilot
-        with self.assertRaisesRegex(ValueError, 'probe'):
-            run_pilot(self.archive,self.manifest,self.config,'cpu',self.root/'pilot')
-        self.assertFalse((self.root/'pilot').exists())
-
     def test_progress_write_failure_keeps_original_error_and_terminal_run(self):
         from association.runtime import write_json
         def writer(path, value):

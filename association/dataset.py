@@ -1,4 +1,4 @@
-"""Prepare portable scene records and split provenance for the CDF1 pilot."""
+"""Prepare portable scene records and split provenance for association references."""
 from __future__ import annotations
 
 from collections import Counter

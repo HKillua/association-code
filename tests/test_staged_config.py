@@ -14,7 +14,7 @@ from association.config import load_config, validate_config, validate_manifest_c
 from association.dataset import make_synthetic_archive, prepare
 from association.profile import profile_reference
 from association.reference import _check_configuration, load_reference, train_reference
-from association.runtime import read_json
+from association.runtime import read_json, semantic_binding, write_json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,6 +94,37 @@ class StagedConfigTests(unittest.TestCase):
             config['model']['length'] += 1
             with self.assertRaisesRegex(ValueError, 'length'):
                 cli._manifest(args, config)
+            # Historical hashes remain optional; semantic compatibility and
+            # completion status must still be checked after CDF retirement.
+            config = staged_config()
+            write_json(root / 'prepared' / 'manifest.json', semantic_binding(manifest))
+            changed_audit = json.loads(audit)
+            changed_audit['manifest_sha256'] = 'unrelated historical value'
+            write_json(root / 'prepared' / 'audit.json', changed_audit)
+            self.assertEqual(cli._manifest(args, config)['splits'], manifest['splits'])
+            changed_audit['status'] = 'RUNNING'
+            write_json(root / 'prepared' / 'audit.json', changed_audit)
+            with self.assertRaisesRegex(ValueError, 'not COMPLETED'):
+                cli._manifest(args, config)
+
+    def test_reference_config_accepts_optional_historical_cdf_fields(self):
+        config = load_config(ROOT / 'configs' / 'pilot.json')
+        self.assertNotIn('heads', config)
+        self.assertNotIn('evaluation', config)
+        historical = dict(config, heads={'historical': 'unused'}, evaluation={'historical': 'unused'})
+        self.assertEqual(validate_config(historical), historical)
+        self.assertEqual(_check_configuration(historical, 'A0', 'ce'),
+                         _check_configuration(config, 'A0', 'ce'))
+
+    def test_retired_commands_fail_before_loading_config_or_device(self):
+        for command in ('run-pilot', 'smoke'):
+            with self.subTest(command=command), \
+                 patch.object(cli, 'load_config', side_effect=AssertionError('config reached')), \
+                 patch.object(cli, 'device_from_string', side_effect=AssertionError('device reached')), \
+                 redirect_stderr(io.StringIO()):
+                with self.assertRaises(SystemExit) as raised:
+                    cli.main([command])
+                self.assertEqual(raised.exception.code, 2)
 
     def test_probe_rejected_by_reference_train_load_and_legacy_profile_before_data(self):
         config = staged_config()
@@ -120,12 +151,11 @@ class StagedConfigTests(unittest.TestCase):
     def _cli_args(self, command, config_path, output):
         args = [command, '--config', str(config_path), '--archive', 'missing.zip',
                 '--prepared', 'missing-prepared', '--output', str(output), '--device', 'cpu']
-        if command != 'run-pilot':
-            args += ['--role', 'A0', '--branch', 'ce', '--seed', '20']
+        args += ['--role', 'A0', '--branch', 'ce', '--seed', '20']
         return args
 
     def test_cli_rejects_mismatched_purposes_before_device_manifest_or_output(self):
-        cases = [(command, staged_config()) for command in ('train-reference', 'run-pilot', 'profile')]
+        cases = [(command, staged_config()) for command in ('train-reference', 'profile')]
         cases += [('profile', staged_config('fit')), ('probe-training', staged_config('fit')),
                   ('probe-training', load_config(ROOT / 'configs' / 'smoke.json'))]
         with tempfile.TemporaryDirectory() as directory:

@@ -39,7 +39,7 @@ def validate_config(config):
         raise ValueError('seeds must be a nonempty unique list')
     for seed in seeds:
         _number(seed, 'seed', integer=True, positive=False)
-    reference, heads, evaluation = config['reference'], config['heads'], config['evaluation']
+    reference = config['reference']
     schedule = reference.get('schedule', 'legacy')
     if schedule not in ('legacy', 'staged_updates_v2'):
         raise ValueError('Unknown reference.schedule')
@@ -63,7 +63,6 @@ def validate_config(config):
         _number(reference.get('gradient_clip', 1.0), 'reference.gradient_clip')
     for name in ('learning_rate', 'max_hours'):
         _number(reference[name], f'reference.{name}')
-        _number(heads[name], f'heads.{name}')
     for name in ('weight_decay', 'completion_weight'):
         _number(reference[name], f'reference.{name}', positive=False)
     if schedule == 'staged_updates_v2' and reference['purpose'] == 'probe':
@@ -71,29 +70,11 @@ def validate_config(config):
                             ('tam_updates', 4), ('joint_updates', 2)):
             if reference[name] > limit:
                 raise ValueError(f'probe reference.{name} must be <= {limit}')
-    _number(heads['weight_decay'], 'heads.weight_decay', positive=False)
-    for name in ('epochs', 'calibration_steps'):
-        _number(heads[name], f'heads.{name}', integer=True)
-    if not isinstance(heads['deltas'], list) or not heads['deltas'] or len(set(heads['deltas'])) != len(heads['deltas']):
-        raise ValueError('deltas must be nonempty and unique')
-    for delta in heads['deltas']:
-        _number(delta, 'delta')
-    for name in ('bootstrap_samples', 'minimum_components'):
-        _number(evaluation[name], f'evaluation.{name}', integer=True)
     return config
 
 
 def load_config(path):
     return validate_config(read_json(path))
-
-
-def requested_seeds(config, seeds=None):
-    selected = config['seeds'] if seeds is None else list(seeds)
-    # Branch selection always uses the first predeclared seed. Prefix runs can
-    # save compute; arbitrary subsets cannot silently redefine that decision.
-    if not selected or selected != config['seeds'][:len(selected)]:
-        raise ValueError('Requested seeds must be a nonempty prefix of config.seeds')
-    return selected
 
 
 def validate_manifest_config(manifest, config):
