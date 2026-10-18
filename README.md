@@ -15,10 +15,10 @@ MTAD 航迹研究的执行代码仓库。研究目标是**在不完整量测下�
 | 双端协作、修改与执行权限 | [AGENTS](AGENTS.md)、[现场授权](docs/server_autonomy.md) |
 | 论文对应、实现差异与数据协议 | [模型说明](docs/model_conformance.md)、[TSA适配](docs/tsactfer_adaptation.md)、[数据契约](docs/data_contract.md) |
 | 实际比较结果及证据边界 | [011结果分析](docs/results/compare011_interim/README.md)、[010结果](docs/first_fit_010_result.md) |
-| 完整配置与成本 | [013诊断](docs/results/tmtaff013_decisions/analysis.md)、[下一步具体方案](docs/proposals/tmtaff_after013/README.md)、[完整配置](docs/tmtaff_complete_plan.md)；新评价及正式训练预算待批 |
+| 完整配置与成本 | [013诊断](docs/results/tmtaff013_decisions/analysis.md)、[014已授权独立评价](HandOver/L2S-20261018-014.md)、[完整配置](docs/tmtaff_complete_plan.md)；正式训练预算仍待批 |
 | 命令说明与运行环境 | [执行协议](docs/pilot_execution.md)、[GPU执行](docs/gpu_execution.md) |
 
-**COMPARE-011三项均已完成。** A0/TSA/A_full的完整V_select分数已复算；CDF1汇总未显示收益，012已补回七臂逐边缓存、007 manifest和010完整history。013已终态FAILED/124，最终评价运行79.38秒后中断；本地已实现冻结TFM步内补全复用与只加载选中检查点评价的入口，未授权补跑。具体状态以[交接索引](HandOver/Handover.md)为准。发布不表示服务器已开跑，完整V_select用于开发比较，T_test继续封存。
+**COMPARE-011三项均已完成。** A0/TSA/A_full的完整V_select分数已复算；CDF1汇总未显示收益，012已补回七臂逐边缓存、007 manifest和010完整history。013已终态FAILED/124，最终评价运行79.38秒后中断；独立014现获授权单次≤1GPU小时，只加载选中检查点评价，不重训/重校准/重选。具体状态以[交接索引](HandOver/Handover.md)为准。发布不表示服务器已开跑，完整V_select用于开发比较，T_test继续封存。
 
 ## 代码导航
 
