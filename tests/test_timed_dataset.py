@@ -1,4 +1,5 @@
 import copy
+from contextlib import redirect_stderr, redirect_stdout
 import csv
 from dataclasses import asdict
 import io
@@ -263,6 +264,38 @@ class TimedDatasetTests(unittest.TestCase):
         self.assertGreater(preparation['elapsed_seconds'], 0)
         self.assertGreater(run['elapsed_seconds'], preparation['elapsed_seconds'])
         self.assertEqual(run['status'], 'COMPLETED')
+
+    def test_cli_preparation_write_failure_keeps_original_training_error_and_notes(self):
+        for original, exit_code, name in ((ValueError('original training error'), 1, 'failed'),
+                                          (KeyboardInterrupt('original interruption'), 130, 'interrupted')):
+            with self.subTest(name=name):
+                args = self.cli_args(name) + ['--device', 'cpu']
+                def fail(*args, **kwargs):
+                    (self.root/name).mkdir()
+                    raise original
+                stderr = io.StringIO()
+                with patch('association.complete_training.train_complete', side_effect=fail), \
+                        patch('tools.experiments.tmtaff_complete_fit.runtime.write_json',
+                              side_effect=OSError('secondary preparation storage error')), \
+                        redirect_stderr(stderr), redirect_stdout(io.StringIO()):
+                    self.assertEqual(main(args), exit_code)
+                self.assertIn(f'FAILED {type(original).__name__}: {original}', stderr.getvalue())
+                self.assertIn('preparation.json: OSError: secondary preparation storage error', stderr.getvalue())
+                self.assertNotIn('FAILED OSError', stderr.getvalue())
+
+    def test_cli_preparation_write_error_alone_still_fails(self):
+        args = self.cli_args('write-failed') + ['--device', 'cpu']
+        def complete(*args, **kwargs):
+            (self.root/'write-failed').mkdir()
+            return dict(status='COMPLETED')
+        stderr, stdout = io.StringIO(), io.StringIO()
+        with patch('association.complete_training.train_complete', side_effect=complete), \
+                patch('tools.experiments.tmtaff_complete_fit.runtime.write_json',
+                      side_effect=OSError('preparation storage error')), \
+                redirect_stderr(stderr), redirect_stdout(stdout):
+            self.assertEqual(main(args), 1)
+        self.assertIn('FAILED OSError: preparation storage error', stderr.getvalue())
+        self.assertNotIn('COMPLETED', stdout.getvalue())
 
 
 if __name__ == '__main__':

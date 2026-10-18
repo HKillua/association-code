@@ -108,6 +108,8 @@ def main(argv=None):
     parser.add_argument('--device', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--save-predictions', action='store_true',
+                        help='Save per-scene physical predictions and valid masks for each comparison arm')
     for name in ('archive', 'manifest', 'alignment', 'config'):
         parser.add_argument('--'+name)
     args = parser.parse_args(argv)
@@ -119,6 +121,8 @@ def main(argv=None):
     try:
         if args.cpu_threads < 1:
             raise ValueError('cpu threads must be positive')
+        if args.mode == 'shape-check' and args.save_predictions:
+            raise ValueError('--save-predictions requires check or fit, not shape-check')
         torch.set_num_threads(args.cpu_threads)
         device, output = resolve_device(args.device), Path(args.output)
         if output.exists():
@@ -154,18 +158,32 @@ def main(argv=None):
                         max_observations=model.max_observations, **config['data']),
                     alignment_by_scene=runtime.read_json(args.alignment), check=check)
                 train, validation, preparation = dataset['train'], dataset['validation'], dataset['report']
+            training_error = None
             try:
                 report = train_cooperative(train, validation, model, training, output, device=device,
-                                           initial_elapsed_seconds=time.monotonic()-started)
+                                           initial_elapsed_seconds=time.monotonic()-started,
+                                           save_predictions=args.save_predictions)
+            except BaseException as error:
+                training_error = error
+                raise
             finally:
                 if output.is_dir():
-                    runtime.write_json(output/'execution.json', dict(mode=args.mode, synthetic=args.mode=='check',
-                        configuration=dict(model=asdict(model), training=training), preparation=preparation,
-                        cpu_threads=args.cpu_threads, native_MTAD_opened=args.mode=='fit'))
+                    try:
+                        runtime.write_json(output/'execution.json', dict(mode=args.mode, synthetic=args.mode=='check',
+                            configuration=dict(model=asdict(model), training=training), preparation=preparation,
+                            cpu_threads=args.cpu_threads, native_MTAD_opened=args.mode=='fit',
+                            save_predictions=args.save_predictions))
+                    except BaseException as writing_error:
+                        if training_error is None:
+                            raise
+                        if hasattr(training_error, 'add_note'):
+                            training_error.add_note(f'execution.json: {type(writing_error).__name__}: {writing_error}')
         print(f"{report['status']}: {output.resolve()}", flush=True)
         return 0
     except (Exception, KeyboardInterrupt) as error:
         print(f'{type(error).__name__}: {error}', file=sys.stderr, flush=True)
+        for note in getattr(error, '__notes__', ()):
+            print(note, file=sys.stderr, flush=True)
         return 130 if isinstance(error, KeyboardInterrupt) else 1
     finally:
         signal.signal(signal.SIGTERM, previous)

@@ -40,7 +40,7 @@ def _regions(prediction, truth, truth_valid, prediction_valid, observed):
 
 def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
                         target_states, target_valid, node_observed, split,
-                        grouping_kind, correspondence_policy):
+                        grouping_kind, correspondence_policy, return_artifact=False):
     """Evaluate all targets and all fixed-order predicted groups without I/O.
 
     ``group_outputs`` accepts the records from ``fuse_track_groups``: each has
@@ -65,8 +65,13 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
     The primary rows contain all T targets plus unmatched duplicate predictions.
     Additional per-group errors retain every group against its anchor identity;
     these repeat targets and must not be interpreted as full-target averages.
-    No checkpoint selection rule is implemented or changed here.
+    No checkpoint selection rule is implemented or changed here. When explicitly
+    requested, ``artifact`` retains the very arrays used for these metrics,
+    including unmatched targets and duplicate prediction rows. It performs no
+    further matching or prediction and is omitted by default.
     """
+    if not isinstance(return_artifact, bool):
+        raise ValueError('return_artifact must be boolean')
     if split not in ALLOWED_SPLITS:
         raise ValueError('full-scene evaluation permits only explicit training/development splits; T_test is sealed')
     if grouping_kind not in ('predicted', 'oracle'):
@@ -150,7 +155,7 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
                                 truth_valid[anchor:anchor+1], valid[index:index+1],
                                 target_observed[anchor:anchor+1]),
         })
-    return {
+    report = {
         'split': split, 'grouping_kind': grouping_kind,
         'correspondence_policy': correspondence_policy,
         'identity_usage': 'evaluation only; never repairs predicted groups or selects minimum error',
@@ -167,6 +172,32 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
         'region_definition': 'union of caller-declared original support over all nodes of each true identity',
         'test_opened': False,
     }
+    if return_artifact:
+        aligned_groups = np.full(rows, -1, dtype=np.int64)
+        for target_row, group_index in first_group.items():
+            aligned_groups[target_row] = group_index
+        aligned_groups[len(targets):] = duplicate_groups
+        report['artifact'] = {
+            'aligned_prediction': aligned_prediction,
+            'aligned_prediction_valid': aligned_valid,
+            'aligned_truth': aligned_truth,
+            'aligned_truth_valid': aligned_truth_valid,
+            'aligned_observed': aligned_observed,
+            'target_ids': targets.astype(str),
+            # Duplicate predictions have no assigned target in the full metric.
+            'aligned_target_ids': np.concatenate((targets.astype(str), np.full(len(duplicate_groups), '', dtype=str))),
+            'aligned_group_indices': aligned_groups,
+            'group_states': prediction,
+            'group_valid': valid,
+            'group_anchor_target_indices': np.asarray(anchor_rows, dtype=np.int64),
+            'group_offsets': np.concatenate(([0], np.cumsum([len(g) for g in groups], dtype=np.int64))),
+            'group_node_indices': np.asarray([node for group in groups for node in group], dtype=np.int64),
+            'node_group_indices': memberships,
+            'split': split,
+            'grouping_kind': grouping_kind,
+            'correspondence_policy': correspondence_policy,
+        }
+    return report
 
 
 def single_source_outputs(node_states, node_valid, node_identities, sources, *, source):

@@ -353,19 +353,25 @@ def load_cooperative_checkpoint(path, *, device):
 
 
 def train_cooperative(train_scenes, validation_scenes, model_config, training_config, output_dir,
-                      *, device, initial_elapsed_seconds=0., check=None):
+                      *, device, initial_elapsed_seconds=0., check=None, progress=None,
+                      save_predictions=False):
     """Teacher -> frozen utility -> matched fixed-identity fusion arms.
 
     The first experiment intentionally excludes changing identity. Full-model
     identity modules/step are available, but not silently added to this fit.
     The configured wall budget includes all routes, evaluation and initial data
     preparation. No resume/retry or implicit training schedule is provided.
+    Phase wall times include sampling and checkpoint/result writes. Historical
+    history[*].seconds retains its narrower train_batch plus device-sync scope.
+    An optional observer receives the same small records as progress.json.
     """
     started = time.monotonic()
     from .cooperative import CooperativeModel
     from .cooperative_evaluation import evaluate_cooperative, score_cooperative
     from .metrics import select_threshold
     cfg = training_configuration(training_config)
+    if not isinstance(save_predictions, bool):
+        raise ValueError('save_predictions must be boolean')
     device = resolve_device(device)
     output = Path(output_dir)
     if output.exists():
@@ -394,9 +400,56 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     output.mkdir(parents=True, exist_ok=False)
     run = dict(status='RUNNING', device=str(device), training=cfg, model_config=asdict(model_config),
                scope='fixed identity candidate development comparison', test_opened=False,
-               scene_contract=contract)
-    runtime.write_json(output / 'run.json', run)
+               save_predictions=save_predictions,
+               scene_contract=contract, completed_updates=0, completed_routes=[],
+               phases={'external_preparation': dict(status='COMPLETED', seconds=initial_elapsed_seconds)},
+               timing_scope=dict(phase_seconds='wall time including sampling and checkpoint/result writes; '
+                                             'terminal run.json write excluded',
+                   external_preparation='caller-supplied elapsed time before train_cooperative',
+                   local_preparation='input contract validation, normalization, packing and model/loss allocation',
+                   history_seconds='train_batch plus device synchronization only; excludes sampling and artifact writes'))
+    active, active_started = None, started
+
+    def report_progress(stage, *, update=0, **details):
+        now = time.monotonic()
+        item = dict(phase=active['phase'], route=active['route'], stage=stage, update=update,
+                    completed_updates=run['completed_updates'],
+                    phase_completed_updates=active['completed_updates'],
+                    total_updates=active['total_updates'], elapsed_seconds=initial_elapsed_seconds+now-started,
+                    phase_elapsed_seconds=now-active_started, **details)
+        if 'identity_selection' in run:
+            item.update(threshold=run['threshold'], identity_selection=run['identity_selection'])
+        run['last_progress'] = item
+        if progress is not None:
+            progress(dict(item))
+        runtime.write_json(output / 'progress.json', dict(item, status='RUNNING'))
+
+    def begin_phase(phase, *, route=None, total_updates=0, tick=None):
+        nonlocal active, active_started
+        active_started = time.monotonic() if tick is None else tick
+        active = dict(phase=phase, route=route, status='RUNNING', completed_updates=0,
+                      total_updates=total_updates, checkpoint_updates=0)
+        run['phases'][phase + (':' + route if route else '')] = active
+        report_progress('starting')
+
+    def finish_phase():
+        report_progress('completed', update=active['completed_updates'])
+        active.update(status='COMPLETED', seconds=time.monotonic()-active_started)
+        run['elapsed_seconds'] = initial_elapsed_seconds+time.monotonic()-started
+        runtime.write_json(output / 'run.json', run)
+        # Include the phase's completed-run write without a second write loop.
+        active['seconds'] = time.monotonic()-active_started
+
+    def evaluation_progress(item):
+        detail = dict(item)
+        stage = detail.pop('stage')
+        if 'elapsed_seconds' in detail:
+            detail['evaluation_elapsed_seconds'] = detail.pop('elapsed_seconds')
+        report_progress(stage, **detail)
+
     try:
+        begin_phase('local_preparation', tick=started)
+        runtime.write_json(output / 'run.json', run)
         bounded()
         torch.manual_seed(cfg['seed'])
         normalizer = fit_normalizer(train_scenes)
@@ -404,6 +457,7 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
         model = CooperativeModel(model_config, normalizer).to(device)
         objective = FusionLoss(position_loss_mode='standard_smooth_l1').to(device)
         teacher = None
+        finish_phase()
         def fit_stage(target_model, target_objective, stage, steps, seed, route='plain'):
             parameters = stage_parameters(target_model, stage, routing=route)
             target_objective.requires_grad_(stage in ('teacher', 'adapt'))
@@ -414,9 +468,11 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             view_rng = np.random.default_rng(seed + 100)
             torch.manual_seed(seed)
             for step in range(steps):
+                report_progress('sampling', update=step+1)
                 bounded()
                 items, population = _batch(train_scenes, packed, sampler, cfg['batch_size'], device,
                     view_rng, cfg['endpoint_fraction'], model_config.max_observations)
+                report_progress('training', update=step+1)
                 tick = time.monotonic()
                 report = train_batch(target_model, target_objective, optimizer, items, stage=stage,
                     routing=route, teacher=teacher, error_scales=normalizer['std'],
@@ -427,30 +483,56 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                     torch.mps.synchronize()
                 report.update(update=step+1, seconds=time.monotonic()-tick, sampling=population)
                 history.append(report)
+                active['completed_updates'] = step+1
+                run['completed_updates'] += 1
+                report_progress('checkpoint', update=step+1)
                 path = output / (stage + ('-' + route if stage == 'adapt' else '') + '.pt')
                 temporary = path.with_suffix('.tmp')
                 torch.save(_snapshot(target_model, target_objective, optimizer, normalizer, cfg,
                                      stage=stage, route=route, updates=step+1), temporary)
                 temporary.replace(path)
+                active['checkpoint_updates'] = step+1
                 runtime.write_json(output / 'history.json', history)
+                report_progress('update_completed', update=step+1)
             return sampler.describe()
+        begin_phase('teacher', total_updates=cfg['teacher_updates'])
         fit_stage(model, objective, 'teacher', cfg['teacher_updates'], cfg['seed'])
+        finish_phase()
+        begin_phase('utility', total_updates=cfg['utility_updates'])
         teacher = copy.deepcopy(model).eval().requires_grad_(False)
         fit_stage(model, objective, 'utility', cfg['utility_updates'], cfg['seed']+1)
+        finish_phase()
         # Base identity never reads the newly learned utility branch.
+        begin_phase('identity_scoring_selection')
         records = score_cooperative(model, normalizer, validation_scenes, device=device,
             batch_tracks=cfg['batch_tracks'], pair_batch_size=cfg['pair_batch_size'],
-            use_utility_identity=False, check=bounded)
-        threshold = select_threshold(records)['threshold']
+            use_utility_identity=False, check=bounded, progress=evaluation_progress)
+        report_progress('threshold_selection')
+        selection = select_threshold(records)
+        threshold = selection['threshold']
+        run['threshold'] = threshold
+        run['identity_selection'] = selection
+        report_progress('threshold_selected', threshold=threshold, selection=selection)
+        finish_phase()
         for route in cfg['routes']:
             bounded()
+            begin_phase('adapt', route=route, total_updates=cfg['adapt_updates'])
             arm, loss = copy.deepcopy(model), copy.deepcopy(objective)
             fit_stage(arm, loss, 'adapt', cfg['adapt_updates'], cfg['seed']+2, route)
+            finish_phase()
+            begin_phase('evaluation', route=route)
+            prediction_writer = None
+            if save_predictions:
+                from .prediction_artifacts import ScenePredictionWriter
+                prediction_writer = ScenePredictionWriter(output / (route+'-predictions'))
             report = evaluate_cooperative(arm, normalizer, validation_scenes, device=device,
                 batch_tracks=cfg['batch_tracks'], pair_batch_size=cfg['pair_batch_size'],
                 select_on_validation=False, threshold=threshold, routing=route,
-                use_utility_identity=False, fixed_records=records, check=bounded)
+                use_utility_identity=False, fixed_records=records, check=bounded, progress=evaluation_progress,
+                prediction_writer=prediction_writer)
             # Numpy score arrays remain in explicit NPZ caches, not JSON magic.
+            report_progress('writing_evaluation', completed_scenes=len(validation_scenes),
+                            total_scenes=len(validation_scenes), scene_id=None)
             cache = {}
             for index, record in enumerate(report.pop('records')):
                 cache[f'scores_{index}'] = np.asarray(record['scores'])
@@ -458,6 +540,8 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             np.savez_compressed(output / (route + '-scores.npz'), **cache)
             runtime.write_json(output / (route + '-evaluation.json'), report)
             completed[route] = report
+            run['completed_routes'] = list(completed)
+            finish_phase()
         bounded()
         run.update(status='COMPLETED', completed_routes=list(completed),
                    parameter_count=sum(p.numel() for p in model.parameters()), threshold=threshold,
@@ -466,11 +550,27 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                    ordinary_gate_features='same frozen utility-trained query pool; fresh ordinary gate, no gain outputs',
                    controls_missing_for_utility_attribution=[x for x in ('identity', 'learned') if x not in cfg['routes']],
                    selection_policy='predetermined final updates', resume_supported=False)
+        runtime.write_json(output / 'progress.json', dict(run['last_progress'], status='COMPLETED',
+                           completed_routes=list(completed), elapsed_seconds=run['elapsed_seconds']))
         runtime.write_json(output / 'run.json', run)
         return run
     except BaseException as error:
-        run.update(status='INTERRUPTED' if isinstance(error, (TimeoutError, InterruptedError, KeyboardInterrupt)) else 'FAILED',
+        terminal = 'INTERRUPTED' if isinstance(error, (TimeoutError, InterruptedError, KeyboardInterrupt)) else 'FAILED'
+        if active is not None and active['status'] == 'RUNNING':
+            active.update(status=terminal, seconds=time.monotonic()-active_started)
+        run.update(status=terminal,
                    error=f'{type(error).__name__}: {error}', completed_routes=list(completed),
                    elapsed_seconds=initial_elapsed_seconds+time.monotonic()-started, resume_supported=False)
-        runtime.write_json(output / 'run.json', run)
+        # A failure while preserving evidence must not replace the original
+        # training/timeout/interruption exception. Try both small terminal files.
+        for name, payload in (('progress.json', dict(run.get('last_progress', {}), status=terminal,
+                                  error=run['error'], completed_routes=list(completed),
+                                  elapsed_seconds=run['elapsed_seconds'])), ('run.json', run)):
+            try:
+                runtime.write_json(output / name, payload)
+            except BaseException as writing_error:
+                message = f'{name}: {type(writing_error).__name__}: {writing_error}'
+                run.setdefault('evidence_write_errors', []).append(message)
+                if hasattr(error, 'add_note'):
+                    error.add_note(message)
         raise

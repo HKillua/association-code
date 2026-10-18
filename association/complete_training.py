@@ -308,7 +308,7 @@ def _targets(scenes, groups, device):
 
 def train_complete(train_scenes, validation_scenes, model_config, fusion_config, config,
                    output, *, device='cpu', resume_from=None, max_updates_this_call=None,
-                   evaluation_fn=None, initial_elapsed_seconds=0.0):
+                   evaluation_fn=None, initial_elapsed_seconds=0.0, save_predictions=False):
     """Train supplied physical scenes; native ZIP preparation is a separate caller.
 
     ``fusion_targets`` maps identity strings to states[L,4]/valid[L,4] and
@@ -320,9 +320,15 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     uses the selected complete snapshot and is included in the cumulative cost.
     Resume requires the same frozen inputs. Compact semantic metadata is checked;
     no full dataset snapshot/hash is stored to detect arbitrary content changes.
+    Explicit save_predictions writes selected-state physical predictions during
+    the default final evaluation, with its I/O included in the same budget.
     """
     started = time.monotonic()
     config = _configuration(config)
+    if not isinstance(save_predictions, bool):
+        raise ValueError('save_predictions must be boolean')
+    if save_predictions and evaluation_fn is not None:
+        raise ValueError('save_predictions requires the default complete evaluator')
     if (isinstance(initial_elapsed_seconds, bool) or not isinstance(initial_elapsed_seconds, (int, float))
             or not math.isfinite(initial_elapsed_seconds) or initial_elapsed_seconds < 0):
         raise ValueError('initial_elapsed_seconds must be finite and nonnegative')
@@ -607,6 +613,11 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             model.eval()
             fusion.eval()
             evaluator = evaluate_complete if evaluation_fn is None else evaluation_fn
+            prediction_options = {}
+            if save_predictions:
+                from .prediction_artifacts import ScenePredictionWriter
+                prediction_options['prediction_writer'] = ScenePredictionWriter(output / 'predictions')
+                run['prediction_artifacts'] = 'predictions/index.json'
             def evaluation_progress(item):
                 run['final_evaluation_progress'] = item
                 runtime.write_json(output / 'evaluation-progress.json', item)
@@ -615,7 +626,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 pair_batch_size=config['validation_batches']['pairs'],
                 select_on_validation=True, threshold=None,
                 singleton_policy=config['singleton_policy'], check=check,
-                **({'progress': evaluation_progress} if evaluation_fn is None else {}))
+                **({'progress': evaluation_progress} if evaluation_fn is None else {}),
+                **prediction_options)
             final_threshold, saved_threshold = evaluation['threshold'], selected['threshold']
             if ((final_threshold is None) != (saved_threshold is None)
                     or (final_threshold is not None and not math.isclose(
@@ -630,7 +642,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             'selection': {k: v for k, v in selected.items() if k != 'states'},
             'selection_scope': run['selection_scope'], 'evaluation': evaluation,
             'evaluation_seconds': run['final_evaluation_seconds'],
-            'normalizer': normalizer, 'coverage': coverage, 'test_opened': False})
+            'normalizer': normalizer, 'coverage': coverage, 'test_opened': False,
+            **({'prediction_artifacts': 'predictions/index.json'} if save_predictions else {})})
         check()
         write_run('COMPLETED')
         return run

@@ -16,6 +16,7 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 | 原生时间、数据与参考监督 | [时间适配规格](docs/specs/tmtaff-time-adaptation.md)、[数据契约](docs/data_contract.md)、[综合审计](docs/experiment_reaudit_20261018.md) |
 | 完整参考与候选实现 | [参考重构](docs/specs/complete-training-refactor.md)、[候选规格](docs/specs/cooperative-completion-fusion.md)、[候选核验](docs/results/cooperative_local_20261018/README.md) |
 | 既有实测与成本 | [012完整复算](docs/results/evidence012_local_review/README.md)、[013诊断](docs/results/tmtaff013_decisions/analysis.md)、[后续成本方案](docs/proposals/tmtaff_after013/README.md) |
+| 下一轮配置、覆盖与费用提案 | [完整任务比较方案](docs/proposals/first_full_comparison/README.md)：候选首次成本配置、正式训练模板及CPU采样复算；尚未授权新GPU任务 |
 | 当前执行入口 | [实验工具](tools/experiments/README.md)、[旧pilot说明](docs/pilot_execution.md) |
 
 014只评价短训模型，不代表充分训练。完整参考与候选的新增训练量、选模配置和总预算仍待确定；旧轮次额度关闭，T_test封存。TMTAFF时间适配改变了模型函数，明确称为近似参考，不能声称作者精确实现或把测试通过当作研究有效。
@@ -31,6 +32,7 @@ MTAD航迹研究的执行仓库。目标是在**不完整量测下完成补全�
 | `association/fusion_inference.py`、`fusion_metrics.py`、`full_scene_evaluation.py` | 分组与递归融合、物理误差、全目标及覆盖评价 |
 | `association/complete_training.py`、`complete_evaluation.py` | 完整参考四阶段训练/恢复与预测、真实分组、单源、简单融合评价 |
 | `association/cooperative.py`、`cooperative_training.py`、`cooperative_evaluation.py` | 共享补全/融合候选与固定身份的四臂机制比较 |
+| `association/prediction_artifacts.py`、`tools/analysis/compare_physical_predictions.py` | 可选保存实际物理预测；离线比较完整人口覆盖与共同有效点误差，保留改善/恶化案例索引 |
 | `association/metrics.py`、`runtime.py`、`sampling.py` | 共享指标、设备/产物处理与采样；保留历史结果只读复算能力 |
 | `association/cli.py`、`profile.py` | 保留prepare、train-reference、profile、probe-training；CDF run-pilot/smoke已移除 |
 | `baselines/tsactfer*.py` | TSA-cTFER离线关联适配与原生输入支持 |

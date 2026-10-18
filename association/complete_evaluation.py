@@ -95,7 +95,8 @@ def _inference_device(device, model_device, fusion_device):
 @torch.inference_mode()
 def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       batch_tracks, pair_batch_size, select_on_validation,
-                      threshold, singleton_policy, check=None, progress=None):
+                      threshold, singleton_policy, check=None, progress=None,
+                      prediction_writer=None):
     """Return full-V association plus predicted/oracle/simple/single-source fusion.
 
     ``singleton_policy`` is explicitly 'missing' or 'observed'. The latter
@@ -110,6 +111,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     fitting uses all supplied V scenes together, never per scene or on T_test.
     Optional progress receives small stage/scene records, never arrays; a caller
     can preserve the last completed boundary even if evaluation is interrupted.
+    An optional prediction_writer receives one scene's actual metric arrays;
+    export I/O is within the evaluation budget and never alters the summaries.
     """
     for value in (batch_tracks, pair_batch_size):
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
@@ -200,7 +203,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                  if target_ids else np.empty((0, model.config.length, 4), dtype=bool))
         common = dict(node_identities=scene['identities'], target_identities=target_ids,
                       target_states=truth, target_valid=valid, node_observed=scene['observed'],
-                      split=scene['split'], correspondence_policy='anchor_identity_first')
+                      split=scene['split'], correspondence_policy='anchor_identity_first',
+                      return_artifact=prediction_writer is not None)
         outputs = {}
         groupings = {
             'predicted': group_predicted_tracks(len(latent), record['pairs'], record['scores'],
@@ -233,6 +237,14 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         for source in sources:
             single = single_source_outputs(scene['values'], node_valid, scene['identities'], scene['sources'], source=source)
             outputs['single_source:' + source] = evaluate_full_scene(single, grouping_kind='oracle', **common)
+        if prediction_writer is not None:
+            artifacts = {key: report.pop('artifact') for key, report in outputs.items()}
+            if check:
+                check()
+            prediction_writer(scene_index, scene, artifacts)
+            if check:
+                check()
+            del artifacts
         for key, report in outputs.items():
             methods[key].append(report)
         per_scene.append(dict(scene_id=str(scene['scene_id']), methods=outputs))

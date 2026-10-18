@@ -96,14 +96,21 @@ def _finite_tensor(value, shape, name):
 
 
 def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
-                     pair_batch_size, use_utility_identity, fixed, check):
+                     pair_batch_size, use_utility_identity, fixed, check, progress=None):
     # Encoding and physical decoding must use the same frozen training moments.
     for key, buffer in (('mean', model.state_mean), ('std', model.state_std)):
         expected = torch.as_tensor(normalizer[key], dtype=torch.float32).to(dtype=buffer.dtype)
         if not torch.equal(buffer.detach().cpu(), expected):
             raise ValueError('evaluation normalizer differs from model physical-state moments')
     records, cached = [], []
+    stage = 'encoding_fixed_identity' if fixed is not None else 'association_scoring'
+    def report(completed, scene_id=None):
+        if progress is not None:
+            progress(dict(stage=stage, completed_scenes=completed,
+                          total_scenes=len(scenes), scene_id=scene_id))
+    report(0)
     for scene_index, scene in enumerate(scenes):
+        report(scene_index, str(scene['scene_id']))
         if check:
             check()
         values, observed = normalize_scene(scene, normalizer)
@@ -136,6 +143,7 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
         cached.append(cached_scene)
         if fixed is not None:
             records.append(fixed[scene_index])
+            report(scene_index + 1, str(scene['scene_id']))
             continue
         pairs = np.asarray(scene['pairs'])
         scores = []
@@ -149,13 +157,15 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
             _finite_tensor(logits, (len(batch),), 'association scores')
             scores.append(logits.detach().cpu().numpy())
         records.append(_record(scene, np.concatenate(scores) if scores else np.empty(0, dtype=np.float32)))
+        report(scene_index + 1, str(scene['scene_id']))
     return records, cached
 
 
 @stable_evaluation_parameters
 @torch.inference_mode()
 def score_cooperative(model, normalizer, scenes, device, batch_tracks=64,
-                      pair_batch_size=1024, check=None, *, use_utility_identity=False):
+                      pair_batch_size=1024, check=None, *, use_utility_identity=False,
+                      progress=None):
     """Score all canonical V_select candidates with CPU-cached native encodings.
 
     Same records/threshold convention as ``score_reference``. Model remains in
@@ -165,7 +175,7 @@ def score_cooperative(model, normalizer, scenes, device, batch_tracks=64,
                                       use_utility_identity)
     model.eval()
     records, _ = _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
-                                  pair_batch_size, use_utility_identity, None, check)
+                                  pair_batch_size, use_utility_identity, None, check, progress)
     return records
 
 
@@ -196,7 +206,8 @@ def _anchor_utility(model, cached, members, device, dtype, pair_batch_size, chec
 @torch.inference_mode()
 def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
                          pair_batch_size, select_on_validation, threshold, routing='plain',
-                         use_utility_identity=False, fixed_records=None, check=None):
+                         use_utility_identity=False, fixed_records=None, check=None, progress=None,
+                         prediction_writer=None):
     """Return association and predicted/oracle/simple/single-source fusion metrics.
 
     ``fixed_records`` must describe exactly these scenes, nodes and canonical
@@ -210,6 +221,10 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
     support across all fragments of each true identity, shared by all methods;
     generated availability never changes that partition. All declared targets,
     including identities without input nodes, remain in metric denominators.
+    Optional progress receives small stage/scene records only; callback failures
+    propagate, and it never receives reference arrays or model tensors.
+    An optional prediction_writer receives full-population physical artifacts
+    after scoring; it never supplies training inputs or changes the metrics.
     """
     if routing not in _ROUTES:
         raise ValueError('unknown cooperative routing policy')
@@ -227,9 +242,14 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
                                       use_utility_identity)
     fixed = _fixed_records(scenes, fixed_records) if fixed_records is not None else None
     started = time.monotonic()
+    def notify(item):
+        if progress is not None:
+            progress(dict(item, elapsed_seconds=time.monotonic()-started))
     model.eval()
     records, cached = _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
-                                       pair_batch_size, use_utility_identity, fixed, check)
+                                       pair_batch_size, use_utility_identity, fixed, check, notify)
+    notify(dict(stage='association_metrics', completed_scenes=len(scenes),
+                total_scenes=len(scenes), scene_id=None))
     selection = select_threshold(records) if select_on_validation else None
     if selection is not None:
         threshold = selection['threshold']
@@ -238,7 +258,11 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
     methods = {key: [] for key in ['predicted', 'oracle', 'simple_fusion_oracle']
                + ['single_source:' + source for source in sources]}
     per_scene, decode_count = [], 0
-    for scene, record, encoded in zip(scenes, records, cached):
+    notify(dict(stage='physical_fusion', completed_scenes=0, total_scenes=len(scenes),
+                scene_id=None, fusion_forward_count=0))
+    for scene_index, (scene, record, encoded) in enumerate(zip(scenes, records, cached)):
+        notify(dict(stage='physical_fusion', completed_scenes=scene_index, total_scenes=len(scenes),
+                    scene_id=str(scene['scene_id']), fusion_forward_count=decode_count))
         node_count = len(scene['node_ids'])
         groups = {
             'predicted': group_predicted_tracks(node_count, record['pairs'], record['scores'],
@@ -270,6 +294,8 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
         common = dict(node_identities=scene['identities'], target_identities=target_ids,
                       target_states=truth, target_valid=valid, node_observed=scene['observed'],
                       split=scene['split'], correspondence_policy='anchor_identity_first')
+        if prediction_writer is not None:
+            common['return_artifact'] = True
         outputs = {kind: evaluate_full_scene(rows, grouping_kind=kind, **common)
                    for kind, rows in predictions.items()}
         node_valid = np.repeat(np.asarray(scene['observed'])[..., None], 4, axis=-1)
@@ -279,13 +305,24 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
             single = single_source_outputs(scene['values'], node_valid, scene['identities'],
                                            scene['sources'], source=source)
             outputs['single_source:' + source] = evaluate_full_scene(single, grouping_kind='oracle', **common)
+        if prediction_writer is not None:
+            artifacts = {key: report.pop('artifact') for key, report in outputs.items()}
+            notify(dict(stage='writing_predictions', completed_scenes=scene_index, total_scenes=len(scenes),
+                        scene_id=str(scene['scene_id']), fusion_forward_count=decode_count))
+            if check:
+                check()
+            prediction_writer(scene_index, scene, artifacts)
+            if check:
+                check()
         for key, report in outputs.items():
             methods[key].append(report)
         per_scene.append(dict(scene_id=str(scene['scene_id']), methods=outputs,
                               predicted_groups=groups['predicted'], oracle_groups=groups['oracle']))
+        notify(dict(stage='physical_fusion', completed_scenes=scene_index+1, total_scenes=len(scenes),
+                    scene_id=str(scene['scene_id']), fusion_forward_count=decode_count))
     if check:
         check()
-    return dict(association=association, selection=selection, threshold=threshold, records=records,
+    result = dict(association=association, selection=selection, threshold=threshold, records=records,
                 fusion={key: aggregate_fusion_reports(reports) for key, reports in methods.items()},
                 per_scene=per_scene, routing=routing, singleton_policy='model_decode',
                 grouping_policy='anchor_direct', correspondence_policy='anchor_identity_first',
@@ -294,3 +331,6 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
                 region_definition='union of original native time support over all fragments of each true identity',
                 elapsed_seconds=time.monotonic()-started, fusion_forward_count=decode_count,
                 test_opened=False, scope='V_select development; oracle, simple-fusion and single-source are diagnostics')
+    notify(dict(stage='completed', completed_scenes=len(scenes), total_scenes=len(scenes),
+                scene_id=None, fusion_forward_count=decode_count))
+    return result

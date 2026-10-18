@@ -1,0 +1,29 @@
+{
+  "status": "PROPOSED_NOT_AUTHORIZED",
+  "current_authorized_task": "HandOver/L2S-20261018-014.md",
+  "new_request": {
+    "purpose": "Candidate-only first native CUDA cost measurement; not a performance comparison",
+    "config": "candidate-cost-proposal.json",
+    "max_gpu_hours": 2,
+    "cpu_threads": 4,
+    "concurrent_jobs": 1,
+    "attempts": 1,
+    "retries": 0,
+    "timeout_term_seconds": 7170,
+    "timeout_kill_grace_seconds": 30,
+    "inner_limit_seconds": 7140,
+    "save_predictions": true
+  },
+  "pending": [
+    "Candidate first-run configuration including LR/endpoint masking/optimizer and fixed-final-state selection",
+    "Candidate-only new <=2 GPU-hour budget",
+    "Reference/candidate development update counts and selection protocol",
+    "Both development budgets after measured costs"
+  ],
+  "templates": {
+    "reference": "reference-development.template.json",
+    "candidate": "candidate-development.template.json"
+  },
+  "template_policy": "max_hours/max_seconds intentionally null; native CLI rejects before loading data. These are reviewable parameter templates, not runnable approved configurations.",
+  "cost_policy": "Known reference arithmetic is not a predicted upper bound; candidate CUDA timings and complete evaluations are not yet measured. No old budget is carried forward."
+}

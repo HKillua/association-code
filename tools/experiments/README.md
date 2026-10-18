@@ -11,6 +11,10 @@
 
 在仓库根使用`python tools/experiments/<入口>.py --help`查看必需参数；正式数据运行采用交接中的完整命令、显式设备和新输出目录。CPU/MPS合成核验不等于真实数据训练，也不能替代CUDA成本测量。
 
+参考和候选的`fit`可显式加`--save-predictions`，逐场景保存实际参与物理指标的预测/参考/有效掩码与分组。默认关闭，014仅评价入口不受影响。候选`progress.json`和`run.json`另记录准备、teacher、utility、身份评分及各臂适配/评价阶段，失败保留最后进度和原错误。阶段墙时与原history中的纯更新耗时分别解释；进程启动和CLI末尾准备报告仍由交接的外层硬时限计入总预算。
+
+完整结果可用`tools/analysis/compare_physical_predictions.py`离线比较：同时报告各自全人口覆盖和共同有效点误差，不重新匹配目标或调整阈值；中断/不完整人口拒绝生成完整比较。配置、调用例子和成本限制见[首轮完整任务提案](../../docs/proposals/first_full_comparison/README.md)。该目录为待确认提案，不是READY。
+
 CDF1活动实现及`cdf1_validation.py`已退役；共享CLI的`run-pilot`与CDF `smoke`也已移除。原结果、分数缓存和只读复算保留，详见[退役决策](../../docs/decisions/retire_cdf1_and_focus.md)和[012复核](../../docs/results/evidence012_local_review/README.md)。不重新领取旧011任务。
 
 数据划分及T_test封存规则保持。当前重点是[完整参考与候选的两张比较表](../../docs/research_brief.md)，既有TSA/关联旧分数不与新原生时间结果直接混排。配置、数据范围、实际完成状态和结果内容用于核验，不设SHA/hash/fingerprint准入门槛。

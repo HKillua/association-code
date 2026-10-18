@@ -67,7 +67,7 @@ class CooperativeCLITests(unittest.TestCase):
             model=asdict(CooperativeConfig(length=4, max_observations=4, d_model=8,
                 nhead=2, num_layers=1, dim_feedforward=16, head_hidden=8, dropout=0.)),
             data={'time_unit_seconds': 10.}, train_splits=['T_core'], training=synthetic_configuration())
-        args = ['fit', '--device', 'cpu', *fixture.cli_args('candidate')]
+        args = ['fit', '--device', 'cpu', '--save-predictions', *fixture.cli_args('candidate')]
         self.assertEqual(self.invoke(args), 0)
         output = fixture.root/'candidate'
         evidence = runtime.read_json(output/'execution.json')
@@ -79,11 +79,57 @@ class CooperativeCLITests(unittest.TestCase):
         empty = report['per_scene'][1]['methods']['predicted']['full_target_metrics']['all']['position']
         self.assertGreater(empty['available_target_count'], 0)
         self.assertEqual(empty['intersection_count'], 0)
+        entries = runtime.read_json(output/'utility-predictions/index.json')['scenes']
+        self.assertEqual(len(entries), 2)
+        with np.load(output/'utility-predictions'/entries[1]['npz'], allow_pickle=False) as arrays:
+            self.assertGreater(arrays['m000__aligned_truth_valid'].sum(), 0)
+            self.assertEqual(arrays['m000__aligned_prediction_valid'].sum(), 0)
+
+    def test_check_can_save_each_arm_predictions_without_changing_default(self):
+        output = self.root/'with-predictions'
+        self.assertEqual(self.invoke(['check', '--device', 'cpu', '--output', str(output),
+                                     '--cpu-threads', '1', '--save-predictions']), 0)
+        run = runtime.read_json(output/'run.json')
+        self.assertTrue(run['save_predictions'])
+        self.assertTrue(runtime.read_json(output/'execution.json')['save_predictions'])
+        for route in run['completed_routes']:
+            directory = output/(route+'-predictions')
+            entries = runtime.read_json(directory/'index.json')['scenes']
+            self.assertEqual(len(entries), 1)
+            methods = runtime.read_json(directory/entries[0]['metadata'])['methods']
+            self.assertIn('predicted', methods)
+            self.assertIn('single_source:9001', methods)
+            with np.load(directory/entries[0]['npz'], allow_pickle=False) as arrays:
+                self.assertEqual(arrays['scene__grid'].shape, (4,))
 
     def test_synthetic_checks_cannot_silently_open_native_data(self):
         args = ['check', '--device', 'cpu', '--output', str(self.root/'bad'), '--archive', 'secret.zip']
         self.assertEqual(self.invoke(args), 1)
         self.assertFalse((self.root/'bad').exists())
+
+    def test_shape_check_refuses_prediction_export_before_model_allocation(self):
+        with patch('tools.experiments.cooperative_fit.production_shape_check',
+                   side_effect=AssertionError('shape check must stay closed')):
+            self.assertEqual(self.invoke(['shape-check', '--device', 'cpu',
+                '--output', str(self.root/'bad-export'), '--save-predictions']), 1)
+        self.assertFalse((self.root/'bad-export').exists())
+
+    def test_execution_log_failure_does_not_replace_original_training_exception(self):
+        output = self.root/'failed'
+        original = ValueError('original candidate training error')
+        def fail(*args, **kwargs):
+            output.mkdir()
+            raise original
+        stderr = io.StringIO()
+        with patch('tools.experiments.cooperative_fit.train_cooperative', side_effect=fail), \
+             patch('tools.experiments.cooperative_fit.runtime.write_json',
+                   side_effect=OSError('secondary execution storage error')), \
+             redirect_stdout(io.StringIO()), redirect_stderr(stderr):
+            code = main(['check', '--device', 'cpu', '--output', str(output)])
+        self.assertEqual(code, 1)
+        self.assertIn('ValueError: original candidate training error', stderr.getvalue())
+        if hasattr(original, 'add_note'):
+            self.assertIn('secondary execution storage error', stderr.getvalue())
 
     def test_missing_native_config_and_unavailable_cuda_fail_without_fallback(self):
         self.assertEqual(self.invoke(['fit', '--device', 'cpu', '--output', str(self.root/'fit')]), 1)

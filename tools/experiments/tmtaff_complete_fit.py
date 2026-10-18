@@ -26,6 +26,8 @@ def main(argv=None):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--device', help='required for fit; no automatic CPU/GPU fallback')
     parser.add_argument('--inspect-only', action='store_true')
+    parser.add_argument('--save-predictions', action='store_true',
+                        help='save scene-local selected-model physical predictions during final evaluation')
     parser.add_argument('--resume', help='an INTERRUPTED run; output must be a new directory')
     parser.add_argument('--cpu-threads', type=int, default=4)
     args = parser.parse_args(argv)
@@ -41,6 +43,8 @@ def main(argv=None):
             raise ValueError('--cpu-threads must be positive')
         if args.inspect_only and args.resume:
             raise ValueError('--resume applies to fit, not inspect-only')
+        if args.inspect_only and args.save_predictions:
+            raise ValueError('--save-predictions applies to fit, not inspect-only')
         if not args.inspect_only and not args.device:
             raise ValueError('--device must be explicit for fit')
         output = Path(args.output)
@@ -92,17 +96,32 @@ def main(argv=None):
             print(f'INSPECTED native-time inputs: {output.resolve()}', flush=True)
         else:
             from association.complete_training import train_complete
+            training_error = None
             try:
                 result = train_complete(dataset['train'], dataset['validation'], model, fusion,
                     training, output, device=args.device, resume_from=args.resume,
-                    initial_elapsed_seconds=time.monotonic()-started)
+                    initial_elapsed_seconds=time.monotonic()-started, save_predictions=args.save_predictions)
+            except BaseException as error:
+                training_error = error
+                raise
             finally:
                 if output.is_dir():
-                    runtime.write_json(output / 'preparation.json', preparation)
+                    try:
+                        runtime.write_json(output / 'preparation.json', preparation)
+                    except BaseException as writing_error:
+                        if training_error is None:
+                            raise
+                        note = f'preparation.json: {type(writing_error).__name__}: {writing_error}'
+                        if hasattr(training_error, 'add_note'):
+                            training_error.add_note(note)
+                        else:
+                            print(note, file=sys.stderr, flush=True)
             print(f"{result['status']} TMTAFF-time-adapted-v1: {output.resolve()}", flush=True)
         return 0
     except (Exception, KeyboardInterrupt) as error:
         print(f'FAILED {type(error).__name__}: {error}', file=sys.stderr, flush=True)
+        for note in getattr(error, '__notes__', ()):
+            print(note, file=sys.stderr, flush=True)
         return 130 if isinstance(error, KeyboardInterrupt) else 1
     finally:
         signal.signal(signal.SIGTERM, previous_signal)
