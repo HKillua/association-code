@@ -14,6 +14,11 @@ from .fusion_inference import _partition, group_tracks_by_identity
 from .fusion_metrics import (_check_valid_states, _mask, _states,
                              evaluate_aligned_fusion, group_membership_diagnostics)
 from .reference_states import ALLOWED_SPLITS
+from .input_support import group_input_support
+
+
+INPUT_SUPPORT_REGIONS = ('anchor_support', 'helper_only_support', 'unsupported', 'unmatched_target')
+INPUT_DISTANCE_REGIONS = ('le_300s', 'gt_300_le_600s', 'gt_600_le_1800s', 'gt_1800s', 'no_input')
 
 
 def _array(value):
@@ -40,7 +45,8 @@ def _regions(prediction, truth, truth_valid, prediction_valid, observed):
 
 def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
                         target_states, target_valid, node_observed, split,
-                        grouping_kind, correspondence_policy, return_artifact=False):
+                        grouping_kind, correspondence_policy, return_artifact=False,
+                        node_input_support=None):
     """Evaluate all targets and all fixed-order predicted groups without I/O.
 
     ``group_outputs`` accepts the records from ``fuse_track_groups``: each has
@@ -69,6 +75,9 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
     requested, ``artifact`` retains the very arrays used for these metrics,
     including unmatched targets and duplicate prediction rows. It performs no
     further matching or prediction and is omitted by default.
+    Optional ``node_input_support`` describes the actual visible encoder inputs,
+    with support/nearest_seconds [N,L]. It adds diagnostic strata only: no true
+    identity repairs group membership and no region changes the primary metric.
     """
     if not isinstance(return_artifact, bool):
         raise ValueError('return_artifact must be boolean')
@@ -172,11 +181,42 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
         'region_definition': 'union of caller-declared original support over all nodes of each true identity',
         'test_opened': False,
     }
+    aligned_groups = np.full(rows, -1, dtype=np.int64)
+    for target_row, group_index in first_group.items():
+        aligned_groups[target_row] = group_index
+    aligned_groups[len(targets):] = duplicate_groups
+    if node_input_support is not None:
+        # This classification uses the supplied group nodes, never the union
+        # of all nodes sharing their true identity. Missing targets stay rows.
+        if np.asarray(node_input_support['support']).shape != (len(nodes), truth.shape[1]):
+            raise ValueError('node_input_support must match all scene nodes and queries')
+        group_support = group_input_support(node_input_support, groups)
+        support_kind = np.full((rows, truth.shape[1]), 3, dtype=np.uint8)
+        nearest = np.full((rows, truth.shape[1]), np.inf)
+        for row, group_index in enumerate(aligned_groups):
+            if group_index < 0:
+                continue
+            support_kind[row] = np.where(group_support['anchor_support'][group_index], 0,
+                np.where(group_support['helper_only_support'][group_index], 1, 2))
+            nearest[row] = group_support['nearest_seconds'][group_index]
+        def metrics(mask):
+            return evaluate_aligned_fusion(aligned_prediction, aligned_truth, aligned_truth_valid,
+                                           prediction_valid=aligned_valid, region_mask=mask)
+        report['input_support_metrics'] = {
+            name: metrics(support_kind == index) for index, name in enumerate(INPUT_SUPPORT_REGIONS)}
+        distance_masks = (nearest <= 300, (nearest > 300) & (nearest <= 600),
+                          (nearest > 600) & (nearest <= 1800),
+                          (nearest > 1800) & np.isfinite(nearest), ~np.isfinite(nearest))
+        report['input_distance_metrics'] = {
+            name: metrics(mask) for name, mask in zip(INPUT_DISTANCE_REGIONS, distance_masks)}
+        report['input_support_definition'] = (
+            'actual group encoder input time support; anchor is first group node; '
+            'helper is another actual group node, regardless of true identity; '
+            'interval support is not an exact measurement or proof of contribution; '
+            'baseline singleton encoder visibility does not imply physical completion; '
+            'unmatched targets remain separate; primary observed/missing metric unchanged')
+        report['input_distance_definition'] = 'seconds to nearest actual visible group input point; no_input includes unmatched targets'
     if return_artifact:
-        aligned_groups = np.full(rows, -1, dtype=np.int64)
-        for target_row, group_index in first_group.items():
-            aligned_groups[target_row] = group_index
-        aligned_groups[len(targets):] = duplicate_groups
         report['artifact'] = {
             'aligned_prediction': aligned_prediction,
             'aligned_prediction_valid': aligned_valid,
@@ -197,6 +237,11 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
             'grouping_kind': grouping_kind,
             'correspondence_policy': correspondence_policy,
         }
+        if node_input_support is not None:
+            report['artifact'].update(aligned_input_support_kind=support_kind,
+                aligned_nearest_input_seconds=nearest,
+                input_support_region_names=np.asarray(INPUT_SUPPORT_REGIONS),
+                input_distance_region_names=np.asarray(INPUT_DISTANCE_REGIONS))
     return report
 
 

@@ -62,6 +62,9 @@ class CooperativeRevisionCLITests(unittest.TestCase):
             report = runtime.read_json(output/(route+'-evaluation.json'))
             self.assertEqual(report['threshold'], run['threshold'])
             self.assertFalse(report['test_opened'])
+            for kind in ('predicted', 'oracle'):
+                self.assertIn('input_support_metrics', report['fusion'][kind])
+                self.assertIn('input_distance_metrics', report['fusion'][kind])
             self.assertTrue((output/(route+'-predictions/index.json')).is_file())
         prior = (output/'run.json').read_bytes()
         self.assertEqual(self.invoke(args), 1)
@@ -88,6 +91,9 @@ class CooperativeRevisionCLITests(unittest.TestCase):
             empty = report['per_scene'][1]['methods']['predicted']['full_target_metrics']['all']['position']
             self.assertGreater(empty['available_target_count'], 0)
             self.assertEqual(empty['intersection_count'], 0)
+            unsupported = report['per_scene'][1]['methods']['predicted']['input_support_metrics']['unmatched_target']['position']
+            self.assertEqual(unsupported['available_target_count'], empty['available_target_count'])
+            self.assertIsNone(unsupported['mae'])
             entries = runtime.read_json(output/(route+'-predictions/index.json'))['scenes']
             with np.load(output/(route+'-predictions')/entries[1]['npz']) as arrays:
                 self.assertGreater(arrays['m000__aligned_truth_valid'].sum(), 0)

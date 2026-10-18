@@ -12,7 +12,8 @@ import time
 import numpy as np
 import torch
 
-from .complete_evaluation import _inference_device, _registered, aggregate_fusion_reports
+from .complete_evaluation import (_inference_device, _registered, aggregate_fusion_reports,
+                                  scene_input_support)
 from .full_scene_evaluation import evaluate_full_scene, simple_fusion_outputs, single_source_outputs
 from .fusion_inference import group_predicted_tracks, group_tracks_by_identity
 from .metrics import evaluate_scenes, select_threshold
@@ -314,7 +315,8 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
                       split=scene['split'], correspondence_policy='anchor_identity_first')
         if prediction_writer is not None:
             common['return_artifact'] = True
-        outputs = {kind: evaluate_full_scene(rows, grouping_kind=kind, **common)
+        support = scene_input_support(scene)
+        outputs = {kind: evaluate_full_scene(rows, grouping_kind=kind, node_input_support=support, **common)
                    for kind, rows in predictions.items()}
         node_valid = np.repeat(np.asarray(scene['observed'])[..., None], 4, axis=-1)
         simple = simple_fusion_outputs(scene['values'], node_valid, scene['identities'], scene['sources'])

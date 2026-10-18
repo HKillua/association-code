@@ -71,6 +71,20 @@ def load_scene_prediction(path):
                 or artifact['group_valid'].dtype != np.bool_
                 or artifact['node_group_indices'].shape != scene['node_ids'].shape):
             raise ValueError('artifact target/group metadata disagrees with arrays')
+        support_keys = {'aligned_input_support_kind', 'aligned_nearest_input_seconds',
+                        'input_support_region_names', 'input_distance_region_names'}
+        if support_keys.intersection(artifact):
+            from .full_scene_evaluation import INPUT_SUPPORT_REGIONS, INPUT_DISTANCE_REGIONS
+            if not support_keys.issubset(artifact):
+                raise ValueError('incomplete input-support artifact arrays')
+            kinds, nearest = artifact['aligned_input_support_kind'], artifact['aligned_nearest_input_seconds']
+            if (kinds.shape != shape[:2] or kinds.dtype.kind not in 'iu'
+                    or ((kinds < 0) | (kinds >= len(INPUT_SUPPORT_REGIONS))).any()
+                    or nearest.shape != shape[:2] or nearest.dtype.kind != 'f'
+                    or np.isnan(nearest).any() or (nearest < 0).any()
+                    or artifact['input_support_region_names'].tolist() != list(INPUT_SUPPORT_REGIONS)
+                    or artifact['input_distance_region_names'].tolist() != list(INPUT_DISTANCE_REGIONS)):
+                raise ValueError('invalid input-support artifact arrays')
         methods[name] = artifact
     return dict(metadata=metadata, scene=scene, methods=methods)
 

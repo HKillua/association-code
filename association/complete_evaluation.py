@@ -11,19 +11,32 @@ import time
 import numpy as np
 import torch
 
-from .full_scene_evaluation import evaluate_full_scene, simple_fusion_outputs, single_source_outputs
+from .full_scene_evaluation import (evaluate_full_scene, simple_fusion_outputs, single_source_outputs,
+                                   INPUT_SUPPORT_REGIONS, INPUT_DISTANCE_REGIONS)
 from .fusion_inference import group_predicted_tracks, group_tracks_by_identity
+from .input_support import build_input_support
 from .metrics import evaluate_scenes, select_threshold
 from .reference import normalize_scene, stable_evaluation_parameters
 
 
 def aggregate_fusion_reports(reports):
     """Pool error numerators and coverage counts, never average scene RMSEs."""
+    result = _aggregate_regions(reports, 'full_target_metrics', ('all', 'observed', 'missing'))
+    for key, names in (('input_support_metrics', INPUT_SUPPORT_REGIONS),
+                       ('input_distance_metrics', INPUT_DISTANCE_REGIONS)):
+        if any(key in report for report in reports):
+            if not all(key in report for report in reports):
+                raise ValueError('cannot pool scenes with incomplete input-support diagnostics')
+            result[key] = _aggregate_regions(reports, key, names)
+    return result
+
+
+def _aggregate_regions(reports, metric_key, regions):
     result = {}
-    for region in ('all', 'observed', 'missing'):
+    for region in regions:
         result[region] = {}
         for feature in ('position', 'speed', 'heading'):
-            rows = [report['full_target_metrics'][region][feature] for report in reports]
+            rows = [report[metric_key][region][feature] for report in reports]
             count_keys = ('available_target_count', 'available_prediction_count',
                           'intersection_count', 'missing_prediction_count',
                           'prediction_without_target_count', 'available_target_trajectory_count',
@@ -41,6 +54,14 @@ def aggregate_fusion_reports(reports):
             pooled['unit'] = {'position': 'metres', 'speed': 'native_speed', 'heading': 'degrees'}[feature]
             result[region][feature] = pooled
     return result
+
+
+def scene_input_support(scene):
+    """Visible encoder inputs in physical seconds; no target/reference access."""
+    if scene.get('input_adapter') == 'native_time_v1':
+        return build_input_support(scene['grid'], scene['native_times'], scene['native_observed'])
+    return build_input_support(scene['grid'], scene['observation_times'], scene['observed'],
+                               node_support=scene['observed'])
 
 
 def _registered(scene, length):
@@ -205,6 +226,7 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       target_states=truth, target_valid=valid, node_observed=scene['observed'],
                       split=scene['split'], correspondence_policy='anchor_identity_first',
                       return_artifact=prediction_writer is not None)
+        support = scene_input_support(scene)
         outputs = {}
         groupings = {
             'predicted': group_predicted_tracks(len(latent), record['pairs'], record['scores'],
@@ -230,7 +252,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                         fusion_steps += 1
                     row['states'] = fused['states'][0].cpu().numpy()
                 generated.append(row)
-            outputs[kind] = evaluate_full_scene(generated, grouping_kind=kind, **common)
+            outputs[kind] = evaluate_full_scene(generated, grouping_kind=kind,
+                                                node_input_support=support, **common)
         node_valid = np.repeat(np.asarray(scene['observed'])[..., None], 4, axis=-1)
         simple = simple_fusion_outputs(scene['values'], node_valid, scene['identities'], scene['sources'])
         outputs['simple_fusion_oracle'] = evaluate_full_scene(simple, grouping_kind='oracle', **common)
