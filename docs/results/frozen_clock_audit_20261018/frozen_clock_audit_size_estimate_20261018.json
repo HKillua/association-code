@@ -1,0 +1,119 @@
+{
+  "measurements": {
+    "member_count": 576,
+    "expanded_bytes": 188588296,
+    "compressed_bytes": 69421171,
+    "largest": [
+      {
+        "scene_id": "3687",
+        "expanded_bytes": 6814695,
+        "compressed_bytes": 2468816
+      },
+      {
+        "scene_id": "4862",
+        "expanded_bytes": 6429490,
+        "compressed_bytes": 2318271
+      },
+      {
+        "scene_id": "982",
+        "expanded_bytes": 6264193,
+        "compressed_bytes": 2272810
+      },
+      {
+        "scene_id": "2694",
+        "expanded_bytes": 6210992,
+        "compressed_bytes": 2265944
+      },
+      {
+        "scene_id": "1139",
+        "expanded_bytes": 4760170,
+        "compressed_bytes": 1733728
+      },
+      {
+        "scene_id": "1480",
+        "expanded_bytes": 4757474,
+        "compressed_bytes": 1731046
+      },
+      {
+        "scene_id": "4928",
+        "expanded_bytes": 4111389,
+        "compressed_bytes": 1484342
+      },
+      {
+        "scene_id": "4594",
+        "expanded_bytes": 3599770,
+        "compressed_bytes": 1299952
+      },
+      {
+        "scene_id": "3539",
+        "expanded_bytes": 3188495,
+        "compressed_bytes": 1153523
+      },
+      {
+        "scene_id": "3641",
+        "expanded_bytes": 3126230,
+        "compressed_bytes": 1139057
+      }
+    ]
+  },
+  "reference": {
+    "member_count": 576,
+    "expanded_bytes": 106168406,
+    "compressed_bytes": 35698034,
+    "largest": [
+      {
+        "scene_id": "3687",
+        "expanded_bytes": 3739653,
+        "compressed_bytes": 1276751
+      },
+      {
+        "scene_id": "4862",
+        "expanded_bytes": 3641972,
+        "compressed_bytes": 1230907
+      },
+      {
+        "scene_id": "982",
+        "expanded_bytes": 3486795,
+        "compressed_bytes": 1168523
+      },
+      {
+        "scene_id": "2694",
+        "expanded_bytes": 3477495,
+        "compressed_bytes": 1178773
+      },
+      {
+        "scene_id": "1480",
+        "expanded_bytes": 2709302,
+        "compressed_bytes": 913916
+      },
+      {
+        "scene_id": "1139",
+        "expanded_bytes": 2691885,
+        "compressed_bytes": 910910
+      },
+      {
+        "scene_id": "4928",
+        "expanded_bytes": 2486570,
+        "compressed_bytes": 815304
+      },
+      {
+        "scene_id": "4594",
+        "expanded_bytes": 2068176,
+        "compressed_bytes": 681240
+      },
+      {
+        "scene_id": "3539",
+        "expanded_bytes": 1816899,
+        "compressed_bytes": 597899
+      },
+      {
+        "scene_id": "3641",
+        "expanded_bytes": 1724138,
+        "compressed_bytes": 561292
+      }
+    ]
+  },
+  "scope": "ZIP directory metadata only for the extracted T_core512/V_select64 allowlist; no CSV payload reads",
+  "archive": "/Users/a1/Downloads/数据集level2.zip",
+  "raw_payloads_read": 0
+}
