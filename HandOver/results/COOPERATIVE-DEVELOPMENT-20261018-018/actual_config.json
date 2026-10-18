@@ -1,0 +1,42 @@
+{
+  "scope": "cooperative-physical-v1",
+  "model": {
+    "length": 64,
+    "max_observations": 128,
+    "d_model": 128,
+    "nhead": 8,
+    "num_layers": 6,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "head_hidden": 64,
+    "gate_floor": 0.001,
+    "support_time_policy": "train_absmax_v1"
+  },
+  "training": {
+    "seed": 20,
+    "batch_size": 64,
+    "teacher_updates": 100,
+    "utility_updates": 100,
+    "adapt_updates": 100,
+    "learning_rate": 0.0001,
+    "gradient_clip": 1.0,
+    "endpoint_fraction": 0.25,
+    "utility_epsilon": 0.001,
+    "error_scale_policy": "training_native_std",
+    "routes": [
+      "plain",
+      "identity",
+      "utility",
+      "learned"
+    ],
+    "max_seconds": 7140.0,
+    "batch_tracks": 1,
+    "pair_batch_size": 1024
+  },
+  "data": {
+    "time_unit_seconds": 20.0
+  },
+  "train_splits": [
+    "T_core"
+  ]
+}
