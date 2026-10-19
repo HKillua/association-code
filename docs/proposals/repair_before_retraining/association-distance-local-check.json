@@ -1,0 +1,2230 @@
+{
+  "status": "COMPLETED",
+  "command": [
+    "/Users/a1/Projects/association-code/.venv/bin/python",
+    "/Users/a1/Projects/association-code/docs/proposals/repair_before_retraining/association-distance-local-check.py"
+  ],
+  "method": "native Q64 position interpolation + endpoint hold, negative RMS haversine metres",
+  "archive": "/Users/a1/Downloads/数据集level2.zip",
+  "manifest_git_object": "612afea:HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json",
+  "scene_ids": [
+    "1671",
+    "2056",
+    "290",
+    "113",
+    "2109",
+    "1977",
+    "2279",
+    "4",
+    "1456",
+    "944",
+    "1391",
+    "4618",
+    "1793",
+    "3829",
+    "4652",
+    "4159",
+    "1331",
+    "2882",
+    "3117",
+    "2996",
+    "1398",
+    "330",
+    "3495",
+    "4980",
+    "211",
+    "1447",
+    "1893",
+    "3332",
+    "870",
+    "2512",
+    "2995",
+    "875",
+    "4038",
+    "2345",
+    "1587",
+    "3245",
+    "2395",
+    "3838",
+    "519",
+    "2715",
+    "3964",
+    "2261",
+    "1457",
+    "907",
+    "1022",
+    "1206",
+    "3879",
+    "2211",
+    "1058",
+    "3527",
+    "2708",
+    "270",
+    "2960",
+    "1089",
+    "1795",
+    "1374",
+    "1396",
+    "3349",
+    "1150",
+    "3330",
+    "4429",
+    "3589",
+    "2025",
+    "4676"
+  ],
+  "population": {
+    "scenes": 64,
+    "nodes": 1635,
+    "pairs": 29008,
+    "positives": 3297
+  },
+  "per_scene_input": [
+    {
+      "scene_id": "1671",
+      "nodes": 18,
+      "pairs": 153,
+      "positives": 37
+    },
+    {
+      "scene_id": "2056",
+      "nodes": 28,
+      "pairs": 378,
+      "positives": 58
+    },
+    {
+      "scene_id": "290",
+      "nodes": 24,
+      "pairs": 276,
+      "positives": 36
+    },
+    {
+      "scene_id": "113",
+      "nodes": 16,
+      "pairs": 120,
+      "positives": 31
+    },
+    {
+      "scene_id": "2109",
+      "nodes": 27,
+      "pairs": 351,
+      "positives": 60
+    },
+    {
+      "scene_id": "1977",
+      "nodes": 79,
+      "pairs": 3081,
+      "positives": 145
+    },
+    {
+      "scene_id": "2279",
+      "nodes": 14,
+      "pairs": 91,
+      "positives": 26
+    },
+    {
+      "scene_id": "4",
+      "nodes": 18,
+      "pairs": 153,
+      "positives": 48
+    },
+    {
+      "scene_id": "1456",
+      "nodes": 27,
+      "pairs": 351,
+      "positives": 66
+    },
+    {
+      "scene_id": "944",
+      "nodes": 38,
+      "pairs": 703,
+      "positives": 72
+    },
+    {
+      "scene_id": "1391",
+      "nodes": 99,
+      "pairs": 4851,
+      "positives": 196
+    },
+    {
+      "scene_id": "4618",
+      "nodes": 22,
+      "pairs": 231,
+      "positives": 52
+    },
+    {
+      "scene_id": "1793",
+      "nodes": 20,
+      "pairs": 190,
+      "positives": 40
+    },
+    {
+      "scene_id": "3829",
+      "nodes": 14,
+      "pairs": 91,
+      "positives": 24
+    },
+    {
+      "scene_id": "4652",
+      "nodes": 14,
+      "pairs": 91,
+      "positives": 27
+    },
+    {
+      "scene_id": "4159",
+      "nodes": 34,
+      "pairs": 561,
+      "positives": 76
+    },
+    {
+      "scene_id": "1331",
+      "nodes": 33,
+      "pairs": 528,
+      "positives": 79
+    },
+    {
+      "scene_id": "2882",
+      "nodes": 11,
+      "pairs": 55,
+      "positives": 25
+    },
+    {
+      "scene_id": "3117",
+      "nodes": 17,
+      "pairs": 136,
+      "positives": 32
+    },
+    {
+      "scene_id": "2996",
+      "nodes": 12,
+      "pairs": 66,
+      "positives": 21
+    },
+    {
+      "scene_id": "1398",
+      "nodes": 18,
+      "pairs": 153,
+      "positives": 49
+    },
+    {
+      "scene_id": "330",
+      "nodes": 13,
+      "pairs": 78,
+      "positives": 36
+    },
+    {
+      "scene_id": "3495",
+      "nodes": 13,
+      "pairs": 78,
+      "positives": 24
+    },
+    {
+      "scene_id": "4980",
+      "nodes": 18,
+      "pairs": 153,
+      "positives": 32
+    },
+    {
+      "scene_id": "211",
+      "nodes": 13,
+      "pairs": 78,
+      "positives": 26
+    },
+    {
+      "scene_id": "1447",
+      "nodes": 16,
+      "pairs": 120,
+      "positives": 37
+    },
+    {
+      "scene_id": "1893",
+      "nodes": 15,
+      "pairs": 105,
+      "positives": 37
+    },
+    {
+      "scene_id": "3332",
+      "nodes": 20,
+      "pairs": 190,
+      "positives": 34
+    },
+    {
+      "scene_id": "870",
+      "nodes": 13,
+      "pairs": 78,
+      "positives": 31
+    },
+    {
+      "scene_id": "2512",
+      "nodes": 14,
+      "pairs": 91,
+      "positives": 31
+    },
+    {
+      "scene_id": "2995",
+      "nodes": 46,
+      "pairs": 1035,
+      "positives": 68
+    },
+    {
+      "scene_id": "875",
+      "nodes": 17,
+      "pairs": 136,
+      "positives": 31
+    },
+    {
+      "scene_id": "4038",
+      "nodes": 31,
+      "pairs": 465,
+      "positives": 83
+    },
+    {
+      "scene_id": "2345",
+      "nodes": 22,
+      "pairs": 231,
+      "positives": 54
+    },
+    {
+      "scene_id": "1587",
+      "nodes": 14,
+      "pairs": 91,
+      "positives": 30
+    },
+    {
+      "scene_id": "3245",
+      "nodes": 24,
+      "pairs": 276,
+      "positives": 49
+    },
+    {
+      "scene_id": "2395",
+      "nodes": 44,
+      "pairs": 946,
+      "positives": 86
+    },
+    {
+      "scene_id": "3838",
+      "nodes": 25,
+      "pairs": 300,
+      "positives": 42
+    },
+    {
+      "scene_id": "519",
+      "nodes": 15,
+      "pairs": 105,
+      "positives": 24
+    },
+    {
+      "scene_id": "2715",
+      "nodes": 37,
+      "pairs": 666,
+      "positives": 65
+    },
+    {
+      "scene_id": "3964",
+      "nodes": 32,
+      "pairs": 496,
+      "positives": 58
+    },
+    {
+      "scene_id": "2261",
+      "nodes": 14,
+      "pairs": 91,
+      "positives": 26
+    },
+    {
+      "scene_id": "1457",
+      "nodes": 38,
+      "pairs": 703,
+      "positives": 79
+    },
+    {
+      "scene_id": "907",
+      "nodes": 43,
+      "pairs": 903,
+      "positives": 69
+    },
+    {
+      "scene_id": "1022",
+      "nodes": 19,
+      "pairs": 171,
+      "positives": 23
+    },
+    {
+      "scene_id": "1206",
+      "nodes": 32,
+      "pairs": 496,
+      "positives": 60
+    },
+    {
+      "scene_id": "3879",
+      "nodes": 18,
+      "pairs": 153,
+      "positives": 28
+    },
+    {
+      "scene_id": "2211",
+      "nodes": 22,
+      "pairs": 231,
+      "positives": 40
+    },
+    {
+      "scene_id": "1058",
+      "nodes": 10,
+      "pairs": 45,
+      "positives": 24
+    },
+    {
+      "scene_id": "3527",
+      "nodes": 30,
+      "pairs": 435,
+      "positives": 68
+    },
+    {
+      "scene_id": "2708",
+      "nodes": 21,
+      "pairs": 210,
+      "positives": 37
+    },
+    {
+      "scene_id": "270",
+      "nodes": 39,
+      "pairs": 741,
+      "positives": 84
+    },
+    {
+      "scene_id": "2960",
+      "nodes": 26,
+      "pairs": 325,
+      "positives": 52
+    },
+    {
+      "scene_id": "1089",
+      "nodes": 15,
+      "pairs": 105,
+      "positives": 31
+    },
+    {
+      "scene_id": "1795",
+      "nodes": 15,
+      "pairs": 105,
+      "positives": 30
+    },
+    {
+      "scene_id": "1374",
+      "nodes": 12,
+      "pairs": 66,
+      "positives": 31
+    },
+    {
+      "scene_id": "1396",
+      "nodes": 88,
+      "pairs": 3828,
+      "positives": 180
+    },
+    {
+      "scene_id": "3349",
+      "nodes": 13,
+      "pairs": 78,
+      "positives": 28
+    },
+    {
+      "scene_id": "1150",
+      "nodes": 18,
+      "pairs": 153,
+      "positives": 32
+    },
+    {
+      "scene_id": "3330",
+      "nodes": 30,
+      "pairs": 435,
+      "positives": 71
+    },
+    {
+      "scene_id": "4429",
+      "nodes": 33,
+      "pairs": 528,
+      "positives": 69
+    },
+    {
+      "scene_id": "3589",
+      "nodes": 23,
+      "pairs": 253,
+      "positives": 50
+    },
+    {
+      "scene_id": "2025",
+      "nodes": 26,
+      "pairs": 325,
+      "positives": 57
+    },
+    {
+      "scene_id": "4676",
+      "nodes": 25,
+      "pairs": 300,
+      "positives": 50
+    }
+  ],
+  "configuration": {
+    "cap": 128,
+    "queries": 64,
+    "time_unit_seconds": 20.0,
+    "longitude_policy": "shortest_arc",
+    "earth_radius_metres": 6371000.0,
+    "score_dtype": "float64",
+    "query_denominator": 64,
+    "candidate_filter": "none"
+  },
+  "selection": {
+    "threshold": -20351.06551962416,
+    "macro_f1": 0.6156266153055335,
+    "candidate_count": 29009,
+    "scene_count": 64,
+    "tie_break": "higher threshold, all-reject above all finite scores"
+  },
+  "metrics": {
+    "scene_count": 64,
+    "pair_count": 29008,
+    "macro_f1": 0.6156266153055361,
+    "positive_scene_macro_f1": 0.6156266153055361,
+    "positive_scene_count": 64,
+    "negative_scene_count": 0,
+    "negative_scene_false_acceptance_rate": null,
+    "micro_f1": 0.3981907162983835,
+    "micro_precision": 0.2635194817940917,
+    "micro_recall": 0.8143767060964513,
+    "p_ca": 0.8143767060964513,
+    "p_fa": 0.7364805182059083,
+    "tp": 2685,
+    "fp": 7504,
+    "fn": 612,
+    "tn": 18207,
+    "threshold": -20351.06551962416,
+    "per_scene": [
+      {
+        "scene_id": "1671",
+        "component_id": "component-81988bc004bbcf214c39edbc",
+        "node_count": 18,
+        "pair_count": 153,
+        "positive_count": 37,
+        "tp": 37,
+        "fp": 56,
+        "fn": 0,
+        "tn": 60,
+        "f1": 0.5692307692307692,
+        "precision": 0.3978494623655914,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.6021505376344086
+      },
+      {
+        "scene_id": "2056",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 28,
+        "pair_count": 378,
+        "positive_count": 58,
+        "tp": 32,
+        "fp": 21,
+        "fn": 26,
+        "tn": 299,
+        "f1": 0.5765765765765766,
+        "precision": 0.6037735849056604,
+        "recall": 0.5517241379310345,
+        "p_ca": 0.5517241379310345,
+        "p_fa": 0.39622641509433965
+      },
+      {
+        "scene_id": "290",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 24,
+        "pair_count": 276,
+        "positive_count": 36,
+        "tp": 34,
+        "fp": 90,
+        "fn": 2,
+        "tn": 150,
+        "f1": 0.425,
+        "precision": 0.27419354838709675,
+        "recall": 0.9444444444444444,
+        "p_ca": 0.9444444444444444,
+        "p_fa": 0.7258064516129032
+      },
+      {
+        "scene_id": "113",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 16,
+        "pair_count": 120,
+        "positive_count": 31,
+        "tp": 31,
+        "fp": 24,
+        "fn": 0,
+        "tn": 65,
+        "f1": 0.7209302325581395,
+        "precision": 0.5636363636363636,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.4363636363636364
+      },
+      {
+        "scene_id": "2109",
+        "component_id": "component-782c7ca25ee552931cd4513f",
+        "node_count": 27,
+        "pair_count": 351,
+        "positive_count": 60,
+        "tp": 56,
+        "fp": 139,
+        "fn": 4,
+        "tn": 152,
+        "f1": 0.4392156862745098,
+        "precision": 0.28717948717948716,
+        "recall": 0.9333333333333333,
+        "p_ca": 0.9333333333333333,
+        "p_fa": 0.7128205128205128
+      },
+      {
+        "scene_id": "1977",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 79,
+        "pair_count": 3081,
+        "positive_count": 145,
+        "tp": 132,
+        "fp": 1080,
+        "fn": 13,
+        "tn": 1856,
+        "f1": 0.19454679439941047,
+        "precision": 0.10891089108910891,
+        "recall": 0.9103448275862069,
+        "p_ca": 0.9103448275862069,
+        "p_fa": 0.8910891089108911
+      },
+      {
+        "scene_id": "2279",
+        "component_id": "component-7ac707d2561c13885d8c9dc1",
+        "node_count": 14,
+        "pair_count": 91,
+        "positive_count": 26,
+        "tp": 26,
+        "fp": 65,
+        "fn": 0,
+        "tn": 0,
+        "f1": 0.4444444444444444,
+        "precision": 0.2857142857142857,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.7142857142857143
+      },
+      {
+        "scene_id": "4",
+        "component_id": "component-d05fc783deb1d56f79a8749b",
+        "node_count": 18,
+        "pair_count": 153,
+        "positive_count": 48,
+        "tp": 37,
+        "fp": 45,
+        "fn": 11,
+        "tn": 60,
+        "f1": 0.5692307692307692,
+        "precision": 0.45121951219512196,
+        "recall": 0.7708333333333334,
+        "p_ca": 0.7708333333333334,
+        "p_fa": 0.5487804878048781
+      },
+      {
+        "scene_id": "1456",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 27,
+        "pair_count": 351,
+        "positive_count": 66,
+        "tp": 50,
+        "fp": 13,
+        "fn": 16,
+        "tn": 272,
+        "f1": 0.7751937984496124,
+        "precision": 0.7936507936507936,
+        "recall": 0.7575757575757576,
+        "p_ca": 0.7575757575757576,
+        "p_fa": 0.2063492063492064
+      },
+      {
+        "scene_id": "944",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 38,
+        "pair_count": 703,
+        "positive_count": 72,
+        "tp": 51,
+        "fp": 329,
+        "fn": 21,
+        "tn": 302,
+        "f1": 0.22566371681415928,
+        "precision": 0.13421052631578947,
+        "recall": 0.7083333333333334,
+        "p_ca": 0.7083333333333334,
+        "p_fa": 0.8657894736842106
+      },
+      {
+        "scene_id": "1391",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 99,
+        "pair_count": 4851,
+        "positive_count": 196,
+        "tp": 172,
+        "fp": 1576,
+        "fn": 24,
+        "tn": 3079,
+        "f1": 0.17695473251028807,
+        "precision": 0.09839816933638444,
+        "recall": 0.8775510204081632,
+        "p_ca": 0.8775510204081632,
+        "p_fa": 0.9016018306636155
+      },
+      {
+        "scene_id": "4618",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 22,
+        "pair_count": 231,
+        "positive_count": 52,
+        "tp": 38,
+        "fp": 0,
+        "fn": 14,
+        "tn": 179,
+        "f1": 0.8444444444444444,
+        "precision": 1.0,
+        "recall": 0.7307692307692307,
+        "p_ca": 0.7307692307692307,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "1793",
+        "component_id": "component-873bd5e10c28890f7e74992f",
+        "node_count": 20,
+        "pair_count": 190,
+        "positive_count": 40,
+        "tp": 40,
+        "fp": 105,
+        "fn": 0,
+        "tn": 45,
+        "f1": 0.43243243243243246,
+        "precision": 0.27586206896551724,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.7241379310344828
+      },
+      {
+        "scene_id": "3829",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 14,
+        "pair_count": 91,
+        "positive_count": 24,
+        "tp": 19,
+        "fp": 16,
+        "fn": 5,
+        "tn": 51,
+        "f1": 0.6440677966101694,
+        "precision": 0.5428571428571428,
+        "recall": 0.7916666666666666,
+        "p_ca": 0.7916666666666666,
+        "p_fa": 0.4571428571428572
+      },
+      {
+        "scene_id": "4652",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 14,
+        "pair_count": 91,
+        "positive_count": 27,
+        "tp": 24,
+        "fp": 8,
+        "fn": 3,
+        "tn": 56,
+        "f1": 0.8135593220338984,
+        "precision": 0.75,
+        "recall": 0.8888888888888888,
+        "p_ca": 0.8888888888888888,
+        "p_fa": 0.25
+      },
+      {
+        "scene_id": "4159",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 34,
+        "pair_count": 561,
+        "positive_count": 76,
+        "tp": 66,
+        "fp": 53,
+        "fn": 10,
+        "tn": 432,
+        "f1": 0.676923076923077,
+        "precision": 0.5546218487394958,
+        "recall": 0.868421052631579,
+        "p_ca": 0.868421052631579,
+        "p_fa": 0.4453781512605042
+      },
+      {
+        "scene_id": "1331",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 33,
+        "pair_count": 528,
+        "positive_count": 79,
+        "tp": 54,
+        "fp": 77,
+        "fn": 25,
+        "tn": 372,
+        "f1": 0.5142857142857142,
+        "precision": 0.4122137404580153,
+        "recall": 0.6835443037974683,
+        "p_ca": 0.6835443037974683,
+        "p_fa": 0.5877862595419847
+      },
+      {
+        "scene_id": "2882",
+        "component_id": "component-98203dd31f28ca84438009d5",
+        "node_count": 11,
+        "pair_count": 55,
+        "positive_count": 25,
+        "tp": 20,
+        "fp": 0,
+        "fn": 5,
+        "tn": 30,
+        "f1": 0.8888888888888888,
+        "precision": 1.0,
+        "recall": 0.8,
+        "p_ca": 0.8,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "3117",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 17,
+        "pair_count": 136,
+        "positive_count": 32,
+        "tp": 32,
+        "fp": 15,
+        "fn": 0,
+        "tn": 89,
+        "f1": 0.810126582278481,
+        "precision": 0.6808510638297872,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.3191489361702128
+      },
+      {
+        "scene_id": "2996",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 12,
+        "pair_count": 66,
+        "positive_count": 21,
+        "tp": 11,
+        "fp": 4,
+        "fn": 10,
+        "tn": 41,
+        "f1": 0.6111111111111112,
+        "precision": 0.7333333333333333,
+        "recall": 0.5238095238095238,
+        "p_ca": 0.5238095238095238,
+        "p_fa": 0.2666666666666667
+      },
+      {
+        "scene_id": "1398",
+        "component_id": "component-9dfa5ad93cf3821d1032a1d2",
+        "node_count": 18,
+        "pair_count": 153,
+        "positive_count": 49,
+        "tp": 49,
+        "fp": 81,
+        "fn": 0,
+        "tn": 23,
+        "f1": 0.547486033519553,
+        "precision": 0.3769230769230769,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.6230769230769231
+      },
+      {
+        "scene_id": "330",
+        "component_id": "component-10bcec41d71aa1c66c878ffd",
+        "node_count": 13,
+        "pair_count": 78,
+        "positive_count": 36,
+        "tp": 15,
+        "fp": 0,
+        "fn": 21,
+        "tn": 42,
+        "f1": 0.5882352941176471,
+        "precision": 1.0,
+        "recall": 0.4166666666666667,
+        "p_ca": 0.4166666666666667,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "3495",
+        "component_id": "component-9dfa5ad93cf3821d1032a1d2",
+        "node_count": 13,
+        "pair_count": 78,
+        "positive_count": 24,
+        "tp": 24,
+        "fp": 29,
+        "fn": 0,
+        "tn": 25,
+        "f1": 0.6233766233766234,
+        "precision": 0.4528301886792453,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.5471698113207547
+      },
+      {
+        "scene_id": "4980",
+        "component_id": "component-10bcec41d71aa1c66c878ffd",
+        "node_count": 18,
+        "pair_count": 153,
+        "positive_count": 32,
+        "tp": 26,
+        "fp": 5,
+        "fn": 6,
+        "tn": 116,
+        "f1": 0.8253968253968254,
+        "precision": 0.8387096774193549,
+        "recall": 0.8125,
+        "p_ca": 0.8125,
+        "p_fa": 0.16129032258064513
+      },
+      {
+        "scene_id": "211",
+        "component_id": "component-093434a3ee9e0a010bb2c2aa",
+        "node_count": 13,
+        "pair_count": 78,
+        "positive_count": 26,
+        "tp": 26,
+        "fp": 0,
+        "fn": 0,
+        "tn": 52,
+        "f1": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "1447",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 16,
+        "pair_count": 120,
+        "positive_count": 37,
+        "tp": 27,
+        "fp": 9,
+        "fn": 10,
+        "tn": 74,
+        "f1": 0.7397260273972602,
+        "precision": 0.75,
+        "recall": 0.7297297297297297,
+        "p_ca": 0.7297297297297297,
+        "p_fa": 0.25
+      },
+      {
+        "scene_id": "1893",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 15,
+        "pair_count": 105,
+        "positive_count": 37,
+        "tp": 29,
+        "fp": 12,
+        "fn": 8,
+        "tn": 56,
+        "f1": 0.7435897435897436,
+        "precision": 0.7073170731707317,
+        "recall": 0.7837837837837838,
+        "p_ca": 0.7837837837837838,
+        "p_fa": 0.29268292682926833
+      },
+      {
+        "scene_id": "3332",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 20,
+        "pair_count": 190,
+        "positive_count": 34,
+        "tp": 21,
+        "fp": 4,
+        "fn": 13,
+        "tn": 152,
+        "f1": 0.711864406779661,
+        "precision": 0.84,
+        "recall": 0.6176470588235294,
+        "p_ca": 0.6176470588235294,
+        "p_fa": 0.16000000000000003
+      },
+      {
+        "scene_id": "870",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 13,
+        "pair_count": 78,
+        "positive_count": 31,
+        "tp": 20,
+        "fp": 4,
+        "fn": 11,
+        "tn": 43,
+        "f1": 0.7272727272727273,
+        "precision": 0.8333333333333334,
+        "recall": 0.6451612903225806,
+        "p_ca": 0.6451612903225806,
+        "p_fa": 0.16666666666666663
+      },
+      {
+        "scene_id": "2512",
+        "component_id": "component-10bcec41d71aa1c66c878ffd",
+        "node_count": 14,
+        "pair_count": 91,
+        "positive_count": 31,
+        "tp": 15,
+        "fp": 4,
+        "fn": 16,
+        "tn": 56,
+        "f1": 0.6,
+        "precision": 0.7894736842105263,
+        "recall": 0.4838709677419355,
+        "p_ca": 0.4838709677419355,
+        "p_fa": 0.21052631578947367
+      },
+      {
+        "scene_id": "2995",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 46,
+        "pair_count": 1035,
+        "positive_count": 68,
+        "tp": 55,
+        "fp": 13,
+        "fn": 13,
+        "tn": 954,
+        "f1": 0.8088235294117647,
+        "precision": 0.8088235294117647,
+        "recall": 0.8088235294117647,
+        "p_ca": 0.8088235294117647,
+        "p_fa": 0.19117647058823528
+      },
+      {
+        "scene_id": "875",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 17,
+        "pair_count": 136,
+        "positive_count": 31,
+        "tp": 28,
+        "fp": 30,
+        "fn": 3,
+        "tn": 75,
+        "f1": 0.6292134831460674,
+        "precision": 0.4827586206896552,
+        "recall": 0.9032258064516129,
+        "p_ca": 0.9032258064516129,
+        "p_fa": 0.5172413793103448
+      },
+      {
+        "scene_id": "4038",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 31,
+        "pair_count": 465,
+        "positive_count": 83,
+        "tp": 52,
+        "fp": 28,
+        "fn": 31,
+        "tn": 354,
+        "f1": 0.6380368098159509,
+        "precision": 0.65,
+        "recall": 0.6265060240963856,
+        "p_ca": 0.6265060240963856,
+        "p_fa": 0.35
+      },
+      {
+        "scene_id": "2345",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 22,
+        "pair_count": 231,
+        "positive_count": 54,
+        "tp": 32,
+        "fp": 9,
+        "fn": 22,
+        "tn": 168,
+        "f1": 0.6736842105263158,
+        "precision": 0.7804878048780488,
+        "recall": 0.5925925925925926,
+        "p_ca": 0.5925925925925926,
+        "p_fa": 0.2195121951219512
+      },
+      {
+        "scene_id": "1587",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 14,
+        "pair_count": 91,
+        "positive_count": 30,
+        "tp": 24,
+        "fp": 0,
+        "fn": 6,
+        "tn": 61,
+        "f1": 0.8888888888888888,
+        "precision": 1.0,
+        "recall": 0.8,
+        "p_ca": 0.8,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "3245",
+        "component_id": "component-9dfa5ad93cf3821d1032a1d2",
+        "node_count": 24,
+        "pair_count": 276,
+        "positive_count": 49,
+        "tp": 49,
+        "fp": 84,
+        "fn": 0,
+        "tn": 143,
+        "f1": 0.5384615384615384,
+        "precision": 0.3684210526315789,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.631578947368421
+      },
+      {
+        "scene_id": "2395",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 44,
+        "pair_count": 946,
+        "positive_count": 86,
+        "tp": 82,
+        "fp": 72,
+        "fn": 4,
+        "tn": 788,
+        "f1": 0.6833333333333333,
+        "precision": 0.5324675324675324,
+        "recall": 0.9534883720930233,
+        "p_ca": 0.9534883720930233,
+        "p_fa": 0.4675324675324676
+      },
+      {
+        "scene_id": "3838",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 25,
+        "pair_count": 300,
+        "positive_count": 42,
+        "tp": 34,
+        "fp": 86,
+        "fn": 8,
+        "tn": 172,
+        "f1": 0.41975308641975306,
+        "precision": 0.2833333333333333,
+        "recall": 0.8095238095238095,
+        "p_ca": 0.8095238095238095,
+        "p_fa": 0.7166666666666667
+      },
+      {
+        "scene_id": "519",
+        "component_id": "component-a6f62faaa3eefe9d4e46e10c",
+        "node_count": 15,
+        "pair_count": 105,
+        "positive_count": 24,
+        "tp": 24,
+        "fp": 24,
+        "fn": 0,
+        "tn": 57,
+        "f1": 0.6666666666666666,
+        "precision": 0.5,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.5
+      },
+      {
+        "scene_id": "2715",
+        "component_id": "component-5084be93e49b2fa14e5ebc36",
+        "node_count": 37,
+        "pair_count": 666,
+        "positive_count": 65,
+        "tp": 65,
+        "fp": 248,
+        "fn": 0,
+        "tn": 353,
+        "f1": 0.3439153439153439,
+        "precision": 0.20766773162939298,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.792332268370607
+      },
+      {
+        "scene_id": "3964",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 32,
+        "pair_count": 496,
+        "positive_count": 58,
+        "tp": 53,
+        "fp": 40,
+        "fn": 5,
+        "tn": 398,
+        "f1": 0.7019867549668874,
+        "precision": 0.5698924731182796,
+        "recall": 0.9137931034482759,
+        "p_ca": 0.9137931034482759,
+        "p_fa": 0.4301075268817204
+      },
+      {
+        "scene_id": "2261",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 14,
+        "pair_count": 91,
+        "positive_count": 26,
+        "tp": 13,
+        "fp": 0,
+        "fn": 13,
+        "tn": 65,
+        "f1": 0.6666666666666666,
+        "precision": 1.0,
+        "recall": 0.5,
+        "p_ca": 0.5,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "1457",
+        "component_id": "component-66d20379d86cb696e0cfe4b8",
+        "node_count": 38,
+        "pair_count": 703,
+        "positive_count": 79,
+        "tp": 77,
+        "fp": 477,
+        "fn": 2,
+        "tn": 147,
+        "f1": 0.24328593996840442,
+        "precision": 0.13898916967509026,
+        "recall": 0.9746835443037974,
+        "p_ca": 0.9746835443037974,
+        "p_fa": 0.8610108303249098
+      },
+      {
+        "scene_id": "907",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 43,
+        "pair_count": 903,
+        "positive_count": 69,
+        "tp": 59,
+        "fp": 93,
+        "fn": 10,
+        "tn": 741,
+        "f1": 0.5339366515837104,
+        "precision": 0.3881578947368421,
+        "recall": 0.855072463768116,
+        "p_ca": 0.855072463768116,
+        "p_fa": 0.611842105263158
+      },
+      {
+        "scene_id": "1022",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 19,
+        "pair_count": 171,
+        "positive_count": 23,
+        "tp": 18,
+        "fp": 2,
+        "fn": 5,
+        "tn": 146,
+        "f1": 0.8372093023255814,
+        "precision": 0.9,
+        "recall": 0.782608695652174,
+        "p_ca": 0.782608695652174,
+        "p_fa": 0.09999999999999998
+      },
+      {
+        "scene_id": "1206",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 32,
+        "pair_count": 496,
+        "positive_count": 60,
+        "tp": 39,
+        "fp": 8,
+        "fn": 21,
+        "tn": 428,
+        "f1": 0.7289719626168224,
+        "precision": 0.8297872340425532,
+        "recall": 0.65,
+        "p_ca": 0.65,
+        "p_fa": 0.17021276595744683
+      },
+      {
+        "scene_id": "3879",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 18,
+        "pair_count": 153,
+        "positive_count": 28,
+        "tp": 27,
+        "fp": 29,
+        "fn": 1,
+        "tn": 96,
+        "f1": 0.6428571428571429,
+        "precision": 0.48214285714285715,
+        "recall": 0.9642857142857143,
+        "p_ca": 0.9642857142857143,
+        "p_fa": 0.5178571428571428
+      },
+      {
+        "scene_id": "2211",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 22,
+        "pair_count": 231,
+        "positive_count": 40,
+        "tp": 39,
+        "fp": 40,
+        "fn": 1,
+        "tn": 151,
+        "f1": 0.6554621848739496,
+        "precision": 0.4936708860759494,
+        "recall": 0.975,
+        "p_ca": 0.975,
+        "p_fa": 0.5063291139240507
+      },
+      {
+        "scene_id": "1058",
+        "component_id": "component-bd7d0f58788057f9be8cb6e2",
+        "node_count": 10,
+        "pair_count": 45,
+        "positive_count": 24,
+        "tp": 24,
+        "fp": 6,
+        "fn": 0,
+        "tn": 15,
+        "f1": 0.8888888888888888,
+        "precision": 0.8,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.19999999999999996
+      },
+      {
+        "scene_id": "3527",
+        "component_id": "component-472a3d4f21df6f4f6b9c0775",
+        "node_count": 30,
+        "pair_count": 435,
+        "positive_count": 68,
+        "tp": 62,
+        "fp": 143,
+        "fn": 6,
+        "tn": 224,
+        "f1": 0.4542124542124542,
+        "precision": 0.3024390243902439,
+        "recall": 0.9117647058823529,
+        "p_ca": 0.9117647058823529,
+        "p_fa": 0.697560975609756
+      },
+      {
+        "scene_id": "2708",
+        "component_id": "component-9eff1fcb4b6a8d5fec917ff7",
+        "node_count": 21,
+        "pair_count": 210,
+        "positive_count": 37,
+        "tp": 24,
+        "fp": 64,
+        "fn": 13,
+        "tn": 109,
+        "f1": 0.384,
+        "precision": 0.2727272727272727,
+        "recall": 0.6486486486486487,
+        "p_ca": 0.6486486486486487,
+        "p_fa": 0.7272727272727273
+      },
+      {
+        "scene_id": "270",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 39,
+        "pair_count": 741,
+        "positive_count": 84,
+        "tp": 33,
+        "fp": 51,
+        "fn": 51,
+        "tn": 606,
+        "f1": 0.39285714285714285,
+        "precision": 0.39285714285714285,
+        "recall": 0.39285714285714285,
+        "p_ca": 0.39285714285714285,
+        "p_fa": 0.6071428571428572
+      },
+      {
+        "scene_id": "2960",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 26,
+        "pair_count": 325,
+        "positive_count": 52,
+        "tp": 44,
+        "fp": 9,
+        "fn": 8,
+        "tn": 264,
+        "f1": 0.8380952380952381,
+        "precision": 0.8301886792452831,
+        "recall": 0.8461538461538461,
+        "p_ca": 0.8461538461538461,
+        "p_fa": 0.16981132075471694
+      },
+      {
+        "scene_id": "1089",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 15,
+        "pair_count": 105,
+        "positive_count": 31,
+        "tp": 28,
+        "fp": 20,
+        "fn": 3,
+        "tn": 54,
+        "f1": 0.7088607594936709,
+        "precision": 0.5833333333333334,
+        "recall": 0.9032258064516129,
+        "p_ca": 0.9032258064516129,
+        "p_fa": 0.41666666666666663
+      },
+      {
+        "scene_id": "1795",
+        "component_id": "component-d05fc783deb1d56f79a8749b",
+        "node_count": 15,
+        "pair_count": 105,
+        "positive_count": 30,
+        "tp": 30,
+        "fp": 32,
+        "fn": 0,
+        "tn": 43,
+        "f1": 0.6521739130434783,
+        "precision": 0.4838709677419355,
+        "recall": 1.0,
+        "p_ca": 1.0,
+        "p_fa": 0.5161290322580645
+      },
+      {
+        "scene_id": "1374",
+        "component_id": "component-deea3ab07b0b8d892361ca5b",
+        "node_count": 12,
+        "pair_count": 66,
+        "positive_count": 31,
+        "tp": 22,
+        "fp": 22,
+        "fn": 9,
+        "tn": 13,
+        "f1": 0.5866666666666667,
+        "precision": 0.5,
+        "recall": 0.7096774193548387,
+        "p_ca": 0.7096774193548387,
+        "p_fa": 0.5
+      },
+      {
+        "scene_id": "1396",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 88,
+        "pair_count": 3828,
+        "positive_count": 180,
+        "tp": 161,
+        "fp": 1779,
+        "fn": 19,
+        "tn": 1869,
+        "f1": 0.15188679245283018,
+        "precision": 0.08298969072164948,
+        "recall": 0.8944444444444445,
+        "p_ca": 0.8944444444444445,
+        "p_fa": 0.9170103092783505
+      },
+      {
+        "scene_id": "3349",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 13,
+        "pair_count": 78,
+        "positive_count": 28,
+        "tp": 13,
+        "fp": 0,
+        "fn": 15,
+        "tn": 50,
+        "f1": 0.6341463414634146,
+        "precision": 1.0,
+        "recall": 0.4642857142857143,
+        "p_ca": 0.4642857142857143,
+        "p_fa": 0.0
+      },
+      {
+        "scene_id": "1150",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 18,
+        "pair_count": 153,
+        "positive_count": 32,
+        "tp": 30,
+        "fp": 15,
+        "fn": 2,
+        "tn": 106,
+        "f1": 0.7792207792207793,
+        "precision": 0.6666666666666666,
+        "recall": 0.9375,
+        "p_ca": 0.9375,
+        "p_fa": 0.33333333333333337
+      },
+      {
+        "scene_id": "3330",
+        "component_id": "component-782c7ca25ee552931cd4513f",
+        "node_count": 30,
+        "pair_count": 435,
+        "positive_count": 71,
+        "tp": 63,
+        "fp": 83,
+        "fn": 8,
+        "tn": 281,
+        "f1": 0.5806451612903226,
+        "precision": 0.4315068493150685,
+        "recall": 0.8873239436619719,
+        "p_ca": 0.8873239436619719,
+        "p_fa": 0.5684931506849316
+      },
+      {
+        "scene_id": "4429",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 33,
+        "pair_count": 528,
+        "positive_count": 69,
+        "tp": 42,
+        "fp": 43,
+        "fn": 27,
+        "tn": 416,
+        "f1": 0.5454545454545454,
+        "precision": 0.49411764705882355,
+        "recall": 0.6086956521739131,
+        "p_ca": 0.6086956521739131,
+        "p_fa": 0.5058823529411764
+      },
+      {
+        "scene_id": "3589",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 23,
+        "pair_count": 253,
+        "positive_count": 50,
+        "tp": 45,
+        "fp": 31,
+        "fn": 5,
+        "tn": 172,
+        "f1": 0.7142857142857143,
+        "precision": 0.5921052631578947,
+        "recall": 0.9,
+        "p_ca": 0.9,
+        "p_fa": 0.4078947368421053
+      },
+      {
+        "scene_id": "2025",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 26,
+        "pair_count": 325,
+        "positive_count": 57,
+        "tp": 33,
+        "fp": 2,
+        "fn": 24,
+        "tn": 266,
+        "f1": 0.717391304347826,
+        "precision": 0.9428571428571428,
+        "recall": 0.5789473684210527,
+        "p_ca": 0.5789473684210527,
+        "p_fa": 0.05714285714285716
+      },
+      {
+        "scene_id": "4676",
+        "component_id": "component-ccdf850af76ead542ca516a9",
+        "node_count": 25,
+        "pair_count": 300,
+        "positive_count": 50,
+        "tp": 47,
+        "fp": 57,
+        "fn": 3,
+        "tn": 193,
+        "f1": 0.6103896103896104,
+        "precision": 0.4519230769230769,
+        "recall": 0.94,
+        "p_ca": 0.94,
+        "p_fa": 0.5480769230769231
+      }
+    ],
+    "itsa": {
+      "scene_count": 64,
+      "pair_count": 14609,
+      "macro_f1": 0.5776818718649064,
+      "positive_scene_macro_f1": 0.5776818718649064,
+      "positive_scene_count": 64,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "micro_f1": 0.3644106463878327,
+      "micro_precision": 0.23765125967070025,
+      "micro_recall": 0.7809647979139505,
+      "p_ca": 0.7809647979139505,
+      "p_fa": 0.7623487403292998,
+      "tp": 1198,
+      "fp": 3843,
+      "fn": 336,
+      "tn": 9232
+    },
+    "mstsa": {
+      "scene_count": 64,
+      "pair_count": 14399,
+      "macro_f1": 0.6455148034155046,
+      "positive_scene_macro_f1": 0.6455148034155046,
+      "positive_scene_count": 64,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "micro_f1": 0.4303284618723774,
+      "micro_precision": 0.28885003885003885,
+      "micro_recall": 0.84344866704481,
+      "p_ca": 0.84344866704481,
+      "p_fa": 0.7111499611499612,
+      "tp": 1487,
+      "fp": 3661,
+      "fn": 276,
+      "tn": 8975
+    },
+    "coverage": {
+      "all_scenes": 64,
+      "eligible_scenes": 64,
+      "scenes_without_pairs": 0
+    },
+    "empty_f1_convention": "truth and prediction empty: 1; no eligible pairs: excluded from shared denominator"
+  },
+  "pooled_roc_auc": 0.8384131933253515,
+  "observation_members_read": [
+    {
+      "kind": "labels",
+      "scene_id": "1671",
+      "member": "数据集level2/关联表/关联结果-1671.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1671",
+      "member": "数据集level2/量测场景/场景-1671.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2056",
+      "member": "数据集level2/关联表/关联结果-2056.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2056",
+      "member": "数据集level2/量测场景/场景-2056.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "290",
+      "member": "数据集level2/关联表/关联结果-290.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "290",
+      "member": "数据集level2/量测场景/场景-290.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "113",
+      "member": "数据集level2/关联表/关联结果-113.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "113",
+      "member": "数据集level2/量测场景/场景-113.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2109",
+      "member": "数据集level2/关联表/关联结果-2109.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2109",
+      "member": "数据集level2/量测场景/场景-2109.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1977",
+      "member": "数据集level2/关联表/关联结果-1977.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1977",
+      "member": "数据集level2/量测场景/场景-1977.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2279",
+      "member": "数据集level2/关联表/关联结果-2279.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2279",
+      "member": "数据集level2/量测场景/场景-2279.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4",
+      "member": "数据集level2/关联表/关联结果-4.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4",
+      "member": "数据集level2/量测场景/场景-4.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1456",
+      "member": "数据集level2/关联表/关联结果-1456.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1456",
+      "member": "数据集level2/量测场景/场景-1456.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "944",
+      "member": "数据集level2/关联表/关联结果-944.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "944",
+      "member": "数据集level2/量测场景/场景-944.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1391",
+      "member": "数据集level2/关联表/关联结果-1391.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1391",
+      "member": "数据集level2/量测场景/场景-1391.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4618",
+      "member": "数据集level2/关联表/关联结果-4618.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4618",
+      "member": "数据集level2/量测场景/场景-4618.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1793",
+      "member": "数据集level2/关联表/关联结果-1793.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1793",
+      "member": "数据集level2/量测场景/场景-1793.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3829",
+      "member": "数据集level2/关联表/关联结果-3829.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3829",
+      "member": "数据集level2/量测场景/场景-3829.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4652",
+      "member": "数据集level2/关联表/关联结果-4652.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4652",
+      "member": "数据集level2/量测场景/场景-4652.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4159",
+      "member": "数据集level2/关联表/关联结果-4159.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4159",
+      "member": "数据集level2/量测场景/场景-4159.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1331",
+      "member": "数据集level2/关联表/关联结果-1331.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1331",
+      "member": "数据集level2/量测场景/场景-1331.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2882",
+      "member": "数据集level2/关联表/关联结果-2882.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2882",
+      "member": "数据集level2/量测场景/场景-2882.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3117",
+      "member": "数据集level2/关联表/关联结果-3117.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3117",
+      "member": "数据集level2/量测场景/场景-3117.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2996",
+      "member": "数据集level2/关联表/关联结果-2996.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2996",
+      "member": "数据集level2/量测场景/场景-2996.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1398",
+      "member": "数据集level2/关联表/关联结果-1398.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1398",
+      "member": "数据集level2/量测场景/场景-1398.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "330",
+      "member": "数据集level2/关联表/关联结果-330.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "330",
+      "member": "数据集level2/量测场景/场景-330.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3495",
+      "member": "数据集level2/关联表/关联结果-3495.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3495",
+      "member": "数据集level2/量测场景/场景-3495.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4980",
+      "member": "数据集level2/关联表/关联结果-4980.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4980",
+      "member": "数据集level2/量测场景/场景-4980.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "211",
+      "member": "数据集level2/关联表/关联结果-211.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "211",
+      "member": "数据集level2/量测场景/场景-211.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1447",
+      "member": "数据集level2/关联表/关联结果-1447.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1447",
+      "member": "数据集level2/量测场景/场景-1447.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1893",
+      "member": "数据集level2/关联表/关联结果-1893.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1893",
+      "member": "数据集level2/量测场景/场景-1893.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3332",
+      "member": "数据集level2/关联表/关联结果-3332.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3332",
+      "member": "数据集level2/量测场景/场景-3332.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "870",
+      "member": "数据集level2/关联表/关联结果-870.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "870",
+      "member": "数据集level2/量测场景/场景-870.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2512",
+      "member": "数据集level2/关联表/关联结果-2512.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2512",
+      "member": "数据集level2/量测场景/场景-2512.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2995",
+      "member": "数据集level2/关联表/关联结果-2995.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2995",
+      "member": "数据集level2/量测场景/场景-2995.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "875",
+      "member": "数据集level2/关联表/关联结果-875.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "875",
+      "member": "数据集level2/量测场景/场景-875.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4038",
+      "member": "数据集level2/关联表/关联结果-4038.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4038",
+      "member": "数据集level2/量测场景/场景-4038.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2345",
+      "member": "数据集level2/关联表/关联结果-2345.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2345",
+      "member": "数据集level2/量测场景/场景-2345.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1587",
+      "member": "数据集level2/关联表/关联结果-1587.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1587",
+      "member": "数据集level2/量测场景/场景-1587.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3245",
+      "member": "数据集level2/关联表/关联结果-3245.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3245",
+      "member": "数据集level2/量测场景/场景-3245.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2395",
+      "member": "数据集level2/关联表/关联结果-2395.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2395",
+      "member": "数据集level2/量测场景/场景-2395.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3838",
+      "member": "数据集level2/关联表/关联结果-3838.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3838",
+      "member": "数据集level2/量测场景/场景-3838.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "519",
+      "member": "数据集level2/关联表/关联结果-519.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "519",
+      "member": "数据集level2/量测场景/场景-519.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2715",
+      "member": "数据集level2/关联表/关联结果-2715.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2715",
+      "member": "数据集level2/量测场景/场景-2715.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3964",
+      "member": "数据集level2/关联表/关联结果-3964.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3964",
+      "member": "数据集level2/量测场景/场景-3964.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2261",
+      "member": "数据集level2/关联表/关联结果-2261.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2261",
+      "member": "数据集level2/量测场景/场景-2261.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1457",
+      "member": "数据集level2/关联表/关联结果-1457.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1457",
+      "member": "数据集level2/量测场景/场景-1457.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "907",
+      "member": "数据集level2/关联表/关联结果-907.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "907",
+      "member": "数据集level2/量测场景/场景-907.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1022",
+      "member": "数据集level2/关联表/关联结果-1022.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1022",
+      "member": "数据集level2/量测场景/场景-1022.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1206",
+      "member": "数据集level2/关联表/关联结果-1206.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1206",
+      "member": "数据集level2/量测场景/场景-1206.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3879",
+      "member": "数据集level2/关联表/关联结果-3879.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3879",
+      "member": "数据集level2/量测场景/场景-3879.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2211",
+      "member": "数据集level2/关联表/关联结果-2211.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2211",
+      "member": "数据集level2/量测场景/场景-2211.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1058",
+      "member": "数据集level2/关联表/关联结果-1058.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1058",
+      "member": "数据集level2/量测场景/场景-1058.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3527",
+      "member": "数据集level2/关联表/关联结果-3527.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3527",
+      "member": "数据集level2/量测场景/场景-3527.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2708",
+      "member": "数据集level2/关联表/关联结果-2708.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2708",
+      "member": "数据集level2/量测场景/场景-2708.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "270",
+      "member": "数据集level2/关联表/关联结果-270.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "270",
+      "member": "数据集level2/量测场景/场景-270.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2960",
+      "member": "数据集level2/关联表/关联结果-2960.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2960",
+      "member": "数据集level2/量测场景/场景-2960.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1089",
+      "member": "数据集level2/关联表/关联结果-1089.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1089",
+      "member": "数据集level2/量测场景/场景-1089.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1795",
+      "member": "数据集level2/关联表/关联结果-1795.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1795",
+      "member": "数据集level2/量测场景/场景-1795.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1374",
+      "member": "数据集level2/关联表/关联结果-1374.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1374",
+      "member": "数据集level2/量测场景/场景-1374.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1396",
+      "member": "数据集level2/关联表/关联结果-1396.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1396",
+      "member": "数据集level2/量测场景/场景-1396.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3349",
+      "member": "数据集level2/关联表/关联结果-3349.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3349",
+      "member": "数据集level2/量测场景/场景-3349.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "1150",
+      "member": "数据集level2/关联表/关联结果-1150.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1150",
+      "member": "数据集level2/量测场景/场景-1150.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3330",
+      "member": "数据集level2/关联表/关联结果-3330.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3330",
+      "member": "数据集level2/量测场景/场景-3330.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4429",
+      "member": "数据集level2/关联表/关联结果-4429.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4429",
+      "member": "数据集level2/量测场景/场景-4429.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "3589",
+      "member": "数据集level2/关联表/关联结果-3589.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "3589",
+      "member": "数据集level2/量测场景/场景-3589.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2025",
+      "member": "数据集level2/关联表/关联结果-2025.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2025",
+      "member": "数据集level2/量测场景/场景-2025.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "4676",
+      "member": "数据集level2/关联表/关联结果-4676.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "4676",
+      "member": "数据集level2/量测场景/场景-4676.csv"
+    }
+  ],
+  "reference_read": false,
+  "training_data_read": false,
+  "model_constructed": false,
+  "checkpoint_loaded": false,
+  "optimizer_updates": 0,
+  "test_opened": false,
+  "device": "cpu",
+  "elapsed_seconds": 0.8946656250045635,
+  "limitations": [
+    "development threshold selected and reported on V, not held-out performance",
+    "only positions; not paper ED/DTW or a trained-method reproduction",
+    "endpoint hold supplies all query times, including unsupported long gaps",
+    "no raw 020/021 pair scores available here for paired correction analysis",
+    "physical CPU control is float64; neural inference remains original FP32"
+  ]
+}
