@@ -1,0 +1,5 @@
+run dir（权重与大件留服务器）: /home/wangguangjie/djs/association-code/runs/COMPLETION-RESIDUAL-20261019-030-attempt-1
+record dir: /home/wangguangjie/djs/association-code/runs/COMPLETION-RESIDUAL-20261019-030-attempt-1-launch
+worktree: /home/wangguangjie/djs/association-code-run030 detached bfa304e
+candidate checkpoint used: /home/wangguangjie/djs/association-code/association-code/runs/STAGEWISE-COMPLETION-20261019-028-preserved/021-attempt-3/before-stop/teacher.pt 25849550B (未传)
+reference checkpoint 只核对数据契约，未实例化/未推理: …/020/before-stop/checkpoint.pt 83309324B (未传)

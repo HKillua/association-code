@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "tools/experiments/completion_check.py",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level2.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code/runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json",
+    "--alignment",
+    "configs/tmtaff-time-reference-alignment.json",
+    "--reference-checkpoint",
+    "/home/wangguangjie/djs/association-code/runs/STAGEWISE-COMPLETION-20261019-028-preserved/020/before-stop/checkpoint.pt",
+    "--candidate-checkpoint",
+    "/home/wangguangjie/djs/association-code/runs/STAGEWISE-COMPLETION-20261019-028-preserved/021-attempt-3/before-stop/teacher.pt",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/COMPLETION-RESIDUAL-20261019-030-attempt-1",
+    "--device",
+    "cuda",
+    "--cpu-threads",
+    "4",
+    "--candidate-residuals"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run030",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-c5a00c37-f181-90b3-f220-be6e7457f473",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-19T14:34:28.733916+00:00",
+  "started_monotonic": 2350879.827539413,
+  "max_seconds": 1200.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

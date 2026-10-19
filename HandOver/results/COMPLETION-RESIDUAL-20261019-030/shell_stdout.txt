@@ -1,0 +1,4 @@
+已经是最新的。
+准备工作区（分离头指针 bfa304e）
+HEAD 现在位于 bfa304e Hand over frozen teacher residual check 030 to server
+SUBMITTED /home/wangguangjie/djs/association-code/runs/COMPLETION-RESIDUAL-20261019-030-attempt-1-launch; status.json is the worker result, not this submission exit code
