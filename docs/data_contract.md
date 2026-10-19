@@ -27,6 +27,23 @@
 
 两level均5000场景，关联标签中26,221个A跨level共享，同编号场景A集合不相同；level名称不证明难度、独立性或训练/测试角色。Level1分卷需作为一个ZIP读取，不分卷独立解压；当前不授权合并level。原始统计见[Level1摘要](https://github.com/HKillua/association-code/blob/612afea/docs/level1_intake_summary.json)、[隔离复核](https://github.com/HKillua/association-code/blob/612afea/docs/level1_isolation_verification.json)。T_test量测、reference和预测继续封存；构建/核对隔离所需标签元数据不等于打开其模型评价。
 
+### 2026-10-19补充：当前子集的代表性风险
+
+用户提出“挑的数据是否不如论文”。只读原manifest及已有576场景元数据后，已证实**隔离正确不等于分布匹配**。71个开发锚点触及20个共享A连通组件，覆盖3885/5000场景，全部强制归训练侧；随后按组件分配和场景cap选择。最终T_core512中495场景（96.68%）来自强制组件，贡献54525/54792条轨迹。前两个大组件合计360场景、50340条轨迹（91.87%）。V64来自17个组件，其中一个含28场景。组件经共享A传递连接，不表示一个组件就是同一艘船；场景也不能一概视为独立重复。
+
+| 既有有效片段/候选统计 | T_core512 | V_select64 |
+| --- | ---: | ---: |
+| 每场景轨迹均值 / 中位数 | 107.02 / 36 | 25.55 / 20.5 |
+| 最大单场轨迹数 | 2372 | 99 |
+| 超过100条轨迹的场景数 | 115 | 0 |
+| 全候选汇总正例率 | 0.6068% | 11.3658% |
+
+这些数字说明密度与组件构成明显不同，**不能证明其造成了低分，也不能说验证集必然比论文更难**。正例率是全候选人口，当前TAM/候选配对训练按每类均匀选场景、再取各半正负对，不是只有0.6%训练正例；大场景pair平方级数量也不等于实际训练权重。TCM另按轨迹抽样，需分别解释。现有长时整场景补全、训练量和输入处理差异仍是独立因素。
+
+[TMTAFF原文§3.1.1](https://www.mdpi.com/2076-3417/16/14/7251)报告随机3000场景按7:1:2分割，并描述双源10/20秒采样及AIS变换；本地原文p16已回读。作者没有在该协议给出可复用场景名单或本项目式共享A组件划分；不能据此指控其泄漏/挑易例，不能把我们512/64严格组件隔离称其等价缩小版。当前数据选择是本项目开发协议，不是已完成的论文数据复现。
+
+复算来源：[007原manifest](https://github.com/HKillua/association-code/blob/612afea/HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json)、[既有逐场景元数据](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz)，两路独立复核一致，无新ZIP扫描/模型推理/测试量测。029仍在原4场景按已批范围做权重诊断，不因本发现取消或扩大；其结果不能证明全V或全MTAD代表性。后续正式重训若调整选择，先按组件、密度和时间支撑制定与模型分数无关的方案，披露已暴露数据并保留旧结果，用户确认后执行；不看效果后换验证集，也不撤销身份隔离求高分。
+
 ## 已核人口与监督分母
 
 以下来自已完成的576场景CPU审计和原manifest装配，不是新模型结果；详细原件查[612afea审计快照](https://github.com/HKillua/association-code/tree/612afea/docs/results/frozen_input_audit_20261018)。历史逐场景副本已从工作树移除，无须重新扫描。
