@@ -1,7 +1,7 @@
 """Behavioral integration checks for v2 training/statistics/checkpoint isolation."""
 import copy
 import json
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 import tempfile
 import unittest
@@ -17,6 +17,7 @@ from association.training.cooperative import (
 )
 from association.models.fusion import FusionLoss
 from association.training.common import fit_normalizer, normalize_scene
+from association.utils import runtime
 from tests.fixtures.scenes import timed_scene
 
 
@@ -324,3 +325,95 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
                 actual = restored(torch.from_numpy(x[:1]), torch.from_numpy(mask[:1]))
             torch.testing.assert_close(actual, expected, rtol=0, atol=0)
             self.assertEqual(metadata['format'], 'cooperative-physical-v1')
+
+    def test_split_shared_and_four_arms_equal_full_fit_with_real_dropout(self):
+        config = replace(self.config, dropout=.25)
+        cfg = {**self.fit_config(), 'adapt_updates': 2}
+
+        def assert_same(left, right):
+            if isinstance(left, torch.Tensor):
+                torch.testing.assert_close(left, right, rtol=0, atol=0)
+            elif isinstance(left, dict):
+                self.assertEqual(left.keys(), right.keys())
+                for key in left:
+                    assert_same(left[key], right[key])
+            elif isinstance(left, (list, tuple)):
+                self.assertEqual(len(left), len(right))
+                for a, b in zip(left, right):
+                    assert_same(a, b)
+            else:
+                self.assertEqual(left, right)
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            train_cooperative([self.scene], [self.validation], config, cfg, root/'full',
+                              device='cpu', save_predictions=True)
+            shared = train_cooperative([self.scene], [self.validation], config,
+                {**cfg, 'max_seconds': 60.}, root/'shared', device='cpu', phase='shared')
+            self.assertEqual(shared['completed_updates'], cfg['teacher_updates']+cfg['utility_updates'])
+            self.assertEqual(shared['completed_routes'], [])
+            self.assertFalse(list((root/'shared').glob('adapt-*.pt')))
+            for route in ROUTES:
+                # Fresh process initialization may consume any RNG amount. Each
+                # adaptation stage must restore the same original seed itself.
+                torch.manual_seed(987); torch.rand(51)
+                with patch('association.data.cooperative.fit_cooperative_normalizer', side_effect=AssertionError('no refit')), \
+                     patch('association.training.cooperative.fit_support_time_scaling', side_effect=AssertionError('no S refit')), \
+                     patch('association.training.cooperative.teacher_error_pair', side_effect=AssertionError('no teacher training')), \
+                     patch('association.evaluation.cooperative.score_cooperative', side_effect=AssertionError('no new scores')), \
+                     patch('association.evaluation.association.select_threshold', side_effect=AssertionError('no reselection')):
+                    arm = train_cooperative([self.scene], [self.validation], config,
+                        {**cfg, 'max_seconds': 45.}, root/route, device='cpu', phase='arm',
+                        shared_from=root/'shared', route=route, save_predictions=True)
+                self.assertEqual(arm['completed_updates'], cfg['adapt_updates'])
+                self.assertEqual(arm['completed_routes'], [route])
+                self.assertNotIn('teacher', arm['phases'])
+                self.assertEqual(arm['identity_selection'], shared['identity_selection'])
+                before = torch.load(root/'full'/f'adapt-{route}.pt', weights_only=True)
+                after = torch.load(root/route/f'adapt-{route}.pt', weights_only=True)
+                for key in ('model_state', 'objective_state', 'optimizer_state', 'normalizer',
+                            'support_time_scale_tau'):
+                    assert_same(before[key], after[key])
+                full_history = [row for row in runtime.read_json(root/'full'/'history.json')
+                                if row['stage'] == 'adapt' and row['routing'] == route]
+                arm_history = runtime.read_json(root/route/'history.json')
+                for row in [*full_history, *arm_history]:
+                    row.pop('seconds')
+                self.assertEqual(full_history, arm_history)
+                full_report = runtime.read_json(root/'full'/f'{route}-evaluation.json')
+                arm_report = runtime.read_json(root/route/f'{route}-evaluation.json')
+                full_report.pop('elapsed_seconds'); arm_report.pop('elapsed_seconds')
+                self.assertEqual(full_report, arm_report)
+                for source in [root/'full'/f'{route}-scores.npz',
+                               *(root/'full'/f'{route}-predictions').glob('*.npz')]:
+                    target = root/route/source.relative_to(root/'full')
+                    with np.load(source, allow_pickle=False) as expected, np.load(target, allow_pickle=False) as actual:
+                        self.assertEqual(expected.files, actual.files)
+                        for key in expected.files:
+                            np.testing.assert_array_equal(actual[key], expected[key])
+
+    def test_arm_rejects_unfinished_shared_or_changed_protocol_and_population(self):
+        cfg = self.fit_config()
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            train_cooperative([self.scene], [self.validation], self.config, cfg,
+                              root/'shared', device='cpu', phase='shared')
+            saved = runtime.read_json(root/'shared'/'run.json')
+            runtime.write_json(root/'shared'/'run.json', {**saved, 'status': 'RUNNING'})
+            with self.assertRaisesRegex(ValueError, 'COMPLETED shared'):
+                train_cooperative([self.scene], [self.validation], self.config, cfg,
+                    root/'unfinished', device='cpu', phase='arm', shared_from=root/'shared', route='plain')
+            runtime.write_json(root/'shared'/'run.json', saved)
+            changed = copy.deepcopy(self.scene)
+            changed['component_id'] = 'different-component'
+            cases = [('protocol', [self.scene], {**cfg, 'learning_rate': cfg['learning_rate']*2}, 'protocol'),
+                     ('population', [changed], cfg, 'scene contract')]
+            for name, scenes, training, message in cases:
+                with self.subTest(name=name), self.assertRaisesRegex(ValueError, message):
+                    train_cooperative(scenes, [self.validation], self.config, training,
+                        root/name, device='cpu', phase='arm', shared_from=root/'shared', route='plain')
+            labels = copy.deepcopy(self.validation)
+            labels['labels'][0] = 1-labels['labels'][0]
+            with self.assertRaisesRegex(ValueError, 'labels disagree'):
+                train_cooperative([self.scene], [labels], self.config, cfg,
+                    root/'labels', device='cpu', phase='arm', shared_from=root/'shared', route='plain')

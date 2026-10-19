@@ -122,6 +122,11 @@ def main(argv=None):
                         help='Synthetic checks only; native fit reads the explicit model variant from config')
     parser.add_argument('--save-predictions', action='store_true',
                         help='Save per-scene physical predictions and valid masks for each comparison arm')
+    parser.add_argument('--phase', choices=('full', 'shared', 'arm'), default='full',
+                        help='v2: shared trains teacher/utility once; arm adapts/evaluates one route')
+    parser.add_argument('--shared-from', help='completed shared phase output, required for --phase arm')
+    parser.add_argument('--route', choices=('plain', 'scalar-u', 'attribute-u', 'learned-attribute'),
+                        help='one independently initialized comparison arm')
     for name in ('archive', 'manifest', 'alignment', 'config'):
         parser.add_argument('--'+name)
     args = parser.parse_args(argv)
@@ -135,6 +140,15 @@ def main(argv=None):
             raise ValueError('cpu threads must be positive')
         if args.mode == 'shape-check' and args.save_predictions:
             raise ValueError('--save-predictions requires check or fit, not shape-check')
+        if args.mode == 'shape-check' and args.phase != 'full':
+            raise ValueError('--phase applies to check or fit, not shape-check')
+        if args.phase == 'arm':
+            if not args.shared_from or not args.route:
+                raise ValueError('--phase arm requires --shared-from and --route')
+        elif args.shared_from or args.route:
+            raise ValueError('--shared-from/--route apply only to --phase arm')
+        if args.phase == 'shared' and args.save_predictions:
+            raise ValueError('shared saves identity records, not physical predictions')
         torch.set_num_threads(args.cpu_threads)
         device, output = resolve_device(args.device), Path(args.output)
         if output.exists():
@@ -170,6 +184,8 @@ def main(argv=None):
                                   else 'cooperative-physical-v1')
                 if config['scope'] != expected_scope:
                     raise ValueError('configuration scope and model_variant disagree')
+                if args.phase != 'full' and model.model_variant != 'support_residual_v2':
+                    raise ValueError('shared/arm phases require support_residual_v2')
                 training = training_configuration(config['training'])
                 expected_routes = synthetic_configuration(model.model_variant)['routes']
                 if (model.model_variant == 'support_residual_v2' and training['routes'] != expected_routes
@@ -187,9 +203,11 @@ def main(argv=None):
                 train, validation, preparation = dataset['train'], dataset['validation'], dataset['report']
             training_error = None
             try:
+                phase_args = ({} if args.phase == 'full' else
+                              dict(phase=args.phase, shared_from=args.shared_from, route=args.route))
                 report = train_cooperative(train, validation, model, training, output, device=device,
                                            initial_elapsed_seconds=time.monotonic()-started,
-                                           save_predictions=args.save_predictions)
+                                           save_predictions=args.save_predictions, **phase_args)
             except BaseException as error:
                 training_error = error
                 raise
@@ -199,7 +217,9 @@ def main(argv=None):
                         runtime.write_json(output/'execution.json', dict(mode=args.mode, synthetic=args.mode=='check',
                             configuration=dict(model=asdict(model), training=training), preparation=preparation,
                             cpu_threads=args.cpu_threads, native_MTAD_opened=args.mode=='fit',
-                            save_predictions=args.save_predictions))
+                            save_predictions=args.save_predictions,
+                            **({} if args.phase == 'full' else dict(
+                                phase=args.phase, shared_from=args.shared_from, route=args.route))))
                     except BaseException as writing_error:
                         if training_error is None:
                             raise

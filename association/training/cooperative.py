@@ -444,14 +444,54 @@ def load_cooperative_checkpoint(path, *, device):
     return model.to(resolve_device(device)).eval(), payload
 
 
+def _load_shared(directory, model_config, config, contract, validation_scenes):
+    """Load one completed shared endpoint by its actual protocol/population."""
+    from association.evaluation.cooperative import _fixed_records
+    directory = Path(directory)
+    source = runtime.read_json(directory / 'run.json')
+    if source.get('status') != 'COMPLETED' or source.get('phase') != 'shared':
+        raise ValueError('arm requires a COMPLETED shared run')
+    model, payload = load_cooperative_checkpoint(directory / 'shared.pt', device='cpu')
+    if payload.get('shared_format') != 'cooperative-shared-v1':
+        raise ValueError('unsupported shared endpoint format')
+    for key in ('training', 'model_config', 'scene_contract', 'support_time_scaling',
+                'identity_selection', 'identity_selection_phase'):
+        if payload.get(key) != source.get(key):
+            raise ValueError('shared checkpoint/run disagree on ' + key)
+    protocol = lambda cfg: {key: value for key, value in cfg.items() if key != 'max_seconds'}
+    if protocol(payload['training']) != protocol(config) or payload['model_config'] != asdict(model_config):
+        raise ValueError('shared training/model protocol differs; only job budget may change')
+    if payload['scene_contract'] != contract:
+        raise ValueError('shared scene contract differs from current train/validation population')
+    if (payload.get('stage') != 'utility' or payload.get('completed_updates') != config['utility_updates']
+            or source.get('completed_updates') != config['teacher_updates'] + config['utility_updates']
+            or source.get('completed_routes') != []):
+        raise ValueError('shared endpoint does not contain the complete teacher/utility stages')
+    for stage, count in (('teacher', config['teacher_updates']), ('utility', config['utility_updates'])):
+        phase = source.get('phases', {}).get(stage, {})
+        if phase.get('status') != 'COMPLETED' or phase.get('completed_updates') != count:
+            raise ValueError('shared stage is incomplete: ' + stage)
+    if (payload['identity_selection_phase'] != 'teacher_endpoint_before_utility'
+            or source.get('threshold') != payload['identity_selection'].get('threshold')
+            or payload['support_time_scaling'].get('scale_tau') != payload['support_time_scale_tau']):
+        raise ValueError('shared identity selection or time scale is inconsistent')
+    records = runtime.load_records(directory / 'identity-records',
+        dict(split='V_select', scene_contract=contract[1]))
+    records = _fixed_records(validation_scenes, records)
+    return model, payload, records
+
+
 def train_cooperative(train_scenes, validation_scenes, model_config, training_config, output_dir,
                       *, device, initial_elapsed_seconds=0., check=None, progress=None,
-                      save_predictions=False):
+                      save_predictions=False, phase='full', shared_from=None, route=None):
     """Teacher -> frozen utility -> matched fixed-identity fusion arms.
 
     The first experiment intentionally excludes changing identity. Full-model
     identity modules/step are available, but not silently added to this fit.
-    The configured wall budget includes all routes, evaluation and initial data
+    ``full`` retains the original single-job path. V2 ``shared`` writes the
+    teacher/utility endpoint and fixed identity records; ``arm`` loads that
+    completed endpoint and performs one fresh, identically seeded adaptation.
+    The wall budget covers this job's stages, evaluation and initial data
     preparation. No resume/retry or implicit training schedule is provided.
     Phase wall times include sampling and checkpoint/result writes. Historical
     history[*].seconds retains its narrower train_batch plus device-sync scope.
@@ -462,6 +502,15 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     from association.evaluation.cooperative import evaluate_cooperative, score_cooperative
     from association.evaluation.association import select_threshold
     cfg = training_configuration(training_config)
+    if phase not in ('full', 'shared', 'arm'):
+        raise ValueError('phase must be full, shared or arm')
+    if phase != 'full' and not _is_v2(model_config):
+        raise ValueError('shared/arm execution is supported only by cooperative v2')
+    if phase == 'arm':
+        if shared_from is None or route not in cfg['routes']:
+            raise ValueError('arm requires a shared source and one configured route')
+    elif shared_from is not None or route is not None:
+        raise ValueError('shared_from and route are only valid for arm execution')
     if (_is_v2(model_config) and set(cfg['routes']) != set(_V2_ROUTES)
             or not _is_v2(model_config) and any(route not in _LEGACY_ROUTES for route in cfg['routes'])):
         raise ValueError('comparison routes do not match the cooperative model variant')
@@ -504,6 +553,11 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                    external_preparation='caller-supplied elapsed time before train_cooperative',
                    local_preparation='input contract validation, normalization, packing and model/loss allocation',
                    history_seconds='train_batch plus device synchronization only; excludes sampling and artifact writes'))
+    if phase != 'full':
+        run['phase'] = phase
+    if phase == 'arm':
+        run.update(route=route, shared_source=dict(path=str(Path(shared_from).resolve()),
+                   format='cooperative-shared-v1'))
     active, active_started = None, started
 
     def report_progress(stage, *, update=0, **details):
@@ -548,7 +602,22 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
         runtime.write_json(output / 'run.json', run)
         bounded()
         torch.manual_seed(cfg['seed'])
-        if _is_v2(model_config):
+        if phase == 'arm':
+            model, shared, records = _load_shared(shared_from, model_config, cfg, contract, validation_scenes)
+            normalizer = shared['normalizer']
+            from association.data.cooperative import normalize_cooperative_scene
+            packed = []
+            for scene in train_scenes:
+                bounded()
+                packed.append(normalize_cooperative_scene(scene, normalizer, model_config))
+            scaling = copy.deepcopy(shared['support_time_scaling'])
+            run.update(identity_selection=copy.deepcopy(shared['identity_selection']),
+                       identity_selection_phase=shared['identity_selection_phase'],
+                       threshold=shared['identity_selection']['threshold'],
+                       cooperative_representation=copy.deepcopy(normalizer['cooperative_representation']))
+            threshold = run['threshold']
+            model = model.to(device)
+        elif _is_v2(model_config):
             from association.data.cooperative import fit_cooperative_normalizer, normalize_cooperative_scene
             normalizer = fit_cooperative_normalizer(train_scenes, model_config, check=bounded)
             packed = []
@@ -559,14 +628,18 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
         else:
             normalizer = fit_normalizer(train_scenes)
             packed = [normalize_scene(scene, normalizer) for scene in train_scenes]
-        if model_config.support_time_policy == 'train_absmax_v1':
-            scaling = fit_support_time_scaling(train_scenes, packed, model_config.max_observations, check=bounded)
-        else:
-            scaling = dict(policy='legacy', scale_tau=1., scope='historical unscaled hand-crafted tau features')
+        if phase != 'arm':
+            if model_config.support_time_policy == 'train_absmax_v1':
+                scaling = fit_support_time_scaling(train_scenes, packed, model_config.max_observations, check=bounded)
+            else:
+                scaling = dict(policy='legacy', scale_tau=1., scope='historical unscaled hand-crafted tau features')
         run['support_time_scaling'] = scaling
-        model = CooperativeModel(model_config, normalizer, support_time_scale=scaling['scale_tau']).to(device)
+        if phase != 'arm':
+            model = CooperativeModel(model_config, normalizer, support_time_scale=scaling['scale_tau']).to(device)
         objective = FusionLoss(position_loss_mode='standard_smooth_l1',
                                longitude_loss_mode=cfg['longitude_loss_mode']).to(device)
+        if phase == 'arm':
+            objective.load_state_dict(shared['objective_state'], strict=True)
         teacher = None
         finish_phase()
         def fit_stage(target_model, target_objective, stage, steps, seed, route='plain'):
@@ -628,18 +701,35 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             finish_phase()
             return records, selection['threshold']
 
-        begin_phase('teacher', total_updates=cfg['teacher_updates'])
-        fit_stage(model, objective, 'teacher', cfg['teacher_updates'], cfg['seed'])
-        finish_phase()
-        if _is_v2(model_config):
-            records, threshold = select_identity()
-        begin_phase('utility', total_updates=cfg['utility_updates'])
-        teacher = copy.deepcopy(model).eval().requires_grad_(False)
-        fit_stage(model, objective, 'utility', cfg['utility_updates'], cfg['seed']+1)
-        finish_phase()
-        if not _is_v2(model_config):
-            records, threshold = select_identity()
-        for route in cfg['routes']:
+        if phase != 'arm':
+            begin_phase('teacher', total_updates=cfg['teacher_updates'])
+            fit_stage(model, objective, 'teacher', cfg['teacher_updates'], cfg['seed'])
+            finish_phase()
+            if _is_v2(model_config):
+                records, threshold = select_identity()
+            begin_phase('utility', total_updates=cfg['utility_updates'])
+            teacher = copy.deepcopy(model).eval().requires_grad_(False)
+            fit_stage(model, objective, 'utility', cfg['utility_updates'], cfg['seed']+1)
+            finish_phase()
+            if not _is_v2(model_config):
+                records, threshold = select_identity()
+        if phase == 'shared':
+            begin_phase('shared_export')
+            bounded()
+            bundle = torch.load(output / 'utility.pt', map_location='cpu', weights_only=True)
+            bundle.update(shared_format='cooperative-shared-v1', scene_contract=contract,
+                          support_time_scaling=copy.deepcopy(scaling),
+                          identity_selection=copy.deepcopy(run['identity_selection']),
+                          identity_selection_phase=run['identity_selection_phase'])
+            torch.save(bundle, output / 'shared.tmp')
+            (output / 'shared.tmp').replace(output / 'shared.pt')
+            runtime.save_records(output / 'identity-records', records,
+                                 dict(split='V_select', scene_contract=contract[1]))
+            run.update(shared_checkpoint='shared.pt', identity_records='identity-records',
+                       shared_format='cooperative-shared-v1')
+            finish_phase()
+        routes = [] if phase == 'shared' else ([route] if phase == 'arm' else cfg['routes'])
+        for route in routes:
             bounded()
             begin_phase('adapt', route=route, total_updates=cfg['adapt_updates'])
             arm, loss = copy.deepcopy(model), copy.deepcopy(objective)

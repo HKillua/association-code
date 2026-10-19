@@ -97,6 +97,23 @@ class CooperativeRevisionCLITests(unittest.TestCase):
                 self.assertGreater(arrays['m000__aligned_truth_valid'].sum(), 0)
                 self.assertEqual(arrays['m000__aligned_prediction_valid'].sum(), 0)
 
+    def test_shared_and_one_independent_arm_use_public_cli(self):
+        common = ['check', '--device', 'cpu', '--cpu-threads', '1',
+                  '--model-variant', 'support_residual_v2']
+        shared, arm = self.root/'shared', self.root/'arm'
+        self.assertEqual(self.invoke([*common, '--phase', 'shared', '--output', str(shared)]), 0)
+        self.assertTrue((shared/'shared.pt').is_file())
+        self.assertFalse(list(shared.glob('*-evaluation.json')))
+        self.assertEqual(self.invoke([*common, '--phase', 'arm', '--shared-from', str(shared),
+                         '--route', 'attribute-u', '--save-predictions', '--output', str(arm)]), 0)
+        run = runtime.read_json(arm/'run.json')
+        self.assertEqual(run['completed_updates'], 1)
+        self.assertEqual(run['completed_routes'], ['attribute-u'])
+        self.assertEqual(runtime.read_json(arm/'execution.json')['phase'], 'arm')
+        self.assertTrue((arm/'attribute-u-predictions/index.json').is_file())
+        self.assertFalse((arm/'teacher.pt').exists())
+        self.assertFalse((arm/'utility.pt').exists())
+
     def test_no_budget_or_inconsistent_variant_fails_before_opening_archive(self):
         cases = []
         value = self.configuration(); value['training']['max_seconds'] = None; cases.append(value)
