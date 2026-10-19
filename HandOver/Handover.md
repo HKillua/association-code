@@ -8,7 +8,7 @@
 
 | 请求 | 前置/状态与安排 |
 | --- | --- |
-| [019](L2S-20261019-019.md) | READY，仍必需的5秒CPU服务托管核实，GPU0、现场CPU≤5分钟；截至本轮fetch尚无S2L。必须先核实实际systemd/linger/cgroup及终态，不能把nohup当替代。 |
+| [019](L2S-20261019-019.md) | **RUNNING**（[S2L-019](S2L-20261019-019.md)，14:20 首次领取；同步至`612afea`、工作区干净；纯CPU`CUDA_VISIBLE_DEVICES=`空，不导入torch/不开GPU/不加载模型数据；一次无重试）。前置核实**全部通过**：`systemd-run`/`systemctl`＝systemd 249、`XDG_RUNTIME_DIR=/run/user/1018`、用户管理器可访问；**Linger 之前`no` → 在授权内执行`loginctl enable-linger`（rc=0）→ 之后`yes`**，落盘标记`/var/lib/systemd/linger/wangguangjie`已生成。`is-system-running=degraded` 的唯一failed单元是**他人遗留的 snap.snapd-desktop-integration（203/EXEC，13:04:21 早于本轮操作）**，服务器未触碰、未reset-failed。AI 自身位于**`session-9554.scope`（Remote=yes）**，即017被连带终止时所属的会话级作用域；本轮验证探针是否落入**独立`.service`**而非AI进程树，**未用nohup/setsid伪装托管**。待补：launch/status/exit_code/worker.pid/probe-start/payload-survived 与 unit 的 systemd 字段；证据层级限定为"提交父进程已退出＋由独立服务托管并写出结果"，**不宣称已实测跨过AI运行时重启**。 |
 | [020参考](L2S-20261019-020.md) | READY，**019通过才启动**。TCM1000/TAM1000/TFM300/JOINT60＋完整终评，固定≤86400秒。 |
 | [021共享](L2S-20261019-021.md) | READY，**019通过才启动**，可与020并行。teacher1000→一次身份V→utility200，只训练一次，固定≤9600秒，完整端点供四臂读取。 |
 | [022主方法](L2S-20261019-022.md) | READY，**021完整COMPLETED才启动**。attribute-u适配300＋V，固定≤1200秒。 |
