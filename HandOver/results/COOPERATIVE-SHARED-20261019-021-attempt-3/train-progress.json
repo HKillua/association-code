@@ -1,0 +1,12 @@
+{
+  "phase": "teacher",
+  "route": null,
+  "stage": "training",
+  "update": 704,
+  "completed_updates": 703,
+  "phase_completed_updates": 703,
+  "total_updates": 1000,
+  "elapsed_seconds": 6814.155375520699,
+  "phase_elapsed_seconds": 6656.54843186494,
+  "status": "RUNNING"
+}
