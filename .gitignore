@@ -19,6 +19,8 @@ wandb/
 *.tar
 *.tar.gz
 !HandOver/results/STAGEWISE-COMPLETION-20261019-028/021/identity-records.tar.gz
+!HandOver/results/COOPERATIVE-SPEED-20261020-031/completion-predictions.tar.gz
+!HandOver/results/COOPERATIVE-SPEED-20261020-032/completion-predictions.tar.gz
 *.7z
 *.pt
 *.pth

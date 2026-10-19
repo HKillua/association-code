@@ -91,9 +91,9 @@ baseline的优先训练对照是**原一步目标 vs加入短程free-running目�
 
 属性控制在支撑内与现有prepare_timed_scene独立核对最大差2.84e−14。校准oracle已独立重读原量测并重算全部17个留出身份，offset和690点误差一致；运动控制以独立三维球面旋转核对前后延伸、日期线和高纬，最大差5.7e−9米。复核计算不等于增加了独立实验样本；所有结论仍限于四个已暴露开发场景。
 
-## 6. 已实现的第一项与待确认A/B（2026-10-20）
+## 6. 已实现的第一项与A/B（2026-10-20）
 
-**DRAFT：代码已准备，未启动真实训练，031/032尚不是READY。** 两组配置分别是[031原公式](../../../configs/cooperative-speed-a-031.json)与[032新公式](../../../configs/cooperative-speed-b-032.json)，唯一模型差异为`speed_output_policy`。新旧输出对应`physical_softplus`与`scaled_log`；缺省保持旧公式。新公式的`speed_reference`参与实际计算并存入权重，阻止跨公式静默加载。相同seed不增加随机初始化，零残差物理速度及非速度输出不变；指数非有限值直接报错，不按V范围裁剪。
+**2026-10-20用户回复“继续”，031/032已发布READY；发布不等于服务器已领取或运行。** 两组配置分别是[031原公式](../../../configs/cooperative-speed-a-031.json)与[032新公式](../../../configs/cooperative-speed-b-032.json)，唯一模型差异为`speed_output_policy`。新旧输出对应`physical_softplus`与`scaled_log`；缺省保持旧公式。新公式的`speed_reference`参与实际计算并存入权重，阻止跨公式静默加载。相同seed不增加随机初始化，零残差物理速度及非速度输出不变；指数非有限值直接报错，不按V范围裁剪。
 
 复用`cooperative_fit.py fit --phase teacher --save-predictions`。teacher仍是原self＋正对cross＋BCE及原学习损失权重；只在其结束后停止后续训练，不能称为纯self训练。保留原`endpoint_fraction=.25`人工端点裁剪，V评价无人工遮挡。utility/adapt更新必须显式为0。固定最后一步，不选V最优checkpoint；不做关联评分/阈值选择、utility或融合。
 
@@ -112,46 +112,4 @@ baseline的优先训练对照是**原一步目标 vs加入短程free-running目�
 
 通过的实现检查：相同seed初值与非速度输出、公式倍率/梯度、checkpoint加载隔离；带dropout的原shared与新teacher端点模型/优化器/loss状态逐位一致；真实native ZIP小夹具的完整CLI输出、无输入但有reference的场景保留、无下游阶段。它们均是CPU合成检查，不是MTAD效果。
 
-服务器执行命令草案如下。确认后分别发布独立L2S及输出目录；当前不得从本段领取。从服务器主仓开始，每次仅选择表中的一组参数；提交时需记录实际命令、GPU、配置、退出码及偏差。冻结checkout不能在运行时pull。
-
-| 参数 | A / 031 | B / 032 |
-| --- | --- | --- |
-| `task_id` | `031` | `032` |
-| `task_config` | `cooperative-speed-a-031.json` | `cooperative-speed-b-032.json` |
-
-```bash
-set -euo pipefail
-# 以下为A；B只替换上表两项，不循环自动提交。
-task_id=031
-task_config=cooperative-speed-a-031.json
-task_repo=$(pwd -P)
-task_python=/home/wangguangjie/djs/mtad-field-20261016/bin/python
-task_code="$task_repo/../association-code-run$task_id"
-task_out="$task_repo/runs/COOPERATIVE-SPEED-20261020-$task_id-attempt-1"
-task_record="$task_out-launch"
-task_result="$task_repo/HandOver/results/COOPERATIVE-SPEED-20261020-$task_id"
-test ! -e "$task_code"
-test ! -e "$task_out"
-test ! -e "$task_record"
-test ! -e "$task_result"
-mkdir "$task_result"
-git worktree add --detach "$task_code" HEAD
-cp "$task_code/configs/$task_config" "$task_result/actual_config.json"
-"$task_python" "$task_code/tools/setup/gpu_allocation.py" --device auto \
-  --output "$task_result/gpu.json" > "$task_result/gpu_uuid.txt"
-IFS= read -r task_gpu < "$task_result/gpu_uuid.txt"
-[[ "$task_gpu" =~ ^GPU-[a-fA-F0-9-]+$ ]]
-"$task_python" "$task_code/tools/experiments/launch_detached.py" \
-  --cwd "$task_code" --record-dir "$task_record" --time-policy advisory \
-  --max-seconds 14400 --grace-seconds 30 \
-  --env CUDA_VISIBLE_DEVICES="$task_gpu" --env OMP_NUM_THREADS=4 \
-  --env MKL_NUM_THREADS=4 --env OPENBLAS_NUM_THREADS=4 \
-  -- "$task_python" "$task_code/tools/experiments/cooperative_fit.py" fit \
-  --archive /home/wangguangjie/djs/data/mtad/数据集level2.zip \
-  --manifest "$task_repo/runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json" \
-  --alignment "$task_code/configs/tmtaff-time-reference-alignment.json" \
-  --config "$task_code/configs/$task_config" --output "$task_out" \
-  --device cuda:0 --cpu-threads 4 --phase teacher --save-predictions --time-policy advisory
-```
-
-训练完成需`run.phase=teacher/status=COMPLETED`、1000更新及可读teacher权重；阶段只含准备/teacher/补全评价，`completed_routes=[]`，`identity_selection_performed=false`。全V人口与原021数据契约一致、NPZ逐场齐全、解码数等于片段数。服务器回传实际命令、退出码、人口/结果JSON和history，较大NPZ可压缩回传；权重留服务器并登记路径。SUBMITTED不能代替COMPLETED，失败保留原件并停止，不自行改参数求通过。
+正式执行命令、独立输出目录与回传要求见[031 L2S](../../../HandOver/L2S-20261020-031.md)和[032 L2S](../../../HandOver/L2S-20261020-032.md)，只按[当前索引](../../../HandOver/Handover.md)领取。当前授权仅这两组；baseline多步对照不在本次训练预算内。
