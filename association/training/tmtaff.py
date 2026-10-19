@@ -412,6 +412,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                         'tcm': 'uniform over training fragments with at least two observed points',
                         'tfm': 'uniform positive-eligible scene, then uniform positive pair; replacement iff necessary'},
            'test_opened': False, 'resume_from': str(resume_from) if resume_from is not None else None,
+           # Diagnostic journals can include completed updates newer than the
+           # last durable model/optimizer snapshot. They never authorize resume.
+           'checkpoint_cursor': None if saved is None else dict(saved['cursor']),
            'validation_timings': [],
            'validation_timing_scope': 'current invocation; full scoring, threshold selection and selected snapshot CPU copy/metrics; excludes checkpoint I/O',
            'final_evaluation_seconds': None, 'final_evaluation_status': 'NOT_STARTED',
@@ -486,6 +489,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             temporary = output / 'checkpoint.pt.tmp'
             torch.save(payload, temporary)
             temporary.replace(output / 'checkpoint.pt')
+            run['checkpoint_cursor'] = dict(payload['cursor'])
             runtime.write_json(output / 'history.json', history)
             runtime.write_json(output / 'coverage.json', coverage)
             write_run('RUNNING')
@@ -571,7 +575,6 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             if device.type == 'cuda':
                 torch.cuda.synchronize(device)
             row.update(stage=phase, update=update, learning_rate=lr, seconds=time.monotonic() - step_started)
-            cursor.update(update=update, completed_updates=cursor['completed_updates'] + 1)
             item = coverage[phase]
             item['scenes'] = sorted(set(item['scenes']) | {s for s, _ in keys})
             item['tracks'] = sorted(set(map(tuple, item['tracks'])) | set(keys))
@@ -586,6 +589,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             for label, name in ((1, 'positive_scene_ids'), (0, 'negative_scene_ids')):
                 item[name] = sorted({train_scenes[s]['scene_id'] for s, i in item['pairs']
                                      if train_scenes[s]['labels'][i] == label})
+            # The optimizer update is complete even if its following validation
+            # is interrupted. Keep its row/coverage before starting validation.
+            history.append(row)
+            cursor.update(update=update, completed_updates=cursor['completed_updates'] + 1)
             if phase in ('TAM_FROZEN', 'JOINT') and (update % config['validate_every_updates'] == 0 or update == total_updates):
                 _synchronize(device)
                 validation_started = time.monotonic()
@@ -610,7 +617,6 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                     row['validation_seconds'] = timing['seconds'] = time.monotonic() - validation_started
             if phase == 'TFM_FROZEN' and update == total_updates:
                 selected = {**selected, 'states': _states(modules), 'fusion_stage': phase, 'fusion_update': update}
-            history.append(row)
             calls += 1
             interrupted = max_updates_this_call is not None and calls >= max_updates_this_call
             if update % config['validate_every_updates'] == 0 or update == total_updates or interrupted:
@@ -663,6 +669,20 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         return run
     except BaseException as error:
         # Never replace the last successful checkpoint with partially updated
-        # parameters/RNG. FAILED runs cannot silently resume as a fresh budget.
-        write_run('FAILED', failure_type=type(error).__name__, failure=str(error))
+        # parameters/RNG. Preserve completed-update diagnostics beyond that
+        # checkpoint; FAILED runs still cannot resume as a fresh budget.
+        writing_errors = []
+        for name, payload in (('history.json', history), ('coverage.json', coverage)):
+            try:
+                runtime.write_json(output / name, payload)
+            except BaseException as writing_error:
+                writing_errors.append(f'{name}: {type(writing_error).__name__}: {writing_error}')
+        try:
+            write_run('FAILED', failure_type=type(error).__name__, failure=str(error),
+                      **({'failure_artifact_errors': writing_errors} if writing_errors else {}))
+        except BaseException as writing_error:
+            writing_errors.append(f'run.json: {type(writing_error).__name__}: {writing_error}')
+        for note in writing_errors:
+            if hasattr(error, 'add_note'):
+                error.add_note(note)
         raise

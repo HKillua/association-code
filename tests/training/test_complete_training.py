@@ -236,6 +236,79 @@ class CompleteTrainingTests(unittest.TestCase):
             self.fit('retry', resume_from=self.root / 'failed')
         self.assertFalse((self.root / 'retry').exists())
 
+    def test_failure_flushes_completed_updates_after_last_checkpoint(self):
+        from association.training import tmtaff as training
+        self.config['updates'] = dict(TCM=1, TAM_FROZEN=1, TFM_FROZEN=1, JOINT=4)
+        self.config['validate_every_updates'] = 4
+        original = training.fusion_training_step
+        joint_calls = 0
+
+        def interrupted_step(*args, **kwargs):
+            nonlocal joint_calls
+            if kwargs['stage'] == 'JOINT':
+                joint_calls += 1
+                if joint_calls == 3:
+                    raise InterruptedError('SIGTERM during third JOINT update')
+            return original(*args, **kwargs)
+
+        with patch.object(training, 'fusion_training_step', side_effect=interrupted_step):
+            with self.assertRaisesRegex(InterruptedError, 'third JOINT'):
+                self.fit('failed-joint')
+        output = self.root / 'failed-joint'
+        run = runtime.read_json(output / 'run.json')
+        history = runtime.read_json(output / 'history.json')
+        coverage = runtime.read_json(output / 'coverage.json')
+        saved = self.checkpoint('failed-joint')
+        self.assertEqual(run['status'], 'FAILED')
+        self.assertEqual(run['cursor'], dict(stage=3, update=2, completed_updates=5))
+        self.assertEqual([r['update'] for r in history if r['stage'] == 'JOINT'], [1, 2])
+        self.assertEqual(len(history), 5)
+        self.assertEqual(coverage['JOINT']['pair_presentations'], 8)
+        self.assertEqual(coverage['JOINT']['positive_pair_presentations'], 4)
+        self.assertEqual(run['checkpoint_cursor'], saved['cursor'])
+        self.assertEqual(saved['cursor']['completed_updates'], 3)
+        self.assertEqual(len(saved['history']), 3)
+        self.assertEqual(saved['coverage']['JOINT']['pair_presentations'], 0)
+        self.assertEqual(run['final_evaluation_status'], 'NOT_STARTED')
+        self.assertFalse((output / 'summary.json').exists())
+
+    def test_validation_interruption_retains_its_completed_training_update(self):
+        with patch('association.training.tmtaff.score_reference',
+                   side_effect=InterruptedError('SIGTERM during validation')):
+            with self.assertRaisesRegex(InterruptedError, 'during validation'):
+                self.fit('failed-validation')
+        output = self.root / 'failed-validation'
+        run = runtime.read_json(output / 'run.json')
+        history = runtime.read_json(output / 'history.json')
+        coverage = runtime.read_json(output / 'coverage.json')
+        self.assertEqual(run['cursor']['completed_updates'], 3)
+        self.assertEqual(len(history), 3)
+        self.assertEqual(history[-1]['stage'], 'TAM_FROZEN')
+        self.assertNotIn('selection', history[-1])
+        self.assertEqual(run['validation_timings'][0]['status'], 'FAILED')
+        self.assertEqual(history[-1]['validation_seconds'], run['validation_timings'][0]['seconds'])
+        self.assertEqual(coverage['TAM_FROZEN']['pair_presentations'], 4)
+        self.assertEqual(run['checkpoint_cursor']['completed_updates'], 2)
+        self.assertEqual(self.checkpoint('failed-validation')['cursor']['completed_updates'], 2)
+
+    def test_failure_artifact_error_does_not_replace_training_error(self):
+        from association.training import tmtaff as training
+        write_json = runtime.write_json
+
+        def cannot_write_history(path, value):
+            if Path(path).name == 'history.json':
+                raise OSError('journal unavailable')
+            return write_json(path, value)
+
+        with (patch.object(training, '_update', side_effect=InterruptedError('original SIGTERM')),
+              patch.object(runtime, 'write_json', side_effect=cannot_write_history)):
+            with self.assertRaisesRegex(InterruptedError, 'original SIGTERM'):
+                self.fit('failed-artifact')
+        run = runtime.read_json(self.root / 'failed-artifact' / 'run.json')
+        self.assertEqual(run['failure_type'], 'InterruptedError')
+        self.assertIn('history.json: OSError: journal unavailable', run['failure_artifact_errors'])
+        self.assertIsNone(run['checkpoint_cursor'])
+
     def test_final_evaluation_failure_is_not_completion(self):
         self.config['updates'] = dict.fromkeys(STAGES, 1)
         clock = [0.]
