@@ -1,0 +1,4 @@
+本 trainer 不写 execution.json，等价物为 preparation.json 122518951B（已 gzip 回传）
+本 trainer 不写 progress.json（该文件由 cooperative_fit.py 产出），进度以 run/history 为准
+checkpoint.pt 57773068B 留服务器: /home/wangguangjie/djs/association-code/runs/BASELINE-TCM-COVERAGE-20261020-033-attempt-1/checkpoint.pt
+coverage.json 2258610B 留服务器（030 已回传过同结构人口摘要）
