@@ -796,5 +796,218 @@
       "interpretation": "Clipping and mixed total loss are observed; neither identifies loss-specific gradient conflict or position improvement."
     },
     "next_evidence": "Frozen teacher self predictions, final objective state and per-region attribute losses; no training or altered input."
+  },
+  "baseline_paper_calibration": {
+    "date": "2026-10-19",
+    "scope": "Read-only baseline audit and paper comparison; no new model forward on real weights, training, threshold selection or T_test",
+    "paper": {
+      "path": "/Users/a1/Library/Containers/com.tencent.xinWeChat/Data/Documents/xwechat_files/wxid_lz510to3a9kg21_460c/temp/drag/applsci-16-07251-v2(1).pdf",
+      "doi": "10.3390/app16147251",
+      "pages": 32,
+      "read_sections": [
+        "2.5",
+        "3.1",
+        "3.2",
+        "4"
+      ],
+      "visually_verified_pages": [
+        18,
+        21,
+        22,
+        23
+      ],
+      "itsA_table1_percent": {
+        "mPCA": 94.58,
+        "mwPCA": 91.71,
+        "mPFA": 3.59,
+        "mwPFA": 6.48
+      },
+      "mstsA_table2_percent": {
+        "mPCA": 93.91,
+        "mwPCA": 91.38,
+        "mPFA": 4.47,
+        "mwPFA": 6.87
+      },
+      "fusion_table3_mME": [
+        0.000624,
+        0.000588,
+        1.03,
+        0.84
+      ],
+      "fusion_table3_units": [
+        "degrees_longitude",
+        "degrees_latitude",
+        "knots",
+        "degrees_heading"
+      ],
+      "fusion_metric_caveat": "Eq28 is signed difference, not MAE; Eq29 notation mixes true values and errors; do not convert Table3 to 2D position MAE.",
+      "training": {
+        "scenes": 3000,
+        "split": [
+          0.7,
+          0.1,
+          0.2
+        ],
+        "epochs": 80,
+        "batch_size": 64,
+        "lr": 0.002,
+        "lr_decay": "half-cycle cosine after 20 epochs",
+        "stage_epoch_allocation": "unspecified"
+      },
+      "completion_independently_evaluated": false
+    },
+    "current020": {
+      "source": "HandOver/results/STAGEWISE-COMPLETION-20261019-028/020/020-before-stop-checkpoint-metadata.json",
+      "population": "overall 64 V_select scenes at original TAM300 threshold; not paper ITSA/MSTSA test population",
+      "mPCA": 0.6902223335200884,
+      "mPCA_defined_scenes": 64,
+      "mPFA_defined_only": 0.6312391602952001,
+      "mPFA_defined_scenes": 63,
+      "zero_prediction_scenes": [
+        "330"
+      ],
+      "mwPCA": 0.7490007620757685,
+      "mwPFA": 0.8202515523005891,
+      "mPFA_full_population": null,
+      "missing": "per-scene ITSA/MSTSA counts or original020 scores needed for task-specific paper metrics; no new inference requested"
+    },
+    "tcm_history": {
+      "source": "HandOver/results/STAGEWISE-COMPLETION-20261019-028/020/history.json.gz",
+      "update_count": 1000,
+      "gradient_clip_threshold": 1.0,
+      "clipped_updates": 0,
+      "gradient_norm_max": 0.39025384187698364
+    },
+    "time_geometry": {
+      "same_four_V_geometry_only": true,
+      "scenes": [
+        {
+          "scene": "1671",
+          "grid_delta": 113.46031746031746,
+          "native_p50_p95_max": [
+            75.00999999046326,
+            185.09999999999997,
+            379.0
+          ],
+          "first_endpoint_p50_p95_max": [
+            65.50793650793639,
+            109.70328260300649,
+            112.11111111111131
+          ]
+        },
+        {
+          "scene": "2056",
+          "grid_delta": 112.52380952380952,
+          "native_p50_p95_max": [
+            54.0,
+            239.08189998865126,
+            572.0
+          ],
+          "first_endpoint_p50_p95_max": [
+            45.80952380952385,
+            100.23571428571466,
+            112.09523809523807
+          ]
+        },
+        {
+          "scene": "290",
+          "grid_delta": 113.9047619047619,
+          "native_p50_p95_max": [
+            50.0,
+            186.22075005769707,
+            569.0
+          ],
+          "first_endpoint_p50_p95_max": [
+            48.404761904761926,
+            105.27380952380952,
+            110.0
+          ]
+        },
+        {
+          "scene": "113",
+          "grid_delta": 114.01587301587301,
+          "native_p50_p95_max": [
+            59.0,
+            140.79674994945526,
+            386.0
+          ],
+          "first_endpoint_p50_p95_max": [
+            47.41269841269832,
+            109.83968253968271,
+            112.7460317460318
+          ]
+        }
+      ],
+      "summary": {
+        "native_step_seconds": {
+          "count": 2511,
+          "p0_p25_p50_p75_p95_p100": [
+            0.8459999561309814,
+            33.125500082969666,
+            58.0,
+            80.70249998569489,
+            184.8825000524521,
+            572.0
+          ]
+        },
+        "query_step_seconds": {
+          "count": 252,
+          "p0_p25_p50_p75_p95_p100": [
+            112.52380952380918,
+            113.22619047619037,
+            113.68253968253975,
+            113.93253968253998,
+            114.01587301587324,
+            114.0158730158737
+          ]
+        },
+        "first_endpoint_step_seconds": {
+          "count": 163,
+          "p0_p25_p50_p75_p95_p100": [
+            0.3510951541720715,
+            27.198412698412994,
+            49.1269841269841,
+            81.19047619047615,
+            108.91428571428575,
+            112.7460317460318
+          ]
+        },
+        "rollout_step_seconds": {
+          "count": 3896,
+          "p0_p25_p50_p75_p95_p100": [
+            0.3510951541720715,
+            112.52380952380963,
+            113.46031746031747,
+            113.90476190476193,
+            114.01587301587301,
+            114.0158730158737
+          ]
+        },
+        "endpoint_distance_seconds": {
+          "count": 3896,
+          "p0_p25_p50_p75_p95_p100": [
+            0.3510951541720715,
+            910.3055555555557,
+            1987.9365079365075,
+            3373.2023809523807,
+            5243.066154823417,
+            6823.0
+          ]
+        },
+        "rollout_count": {
+          "count": 172,
+          "p0_p25_p50_p75_p95_p100": [
+            0.0,
+            1.75,
+            21.0,
+            40.0,
+            54.0,
+            61.0
+          ]
+        }
+      },
+      "limitations": "Native intervals here are V4, not T_core training distribution; no model weights or outputs."
+    },
+    "decision": "020 is an incomplete time/output-adapted reference, not an established paper-level baseline. Calibrate paper protocol and full training before superiority claims; 030 unchanged, no new READY."
   }
 }
