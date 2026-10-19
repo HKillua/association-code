@@ -1,0 +1,11 @@
+{
+  "status": "RUNNING",
+  "worker_pid": 1917300,
+  "payload_pid": 1917309,
+  "payload_pgid": 1917309,
+  "returncode": null,
+  "timed_out": false,
+  "worker_started_at": "2026-10-19T06:47:55.813518+00:00",
+  "backend": "systemd",
+  "payload_started_at": "2026-10-19T06:47:55.814751+00:00"
+}

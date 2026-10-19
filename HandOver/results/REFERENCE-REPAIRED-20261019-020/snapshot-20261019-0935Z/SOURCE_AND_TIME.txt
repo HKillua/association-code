@@ -1,0 +1,2 @@
+collected 2026-10-19T09:38:40Z UTC; source dirs /home/wangguangjie/djs/association-code/runs/REFERENCE-REPAIRED-20261019-020-attempt-1 and /home/wangguangjie/djs/association-code/runs/REFERENCE-REPAIRED-20261019-020-attempt-1-launch; cursor at collection = {'stage': 1, 'update': 200, 'completed_updates': 1200}
+weights not returned: checkpoint.pt 83176972 bytes
