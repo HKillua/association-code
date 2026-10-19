@@ -23,7 +23,23 @@
 - 100步/阶段末才写checkpoint确有可观测性限制，旧history不能定位实时阶段。重复SIGTERM打断终态的修复已在9b06f80并用于新四臂，不重复实现，不热改活动020/021。真实故障照原件处理。
 - authorization.json已是advisory，86400/1200为建议值，不是待补的新额度。四臂20分钟也只是旧速估计，不能保证；无需为了推算略超重写授权或申请28小时从头重跑。
 
-**服务器下一次正常回传请补原件，不另开实验：** 020 TAM100或更新的现成run/history（可gzip），其中selection/selected.validation、validation_timings及相应coverage摘要；021现成progress/history及共享终态。写新快照目录避免覆盖inspection-027，不加载模型、不追加评价/推理/扫描/成本探测。只贴解释文字不能完成新分数与人口的独立核验。
+**当前回传清单：先回已有文件，不等训练结束，不另开实验。**
+
+| 来源 | 现在可返回的已有内容 | 用途 |
+| --- | --- | --- |
+| 020：runs/REFERENCE-REPAIRED-20261019-020-attempt-1 | run.json、history.json、coverage.json，可gzip；对应-launch的status.json及有内容的stderr/stdout | 核阶段、loss/梯度、验证曲线、真实训练覆盖和异常；只报F1不足以定位问题。 |
+| 020：同目录checkpoint.pt | 权重留服务器；只用CPU torch.load(map_location='cpu', weights_only=True)导出checkpoint-metadata.json：cursor、elapsed_seconds、config、normalizer；selected去掉states后原样保留，尤其stage/update/threshold/validation；data_contract只导出下面的人口摘要 | 中期完整P/R、TP/FP/FN/TN及逐场景指标实际在selected.validation，不在run/history。必须标明被选快照的stage/update，若已到后续步，不冒充TAM100。 |
+| 021：实际attempt3 | run.json、progress.json、history.json；对应-launch/status.json和有变化的stderr | 核teacher/utility实际更新、身份BCE与物理分项loss、当前进度和失败。run可能停在阶段边界，应结合progress/history。 |
+
+020人口摘要直接读取checkpoint的data_contract=[训练场景列表,V场景列表]：每场景保留scene_id/split及节点数、pair_count、positive_count、target_ids数量、native_observed_counts之和，再汇总。预期V为64场景/1635轨/29008对（3297正、25711负）/377目标；若不同如实返回，不改筛选凑数。正常配置/normalizer保留原值，不能重新fit。CPU只反序列化已有检查点，不构造模型、不forward、不读ZIP；无须上传.pt权重。每包注明采集时间和实际源路径；文件可能分别处于不同更新游标，如实注明即可。
+
+**正常运行产生后再回，不为了取件追加计算：**
+
+- 021完整shared阶段结束：终态run/progress/history、已有execution及launcher退出码，identity-records/index.json和全部场景NPZ（可打包），shared.pt只登记实际路径和存在情况。identity-records在teacher1000→身份V→utility200→shared_export之后才写，不要求teacher刚结束就有。
+- 020终评：summary.json、evaluation-progress.json、predictions/index.json和场景metadata。022—025各臂：route-evaluation.json、route-scores.npz、route-predictions/index.json和场景metadata，route为attribute-u/plain/scalar-u/learned-attribute。这些报告已有预测/oracle分组、单源/简单融合、覆盖、观测区/缺失区及输入支撑/距离分层。
+- 为核实际数据和恢复轨迹，终评先回各自预测index中场景序号0—3的metadata＋NPZ，按固定序号、不按结果好坏挑；四臂和参考用相同场景核对。其余完整数组留服务器，后续需要时只复制已有文件。这些数组包含真实输入/时刻、query、标签、reference/mask和预测，足以先查具体错位/外推案例，但4场景不能冒充全V逐点复核。
+
+020中期没有逐对score缓存，不能要求不存在的identity-records；缺少的字段标“未保存/尚未产生”，不临时加载模型补算。preparation.json和exit_code等终态文件在RUNNING期间不存在不算失败。用新快照子目录避免覆盖inspection-027/原失败产物；本清单只是现有任务结果回传，不是新READY轮次，不改活动代码、阈值、训练步数或T_test封存。
 
 四臂等021完整COMPLETED（teacher1000/utility200，共1200更新，shared.pt、identity-records及唯一阈值齐），读取同一实际成功端点（预期attempt3），不读失败attempt1。复用已备独立冻结目录和027命令；科学配置、normalizer/S、身份阈值、初始化/seed22、新Adam不变。每臂一次无重试，优先022/023，最多两单卡，可共卡，不触碰他人。
 
