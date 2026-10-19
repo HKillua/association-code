@@ -1,0 +1,596 @@
+{
+  "package_type": "SQUEEZE_REPORT",
+  "package_version": "research-pipeline-contract v1.0",
+  "squeeze_id": "LOCAL-029-20261019",
+  "input_experiment_record_ids": [
+    "S2L-20261019-029",
+    "S2L-20261019-028",
+    "association-distance-local-check"
+  ],
+  "recorded_at": "2026-10-19",
+  "execution_status": "completed exploratory development check",
+  "scope": "local analysis of returned summaries and original cached scores only; no inference, training, threshold selection or T_test use",
+  "sources": {
+    "completion": "HandOver/results/COMPLETION-CHECK-20261019-029",
+    "identity_cache": "HandOver/results/STAGEWISE-COMPLETION-20261019-028/021/identity-records.tar.gz",
+    "position_control": "docs/proposals/repair_before_retraining/association-distance-local-check.json",
+    "control_pairs": "docs/proposals/repair_before_retraining/association-distance-local-records.npz"
+  },
+  "completion": {
+    "scene_ids": [
+      "1671",
+      "2056",
+      "290",
+      "113"
+    ],
+    "fragment_count": 86,
+    "identity_count": 21,
+    "reference_one_step": {
+      "model": {
+        "all": {
+          "query_count": 5022,
+          "evaluable_query_count": 5022,
+          "missing_reference_query_count": 0,
+          "feature_elements": 642816,
+          "squared_error_sum": 5332.045161770178,
+          "feature_mse": 0.008294823342558646,
+          "reference_coverage": 1.0
+        },
+        "forward": {
+          "query_count": 2511,
+          "evaluable_query_count": 2511,
+          "missing_reference_query_count": 0,
+          "feature_elements": 321408,
+          "squared_error_sum": 2675.518165131801,
+          "feature_mse": 0.008324367051012424,
+          "reference_coverage": 1.0
+        },
+        "reverse": {
+          "query_count": 2511,
+          "evaluable_query_count": 2511,
+          "missing_reference_query_count": 0,
+          "feature_elements": 321408,
+          "squared_error_sum": 2656.526996638376,
+          "feature_mse": 0.008265279634104864,
+          "reference_coverage": 1.0
+        }
+      },
+      "state_hold": {
+        "all": {
+          "query_count": 5022,
+          "evaluable_query_count": 5022,
+          "missing_reference_query_count": 0,
+          "feature_elements": 642816,
+          "squared_error_sum": 7145.768264062777,
+          "feature_mse": 0.011116350968337406,
+          "reference_coverage": 1.0
+        },
+        "forward": {
+          "query_count": 2511,
+          "evaluable_query_count": 2511,
+          "missing_reference_query_count": 0,
+          "feature_elements": 321408,
+          "squared_error_sum": 3578.4787026323056,
+          "feature_mse": 0.011133757413108278,
+          "reference_coverage": 1.0
+        },
+        "reverse": {
+          "query_count": 2511,
+          "evaluable_query_count": 2511,
+          "missing_reference_query_count": 0,
+          "feature_elements": 321408,
+          "squared_error_sum": 3567.2895614304703,
+          "feature_mse": 0.011098944523566526,
+          "reference_coverage": 1.0
+        }
+      }
+    },
+    "reference_query": {
+      "model": {
+        "regions": {
+          "all": {
+            "query_count": 5504,
+            "evaluable_query_count": 4008,
+            "missing_reference_query_count": 1496,
+            "feature_elements": 513024,
+            "squared_error_sum": 3224.414105989416,
+            "feature_mse": 0.006285113573613351,
+            "reference_coverage": 0.7281976744186046
+          },
+          "inside_support": {
+            "query_count": 1608,
+            "evaluable_query_count": 1608,
+            "missing_reference_query_count": 0,
+            "feature_elements": 205824,
+            "squared_error_sum": 497.1831345843485,
+            "feature_mse": 0.0024155741535697903,
+            "reference_coverage": 1.0
+          },
+          "before_support": {
+            "query_count": 1841,
+            "evaluable_query_count": 1253,
+            "missing_reference_query_count": 588,
+            "feature_elements": 160384,
+            "squared_error_sum": 1435.4954430412156,
+            "feature_mse": 0.008950365641468075,
+            "reference_coverage": 0.6806083650190115
+          },
+          "after_support": {
+            "query_count": 2055,
+            "evaluable_query_count": 1147,
+            "missing_reference_query_count": 908,
+            "feature_elements": 146816,
+            "squared_error_sum": 1291.7355283638506,
+            "feature_mse": 0.008798329394370167,
+            "reference_coverage": 0.5581508515815086
+          }
+        },
+        "input_distance_metrics": {
+          "le_300s": {
+            "query_count": 1982,
+            "evaluable_query_count": 1902,
+            "missing_reference_query_count": 80,
+            "feature_elements": 243456,
+            "squared_error_sum": 821.1988300638285,
+            "feature_mse": 0.0033730893059272663,
+            "reference_coverage": 0.9596367305751766
+          },
+          "gt_300_le_600s": {
+            "query_count": 294,
+            "evaluable_query_count": 250,
+            "missing_reference_query_count": 44,
+            "feature_elements": 32000,
+            "squared_error_sum": 275.64853613841666,
+            "feature_mse": 0.00861401675432552,
+            "reference_coverage": 0.8503401360544217
+          },
+          "gt_600_le_1800s": {
+            "query_count": 1118,
+            "evaluable_query_count": 875,
+            "missing_reference_query_count": 243,
+            "feature_elements": 112000,
+            "squared_error_sum": 953.9204698366234,
+            "feature_mse": 0.00851714705211271,
+            "reference_coverage": 0.7826475849731663
+          },
+          "gt_1800s": {
+            "query_count": 2110,
+            "evaluable_query_count": 981,
+            "missing_reference_query_count": 1129,
+            "feature_elements": 125568,
+            "squared_error_sum": 1173.6462699505464,
+            "feature_mse": 0.009346698760436947,
+            "reference_coverage": 0.46492890995260666
+          },
+          "no_input": {
+            "query_count": 0,
+            "evaluable_query_count": 0,
+            "missing_reference_query_count": 0,
+            "feature_elements": 0,
+            "squared_error_sum": 0.0,
+            "feature_mse": null,
+            "reference_coverage": null
+          }
+        }
+      },
+      "state_hold": {
+        "regions": {
+          "all": {
+            "query_count": 5504,
+            "evaluable_query_count": 4008,
+            "missing_reference_query_count": 1496,
+            "feature_elements": 513024,
+            "squared_error_sum": 3335.9893160210763,
+            "feature_mse": 0.006502598934983697,
+            "reference_coverage": 0.7281976744186046
+          },
+          "inside_support": {
+            "query_count": 1608,
+            "evaluable_query_count": 1608,
+            "missing_reference_query_count": 0,
+            "feature_elements": 205824,
+            "squared_error_sum": 497.1831345843485,
+            "feature_mse": 0.0024155741535697903,
+            "reference_coverage": 1.0
+          },
+          "before_support": {
+            "query_count": 1841,
+            "evaluable_query_count": 1253,
+            "missing_reference_query_count": 588,
+            "feature_elements": 160384,
+            "squared_error_sum": 1264.1895485152581,
+            "feature_mse": 0.007882267236851918,
+            "reference_coverage": 0.6806083650190115
+          },
+          "after_support": {
+            "query_count": 2055,
+            "evaluable_query_count": 1147,
+            "missing_reference_query_count": 908,
+            "feature_elements": 146816,
+            "squared_error_sum": 1574.6166329214695,
+            "feature_mse": 0.01072510239293721,
+            "reference_coverage": 0.5581508515815086
+          }
+        },
+        "input_distance_metrics": {
+          "le_300s": {
+            "query_count": 1982,
+            "evaluable_query_count": 1902,
+            "missing_reference_query_count": 80,
+            "feature_elements": 243456,
+            "squared_error_sum": 811.739207170122,
+            "feature_mse": 0.00333423373081839,
+            "reference_coverage": 0.9596367305751766
+          },
+          "gt_300_le_600s": {
+            "query_count": 294,
+            "evaluable_query_count": 250,
+            "missing_reference_query_count": 44,
+            "feature_elements": 32000,
+            "squared_error_sum": 259.1483583764443,
+            "feature_mse": 0.008098386199263886,
+            "reference_coverage": 0.8503401360544217
+          },
+          "gt_600_le_1800s": {
+            "query_count": 1118,
+            "evaluable_query_count": 875,
+            "missing_reference_query_count": 243,
+            "feature_elements": 112000,
+            "squared_error_sum": 957.1250792168296,
+            "feature_mse": 0.00854575963586455,
+            "reference_coverage": 0.7826475849731663
+          },
+          "gt_1800s": {
+            "query_count": 2110,
+            "evaluable_query_count": 981,
+            "missing_reference_query_count": 1129,
+            "feature_elements": 125568,
+            "squared_error_sum": 1307.9766712576795,
+            "feature_mse": 0.010416480880938451,
+            "reference_coverage": 0.46492890995260666
+          },
+          "no_input": {
+            "query_count": 0,
+            "evaluable_query_count": 0,
+            "missing_reference_query_count": 0,
+            "feature_elements": 0,
+            "squared_error_sum": 0.0,
+            "feature_mse": null,
+            "reference_coverage": null
+          }
+        }
+      }
+    },
+    "candidate_position_regions": {
+      "model": {
+        "all": {
+          "available_target_count": 4008,
+          "available_prediction_count": 5504,
+          "intersection_count": 4008,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 1496,
+          "available_target_trajectory_count": 86,
+          "covered_target_trajectory_count": 86,
+          "missing_target_trajectory_count": 0,
+          "mae": 8559.441525719914,
+          "mse": 211441181.32607672,
+          "rmse": 14541.017203967427,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "inside_support": {
+          "available_target_count": 1608,
+          "available_prediction_count": 1608,
+          "intersection_count": 1608,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 0,
+          "available_target_trajectory_count": 84,
+          "covered_target_trajectory_count": 84,
+          "missing_target_trajectory_count": 0,
+          "mae": 2047.425319592255,
+          "mse": 8949972.623108936,
+          "rmse": 2991.6504847840993,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "before_support": {
+          "available_target_count": 1253,
+          "available_prediction_count": 1841,
+          "intersection_count": 1253,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 588,
+          "available_target_trajectory_count": 59,
+          "covered_target_trajectory_count": 59,
+          "missing_target_trajectory_count": 0,
+          "mae": 12433.180071603061,
+          "mse": 321101993.6609327,
+          "rmse": 17919.319006617767,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "after_support": {
+          "available_target_count": 1147,
+          "available_prediction_count": 2055,
+          "intersection_count": 1147,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 908,
+          "available_target_trajectory_count": 59,
+          "covered_target_trajectory_count": 59,
+          "missing_target_trajectory_count": 0,
+          "mae": 13457.024491248852,
+          "mse": 375522145.3529274,
+          "rmse": 19378.393776392495,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "exact_observation": {
+          "available_target_count": 9,
+          "available_prediction_count": 9,
+          "intersection_count": 9,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 0,
+          "available_target_trajectory_count": 9,
+          "covered_target_trajectory_count": 9,
+          "missing_target_trajectory_count": 0,
+          "mae": 205.2452983165834,
+          "mse": 57254.623372462,
+          "rmse": 239.27938350903113,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "inside_nonobserved": {
+          "available_target_count": 1599,
+          "available_prediction_count": 1599,
+          "intersection_count": 1599,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 0,
+          "available_target_trajectory_count": 84,
+          "covered_target_trajectory_count": 84,
+          "missing_target_trajectory_count": 0,
+          "mae": 2057.794062676358,
+          "mse": 9000025.444871059,
+          "rmse": 3000.0042408088457,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        }
+      },
+      "position_base": {
+        "all": {
+          "available_target_count": 4008,
+          "available_prediction_count": 5504,
+          "intersection_count": 4008,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 1496,
+          "available_target_trajectory_count": 86,
+          "covered_target_trajectory_count": 86,
+          "missing_target_trajectory_count": 0,
+          "mae": 8530.00470983735,
+          "mse": 212285408.931208,
+          "rmse": 14570.017465027557,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "inside_support": {
+          "available_target_count": 1608,
+          "available_prediction_count": 1608,
+          "intersection_count": 1608,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 0,
+          "available_target_trajectory_count": 84,
+          "covered_target_trajectory_count": 84,
+          "missing_target_trajectory_count": 0,
+          "mae": 1927.1044087293053,
+          "mse": 9036955.613807539,
+          "rmse": 3006.152959150206,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "before_support": {
+          "available_target_count": 1253,
+          "available_prediction_count": 1841,
+          "intersection_count": 1253,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 588,
+          "available_target_trajectory_count": 59,
+          "covered_target_trajectory_count": 59,
+          "missing_target_trajectory_count": 0,
+          "mae": 12484.587739934146,
+          "mse": 322965617.9221968,
+          "rmse": 17971.244195163472,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "after_support": {
+          "available_target_count": 1147,
+          "available_prediction_count": 2055,
+          "intersection_count": 1147,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 908,
+          "available_target_trajectory_count": 59,
+          "covered_target_trajectory_count": 59,
+          "missing_target_trajectory_count": 0,
+          "mae": 13466.684001441927,
+          "mse": 376314363.65541965,
+          "rmse": 19398.823769894392,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "exact_observation": {
+          "available_target_count": 9,
+          "available_prediction_count": 9,
+          "intersection_count": 9,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 0,
+          "available_target_trajectory_count": 9,
+          "covered_target_trajectory_count": 9,
+          "missing_target_trajectory_count": 0,
+          "mae": 1.1635595111744748,
+          "mse": 1.8968118714429023,
+          "rmse": 1.3772479339040238,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        },
+        "inside_nonobserved": {
+          "available_target_count": 1599,
+          "available_prediction_count": 1599,
+          "intersection_count": 1599,
+          "missing_prediction_count": 0,
+          "prediction_without_target_count": 0,
+          "available_target_trajectory_count": 84,
+          "covered_target_trajectory_count": 84,
+          "missing_target_trajectory_count": 0,
+          "mae": 1937.9446011264054,
+          "mse": 9087820.268875057,
+          "rmse": 3014.601179074117,
+          "coverage": 1.0,
+          "trajectory_coverage": 1.0,
+          "unit": "metres"
+        }
+      }
+    },
+    "candidate_inside_scene_deltas_m": {
+      "1671": 19.25214550704277,
+      "2056": 98.58795958277369,
+      "290": 206.42039135502205,
+      "113": 114.79024523155863
+    },
+    "candidate_fragment_mae_improved_count": 40
+  },
+  "association": {
+    "population": {
+      "scenes": 64,
+      "nodes": 1635,
+      "pairs": 29008,
+      "positives": 3297,
+      "negatives": 25711
+    },
+    "threshold": 0.5957852602005005,
+    "control_threshold": -20351.06551962416,
+    "candidate": {
+      "tp": 2754,
+      "fp": 6382,
+      "fn": 543,
+      "tn": 19329,
+      "precision": 0.3014448336252189,
+      "recall": 0.835304822565969,
+      "f1": 0.4430145580310464,
+      "macro_f1": 0.6303206221894198,
+      "auc": 0.8655633126606045,
+      "average_precision": 0.4194244470560809,
+      "prevalence": 0.11365830115830115,
+      "macro_auc": 0.8711995389432422,
+      "macro_ap": 0.6660200622430101
+    },
+    "control": {
+      "tp": 2685,
+      "fp": 7504,
+      "fn": 612,
+      "tn": 18207,
+      "precision": 0.2635194817940917,
+      "recall": 0.8143767060964513,
+      "f1": 0.3981907162983835,
+      "macro_f1": 0.6156266153055361,
+      "auc": 0.8384131933253515,
+      "average_precision": 0.38971099959277616,
+      "prevalence": 0.11365830115830115,
+      "macro_auc": 0.8971673630233373,
+      "macro_ap": 0.7082926919698299
+    },
+    "candidate_minus_control": {
+      "macro_f1": 0.01469400688388367,
+      "f1": 0.044823841732662906,
+      "precision": 0.03792535183112722,
+      "recall": 0.020928116469517755,
+      "auc": 0.02715011933525302,
+      "average_precision": 0.029713447463304732,
+      "macro_auc": -0.025967824080095125,
+      "macro_ap": -0.04227262972681978
+    },
+    "paired": {
+      "candidate_fixes_control_errors": 3047,
+      "candidate_breaks_control_correct": 1856,
+      "both_correct": 19036,
+      "both_wrong": 5069,
+      "positive_fixed": 386,
+      "positive_broken": 317,
+      "negative_fixed": 2661,
+      "negative_broken": 1539,
+      "scene_f1_better": 36,
+      "scene_f1_equal": 0,
+      "scene_f1_worse": 28
+    },
+    "subgroups": {
+      "same": {
+        "tp": 1278,
+        "fp": 3329,
+        "fn": 256,
+        "tn": 9746,
+        "precision": 0.2774039505100933,
+        "recall": 0.833116036505867,
+        "f1": 0.41621885686370297,
+        "macro_f1": 0.6142341296066167,
+        "auc": 0.8626434346027956,
+        "average_precision": 0.40601562524858426,
+        "prevalence": 0.105003764802519
+      },
+      "cross": {
+        "tp": 1476,
+        "fp": 3053,
+        "fn": 287,
+        "tn": 9583,
+        "precision": 0.32589975712077723,
+        "recall": 0.8372093023255814,
+        "f1": 0.4691671964399237,
+        "macro_f1": 0.6443021530439775,
+        "auc": 0.8693790234960589,
+        "average_precision": 0.4376138898489907,
+        "prevalence": 0.12243905826793527
+      }
+    },
+    "reference": {
+      "scene_count": 64,
+      "pair_count": 29008,
+      "macro_f1": 0.4356723171661778,
+      "positive_scene_macro_f1": 0.4356723171661778,
+      "positive_scene_count": 64,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "micro_f1": 0.28475944258780506,
+      "micro_precision": 0.17974844769941092,
+      "micro_recall": 0.6848650288140734,
+      "p_ca": 0.6848650288140734,
+      "p_fa": 0.8202515523005891,
+      "tp": 2258,
+      "fp": 10304,
+      "fn": 1039,
+      "tn": 15407,
+      "threshold": -0.000810326193459332,
+      "coverage": {
+        "all_scenes": 64,
+        "eligible_scenes": 64,
+        "scenes_without_pairs": 0
+      },
+      "empty_f1_convention": "truth and prediction empty: 1; no eligible pairs: excluded from shared denominator"
+    },
+    "independent_identity_components": 17
+  },
+  "limits": [
+    "Completion: four fixed V scenes, no random replicate; 86 fragments are not independent targets.",
+    "Association: thresholds selected on the same V; 64 scenes share 17 components; no confirmatory significance claim.",
+    "Model weights not received; local analysis does not independently rerun predictions.",
+    "020 raw pair scores still unavailable; no 020 ranking or pairwise correction claim.",
+    "No approved new training or downstream execution."
+  ],
+  "next_routes": "trace residual recovery and objective scales; preserve downstream HOLD; research changes need a concrete user-confirmed plan"
+}

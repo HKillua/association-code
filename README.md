@@ -7,8 +7,8 @@ MTAD不完整量测下的**补全、关联、融合**研究。当前按**补全�
 ## 当前状态
 
 - **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
-- **021候选共享阶段已自然完成**：teacher1000＋utility200，身份开发macro-F1记录为 **.630321**。该分数来自utility之前的teacher端点，不能归因于效用融合；逐对缓存漏传，等待原件独立复算。原始run/history已核，T_test未开启。
-- **当前先独立核补全**：两端权重已保留、没有继续训练；四臂022—025保持HOLD。[候选方法与配置](docs/proposals/candidate_revision_after018/README.md)已实现，但新版本的独立补全和四臂融合效果尚未证实。具体进展与下一步见[研究说明](docs/research_brief.md)、[交接索引](HandOver/Handover.md)。
+- **021身份原分数已复核**：teacher1000＋utility200完成，teacher端点开发macro-F1 **.630321**、P .301445、R .835305。比同人口位置控制仅高1.47个百分点，跨源F1没有优势；不能归因于utility或融合，T_test未开启。
+- **029补全检查已完成，尚无稳定改善证据**：固定4场景86片段，候选支撑内位置MAE2047.43米，对底座1927.10米，四场均退化；参考一步特征有收益，但查询结果跨场景不稳。两端权重保留、没有继续训练；022—025仍HOLD，当前无新READY。[复核与原因边界](docs/proposals/repair_before_retraining/README.md#029及021原分数复核2026-10-19)、[研究说明](docs/research_brief.md)、[交接索引](HandOver/Handover.md)。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和旧交接在Git历史中追溯。21分钟窗口未采用，当前先验证已实现修正版。
 
 ## 代码与资料
