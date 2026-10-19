@@ -62,6 +62,8 @@ def main(argv=None):
                  'candidate-checkpoint', 'output', 'device'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--candidate-residuals', action='store_true',
+        help='Only run the candidate; export existing predictions and frozen objective diagnostics')
     args = parser.parse_args(argv)
     import torch
     from association.utils import runtime
@@ -69,13 +71,14 @@ def main(argv=None):
     from association.models.timed import TimedAssociationModel
     from association.training.cooperative import load_cooperative_checkpoint, resolve_device
     from association.evaluation.tmtaff import evaluate_tcm_completion
-    from association.evaluation.cooperative import evaluate_cooperative_completion
+    from association.evaluation.cooperative import evaluate_cooperative_completion, completion_objective_report
 
     started, output = time.monotonic(), Path(args.output)
     run = dict(status='RUNNING', stage='loading', command=[sys.executable, __file__, *(argv or sys.argv[1:])],
         sources={name: str(Path(getattr(args, name)).resolve()) for name in
                  ('archive', 'manifest', 'alignment', 'reference_checkpoint', 'candidate_checkpoint')},
         device=args.device, cpu_threads=args.cpu_threads, scene_ids=SCENE_IDS,
+        mode='candidate_residuals' if args.candidate_residuals else 'both_models',
         optimizer_updates=0, normalizer_refit=False, margin_recalibrated=False,
         threshold_reselected=False, test_opened=False)
     previous_signal = signal.getsignal(signal.SIGTERM)
@@ -129,29 +132,74 @@ def main(argv=None):
         progress(dict(stage='preparation'))
         scenes, reads = load_scenes(args.archive, manifest, alignment, data)
         run.update(**reads, fragment_count=sum(len(scene['node_ids']) for scene in scenes))
-        config = replace(ModelConfig(**saved['model_config']), margin=saved['effective_margin'])
-        reference = TimedAssociationModel(config, saved['config']['branch'],
-                                           max_observations=saved['max_observations'])
-        reference.load_state_dict(saved['states'][0], strict=True)
-        reference.to(device).eval()
+        if not args.candidate_residuals:
+            config = replace(ModelConfig(**saved['model_config']), margin=saved['effective_margin'])
+            reference = TimedAssociationModel(config, saved['config']['branch'],
+                                               max_observations=saved['max_observations'])
+            reference.load_state_dict(saved['states'][0], strict=True)
+            reference.to(device).eval()
+            run['stage'] = 'reference_completion'
+            progress(dict(stage=run['stage']))
+            reference_report = evaluate_tcm_completion(reference, normalizer, scenes, device=device, progress=progress)
+            runtime.write_json(output/'reference.json', reference_report)
+            del reference
         del saved
-        run['stage'] = 'reference_completion'
-        progress(dict(stage=run['stage']))
-        reference_report = evaluate_tcm_completion(reference, normalizer, scenes, device=device, progress=progress)
-        runtime.write_json(output/'reference.json', reference_report)
-        del reference
         if device.type == 'cuda':
             torch.cuda.empty_cache()
+        writer, captures, exports = None, [], []
+        if args.candidate_residuals:
+            import numpy as np
+            from association.models.fusion import FusionLoss
+            # Match the teacher's fixed loss implementation; require its saved policy/state.
+            objective = FusionLoss(position_loss_mode='standard_smooth_l1',
+                longitude_loss_mode=payload['training']['longitude_loss_mode']).eval()
+            objective.load_state_dict(payload['objective_state'], strict=True)
+
+            def writer(scene, arrays):
+                sid = str(scene['scene_id'])
+                name = f'predictions-{sid}.npz'
+                np.savez_compressed(output/name, scene_id=np.asarray(sid),
+                    node_ids=np.asarray(scene['node_ids'], dtype=str),
+                    identities=np.asarray(scene['identities'], dtype=str),
+                    sources=np.asarray(scene['sources'], dtype=str),
+                    query_seconds=np.asarray(scene['grid']),
+                    **{key: value for key, value in arrays.items() if key != 'region_masks'},
+                    **{'region_'+key: value for key, value in arrays['region_masks'].items()})
+                captures.append(arrays)
+                exports.append(dict(scene_id=sid, path=name, fragment_count=len(scene['node_ids'])))
         run['stage'] = 'candidate_completion'
         progress(dict(stage=run['stage']))
         candidate.to(device).eval()
         candidate_report = evaluate_cooperative_completion(candidate, payload['normalizer'], scenes,
-                                                           device=device, progress=progress)
-        runtime.write_json(output/'candidate.json', candidate_report)
-        runtime.write_json(output/'summary.json', dict(reference=reference_report, candidate=candidate_report,
-            scope='four fixed development scenes; not full V or an industry benchmark',
-            metric_warning='reference latent MSE and candidate physical error are not a common ranking',
-            test_opened=False))
+            device=device, progress=progress, prediction_writer=writer)
+        if args.candidate_residuals:
+            pooled = {key: np.concatenate([row[key] for row in captures]) for key in
+                      ('prediction', 'position_base', 'target', 'target_valid')}
+            regions = {key: np.concatenate([row['region_masks'][key] for row in captures])
+                       for key in captures[0]['region_masks']}
+            base_valid = pooled['target_valid'].copy()
+            base_valid[..., 2:] = False
+            objective_report = completion_objective_report(pooled['prediction'], pooled['target'],
+                pooled['target_valid'], objective, regions)
+            base_report = completion_objective_report(pooled['position_base'], pooled['target'],
+                base_valid, objective, regions)
+            runtime.write_json(output/'residual-diagnostics.json', dict(
+                objective=objective_report, position_base_regions=base_report['regions'],
+                output_head=dict(row_norms=candidate.state_projection.weight.detach().norm(dim=1).cpu().tolist(),
+                    bias=candidate.state_projection.bias.detach().cpu().tolist(),
+                    state_std=candidate.state_std.detach().cpu().tolist()),
+                training=payload['training'], prediction_files=exports,
+                scope='same four V scenes, self-only, no crop or new forward beyond one decode per fragment; not training gradients',
+                position_base_scope='lat/lon only; no speed/course prediction',
+                optimizer_updates=0, test_opened=False))
+            runtime.write_json(output/'candidate-summary.json',
+                {key: value for key, value in candidate_report.items() if key != 'per_fragment'})
+        else:
+            runtime.write_json(output/'candidate.json', candidate_report)
+            runtime.write_json(output/'summary.json', dict(reference=reference_report, candidate=candidate_report,
+                scope='four fixed development scenes; not full V or an industry benchmark',
+                metric_warning='reference latent MSE and candidate physical error are not a common ranking',
+                test_opened=False))
         run.update(status='COMPLETED', stage='completed')
         progress(dict(stage='completed'))
         print(f'COMPLETED: {run["fragment_count"]} fragments; {output}')

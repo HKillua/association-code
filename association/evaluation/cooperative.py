@@ -368,7 +368,7 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
 @stable_evaluation_parameters
 @torch.inference_mode()
 def evaluate_cooperative_completion(model, normalizer, scenes, *, device='cpu', check=None,
-                                    progress=None):
+                                    progress=None, prediction_writer=None):
     """Evaluate every native fragment independently, without association or helpers.
 
     Only the fragment's visible inputs and query times enter encode/decode. Its
@@ -377,6 +377,9 @@ def evaluate_cooperative_completion(model, normalizer, scenes, *, device='cpu', 
     pool point numerators; per-fragment rows and scene reports retain coverage.
     This is V_select development evaluation of an existing v2 teacher, not a
     pure-completion training claim or a new artificial endpoint-hiding protocol.
+    An optional writer receives ``(scene, arrays)`` after metrics are computed;
+    it observes the existing predictions and never causes another model call.
+    ``position_base`` has four columns, with unavailable speed/course as NaN.
     """
     from association.data.cooperative import normalize_cooperative_scene
     if not _is_v2(model):
@@ -461,6 +464,14 @@ def evaluate_cooperative_completion(model, normalizer, scenes, *, device='cpu', 
             reference_targets_without_input=[str(identity) for identity in targets
                                              if identity not in set(scene['identities'])],
             methods=methods))
+        if prediction_writer is not None:
+            if check:
+                check()
+            prediction_writer(scene, dict(prediction=predictions, position_base=base,
+                target=truth, target_valid=valid, region_masks=masks,
+                nearest_seconds=nearest))
+            if check:
+                check()
         if progress is not None:
             progress(dict(stage='single_fragment_completion', completed_scenes=scene_index+1,
                 total_scenes=len(scenes), completed_fragments=decoded, total_fragments=total_fragments,
@@ -478,3 +489,60 @@ def evaluate_cooperative_completion(model, normalizer, scenes, *, device='cpu', 
         error_scope='point-pooled metrics over all fragments, retaining repeated identities and no-reference rows; not target-weighted',
         scope='V_select single-fragment development; no artificial hiding, helpers or identity scores',
         elapsed_seconds=time.monotonic()-started, test_opened=False)
+
+
+@torch.inference_mode()
+def completion_objective_report(prediction, target, valid, objective, region_masks):
+    """Measure frozen self predictions with the original FP32 FusionLoss.
+
+    Attribute means use each region's actual valid counts. Missing attributes
+    are reported as None, not zero. Counts of one for empty columns only satisfy
+    FusionLoss's microbatch denominator contract; their zero internal sums are
+    never reported as measured losses. The learned regularizer is listed once,
+    separately from data terms, and no objective state or gradient is changed.
+    This is a self-only development measurement, not the sampled training loss
+    or evidence of self/cross/identity gradient conflict.
+    """
+    from association.models.fusion import FusionLoss
+
+    if not isinstance(objective, FusionLoss):
+        raise ValueError('completion objective report requires FusionLoss')
+    if objective.log_variance.dtype != torch.float32:
+        raise ValueError('completion objective report requires FP32 objective weights')
+    device = objective.log_variance.device
+    prediction = torch.as_tensor(prediction, dtype=torch.float32, device=device)
+    target = torch.as_tensor(target, dtype=torch.float32, device=device)
+    valid = torch.as_tensor(valid, device=device)
+    if (prediction.ndim != 3 or prediction.shape[-1] != 4
+            or target.shape != prediction.shape or valid.shape != prediction.shape
+            or valid.dtype != torch.bool):
+        raise ValueError('completion objective inputs require matching [N,Q,4] arrays and boolean valid mask')
+    log_variance = objective.log_variance.detach()
+    weights = .5 * torch.exp(-log_variance)
+    regularizer = torch.nn.functional.softplus(log_variance)
+    if not all(torch.isfinite(value).all() for value in (log_variance, weights, regularizer)):
+        raise ValueError('completion objective weights must be finite')
+    reports = {}
+    for name, region in region_masks.items():
+        region = torch.as_tensor(region, device=device)
+        if region.dtype != torch.bool or region.shape != prediction.shape[:2]:
+            raise ValueError('completion objective region masks must be boolean [N,Q] arrays')
+        selected = valid & region[..., None]
+        counts = selected.sum((0, 1))
+        stats = objective(prediction, target, selected,
+            normalization_counts=counts.clamp_min(1), regularizer_weight=0.)
+        attributes = {}
+        for column, attribute in enumerate(objective.feature_names):
+            count = int(counts[column].item())
+            raw = stats['losses'][attribute]
+            attributes[attribute] = dict(valid_count=count,
+                raw_data_loss=float(raw.item()) if count else None,
+                weighted_contribution=float((weights[column]*raw).item()) if count else None)
+        reports[str(name)] = dict(attributes=attributes)
+    return dict(feature_order=list(objective.feature_names), dtype='float32',
+        position_loss_mode=objective.position_loss_mode,
+        longitude_loss_mode=objective.longitude_loss_mode,
+        log_variance=log_variance.cpu().tolist(), data_weights=weights.cpu().tolist(),
+        regularizer_by_attribute=regularizer.cpu().tolist(),
+        regularizer_total=float(regularizer.sum().item()), regions=reports,
+        scope='frozen self predictions; per-region attribute means; regularizer excluded from data contributions')

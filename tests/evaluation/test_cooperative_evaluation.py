@@ -170,6 +170,28 @@ class CooperativeCompletionTests(unittest.TestCase):
         return evaluate_cooperative_completion(self.model, self.normalizer,
             [self.scene] if scenes is None else scenes)
 
+    def test_prediction_writer_preserves_metrics_population_and_forward_count(self):
+        from association.evaluation.cooperative import evaluate_cooperative_completion
+        del self.scene['fusion_targets']['completion-B']
+        scenes = [self.scene, empty_timed_scene()]
+        original = self.evaluate(scenes)
+        written = []
+        with patch.object(self.model, 'encode', wraps=self.model.encode) as encode, \
+             patch.object(self.model, 'decode_group', wraps=self.model.decode_group) as decode:
+            recorded = evaluate_cooperative_completion(self.model, self.normalizer, scenes,
+                prediction_writer=lambda scene, arrays: written.append((scene['scene_id'], arrays)))
+        self.assertEqual((encode.call_count, decode.call_count), (4, 4))
+        original.pop('elapsed_seconds'); recorded.pop('elapsed_seconds')
+        self.assertEqual(original, recorded)
+        self.assertEqual([scene_id for scene_id, _ in written], [s['scene_id'] for s in scenes])
+        arrays = written[0][1]
+        self.assertEqual(arrays['prediction'].shape, (4, 4, 4))
+        self.assertFalse(arrays['target_valid'][2:].any())
+        self.assertTrue(np.isnan(arrays['position_base'][..., 2:]).all())
+        np.testing.assert_array_equal(arrays['region_masks']['exact_observation'],
+                                      arrays['nearest_seconds'] == 0)
+        self.assertEqual(written[1][1]['prediction'].shape, (0, 4, 4))
+
     def test_every_fragment_kept_and_forward_ignores_helpers_and_reference(self):
         changed = copy.deepcopy(self.scene)
         for target in changed['fusion_targets'].values():
@@ -255,6 +277,43 @@ class CooperativeCompletionTests(unittest.TestCase):
         self.assertEqual(short['region_query_counts']['inside_support'], 0)
         self.assertEqual(short['region_query_counts']['before_support'], 2)
         self.assertEqual(short['region_query_counts']['after_support'], 2)
+
+
+class CompletionObjectiveReportTests(unittest.TestCase):
+    def test_original_loss_reconstruction_shortest_arc_and_missing_supervision(self):
+        from association.evaluation.cooperative import completion_objective_report
+        from association.models.fusion import FusionLoss
+        objective = FusionLoss(position_loss_mode='standard_smooth_l1',
+                               longitude_loss_mode='shortest_arc')
+        with torch.no_grad():
+            objective.log_variance.copy_(torch.tensor([.1, -.2, .3, -.4]))
+        prediction = torch.tensor([[[20.01, 179.875, 4., 359.], [20.2, -179.75, 3., 5.]]])
+        target = torch.tensor([[[20., -179.875, 2., 1.], [20., 179.75, 2., 3.]]])
+        valid = torch.ones_like(prediction, dtype=torch.bool)
+        regions = {'all': np.ones((1, 2), dtype=bool), 'empty': np.zeros((1, 2), dtype=bool)}
+        saved = objective.log_variance.detach().clone()
+        expected = objective(prediction, target, valid)
+        report = completion_objective_report(prediction, target, valid, objective, regions)
+        attributes = report['regions']['all']['attributes']
+        for name, measured in attributes.items():
+            self.assertEqual(measured['valid_count'], 2)
+            self.assertAlmostEqual(measured['raw_data_loss'], expected['losses'][name].item(), places=7)
+        # The two dateline differences are 0.25 and 0.5 degrees, not ~360.
+        self.assertAlmostEqual(attributes['lon']['raw_data_loss'], .3745, places=6)
+        reconstructed = sum(row['weighted_contribution'] for row in attributes.values())
+        self.assertAlmostEqual(reconstructed + report['regularizer_total'],
+                               expected['total'].item(), places=6)
+        self.assertTrue(all(row == dict(valid_count=0, raw_data_loss=None, weighted_contribution=None)
+                            for row in report['regions']['empty']['attributes'].values()))
+        valid[..., 2:] = False
+        prediction[..., 2:] = float('nan'); target[..., 2:] = float('nan')
+        partial = completion_objective_report(prediction, target, valid, objective, regions)
+        for name in ('vel', 'cou'):
+            self.assertEqual(partial['regions']['all']['attributes'][name],
+                             dict(valid_count=0, raw_data_loss=None, weighted_contribution=None))
+        self.assertEqual(partial['regions']['all']['attributes']['lon'], attributes['lon'])
+        torch.testing.assert_close(objective.log_variance, saved, rtol=0, atol=0)
+        self.assertIsNone(objective.log_variance.grad)
 
 
 if __name__ == '__main__':

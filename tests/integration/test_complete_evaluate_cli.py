@@ -6,6 +6,7 @@ import io
 import unittest
 from unittest.mock import patch
 
+import numpy as np
 import torch
 
 from association.utils import runtime
@@ -129,11 +130,16 @@ class CompleteEvaluateCliTests(unittest.TestCase):
             model_variant='support_residual_v2', support_time_policy='train_absmax_v1')
         normalizer = fit_cooperative_normalizer(dataset['train'], config)
         candidate = CooperativeModel(config, normalizer, support_time_scale=3.)
+        objective = FusionLoss(position_loss_mode='standard_smooth_l1', longitude_loss_mode='shortest_arc')
+        with torch.no_grad():
+            objective.log_variance.copy_(torch.tensor([-.2, .1, .3, .4]))
+            candidate.state_projection.bias[:2].copy_(torch.tensor([.001, .002]))
         teacher = self.source/'teacher.pt'
         torch.save(dict(format='cooperative-physical-v2', model_variant='support_residual_v2',
             representation_version='support_residual_v2', model_config=asdict(config),
             model_state=candidate.state_dict(), normalizer=normalizer,
-            support_time_scale_tau=3., stage='teacher', completed_updates=1000), teacher)
+            support_time_scale_tau=3., stage='teacher', completed_updates=1000,
+            objective_state=objective.state_dict(), training=dict(longitude_loss_mode='shortest_arc')), teacher)
         originals = [path.read_bytes() for path in (self.checkpoint, teacher)]
         args = ['--archive', str(self.fixture.path), '--manifest', str(self.root/'manifest.json'),
             '--alignment', str(self.root/'alignment.json'), '--reference-checkpoint', str(self.checkpoint),
@@ -149,6 +155,14 @@ class CompleteEvaluateCliTests(unittest.TestCase):
                            'association.evaluation.tmtaff.select_threshold'):
                 stack.enter_context(patch(target, side_effect=AssertionError('forbidden: '+target)))
             self.assertEqual(completion_check.main(args), 0)
+            # Evidence export must reuse the same predictions and never repeat reference inference.
+            with patch('association.evaluation.tmtaff.evaluate_tcm_completion',
+                       side_effect=AssertionError('reference inference forbidden')), \
+                 patch.object(CooperativeModel, 'decode_group', autospec=True,
+                              side_effect=CooperativeModel.decode_group) as decode:
+                self.assertEqual(completion_check.main(args + ['--candidate-residuals',
+                    '--output', str(self.root/'residuals')]), 0)
+                self.assertEqual(decode.call_count, 4)
         report = runtime.read_json(self.root/'completion'/'summary.json')
         self.assertEqual(report['reference']['fragment_count'], 4)
         self.assertEqual(report['candidate']['fragment_count'], 4)
@@ -158,6 +172,30 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         self.assertEqual(run['optimizer_updates'], 0)
         self.assertEqual([row['scene_id'] for row in run['reference_members_read']], ['2', '4'])
         self.assertFalse(run['test_opened'])
+        residuals = runtime.read_json(self.root/'residuals'/'residual-diagnostics.json')
+        self.assertEqual(residuals['objective']['log_variance'], objective.log_variance.detach().tolist())
+        self.assertEqual(residuals['objective']['longitude_loss_mode'], 'shortest_arc')
+        base = residuals['position_base_regions']['all']['attributes']
+        self.assertIsNone(base['vel']['raw_data_loss'])
+        self.assertIsNone(base['cou']['weighted_contribution'])
+        summary = runtime.read_json(self.root/'residuals'/'candidate-summary.json')
+        self.assertEqual(summary['methods'], report['candidate']['methods'])
+        self.assertEqual(summary['per_scene'], report['candidate']['per_scene'])
+        self.assertFalse((self.root/'residuals'/'reference.json').exists())
+        fragments = valid_lat = 0
+        for entry in residuals['prediction_files']:
+            with np.load(self.root/'residuals'/entry['path'], allow_pickle=False) as arrays:
+                fragments += len(arrays['node_ids'])
+                valid_lat += int(arrays['target_valid'][..., 0].sum())
+                self.assertEqual(str(arrays['scene_id']), entry['scene_id'])
+                self.assertEqual(arrays['prediction'].shape, arrays['target_valid'].shape)
+                self.assertEqual(arrays['prediction'].dtype, np.float32)
+                self.assertEqual(arrays['target_valid'].dtype, bool)
+                self.assertEqual(arrays['region_inside_support'].dtype, bool)
+                np.testing.assert_array_equal(arrays['region_all'], True)
+                self.assertTrue(np.isnan(arrays['position_base'][..., 2:]).all())
+        self.assertEqual(fragments, 4)
+        self.assertEqual(valid_lat, residuals['objective']['regions']['all']['attributes']['lat']['valid_count'])
         self.assertEqual(originals, [path.read_bytes() for path in (self.checkpoint, teacher)])
 
 

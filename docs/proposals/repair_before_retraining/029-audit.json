@@ -592,5 +592,209 @@
     "020 raw pair scores still unavailable; no 020 ranking or pairwise correction claim.",
     "No approved new training or downstream execution."
   ],
-  "next_routes": "trace residual recovery and objective scales; preserve downstream HOLD; research changes need a concrete user-confirmed plan"
+  "next_routes": "trace residual recovery and objective scales; preserve downstream HOLD; research changes need a concrete user-confirmed plan",
+  "followup_local_diagnostics": {
+    "date": "2026-10-19",
+    "input_chain": {
+      "status": "COMPLETED",
+      "date": "2026-10-19",
+      "purpose": "Bounded read-only localization of completion input, clock and position-base alternatives",
+      "git_commit": "615b29a49698402d54dda634520f45c97bf00a23",
+      "sources": {
+        "archive": "/Users/a1/Downloads/数据集level2.zip",
+        "manifest": "612afea:HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json",
+        "normalizer": "HandOver/results/COMPLETION-CHECK-20261019-029/run.json.gz:candidate_normalizer",
+        "alignment": "configs/tmtaff-time-reference-alignment.json",
+        "model_config": "configs/cooperative-v2-shared-021-attempt-3.json"
+      },
+      "method": {
+        "scene_loader": "tools.experiments.completion_check.load_scenes; fixed original first four V_select scenes",
+        "normalization": "normalize_cooperative_scene with returned frozen T_core normalizer; no refit",
+        "inverse": "packed_native_position * float32 std + float32 mean; same arithmetic as CooperativeModel.encode",
+        "base": "CooperativeModel.position_base called with supplied tensors, no neural model",
+        "base_control": "same base implementation/tau/mask using direct raw native FP32 positions",
+        "distance": "spherical haversine R=6371000 metres, wrapped longitude",
+        "cap": "compare retained timestamps to uniform_observation_indices of full canonical_times, not already capped times",
+        "reference": "independently index same four raw references by (identity_id, raw_time-offset); compare canonical source9001 positions at exact matching timestamps",
+        "crop": "force endpoint_view mode 1 (prefix) for time-axis assertions; auxiliary base-only loss modes 0/1/2 use existing .25 fraction",
+        "loss": "sum lat and shortest-longitude SmoothL1(beta=.001) in physical degrees, same pre-variance position form; no learned weights or gradients"
+      },
+      "population": {
+        "split": "V_select",
+        "scene_ids": [
+          "1671",
+          "2056",
+          "290",
+          "113"
+        ],
+        "fragment_count": 86,
+        "query_count_per_fragment": 64,
+        "total_query_points": 5504,
+        "canonical_point_count": 2730,
+        "retained_point_count": 2597,
+        "source9001_exact_reference_matches": 1067
+      },
+      "per_scene": [
+        {
+          "scene_id": "1671",
+          "fragment_count": 18,
+          "canonical_point_count": 484,
+          "retained_point_count": 457,
+          "grid_seconds": [
+            0.0,
+            7148.0
+          ],
+          "grid_step_seconds": 113.46031746031746,
+          "fp32_native_roundtrip_max_metres": 1.6053091050762278,
+          "base_roundtrip_difference_max_metres": 3.2213258743286133,
+          "base_roundtrip_difference_mean_metres": 1.1166468858718872,
+          "query_seconds_roundtrip_max": 0.0002983940976264421,
+          "source9001_exact_reference_matches": 174,
+          "cap_matches_one_selection_of_canonical_indices": true,
+          "target_queries_equal_scene_grid": true,
+          "time_offset_seconds": 0.0,
+          "source9001_exact_reference_position_mae_metres": 0.0,
+          "source9001_exact_reference_position_max_metres": 0.0,
+          "prefix_crop_preserves_query_tau": true,
+          "prefix_crop_preserves_retained_native_tau": true
+        },
+        {
+          "scene_id": "2056",
+          "fragment_count": 28,
+          "canonical_point_count": 562,
+          "retained_point_count": 562,
+          "grid_seconds": [
+            0.0,
+            7089.0
+          ],
+          "grid_step_seconds": 112.52380952380952,
+          "fp32_native_roundtrip_max_metres": 1.5842591599872005,
+          "base_roundtrip_difference_max_metres": 3.21993350982666,
+          "base_roundtrip_difference_mean_metres": 0.5486769080162048,
+          "query_seconds_roundtrip_max": 0.0003022693454113323,
+          "source9001_exact_reference_matches": 209,
+          "cap_matches_one_selection_of_canonical_indices": true,
+          "target_queries_equal_scene_grid": true,
+          "time_offset_seconds": 0.0,
+          "source9001_exact_reference_position_mae_metres": 0.0,
+          "source9001_exact_reference_position_max_metres": 0.0,
+          "prefix_crop_preserves_query_tau": true,
+          "prefix_crop_preserves_retained_native_tau": true
+        },
+        {
+          "scene_id": "290",
+          "fragment_count": 24,
+          "canonical_point_count": 896,
+          "retained_point_count": 896,
+          "grid_seconds": [
+            0.0,
+            7176.0
+          ],
+          "grid_step_seconds": 113.9047619047619,
+          "fp32_native_roundtrip_max_metres": 1.5728167877834958,
+          "base_roundtrip_difference_max_metres": 3.2059755325317383,
+          "base_roundtrip_difference_mean_metres": 0.8632480502128601,
+          "query_seconds_roundtrip_max": 0.00028483072946983157,
+          "source9001_exact_reference_matches": 408,
+          "cap_matches_one_selection_of_canonical_indices": true,
+          "target_queries_equal_scene_grid": true,
+          "time_offset_seconds": 0.0,
+          "source9001_exact_reference_position_mae_metres": 0.0,
+          "source9001_exact_reference_position_max_metres": 0.0,
+          "prefix_crop_preserves_query_tau": true,
+          "prefix_crop_preserves_retained_native_tau": true
+        },
+        {
+          "scene_id": "113",
+          "fragment_count": 16,
+          "canonical_point_count": 788,
+          "retained_point_count": 682,
+          "grid_seconds": [
+            0.0,
+            7183.0
+          ],
+          "grid_step_seconds": 114.01587301587301,
+          "fp32_native_roundtrip_max_metres": 1.5951004879094817,
+          "base_roundtrip_difference_max_metres": 3.2137012481689453,
+          "base_roundtrip_difference_mean_metres": 0.7492484450340271,
+          "query_seconds_roundtrip_max": 0.00030420696930377744,
+          "source9001_exact_reference_matches": 276,
+          "cap_matches_one_selection_of_canonical_indices": true,
+          "target_queries_equal_scene_grid": true,
+          "time_offset_seconds": 0.0,
+          "source9001_exact_reference_position_mae_metres": 0.0,
+          "source9001_exact_reference_position_max_metres": 0.0,
+          "prefix_crop_preserves_query_tau": true,
+          "prefix_crop_preserves_retained_native_tau": true
+        }
+      ],
+      "base_only_loss_region_probe": {
+        "none": {
+          "valid_position_points": 4008,
+          "inside_points": 1608,
+          "outside_points": 2400,
+          "position_loss_sum_inside": 37.86991249910809,
+          "position_loss_sum_outside": 364.82892076465885,
+          "removed_points": 0,
+          "outside_point_fraction": 0.5988023952095808,
+          "outside_position_loss_fraction": 0.905959716366242
+        },
+        "prefix25": {
+          "valid_position_points": 4008,
+          "inside_points": 1193,
+          "outside_points": 2815,
+          "position_loss_sum_inside": 28.05420788734905,
+          "position_loss_sum_outside": 422.0093092933222,
+          "removed_points": 622,
+          "outside_point_fraction": 0.7023453093812375,
+          "outside_position_loss_fraction": 0.9376661141896399
+        },
+        "suffix25": {
+          "valid_position_points": 4008,
+          "inside_points": 1184,
+          "outside_points": 2824,
+          "position_loss_sum_inside": 27.749680109600746,
+          "position_loss_sum_outside": 413.63054858938085,
+          "removed_points": 622,
+          "outside_point_fraction": 0.7045908183632734,
+          "outside_position_loss_fraction": 0.9371297618124037
+        }
+      },
+      "model_constructed": false,
+      "checkpoint_loaded": false,
+      "normalizer_refitted": false,
+      "optimizer_updates": 0,
+      "test_opened": false,
+      "device": "cpu",
+      "cpu_threads": 1,
+      "limitations": [
+        "Four fixed development scenes only; no all-training-population conclusion.",
+        "Exact raw reference equality only covers source9001 exact-time matches; it also confirms known input/reference reuse, so it is not independent denoising evidence.",
+        "Base-only loss probes do not establish learned-teacher loss or gradient contribution. Forced all-prefix/all-suffix probes are not the actual balanced-pair training sampling distribution.",
+        "FP32 base arithmetic comparison does not remove the same shared arithmetic from model versus position_base in 029; both used identical reconstructed positions.",
+        "No model weights or learned predictions were present locally; checks exclude gross input/clock/cap/normalization alternatives, not prove residual training root cause."
+      ]
+    },
+    "teacher_history": {
+      "source": "HandOver/results/STAGEWISE-COMPLETION-20261019-028/021/history.json.gz",
+      "update_count": 1000,
+      "gradient_clip_threshold": 1.0,
+      "updates_above_clip_threshold": 1000,
+      "preclip_gradient_norm": {
+        "min": 2.0995702743530273,
+        "median": 5.0640881061553955,
+        "p95": 9.599900722503662,
+        "max": 16.136302947998047
+      },
+      "physical_mean_first20": 4.164875356346601,
+      "physical_mean_last20": 3.911886281881016,
+      "identity_bce_mean_first20": 0.7604749551508576,
+      "identity_bce_mean_last20": 0.47613428156473675,
+      "physical_includes_learned_regularizer": true,
+      "initial_regularizer_total_at_log_variance_zero": 2.772588722239781,
+      "final_objective_values_present_in_return": false,
+      "interpretation": "Clipping and mixed total loss are observed; neither identifies loss-specific gradient conflict or position improvement."
+    },
+    "next_evidence": "Frozen teacher self predictions, final objective state and per-region attribute losses; no training or altered input."
+  }
 }
