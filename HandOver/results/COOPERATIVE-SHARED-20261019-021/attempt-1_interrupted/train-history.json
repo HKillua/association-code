@@ -1,0 +1,1520 @@
+[
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.0487570548430085,
+    "loss_components": {
+      "physical": 4.0749193681403995,
+      "identity_bce": 0.9738376885652542,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9795,
+      9795,
+      9795,
+      9795
+    ],
+    "gradient_norm": 13.359161376953125,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 494,
+    "update": 1,
+    "seconds": 13.314232869073749,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3501",
+        "2843"
+      ],
+      "groups": [
+        {
+          "scene_index": 456,
+          "scene_id": "3501",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 193,
+          "scene_id": "2843",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.1629502680152655,
+    "loss_components": {
+      "physical": 4.346164040733129,
+      "identity_bce": 0.8167861234396696,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9608,
+      9608,
+      9608,
+      9608
+    ],
+    "gradient_norm": 5.767505645751953,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 742,
+    "update": 2,
+    "seconds": 7.54684098996222,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 46,
+      "duplicate_pair_count": 18,
+      "scene_ids": [
+        "2776",
+        "4838"
+      ],
+      "groups": [
+        {
+          "scene_index": 463,
+          "scene_id": "2776",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 377,
+          "scene_id": "4838",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 14,
+          "duplicate_pair_count": 18,
+          "duplicate_pair_indices": [
+            1,
+            8,
+            24,
+            25,
+            30,
+            34,
+            35,
+            53
+          ],
+          "duplicate_pair_counts": [
+            5,
+            2,
+            4,
+            4,
+            3,
+            4,
+            2,
+            2
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.862788097932935,
+    "loss_components": {
+      "physical": 4.182901501189917,
+      "identity_bce": 0.6798867173492908,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      8295,
+      8295,
+      8295,
+      8295
+    ],
+    "gradient_norm": 6.070951461791992,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 746,
+    "update": 3,
+    "seconds": 7.54460594477132,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2011",
+        "792"
+      ],
+      "groups": [
+        {
+          "scene_index": 206,
+          "scene_id": "2011",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 137,
+          "scene_id": "792",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.646121259778738,
+    "loss_components": {
+      "physical": 3.886088085360825,
+      "identity_bce": 0.760033271741122,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10061,
+      10061,
+      10061,
+      10061
+    ],
+    "gradient_norm": 6.14009952545166,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 489,
+    "update": 4,
+    "seconds": 7.539212969131768,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4054",
+        "4706"
+      ],
+      "groups": [
+        {
+          "scene_index": 58,
+          "scene_id": "4054",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 95,
+          "scene_id": "4706",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.986351164057851,
+    "loss_components": {
+      "physical": 4.279040295630693,
+      "identity_bce": 0.7073108297772706,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9953,
+      9953,
+      9953,
+      9953
+    ],
+    "gradient_norm": 5.7122697830200195,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 599,
+    "update": 5,
+    "seconds": 7.5472802692092955,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4313",
+        "4466"
+      ],
+      "groups": [
+        {
+          "scene_index": 294,
+          "scene_id": "4313",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 479,
+          "scene_id": "4466",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.85783763974905,
+    "loss_components": {
+      "physical": 3.869062682148069,
+      "identity_bce": 0.9887748872861266,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9325,
+      9325,
+      9325,
+      9325
+    ],
+    "gradient_norm": 9.368917465209961,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 1025,
+    "update": 6,
+    "seconds": 7.564352054614574,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 44,
+      "duplicate_pair_count": 20,
+      "scene_ids": [
+        "2040",
+        "1604"
+      ],
+      "groups": [
+        {
+          "scene_index": 365,
+          "scene_id": "2040",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 471,
+          "scene_id": "1604",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 12,
+          "duplicate_pair_count": 20,
+          "duplicate_pair_indices": [
+            2,
+            3,
+            6,
+            8,
+            9,
+            15,
+            16,
+            18,
+            25
+          ],
+          "duplicate_pair_counts": [
+            2,
+            6,
+            3,
+            2,
+            5,
+            3,
+            2,
+            3,
+            3
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.7982123754918575,
+    "loss_components": {
+      "physical": 4.012501731514931,
+      "identity_bce": 0.7857107389718294,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9664,
+      9664,
+      9664,
+      9664
+    ],
+    "gradient_norm": 3.9447853565216064,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 551,
+    "update": 7,
+    "seconds": 7.5185159794054925,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "1857",
+        "3594"
+      ],
+      "groups": [
+        {
+          "scene_index": 301,
+          "scene_id": "1857",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 457,
+          "scene_id": "3594",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.876423688605428,
+    "loss_components": {
+      "physical": 4.102419456932694,
+      "identity_bce": 0.774004134349525,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10414,
+      10414,
+      10414,
+      10414
+    ],
+    "gradient_norm": 3.7334537506103516,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 487,
+    "update": 8,
+    "seconds": 7.628178623039275,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "51",
+        "4515"
+      ],
+      "groups": [
+        {
+          "scene_index": 428,
+          "scene_id": "51",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 387,
+          "scene_id": "4515",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.745275440625846,
+    "loss_components": {
+      "physical": 4.099816236179322,
+      "identity_bce": 0.6454591562505811,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      7449,
+      7449,
+      7449,
+      7449
+    ],
+    "gradient_norm": 4.155218601226807,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 485,
+    "update": 9,
+    "seconds": 7.514704584144056,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 56,
+      "duplicate_pair_count": 8,
+      "scene_ids": [
+        "158",
+        "1300"
+      ],
+      "groups": [
+        {
+          "scene_index": 353,
+          "scene_id": "158",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 24,
+          "duplicate_pair_count": 8,
+          "duplicate_pair_indices": [
+            18,
+            28,
+            33,
+            35,
+            36,
+            54,
+            58
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 475,
+          "scene_id": "1300",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.6094360472634435,
+    "loss_components": {
+      "physical": 3.851070941891521,
+      "identity_bce": 0.7583652050234377,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10364,
+      10364,
+      10364,
+      10364
+    ],
+    "gradient_norm": 5.647974967956543,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 1468,
+    "update": 10,
+    "seconds": 7.521507083903998,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4626",
+        "1142"
+      ],
+      "groups": [
+        {
+          "scene_index": 286,
+          "scene_id": "4626",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 105,
+          "scene_id": "1142",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.899696996435523,
+    "loss_components": {
+      "physical": 4.16180395334959,
+      "identity_bce": 0.7378929476253688,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      11008,
+      11008,
+      11008,
+      11008
+    ],
+    "gradient_norm": 7.514449596405029,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 523,
+    "update": 11,
+    "seconds": 7.518391666933894,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 47,
+      "duplicate_pair_count": 17,
+      "scene_ids": [
+        "3152",
+        "118"
+      ],
+      "groups": [
+        {
+          "scene_index": 290,
+          "scene_id": "3152",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 15,
+          "duplicate_pair_count": 17,
+          "duplicate_pair_indices": [
+            1,
+            11,
+            13,
+            14,
+            18,
+            28,
+            29,
+            31,
+            44,
+            46
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            3,
+            2,
+            2,
+            2,
+            3,
+            3,
+            6,
+            2
+          ]
+        },
+        {
+          "scene_index": 182,
+          "scene_id": "118",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.039449159987271,
+    "loss_components": {
+      "physical": 4.271894843317568,
+      "identity_bce": 0.7675544191151857,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9603,
+      9603,
+      9603,
+      9603
+    ],
+    "gradient_norm": 4.003818988800049,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 613,
+    "update": 12,
+    "seconds": 7.476734927855432,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4479",
+        "1812"
+      ],
+      "groups": [
+        {
+          "scene_index": 236,
+          "scene_id": "4479",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 437,
+          "scene_id": "1812",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.750446483492851,
+    "loss_components": {
+      "physical": 4.012947785668075,
+      "identity_bce": 0.7374986037611961,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10500,
+      10500,
+      10500,
+      10500
+    ],
+    "gradient_norm": 3.96952223777771,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 896,
+    "update": 13,
+    "seconds": 7.534528175368905,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "882",
+        "4826"
+      ],
+      "groups": [
+        {
+          "scene_index": 76,
+          "scene_id": "882",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 334,
+          "scene_id": "4826",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.405460486188531,
+    "loss_components": {
+      "physical": 4.683179174899124,
+      "identity_bce": 0.7222812948748469,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9920,
+      9920,
+      9920,
+      9920
+    ],
+    "gradient_norm": 4.363966941833496,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 597,
+    "update": 14,
+    "seconds": 7.528093384578824,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4458",
+        "3280"
+      ],
+      "groups": [
+        {
+          "scene_index": 123,
+          "scene_id": "4458",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 270,
+          "scene_id": "3280",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.298609031364322,
+    "loss_components": {
+      "physical": 4.61917644017376,
+      "identity_bce": 0.6794326289091259,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      8734,
+      8734,
+      8734,
+      8734
+    ],
+    "gradient_norm": 6.441873550415039,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 528,
+    "update": 15,
+    "seconds": 7.519211085047573,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4428",
+        "3067"
+      ],
+      "groups": [
+        {
+          "scene_index": 222,
+          "scene_id": "4428",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 218,
+          "scene_id": "3067",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.601108446717262,
+    "loss_components": {
+      "physical": 3.770961738191545,
+      "identity_bce": 0.8301467346027493,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10944,
+      10944,
+      10944,
+      10944
+    ],
+    "gradient_norm": 4.105483055114746,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 783,
+    "update": 16,
+    "seconds": 7.51047374913469,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 35,
+      "duplicate_pair_count": 29,
+      "scene_ids": [
+        "1629",
+        "2072"
+      ],
+      "groups": [
+        {
+          "scene_index": 511,
+          "scene_id": "1629",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 14,
+          "duplicate_pair_count": 18,
+          "duplicate_pair_indices": [
+            1,
+            32,
+            33,
+            41,
+            42,
+            51,
+            60,
+            61,
+            62,
+            64
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            4,
+            4,
+            3,
+            2,
+            2,
+            3,
+            2,
+            4
+          ]
+        },
+        {
+          "scene_index": 214,
+          "scene_id": "2072",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 21,
+          "duplicate_pair_count": 11,
+          "duplicate_pair_indices": [
+            5,
+            6,
+            9,
+            12,
+            20,
+            36,
+            39,
+            40
+          ],
+          "duplicate_pair_counts": [
+            2,
+            2,
+            2,
+            2,
+            5,
+            2,
+            2,
+            2
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.004888046532869,
+    "loss_components": {
+      "physical": 4.2506608897820115,
+      "identity_bce": 0.7542272116988897,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      7856,
+      7856,
+      7856,
+      7856
+    ],
+    "gradient_norm": 4.209823131561279,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 517,
+    "update": 17,
+    "seconds": 7.5042187361977994,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 49,
+      "duplicate_pair_count": 15,
+      "scene_ids": [
+        "589",
+        "1826"
+      ],
+      "groups": [
+        {
+          "scene_index": 379,
+          "scene_id": "589",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 17,
+          "duplicate_pair_count": 15,
+          "duplicate_pair_indices": [
+            11,
+            24,
+            25,
+            27,
+            33,
+            43,
+            44,
+            51
+          ],
+          "duplicate_pair_counts": [
+            2,
+            4,
+            2,
+            3,
+            3,
+            2,
+            3,
+            4
+          ]
+        },
+        {
+          "scene_index": 39,
+          "scene_id": "1826",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.129977016709745,
+    "loss_components": {
+      "physical": 4.361553963273764,
+      "identity_bce": 0.7684231724124402,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      8164,
+      8164,
+      8164,
+      8164
+    ],
+    "gradient_norm": 6.993457794189453,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 408,
+    "update": 18,
+    "seconds": 7.519090948160738,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4466",
+        "2082"
+      ],
+      "groups": [
+        {
+          "scene_index": 479,
+          "scene_id": "4466",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 368,
+          "scene_id": "2082",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.711030545644462,
+    "loss_components": {
+      "physical": 4.0625921953469515,
+      "identity_bce": 0.6484384406358004,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10858,
+      10858,
+      10858,
+      10858
+    ],
+    "gradient_norm": 4.044917583465576,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 851,
+    "update": 19,
+    "seconds": 7.532806538045406,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3711",
+        "2757"
+      ],
+      "groups": [
+        {
+          "scene_index": 279,
+          "scene_id": "3711",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 324,
+          "scene_id": "2757",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 5.0718584368005395,
+    "loss_components": {
+      "physical": 4.398719864082523,
+      "identity_bce": 0.6731385760940611,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      8090,
+      8090,
+      8090,
+      8090
+    ],
+    "gradient_norm": 4.517063140869141,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 367,
+    "update": 20,
+    "seconds": 7.488533003721386,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "2082",
+        "459"
+      ],
+      "groups": [
+        {
+          "scene_index": 368,
+          "scene_id": "2082",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 72,
+          "scene_id": "459",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.834199344739318,
+    "loss_components": {
+      "physical": 4.125557204475626,
+      "identity_bce": 0.7086421349085867,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      7312,
+      7312,
+      7312,
+      7312
+    ],
+    "gradient_norm": 3.8305294513702393,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 819,
+    "update": 21,
+    "seconds": 7.5162991201505065,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 51,
+      "duplicate_pair_count": 13,
+      "scene_ids": [
+        "858",
+        "4741"
+      ],
+      "groups": [
+        {
+          "scene_index": 84,
+          "scene_id": "858",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 19,
+          "duplicate_pair_count": 13,
+          "duplicate_pair_indices": [
+            5,
+            28,
+            64,
+            95,
+            219,
+            265,
+            274
+          ],
+          "duplicate_pair_counts": [
+            2,
+            4,
+            4,
+            3,
+            3,
+            2,
+            2
+          ]
+        },
+        {
+          "scene_index": 102,
+          "scene_id": "4741",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.958935314789414,
+    "loss_components": {
+      "physical": 4.251246507745236,
+      "identity_bce": 0.707688900642097,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      10620,
+      10620,
+      10620,
+      10620
+    ],
+    "gradient_norm": 3.4165852069854736,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 1383,
+    "update": 22,
+    "seconds": 7.467984109651297,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "3641",
+        "4591"
+      ],
+      "groups": [
+        {
+          "scene_index": 451,
+          "scene_id": "3641",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 140,
+          "scene_id": "4591",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.7692388612776995,
+    "loss_components": {
+      "physical": 4.011071429471485,
+      "identity_bce": 0.758167470805347,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      8562,
+      8562,
+      8562,
+      8562
+    ],
+    "gradient_norm": 4.072837829589844,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 1156,
+    "update": 23,
+    "seconds": 7.512428423855454,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "4190",
+        "4256"
+      ],
+      "groups": [
+        {
+          "scene_index": 427,
+          "scene_id": "4190",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 161,
+          "scene_id": "4256",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  },
+  {
+    "stage": "teacher",
+    "routing": "plain",
+    "loss": 4.762512223795056,
+    "loss_components": {
+      "physical": 4.04594002943486,
+      "identity_bce": 0.716572078410536,
+      "utility": 0.0
+    },
+    "valid_counts": [
+      9112,
+      9112,
+      9112,
+      9112
+    ],
+    "gradient_norm": 4.4928717613220215,
+    "sampled_pairs": 64,
+    "used_pairs": 64,
+    "removed_observations": 1179,
+    "update": 24,
+    "seconds": 7.514749068301171,
+    "sampling": {
+      "pair_count": 64,
+      "positive_count": 32,
+      "negative_count": 32,
+      "unique_pair_count": 64,
+      "duplicate_pair_count": 0,
+      "scene_ids": [
+        "249",
+        "858"
+      ],
+      "groups": [
+        {
+          "scene_index": 152,
+          "scene_id": "249",
+          "pair_count": 32,
+          "positive_count": 32,
+          "negative_count": 0,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        },
+        {
+          "scene_index": 84,
+          "scene_id": "858",
+          "pair_count": 32,
+          "positive_count": 0,
+          "negative_count": 32,
+          "unique_pair_count": 32,
+          "duplicate_pair_count": 0,
+          "duplicate_pair_indices": [],
+          "duplicate_pair_counts": []
+        }
+      ]
+    }
+  }
+]
