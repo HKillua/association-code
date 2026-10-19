@@ -1,0 +1,1 @@
+stopped by user instruction at 2026-10-19T07:24:21Z; wall pace at stop: teacher 192 completed, phase_elapsed 1602.208s => 8.345 s/step wall; launcher INTERRUPTED rc1 elapsed 1770.667s; execution.json 122518184B left on server at runs/COOPERATIVE-SHARED-20261019-021-attempt-2/execution.json (not committed); teacher.pt 25849550B left on server; no shared.pt (never reached)

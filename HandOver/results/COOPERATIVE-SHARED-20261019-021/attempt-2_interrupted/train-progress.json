@@ -1,0 +1,14 @@
+{
+  "phase": "teacher",
+  "route": null,
+  "stage": "training",
+  "update": 193,
+  "completed_updates": 192,
+  "phase_completed_updates": 192,
+  "total_updates": 1000,
+  "elapsed_seconds": 1756.747883008793,
+  "phase_elapsed_seconds": 1602.2075792741962,
+  "status": "INTERRUPTED",
+  "error": "InterruptedError: SIGTERM; candidate did not complete",
+  "completed_routes": []
+}

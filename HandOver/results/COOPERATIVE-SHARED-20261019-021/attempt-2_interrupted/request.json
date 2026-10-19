@@ -1,0 +1,37 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code/../association-code-run021/tools/experiments/cooperative_fit.py",
+    "fit",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level2.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code/runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json",
+    "--alignment",
+    "/home/wangguangjie/djs/association-code/../association-code-run021/configs/tmtaff-time-reference-alignment.json",
+    "--config",
+    "/home/wangguangjie/djs/association-code/../association-code-run021/configs/cooperative-v2-shared-021.json",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-SHARED-20261019-021-attempt-2",
+    "--device",
+    "cuda:0",
+    "--cpu-threads",
+    "4",
+    "--phase",
+    "shared"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run021",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-6811d9c0-b8a4-b5fd-0175-790964d42afc",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-19T06:54:51.243544+00:00",
+  "started_monotonic": 2323302.337029009,
+  "max_seconds": 9599.0,
+  "grace_seconds": 30.0,
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": 2332901.337029009
+}
