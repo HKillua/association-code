@@ -6,9 +6,9 @@ MTAD不完整量测下的**补全、关联、融合**研究。完整TMTAFF时间
 
 ## 当前状态
 
-- **017待回传终态**：10月19日北京时间约06:42:56的原10小时上限已过，截至10:30仓库仍只有260/320更新的旧快照；不能据此判断作业仍运行或已成功。服务器需按[交接索引](HandOver/Handover.md)回传已有终态/退出码，不重跑。
+- **017已FAILED**：外部SIGTERM于约5小时27分中断，未到预算上限；完整融合终评未开始。原件已pull并独立复算，不能用不同batch首末loss宣称位置变差。见[017分析与修复](docs/proposals/repair_before_retraining/README.md)。
 - **018候选已完成**：600更新、2371秒；基础恢复及关联仍弱，效用无稳定专属收益。见[实测分析](docs/results/cooperative018_local_review/README.md)。
-- **候选修正版已完成本地实现**：观测底座＋位置残差、log速度/圆周航向、支撑补全、局部关联与四臂属性残差融合；[规格与下一轮草案](docs/proposals/candidate_revision_after018/README.md)。尚无新GPU授权/READY，不把CPU检查当效果。
+- **候选修正版已完成本地实现**：观测底座＋位置残差、log速度/圆周航向、支撑补全、局部关联与四臂属性残差融合；[规格与下一轮草案](docs/proposals/candidate_revision_after018/README.md)。已知修复已接入，新增GPU预算仍待决定；[019](HandOver/L2S-20261019-019.md)仅核实CPU服务托管，不启动训练。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和原始交接保留。21分钟窗口未采用，当前先验证已实现修正版。
 
 ## 代码与资料

@@ -1,0 +1,743 @@
+{
+  "scope": "017 returned run/history/coverage/preparation_extract only; no checkpoint or physical arrays inspected",
+  "terminal": {
+    "status": "FAILED",
+    "failure_type": "InterruptedError",
+    "failure": "SIGTERM: preparation/fit interrupted, not completed",
+    "elapsed_seconds": 19644.00271381298,
+    "cursor": {
+      "stage": 3,
+      "update": 2,
+      "completed_updates": 302
+    },
+    "history_count": 300
+  },
+  "population_denominators": {
+    "T_core_scenes": 512,
+    "T_core_tracks": 54792,
+    "T_core_all_candidate_pairs": 18249384,
+    "T_core_positive_pairs": 110733,
+    "V_select_scenes": 64,
+    "V_select_tracks": 1635,
+    "V_select_pairs": 29008,
+    "V_select_positive_pairs": 3297,
+    "V_select_targets": 377,
+    "V_select_reference_points_per_feature": 18364
+  },
+  "stages": {
+    "TCM": {
+      "verified_history_updates": 100,
+      "training_seconds": 194.52382618375123,
+      "seconds_per_update": {
+        "count": 100,
+        "mean": 1.9452382618375124,
+        "median": 1.9328304359223694,
+        "min": 1.641620078124106,
+        "max": 3.902916710358113
+      },
+      "gradient_summary": {
+        "count": 100,
+        "mean": 0.2161585958302021,
+        "median": 0.21183589845895767,
+        "min": 0.17878328263759613,
+        "max": 0.39025384187698364
+      },
+      "gradient_above_clip_1_count": 0,
+      "nonfinite_loss_or_gradient_count": 0,
+      "coverage": {
+        "track_presentations": 6400,
+        "pair_presentations": 0,
+        "positive_pair_presentations": 0,
+        "unique_scene_count": 466,
+        "unique_track_count": 6078,
+        "unique_pair_count": 0,
+        "unique_scene_denominator": 512,
+        "unique_scene_percent": 91.015625,
+        "unique_track_denominator": 54792,
+        "unique_track_percent": 11.092860271572492,
+        "unique_pair_all_candidate_denominator": 18249384,
+        "unique_pair_all_candidate_percent": 0.0
+      },
+      "windows_20": [
+        {
+          "updates": [
+            1,
+            20
+          ],
+          "mean_loss": 0.8709553599357605,
+          "median_loss": 0.8665792346000671,
+          "mean_gradient_before_clip": 0.2602739304304123,
+          "median_gradient_before_clip": 0.24273186177015305,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            21,
+            40
+          ],
+          "mean_loss": 0.7289390057325363,
+          "median_loss": 0.7238842844963074,
+          "mean_gradient_before_clip": 0.22942468225955964,
+          "median_gradient_before_clip": 0.2262979969382286,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            41,
+            60
+          ],
+          "mean_loss": 0.6194332271814347,
+          "median_loss": 0.6231717765331268,
+          "mean_gradient_before_clip": 0.209392661601305,
+          "median_gradient_before_clip": 0.20866472274065018,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            61,
+            80
+          ],
+          "mean_loss": 0.5252507761120796,
+          "median_loss": 0.520542323589325,
+          "mean_gradient_before_clip": 0.1985277697443962,
+          "median_gradient_before_clip": 0.19562926143407822,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            81,
+            100
+          ],
+          "mean_loss": 0.42201442569494246,
+          "median_loss": 0.4201309382915497,
+          "mean_gradient_before_clip": 0.18317393511533736,
+          "median_gradient_before_clip": 0.18309224396944046,
+          "sampled_scene_count": null
+        }
+      ],
+      "windows_25": [
+        {
+          "updates": [
+            1,
+            25
+          ],
+          "mean_loss": 0.8527036142349244,
+          "median_loss": 0.852168619632721,
+          "mean_gradient_before_clip": 0.25666157484054564,
+          "median_gradient_before_clip": 0.24748285114765167,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            26,
+            50
+          ],
+          "mean_loss": 0.6857664942741394,
+          "median_loss": 0.6816002726554871,
+          "mean_gradient_before_clip": 0.2207685339450836,
+          "median_gradient_before_clip": 0.22123096883296967,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            51,
+            75
+          ],
+          "mean_loss": 0.5610509014129639,
+          "median_loss": 0.5664310455322266,
+          "mean_gradient_before_clip": 0.20231135189533234,
+          "median_gradient_before_clip": 0.20163170993328094,
+          "sampled_scene_count": null
+        },
+        {
+          "updates": [
+            76,
+            100
+          ],
+          "mean_loss": 0.4337532258033752,
+          "median_loss": 0.4301320016384125,
+          "mean_gradient_before_clip": 0.1848929226398468,
+          "median_gradient_before_clip": 0.18394017219543457,
+          "sampled_scene_count": null
+        }
+      ]
+    },
+    "TAM_FROZEN": {
+      "verified_history_updates": 100,
+      "training_seconds": 1837.379707715474,
+      "seconds_per_update": {
+        "count": 100,
+        "mean": 18.37379707715474,
+        "median": 17.427731435978785,
+        "min": 0.4727297849021852,
+        "max": 43.62762470729649
+      },
+      "gradient_summary": {
+        "count": 100,
+        "mean": 62.355393180847166,
+        "median": 19.084139823913574,
+        "min": 1.8142075538635254,
+        "max": 735.4736328125
+      },
+      "gradient_above_clip_1_count": 100,
+      "nonfinite_loss_or_gradient_count": 0,
+      "coverage": {
+        "track_presentations": 6194,
+        "pair_presentations": 6400,
+        "positive_pair_presentations": 3200,
+        "unique_scene_count": 164,
+        "unique_track_count": 5510,
+        "unique_pair_count": 5803,
+        "unique_scene_denominator": 512,
+        "unique_scene_percent": 32.03125,
+        "unique_track_denominator": 54792,
+        "unique_track_percent": 10.056212585778946,
+        "unique_pair_all_candidate_denominator": 18249384,
+        "unique_pair_all_candidate_percent": 0.03179833357662922,
+        "unique_positive_pair_count": "not derivable separately from these returned coverage keys; unique_pair_count includes positive and negative pairs"
+      },
+      "windows_20": [
+        {
+          "updates": [
+            1,
+            20
+          ],
+          "mean_loss": 29.031930255889893,
+          "median_loss": 19.352266311645508,
+          "mean_gradient_before_clip": 149.24302659034728,
+          "median_gradient_before_clip": 51.47920799255371,
+          "sampled_scene_count": 38
+        },
+        {
+          "updates": [
+            21,
+            40
+          ],
+          "mean_loss": 21.300320053100585,
+          "median_loss": 20.067134857177734,
+          "mean_gradient_before_clip": 65.27816361188889,
+          "median_gradient_before_clip": 41.666626930236816,
+          "sampled_scene_count": 38
+        },
+        {
+          "updates": [
+            41,
+            60
+          ],
+          "mean_loss": 18.51201972961426,
+          "median_loss": 18.376096725463867,
+          "mean_gradient_before_clip": 21.37920523881912,
+          "median_gradient_before_clip": 12.62984323501587,
+          "sampled_scene_count": 39
+        },
+        {
+          "updates": [
+            61,
+            80
+          ],
+          "mean_loss": 18.441069507598876,
+          "median_loss": 18.301156997680664,
+          "mean_gradient_before_clip": 16.5818913936615,
+          "median_gradient_before_clip": 11.474077224731445,
+          "sampled_scene_count": 38
+        },
+        {
+          "updates": [
+            81,
+            100
+          ],
+          "mean_loss": 35.02014608383179,
+          "median_loss": 20.90249252319336,
+          "mean_gradient_before_clip": 59.29467906951904,
+          "median_gradient_before_clip": 19.084139823913574,
+          "sampled_scene_count": 39
+        }
+      ],
+      "windows_25": [
+        {
+          "updates": [
+            1,
+            25
+          ],
+          "mean_loss": 27.855195693969726,
+          "median_loss": 19.218555450439453,
+          "mean_gradient_before_clip": 140.32247455596925,
+          "median_gradient_before_clip": 49.39651870727539,
+          "sampled_scene_count": 47
+        },
+        {
+          "updates": [
+            26,
+            50
+          ],
+          "mean_loss": 19.837855834960937,
+          "median_loss": 18.63190460205078,
+          "mean_gradient_before_clip": 38.19771337509155,
+          "median_gradient_before_clip": 13.337059020996094,
+          "sampled_scene_count": 49
+        },
+        {
+          "updates": [
+            51,
+            75
+          ],
+          "mean_loss": 18.512906036376954,
+          "median_loss": 18.44190216064453,
+          "mean_gradient_before_clip": 20.99748694419861,
+          "median_gradient_before_clip": 12.657271385192871,
+          "sampled_scene_count": 47
+        },
+        {
+          "updates": [
+            76,
+            100
+          ],
+          "mean_loss": 31.638430938720703,
+          "median_loss": 19.93830108642578,
+          "mean_gradient_before_clip": 49.903897848129276,
+          "median_gradient_before_clip": 19.01254653930664,
+          "sampled_scene_count": 49
+        }
+      ]
+    },
+    "TFM_FROZEN": {
+      "verified_history_updates": 100,
+      "training_seconds": 12361.104825466406,
+      "seconds_per_update": {
+        "count": 100,
+        "mean": 123.61104825466406,
+        "median": 123.74445234402083,
+        "min": 98.6661448138766,
+        "max": 182.16926174005494
+      },
+      "gradient_summary": {
+        "count": 100,
+        "mean": 682.6710730886459,
+        "median": 3.482736349105835,
+        "min": 0.8075198531150818,
+        "max": 67904.8984375
+      },
+      "gradient_above_clip_1_count": 96,
+      "nonfinite_loss_or_gradient_count": 0,
+      "coverage": {
+        "track_presentations": 4851,
+        "pair_presentations": 6400,
+        "positive_pair_presentations": 6400,
+        "unique_scene_count": 91,
+        "unique_track_count": 4492,
+        "unique_pair_count": 4671,
+        "unique_scene_denominator": 512,
+        "unique_scene_percent": 17.7734375,
+        "unique_track_denominator": 54792,
+        "unique_track_percent": 8.198277120747555,
+        "unique_pair_all_candidate_denominator": 18249384,
+        "unique_pair_all_candidate_percent": 0.025595384479826823,
+        "unique_positive_pair_count": 4671,
+        "unique_positive_pair_denominator": 110733,
+        "unique_positive_pair_percent": 4.218254720814933
+      },
+      "windows_20": [
+        {
+          "updates": [
+            1,
+            20
+          ],
+          "mean_loss": 4.910892921435879,
+          "median_loss": 4.428385184146464,
+          "mean_gradient_before_clip": 3401.2030798196793,
+          "median_gradient_before_clip": 4.990987062454224,
+          "sampled_scene_count": 20,
+          "mean_component_losses": {
+            "lat": 0.5559903914225288,
+            "lon": 0.8877314459256013,
+            "vel": 1.8015169811304077,
+            "cou": 1.0386703659984051
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.5495540505150363,
+            "lon": 0.9151808709682069,
+            "vel": 1.8578054005961837,
+            "cou": 1.0420402497272023
+          }
+        },
+        {
+          "updates": [
+            21,
+            40
+          ],
+          "mean_loss": 4.334318203185103,
+          "median_loss": 4.245935146929696,
+          "mean_gradient_before_clip": 3.1297950446605682,
+          "median_gradient_before_clip": 3.5364269018173218,
+          "sampled_scene_count": 20,
+          "mean_component_losses": {
+            "lat": 0.4042822870906093,
+            "lon": 0.6572665469619097,
+            "vel": 1.1193753392260077,
+            "cou": 0.979486513097072
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.41327281760486434,
+            "lon": 0.6618879897474124,
+            "vel": 1.1408883162714387,
+            "cou": 0.9830326847915947
+          }
+        },
+        {
+          "updates": [
+            41,
+            60
+          ],
+          "mean_loss": 4.193486408225726,
+          "median_loss": 4.1412519530858845,
+          "mean_gradient_before_clip": 2.7927964717149734,
+          "median_gradient_before_clip": 2.665015459060669,
+          "sampled_scene_count": 20,
+          "mean_component_losses": {
+            "lat": 0.3174632218127954,
+            "lon": 0.5067562568154245,
+            "vel": 1.087887483688246,
+            "cou": 1.0120808740175562
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.32523924269244214,
+            "lon": 0.5111392508129089,
+            "vel": 1.1099153362088572,
+            "cou": 1.0071318439956585
+          }
+        },
+        {
+          "updates": [
+            61,
+            80
+          ],
+          "mean_loss": 4.141826291759753,
+          "median_loss": 4.138181416201405,
+          "mean_gradient_before_clip": 3.170592632889748,
+          "median_gradient_before_clip": 3.3677200078964233,
+          "sampled_scene_count": 19,
+          "mean_component_losses": {
+            "lat": 0.3625338629034559,
+            "lon": 0.4836348451435697,
+            "vel": 0.9805163994515397,
+            "cou": 1.0233092365616812
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.3654898950448376,
+            "lon": 0.44519885467840725,
+            "vel": 1.0177798065952275,
+            "cou": 1.023530596469716
+          }
+        },
+        {
+          "updates": [
+            81,
+            100
+          ],
+          "mean_loss": 3.971629773953464,
+          "median_loss": 3.936102358624339,
+          "mean_gradient_before_clip": 3.059101474285126,
+          "median_gradient_before_clip": 3.2222108840942383,
+          "sampled_scene_count": 20,
+          "mean_component_losses": {
+            "lat": 0.33808051294181496,
+            "lon": 0.5067020197064267,
+            "vel": 0.6992093574936007,
+            "cou": 0.9929226878215559
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.34155356186589225,
+            "lon": 0.5006049454991672,
+            "vel": 0.6904461859788035,
+            "cou": 0.9952188722589955
+          }
+        }
+      ],
+      "windows_25": [
+        {
+          "updates": [
+            1,
+            25
+          ],
+          "mean_loss": 4.7722755996184425,
+          "median_loss": 4.362130040302873,
+          "mean_gradient_before_clip": 2721.6402897548674,
+          "median_gradient_before_clip": 4.685105800628662,
+          "sampled_scene_count": 25,
+          "mean_component_losses": {
+            "lat": 0.5307880034763366,
+            "lon": 0.822403323991457,
+            "vel": 1.6381456045003142,
+            "cou": 1.018518829026725
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.5242191379278844,
+            "lon": 0.8374656686882832,
+            "vel": 1.6664081025134103,
+            "cou": 1.0187676033118953
+          }
+        },
+        {
+          "updates": [
+            26,
+            50
+          ],
+          "mean_loss": 4.328108488132711,
+          "median_loss": 4.2284917598590255,
+          "mean_gradient_before_clip": 2.9818141078948974,
+          "median_gradient_before_clip": 3.0362441539764404,
+          "sampled_scene_count": 24,
+          "mean_component_losses": {
+            "lat": 0.3676325935439672,
+            "lon": 0.6353237764944788,
+            "vel": 1.1767931551729998,
+            "cou": 0.985085762324743
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.37244587008189256,
+            "lon": 0.6372628196150322,
+            "vel": 1.199382028569268,
+            "cou": 0.9880928759109585
+          }
+        },
+        {
+          "updates": [
+            51,
+            75
+          ],
+          "mean_loss": 4.147476395921985,
+          "median_loss": 4.139434219803661,
+          "mean_gradient_before_clip": 3.0222029447555543,
+          "median_gradient_before_clip": 3.183901071548462,
+          "sampled_scene_count": 23,
+          "mean_component_losses": {
+            "lat": 0.3195318747242709,
+            "lon": 0.472585526334733,
+            "vel": 1.0183793730838988,
+            "cou": 1.0448823623572752
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.3279069948199355,
+            "lon": 0.44451818150257283,
+            "vel": 1.0606629738303828,
+            "cou": 1.0456578839232946
+          }
+        },
+        {
+          "updates": [
+            76,
+            100
+          ],
+          "mean_loss": 3.9938623951748013,
+          "median_loss": 3.96832386078313,
+          "mean_gradient_before_clip": 3.0399855470657347,
+          "median_gradient_before_clip": 2.9328184127807617,
+          "sampled_scene_count": 25,
+          "mean_component_losses": {
+            "lat": 0.3647277491923887,
+            "lon": 0.5033602648216765,
+            "vel": 0.7174863160346285,
+            "cou": 0.9886887882882729
+          },
+          "valid_count_weighted_component_losses": {
+            "lat": 0.3649199095635045,
+            "lon": 0.49664432487408694,
+            "vel": 0.71341095263104,
+            "cou": 0.9905194024053479
+          }
+        }
+      ]
+    },
+    "JOINT": {
+      "verified_history_updates": 0,
+      "training_seconds": 0,
+      "seconds_per_update": null,
+      "gradient_summary": null,
+      "gradient_above_clip_1_count": 0,
+      "nonfinite_loss_or_gradient_count": 0,
+      "coverage": {
+        "track_presentations": 0,
+        "pair_presentations": 0,
+        "positive_pair_presentations": 0,
+        "unique_scene_count": 0,
+        "unique_track_count": 0,
+        "unique_pair_count": 0,
+        "unique_scene_denominator": 512,
+        "unique_scene_percent": 0.0,
+        "unique_track_denominator": 54792,
+        "unique_track_percent": 0.0,
+        "unique_pair_all_candidate_denominator": 18249384,
+        "unique_pair_all_candidate_percent": 0.0
+      },
+      "windows_20": [],
+      "windows_25": []
+    }
+  },
+  "calibration": {
+    "status": "COMPLETED",
+    "effective_margin": 71.58904266357422,
+    "seconds": 1719.930942647159,
+    "seed": 21,
+    "batch_count": 64,
+    "completed_batches": 64,
+    "pair_presentations": 4096,
+    "positive_presentations": 2048,
+    "negative_presentations": 2048,
+    "unique_pair_count": 3927,
+    "unique_scene_count": 116,
+    "distance_quantiles": {
+      "positive": {
+        "min": 59.20846939086914,
+        "p05": 62.5446741104126,
+        "p25": 64.74752998352051,
+        "median": 66.69342803955078,
+        "p75": 69.63198471069336,
+        "p95": 88.49366989135738,
+        "max": 115.1117935180664
+      },
+      "negative": {
+        "min": 59.5527229309082,
+        "p05": 63.981071662902835,
+        "p25": 67.39330101013184,
+        "median": 71.58904266357422,
+        "p75": 81.17751502990723,
+        "p95": 107.4141143798828,
+        "max": 130.9954833984375
+      }
+    }
+  },
+  "validation": {
+    "count": 5,
+    "selections": [
+      {
+        "stage": "TAM_FROZEN",
+        "update": 20,
+        "threshold": -10.935664176940918,
+        "macro_f1": 0.40980538977734565,
+        "candidate_count": 29004,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 40,
+        "threshold": -0.12437852472066879,
+        "macro_f1": 0.39137366191275896,
+        "candidate_count": 28975,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 60,
+        "threshold": -0.05101440101861954,
+        "macro_f1": 0.3963487324353993,
+        "candidate_count": 28956,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 80,
+        "threshold": -0.042965203523635864,
+        "macro_f1": 0.39728403495990466,
+        "candidate_count": 28985,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 100,
+        "threshold": -0.0017543405992910266,
+        "macro_f1": 0.43298539900213834,
+        "candidate_count": 28993,
+        "scene_count": 64,
+        "tie_break": "higher threshold, all-reject above all finite scores"
+      }
+    ],
+    "seconds_total": 2719.7571931462735,
+    "timings": [
+      {
+        "stage": "TAM_FROZEN",
+        "update": 20,
+        "status": "COMPLETED",
+        "seconds": 587.6868258998729,
+        "selected_snapshot_copied": true
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 40,
+        "status": "COMPLETED",
+        "seconds": 548.9499337919988,
+        "selected_snapshot_copied": false
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 60,
+        "status": "COMPLETED",
+        "seconds": 544.818806597963,
+        "selected_snapshot_copied": false
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 80,
+        "status": "COMPLETED",
+        "seconds": 517.5531701180153,
+        "selected_snapshot_copied": false
+      },
+      {
+        "stage": "TAM_FROZEN",
+        "update": 100,
+        "status": "COMPLETED",
+        "seconds": 520.7484567384236,
+        "selected_snapshot_copied": true
+      }
+    ],
+    "best_recorded_selection": {
+      "stage": "TAM_FROZEN",
+      "update": 100,
+      "threshold": -0.0017543405992910266,
+      "macro_f1": 0.43298539900213834,
+      "candidate_count": 28993,
+      "scene_count": 64,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    },
+    "not_returned": "No checkpoint tensor/state inspection; no full validation P/R/F1 confusion counts or raw association-score arrays; no physical validation metrics."
+  },
+  "cost": {
+    "history_training_seconds": 14393.00835936563,
+    "calibration_seconds": 1719.930942647159,
+    "validation_seconds": 2719.7571931462735,
+    "preparation_snapshot_seconds": 114.00050775380805,
+    "known_accounted_seconds": 18946.69700291287,
+    "other_elapsed_seconds": 697.3057109001093,
+    "other_elapsed_scope": "includes unreturned JOINT work, sampling, checkpoint/JSON I/O, GPU/model/setup and other overhead; not idle time or discrepancy proof"
+  },
+  "gradient_interpretation": "Reported gradient_norm is before clip_grad_norm_ at threshold1, not the norm actually applied. TFM first-step67904.9 is finite and clipped; subsequent median about3.48, so this alone does not establish divergence.",
+  "checkpoint_evidence_boundary": "history/coverage are written at durable checkpoints (every20 updates or stage endpoint); the failure path writes current run cursor only, preserving previous successful checkpoint. The 302 vs300 pattern is compatible with this write policy; not evidence of invented optimizer updates. Actual durable checkpoint cursor must be inspected before any future explicitly authorized resume.",
+  "selection_scale_observation": "Selected distance threshold moves -10.9357 to -0.00175434; score-scale contraction is observable but AUC/PR/distance distributions are absent. Cannot establish rank collapse or a calibration bug from threshold magnitude.",
+  "protocol_assertions": {
+    "test_opened": false,
+    "resume_from": null,
+    "fusion_output_parameterization": "train_position_affine",
+    "final_evaluation_status": "NOT_STARTED"
+  },
+  "boundaries": [
+    "300 history rows verified; run cursor claims 302 but no JOINT rows or coverage saved, so two further updates cannot be independently reconstructed from returned files.",
+    "Best recorded macro-F1 TAM100 can be identified; selected checkpoint composition/state cannot be inspected from these files.",
+    "Window means compare changing training batches/scenes; neither paired before/after evidence nor physical validation error.",
+    "TFM component values and weighted total are different statistics; learned uncertainty weights prevent component sums equalling total loss.",
+    "No final evaluation or prediction arrays: no valid fusion precision/physical performance claim."
+  ],
+  "union_distinct_training_coverage": {
+    "unique_tracks": 14306,
+    "unique_scenes": 484,
+    "unique_track_denominator": 54792,
+    "unique_track_percent": 26.10965104394802,
+    "unique_scene_denominator": 512,
+    "unique_scene_percent": 94.53125,
+    "meaning": "Union across TCM/TAM/TFM stages; not all tasks trained on every item and not an epoch count."
+  },
+  "coverage_interpretation": "Scene/track percentages use all T_core population, not an inferred eligible subpopulation. TFM unique pairs are all positive; TAM unique pair count mixes labels. Track presentations for pair stages count deduplicated endpoint tracks within each batch. Sampling uses replacement; population fractions describe distinct coverage, not epochs or convergence.",
+  "tfm_first_vs_last_window_interpretation": "Mean first25→last25: lat .530788→.364728, lon .822403→.503360, vel1.638146→.717486, cou1.018519→.988689; total4.772276→3.993862. This does not support saying lat/lon/cou deteriorated based only on first/last batch. Batches/scenes differ and uncertainty weights are learned, so neither window changes nor total loss establishes physical validation improvement."
+}

@@ -6,7 +6,7 @@
 
 | 对象 | 当前角色与证据 |
 | --- | --- |
-| 完整TMTAFF近似参考 | 原生时间输入、TCM/TAM/TFM四阶段、恢复与全人口评价已实现。017已过原执行上限，终态尚未回传；[已收中期原件分析](results/reference017_snapshot7/README.md)没有完整物理终评，不宣布运行状态、收敛或与候选胜负。 |
+| 完整TMTAFF近似参考 | 原生时间输入、TCM/TAM/TFM四阶段、恢复与全人口评价已实现。017已外部SIGTERM中断，未到预算、完整终评未开始；[终态复算与修复](proposals/repair_before_retraining/README.md)纠正首末batch归因并交付独立托管/日志修复，不宣布融合胜负。 |
 | 018共享补全/融合候选 | 600更新和四臂全V完成。身份弱、物理恢复误差大，效用没有稳定专属收益；[完整负结果](results/cooperative018_local_review/README.md)保留，额度关闭。 |
 | 当前候选v2 | [规格](proposals/candidate_revision_after018/README.md)、[本地实现/验证](proposals/candidate_revision_after018/implementation.md)已完成；保留可见位置底座，修正速度/航向表示，加入支撑补全、局部关联、属性残差融合。尚无真实MTAD效果，GPU未批准，无新READY。 |
 | TSA-cTFER | [独立离线关联诊断](tsactfer_adaptation.md)，不是完整补全/融合baseline，也未复现原在线指派。保留既有结果，不扩建新融合管线。 |
@@ -33,6 +33,6 @@
 
 [实际输入支撑/距离评价](specs/input-support-evaluation.md)已接入正常完整评价，不改主指标、选模或模型调用；没有新真实全量分层结果，不为它另开GPU诊断。9001/reference数值复用和速度单位冲突见[数据复查](results/dataset_followup018/README.md)：保留原值和尾部，不擅自换单位或用已有观测零误差证明降噪。
 
-本地模型及评价工作已收尾，CPU验证与独立复核完成；最新仓库清理的验证范围见[历史整理记录](history/README.md)，这些检查只证明软件行为。候选草案teacher1000、utility200、四臂各300共2400更新，按018旧实耗机械外推约3.11h，4h仅待批建议，max_seconds仍null。下一步是017终态分析和用户决定候选新增GPU资源；没有授权前不发新READY，不挪旧额度、不重复成本测量或制造新框架。
+本地模型及评价工作已收尾，CPU验证与独立复核完成；最新仓库清理的验证范围见[历史整理记录](history/README.md)，这些检查只证明软件行为。候选草案teacher1000、utility200、四臂各300共2400更新，按018旧实耗机械外推约3.11h，4h仅待批建议，max_seconds仍null。下一步先由019核实CPU服务托管，再由用户决定修复后两套训练的新增GPU资源；没有授权前不发新READY，不挪旧额度、不重复成本测量或制造新框架。
 
 旧环境、013/014/015/016及被替代计划统一见[历史摘要](history/README.md)。原始回执和机器证据保留，取消SHA门槛、动态GPU/共卡、每6小时跟进等现行权限不变。

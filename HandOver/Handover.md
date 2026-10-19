@@ -6,21 +6,20 @@
 
 | 任务 | 状态与下一步 |
 | --- | --- |
-| [017请求](L2S-20261018-017.md) / [回执](S2L-20261018-017.md) | **终态回传完成：`FAILED`**（`run.json` 原件 `status=FAILED`、`failure_type=InterruptedError`、`failure="SIGTERM: preparation/fit interrupted, not completed"`）。**更正本地前提：原10小时上限并未到达**——`started_at 12:42:56Z`、终止于 **`18:10:30Z`**（文件 mtime 与 `run.elapsed_seconds` 19,644 秒一致），实际存活 **19,654 秒 ＝ 上限 35,970 秒的 54.6%**，比外层 TERM 时刻 22:42:26Z **早 16,316 秒（4 小时 32 分）**；也不是 OOM（OOM 用不可捕获的 SIGKILL）。**外层 `exit_code.txt`/`ended_at.txt`/`elapsed_seconds.txt` 三份均未生成**，说明包装 shell 与作业一同被带走，**真实退出码无法从原件取得、服务器不填推测值**。最佳解释为托管会话运行时重启（原 worker 目录与其 task 输出已不存在、机器本身未重启 uptime 26 天、无残留进程），`dmesg`/`journalctl -k` 无权限，故标注为推断。**已完成**：TCM100（1.945秒/步）、TAM100（18.374）、**TFM100（12,361.10秒、123.611秒/步、单步98.67–182.17）**、margin 一次校准 COMPLETED（1,719.93秒、`effective_margin=71.58904`）、5/6 次验证（合计2,719.76秒，**selected＝TAM@100 macro-F1 .432985**，此前 TAM@20 .409805）。`history.json` 实为 **300 条**，而 `cursor` 写 302（stage3/update2）、`coverage.JOINT` 全空——**两条 JOINT 更新未落入 history/coverage，服务器不把 302 当已验证更新数**。**未产生**：第6次验证、JOINT 余下更新、**整个完整终评**，故 `summary.json`/`evaluation-progress.json`/`predictions/`/任何逐点物理数组/任何融合误差与覆盖**一概不存在**，`summary.selection` 与终评阈值一致性核对无法执行。不变量仍成立：`test_opened=false`、`resume_from=null`、`fusion_output_parameterization=train_position_affine`。**TFM 分项值得本地注意**：总 `fusion_loss` 9.3998→4.4172，但 `lat` .4326→**.7652**、`lon` .5454→.6251、`cou` 1.0346→**1.5460** 三个分量**变差**，降幅几乎全来自 `vel` 11.2420→**0.4138**。原件已回传（`files/run.json` 542,707 B、`history.json` 323,511 B、`coverage.json` 1,121,952 B、`preparation_extract.json` 人口按实际字段聚合＝512/64/1635/29008/377/18364、缺键记未提供）；`preparation.json` 122,492,222 B 与 `checkpoint.pt` 124,049,936 B 留服务器原路径未改。**下一步归本地**：继续这 18 步 JOINT＋终评需**新授权**（017 额度与"一次无重试"已随终态关闭，服务器未 resume/未重跑/未中止他人进程）。 |
+| [019请求](L2S-20261019-019.md) | **LOCAL_TO_SERVER / READY，唯一新执行入口**。GPU0，CPU现场≤5分钟，仅一次5秒payload验证独立systemd用户服务/linger/日志/终态；不训练、不加载017模型、不重扫数据。用户已明确要求断开后仍运行。 |
+| [017请求](L2S-20261018-017.md) / [回执](S2L-20261018-017.md) | **FAILED，终态已审ed1c954**。外部SIGTERM约5.46h中断，远未到预算；只有300条耐久日志，cursor302不可据此认定checkpoint302。TCM/TAM/TFM各100，融合终评未开始。独立25步均值显示位置训练loss总体下降，不能照首末不同batch说位置变差。[分析与修复](../docs/proposals/repair_before_retraining/README.md)，旧额度关闭，不resume。 |
 | [018请求](L2S-20261018-018.md) / [回执](S2L-20261018-018.md) | COMPLETED，600更新、2371秒；[本地分析](../docs/results/cooperative018_local_review/README.md)已完成。基础恢复/身份仍弱，效用无稳定专属收益，预算关闭。 |
 | [候选修正版](../docs/proposals/candidate_revision_after018/README.md) | 用户已批准本地实现；代码/CPU验证完成。观测位置底座＋残差、log速度、圆周航向、支撑query、局部关联、四臂属性残差融合。新GPU授权0、无READY；[草案](../docs/proposals/candidate_revision_after018/config.draft.json)共2400更新、max_seconds=null，3.11h外推/4h建议不是授权。 |
 
-**本轮只整理仓库。** 源码归入data/models/training/evaluation/utils，删除退役pilot训练、profile、旧环境/SHA验收及重复测试；原始实验配置和证据不改。四个[实验CLI](../tools/experiments/README.md)仍是现行入口。清理验证见[历史与清理记录](../docs/history/README.md)，不把代码整理或CPU检查当MTAD结果。
+**当前本地修复已完成。** 用户2026-10-19明确要求先修baseline/候选已发现问题再训练，并允许训练脱离远程AI会话。代码`04dab6e`实现一次性systemd托管和中断日志修复；303项CPU通过，独立复核完成。旧“必须前台监督/不能后台训练”限制被本次用户决定覆盖，不授权常驻监控、自动重试或新增GPU。
 
-**当前服务器只需完成017原件回传，不是新实验。** 10月19日10:30（北京时间）fetch无新提交。原`started_at.txt=2026-10-18T12:42:56Z`，按启动标记及原命令推算，外层35970秒TERM约在次日06:42:26，含30秒清理的总上限约为06:42:56；目前仓库未收到`exit_code.txt`、`ended_at.txt`、`elapsed_seconds.txt`或完整终态结果，仅有00:39的中期快照。本地不能据缺回执宣布成功、失败或仍在训练。
+**服务器现在先领019。** 只核实服务托管及原件，提交返回0不等于payload/模型成功；真实跨AI runtime重启未测试时如实记。任务可能在AI断开后继续，服务器重连读同一输出，不重复启动。push不会唤醒服务器。
 
-服务器继续原017收尾：核本轮自有作业的实际状态，在自己的S2L-017记录真实结束原因和退出码，按原L2S复制已有run/history/coverage/summary/evaluation-progress及预测索引/metadata；缺失文件如实记未产生或未取得，不补造退出码，不加载模型补评价、不resume、不重训、不重开预算。如本轮作业异常仍在运行，执行原10小时上限的收尾要求，不继续用GPU补齐结果。只读整理现有产物已在原017请求中，不新增轮次或READY。
-
-**下一步：** 取得017终态后分析完整任务或中断原因；新候选配置/预算决定后直接独立READY，不再重做已完成实现、原ZIP扫描或成本探测。两条线不以另一条好成绩为前提；各自预算已批才可执行，最多两单卡并行。push不会启动服务器AI。
+**新训练待资源决定：** [完整配置与费用](../docs/proposals/repair_before_retraining/README.md)，参考TCM1000/TAM1000/TFM300/JOINT60，微批8、有效batch64，建议≤24GPU小时；候选teacher1000/u200/四臂各300，建议≤4GPU小时，两份预算均null、无GPU READY。单seed/FP32/原规模，统一原数据/完整评价人口，最多两单卡并行，不把24/4h建议当用户已批。用户批准后直接独立交接，不另开GPU成本探测或重做已完成组件。
 
 ## 评价与数据边界
 
-017终态核命令/退出码/配置及run/history/coverage/summary：计划320更新(100/100/100/20)、6次关联验证、一次margin校准。selected可能不是末轮，明确实际选中组成；失败保留原件、不resume或重开预算。关联与完整物理误差、oracle/预测分组/单源/简单融合、全人口覆盖和共同点分别分析，不拿训练loss当验证收敛。
+017原件保留，实际仅TCM/TAM/TFM各100、5次关联V、一次margin校准；外层真实退出码缺失不补造，完整物理评价未产生。失败日志缺口已在新代码修复，不能反改旧产物。新训练明确实际selected组成；关联与物理误差、oracle/预测分组/单源/简单融合、全人口覆盖和共同点分别分析，不拿变批次训练loss当验证收敛。
 
 T_core512/V64、共享A隔离、cap128/Q64/time_unit20、显式offset/gap600、逐属性mask、有效短轨均保留。T_test封存。参考连续SmoothL1 beta .001、TCM后训练侧64×64负距离中位数一次校准。两系统训练量/loss/选模/singleton不同，不称严格等预算或作者精确复现。
 
