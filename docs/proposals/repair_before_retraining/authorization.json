@@ -7,10 +7,10 @@
     "我感觉我们，先一步一步解决问题吧，先把补齐数据解决，再关联解决，再融合解决，我们一步一步来，现在上游出问题，下游就会跟着出问题",
     "保留已有权重后停止020和021（推荐）"
   ],
-  "context": "最新用户明确改为补全→关联→融合，并授权保留已有权重后停止020/021。028为已有任务收尾；022—025暂停，不因021成功启动。旧时长建议政策保留用于以后明确授权的任务，本记录不授权恢复或新训练。",
+  "context": "用户最新按补全→关联→融合推进。028原件已核：020保全后停止，021在停止指令到达前自然完成。022—025保持HOLD；本记录不授权恢复或新增推理/训练。",
   "time_policy": "advisory",
   "on_recommended_duration": "future_reauthorized_jobs_only_record_notice_and_ask_user_at_next_ai_check",
-  "while_waiting_for_reply": "not_applicable_to_020_021_stop_confirmed_execute_028",
+  "while_waiting_for_reply": "NO_ACTIVE_JOBS_NO_NEW_GPU_READY",
   "instant_notification_when_ai_offline": false,
   "reference": {
     "task": "020",
@@ -52,11 +52,11 @@
   "retry": false,
   "reuse_closed_budgets": false,
   "account_preparation_submission_training_evaluation_io_failure_and_cleanup": true,
-  "running_legacy_jobs_keep_loaded_deadlines_until_they_finish_or_user_decides": true,
-  "current_status": "STOP_020_021_AND_HOLD_022_025_FOR_COMPLETION_REVIEW",
+  "running_legacy_jobs_keep_loaded_deadlines_until_they_finish_or_user_decides": false,
+  "current_status": "020_STOPPED_021_COMPLETED_AND_022_025_HOLD_FOR_COMPLETION_REVIEW",
   "execution_override": {
-    "020": "PRESERVE_THEN_STOP",
-    "021": "PRESERVE_THEN_STOP",
+    "020": "STOPPED_PRESERVED_TCM1000_TAM300_NO_RESTART",
+    "021": "COMPLETED_NATURALLY_NO_RESTART",
     "022": "HOLD",
     "023": "HOLD",
     "024": "HOLD",

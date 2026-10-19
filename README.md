@@ -6,9 +6,9 @@ MTAD不完整量测下的**补全、关联、融合**研究。当前按**补全�
 
 ## 当前状态
 
-- **017已FAILED**：外部SIGTERM于约5小时27分中断，未到预算上限；完整融合终评未开始。原件已pull并独立复算，不能用不同batch首末loss宣称位置变差。见[017分析与修复](docs/proposals/repair_before_retraining/README.md)。
-- **018候选已完成**：600更新、2371秒；基础恢复及关联仍弱，效用无稳定专属收益。见[实测分析](https://github.com/HKillua/association-code/blob/612afea/docs/results/cooperative018_local_review/README.md)。
-- **候选修正版已完成本地实现**：观测底座＋位置残差、log速度/圆周航向、支撑补全、局部关联与四臂属性残差融合；[当前方法与配置](docs/proposals/candidate_revision_after018/README.md)。已知修复与共享/单臂独立入口均已实现。用户已授权先保留权重再停止020/021，四臂022—025暂停；[028收尾](HandOver/L2S-20261019-028.md)已发布，实际停止待服务器回执。当前先做[补全独立验证](docs/research_brief.md)，不因021成功自动启动下游。
+- **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
+- **021候选共享阶段已自然完成**：teacher1000＋utility200，身份开发macro-F1记录为 **.630321**。该分数来自utility之前的teacher端点，不能归因于效用融合；逐对缓存漏传，等待原件独立复算。原始run/history已核，T_test未开启。
+- **当前先独立核补全**：两端权重已保留、没有继续训练；四臂022—025保持HOLD。[候选方法与配置](docs/proposals/candidate_revision_after018/README.md)已实现，但新版本的独立补全和四臂融合效果尚未证实。具体进展与下一步见[研究说明](docs/research_brief.md)、[交接索引](HandOver/Handover.md)。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和旧交接在Git历史中追溯。21分钟窗口未采用，当前先验证已实现修正版。
 
 ## 代码与资料
