@@ -1,0 +1,4 @@
+summary.json 1555496 B 留在服务器未入 Git（中枢：与两报告重复）
+output_dir=/home/wangguangjie/djs/association-code/runs/COMPLETION-CHECK-20261019-029-attempt-1
+record_dir=/home/wangguangjie/djs/association-code/runs/COMPLETION-CHECK-20261019-029-attempt-1-launch
+worktree=/home/wangguangjie/djs/association-code-run029 detached 6297a8c
