@@ -60,7 +60,7 @@ def synthetic_scenes(model_config):
     return [scenes[0]], [scenes[1]]
 
 
-def synthetic_configuration(model_variant='legacy'):
+def synthetic_configuration(model_variant='legacy', *, phase='full'):
     routes = (['plain', 'scalar-u', 'attribute-u', 'learned-attribute']
               if model_variant == 'support_residual_v2' else ['plain', 'identity', 'utility', 'learned'])
     config = dict(seed=20, batch_size=2, teacher_updates=1, utility_updates=1, adapt_updates=1,
@@ -69,6 +69,8 @@ def synthetic_configuration(model_variant='legacy'):
                 max_seconds=300., batch_tracks=2, pair_batch_size=3)
     if model_variant == 'support_residual_v2':
         config['longitude_loss_mode'] = 'shortest_arc'
+    if phase == 'teacher':
+        config.update(utility_updates=0, adapt_updates=0)
     return config
 
 
@@ -123,9 +125,10 @@ def main(argv=None):
     parser.add_argument('--model-variant', choices=('legacy', 'support_residual_v2'),
                         help='Synthetic checks only; native fit reads the explicit model variant from config')
     parser.add_argument('--save-predictions', action='store_true',
-                        help='Save per-scene physical predictions and valid masks for each comparison arm')
-    parser.add_argument('--phase', choices=('full', 'shared', 'arm'), default='full',
-                        help='v2: shared trains teacher/utility once; arm adapts/evaluates one route')
+                        help='Save per-scene physical predictions and valid masks for teacher completion or comparison arms')
+    parser.add_argument('--phase', choices=('full', 'teacher', 'shared', 'arm'), default='full',
+                        help='v2: teacher trains the original teacher objective then evaluates self completion; '
+                             'shared trains teacher/utility once; arm adapts/evaluates one route')
     parser.add_argument('--shared-from', help='completed shared phase output, required for --phase arm')
     parser.add_argument('--route', choices=('plain', 'scalar-u', 'attribute-u', 'learned-attribute'),
                         help='one independently initialized comparison arm')
@@ -161,6 +164,8 @@ def main(argv=None):
         if args.mode == 'fit' and args.model_variant is not None:
             raise ValueError('fit takes its model_variant only from config')
         variant = args.model_variant or 'legacy'
+        if args.mode == 'check' and args.phase != 'full' and variant != 'support_residual_v2':
+            raise ValueError('teacher/shared/arm phases require support_residual_v2')
         if args.mode == 'shape-check':
             report = production_shape_check(device, output, variant)
         else:
@@ -170,7 +175,7 @@ def main(argv=None):
                     num_layers=1, dim_feedforward=16, head_hidden=8, dropout=.1,
                     model_variant=variant,
                     support_time_policy='train_absmax_v1' if variant == 'support_residual_v2' else 'legacy')
-                training = synthetic_configuration(variant)
+                training = synthetic_configuration(variant, phase=args.phase)
                 if args.time_policy is not None:
                     training['time_policy'] = args.time_policy
                 train, validation = synthetic_scenes(model)
@@ -190,10 +195,10 @@ def main(argv=None):
                 if config['scope'] != expected_scope:
                     raise ValueError('configuration scope and model_variant disagree')
                 if args.phase != 'full' and model.model_variant != 'support_residual_v2':
-                    raise ValueError('shared/arm phases require support_residual_v2')
+                    raise ValueError('teacher/shared/arm phases require support_residual_v2')
                 if args.time_policy is not None:
                     config['training']['time_policy'] = args.time_policy
-                training = training_configuration(config['training'])
+                training = training_configuration(config['training'], phase=args.phase)
                 expected_routes = synthetic_configuration(model.model_variant)['routes']
                 if (model.model_variant == 'support_residual_v2' and training['routes'] != expected_routes
                         or model.model_variant == 'legacy' and

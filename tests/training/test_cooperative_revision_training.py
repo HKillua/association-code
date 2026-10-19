@@ -316,6 +316,7 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
                             stage='teacher', route='plain', updates=0)
             del old['model_config']['model_variant']
             del old['model_config']['support_time_policy']
+            del old['model_config']['speed_output_policy']
             del old['support_time_scale_tau']
             torch.save(old,path)
             restored, metadata = load_cooperative_checkpoint(path, device='cpu')
@@ -353,6 +354,29 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             self.assertEqual(shared['completed_updates'], cfg['teacher_updates']+cfg['utility_updates'])
             self.assertEqual(shared['completed_routes'], [])
             self.assertFalse(list((root/'shared').glob('adapt-*.pt')))
+            # Stopping at teacher must preserve the exact original training
+            # endpoint, including dropout/sampling and learned loss weights.
+            with patch('association.evaluation.cooperative.score_cooperative', side_effect=AssertionError('no scores')), \
+                 patch('association.evaluation.association.select_threshold', side_effect=AssertionError('no threshold')):
+                teacher = train_cooperative([self.scene], [self.validation], config,
+                    {**cfg, 'utility_updates': 0, 'adapt_updates': 0}, root/'teacher',
+                    device='cpu', phase='teacher', save_predictions=True)
+            self.assertEqual(teacher['completed_updates'], cfg['teacher_updates'])
+            self.assertEqual(set(teacher['phases']),
+                {'external_preparation', 'local_preparation', 'teacher', 'completion_evaluation'})
+            self.assertNotIn('threshold', teacher)
+            original = torch.load(root/'shared'/'teacher.pt', weights_only=True)
+            stopped = torch.load(root/'teacher'/'teacher.pt', weights_only=True)
+            for key in ('model_state', 'objective_state', 'optimizer_state', 'normalizer',
+                        'support_time_scale_tau'):
+                assert_same(original[key], stopped[key])
+            # A pre-policy shared checkpoint/run must still feed legacy-formula
+            # arms without interpreting those weights under a different chart.
+            old_bundle = torch.load(root/'shared'/'shared.pt', weights_only=True)
+            del old_bundle['model_config']['speed_output_policy']
+            del shared['model_config']['speed_output_policy']
+            torch.save(old_bundle, root/'shared'/'shared.pt')
+            runtime.write_json(root/'shared'/'run.json', shared)
             for route in ROUTES:
                 # Fresh process initialization may consume any RNG amount. Each
                 # adaptation stage must restore the same original seed itself.

@@ -322,7 +322,9 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
                 removed_observations=sum(sum(x['removed']) for x in items))
 
 
-def training_configuration(config):
+def training_configuration(config, *, phase='full'):
+    if phase not in ('full', 'shared', 'arm', 'teacher'):
+        raise ValueError('phase must be full, shared, arm or teacher')
     required = {'seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates',
                 'learning_rate', 'gradient_clip', 'endpoint_fraction', 'utility_epsilon',
                 'error_scale_policy', 'routes', 'max_seconds', 'batch_tracks', 'pair_batch_size'}
@@ -337,6 +339,10 @@ def training_configuration(config):
         raise ValueError('longitude_loss_mode must be linear or shortest_arc')
     for key in ('seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates', 'batch_tracks', 'pair_batch_size'):
         value = cfg[key]
+        if phase == 'teacher' and key in ('utility_updates', 'adapt_updates'):
+            if isinstance(value, bool) or not isinstance(value, int) or value != 0:
+                raise ValueError('teacher phase requires ' + key + ' = 0')
+            continue
         if isinstance(value, bool) or not isinstance(value, int) or value < (0 if key == 'seed' else 1):
             raise ValueError(key + ' must be an explicit nonnegative seed or positive count')
     if cfg['batch_size'] < 2 or cfg['batch_size'] % 2:
@@ -463,7 +469,9 @@ def _load_shared(directory, model_config, config, contract, validation_scenes):
             raise ValueError('shared checkpoint/run disagree on ' + key)
     protocol = lambda cfg: {key: value for key, value in cfg.items()
                             if key not in ('max_seconds', 'time_policy')}
-    if protocol(payload['training']) != protocol(config) or payload['model_config'] != asdict(model_config):
+    # Older snapshots predate optional model fields; compare their resolved
+    # behavior while retaining the checkpoint/run consistency check above.
+    if protocol(payload['training']) != protocol(config) or asdict(model.config) != asdict(model_config):
         raise ValueError('shared training/model protocol differs; only job timing may change')
     if payload['scene_contract'] != contract:
         raise ValueError('shared scene contract differs from current train/validation population')
@@ -495,6 +503,8 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     ``full`` retains the original single-job path. V2 ``shared`` writes the
     teacher/utility endpoint and fixed identity records; ``arm`` loads that
     completed endpoint and performs one fresh, identically seeded adaptation.
+    V2 ``teacher`` stops after the unchanged self/cross/identity objective and
+    evaluates every V fragment independently, without identity selection.
     The wall budget covers this job's stages, evaluation and initial data
     preparation. No resume/retry or implicit training schedule is provided.
     Phase wall times include sampling and checkpoint/result writes. Historical
@@ -505,11 +515,9 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     from association.models.cooperative import CooperativeModel
     from association.evaluation.cooperative import evaluate_cooperative, score_cooperative
     from association.evaluation.association import select_threshold
-    cfg = training_configuration(training_config)
-    if phase not in ('full', 'shared', 'arm'):
-        raise ValueError('phase must be full, shared or arm')
+    cfg = training_configuration(training_config, phase=phase)
     if phase != 'full' and not _is_v2(model_config):
-        raise ValueError('shared/arm execution is supported only by cooperative v2')
+        raise ValueError('shared/arm/teacher execution is supported only by cooperative v2')
     if phase == 'arm':
         if shared_from is None or route not in cfg['routes']:
             raise ValueError('arm requires a shared source and one configured route')
@@ -559,6 +567,8 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                    history_seconds='train_batch plus device synchronization only; excludes sampling and artifact writes'))
     if phase != 'full':
         run['phase'] = phase
+    if phase == 'teacher':
+        run['scope'] = 'teacher endpoint and full-V independent completion development'
     if phase == 'arm':
         run.update(route=route, shared_source=dict(path=str(Path(shared_from).resolve()),
                    format='cooperative-shared-v1'))
@@ -709,6 +719,45 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
             begin_phase('teacher', total_updates=cfg['teacher_updates'])
             fit_stage(model, objective, 'teacher', cfg['teacher_updates'], cfg['seed'])
             finish_phase()
+            if phase == 'teacher':
+                from association.evaluation.cooperative import evaluate_cooperative_completion
+                begin_phase('completion_evaluation')
+                prediction_writer, exports = None, []
+                if save_predictions:
+                    prediction_dir = output / 'completion-predictions'
+                    prediction_dir.mkdir()
+                    def prediction_writer(scene, arrays):
+                        # Use an index as filename; original IDs remain in the
+                        # archive. Capture existing forwards, never re-infer.
+                        name = f'scene-{len(exports):04d}.npz'
+                        np.savez_compressed(prediction_dir / name,
+                            scene_id=np.asarray(str(scene['scene_id'])),
+                            node_ids=np.asarray(scene['node_ids'], dtype=str),
+                            identities=np.asarray(scene['identities'], dtype=str),
+                            sources=np.asarray(scene['sources'], dtype=str),
+                            query_seconds=np.asarray(scene['grid']),
+                            **{key: value for key, value in arrays.items() if key != 'region_masks'},
+                            **{'region_'+key: value for key, value in arrays['region_masks'].items()})
+                        exports.append(dict(scene_id=str(scene['scene_id']), path=name,
+                                            fragment_count=len(scene['node_ids'])))
+                        runtime.write_json(prediction_dir / 'index.json', exports)
+                report = evaluate_cooperative_completion(model, normalizer, validation_scenes,
+                    device=device, check=bounded, progress=evaluation_progress,
+                    prediction_writer=prediction_writer)
+                runtime.write_json(output / 'completion-evaluation.json', report)
+                finish_phase()
+                bounded()
+                run.update(status='COMPLETED', teacher_checkpoint='teacher.pt',
+                    completion_evaluation='completion-evaluation.json',
+                    parameter_count=sum(p.numel() for p in model.parameters()),
+                    error_scales=normalizer['std'], identity_selection_performed=False,
+                    selection_policy='predetermined teacher endpoint; no V selection',
+                    elapsed_seconds=initial_elapsed_seconds+time.monotonic()-started,
+                    resume_supported=False)
+                runtime.write_json(output / 'progress.json', dict(run['last_progress'], status='COMPLETED',
+                    completed_routes=[], elapsed_seconds=run['elapsed_seconds']))
+                runtime.write_json(output / 'run.json', run)
+                return run
             if _is_v2(model_config):
                 records, threshold = select_identity()
             begin_phase('utility', total_updates=cfg['utility_updates'])

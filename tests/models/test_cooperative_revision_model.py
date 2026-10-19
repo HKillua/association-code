@@ -20,10 +20,11 @@ from tests.fixtures.scenes import timed_scene
 ROUTES = ('plain', 'scalar-u', 'attribute-u', 'learned-attribute')
 
 
-def revision_model(*, length=7, maximum=6):
+def revision_model(*, length=7, maximum=6, speed_output_policy='physical_softplus'):
     config = CooperativeConfig(length=length, max_observations=maximum, d_model=8,
         nhead=2, num_layers=1, dim_feedforward=16, dropout=0., head_hidden=6,
-        model_variant='support_residual_v2', support_time_policy='train_absmax_v1')
+        model_variant='support_residual_v2', support_time_policy='train_absmax_v1',
+        speed_output_policy=speed_output_policy)
     normalizer = fit_cooperative_normalizer([timed_scene('train', 'T_core')], config)
     # Simple physical scales make the geometry expectations independently exact.
     normalizer['mean'] = [0., 0., 109., 0.]
@@ -169,6 +170,71 @@ class CooperativeRevisionModelTests(unittest.TestCase):
             model.state_projection.bias[2] = 1e6
             tail = model(x, mask)
         self.assertGreater(float(tail[:, 2].min()), 999999.)
+
+    def test_scaled_log_preserves_initialization_rng_and_non_speed_outputs(self):
+        original, _ = revision_model(length=3)
+        original_rng = torch.get_rng_state().clone()
+        revised, _ = revision_model(length=3, speed_output_policy='scaled_log')
+        self.assertTrue(torch.equal(original_rng, torch.get_rng_state()))
+        before = dict(original.named_parameters())
+        after = dict(revised.named_parameters())
+        self.assertEqual(before.keys(), after.keys())
+        for name in before:
+            torch.testing.assert_close(before[name], after[name], rtol=0, atol=0)
+        self.assertEqual(set(revised.state_dict()) - set(original.state_dict()), {'speed_reference'})
+        original.eval(); revised.eval()
+        x, mask = packed(original, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
+        with torch.no_grad():
+            torch.testing.assert_close(original(x, mask), revised(x, mask), rtol=0, atol=0)
+            for model in (original, revised):
+                model.state_projection.bias.copy_(torch.tensor([.25, -.5, 1., .7]))
+            old, new = original(x, mask), revised(x, mask)
+        torch.testing.assert_close(old[:, [0, 1, 3]], new[:, [0, 1, 3]], rtol=0, atol=0)
+        self.assertFalse(torch.equal(old[:, 2], new[:, 2]))
+
+    def test_scaled_log_one_residual_unit_is_one_log_scale_with_physical_gradient(self):
+        model, _ = revision_model(length=3, speed_output_policy='scaled_log')
+        model.eval()
+        x, mask = packed(model, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
+        with torch.no_grad():
+            model.state_projection.bias[2] = 1.
+        output = model(x, mask)
+        expected = F.softplus(model.speed_bias) * model.log_speed_std.exp()
+        torch.testing.assert_close(output[:, 2], expected.expand(3))
+        derivative = torch.autograd.grad(output[:, 2].sum(), model.state_projection.bias)[0][2]
+        torch.testing.assert_close(derivative, 3 * model.log_speed_std * expected)
+
+    def test_speed_policy_state_cannot_be_cross_loaded_or_recalibrated(self):
+        original, _ = revision_model(length=3)
+        revised, _ = revision_model(length=3, speed_output_policy='scaled_log')
+        with torch.no_grad():
+            revised.state_projection.bias[2] = .75
+        # Even non-strict loads must not silently reinterpret the head weights.
+        for strict in (True, False):
+            with self.subTest(strict=strict), self.assertRaisesRegex(ValueError, 'speed_reference'):
+                revised.load_state_dict(original.state_dict(), strict=strict)
+            with self.subTest(strict=strict), self.assertRaisesRegex(ValueError, 'speed_output_policy'):
+                original.load_state_dict(revised.state_dict(), strict=strict)
+        bad = copy.deepcopy(revised.state_dict()); bad['speed_reference'] += 1.
+        with self.assertRaisesRegex(ValueError, 'speed_reference'):
+            revised.load_state_dict(bad)
+        restored, _ = revision_model(length=3, speed_output_policy='scaled_log')
+        restored.load_state_dict(revised.state_dict())
+        revised.eval(); restored.eval()
+        x, mask = packed(revised, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
+        with torch.no_grad():
+            torch.testing.assert_close(revised(x, mask), restored(x, mask), rtol=0, atol=0)
+        with self.assertRaisesRegex(ValueError, 'requires support_residual_v2'):
+            CooperativeConfig(speed_output_policy='scaled_log')
+
+    def test_scaled_log_overflow_is_reported_instead_of_clipped(self):
+        model, _ = revision_model(length=3, speed_output_policy='scaled_log')
+        model.eval()
+        x, mask = packed(model, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
+        with torch.no_grad():
+            model.state_projection.bias[2] = 1e6
+            with self.assertRaisesRegex(ValueError, 'physical output is nonfinite'):
+                model(x, mask)
 
     def test_local_identity_is_symmetric_at_tied_cutoff_and_nonoverlap_uses_endpoints(self):
         model, _ = revision_model(length=3)

@@ -6,7 +6,7 @@
 | --- | --- |
 | `tmtaff_complete_fit.py` | 完整参考的四阶段训练、恢复及关联/融合评价 |
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
-| `cooperative_fit.py` | 候选训练及plain/identity/utility/learned四臂比较；当前修正版用`support_residual_v2` |
+| `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
 | `completion_check.py` | 复用020/021保全权重，固定4个V场景做独立补全诊断；无训练、关联或融合 |
 
@@ -30,3 +30,5 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 
 
 候选v2可拆成共享阶段与独立融合臂：`fit --phase shared`先保存shared.pt、identity-records/与唯一阈值；随后`fit --phase arm --shared-from /已完成021输出 --route attribute-u --save-predictions --time-policy advisory`（其余臂替换route）。每臂独立输出和耗时，只加载同normalizer/S/模型/loss/身份记录，不重训teacher/u或选阈值。默认full保持旧行为，shared不接受--save-predictions。当前GPU队列以[交接索引](../../HandOver/Handover.md)为准。
+
+`fit --phase teacher --save-predictions`保留原teacher self/cross/BCE训练，在固定端点做完整V独立片段补全，不进入关联选阈值、utility或融合；配置的utility/adapt更新数必须为0。输出`teacher.pt`、`completion-evaluation.json`及`completion-predictions/`逐场NPZ。该NPZ是独立补全格式，按逐属性mask/region统计，不能直接当分组融合格式交给`compare_physical_predictions.py`。`model.speed_output_policy`缺省为原`physical_softplus`；`scaled_log`只对v2生效并要求相应新权重。[031/032 A/B草案](../../docs/proposals/repair_before_retraining/030-repair-analysis.md#6-已实现的第一项与待确认ab2026-10-20)尚未获新训练授权。

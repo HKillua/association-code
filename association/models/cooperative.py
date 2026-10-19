@@ -28,6 +28,7 @@ class CooperativeConfig:
     gate_floor: float = 1e-3
     support_time_policy: str = 'legacy'
     model_variant: str = 'legacy'
+    speed_output_policy: str = 'physical_softplus'
 
     def __post_init__(self):
         for name in ('length', 'max_observations', 'd_model', 'nhead',
@@ -47,6 +48,10 @@ class CooperativeConfig:
             raise ValueError('unknown cooperative model_variant')
         if self.model_variant == 'support_residual_v2' and self.support_time_policy != 'train_absmax_v1':
             raise ValueError('support_residual_v2 requires train_absmax_v1 support scaling')
+        if self.speed_output_policy not in ('physical_softplus', 'scaled_log'):
+            raise ValueError('speed_output_policy must be physical_softplus or scaled_log')
+        if self.speed_output_policy == 'scaled_log' and self.model_variant != 'support_residual_v2':
+            raise ValueError('scaled_log speed requires support_residual_v2')
 
 
 def _head(inputs, hidden, outputs):
@@ -72,6 +77,11 @@ class CooperativeModel(nn.Module):
         if representation is not None:
             for key in ('log_speed_mean', 'log_speed_std', 'speed_bias'):
                 self.register_buffer(key, torch.tensor(representation[key], dtype=torch.float32))
+            if config.speed_output_policy == 'scaled_log':
+                # Preserve the original FP32 zero-residual speed exactly. This
+                # policy-specific state also prevents old weights from being
+                # silently reinterpreted in a different output coordinate.
+                self.register_buffer('speed_reference', F.softplus(self.speed_bias))
         scaled_support = config.support_time_policy == 'train_absmax_v1'
         if support_time_scale is None and not scaled_support:
             support_time_scale = 1.
@@ -129,6 +139,8 @@ class CooperativeModel(nn.Module):
 
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                               missing_keys, unexpected_keys, error_msgs):
+        if self.config.speed_output_policy != 'scaled_log' and prefix + 'speed_reference' in state_dict:
+            raise ValueError('checkpoint scaled_log speed disagrees with declared speed_output_policy')
         if self.config.support_time_policy == 'train_absmax_v1':
             incoming = state_dict.get(prefix + 'support_time_scale')
             expected = self.support_time_scale
@@ -137,7 +149,10 @@ class CooperativeModel(nn.Module):
                     or not torch.equal(incoming.to(expected), expected)):
                 raise ValueError('checkpoint support_time_scale disagrees with its declared training scale')
         if self.config.model_variant == 'support_residual_v2':
-            for key in ('state_mean', 'state_std', 'log_speed_mean', 'log_speed_std', 'speed_bias'):
+            keys = ('state_mean', 'state_std', 'log_speed_mean', 'log_speed_std', 'speed_bias')
+            if self.config.speed_output_policy == 'scaled_log':
+                keys += ('speed_reference',)
+            for key in keys:
                 incoming, expected = state_dict.get(prefix + key), getattr(self, key)
                 if (not isinstance(incoming, Tensor) or incoming.shape != expected.shape
                         or not incoming.is_floating_point() or not torch.isfinite(incoming).all()
@@ -496,7 +511,10 @@ class CooperativeModel(nn.Module):
         base = self.position_base(encoded, members[:1])[0]
         latitude = (base[:, 0]+self.state_std[0]*residual[:, 0]).clamp(-90., 90.)
         longitude = torch.remainder(base[:, 1]+self.state_std[1]*residual[:, 1]+180., 360.)-180.
-        speed = F.softplus(residual[:, 2]+self.speed_bias)
+        if self.config.speed_output_policy == 'scaled_log':
+            speed = self.speed_reference * torch.exp(self.log_speed_std * residual[:, 2])
+        else:
+            speed = F.softplus(residual[:, 2]+self.speed_bias)
         course = torch.remainder(self.state_std[3]*residual[:, 3]+self.state_mean[3], 360.)
         prediction = torch.stack((latitude, longitude, speed, course), dim=-1)
         if not torch.isfinite(prediction).all():

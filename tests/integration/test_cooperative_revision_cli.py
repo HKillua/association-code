@@ -100,6 +100,82 @@ class CooperativeRevisionCLITests(unittest.TestCase):
                 self.assertGreater(arrays['m000__aligned_truth_valid'].sum(), 0)
                 self.assertEqual(arrays['m000__aligned_prediction_valid'].sum(), 0)
 
+    def test_public_synthetic_teacher_is_v2_only_and_saves_completion(self):
+        output = self.root/'teacher-check'
+        common = ['check', '--device', 'cpu', '--cpu-threads', '1',
+                  '--phase', 'teacher', '--save-predictions', '--output', str(output)]
+        self.assertEqual(self.invoke(common), 1)
+        self.assertFalse(output.exists())
+        self.assertEqual(self.invoke([*common, '--model-variant', 'support_residual_v2']), 0)
+        run = runtime.read_json(output/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['phase'], 'teacher')
+        self.assertEqual(run['completed_updates'], 1)
+        self.assertEqual(run['training']['utility_updates'], 0)
+        self.assertEqual(run['training']['adapt_updates'], 0)
+        self.assertNotIn('threshold', run)
+        self.assertNotIn('identity_selection', run)
+        self.assertEqual(runtime.read_json(output/'completion-evaluation.json')['fragment_count'], 4)
+        self.assertTrue(list((output/'completion-predictions').glob('*.npz')))
+
+    def test_native_scaled_log_teacher_has_no_downstream_training_or_selection(self):
+        fixture = native_fixture.make_native_zip_fixture(self)
+        fixture.config = self.configuration()
+        fixture.config['model']['speed_output_policy'] = 'scaled_log'
+        fixture.config['training'].update(utility_updates=0, adapt_updates=0, max_seconds=1e-12)
+        output = fixture.root/'teacher-scaled-log'
+        with (patch('association.evaluation.association.select_threshold',
+                    side_effect=AssertionError('teacher does not select an association threshold')),
+              patch('association.evaluation.cooperative.score_cooperative',
+                    side_effect=AssertionError('teacher does not score validation associations')),
+              patch('association.evaluation.cooperative.evaluate_cooperative',
+                    side_effect=AssertionError('teacher does not run grouped fusion'))):
+            self.assertEqual(self.invoke(['fit', '--device', 'cpu', '--cpu-threads', '1',
+                '--phase', 'teacher', '--time-policy', 'advisory', '--save-predictions',
+                *fixture.cli_args('teacher-scaled-log')]), 0)
+        run = runtime.read_json(output/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['phase'], 'teacher')
+        self.assertEqual(run['completed_updates'], 1)
+        self.assertEqual(run['completed_routes'], [])
+        self.assertEqual(run['training']['time_policy'], 'advisory')
+        self.assertEqual(run['phases']['teacher']['completed_updates'], 1)
+        self.assertFalse(set(run['phases']) & {'identity_scoring_selection', 'utility', 'shared_export'})
+        self.assertFalse(any(name.startswith('adapt') for name in run['phases']))
+        self.assertNotIn('threshold', run)
+        self.assertNotIn('identity_selection', run)
+        model, payload = load_cooperative_checkpoint(output/'teacher.pt', device='cpu')
+        self.assertEqual(model.config.speed_output_policy, 'scaled_log')
+        self.assertEqual(payload['stage'], 'teacher')
+        self.assertEqual(payload['completed_updates'], 1)
+        self.assertFalse((output/'utility.pt').exists())
+        self.assertFalse((output/'shared.pt').exists())
+        self.assertFalse(list(output.glob('adapt-*.pt')))
+        report = runtime.read_json(output/'completion-evaluation.json')
+        self.assertEqual(report['scene_count'], 2)
+        self.assertEqual(report['fragment_count'], 4)
+        self.assertEqual(report['completion_forward_count'], 4)
+        self.assertFalse(report['test_opened'])
+        self.assertEqual(report['per_scene'][1]['fragment_count'], 0)
+        self.assertTrue(report['per_scene'][1]['reference_targets_without_input'])
+        files = sorted((output/'completion-predictions').glob('*.npz'))
+        self.assertEqual(len(files), 2)
+        fragments = 0
+        for path in files:
+            with np.load(path) as arrays:
+                prediction = arrays['prediction']
+                self.assertEqual(prediction.shape[1:], (4, 4))
+                self.assertEqual(arrays['target'].shape, prediction.shape)
+                self.assertEqual(arrays['target_valid'].shape, prediction.shape)
+                self.assertTrue(np.isfinite(prediction).all())
+                self.assertEqual(len(arrays['node_ids']), len(prediction))
+                fragments += len(prediction)
+        self.assertEqual(fragments, 4)
+        execution = runtime.read_json(output/'execution.json')
+        self.assertEqual(execution['phase'], 'teacher')
+        self.assertEqual(execution['configuration']['model']['speed_output_policy'], 'scaled_log')
+        self.assertFalse(execution['preparation']['test_opened'])
+
     def test_shared_and_one_independent_arm_use_public_cli(self):
         common = ['check', '--device', 'cpu', '--cpu-threads', '1',
                   '--model-variant', 'support_residual_v2']
