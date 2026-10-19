@@ -1,0 +1,16 @@
+{
+  "status": "INTERRUPTED",
+  "worker_pid": 1917300,
+  "payload_pid": 1917309,
+  "payload_pgid": 1917309,
+  "returncode": 1,
+  "timed_out": false,
+  "worker_started_at": "2026-10-19T06:47:55.813518+00:00",
+  "backend": "systemd",
+  "payload_started_at": "2026-10-19T06:47:55.814751+00:00",
+  "group_cleanup_requested": true,
+  "failure": "InterruptedError: supervisor received signal 15",
+  "ended_at": "2026-10-19T10:23:41.608569+00:00",
+  "elapsed_seconds": 12945.90764585184,
+  "deadline_exceeded": false
+}

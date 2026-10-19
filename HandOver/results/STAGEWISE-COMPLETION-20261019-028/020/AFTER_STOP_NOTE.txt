@@ -1,0 +1,6 @@
+after-stop collected_at_utc=2026-10-19T10:25:26Z
+NO new weights: checkpoint.pt mtime unchanged at 2026-10-19T10:01:39Z (TAM@300 checkpoint), size 83309324 identical to before-stop copy
+new state files after the single SIGTERM: run.json(542478) history.json(723680) coverage.json(3196364) preparation.json(122518921, path registered only, not copied)
+terminal: launcher status=INTERRUPTED returncode=1 exit_code.txt=1 timed_out=false deadline_exceeded=false ended_at=10:23:41.608569Z elapsed=12945.908; trainer run.json status=FAILED cursor={stage1,update400,completed1400} elapsed=12913.7
+systemd: Result=exit-code ExecMainCode=1 ExecMainStatus=130 NRestarts=0 unit now failed (NOT reset-failed, evidence retained)
+stop_reason=user_requested_completion_first

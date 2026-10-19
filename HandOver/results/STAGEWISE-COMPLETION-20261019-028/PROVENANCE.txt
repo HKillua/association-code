@@ -1,0 +1,8 @@
+collected_at_utc=2026-10-19T10:21:46Z
+020_src=/home/wangguangjie/djs/association-code/runs/REFERENCE-REPAIRED-20261019-020-attempt-1 (+-launch)
+020_config_src=/home/wangguangjie/djs/association-code/configs/tmtaff-repaired-020.json (worktree ../association-code-run020 detached 6168f29)
+021_src=/home/wangguangjie/djs/association-code/runs/COOPERATIVE-SHARED-20261019-021-attempt-3 (+-launch)
+021_config_src=/home/wangguangjie/djs/association-code/configs/cooperative-v2-shared-021-attempt-3.json (worktree ../association-code-run021 detached a945a09)
+021_status_at_copy=COMPLETED (natural, returncode 0, ended_at 2026-10-19T10:20:53.049356Z) no signal sent
+020_status_at_copy=RUNNING unit mtad-7ad02f794d08.service MainPID 1917300 payload 1917309
+execution.json 122518185B in 021 run dir NOT copied (size only, path registered)
