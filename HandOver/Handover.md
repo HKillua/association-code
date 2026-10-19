@@ -7,8 +7,8 @@
 | 项目 | 最新状态与下一步 |
 | --- | --- |
 | [019](S2L-20261019-019.md) / [026](S2L-20261019-026.md) | 019转录错误FAILED；026退出0及独立服务托管已核，两项不重跑。 |
-| [020参考](S2L-20261019-020.md) | RUNNING。服务器16:39落盘、16:46读取的文字回执称TCM1000＋TAM100完成，首V macro-F1 .4245588、验证708.24秒、TAM history均时23.164秒；本次未附对应原run/history，暂标服务器报告，不能称本地已复算。尚无融合结果。此前TCM1000及校准75.6931877原件已核。旧截止约北京时间10月20日14:46:55/14:47:25。 ✅ **服务器已接受 `01618a2` 三条纠正并补交原件**（见 [S2L-020](S2L-20261019-020.md) 末节）：缓存存 CPU（`batches.py:64` 写的是 `tensor.detach().cpu().clone()`，故「再加约 900 MiB 显存」作废；`peak_reserved` 实测升至 1,308,622,848）、TAM 不使用 `pair／track_microbatch`（`tmtaff.py:559‑572` 只在 `else` 即 TFM／JOINT 传入，故该项减速归因作废，原因改为**未判定**）、86,735／100,484 秒降格为**条件情景**而非「大概率失败」。已 gzip 回传 `run.json` 541,875／`history.json` 342,283（1,100 行）／`coverage.json` 2,054,333 至 `results/REFERENCE-REPAIRED-20261019-020/tam100/`，全部经 gzip 解压后逐字节 cmp 验回；`checkpoint.pt` 83,022,220 留服务器不传。**逐场景 P／R 目前不在 run／history 里**（按 `tmtaff.py:618‑620` 只随 `checkpoint.pt` 的内存 `selected` 持久化），取它须加载 checkpoint，属 027 禁止项 ⇒ **等中枢明确许可**，服务器不擅自加载；人口部分（scenes／tracks／pairs／presentations）已在 coverage 与 history 的 `sampling` 内。 |
-| [021共享](S2L-20261019-021.md) | RUNNING attempt3。服务器16:53快照称teacher518/1000，elapsed5274.914秒，阶段均时9.879秒；本次原run/history未附。teacher1000→身份V→utility200，尚无该次验证成绩。18:33只是旧速外推。旧截止约北京时间10月19日19:25:41/19:26:10，前两次中断2132.71秒照计。 |
+| [020参考](S2L-20261019-020.md) | RUNNING。72b3bad已回传tam100原run/history/coverage；本地核1100更新=TCM1000/TAM100、全部loss/梯度有限、一次V完成708.240秒、history记录F1 .4245588143/64场景、TAM均时23.164249秒、test_opened=false。没有逐边scores，不称独立重算F1；仍缺checkpoint.selected.validation的P/R与V人口摘要，下面已明确允许CPU只读导出。尚无物理终评。旧截止约北京时间10月20日14:46:55/14:47:25。 |
+| [021共享](S2L-20261019-021.md) | RUNNING attempt3。17:19快照原history703行teacher、progress完成703/下一步704、elapsed6814.155秒；run仍是阶段开始0步快照，不能据此说未训练。尚无该次身份V；teacher1000→身份V→utility200。旧截止约北京时间10月19日19:25:41/19:26:10。 |
 | [027修订](S2L-20261019-027.md) | COMPLETED，旧校准取件已核，不重复。四臂独立代码目录已备，尚未启动。 |
 | [022主方法](L2S-20261019-022.md) | WAITING_021；attribute-u300＋全V，按027两层advisory，建议20分钟。 |
 | [023普通融合](L2S-20261019-023.md) | WAITING_021；plain300＋全V，同上。 |
@@ -23,7 +23,7 @@
 - 100步/阶段末才写checkpoint确有可观测性限制，旧history不能定位实时阶段。重复SIGTERM打断终态的修复已在9b06f80并用于新四臂，不重复实现，不热改活动020/021。真实故障照原件处理。
 - authorization.json已是advisory，86400/1200为建议值，不是待补的新额度。四臂20分钟也只是旧速估计，不能保证；无需为了推算略超重写授权或申请28小时从头重跑。
 
-**当前回传清单：先回已有文件，不等训练结束，不另开实验。**
+**当前回传清单：72b3bad的020 run/history/coverage和021 run/progress/history已收到，不重复同一快照。现在优先补020检查点元数据；明确允许以下CPU只读提取，它不属于被禁止的模型推理，无需再等用户审批。**
 
 | 来源 | 现在可返回的已有内容 | 用途 |
 | --- | --- | --- |

@@ -64,3 +64,5 @@
 补全LRU缓存存CPU，cache增长不能当GPU额外900MiB；GPU空闲值不再次减本进程峰值。TAM不使用pair/track_microbatch，其改动仅作用TFM/JOINT。100步或阶段末耐久落盘使中途可观测性有限，但目前无已证实需停止的故障；重复SIGTERM修复已完成、新四臂采用，不重复开发/热改在途任务。authorization.json已为advisory，24h/20min只是建议，四臂也不保证20min内完成。
 
 继续已批准任务；下一次正常回传补020已有run/history/验证人口与P/R、021已有progress/history和终态，不新增推理、扫描或诊断轮次。真实失败不自动恢复、不篡改原status，是否接续按完整方案另议。
+
+72b3bad随后补交原件：020 tam100 run/history/coverage核实1100次更新、唯一V708.240秒及F1记录.4245588143，loss/梯度有限、test封存；无逐边scores，尚未独立重算F1/P/R。coverage为训练采样覆盖（TCM512场景/37862唯一轨；TAM164场景/5510轨/5803唯一对），不能当V人口。021 attempt3原history703步，progress记录完成703/下一步704，run仍阶段初0步属于更新时机。中期P/R实际只在checkpoint.selected.validation，本地已明确允许CPU只读导出该元数据和data_contract人口，不构造模型/forward/新评价；详细清单见交接索引。
