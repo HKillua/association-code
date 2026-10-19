@@ -9,6 +9,8 @@
 
 **用户随后要求baseline也应接近所附TMTAFF论文结果。** 这是正式比较的复现目标：先建立可信baseline，再判断候选价值；020当前低分不能作为“超过TMTAFF”的证据。030只涉及候选，不作为baseline验收。已核用户32页PDF的实验设置/表1–3并补齐评价报告，具体对照见[baseline校准](#baseline与论文结果的校准2026-10-19)。此次不自动恢复020或新增训练。
 
+**用户继续要求分析数据、形成修改方案。** 本地进一步完成原量测属性控制、平均运动外推、留身份跨源校准oracle及baseline特征几何分解：当前误差至少涉及观测信息保留、同场跨源偏移和长时外推三个不同问题，不能统一靠加训练或改loss权重解决。速度输出坐标修正是最小可归因候选；观测底座和未知配对下校准分别验证。baseline原生特征变化主要反映航向，不能用总feature MSE验证位置。具体数值、边界和顺序见[030修改分析](proposals/repair_before_retraining/030-repair-analysis.md)，不新增服务器任务。
+
 ## Baseline与论文结果的校准（2026-10-19）
 
 来源：用户提供的`applsci-16-07251-v2(1).pdf`，DOI `10.3390/app16147251`，PDF p15–18、p21–23、p27–28；表格与Eq26–31已视觉复核。数值、来源与本地复算保存在[029记录](proposals/repair_before_retraining/029-audit.json)的`baseline_paper_calibration`，不另建实验框架。
