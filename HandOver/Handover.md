@@ -2,20 +2,29 @@
 
 首要目标是推进实验、解释结果。先看本页当前状态；没有具体故障不新增框架、审计或准备轮次。旧计划已归入[历史摘要](../docs/history/README.md)，原始L2S/S2L和机器结果保留，旧轮次不重复领取。
 
-## 当前任务
+## 当前任务：只认本表，不扫描旧READY
 
-| 任务 | 状态与下一步 |
+用户已同意在已讨论参考≤24h＋候选整条线≤4h范围内按独立任务合理安排，[授权原话/上下文](../docs/proposals/repair_before_retraining/authorization.json)。5种最终方法、6个GPU作业，各一次无重试，最多两个单卡并发；每项独立输出/额度，不互转结余。push不唤醒服务器AI。
+
+| 请求 | 前置/状态与安排 |
 | --- | --- |
-| [019请求](L2S-20261019-019.md) | **LOCAL_TO_SERVER / READY，唯一新执行入口**。GPU0，CPU现场≤5分钟，仅一次5秒payload验证独立systemd用户服务/linger/日志/终态；不训练、不加载017模型、不重扫数据。用户已明确要求断开后仍运行。 |
-| [017请求](L2S-20261018-017.md) / [回执](S2L-20261018-017.md) | **FAILED，终态已审ed1c954**。外部SIGTERM约5.46h中断，远未到预算；只有300条耐久日志，cursor302不可据此认定checkpoint302。TCM/TAM/TFM各100，融合终评未开始。独立25步均值显示位置训练loss总体下降，不能照首末不同batch说位置变差。[分析与修复](../docs/proposals/repair_before_retraining/README.md)，旧额度关闭，不resume。 |
-| [018请求](L2S-20261018-018.md) / [回执](S2L-20261018-018.md) | COMPLETED，600更新、2371秒；[本地分析](../docs/results/cooperative018_local_review/README.md)已完成。基础恢复/身份仍弱，效用无稳定专属收益，预算关闭。 |
-| [候选修正版](../docs/proposals/candidate_revision_after018/README.md) | 用户已批准本地实现；代码/CPU验证完成。观测位置底座＋残差、log速度、圆周航向、支撑query、局部关联、四臂属性残差融合。新GPU授权0、无READY；[草案](../docs/proposals/candidate_revision_after018/config.draft.json)共2400更新、max_seconds=null，3.11h外推/4h建议不是授权。 |
+| [019](L2S-20261019-019.md) | READY，仍必需的5秒CPU服务托管核实，GPU0、现场CPU≤5分钟；截至本轮fetch尚无S2L。必须先核实实际systemd/linger/cgroup及终态，不能把nohup当替代。 |
+| [020参考](L2S-20261019-020.md) | READY，**019通过才启动**。TCM1000/TAM1000/TFM300/JOINT60＋完整终评，固定≤86400秒。 |
+| [021共享](L2S-20261019-021.md) | READY，**019通过才启动**，可与020并行。teacher1000→一次身份V→utility200，只训练一次，固定≤9600秒，完整端点供四臂读取。 |
+| [022主方法](L2S-20261019-022.md) | READY，**021完整COMPLETED才启动**。attribute-u适配300＋V，固定≤1200秒。 |
+| [023普通融合](L2S-20261019-023.md) | 同一021端点，plain适配300＋V，固定≤1200秒。 |
+| [024统一效用](L2S-20261019-024.md) | 同一021端点，scalar-u适配300＋V，固定≤1200秒。 |
+| [025普通门控](L2S-20261019-025.md) | 同一021端点，learned-attribute适配300＋V，固定≤1200秒。 |
 
-**当前本地修复已完成。** 用户2026-10-19明确要求先修baseline/候选已发现问题再训练，并允许训练脱离远程AI会话。代码`04dab6e`实现一次性systemd托管和中断日志修复；303项CPU通过，独立复核完成。旧“必须前台监督/不能后台训练”限制被本次用户决定覆盖，不授权常驻监控、自动重试或新增GPU。
+候选总上限9600＋4×1200=14400秒，**不是每臂4小时**。正常顺序021→022→023→024→025，优先主方法与普通融合；020占一卡时候选一次跑一项，020结束后可在两卡上跑两个已具备前置的臂。服务独立托管，AI可断开；重连读取同一任务结果后领取下一项，不重复启动。021失败则四臂不读部分产物；单臂失败其他已满足前置的臂继续，020失败不阻塞候选。
 
-**服务器现在先领019。** 只核实服务托管及原件，提交返回0不等于payload/模型成功；真实跨AI runtime重启未测试时如实记。任务可能在AI断开后继续，服务器重连读同一输出，不重复启动。push不会唤醒服务器。
+四臂共用021冻结执行目录/同一shared.pt、normalizer/S、身份records和阈值，独立初始化及seed22采样，不继承上一臂。既有full入口保留，新shared/arm入口已实现；本地CPU等价验证与完整配置见[安排与修复](../docs/proposals/repair_before_retraining/README.md)。正式任务只用上述对应JSON/L2S，不执行预算null旧草案。
 
-**新训练待资源决定：** [完整配置与费用](../docs/proposals/repair_before_retraining/README.md)，参考TCM1000/TAM1000/TFM300/JOINT60，微批8、有效batch64，建议≤24GPU小时；候选teacher1000/u200/四臂各300，建议≤4GPU小时，两份预算均null、无GPU READY。单seed/FP32/原规模，统一原数据/完整评价人口，最多两单卡并行，不把24/4h建议当用户已批。用户批准后直接独立交接，不另开GPU成本探测或重做已完成组件。
+**从当前待办撤销：** 006旧查询、001—018重新领取/重试/续预算、017续训/补终评或为此取checkpoint、重复012/016取件/原ZIP审计/smoke/prepare/成本测量、CDF训练及本轮额外TSA训练。保留原件，不改历史L2S/S2L的READY头部；019原请求的“无新GPU READY”是其发布时快照，后续队列以本表和新授权为准。
+
+## 017/018已结案
+
+[017](S2L-20261018-017.md) FAILED，已审服务器ed1c954；约5.46h时外部SIGTERM中断，未到预算，融合终评没有开始。300条history与cursor302日志落盘差异已修，原checkpoint耐久进度未本地读取不猜。25步均值位置loss总体下降，不能接受不同batch首末“位置变差”的定性。[018](S2L-20261018-018.md) COMPLETED但基础恢复/身份仍弱、无稳定效用专属收益。两轮额度关闭，详见[终态分析](../docs/proposals/repair_before_retraining/README.md)与[018报告](../docs/results/cooperative018_local_review/README.md)。
 
 ## 评价与数据边界
 

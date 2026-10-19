@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-19",
+  "user_words": [
+    "几个实验啊，如果是多个实验分别跑不就行吗",
+    "可以的，你做合理安排，还有就是服务器AI现在还有没做的吗，判断一下还有做的必要吗，没有的话直接废除即可"
+  ],
+  "context": "用户在参考最多24 GPU小时、候选整条线合计最多4 GPU小时的具体提案后，要求按独立实验拆分；已解释总上限不是串行等待时间，随后同意合理安排。按该上下文执行既有上限内拆分，不把用户原话伪造为逐字重述数字。",
+  "reference": {
+    "task": "020",
+    "max_seconds": 86400
+  },
+  "candidate": {
+    "shared": {
+      "task": "021",
+      "max_seconds": 9600
+    },
+    "arms": [
+      {
+        "task": "022",
+        "route": "attribute-u",
+        "max_seconds": 1200
+      },
+      {
+        "task": "023",
+        "route": "plain",
+        "max_seconds": 1200
+      },
+      {
+        "task": "024",
+        "route": "scalar-u",
+        "max_seconds": 1200
+      },
+      {
+        "task": "025",
+        "route": "learned-attribute",
+        "max_seconds": 1200
+      }
+    ],
+    "cumulative_max_seconds": 14400
+  },
+  "max_concurrent_single_gpu_jobs": 2,
+  "attempts_per_task": 1,
+  "retry": false,
+  "reuse_closed_budgets": false,
+  "fixed_caps_include_preparation_submission_training_evaluation_io_failure_and_cleanup": true
+}

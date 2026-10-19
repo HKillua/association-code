@@ -11,7 +11,7 @@
 
 参考和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
 
-旧pilot/profile/成本probe入口已删除。017活动checkout保持冻结，018已结束；当前候选修正版代码完成，新训练预算尚未批准。研究方法与配置见[候选规格](../../docs/proposals/candidate_revision_after018/README.md)，旧阶段见[历史摘要](../../docs/history/README.md)。
+旧pilot/profile/成本probe入口已删除。017、018均已结束；候选修正版和共享/独立臂入口已完成。用户已同意按参考24h＋候选合计4h拆分，当前019—025依赖与正式配置以[交接索引](../../HandOver/Handover.md)为准。研究方法见[候选规格](../../docs/proposals/candidate_revision_after018/README.md)，旧阶段见[历史摘要](../../docs/history/README.md)。
 
 
 正式服务器训练从`launch_detached.py`的一次性systemd用户服务提交，已启动任务不依赖AI前台会话。示例接口：
@@ -24,3 +24,6 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 ```
 
 显式传递MKL/OPENBLAS线程等所需环境；服务不继承AI shell全部环境。payload命令是argv，不通过shell展开。`launch.json`的SUBMITTED不是模型成功；重连读取`status.json`/exit_code及模型run/summary。systemd失败unit保留供Result/ExecMainStatus取证。用户管理器须可跨断开存在（Linger=yes），`session`仅本地核验，不可静默作为抵抗runtime回收的替代。当前019只做CPU验证，新训练配置与预算见[修复后方案](../../docs/proposals/repair_before_retraining/README.md)。
+
+
+候选v2可拆成共享阶段与独立融合臂：`fit --phase shared`先保存shared.pt、identity-records/与唯一阈值；随后`fit --phase arm --shared-from /已完成021输出 --route attribute-u --save-predictions`（其余臂替换route）。每臂有自己的输出与限时，只加载同normalizer/S/模型/loss/身份记录，不重训teacher/u或选阈值。默认full入口保持旧行为，shared不接受--save-predictions。正式配置和当前GPU队列以[交接索引](../../HandOver/Handover.md)为准，旧null草案不执行。

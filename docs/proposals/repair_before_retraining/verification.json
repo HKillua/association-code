@@ -38,5 +38,26 @@
     "dropout": 0,
     "cpu_max_gradient_difference": 1.5e-12,
     "cuda_capacity_or_speed_verified": false
+  },
+  "split_execution": {
+    "unit_suite": {
+      "command": "python -m unittest discover -s tests",
+      "tests": 306,
+      "seconds": 17.126,
+      "exit_code": 0
+    },
+    "new_checks": 3,
+    "equivalence": "Synthetic CPU dropout=.25: full vs shared + four independent arms; model/objective/Adam states, sampling and loss history, scores, physical NPZ and evaluation equal excluding timing.",
+    "independent_review": "Core split protocol and six task commands independently reviewed; no blocking findings.",
+    "identity_selection": "teacher endpoint once; arms load fixed records/threshold without refit or rescoring",
+    "budget_seconds": {
+      "reference": 86400,
+      "shared": 9600,
+      "each_of_four_arms": 1200,
+      "candidate_total": 14400
+    },
+    "linux_systemd_live_verified": false,
+    "gpu_runs": 0,
+    "real_MTAD_v2_training_results": false
   }
 }
