@@ -18,6 +18,7 @@ wandb/
 *.zip
 *.tar
 *.tar.gz
+!HandOver/results/STAGEWISE-COMPLETION-20261019-028/021/identity-records.tar.gz
 *.7z
 *.pt
 *.pth

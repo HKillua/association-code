@@ -12,8 +12,9 @@ import time
 import numpy as np
 import torch
 
-from association.evaluation.tmtaff import _inference_device, _registered, aggregate_fusion_reports, scene_input_support
-from association.evaluation.scene import evaluate_full_scene, simple_fusion_outputs, single_source_outputs
+from association.evaluation.tmtaff import _inference_device, _registered, _aggregate_regions, aggregate_fusion_reports, scene_input_support
+from association.evaluation.scene import evaluate_full_scene, simple_fusion_outputs, single_source_outputs, INPUT_DISTANCE_REGIONS
+from association.evaluation.physical import evaluate_aligned_fusion
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
 from association.evaluation.association import evaluate_scenes, select_threshold
 from association.training.common import normalize_scene, stable_evaluation_parameters
@@ -101,21 +102,27 @@ def _finite_tensor(value, shape, name):
         raise FloatingPointError(f'nonfinite {name}')
 
 
-def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
-                     pair_batch_size, use_utility_identity, fixed, check, progress=None):
+def _validate_normalizer(model, normalizer):
     # Encoding and physical decoding must use the same frozen training moments.
     for key, buffer in (('mean', model.state_mean), ('std', model.state_std)):
         expected = torch.as_tensor(normalizer[key], dtype=torch.float32).to(dtype=buffer.dtype)
         if not torch.equal(buffer.detach().cpu(), expected):
             raise ValueError('evaluation normalizer differs from model physical-state moments')
     if _is_v2(model):
-        from association.data.cooperative import normalize_cooperative_scene, validate_cooperative_representation
+        from association.data.cooperative import validate_cooperative_representation
         representation = validate_cooperative_representation(normalizer, model.config)
         for key in ('log_speed_mean', 'log_speed_std', 'speed_bias'):
             buffer = getattr(model, key)
             expected = torch.as_tensor(representation[key], dtype=torch.float32).to(dtype=buffer.dtype)
             if not torch.equal(buffer.detach().cpu(), expected):
                 raise ValueError('evaluation representation differs from frozen model buffers')
+
+
+def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
+                     pair_batch_size, use_utility_identity, fixed, check, progress=None):
+    _validate_normalizer(model, normalizer)
+    if _is_v2(model):
+        from association.data.cooperative import normalize_cooperative_scene
     encoded_keys = _ENCODED + (('native_positions',) if _is_v2(model) else ())
     records, cached = [], []
     stage = 'encoding_fixed_identity' if fixed is not None else 'association_scoring'
@@ -356,3 +363,118 @@ def evaluate_cooperative(model, normalizer, scenes, *, device, batch_tracks,
     notify(dict(stage='completed', completed_scenes=len(scenes), total_scenes=len(scenes),
                 scene_id=None, fusion_forward_count=decode_count))
     return result
+
+
+@stable_evaluation_parameters
+@torch.inference_mode()
+def evaluate_cooperative_completion(model, normalizer, scenes, *, device='cpu', check=None,
+                                    progress=None):
+    """Evaluate every native fragment independently, without association or helpers.
+
+    Only the fragment's visible inputs and query times enter encode/decode. Its
+    identity selects reference rows afterwards; repeated identities retain every
+    fragment. Position-base controls have no speed or heading prediction. Metrics
+    pool point numerators; per-fragment rows and scene reports retain coverage.
+    This is V_select development evaluation of an existing v2 teacher, not a
+    pure-completion training claim or a new artificial endpoint-hiding protocol.
+    """
+    from association.data.cooperative import normalize_cooperative_scene
+    if not _is_v2(model):
+        raise ValueError('independent completion requires support_residual_v2 and its position base')
+    scenes, device, dtype = _validate(model, scenes, device, 1, 1, False)
+    _validate_normalizer(model, normalizer)
+    model.eval()
+    started = time.monotonic()
+    regions = ('all', 'inside_support', 'before_support', 'after_support',
+               'exact_observation', 'inside_nonobserved')
+    per_scene, per_fragment = [], []
+    method_reports = {name: [] for name in ('model', 'position_base')}
+    total_fragments = sum(len(scene['node_ids']) for scene in scenes)
+    decoded = 0
+    for scene_index, scene in enumerate(scenes):
+        if check:
+            check()
+        values, observed = normalize_cooperative_scene(scene, normalizer, model.config)
+        n, q = len(values), model.config.length
+        predictions = np.empty((n, q, 4), dtype=np.float32)
+        base = np.full((n, q, 4), np.nan, dtype=np.float32)
+        for node in range(n):
+            if check:
+                check()
+            encoded = model.encode(torch.as_tensor(values[node:node+1], device=device, dtype=dtype),
+                                   torch.as_tensor(observed[node:node+1], device=device))
+            states = model.decode_group(encoded, [0], routing='plain')
+            positions = model.position_base(encoded, [0])
+            _finite_tensor(states, (q, 4), 'single-fragment physical states')
+            _finite_tensor(positions, (1, q, 2), 'single-fragment position base')
+            predictions[node] = states.detach().cpu().numpy()
+            base[node, :, :2] = positions[0].detach().cpu().numpy()
+            decoded += 1
+        # Reference identity, values and masks are used only after model calls.
+        truth = np.full((n, q, 4), np.nan)
+        valid = np.zeros((n, q, 4), dtype=bool)
+        targets = scene['fusion_targets']
+        for node, identity in enumerate(scene['identities']):
+            if identity in targets:
+                truth[node] = targets[identity]['states']
+                valid[node] = targets[identity]['valid']
+        support = scene_input_support(scene)
+        inside, nearest = support['support'], support['nearest_seconds']
+        before, after = np.zeros((n, q), bool), np.zeros((n, q), bool)
+        for node in range(n):
+            times = np.asarray(scene['native_times'])[node, scene['native_observed'][node]]
+            before[node] = scene['grid'] < times.min()
+            after[node] = scene['grid'] > times.max()
+        exact = nearest == 0
+        masks = dict(zip(regions, (np.ones((n, q), bool), inside, before, after,
+                                  exact, inside & ~exact)))
+        distance_masks = (nearest <= 300, (nearest > 300) & (nearest <= 600),
+                          (nearest > 600) & (nearest <= 1800),
+                          (nearest > 1800) & np.isfinite(nearest), ~np.isfinite(nearest))
+        model_valid = np.ones((n, q, 4), bool)
+        base_valid = np.zeros_like(model_valid)
+        base_valid[..., :2] = True
+        fragment_start = len(per_fragment)
+        for node in range(n):
+            per_fragment.append(dict(scene_id=str(scene['scene_id']), node_index=node,
+                node_id=str(scene['node_ids'][node]), identity=str(scene['identities'][node]),
+                source=str(scene['sources'][node]), query_count=q,
+                reference_declared=scene['identities'][node] in targets,
+                has_supervision=bool(valid[node].any()),
+                region_query_counts={key: int(mask[node].sum()) for key, mask in masks.items()},
+                methods={}))
+        methods = {}
+        for name, prediction, available in (('model', predictions, model_valid),
+                                             ('position_base', base, base_valid)):
+            def metric(mask, rows=slice(None)):
+                return evaluate_aligned_fusion(prediction[rows], truth[rows], valid[rows],
+                    prediction_valid=available[rows], region_mask=mask[rows])
+            report = dict(regions={key: metric(mask) for key, mask in masks.items()},
+                          input_distance_metrics={key: metric(mask) for key, mask in
+                                                  zip(INPUT_DISTANCE_REGIONS, distance_masks)})
+            methods[name] = report
+            method_reports[name].append(report)
+            for node in range(n):
+                per_fragment[fragment_start+node]['methods'][name] = metric(masks['all'], slice(node, node+1))
+        per_scene.append(dict(scene_id=str(scene['scene_id']), fragment_count=n,
+            reference_unavailable_fragment_count=int((~valid.any(axis=(1, 2))).sum()),
+            reference_targets_without_input=[str(identity) for identity in targets
+                                             if identity not in set(scene['identities'])],
+            methods=methods))
+        if progress is not None:
+            progress(dict(stage='single_fragment_completion', completed_scenes=scene_index+1,
+                total_scenes=len(scenes), completed_fragments=decoded, total_fragments=total_fragments,
+                scene_id=str(scene['scene_id']), elapsed_seconds=time.monotonic()-started))
+    if check:
+        check()
+    return dict(scene_count=len(scenes), fragment_count=total_fragments,
+        reference_unavailable_fragment_count=sum(row['reference_unavailable_fragment_count'] for row in per_scene),
+        methods={name: dict(regions=_aggregate_regions(reports, 'regions', regions),
+            input_distance_metrics=_aggregate_regions(reports, 'input_distance_metrics', INPUT_DISTANCE_REGIONS))
+            for name, reports in method_reports.items()},
+        per_scene=per_scene, per_fragment=per_fragment, completion_forward_count=decoded,
+        position_control='visible native position interpolation within support; endpoint hold outside; no speed/heading control',
+        region_definition='per-fragment retained native time span; exact_observation requires identical physical query time; inside_nonobserved includes interpolation and internal gaps',
+        error_scope='point-pooled metrics over all fragments, retaining repeated identities and no-reference rows; not target-weighted',
+        scope='V_select single-fragment development; no artificial hiding, helpers or identity scores',
+        elapsed_seconds=time.monotonic()-started, test_opened=False)
