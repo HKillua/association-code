@@ -12,7 +12,7 @@ MTAD不完整量测下的**补全、关联、融合**研究。用户2026-10-20�
 - **baseline须以论文结果校准**：已补充`paper_metrics`及逐场计数，原指标、阈值选择不变。最新核对020 TCM1000步仅覆盖37,862/54,792条训练片段（69.10%）；未发现next-time/逆序/mask确定错误，训练量不足与递推目标不匹配仍需区分。低分不能用于宣称超过TMTAFF。[协议差异](docs/research_brief.md#baseline与论文结果的校准2026-10-19)、[本地续审](docs/proposals/repair_before_retraining/030-repair-analysis.md#7-本地baseline续审与结果准备2026-10-20)。
 - **030进一步分析已有具体改法**：原量测速度/航向控制优于当前teacher；9002留身份跨源校准oracle位置误差4488.71→722.79米，证明共享偏移有可利用信息，但真值配对收益不是算法成绩。片段平均运动外推整体有效、逐场不稳定；baseline特征MSE主要对航向敏感。推荐先做速度输出坐标单因素修正，再分别验证观测底座、场景校准与动态补全。[数据、方案与复算脚本](docs/proposals/repair_before_retraining/030-repair-analysis.md)。
 - **031/032已完成并深挖**：各1000步、完整V64。log速度输出使MAE从29.4878降至19.7287（−33.1%），但航向70.3884°→89.9213°、支撑内位置2105.70→2185.77米；片段内部速度仍近常量。不能判为补全通过或恢复四臂。全V原量测控制显示来源/支撑差异，9002支撑内速度反而是神经B更好；不统一复制观测。[完整分析与下一方案](docs/proposals/repair_before_retraining/031-032-analysis.md)。
-- **本地baseline入口已补齐**：现有CLI增加可选`--phase tcm`及完整V一步/自然query评价，默认完整流程保持。下一提案是原目标TCM4000步，一次单卡、4小时仅提醒；用户已批准033，唯一新READY见交接索引；不自动恢复020/022—025。[实现规格](docs/specs/tmtaff-tcm-phase.md)、[交接索引](HandOver/Handover.md)。
+- **本地baseline入口已补齐**：现有CLI增加可选`--phase tcm`及完整V一步/自然query评价，默认完整流程保持。下一提案是原目标TCM4000步，一次单卡、4小时仅提醒；033已按服务器回执于北京时间03:38:46启动，独立worktree运行，尚无终态；不自动恢复020/022—025。[实现规格](docs/specs/tmtaff-tcm-phase.md)、[交接索引](HandOver/Handover.md)。
 - **候选不等待033**：已准备可选航向“观测底座＋角度残差”，保留032其它设置；034为一次1000步的待批准草案。未知对应下场景平移控制与固定分组的效用融合设计可独立推进。[当前本地工作](docs/research_brief.md#不等待033的本地推进2026-10-20)、[航向规格](docs/specs/cooperative-heading-residual.md)。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和旧交接在Git历史中追溯。21分钟窗口未采用，当前先验证已实现修正版。
 
