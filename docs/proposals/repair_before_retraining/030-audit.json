@@ -1,0 +1,636 @@
+{
+  "recorded_at": "2026-10-19",
+  "source": "HandOver/results/COMPLETION-RESIDUAL-20261019-030",
+  "scope": "Local audit of frozen teacher1000 self predictions in four V scenes. No new model forward, fit, optimizer update, threshold selection, normalizer refit or T_test access.",
+  "population": {
+    "scenes": [
+      "1671",
+      "2056",
+      "290",
+      "113"
+    ],
+    "fragments": 86,
+    "identities": 21,
+    "queries": 5504,
+    "valid_position": 4008,
+    "without_reference": 1496
+  },
+  "method": "Residual directions use local north/east tangent approximation at base latitude and longitude shortest arc; reported MAE uses same spherical haversine radius 6371000m as repository. No model updates or calibration. Four V scenes only.",
+  "formula_notes": {
+    "residual": "prediction - position_base; longitude shortest arc; local N/E at base latitude for directions and variation",
+    "needed_correction": "target - position_base, same local tangent",
+    "within_fragment_rms": "sqrt(mean(sum((vector - mean(vector))**2)))",
+    "energy_fraction": "1 - total within-fragment squared residual / total squared residual; descriptive, not R-squared",
+    "regional_loss": "Original FusionLoss in FP32; disjoint regional losses aggregated by per-attribute valid-point counts"
+  },
+  "overall": {
+    "all": {
+      "prediction_query_n": 5504,
+      "valid_n": 4008,
+      "fragments_with_valid": 86,
+      "base_mae_m": 8530.00470983735,
+      "pred_mae_m": 8559.441525719914,
+      "delta_mae_m": 29.43681588256352,
+      "point_improved_n": 1933,
+      "fragment_mean_improved_n": 40
+    },
+    "inside_support": {
+      "prediction_query_n": 1608,
+      "valid_n": 1608,
+      "fragments_with_valid": 84,
+      "base_mae_m": 1927.1044087293058,
+      "pred_mae_m": 2047.425319592255,
+      "delta_mae_m": 120.3209108629494,
+      "point_improved_n": 447,
+      "fragment_mean_improved_n": 28
+    },
+    "before_support": {
+      "prediction_query_n": 1841,
+      "valid_n": 1253,
+      "fragments_with_valid": 59,
+      "base_mae_m": 12484.587739934148,
+      "pred_mae_m": 12433.180071603061,
+      "delta_mae_m": -51.407668331085866,
+      "point_improved_n": 902,
+      "fragment_mean_improved_n": 40
+    },
+    "after_support": {
+      "prediction_query_n": 2055,
+      "valid_n": 1147,
+      "fragments_with_valid": 59,
+      "base_mae_m": 13466.684001441929,
+      "pred_mae_m": 13457.024491248852,
+      "delta_mae_m": -9.659510193075407,
+      "point_improved_n": 584,
+      "fragment_mean_improved_n": 35
+    },
+    "exact_observation": {
+      "prediction_query_n": 9,
+      "valid_n": 9,
+      "fragments_with_valid": 9,
+      "base_mae_m": 1.1635595111744748,
+      "pred_mae_m": 205.24529831658342,
+      "delta_mae_m": 204.08173880540892,
+      "point_improved_n": 0,
+      "fragment_mean_improved_n": 0
+    },
+    "inside_nonobserved": {
+      "prediction_query_n": 1599,
+      "valid_n": 1599,
+      "fragments_with_valid": 84,
+      "base_mae_m": 1937.9446011264058,
+      "pred_mae_m": 2057.7940626763584,
+      "delta_mae_m": 119.84946154995245,
+      "point_improved_n": 447,
+      "fragment_mean_improved_n": 28
+    }
+  },
+  "by_source": {
+    "9001": {
+      "all": {
+        "prediction_query_n": 2880,
+        "valid_n": 2171,
+        "fragments_with_valid": 45,
+        "base_mae_m": 8444.514314672677,
+        "pred_mae_m": 8536.77671705208,
+        "delta_mae_m": 92.26240237940226,
+        "point_improved_n": 687,
+        "fragment_mean_improved_n": 11
+      },
+      "inside_support": {
+        "prediction_query_n": 918,
+        "valid_n": 918,
+        "fragments_with_valid": 45,
+        "base_mae_m": 1.2586790068071623,
+        "pred_mae_m": 241.6202233302532,
+        "delta_mae_m": 240.36154432344608,
+        "point_improved_n": 0,
+        "fragment_mean_improved_n": 0
+      },
+      "before_support": {
+        "prediction_query_n": 939,
+        "valid_n": 658,
+        "fragments_with_valid": 24,
+        "base_mae_m": 13737.601974200508,
+        "pred_mae_m": 13698.735930164527,
+        "delta_mae_m": -38.86604403598177,
+        "point_improved_n": 437,
+        "fragment_mean_improved_n": 15
+      },
+      "after_support": {
+        "prediction_query_n": 1023,
+        "valid_n": 595,
+        "fragments_with_valid": 24,
+        "base_mae_m": 15617.719345886053,
+        "pred_mae_m": 15626.498564125437,
+        "delta_mae_m": 8.779218239386303,
+        "point_improved_n": 250,
+        "fragment_mean_improved_n": 11
+      },
+      "exact_observation": {
+        "prediction_query_n": 9,
+        "valid_n": 9,
+        "fragments_with_valid": 9,
+        "base_mae_m": 1.1635595111744748,
+        "pred_mae_m": 205.24529831658342,
+        "delta_mae_m": 204.08173880540892,
+        "point_improved_n": 0,
+        "fragment_mean_improved_n": 0
+      },
+      "inside_nonobserved": {
+        "prediction_query_n": 909,
+        "valid_n": 909,
+        "fragments_with_valid": 45,
+        "base_mae_m": 1.2596207839916445,
+        "pred_mae_m": 241.9803711026658,
+        "delta_mae_m": 240.72075031867413,
+        "point_improved_n": 0,
+        "fragment_mean_improved_n": 0
+      }
+    },
+    "9002": {
+      "all": {
+        "prediction_query_n": 2624,
+        "valid_n": 1837,
+        "fragments_with_valid": 41,
+        "base_mae_m": 8631.038813213781,
+        "pred_mae_m": 8586.227208690989,
+        "delta_mae_m": -44.81160452279135,
+        "point_improved_n": 1246,
+        "fragment_mean_improved_n": 29
+      },
+      "inside_support": {
+        "prediction_query_n": 690,
+        "valid_n": 690,
+        "fragments_with_valid": 39,
+        "base_mae_m": 4489.316553490543,
+        "pred_mae_m": 4449.931230271266,
+        "delta_mae_m": -39.385323219276536,
+        "point_improved_n": 447,
+        "fragment_mean_improved_n": 28
+      },
+      "before_support": {
+        "prediction_query_n": 902,
+        "valid_n": 595,
+        "fragments_with_valid": 35,
+        "base_mae_m": 11098.901410274879,
+        "pred_mae_m": 11033.62418095862,
+        "delta_mae_m": -65.27722931625979,
+        "point_improved_n": 465,
+        "fragment_mean_improved_n": 25
+      },
+      "after_support": {
+        "prediction_query_n": 1032,
+        "valid_n": 552,
+        "fragments_with_valid": 35,
+        "base_mae_m": 11148.086121108134,
+        "pred_mae_m": 11118.551532260502,
+        "delta_mae_m": -29.53458884763105,
+        "point_improved_n": 334,
+        "fragment_mean_improved_n": 24
+      },
+      "exact_observation": {
+        "prediction_query_n": 0,
+        "valid_n": 0
+      },
+      "inside_nonobserved": {
+        "prediction_query_n": 690,
+        "valid_n": 690,
+        "fragments_with_valid": 39,
+        "base_mae_m": 4489.316553490543,
+        "pred_mae_m": 4449.931230271266,
+        "delta_mae_m": -39.385323219276536,
+        "point_improved_n": 447,
+        "fragment_mean_improved_n": 28
+      }
+    }
+  },
+  "output_constancy": {
+    "all_query_n": 5504,
+    "global_mean_N_E_m": [
+      -43.561283328478005,
+      82.62542812585453
+    ],
+    "global_mean_fraction_raw_energy": 0.13281071337317685,
+    "fragment_mean_fraction_raw_energy": 0.9999476651953344,
+    "within_rms_m": {
+      "n": 86,
+      "mean": 1.7424155861539599,
+      "median": 1.7132714141880174,
+      "p05": 0.7832296904256644,
+      "p95": 3.332241871268907,
+      "min": 0.44660497587103243,
+      "max": 3.778683816222226
+    },
+    "within_fraction_energy": {
+      "n": 86,
+      "mean": 0.0002080760698400487,
+      "median": 6.342569206338302e-05,
+      "p05": 1.8527970679268915e-05,
+      "p95": 0.0005502765839608854,
+      "min": 8.30813376146928e-06,
+      "max": 0.006487381855856961
+    },
+    "within_rms_lt_10m_n": 86,
+    "within_rms_lt_30m_n": 86,
+    "mean_vector_N_E_ranges": [
+      [
+        -299.34161078342754,
+        -283.28595474259816
+      ],
+      [
+        155.5893719461165,
+        565.0818580431899
+      ]
+    ],
+    "speed_within_std": {
+      "n": 86,
+      "mean": 0.0006377058272532067,
+      "median": 0.0005047682533904998,
+      "p05": 0.0003121441162706551,
+      "p95": 0.001912396468111369,
+      "min": 0.000290047127564538,
+      "max": 0.0021141446975298022
+    },
+    "course_circular_std_deg": {
+      "n": 86,
+      "mean": 0.14855765922272957,
+      "median": 0.1224781576697583,
+      "p05": 0.07290472329560305,
+      "p95": 0.45170847077933174,
+      "min": 0.06014210545988649,
+      "max": 0.5478252170917002
+    }
+  },
+  "speed_output": {
+    "all_prediction_quantiles_0_1_10_50_90_99_100": [
+      41.85580062866211,
+      41.856952896118166,
+      41.87602195739746,
+      41.956382751464844,
+      42.11950492858887,
+      42.334463653564455,
+      42.338077545166016
+    ],
+    "valid_prediction_std": 0.08541373908519745,
+    "valid_target_quantiles_0_1_10_50_90_99_100": [
+      0.5926273398744123,
+      2.2202851936560917,
+      7.817882350264551,
+      21.04497541731287,
+      45.46482667619048,
+      87.35458853174607,
+      1113.2774509602004
+    ],
+    "valid_target_std": 40.370520936740796,
+    "within_fragment_prediction_std_min_median_max": [
+      0.0002900738036260009,
+      0.0005047767190262675,
+      0.002114147413522005
+    ],
+    "within_fragment_prediction_range_min_median_max": [
+      0.001255035400390625,
+      0.0022792816162109375,
+      0.010585784912109375
+    ],
+    "within_fragment_target_std_min_median_max": [
+      2.6938730996956837,
+      15.504592425714314,
+      136.48125767298896
+    ],
+    "within_fragment_target_range_min_median_max": [
+      13.237065099841562,
+      71.05321415406341,
+      1108.3259789602005
+    ],
+    "linear_correlation_speed_only": 0.05790616113446625
+  },
+  "target_variation": {
+    "all": {
+      "all": {
+        "residual_within_rms_m": 1.6719371286320572,
+        "needed_correction_within_rms_m": 5049.247128728349,
+        "rms_ratio": 0.00038386581945558786
+      },
+      "inside_support": {
+        "residual_within_rms_m": 1.6091370825468594,
+        "needed_correction_within_rms_m": 1.467774562234653,
+        "rms_ratio": 0.7000572283715949
+      },
+      "before_support": {
+        "residual_within_rms_m": 1.5817396795456855,
+        "needed_correction_within_rms_m": 4413.082043806522,
+        "rms_ratio": 0.0003348447903107632
+      },
+      "after_support": {
+        "residual_within_rms_m": 1.3371728000117526,
+        "needed_correction_within_rms_m": 4057.8107292461978,
+        "rms_ratio": 0.00039548217775608243
+      }
+    },
+    "9001": {
+      "all": {
+        "residual_within_rms_m": 1.6671877444366545,
+        "needed_correction_within_rms_m": 5077.799922677394,
+        "rms_ratio": 0.00032965855328890447
+      },
+      "inside_support": {
+        "residual_within_rms_m": 1.6328143005974964,
+        "needed_correction_within_rms_m": 1.2168697109181787,
+        "rms_ratio": 1.285208225592296
+      },
+      "before_support": {
+        "residual_within_rms_m": 1.4120429951024929,
+        "needed_correction_within_rms_m": 4609.215947465704,
+        "rms_ratio": 0.0002689922998043374
+      },
+      "after_support": {
+        "residual_within_rms_m": 1.3184913258164963,
+        "needed_correction_within_rms_m": 4561.000867678285,
+        "rms_ratio": 0.00027556923215766606
+      }
+    },
+    "9002": {
+      "all": {
+        "residual_within_rms_m": 1.6766865128274602,
+        "needed_correction_within_rms_m": 4921.643156774089,
+        "rms_ratio": 0.0004153021541256639
+      },
+      "inside_support": {
+        "residual_within_rms_m": 1.5304019743257067,
+        "needed_correction_within_rms_m": 415.4038148531269,
+        "rms_ratio": 0.0033510864612894746
+      },
+      "before_support": {
+        "residual_within_rms_m": 1.656283437259011,
+        "needed_correction_within_rms_m": 3292.2248248830497,
+        "rms_ratio": 0.000390880457011481
+      },
+      "after_support": {
+        "residual_within_rms_m": 1.4316141652944678,
+        "needed_correction_within_rms_m": 2935.447001400599,
+        "rms_ratio": 0.00046097713301741436
+      }
+    }
+  },
+  "9002_inside_mean_correction": {
+    "summary": {
+      "model_mean_magnitude_m": {
+        "n": 38,
+        "mean": 217.1761923191167,
+        "median": 162.47236905001847,
+        "p05": 57.755349621476235,
+        "p95": 504.51438640520223,
+        "min": 27.421607994596094,
+        "max": 565.9622056565006
+      },
+      "needed_mean_magnitude_m": {
+        "n": 38,
+        "mean": 4521.0690328566225,
+        "median": 4430.563175134694,
+        "p05": 3145.689922588623,
+        "p95": 5880.0956235648555,
+        "min": 3091.0609382664247,
+        "max": 5930.231044999548
+      },
+      "model_within_rms_m": {
+        "n": 38,
+        "mean": 1.4782386712806204,
+        "median": 1.5304019743257067,
+        "p05": 0.3687973624612887,
+        "p95": 2.3636983771059064,
+        "min": 0.31813171151730096,
+        "max": 3.4668715968371444
+      },
+      "needed_within_rms_m": {
+        "n": 38,
+        "mean": 503.58078396613763,
+        "median": 415.4038148531269,
+        "p05": 177.5534859647825,
+        "p95": 791.3801279521163,
+        "min": 108.83664181053294,
+        "max": 3019.0066439395296
+      },
+      "needed_variation_over_mean": {
+        "n": 38,
+        "mean": 0.11485488023934524,
+        "median": 0.09976346335391563,
+        "p05": 0.03875021038979146,
+        "p95": 0.2317631961136354,
+        "min": 0.018841487445012118,
+        "max": 0.5617137937660034
+      },
+      "model_over_needed_mean_ratio": {
+        "n": 38,
+        "mean": 0.04842869893483873,
+        "median": 0.04432097467771341,
+        "p05": 0.010050245265878298,
+        "p95": 0.09861965801816228,
+        "min": 0.0062719315784152225,
+        "max": 0.10974765378623783
+      },
+      "model_projection_over_needed_mean": {
+        "n": 38,
+        "mean": 0.017480812730755402,
+        "median": 0.014281651517750953,
+        "p05": -0.02963291971037135,
+        "p95": 0.08191414280734939,
+        "min": -0.06454119426971142,
+        "max": 0.09916496939837154
+      },
+      "mean_vector_cosine": {
+        "n": 38,
+        "mean": 0.31719389589166813,
+        "median": 0.6128622181090013,
+        "p05": -0.9440881625372028,
+        "p95": 0.9742678186598945,
+        "min": -0.9486064931833917,
+        "max": 0.987068927005601
+      },
+      "needed_fragment_mean_energy_fraction": {
+        "n": 38,
+        "mean": 0.9811776938777702,
+        "median": 0.9901444519922402,
+        "p05": 0.9490219574048434,
+        "p95": 0.9984556060528786,
+        "min": 0.7601543011056494,
+        "max": 0.9996451243323068
+      }
+    },
+    "positive_direction_n": 28,
+    "n_fragments": 38
+  },
+  "objective": {
+    "attribute_order": [
+      "latitude",
+      "longitude",
+      "speed",
+      "course"
+    ],
+    "log_variance": [
+      -0.090937539935112,
+      -0.09069470316171646,
+      0.05841109901666641,
+      -0.04083060100674629
+    ],
+    "data_weights": [
+      0.547600269317627,
+      0.5474673509597778,
+      0.4716310501098633,
+      0.5208378434181213
+    ],
+    "regularizer_total": 2.693258762359619,
+    "regularizer_fraction_of_value": 0.7406486669127936,
+    "position_value_fraction_outside": 0.9022921021923234,
+    "regions": {
+      "all": {
+        "counts": [
+          4008,
+          4008,
+          4008,
+          4008
+        ],
+        "raw_loss": [
+          0.03722386807203293,
+          0.06342454999685287,
+          1.1015255451202393,
+          0.7074605822563171
+        ],
+        "weighted_loss": [
+          0.020383800181289047,
+          0.03472287037259303,
+          0.519513649567898,
+          0.36847224396570866
+        ],
+        "sum_weighted_data": 0.9430925640874888,
+        "position_share_data": 0.058431878961109,
+        "max_abs_report_raw_difference": 7.450580596923828e-09
+      },
+      "inside_support": {
+        "counts": [
+          1608,
+          1608,
+          1608,
+          1608
+        ],
+        "raw_loss": [
+          0.010065469890832901,
+          0.014446279965341091,
+          1.4138368368148804,
+          0.6742581725120544
+        ],
+        "weighted_loss": [
+          0.005511854023028562,
+          0.007908866623848598,
+          0.6668093520310094,
+          0.35117917247822206
+        ],
+        "sum_weighted_data": 1.0314092451561088,
+        "position_share_data": 0.013012022831776993,
+        "max_abs_report_raw_difference": 0.0
+      },
+      "before_support": {
+        "counts": [
+          1253,
+          1253,
+          1253,
+          1253
+        ],
+        "raw_loss": [
+          0.05689939111471176,
+          0.08975955098867416,
+          0.8175252676010132,
+          0.7410890460014343
+        ],
+        "weighted_loss": [
+          0.03115812189842515,
+          0.04914042360310855,
+          0.38557030045001284,
+          0.38598722050018
+        ],
+        "sum_weighted_data": 0.8518560664517265,
+        "position_share_data": 0.09426304356322161,
+        "max_abs_report_raw_difference": 7.450580596923828e-09
+      },
+      "after_support": {
+        "counts": [
+          1147,
+          1147,
+          1147,
+          1147
+        ],
+        "raw_loss": [
+          0.05380388721823692,
+          0.10331933945417404,
+          0.9739368557929993,
+          0.7172713279724121
+        ],
+        "weighted_loss": [
+          0.029463023131041766,
+          0.05656396507389072,
+          0.4593388620383507,
+          0.37358205160680313
+        ],
+        "sum_weighted_data": 0.9189479018500863,
+        "position_share_data": 0.09361465218184545,
+        "max_abs_report_raw_difference": 1.1920928955078125e-07
+      },
+      "exact_observation": {
+        "counts": [
+          9,
+          9,
+          9,
+          9
+        ],
+        "raw_loss": [
+          0.0005043529090471566,
+          0.0010658130049705505,
+          0.5931691527366638,
+          0.7125305533409119
+        ],
+        "weighted_loss": [
+          0.00027618378882535155,
+          0.0005834978224497078,
+          0.27975699039797064,
+          0.3711128767716012
+        ],
+        "sum_weighted_data": 0.6517295487808469,
+        "position_share_data": 0.0013190772351556201,
+        "max_abs_report_raw_difference": 1.1920928955078125e-07
+      }
+    },
+    "raw_residual_per_point_derivative_rms_all": [
+      0.25860868717115665,
+      0.31359030279830513,
+      0.02359765418606797,
+      0.6455523409966721
+    ]
+  },
+  "speed_initialization_comparison": {
+    "fixed_T_core_typical_speed": 53.310449838974876,
+    "initial_constant_raw_log_loss": 1.5190175645106734,
+    "current_raw_log_loss_fp64": 1.1015256740911006,
+    "current_mae": 23.114971193749263,
+    "current_prediction_global_mean": 41.98745346069336
+  },
+  "conclusions": [
+    "Inside-support degradation is source-dependent: 9001 worsens at every evaluable point; 9002 modestly improves. 9001/reference reuse limits denoising claims.",
+    "Position residual is nearly constant within each fragment; speed nearly constant across all queries. This is an output observation, not proof of the internal cause.",
+    "For 9002 inside support, required correction is itself predominantly a per-fragment translation; too-small amplitude and direction matter. Constant shape alone is not a failure proof there.",
+    "Outside support the required correction varies by kilometers while predicted residual varies by meters.",
+    "Loss reconstruction found no denominator mismatch. Regularizer has zero direct prediction-network gradient. Loss-value shares and differently initialized head norms do not establish gradient domination.",
+    "No post-hoc V fitting, hardcoded source offsets, forced zero residual or increased loss weight is justified by these four scenes alone. Model repair remains unvalidated."
+  ],
+  "caveats": [
+    "Per-output derivatives do not include decoder/encoder Jacobians, pair cross reconstruction, BCE, optimizer or clipping. They cannot establish dominant training gradient.",
+    "Position and speed head started zero while course used Xavier; final row norm comparison is not proof of no training.",
+    "All variation results use same four scenes; 4,008 reference-supervised points, 86 fragments; 21 identities create correlated repetitions.",
+    "Actual 021 training gradient conflict/collapse chronology cannot be reconstructed without saved batch gradients/checkpoints."
+  ],
+  "software_verification": {
+    "change": "Add paper_metrics and ITSA/MSTSA per_scene counts, retain all old metrics and threshold selection",
+    "focused_tests_passed": 35,
+    "independent_review": "passed; random independent count oracle over 100 populations, overall/ITSA/MSTSA",
+    "does_not_improve_model": true
+  }
+}

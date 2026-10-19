@@ -65,6 +65,36 @@ def _counts(labels, predictions):
             "p_fa": 1 - precision if precision is not None else None}
 
 
+def _paper_metrics(active):
+    """Scene averages; undefined denominators never silently remove a scene."""
+    recalls = [row["recall"] for row in active if row["recall"] is not None]
+    false_acceptances = [row["p_fa"] for row in active if row["p_fa"] is not None]
+    defined_means = {
+        "m_pca": float(np.mean(recalls)) if recalls else None,
+        "m_pfa": float(np.mean(false_acceptances)) if false_acceptances else None,
+    }
+    weighted = [row for row in active if row["tp"] + row["fp"] > 0]
+    prediction_count = sum(row["tp"] + row["fp"] for row in weighted)
+    weighted_recall = None
+    if prediction_count and all(row["recall"] is not None for row in weighted):
+        weighted_recall = sum((row["tp"] + row["fp"]) * row["recall"]
+                              for row in weighted) / prediction_count
+    return {
+        "unit": "fraction", "eligible_scene_count": len(active),
+        "m_pca": defined_means["m_pca"] if len(recalls) == len(active) else None,
+        "m_pfa": defined_means["m_pfa"] if len(false_acceptances) == len(active) else None,
+        "mw_pca": weighted_recall,
+        "mw_pfa": sum(row["fp"] for row in weighted) / prediction_count if prediction_count else None,
+        "defined_scene_count": {"m_pca": len(recalls), "m_pfa": len(false_acceptances)},
+        "defined_only_mean": defined_means,
+        "predicted_positive_count": prediction_count,
+        "prediction_weighted_scene_count": len(weighted),
+        "definition": "eligible: pair_count > 0; m: equal scene weights; "
+                      "PCA=TP/(TP+FN), PFA=FP/(TP+FP); mw: weights TP+FP; "
+                      "any undefined positive-weight term makes the population metric null",
+    }
+
+
 def _aggregate(rows):
     active = [row for row in rows if row["pair_count"] > 0]
     tp, fp, fn, tn = (sum(row[key] for row in active) for key in ("tp", "fp", "fn", "tn"))
@@ -82,7 +112,8 @@ def _aggregate(rows):
             "micro_f1": 2 * tp / denominator if denominator else (1.0 if active else None),
             "micro_precision": precision, "micro_recall": recall,
             "p_ca": recall, "p_fa": 1 - precision if precision is not None else None,
-            "tp": tp, "fp": fp, "fn": fn, "tn": tn}
+            "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+            "paper_metrics": _paper_metrics(active)}
 
 
 def evaluate_scenes(records, threshold):
@@ -102,7 +133,8 @@ def evaluate_scenes(records, threshold):
                 row["f1"] = None
             destination.append(row)
     return {**_aggregate(rows), "threshold": threshold, "per_scene": rows,
-            "itsa": _aggregate(same_rows), "mstsa": _aggregate(cross_rows),
+            "itsa": {**_aggregate(same_rows), "per_scene": same_rows},
+            "mstsa": {**_aggregate(cross_rows), "per_scene": cross_rows},
             "coverage": {"all_scenes": len(records), "eligible_scenes": sum(bool(len(r["scores"])) for r in records),
                          "scenes_without_pairs": sum(not len(r["scores"]) for r in records)},
             "empty_f1_convention": "truth and prediction empty: 1; no eligible pairs: excluded from shared denominator"}
