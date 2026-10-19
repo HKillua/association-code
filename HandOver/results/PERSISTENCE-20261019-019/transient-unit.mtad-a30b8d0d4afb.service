@@ -1,0 +1,17 @@
+# This is a transient unit file, created programmatically via the systemd API. Do not edit.
+[Unit]
+Description=/home/wangguangjie/djs/mtad-field-20261016/bin/python /home/wangguangjie/djs/association-code/tools/experiments/launch_detached.py --_worker /home/wangguangjie/djs/association-code/runs/PERSISTENCE-20261019-019-attempt-1
+
+[Service]
+Type=exec
+Restart=no
+KillMode=control-group
+SendSIGKILL=yes
+RuntimeMaxSec=26.990s
+TimeoutStopSec=3s
+StandardInput=null
+WorkingDirectory=/home/wangguangjie/djs/association-code
+StandardOutput=append:/home/wangguangjie/djs/association-code/runs/PERSISTENCE-20261019-019-attempt-1/worker.stdout.log
+StandardError=append:/home/wangguangjie/djs/association-code/runs/PERSISTENCE-20261019-019-attempt-1/worker.stderr.log
+ExecStart=
+ExecStart="/home/wangguangjie/djs/mtad-field-20261016/bin/python" "/home/wangguangjie/djs/association-code/tools/experiments/launch_detached.py" "--_worker" "/home/wangguangjie/djs/association-code/runs/PERSISTENCE-20261019-019-attempt-1"
