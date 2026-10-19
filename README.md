@@ -1,6 +1,6 @@
 # association-code
 
-MTAD不完整量测下的**补全、关联、融合**研究。完整TMTAFF时间/输出尺度适配近似参考与自有候选并行验证，目标是得到可信的实验比较。
+MTAD不完整量测下的**补全、关联、融合**研究。当前按**补全→关联→融合**逐阶段核验；完整TMTAFF时间/输出尺度适配近似参考与自有候选在同阶段比较。
 
 **首要目标是推进实验，弄清结果。** 不以代码量、测试数或文档量代替研究进展；必要正确性检查通过即推进已批实验，不反复增加框架与准备轮次。长期约定见[AGENTS](AGENTS.md)。
 
@@ -8,7 +8,7 @@ MTAD不完整量测下的**补全、关联、融合**研究。完整TMTAFF时间
 
 - **017已FAILED**：外部SIGTERM于约5小时27分中断，未到预算上限；完整融合终评未开始。原件已pull并独立复算，不能用不同batch首末loss宣称位置变差。见[017分析与修复](docs/proposals/repair_before_retraining/README.md)。
 - **018候选已完成**：600更新、2371秒；基础恢复及关联仍弱，效用无稳定专属收益。见[实测分析](https://github.com/HKillua/association-code/blob/612afea/docs/results/cooperative018_local_review/README.md)。
-- **候选修正版已完成本地实现**：观测底座＋位置残差、log速度/圆周航向、支撑补全、局部关联与四臂属性残差融合；[当前方法与配置](docs/proposals/candidate_revision_after018/README.md)。已知修复与共享/单臂独立入口均已实现。参考020与共享021已由服务托管并行训练，四臂等待共享完成，见[当前执行队列](HandOver/Handover.md)。用户已取消墙时硬上限，新作业使用建议时长提醒；在途020/021仍有旧固化截止。
+- **候选修正版已完成本地实现**：观测底座＋位置残差、log速度/圆周航向、支撑补全、局部关联与四臂属性残差融合；[当前方法与配置](docs/proposals/candidate_revision_after018/README.md)。已知修复与共享/单臂独立入口均已实现。用户已授权先保留权重再停止020/021，四臂022—025暂停；[028收尾](HandOver/L2S-20261019-028.md)已发布，实际停止待服务器回执。当前先做[补全独立验证](docs/research_brief.md)，不因021成功自动启动下游。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和旧交接在Git历史中追溯。21分钟窗口未采用，当前先验证已实现修正版。
 
 ## 代码与资料
