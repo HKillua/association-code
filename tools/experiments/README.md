@@ -11,7 +11,7 @@
 
 参考和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
 
-旧pilot/profile/成本probe入口已删除。017、018均已结束；候选修正版和共享/独立臂入口已完成。用户已同意按参考24h＋候选合计4h拆分，当前019—025依赖与正式配置以[交接索引](../../HandOver/Handover.md)为准。研究方法见[候选规格](../../docs/proposals/candidate_revision_after018/README.md)，旧阶段见[历史摘要](../../docs/history/README.md)。
+旧pilot/profile/成本probe入口已删除。017、018均已结束；候选修正版和共享/独立臂入口已完成。用户已同意按参考24h＋候选合计4h拆分，当前队列依赖与正式配置以[交接索引](../../HandOver/Handover.md)为准。研究方法见[候选规格](../../docs/proposals/candidate_revision_after018/README.md)，旧阶段见[历史摘要](../../docs/history/README.md)。
 
 
 正式服务器训练从`launch_detached.py`的一次性systemd用户服务提交，已启动任务不依赖AI前台会话。示例接口：
