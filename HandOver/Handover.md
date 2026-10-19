@@ -7,31 +7,20 @@
 | 项目 | 最新状态与下一步 |
 | --- | --- |
 | [019](S2L-20261019-019.md) / [026](S2L-20261019-026.md) | 019转录错误FAILED；026退出0及独立服务托管已核，两项不重跑。 |
-| [020参考](S2L-20261019-020.md) | RUNNING。72b3bad已回传tam100原run/history/coverage；本地核1100更新=TCM1000/TAM100、全部loss/梯度有限、一次V完成708.240秒、history记录F1 .4245588143/64场景、TAM均时23.164249秒、test_opened=false。没有逐边scores，不称独立重算F1；仍缺checkpoint.selected.validation的P/R与V人口摘要，下面已明确允许CPU只读导出。尚无物理终评。旧截止约北京时间10月20日14:46:55/14:47:25。 ✅ **TAM@200 已落盘并按 `48046d6` 授权完成 checkpoint 的 CPU 只读元数据提取**（`torch.load(map_location='cpu', weights_only=True)` 一次成功，未回退 `weights_only=False`，未构造模型／未 forward／未读 ZIP，`states` 与 `optimizer` 未导出）。新目录 `results/REFERENCE-REPAIRED-20261019-020/snapshot-20261019-0935Z/`：`checkpoint-metadata.json` 175,698、`run/history/coverage` 的 gz（原 542,042／466,541（**1,200 行＝TCM1000＋TAM200**）／2,510,826）、launcher 四件与 `SOURCE_AND_TIME.txt`。**首个可复核 P／R**：`selected` 明标 **`stage TAM_FROZEN／update 200`**、`macro_f1 = 0.42525871846207886`、`threshold −0.000253647`（`selected_snapshot_copied=true` ⇒ 确实超过 TAM@100 的 .4245588，＋0.00070）；**tp 2,262／fp 11,391／fn 1,035／tn 14,320**，**micro precision 0.165678 ＝ 1.4577 倍先验（先验 3,297／29,008＝0.113658）**、recall `p_ca` 0.686078、`p_fa`（FDR）0.834322、FPR 0.4430、micro-F1 0.26690；`negative_scene_count 0` ⇒ 过并仍 **null 不可测**；`per_scene` 64 项全量回传。人口逐项对上预期：**V 64 场景／1,635 轨／29,008 对（正 3,297／负 25,711）／377 目标**，T_core 512／54,792／18,249,384／12,699。边界：017 的可核摘要无 tp／fp／tn，**不得把 1.4577 倍说成优于 017**。实测第二单价：**`t_TAM(100→200) = 22.027 秒/步`**（比第一百步快 5.1%）、验证 **694.653 秒**。条件情景更新：按实测 TAM/验证＋017/013 的 TFM/JOINT 原单价总需 **85,527 秒（余 813 秒）**；若 TFM/JOINT/终评按 1.1988 放大则 **97,123 秒（超 10,783）** ⇒ 仍取决于未被 020 实测的 TFM/JOINT 单价。照 `48046d6`：不提前接受失败、不从头重跑、不缩步骤、不为略超重写授权。 |
-| [021共享](S2L-20261019-021.md) | RUNNING attempt3。17:19快照原history703行teacher、progress完成703/下一步704、elapsed6814.155秒；run仍是阶段开始0步快照，不能据此说未训练。尚无该次身份V；teacher1000→身份V→utility200。旧截止约北京时间10月19日19:25:41/19:26:10。 `09:40:32Z`：teacher **854/1,000**、`elapsed 8,085.326`、阶段均 9.283 秒/步，而 `history` **最近 20 步 8.073／最近 50 步 8.064**（在加速）。余需 **2,177～2,502 秒** ⇒ 内部累计 **10,262～10,587 秒 ＜ 14,400（余 3,813～4,138）**，预计 **`10:17～10:22Z`** 出 `shared.pt`。不重复已收快照，待终态一次性回传 run/progress/history、identity-records（index.json＋全部场景 NPZ）与 `shared.pt` 路径登记。 |
+| [020参考](S2L-20261019-020.md) | RUNNING。a221083原件已核TCM1000/TAM200共1200更新；selected=TAM200。V64场景/1635轨/29008对/377目标符合协议，macro-F1 .425259（较TAM100＋0.07个百分点），P .165678/R .686078，TP2262/FP11391/FN1035/TN14320。逐场景计数与公式复算一致，无逐边scores；尚无TFM/JOINT及物理终评。旧截止约北京时间10月20日14:46:55/14:47:25。 |
+| [021共享](S2L-20261019-021.md) | RUNNING attempt3。17:40文字快照teacher854/1000；最新已收原history为17:19的703步，二者不混称独立核验。仍待teacher1000→身份V→utility200→shared_export，尚无该次身份分数；022—025尚未领取。旧截止约北京时间10月19日19:25:41/19:26:10。 |
 | [027修订](S2L-20261019-027.md) | COMPLETED，旧校准取件已核，不重复。四臂独立代码目录已备，尚未启动。 |
 | [022主方法](L2S-20261019-022.md) | WAITING_021；attribute-u300＋全V，按027两层advisory，建议20分钟。 |
 | [023普通融合](L2S-20261019-023.md) | WAITING_021；plain300＋全V，同上。 |
 | [024统一效用](L2S-20261019-024.md) | WAITING_021；scalar-u300＋全V，同上。 |
 | [025普通门控](L2S-20261019-025.md) | WAITING_021；learned-attribute300＋全V，输出仍COOPERATIVE-LEARNED。 |
 
-**本地对六项复核请求的结论：**
+**本地结论与下一步：**
 
-- 首分暂未显示改善：020报告.42456，017已核TAM100为.432985，约低0.84个百分点。但TCM已从100变1000、校准值71.589→75.693、验证频率/批次等也不同，不能称同总预算或单因素对照。两轮都做校准，不等于校准数值不影响结果。selection.candidate_count=28737是阈值候选数，不是关联人口，需原记录核实际对数及P/R。
-- 时间投影只作条件情景。按回执列出的单价复算总24.093h；把旧TFM/JOINT及终评同时乘1.264得27.912h，不是概率界限。基础情景的训练结束约83527秒，早于旧86340秒截止，可能截在终评而非训练；不能宣称“最可能在TFM/JOINT被杀”。TFM/JOINT还未实测、新微批会改变其成本，不据此从头重跑或缩步。
-- 补全LRU缓存驻CPU，不会涨满额外占约900MiB显存；nvidia-smi空闲值已扣当前占用，不再减一次本进程峰值。TAM不使用pair/track_microbatch，不能以其变更解释TAM慢。共卡成本不当独占基准。
-- 100步/阶段末才写checkpoint确有可观测性限制，旧history不能定位实时阶段。重复SIGTERM打断终态的修复已在9b06f80并用于新四臂，不重复实现，不热改活动020/021。真实故障照原件处理。
-- authorization.json已是advisory，86400/1200为建议值，不是待补的新额度。四臂20分钟也只是旧速估计，不能保证；无需为了推算略超重写授权或申请28小时从头重跑。
-
-**当前回传清单：72b3bad的020 run/history/coverage和021 run/progress/history已收到，不重复同一快照。现在优先补020检查点元数据；明确允许以下CPU只读提取，它不属于被禁止的模型推理，无需再等用户审批。**
-
-| 来源 | 现在可返回的已有内容 | 用途 |
-| --- | --- | --- |
-| 020：runs/REFERENCE-REPAIRED-20261019-020-attempt-1 | run.json、history.json、coverage.json，可gzip；对应-launch的status.json及有内容的stderr/stdout | 核阶段、loss/梯度、验证曲线、真实训练覆盖和异常；只报F1不足以定位问题。 |
-| 020：同目录checkpoint.pt | 权重留服务器；只用CPU torch.load(map_location='cpu', weights_only=True)导出checkpoint-metadata.json：cursor、elapsed_seconds、config、normalizer；selected去掉states后原样保留，尤其stage/update/threshold/validation；data_contract只导出下面的人口摘要 | 中期完整P/R、TP/FP/FN/TN及逐场景指标实际在selected.validation，不在run/history。必须标明被选快照的stage/update，若已到后续步，不冒充TAM100。 |
-| 021：实际attempt3 | run.json、progress.json、history.json；对应-launch/status.json和有变化的stderr | 核teacher/utility实际更新、身份BCE与物理分项loss、当前进度和失败。run可能停在阶段边界，应结合progress/history。 |
-
-020人口摘要直接读取checkpoint的data_contract=[训练场景列表,V场景列表]：每场景保留scene_id/split及节点数、pair_count、positive_count、target_ids数量、native_observed_counts之和，再汇总。预期V为64场景/1635轨/29008对（3297正、25711负）/377目标；若不同如实返回，不改筛选凑数。正常配置/normalizer保留原值，不能重新fit。CPU只反序列化已有检查点，不构造模型、不forward、不读ZIP；无须上传.pt权重。每包注明采集时间和实际源路径；文件可能分别处于不同更新游标，如实注明即可。
+- 020首两次关联验证仅小幅改善，误关联仍多。相较同场景“全接受”macro-F1 .347362有提升，不称全随机。p_fa=1−precision；无纯负场景只使该特定指标为null，FP仍可测。计数/人口、训练覆盖和成本详见[复核](../docs/proposals/repair_before_retraining/README.md)。
+- 原人口与协议一致，不能扩展为已排除所有时间/标签/监督问题。当前无已证实需停训的实现故障；继续已批固定工作，不为本次回执重扫数据、重选阈值或另开诊断。
+- 020 checkpoint元数据、run/history/coverage已收齐本次中期需要，**不重复取同一快照**。以后正常落盘更新再回，selected须标真实阶段/步数；CPU只读元数据导出已获准，不需再次审批。权重留服务器、不构造模型或额外forward。
+- 新四臂启动配置已设为advisory，时间是建议；在途020/021旧限制仍存在。成本外推不是失败概率；不从头重跑、不缩步、不注入进程。接近旧截止且未完成时按下文报告。
 
 **正常运行产生后再回，不为了取件追加计算：**
 
