@@ -176,6 +176,48 @@ class CooperativeRevisionCLITests(unittest.TestCase):
         self.assertEqual(execution['configuration']['model']['speed_output_policy'], 'scaled_log')
         self.assertFalse(execution['preparation']['test_opened'])
 
+    def test_observed_heading_teacher_exports_reloads_and_retains_group_cache(self):
+        from association.evaluation.cooperative import _score_and_cache, _take
+        from association.data.cooperative import normalize_cooperative_scene
+        fixture = native_fixture.make_native_zip_fixture(self)
+        fixture.config = self.configuration()
+        fixture.config['model'].update(speed_output_policy='scaled_log', heading_output_policy='observation_residual')
+        fixture.config['training'].update(utility_updates=0, adapt_updates=0)
+        self.assertEqual(self.invoke(['fit', '--device', 'cpu', '--cpu-threads', '1',
+            '--phase', 'teacher', '--save-predictions', *fixture.cli_args('heading')]), 0)
+        output = fixture.root/'heading'
+        model, payload = load_cooperative_checkpoint(output/'teacher.pt', device='cpu')
+        self.assertEqual(model.config.heading_output_policy, 'observation_residual')
+        self.assertEqual(payload['model_config']['heading_output_policy'], 'observation_residual')
+        self.assertEqual(model.heading_base_version.item(), 1)
+        self.assertEqual(runtime.read_json(output/'run.json')['status'], 'COMPLETED')
+        data = fixture.load(data_config={**fixture.data, 'reference_longitude_policy': 'shortest_arc'})
+        scenes = data['validation']
+        # A cached pair/group view must carry the raw native heading alongside
+        # its mask and time. This is additional tiny inference, never training.
+        _, cache = _score_and_cache(model, payload['normalizer'], scenes, torch.device('cpu'),
+            torch.float32, 2, 2, False, None, None)
+        self.assertIsNone(cache[1])
+        values, observed = normalize_cooperative_scene(scenes[0], payload['normalizer'], model.config)
+        direct = model.encode(torch.as_tensor(values), torch.as_tensor(observed))
+        subset = _take(cache[0], [1, 0], torch.device('cpu'))
+        torch.testing.assert_close(subset['native_headings'], direct['native_headings'][[1, 0]], rtol=0, atol=0)
+        with torch.no_grad():
+            cached_prediction = model.decode_group(subset, [0, 1])
+            direct_prediction = model.decode_group(direct, [1, 0])
+        torch.testing.assert_close(cached_prediction, direct_prediction, rtol=1e-6, atol=1e-5)
+        entries = runtime.read_json(output/'completion-predictions'/'index.json')
+        self.assertEqual([item['scene_id'] for item in entries], ['2', '4'])
+        for entry in entries:
+            with np.load(output/'completion-predictions'/entry['path']) as arrays:
+                self.assertTrue(np.isfinite(arrays['prediction']).all())
+                if entry['scene_id'] == '2':
+                    with torch.no_grad():
+                        prediction = model.decode_group(direct, [0]).cpu().numpy()
+                    np.testing.assert_allclose(arrays['prediction'][0], prediction, rtol=1e-6, atol=1e-5)
+                else:
+                    self.assertEqual(arrays['prediction'].shape, (0, 4, 4))
+
     def test_shared_and_one_independent_arm_use_public_cli(self):
         common = ['check', '--device', 'cpu', '--cpu-threads', '1',
                   '--model-variant', 'support_residual_v2']
@@ -186,9 +228,13 @@ class CooperativeRevisionCLITests(unittest.TestCase):
         # Existing 021 endpoints predate the explicit timing-policy field.
         old_run = runtime.read_json(shared/'run.json')
         old_run['training'].pop('time_policy')
+        old_run['model_config'].pop('speed_output_policy')
+        old_run['model_config'].pop('heading_output_policy')
         runtime.write_json(shared/'run.json', old_run)
         old_checkpoint = torch.load(shared/'shared.pt', weights_only=True)
         old_checkpoint['training'].pop('time_policy')
+        old_checkpoint['model_config'].pop('speed_output_policy')
+        old_checkpoint['model_config'].pop('heading_output_policy')
         torch.save(old_checkpoint, shared/'shared.pt')
         self.assertEqual(self.invoke([*common, '--phase', 'arm', '--shared-from', str(shared),
                          '--time-policy', 'advisory',

@@ -36,3 +36,5 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 本地收到两组完整结果后，先将gzip JSON和预测tar.gz还原为各自run目录的原层级，再执行`python tools/analysis/compare_completion_predictions.py --left /031结果目录 --right /032结果目录 --output /新的对比.json`。只读取已完成teacher预测，核完整人口与共有真值/mask一致，输出整体、来源、逐场的各区域/距离误差、raw log-speed MSE及速度分布；不重新推理或选阈值。
 
 `tmtaff_complete_fit.py --phase tcm`要求非TCM更新全部为0，固定端点输出`completion-evaluation.json`和未选模`checkpoint.pt`；不支持`--save-predictions`。模型仍为原一步TCM，特征误差不能与物理米误差比较。默认`full`保持四阶段。[规格](../../docs/specs/tmtaff-tcm-phase.md)与[033任务](../../HandOver/L2S-20261020-033.md)说明具体范围；用户已批准一次4000更新，只按当前索引READY领取。
+
+候选新可选`model.heading_output_policy=observation_residual`保留anchor可见航向底座并学习圆周修正；默认`learned_absolute`保持。新头需要新训练，不能将032旧权重静默改公式。034目前仅[草案](../../HandOver/L2S-20261020-034.md)，不因033READY自动授权；CPU验收不代表实际效果。

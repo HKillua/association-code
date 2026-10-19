@@ -91,7 +91,7 @@ def _fixed_records(scenes, records):
 
 def _take(encoded, nodes, device):
     indices = torch.as_tensor(nodes, dtype=torch.long)
-    keys = _ENCODED + (('native_positions',) if 'native_positions' in encoded else ())
+    keys = _ENCODED + tuple(key for key in ('native_positions', 'native_headings') if key in encoded)
     return {key: encoded[key].index_select(0, indices).to(device) for key in keys}
 
 
@@ -124,6 +124,8 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
     if _is_v2(model):
         from association.data.cooperative import normalize_cooperative_scene
     encoded_keys = _ENCODED + (('native_positions',) if _is_v2(model) else ())
+    if model.config.heading_output_policy == 'observation_residual':
+        encoded_keys += ('native_headings',)
     records, cached = [], []
     stage = 'encoding_fixed_identity' if fixed is not None else 'association_scoring'
     def report(completed, scene_id=None):
@@ -157,6 +159,8 @@ def _score_and_cache(model, normalizer, scenes, device, dtype, batch_tracks,
                 raise FloatingPointError('nonfinite observed native times')
             if _is_v2(model):
                 _finite_tensor(encoded['native_positions'], (n, m, 2), 'native_positions')
+            if 'native_headings' in encoded_keys:
+                _finite_tensor(encoded['native_headings'], (n, m), 'native_headings')
             for key in encoded_keys:
                 chunks[key].append(encoded[key].detach().cpu())
         # Empty input scenes retain targets and metric denominators, with no model call.

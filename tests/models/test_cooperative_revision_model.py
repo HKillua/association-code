@@ -20,11 +20,12 @@ from tests.fixtures.scenes import timed_scene
 ROUTES = ('plain', 'scalar-u', 'attribute-u', 'learned-attribute')
 
 
-def revision_model(*, length=7, maximum=6, speed_output_policy='physical_softplus'):
+def revision_model(*, length=7, maximum=6, speed_output_policy='physical_softplus',
+                   heading_output_policy='learned_absolute'):
     config = CooperativeConfig(length=length, max_observations=maximum, d_model=8,
         nhead=2, num_layers=1, dim_feedforward=16, dropout=0., head_hidden=6,
         model_variant='support_residual_v2', support_time_policy='train_absmax_v1',
-        speed_output_policy=speed_output_policy)
+        speed_output_policy=speed_output_policy, heading_output_policy=heading_output_policy)
     normalizer = fit_cooperative_normalizer([timed_scene('train', 'T_core')], config)
     # Simple physical scales make the geometry expectations independently exact.
     normalizer['mean'] = [0., 0., 109., 0.]
@@ -144,6 +145,103 @@ class CooperativeRevisionModelTests(unittest.TestCase):
         self.assertTrue(torch.isfinite(x.grad).all())
         self.assertEqual(float(x.grad[:, 6:, :4].abs().sum()), 0.)
         self.assertEqual(float(x.grad[:, :6][~mask[:, :6]].abs().sum()), 0.)
+
+    def test_observed_heading_short_arc_half_turns_and_cross_anchor(self):
+        model, _ = revision_model(length=5, heading_output_policy='observation_residual')
+        model.eval()
+        rows = [[(0, 10, 20, 3, a), (2, 12, 21, 7, b)]
+                for a, b in ((359, 1), (1, 359), (0, 180), (180, 0))]
+        x, mask = packed(model, rows, [-1, 0, 1, 2, 3])
+        expected = torch.tensor([[359., 359., 0., 1., 1.], [1., 1., 0., 359., 359.],
+                                 [0., 0., 90., 180., 180.], [180., 180., 90., 0., 0.]])
+        encoded = model.encode(x, mask)
+        torch.testing.assert_close(model.heading_base(encoded, list(range(4))), expected, rtol=0, atol=0)
+        for anchor, helper in ((0, 1), (1, 0), (2, 3)):
+            for members in ([anchor], [anchor, helper]):
+                result = model.decode_group(encoded, members)
+                torch.testing.assert_close(result[:, 3], expected[anchor], rtol=0, atol=0)
+        with torch.no_grad():
+            model.state_projection.bias[3] = 3.
+        prediction = model.decode_group(encoded, [1, 0])
+        torch.testing.assert_close(prediction[:, 3], (expected[1]+3).remainder(360), rtol=0, atol=0)
+        # The head can correct exact observed points; zero initialization does
+        # not freeze the residual or impose zero correction at observations.
+        truth = prediction.detach().clone()[None]
+        truth[..., 3] = (truth[..., 3]+15).remainder(360)
+        objective = FusionLoss(position_loss_mode='standard_smooth_l1')
+        objective(prediction[None], truth, torch.ones_like(truth, dtype=torch.bool))['total'].backward()
+        self.assertGreater(float(model.state_projection.weight.grad[3].abs().sum()), 0.)
+        self.assertTrue(torch.isfinite(model.state_projection.weight.grad).all())
+        # Real native inputs are standardized before their FP32 inverse. A
+        # true signed half turn must not flip its arc from roundoff alone.
+        with torch.no_grad():
+            model.state_mean[3] = 123.456
+            model.state_std[3] = 104.69449368349127
+        rows = [[(0, 10, 20, 3, a), (2, 12, 21, 7, b)] for a, b in ((154, 334), (334, 154))]
+        x, mask = packed(model, rows, [-1, 0, 1, 2, 3])
+        x[:, :2, 3] = (x[:, :2, 3]-model.state_mean[3])/model.state_std[3]
+        expected = torch.tensor([[154., 154., 244., 334., 334.], [334., 334., 244., 154., 154.]])
+        torch.testing.assert_close(model.heading_base(model.encode(x, mask), [0, 1]), expected, rtol=0, atol=5e-5)
+
+    def test_observed_heading_uses_clipped_native_values_without_hidden_leak(self):
+        model, _ = revision_model(length=5, heading_output_policy='observation_residual')
+        model.eval()
+        row = [(0, 0, 0, 2, 300), (2, 20, 2, 2, 350),
+               (4, 40, 4, 2, 10), (6, 60, 6, 2, 40)]
+        x, mask = packed(model, [row, [(t, a, b, v, 100.) for t, a, b, v, _ in row]], [-1, 0, 1, 3, 7])
+        class Prefix:
+            def integers(self, *args):
+                return 1
+        clipped, visible, removed = endpoint_view(x, mask, 6, Prefix(), fraction=.25)
+        self.assertEqual(removed, [1, 1])
+        poisoned = clipped.clone()
+        poisoned[:, :6][~visible[:, :6]] = float('nan')
+        poisoned[:, 6:, :4] = float('inf')
+        with torch.no_grad():
+            expected = model(clipped, visible, [0, 1])
+            actual = model(poisoned, visible, [0, 1])
+        torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+        torch.testing.assert_close(expected[:, 3], torch.tensor([350., 350., 350., 0., 40.]), rtol=0, atol=0)
+        clipped.requires_grad_()
+        model(clipped, visible, [0, 1]).sum().backward()
+        self.assertTrue(torch.isfinite(clipped.grad).all())
+        self.assertEqual(float(clipped.grad[:, 6:, :4].abs().sum()), 0.)
+        self.assertEqual(float(clipped.grad[:, :6][~visible[:, :6]].abs().sum()), 0.)
+
+    def test_heading_policy_preserves_other_initialization_and_forbids_cross_loading(self):
+        original, _ = revision_model(length=3, speed_output_policy='scaled_log')
+        rng = torch.get_rng_state().clone()
+        revised, _ = revision_model(length=3, speed_output_policy='scaled_log',
+                                    heading_output_policy='observation_residual')
+        self.assertTrue(torch.equal(rng, torch.get_rng_state()))
+        for (name, before), (other_name, after) in zip(original.named_parameters(), revised.named_parameters()):
+            self.assertEqual(name, other_name)
+            if name in ('state_projection.weight', 'state_projection.bias'):
+                torch.testing.assert_close(before[:3], after[:3], rtol=0, atol=0)
+                self.assertEqual(float(after[3].detach().abs().sum()), 0.)
+            else:
+                torch.testing.assert_close(before, after, rtol=0, atol=0)
+        original.eval(); revised.eval()
+        x, mask = packed(original, [[(0, 10, 20, 3, 359), (2, 12, 21, 7, 1)],
+                                    [(0, 11, 22, 5, 30), (2, 13, 24, 6, 40)]])
+        with torch.no_grad():
+            torch.testing.assert_close(original(x, mask)[:, :3], revised(x, mask)[:, :3], rtol=0, atol=0)
+            torch.testing.assert_close(original.score_pairs(original.encode(x, mask), [[0, 1]]),
+                                       revised.score_pairs(revised.encode(x, mask), [[0, 1]]), rtol=0, atol=0)
+        self.assertEqual(set(revised.state_dict())-set(original.state_dict()), {'heading_base_version'})
+        for strict in (True, False):
+            with self.assertRaisesRegex(ValueError, 'heading_base_version'):
+                revised.load_state_dict(original.state_dict(), strict=strict)
+            with self.assertRaisesRegex(ValueError, 'heading_output_policy'):
+                original.load_state_dict(revised.state_dict(), strict=strict)
+        bad = copy.deepcopy(revised.state_dict()); bad['heading_base_version'] += 1
+        with self.assertRaisesRegex(ValueError, 'heading_base_version'):
+            revised.load_state_dict(bad)
+        # Old serialized configurations have no heading policy and keep the
+        # historical output, without a new state-dict key.
+        self.assertEqual(CooperativeConfig().heading_output_policy, 'learned_absolute')
+        with self.assertRaisesRegex(ValueError, 'requires support_residual_v2'):
+            CooperativeConfig(heading_output_policy='observation_residual')
 
     def test_speed_output_does_not_use_native_std_and_loss_accepts_zero_and_tail(self):
         model, _ = revision_model(length=3)

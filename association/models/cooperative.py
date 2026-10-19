@@ -29,6 +29,7 @@ class CooperativeConfig:
     support_time_policy: str = 'legacy'
     model_variant: str = 'legacy'
     speed_output_policy: str = 'physical_softplus'
+    heading_output_policy: str = 'learned_absolute'
 
     def __post_init__(self):
         for name in ('length', 'max_observations', 'd_model', 'nhead',
@@ -52,6 +53,10 @@ class CooperativeConfig:
             raise ValueError('speed_output_policy must be physical_softplus or scaled_log')
         if self.speed_output_policy == 'scaled_log' and self.model_variant != 'support_residual_v2':
             raise ValueError('scaled_log speed requires support_residual_v2')
+        if self.heading_output_policy not in ('learned_absolute', 'observation_residual'):
+            raise ValueError('heading_output_policy must be learned_absolute or observation_residual')
+        if self.heading_output_policy == 'observation_residual' and self.model_variant != 'support_residual_v2':
+            raise ValueError('observation_residual heading requires support_residual_v2')
 
 
 def _head(inputs, hidden, outputs):
@@ -82,6 +87,11 @@ class CooperativeModel(nn.Module):
                 # policy-specific state also prevents old weights from being
                 # silently reinterpreted in a different output coordinate.
                 self.register_buffer('speed_reference', F.softplus(self.speed_bias))
+            if config.heading_output_policy == 'observation_residual':
+                # Same-shaped absolute/residual heads have different meaning.
+                # A constant marker forbids silent reinterpretation without
+                # consuming RNG or changing the input representation.
+                self.register_buffer('heading_base_version', torch.tensor(1, dtype=torch.int64))
         scaled_support = config.support_time_policy == 'train_absmax_v1'
         if support_time_scale is None and not scaled_support:
             support_time_scale = 1.
@@ -134,6 +144,9 @@ class CooperativeModel(nn.Module):
             with torch.no_grad():
                 self.state_projection.weight[:3].zero_()
                 self.state_projection.bias[:3].zero_()
+                if config.heading_output_policy == 'observation_residual':
+                    self.state_projection.weight[3].zero_()
+                    self.state_projection.bias[3].zero_()
                 self.local_identity[-1].weight.zero_()
                 self.local_identity[-1].bias.zero_()
 
@@ -141,6 +154,13 @@ class CooperativeModel(nn.Module):
                               missing_keys, unexpected_keys, error_msgs):
         if self.config.speed_output_policy != 'scaled_log' and prefix + 'speed_reference' in state_dict:
             raise ValueError('checkpoint scaled_log speed disagrees with declared speed_output_policy')
+        if self.config.heading_output_policy == 'observation_residual':
+            incoming = state_dict.get(prefix + 'heading_base_version')
+            if (not isinstance(incoming, Tensor) or incoming.shape != () or incoming.dtype != torch.int64
+                    or not torch.equal(incoming.to(self.heading_base_version.device), self.heading_base_version)):
+                raise ValueError('checkpoint heading_base_version disagrees with declared heading_output_policy')
+        elif prefix + 'heading_base_version' in state_dict:
+            raise ValueError('checkpoint residual heading disagrees with declared heading_output_policy')
         if self.config.support_time_policy == 'train_absmax_v1':
             incoming = state_dict.get(prefix + 'support_time_scale')
             expected = self.support_time_scale
@@ -191,12 +211,15 @@ class CooperativeModel(nn.Module):
         states = torch.where(mask[..., None], values[:, :m, :4], 0.)
         times = torch.where(mask, values[:, :m, 4], 0.)
         queries = values[:, m:, 4]
-        native_positions = None
+        native_positions = native_headings = None
         if self.config.model_variant == 'support_residual_v2':
             native_positions = states[..., :2] * self.state_std[:2] + self.state_mean[:2]
             native_positions = torch.where(mask[..., None], native_positions, 0.)
             # v2 speed is already z_logspeed, never invert it using physical moments.
-            heading = (states[..., 3] * self.state_std[3] + self.state_mean[3]) * (math.pi / 180.)
+            physical_heading = states[..., 3] * self.state_std[3] + self.state_mean[3]
+            if self.config.heading_output_policy == 'observation_residual':
+                native_headings = torch.where(mask, physical_heading, 0.)
+            heading = physical_heading * (math.pi / 180.)
             states = torch.cat((states[..., :3], heading.sin()[..., None], heading.cos()[..., None]), dim=-1)
             states = torch.where(mask[..., None], states, 0.)
         if len(values) == 0:
@@ -210,6 +233,8 @@ class CooperativeModel(nn.Module):
         result = dict(memory=memory, observed=mask, times=times, queries=queries, pooled=pooled)
         if native_positions is not None:
             result['native_positions'] = native_positions
+        if native_headings is not None:
+            result['native_headings'] = native_headings
         return result
 
     def support_features(self, encoded):
@@ -250,6 +275,37 @@ class CooperativeModel(nn.Module):
         longitude_delta = torch.remainder(pr[..., 1]-pl[..., 1]+180., 360.)-180.
         longitude = torch.remainder(pl[..., 1]+alpha*longitude_delta+180., 360.)-180.
         return torch.stack((latitude, longitude), dim=-1)
+
+    def heading_base(self, encoded, members):
+        """Visible native headings, shortest signed arc, endpoint hold outside.
+
+        Half turns follow the sign of the native degree difference, as in the
+        data adapter. A small dtype-relative tolerance absorbs normalization
+        roundoff; query-state slots and helpers never supply a base.
+        """
+        members = torch.as_tensor(members, device=encoded['memory'].device, dtype=torch.long)
+        times, valid = encoded['times'][members], encoded['observed'][members]
+        query, headings = encoded['queries'][members], encoded['native_headings'][members]
+        expanded = times[:, None, :].expand(-1, self.config.length, -1)
+        left_valid = valid[:, None, :] & (expanded <= query[..., None])
+        right_valid = valid[:, None, :] & (expanded >= query[..., None])
+        left = expanded.masked_fill(~left_valid, -float('inf')).argmax(-1)
+        right = expanded.masked_fill(~right_valid, float('inf')).argmin(-1)
+        first = times.masked_fill(~valid, float('inf')).argmin(-1)
+        last = times.masked_fill(~valid, -float('inf')).argmax(-1)
+        left = torch.where(left_valid.any(-1), left, first[:, None])
+        right = torch.where(right_valid.any(-1), right, last[:, None])
+        tl, tr = times.gather(1, left), times.gather(1, right)
+        hl, hr = headings.gather(1, left), headings.gather(1, right)
+        width = tr-tl
+        alpha = torch.where(width > 0, (query-tl)/torch.where(width > 0, width, 1.), 0.)
+        raw_delta = hr-hl
+        delta = torch.remainder(raw_delta+180., 360.)-180.
+        # Native degrees are [0,360]. Standardize/invert in FP32 can turn a
+        # true +180 difference into 180.00003 and otherwise reverse the arc.
+        half_turn = (delta.abs()-180.).abs() <= 8*torch.finfo(delta.dtype).eps*360.
+        delta = torch.where(half_turn, torch.where(raw_delta > 0, 180., -180.), delta)
+        return torch.remainder(hl+alpha*delta, 360.)
 
     @staticmethod
     def _support(encoded):
@@ -515,7 +571,9 @@ class CooperativeModel(nn.Module):
             speed = self.speed_reference * torch.exp(self.log_speed_std * residual[:, 2])
         else:
             speed = F.softplus(residual[:, 2]+self.speed_bias)
-        course = torch.remainder(self.state_std[3]*residual[:, 3]+self.state_mean[3], 360.)
+        heading_base = (self.heading_base(encoded, members[:1])[0]
+                        if self.config.heading_output_policy == 'observation_residual' else self.state_mean[3])
+        course = torch.remainder(self.state_std[3]*residual[:, 3]+heading_base, 360.)
         prediction = torch.stack((latitude, longitude, speed, course), dim=-1)
         if not torch.isfinite(prediction).all():
             raise ValueError('cooperative physical output is nonfinite')
