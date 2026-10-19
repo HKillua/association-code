@@ -6,7 +6,7 @@
 
 | 对象 | 当前角色与证据 |
 | --- | --- |
-| 完整TMTAFF近似参考 | 原生时间输入、TCM/TAM/TFM四阶段、恢复与全人口评价已实现。017正在运行；[最新原件分析](results/reference017_snapshot7/README.md)尚无完整物理终评，不宣布收敛或与候选胜负。 |
+| 完整TMTAFF近似参考 | 原生时间输入、TCM/TAM/TFM四阶段、恢复与全人口评价已实现。017已过原执行上限，终态尚未回传；[已收中期原件分析](results/reference017_snapshot7/README.md)没有完整物理终评，不宣布运行状态、收敛或与候选胜负。 |
 | 018共享补全/融合候选 | 600更新和四臂全V完成。身份弱、物理恢复误差大，效用没有稳定专属收益；[完整负结果](results/cooperative018_local_review/README.md)保留，额度关闭。 |
 | 当前候选v2 | [规格](proposals/candidate_revision_after018/README.md)、[本地实现/验证](proposals/candidate_revision_after018/implementation.md)已完成；保留可见位置底座，修正速度/航向表示，加入支撑补全、局部关联、属性残差融合。尚无真实MTAD效果，GPU未批准，无新READY。 |
 | TSA-cTFER | [独立离线关联诊断](tsactfer_adaptation.md)，不是完整补全/融合baseline，也未复现原在线指派。保留既有结果，不扩建新融合管线。 |

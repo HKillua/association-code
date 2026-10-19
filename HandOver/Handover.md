@@ -6,13 +6,17 @@
 
 | 任务 | 状态与下一步 |
 | --- | --- |
-| [017请求](L2S-20261018-017.md) / [回执](S2L-20261018-017.md) | RUNNING；最近已审服务器589ca97，260/320＝TCM100+TAM100+TFM60，关联选中macro-F1 .432985；尚无完整物理终评。[快照复核](../docs/results/reference017_snapshot7/README.md)未见必须停止的实现错误，继续原10GPU小时上限，一次无重试。独立`association-code-run017`冻结，不pull、不改配置。 |
+| [017请求](L2S-20261018-017.md) / [回执](S2L-20261018-017.md) | **待回传终态**；原10小时上限已过，最后S2L仍为RUNNING，不是当前进程状态。最近已审服务器589ca97，仅有260/320旧快照、关联macro-F1 .432985，尚无完整物理终评。独立`association-code-run017`冻结，不pull、不改配置、不重跑；服务器按下文回传已有原件。 |
 | [018请求](L2S-20261018-018.md) / [回执](S2L-20261018-018.md) | COMPLETED，600更新、2371秒；[本地分析](../docs/results/cooperative018_local_review/README.md)已完成。基础恢复/身份仍弱，效用无稳定专属收益，预算关闭。 |
 | [候选修正版](../docs/proposals/candidate_revision_after018/README.md) | 用户已批准本地实现；代码/CPU验证完成。观测位置底座＋残差、log速度、圆周航向、支撑query、局部关联、四臂属性残差融合。新GPU授权0、无READY；[草案](../docs/proposals/candidate_revision_after018/config.draft.json)共2400更新、max_seconds=null，3.11h外推/4h建议不是授权。 |
 
 **本轮只整理仓库。** 源码归入data/models/training/evaluation/utils，删除退役pilot训练、profile、旧环境/SHA验收及重复测试；原始实验配置和证据不改。四个[实验CLI](../tools/experiments/README.md)仍是现行入口。清理验证见[历史与清理记录](../docs/history/README.md)，不把代码整理或CPU检查当MTAD结果。
 
-**下一步：** 收017终态并分析完整补全/关联/融合结果；新候选配置/预算决定后直接独立READY，不再重做已完成实现、原ZIP扫描或成本探测。两条线不以另一条好成绩为前提；各自预算已批才可执行，最多两单卡并行。push不会启动服务器AI。
+**当前服务器只需完成017原件回传，不是新实验。** 10月19日10:30（北京时间）fetch无新提交。原`started_at.txt=2026-10-18T12:42:56Z`，按启动标记及原命令推算，外层35970秒TERM约在次日06:42:26，含30秒清理的总上限约为06:42:56；目前仓库未收到`exit_code.txt`、`ended_at.txt`、`elapsed_seconds.txt`或完整终态结果，仅有00:39的中期快照。本地不能据缺回执宣布成功、失败或仍在训练。
+
+服务器继续原017收尾：核本轮自有作业的实际状态，在自己的S2L-017记录真实结束原因和退出码，按原L2S复制已有run/history/coverage/summary/evaluation-progress及预测索引/metadata；缺失文件如实记未产生或未取得，不补造退出码，不加载模型补评价、不resume、不重训、不重开预算。如本轮作业异常仍在运行，执行原10小时上限的收尾要求，不继续用GPU补齐结果。只读整理现有产物已在原017请求中，不新增轮次或READY。
+
+**下一步：** 取得017终态后分析完整任务或中断原因；新候选配置/预算决定后直接独立READY，不再重做已完成实现、原ZIP扫描或成本探测。两条线不以另一条好成绩为前提；各自预算已批才可执行，最多两单卡并行。push不会启动服务器AI。
 
 ## 评价与数据边界
 
