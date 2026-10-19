@@ -1,0 +1,57 @@
+{
+  "source_server_commit": "dba3367 (Git provenance only)",
+  "scope": "Returned run/history/calibration arrays only; no dataset scan, model, inference or new threshold selection.",
+  "snapshot_status": "RUNNING",
+  "snapshot_cursor": {
+    "stage": 1,
+    "update": 0,
+    "completed_updates": 1000
+  },
+  "snapshot_elapsed_seconds": 3645.8659894168377,
+  "validation_record_count": 0,
+  "checks": {
+    "updates_consecutive": true,
+    "all_TCM": true,
+    "training_values_finite": true,
+    "config_matches_020": true,
+    "64_balanced_batches": true,
+    "distances_finite_nonnegative": true,
+    "stored_margin_matches_negative_median": true,
+    "training_margin_matches_fp32": true,
+    "unique_pairs_match": true,
+    "unique_scenes_match": true,
+    "negative_hinge_count_matches": true,
+    "distance_quantiles_match": true,
+    "diagnostic_loss_matches": true,
+    "test_opened_false": true
+  },
+  "TCM": {
+    "updates": 1000,
+    "first_100_mean_loss": 0.6330405208468437,
+    "last_100_mean_loss": 0.013105428172275424,
+    "step_seconds_sum": 1710.2779557639733,
+    "last_100_mean_step_seconds": 1.8007061738334595,
+    "interpretation": "Training next-point objective decreases; not held-out completion/association/fusion performance."
+  },
+  "calibration": {
+    "seconds": 1768.6725774928927,
+    "effective_margin": 75.69318771362305,
+    "training_margin": 75.69319152832031,
+    "positive_count": 2048,
+    "negative_count": 2048,
+    "unique_pairs": 3927,
+    "unique_scenes": 116,
+    "active_negative_fraction": 0.5,
+    "cache_bytes": 131727360,
+    "cache_evictions": 0,
+    "interpretation": "Half active negatives follow median construction, not an accuracy result."
+  },
+  "receipt_corrections": [
+    "017 already completed the same margin policy: margin71.58904266357422,1719.930942647159seconds; original run in Git612afea. Not a new020 repair.",
+    "Actual020 code6168f29 validates at TAM100 before writing history/checkpoint. No new history cannot prove update<100 or a13.99-second training-step lower bound.",
+    "14seconds is not a measured upper bound; TFM/JOINT have different computation. No deadline-safety conclusion is supported.",
+    "Snapshot elapsed3645.87seconds is not elapsed at collection08:12Z. Use current time and actual deadlines for remaining wall time.",
+    "Checkpoint size differs between receipt57339340 and summary41376034; checkpoint not returned, current size/completeness unverified."
+  ],
+  "next": "Keep020/021 unchanged; collect existing progress and validation at natural checkpoint/termination. No new diagnostic run, retry, inference or rescanning."
+}
