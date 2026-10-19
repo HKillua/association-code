@@ -25,6 +25,8 @@ def main(argv=None):
     for name in ('archive', 'manifest', 'alignment', 'config', 'output'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--device', help='required for fit; no automatic CPU/GPU fallback')
+    parser.add_argument('--phase', choices=('full', 'tcm'), default='full',
+                        help='tcm: native TCM only, then full V feature diagnostics; downstream updates must be zero')
     parser.add_argument('--inspect-only', action='store_true')
     parser.add_argument('--save-predictions', action='store_true',
                         help='save scene-local selected-model physical predictions during final evaluation')
@@ -50,6 +52,8 @@ def main(argv=None):
             raise ValueError('--resume applies to fit, not inspect-only')
         if args.inspect_only and args.save_predictions:
             raise ValueError('--save-predictions applies to fit, not inspect-only')
+        if args.phase == 'tcm' and args.save_predictions:
+            raise ValueError('--save-predictions requires --phase full; TCM exports feature diagnostics only')
         if not args.inspect_only and not args.device:
             raise ValueError('--device must be explicit for fit')
         output = Path(args.output)
@@ -73,7 +77,7 @@ def main(argv=None):
         from association.training.calibration import MARGIN_POLICY
         if args.time_policy is not None:
             config['training']['time_policy'] = args.time_policy
-        training = _configuration(config['training'])
+        training = _configuration(config['training'], phase=args.phase)
         config['training'] = training
         if training['margin_policy'] == MARGIN_POLICY and (
                 model.contrastive_positive_power != 1 or config['train_splits'] != ['T_core']):
@@ -95,7 +99,7 @@ def main(argv=None):
         dataset = load_timed_dataset(args.archive, runtime.read_json(args.manifest),
             train_splits=config['train_splits'], data_config=data_config,
             alignment_by_scene=runtime.read_json(args.alignment), check=check)
-        preparation = {'status': 'INSPECTED' if args.inspect_only else 'PREPARED',
+        preparation = {'status': 'INSPECTED' if args.inspect_only else 'PREPARED', 'phase': args.phase,
                        'report_phase': 'input preparation before model construction',
                        'configuration': config, 'cpu_threads': args.cpu_threads,
                        'dataset': dataset['report'], 'elapsed_seconds': time.monotonic()-started,
@@ -110,7 +114,8 @@ def main(argv=None):
             try:
                 result = train_complete(dataset['train'], dataset['validation'], model, fusion,
                     training, output, device=args.device, resume_from=args.resume,
-                    initial_elapsed_seconds=time.monotonic()-started, save_predictions=args.save_predictions)
+                    initial_elapsed_seconds=time.monotonic()-started, save_predictions=args.save_predictions,
+                    phase=args.phase)
             except BaseException as error:
                 training_error = error
                 raise
@@ -126,7 +131,7 @@ def main(argv=None):
                             training_error.add_note(note)
                         else:
                             print(note, file=sys.stderr, flush=True)
-            print(f"{result['status']} TMTAFF-time-adapted-v1: {output.resolve()}", flush=True)
+            print(f"{result['status']} TMTAFF-time-adapted-v1 ({args.phase}): {output.resolve()}", flush=True)
         return 0
     except (Exception, KeyboardInterrupt) as error:
         print(f'FAILED {type(error).__name__}: {error}', file=sys.stderr, flush=True)

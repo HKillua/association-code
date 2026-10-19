@@ -4,7 +4,7 @@
 
 | 脚本 | 用途 |
 | --- | --- |
-| `tmtaff_complete_fit.py` | 完整参考的四阶段训练、恢复及关联/融合评价 |
+| `tmtaff_complete_fit.py` | 默认完整参考四阶段；可选`--phase tcm`只训TCM并做完整V特征诊断 |
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
@@ -12,7 +12,7 @@
 
 `completion_check.py --candidate-residuals`复用同一入口，只推理既有teacher，每片段一次；参考checkpoint仅用于原数据契约核对。输出逐场景`predictions-*.npz`（预测、位置底座、原真值、逐属性mask及片段/时间/区域）、`residual-diagnostics.json`（最终学习权重、正则、分区域原属性损失）及`candidate-summary.json`。分区域loss为区域内均值，计算全局贡献时乘该属性的区域有效点数/全部有效点数；位置底座没有速度/航向预测。它不还原训练梯度、不生成额外裁剪或改写权重。
 
-参考和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
+参考完整流程和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
 
 旧pilot/profile/成本probe入口已删除。017、018均已结束；候选修正版和共享/独立臂入口已完成。用户最新把训练时长改为建议与提醒，固定训练计划和当前依赖以[交接索引](../../HandOver/Handover.md)为准。研究方法见[候选规格](../../docs/proposals/candidate_revision_after018/README.md)，旧阶段见[历史摘要](../../docs/history/README.md)。
 
@@ -34,3 +34,5 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 `fit --phase teacher --save-predictions`保留原teacher self/cross/BCE训练，在固定端点做完整V独立片段补全，不进入关联选阈值、utility或融合；配置的utility/adapt更新数必须为0。输出`teacher.pt`、`completion-evaluation.json`及`completion-predictions/`逐场NPZ。该NPZ是独立补全格式，按逐属性mask/region统计，不能直接当分组融合格式交给`compare_physical_predictions.py`。`model.speed_output_policy`缺省为原`physical_softplus`；`scaled_log`只对v2生效并要求相应新权重。[031/032 A/B方案](../../docs/proposals/repair_before_retraining/030-repair-analysis.md#6-已实现的第一项与ab2026-10-20)已获用户继续指令，只按当前索引的独立READY执行。
 
 本地收到两组完整结果后，先将gzip JSON和预测tar.gz还原为各自run目录的原层级，再执行`python tools/analysis/compare_completion_predictions.py --left /031结果目录 --right /032结果目录 --output /新的对比.json`。只读取已完成teacher预测，核完整人口与共有真值/mask一致，输出整体、来源、逐场的各区域/距离误差、raw log-speed MSE及速度分布；不重新推理或选阈值。
+
+`tmtaff_complete_fit.py --phase tcm`要求非TCM更新全部为0，固定端点输出`completion-evaluation.json`和未选模`checkpoint.pt`；不支持`--save-predictions`。模型仍为原一步TCM，特征误差不能与物理米误差比较。默认`full`保持四阶段。[规格](../../docs/specs/tmtaff-tcm-phase.md)与[033任务](../../HandOver/L2S-20261020-033.md)说明具体范围；用户已批准一次4000更新，只按当前索引READY领取。

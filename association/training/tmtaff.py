@@ -17,7 +17,7 @@ import numpy as np
 import torch
 
 from association.utils import runtime
-from association.evaluation.tmtaff import evaluate_complete
+from association.evaluation.tmtaff import evaluate_complete, evaluate_tcm_completion
 from association.models.fusion import FusionLoss, PairFusion, PairFusionConfig
 from association.evaluation.physical import _check_valid_states
 from association.training.fusion import fusion_training_parameters, fusion_training_step
@@ -51,7 +51,9 @@ def _record_cuda_peaks(run, device):
             run.setdefault('cuda_memory_measurement_errors', {})[key] = f'{type(error).__name__}: {error}'
 
 
-def _configuration(config):
+def _configuration(config, *, phase='full'):
+    if phase not in ('full', 'tcm'):
+        raise ValueError('phase must be full or tcm')
     config = copy.deepcopy(config)
     config.setdefault('margin_policy', 'fixed')
     config.setdefault('longitude_loss_mode', 'linear')
@@ -72,7 +74,13 @@ def _configuration(config):
     for name, value in [('seed', config['seed']), ('completion_cache_mib', config['completion_cache_mib'])]:
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ValueError(f'{name} must be a nonnegative integer')
-    for name, value in list(config['updates'].items()) + [(k, config[k]) for k in
+    for stage, value in config['updates'].items():
+        if phase == 'tcm' and stage != 'TCM':
+            if isinstance(value, bool) or not isinstance(value, int) or value != 0:
+                raise ValueError(f'{stage} updates must be zero for phase tcm')
+        elif isinstance(value, bool) or not isinstance(value, int) or value < 1:
+            raise ValueError(f'{stage} updates must be a positive integer')
+    for name, value in [(k, config[k]) for k in
             ('batch_tracks', 'pair_batch_size', 'pair_microbatch', 'track_microbatch', 'validate_every_updates')]:
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
             raise ValueError(f'{name} must be a positive integer')
@@ -316,7 +324,7 @@ def _targets(scenes, groups, device):
 
 def train_complete(train_scenes, validation_scenes, model_config, fusion_config, config,
                    output, *, device='cpu', resume_from=None, max_updates_this_call=None,
-                   evaluation_fn=None, initial_elapsed_seconds=0.0, save_predictions=False):
+                   evaluation_fn=None, initial_elapsed_seconds=0.0, save_predictions=False, phase='full'):
     """Train supplied physical scenes; native ZIP preparation is a separate caller.
 
     ``fusion_targets`` maps identity strings to states[L,4]/valid[L,4] and
@@ -330,13 +338,20 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     no full dataset snapshot/hash is stored to detect arbitrary content changes.
     Explicit save_predictions writes selected-state physical predictions during
     the default final evaluation, with its I/O included in the same budget.
+    Explicit phase='tcm' ends after the unchanged native TCM updates and full V
+    feature diagnostics. Its checkpoint has no association-selected snapshot;
+    future stages require a separately specified new run, not an implicit resume.
     """
     started = time.monotonic()
-    config = _configuration(config)
+    requested_phase = phase
+    config = _configuration(config, phase=requested_phase)
+    active_stages = STAGES[:1] if requested_phase == 'tcm' else STAGES
     if not isinstance(save_predictions, bool):
         raise ValueError('save_predictions must be boolean')
     if save_predictions and evaluation_fn is not None:
         raise ValueError('save_predictions requires the default complete evaluator')
+    if requested_phase == 'tcm' and (save_predictions or evaluation_fn is not None):
+        raise ValueError('phase tcm uses the native feature diagnostic only; no complete evaluator or prediction export')
     if (isinstance(initial_elapsed_seconds, bool) or not isinstance(initial_elapsed_seconds, (int, float))
             or not math.isfinite(initial_elapsed_seconds) or initial_elapsed_seconds < 0):
         raise ValueError('initial_elapsed_seconds must be finite and nonnegative')
@@ -346,6 +361,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     if (model_config.length, model_config.d_model) != (fusion_config.length, fusion_config.d_model):
         raise ValueError('association and fusion length/dimension must agree')
     contract = _scenes(train_scenes, validation_scenes, model_config.length)
+    if requested_phase == 'tcm' and train_scenes[0].get('input_adapter') != 'native_time_v1':
+        raise ValueError('phase tcm requires native-time scenes for its endpoint diagnostic')
     calibrating = config['margin_policy'] == MARGIN_POLICY
     if calibrating and (model_config.contrastive_positive_power != 1
                         or any(scene['split'] != 'T_core' for scene in train_scenes)):
@@ -367,7 +384,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         if previous_run.get('status') != 'INTERRUPTED':
             raise ValueError('only an INTERRUPTED run can resume; failed runs are not automatic retries')
         saved = torch.load(previous / 'checkpoint.pt', map_location='cpu', weights_only=True)
-        previous_config = _configuration(saved['config'])
+        previous_phase = saved.get('phase', 'full')
+        if previous_phase != requested_phase or previous_run.get('phase', 'full') != requested_phase:
+            raise ValueError('resume phase differs; stage transfer requires a separately specified new run')
+        previous_config = _configuration(saved['config'], phase=previous_phase)
         # An explicit scheduling-policy change does not change the trained
         # protocol. Keep all scientific configuration and elapsed accounting.
         previous_config['time_policy'] = config['time_policy']
@@ -403,7 +423,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     calibration = None if saved is None else copy.deepcopy(saved.get('margin_calibration'))
     effective_margin = model_config.margin if saved is None else saved.get('effective_margin', model_config.margin)
     adapter = train_scenes[0].get('input_adapter', 'registered_v1')
-    run = {'status': 'RUNNING', 'config': config, 'input_adapter': adapter,
+    run = {'status': 'RUNNING', 'phase': requested_phase, 'training_stages': list(active_stages),
+           'config': config, 'input_adapter': adapter,
            'requested_model_config': asdict(model_config), 'effective_margin': effective_margin,
            'margin_calibration': calibration,
            'scope': (('TMTAFF time/output-scale-adapted approximate reference'
@@ -411,7 +432,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                       else 'TMTAFF time-adapted approximate reference') if adapter == 'native_time_v1'
                      else 'registered-data training kernel'),
            'fusion_output_parameterization': fusion_config.output_parameterization,
-           'selection_scope': 'association V_select macro-F1 only; not full-task optimality',
+           'selection_scope': ('none; fixed TCM endpoint, no threshold or snapshot selection'
+                               if requested_phase == 'tcm' else
+                               'association V_select macro-F1 only; not full-task optimality'),
            'device': str(device),
            'resume_device_changed': saved is not None and saved['device'] != str(device),
            'resume_reproducibility': 'bitwise replay requires the same frozen inputs, hardware and software; compatible GPU changes are permitted',
@@ -425,7 +448,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'validation_timings': [],
            'validation_timing_scope': 'current invocation; full scoring, threshold selection and selected snapshot CPU copy/metrics; excludes checkpoint I/O',
            'final_evaluation_seconds': None, 'final_evaluation_status': 'NOT_STARTED',
-           'final_evaluation_scope': 'selected state restore, full association/fusion evaluation and threshold consistency check; excludes summary I/O',
+           'final_evaluation_scope': ('full V native one-step and natural-query feature diagnostics; excludes summary I/O'
+                                      if requested_phase == 'tcm' else
+                                      'selected state restore, full association/fusion evaluation and threshold consistency check; excludes summary I/O'),
            'timing_note': 'successful CUDA boundaries synchronize; failed timings stop at exception without waiting for outstanding CUDA work',
            'cuda_process_peak_allocated_bytes': None, 'cuda_process_peak_reserved_bytes': None,
            'cuda_peak_reset_completed': False if device.type == 'cuda' else None,
@@ -474,7 +499,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 # Validate it before resuming any optimizer updates as well.
                 fusion.validate_output_statistics(selected['states'][1])
             _restore(modules, saved['states'])
-            if cursor['stage'] < len(STAGES):
+            if cursor['stage'] < len(active_stages):
                 phase = STAGES[cursor['stage']]
                 parameters = _stage_parameters(modules, phase)
                 optimizer = _optimizer(parameters, {'learning_rate': config['learning_rates'][phase]})
@@ -483,7 +508,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
 
         def checkpoint():
             check()
-            payload = {'format_version': 1, 'config': config, 'model_config': asdict(model_config),
+            payload = {'format_version': 1, 'phase': requested_phase, 'training_stages': list(active_stages),
+                       'config': config, 'model_config': asdict(model_config),
                        'effective_margin': effective_margin, 'margin_calibration': calibration,
                        'input_adapter': adapter,
                        'max_observations': train_scenes[0].get('max_observations'),
@@ -502,7 +528,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             write_run('RUNNING')
 
         calls = 0
-        while cursor['stage'] < len(STAGES):
+        while cursor['stage'] < len(active_stages):
             phase = STAGES[cursor['stage']]
             total_updates = config['updates'][phase]
             if cursor['update'] == total_updates:
@@ -510,6 +536,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 optimizer, cache = None, None
                 continue
             if phase == 'TCM' and not transitions:
+                if requested_phase == 'tcm':
+                    raise ValueError('phase tcm requires observed temporal transitions; no updates can be completed')
                 history.append({'stage': phase, 'status': 'SKIPPED', 'reason': 'no observed temporal transitions',
                                 'completed_updates': 0})
                 cursor['update'] = total_updates
@@ -629,9 +657,36 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             if update % config['validate_every_updates'] == 0 or update == total_updates or interrupted:
                 checkpoint()
             if interrupted:
-                if not (phase == 'JOINT' and update == total_updates):
+                if not (phase == active_stages[-1] and update == total_updates):
                     write_run('INTERRUPTED')
                     return run
+        if requested_phase == 'tcm':
+            _synchronize(device)
+            evaluation_started = time.monotonic()
+            run['final_evaluation_status'] = 'FAILED'
+            run['selection_performed'] = False
+
+            def completion_progress(item):
+                run['final_evaluation_progress'] = item
+                runtime.write_json(output / 'evaluation-progress.json', item)
+
+            try:
+                evaluation = evaluate_tcm_completion(model, normalizer, validation_scenes,
+                    device=device, check=check, progress=completion_progress)
+                _synchronize(device)
+                run['final_evaluation_status'] = 'COMPLETED'
+            finally:
+                run['final_evaluation_seconds'] = time.monotonic() - evaluation_started
+            check()
+            runtime.write_json(output / 'completion-evaluation.json', evaluation)
+            runtime.write_json(output / 'summary.json', dict(phase=requested_phase,
+                selection_scope=run['selection_scope'], selection_performed=False,
+                completion_evaluation='completion-evaluation.json',
+                evaluation_seconds=run['final_evaluation_seconds'], normalizer=normalizer,
+                coverage=coverage, checkpoint='checkpoint.pt', test_opened=False))
+            check()
+            write_run('COMPLETED')
+            return run
         _synchronize(device)
         evaluation_started = time.monotonic()
         run['final_evaluation_status'] = 'FAILED'
