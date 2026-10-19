@@ -2,45 +2,53 @@
   "date": "2026-10-19",
   "user_words": [
     "几个实验啊，如果是多个实验分别跑不就行吗",
-    "可以的，你做合理安排，还有就是服务器AI现在还有没做的吗，判断一下还有做的必要吗，没有的话直接废除即可"
+    "可以的，你做合理安排，还有就是服务器AI现在还有没做的吗，判断一下还有做的必要吗，没有的话直接废除即可",
+    "我觉得我们不去限制时间了，顶多给个建议时长，比如如果超过时长的时候让ai问我后续如何处理，还有就是020到底是咋回事"
   ],
-  "context": "用户在参考最多24 GPU小时、候选整条线合计最多4 GPU小时的具体提案后，要求按独立实验拆分；已解释总上限不是串行等待时间，随后同意合理安排。按该上下文执行既有上限内拆分，不把用户原话伪造为逐字重述数字。",
+  "context": "最新用户决定覆盖原墙时硬上限：时长仅建议，超过时长由AI询问，不自动终止当前固定工作。没有批准增加训练更新、额外实验、自动重试或付费资源；不再要求确认4h/6h硬额度。在途020/021固化的旧截止不可通过改文件移除，不为此停止重开。",
+  "time_policy": "advisory",
+  "on_recommended_duration": "record_notice_and_ask_user_at_next_ai_check",
+  "while_waiting_for_reply": "continue_current_fixed_work_without_extra_updates_or_experiments",
+  "instant_notification_when_ai_offline": false,
   "reference": {
     "task": "020",
-    "max_seconds": 86400
+    "recommended_seconds": 86400
   },
   "candidate": {
     "shared": {
       "task": "021",
-      "max_seconds": 9600
+      "recommended_seconds": 14400
     },
     "arms": [
       {
         "task": "022",
         "route": "attribute-u",
-        "max_seconds": 1200
+        "recommended_seconds": 1200
       },
       {
         "task": "023",
         "route": "plain",
-        "max_seconds": 1200
+        "recommended_seconds": 1200
       },
       {
         "task": "024",
         "route": "scalar-u",
-        "max_seconds": 1200
+        "recommended_seconds": 1200
       },
       {
         "task": "025",
         "route": "learned-attribute",
-        "max_seconds": 1200
+        "recommended_seconds": 1200
       }
     ],
-    "cumulative_max_seconds": 14400
+    "cumulative_recommended_seconds": 21600,
+    "known_interrupted_attempt_seconds": 2132.710535170045,
+    "historical_limit_seconds": 14400
   },
   "max_concurrent_single_gpu_jobs": 2,
   "attempts_per_task": 1,
   "retry": false,
   "reuse_closed_budgets": false,
-  "fixed_caps_include_preparation_submission_training_evaluation_io_failure_and_cleanup": true
+  "account_preparation_submission_training_evaluation_io_failure_and_cleanup": true,
+  "running_legacy_jobs_keep_loaded_deadlines_until_they_finish_or_user_decides": true
 }
