@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 1916959,
+  "linger": "yes",
+  "unit": "mtad-748bb2c505e6.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-748bb2c505e6.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=26.989754s",
+    "--property=TimeoutStopSec=3.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/PERSISTENCE-CORRECTION-20261019-026-attempt-1/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/PERSISTENCE-CORRECTION-20261019-026-attempt-1/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/PERSISTENCE-CORRECTION-20261019-026-attempt-1"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-19T06:42:35.850857+00:00",
+  "elapsed_seconds": 0.07518604211509228
+}

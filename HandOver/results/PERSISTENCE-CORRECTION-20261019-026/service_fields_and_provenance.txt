@@ -1,0 +1,8 @@
+collected_at_utc: 2026-10-19T06:43:24Z
+unit: mtad-748bb2c505e6.service
+systemctl_show_after_unload: Result=success ExecMainCode=0 ExecMainStatus=0 NRestarts=0 ActiveState=inactive SubState=dead MainPID=0 ControlGroup=<empty after GC> Type=<empty> RuntimeMaxUSec=infinity TimeoutStopUSec=1min30s
+note: RuntimeMaxUSec/TimeoutStopUSec/Type above are post-unload defaults; the values actually applied are in launch.json systemd_argv (RuntimeMaxSec=26.989754s, TimeoutStopSec=3.000000s, Type=exec)
+journal_user_manager: systemd[1911324] Started/Starting the unit (user manager, not session-9554.scope)
+ai_own_cgroup_contrast: 0::/user.slice/user-1018.slice/session-9554.scope
+payload_cgroup_from_probe_start: 0::/user.slice/user-1018.slice/user@1018.service/app.slice/mtad-748bb2c505e6.service
+extracted_block_sha256: fd14fc2eac9b19a34aa5a1ff1014d62931b086ca8932268684af56cb6c620afb (861 B, from L2S-20261019-026.md)
