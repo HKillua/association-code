@@ -26,4 +26,4 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 显式传递MKL/OPENBLAS线程等所需环境；服务不继承AI shell全部环境。payload命令是argv，不通过shell展开。`launch.json`的SUBMITTED不是模型成功；重连读取`status.json`/exit_code及模型run/summary。systemd失败unit保留供Result/ExecMainStatus取证。用户管理器须可跨断开存在（Linger=yes），`session`仅本地核验，不可静默作为抵抗runtime回收的替代。当前019只做CPU验证，新训练配置与预算见[修复后方案](../../docs/proposals/repair_before_retraining/README.md)。
 
 
-候选v2可拆成共享阶段与独立融合臂：`fit --phase shared`先保存shared.pt、identity-records/与唯一阈值；随后`fit --phase arm --shared-from /已完成021输出 --route attribute-u --save-predictions`（其余臂替换route）。每臂有自己的输出与限时，只加载同normalizer/S/模型/loss/身份记录，不重训teacher/u或选阈值。默认full入口保持旧行为，shared不接受--save-predictions。正式配置和当前GPU队列以[交接索引](../../HandOver/Handover.md)为准，旧null草案不执行。
+候选v2可拆成共享阶段与独立融合臂：`fit --phase shared`先保存shared.pt、identity-records/与唯一阈值；随后`fit --phase arm --shared-from /已完成021输出 --route attribute-u --save-predictions`（其余臂替换route）。每臂有自己的输出与限时，只加载同normalizer/S/模型/loss/身份记录，不重训teacher/u或选阈值。默认full入口保持旧行为，shared不接受--save-predictions。正式配置和当前GPU队列以[交接索引](../../HandOver/Handover.md)为准，旧草案已从工作树删除。

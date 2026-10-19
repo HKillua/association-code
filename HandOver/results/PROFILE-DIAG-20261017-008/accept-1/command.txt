@@ -1,1 +1,0 @@
-env CUDA_VISIBLE_DEVICES= /home/wangguangjie/djs/mtad-field-20261016/bin/python - runs/PREP-NATIVE-20261017-007-attempt-1 runs/PROFILE-DIAG-20261017-008-attempt-1 GPU-6811d9c0-b8a4-b5fd-0175-790964d42afc 

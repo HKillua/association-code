@@ -1,1 +1,0 @@
-/usr/bin/time -v env CUDA_VISIBLE_DEVICES= /home/wangguangjie/djs/mtad-field-20261016/bin/python -m association.cli prepare --archive /home/wangguangjie/djs/data/mtad/数据集level2.zip --config configs/pilot.json --output runs/PREP-NATIVE-20261017-007-attempt-1 

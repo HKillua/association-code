@@ -1,3 +1,0 @@
-/home/wangguangjie/djs/diag008_wrapper.sh
-/home/wangguangjie/djs/diag008_phaseAB.sh
-/home/wangguangjie/djs/diag008_phaseC.sh

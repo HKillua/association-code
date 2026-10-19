@@ -1,8 +1,0 @@
-{
-  "directory": "/home/wangguangjie/djs/association-code/HandOver/results/ENV-20261016-005/attempt-1",
-  "cpu_actual_commit": "2af59d672385fbc85220b8717b495749fd36d71a",
-  "current_commit": "ebc9522780cd7769924bacbbd0289775738e1da2",
-  "validation_sha256": "94eb3b149f3c7163eea88a0b85f8c3bd2b20ae6b2da433501a29ff6003283f25",
-  "source_files_sha256": "311dd99b88be8804455eb81693eb5376ff2bd7e951acaed56f19035a6f4d52c7",
-  "environment_sha256": "d69e06422c8167393b3d80b7b98d22aa59e6b842bd2c0dca0af1c788f326514c"
-}

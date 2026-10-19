@@ -1,4 +1,0 @@
-searched locations (bounded, outside data packages; no script execution):
-FOUND diag008_wrapper.sh -> /home/wangguangjie/djs/diag008_wrapper.sh (bytes=2946 sha256=6894fd7481756d45d884642eeaf1448010c5d886ad41ee5d09100a045a76e7ae)
-FOUND diag008_phaseAB.sh -> /home/wangguangjie/djs/diag008_phaseAB.sh (bytes=4282 sha256=67c74c505ca6d85db4e4df298a67e7f392ad84a9ddd3854fb621629955614236)
-FOUND diag008_phaseC.sh -> /home/wangguangjie/djs/diag008_phaseC.sh (bytes=4569 sha256=efa76c132a699d75b24281827e28ddc5c8da4d54908d2c3393e92073b7b8b866)

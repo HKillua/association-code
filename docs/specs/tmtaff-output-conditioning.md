@@ -1,12 +1,12 @@
 # TFM物理输出尺度修正
 
-2026-10-18；状态：按用户“找到问题直接改代码”的最新授权实施本地修正，不授权新增GPU训练。证据见 `docs/results/tmtaff014_local_review/`。
+2026-10-18；状态：按用户“找到问题直接改代码”的最新授权实施本地修正，不授权新增GPU训练。旧证据见[Git历史](https://github.com/HKillua/association-code/tree/612afea/docs/results/tmtaff014_local_review)。
 
 014的358个真实身份多轨组全部出现千万米级误差；42个二轨组同样异常。当前最终LayerNorm之后直接线性输出原始经纬度，Xavier零偏置初始化与Adam短更新量不能迅速跨到约131°的经度区域。它是当前近似实现的数值参数化与训练方案冲突，不能冒称查到了作者代码的缺陷。
 
 ## 行为与范围
 
-增加显式 `PairFusionConfig.output_parameterization`，允许 `raw`（默认、历史行为）和 `train_position_affine`。017正式参考配置已选择后者并获得独立预算；本页不授权新训练或改动017活动配置。
+增加显式 `PairFusionConfig.output_parameterization`，允许 `raw`（默认、历史行为）和 `train_position_affine`。017和当前020参考配置均选择后者；本页记录行为，实际执行见交接索引。
 
 `train_position_affine`仅将经纬度投影 z 按仅由T_core原生输入拟合的固定统计量恢复 `position = z * std[:2] + mean[:2]`。速度沿用原raw投影softplus，航向沿用原raw投影，不用速度/航向mean/std。连续SmoothL1、速度/航向损失、损失权重、TCM/TAM、分组递归、参数规模、数据/标签/采样/选择规则不变。不增加经纬度裁剪、不用V/reference拟合尺度、不改历史运行或候选实现。命名为“TMTAFF时间与输出尺度适配近似参考”，不是原作者精确实现，也不是创新模块。
 

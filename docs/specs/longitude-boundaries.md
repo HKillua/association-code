@@ -22,7 +22,7 @@
 
 旧调用、旧正式JSON、旧checkpoint缺新字段均保持linear；接口没有自动升级历史实验。017的正式JSON未改。单独选择shortest_arc会改变跨日期线样本的监督或目标函数，须在报告中明确，不把修正前后分数当完全相同处理。
 
-尚未真实训练的候选v2 [草案](../proposals/candidate_revision_after018/config.draft.json)显式启用两个shortest_arc选项；其`max_seconds`仍为null，不构成GPU授权或READY。v2合成CLI检查显式启用新loss；合成原生ZIP检查同时覆盖新的reference装配。既有legacy合成检查维持原行为。
+当前020参考与021—025候选正式配置均显式启用两个shortest_arc选项，见[执行安排](../proposals/repair_before_retraining/README.md)。合成原生ZIP检查覆盖参考装配和新loss；历史linear路径继续兼容。
 
 ## CPU验收
 

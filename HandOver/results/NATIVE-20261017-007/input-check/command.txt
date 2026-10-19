@@ -1,1 +1,0 @@
-env CUDA_VISIBLE_DEVICES= /home/wangguangjie/djs/mtad-field-20261016/bin/python - /home/wangguangjie/djs/data/mtad/数据集level2.zip 

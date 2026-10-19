@@ -17,7 +17,7 @@
 
 任一量测非数值/非有限、非法坐标/速度/航向、缺失或歧义标签、同刻冲突，会隔离整个节点。完全相同数值重复去除；只剩一个时刻不足以保留。冲突检查先于航向canonical化，同刻0/360不静默合并。隔离原因、原行、身份与正对覆盖变化保留；未知量测或缺节点不能不记账。
 
-官方指南与原论文的速度单位相冲突；8固定场景几何差分支持vel更接近节，但不是全库统一物理单位证明。当前没有量测/reference单边换算错误证据，速度尾部不自动删除，也不把速度直接用于未经核验单位的运动学门限。见[数据复查](results/dataset_followup018/README.md)。
+官方指南与原论文的速度单位相冲突；8固定场景几何差分支持vel更接近节，但不是全库统一物理单位证明。当前没有量测/reference单边换算错误证据，速度尾部不自动删除，也不把速度直接用于未经核验单位的运动学门限。见[已完成的数据复查](https://github.com/HKillua/association-code/blob/612afea/docs/results/dataset_followup018/README.md)。
 
 ## 冻结划分与已知数据暴露
 
@@ -25,25 +25,47 @@
 
 开发锚点共71个：原53个`0,1,2,100,200,…,4900,4999`，加Level1 scene0初次预览所关联的18个Level2场景：`133,878,938,1174,1214,1372,1443,1853,1929,2052,2244,2697,3048,3670,3839,4576,4682,4731`。其共享A组件保守归训练。预览暴露已记录，旧缺锚点manifest不能作为新实验冻结划分；历史结果不改写。
 
-两level均5000场景，关联标签中26,221个A跨level共享，同编号场景A集合不相同；level名称不证明难度、独立性或训练/测试角色。Level1分卷需作为一个ZIP读取，不分卷独立解压；当前不授权合并level。原始统计见[Level1摘要](level1_intake_summary.json)、[隔离复核](level1_isolation_verification.json)。T_test量测、reference和预测继续封存；构建/核对隔离所需标签元数据不等于打开其模型评价。
+两level均5000场景，关联标签中26,221个A跨level共享，同编号场景A集合不相同；level名称不证明难度、独立性或训练/测试角色。Level1分卷需作为一个ZIP读取，不分卷独立解压；当前不授权合并level。原始统计见[Level1摘要](https://github.com/HKillua/association-code/blob/612afea/docs/level1_intake_summary.json)、[隔离复核](https://github.com/HKillua/association-code/blob/612afea/docs/level1_isolation_verification.json)。T_test量测、reference和预测继续封存；构建/核对隔离所需标签元数据不等于打开其模型评价。
+
+## 已核人口与监督分母
+
+以下来自已完成的576场景CPU审计和原manifest装配，不是新模型结果；详细原件查[612afea审计快照](https://github.com/HKillua/association-code/tree/612afea/docs/results/frozen_input_audit_20261018)。历史逐场景副本已从工作树移除，无须重新扫描。
+
+| 已核统计 | T_core | V_select |
+| --- | ---: | ---: |
+| 场景数 | 512 | 64 |
+| 有效轨 / 隔离轨 | 54,792 / 1,873 | 1,635 / 51 |
+| 原生点数 | 2,938,785 | 47,303 |
+| cap128保点率 | 78.62% | 97.35% |
+| Q64零 / 单支撑轨 | 567 / 1,798 | 8 / 62 |
+| 正候选 / 负候选 | 110,733 / 18,138,651 | 3,297 / 25,711 |
+| 标签目标 / 目标×Q64 | 12,699 / 812,736 | 377 / 24,128 |
+| gap600合法lat/lon/vel查询 | 623,895（76.7648%） | 18,364（76.1107%） |
+| 未采用gap180的合法查询 | 470,395（57.8780%） | 12,516（51.8733%） |
+
+零共同query支撑不是原生输入为空：所有有效片段至少有两个不同真实时刻，cap保首尾。gap600每个标签身份的每种属性均至少一个合法query；训练cou合法数比前三维多2。gap180会让57个训练身份全无监督，故不能把600静默改成180。gap600无监督查询中，训练99.4657%、V99.8439%源于超出该身份实际reference首末时间；其余为属性无效/同刻冲突，不是缺整份reference。
 
 ## 原生输入与共同物理时间
 
-`native_inputs.py`保留有效片段真实点；`timed_inputs.py`按显式cap均匀选原点，保首尾，不先投共同64格。当前cap128，保留全部54,792条训练有效轨，但只保留78.62%原始训练点；“保轨”不等于“保全部点”。短轨在Q64无/仅一个支撑时刻仍保留至少两个真实native点。
+`association/data/native.py`保留有效片段真实点；`association/data/timed.py`按显式cap均匀选原点，保首尾，不先投共同64格。当前cap128，保留全部54,792条训练有效轨，但只保留78.62%原始训练点；“保轨”不等于“保全部点”。短轨在Q64无/仅一个支撑时刻仍保留至少两个真实native点。
 
 当前共同Q64为场景全部有效canonical片段最早/最晚观测间的linspace，原点为最早观测；不使用reference可用性决定窗口。`tau=(t-origin)/20`中的20秒是编码尺度，不是原采样周期或固定查询步长。实际query、原生点、reference监督统一物理时钟，位置和mask按真实时刻计算。原生物理状态先插值再归一化；训练统计仅从训练侧可见native点拟合，V不重fit。
 
-TCM显式接收原生时间与下一预测时刻，共同query支持内插值、支持外双向递推。详见[时间适配规格](specs/tmtaff-time-adaptation.md)。整场景窗口是我们的工程适配，论文未公开可还原窗长；[时间分析](results/time_task_analysis20261019/README.md)没有证明它最优，也不将21分钟切窗作为当前前置。
+训练场景首末跨度中位119.7分钟，单片段中位24.5分钟，Q64相邻query中位114秒；原生相邻间隔中位训练9001/9002为30/15.722秒，开发为67/34.003秒。因此20秒编码单位不能解释成数据采样周期。训练cap128最大保留点间隔909秒；FP32时刻最大舍入0.000304699秒，保留递增和支撑归属，但有1个不同内部native/query时刻转换后重合，不声称全部时间无碰撞。
+
+21分钟滑窗会使37.49%的原同身份片段对不再共窗，轨窗口副本为原轨4.32倍；保短轨不等于保全部接续关联任务，当前不切窗。全部训练片段×Q64按端点区间分类：自身内25.97%，自身外但同身份其他片段内46.42%，身份包络内全部片段外5.44%，身份包络外22.17%。这些是oracle潜在支撑上界，未按reference过滤，不能当作实际抽样输入或模型已获辅助信息。
+
+TCM显式接收原生时间与下一预测时刻，共同query支持内插值、支持外双向递推。详见[时间适配规格](specs/tmtaff-time-adaptation.md)。整场景窗口是我们的工程适配，论文未公开可还原窗长；[已完成的时间分析](https://github.com/HKillua/association-code/blob/612afea/docs/results/time_task_analysis20261019/README.md)没有证明它最优，也不将21分钟切窗作为当前前置。
 
 旧`scene64-quantized-endpoints-in-support-v1`只服务历史A0/A_full/CDF/TSA产物：每轨按自身首尾内插值，放在量化后的名义槽，实际与名义时刻可能不同，旧模型不读实际时刻。不得把旧缓存直接接作当前严格时间监督，或混排新旧分数。失配证据与修正经过见[历史摘要](history/README.md)。
 
 ## 显式reference与合法监督
 
-`reference_states.read_reference_states`只读调用方明确列出的T_core/T_head/V_select场景，拒绝T_test和跨划分请求；原列为`MMSI,time,lat,lon,vel,cou`。保留原行序、行号、字段字符串和问题记录，不在reader中移动时钟、插值、造量测或自动修复冲突。完整trainer现已接入该接口，原“未接入CLI”状态已过时。
+`association.data.reference_states.read_reference_states`只读调用方明确列出的T_core/T_head/V_select场景，拒绝T_test和跨划分请求；原列为`MMSI,time,lat,lon,vel,cou`。保留原行序、行号、字段字符串和问题记录，不在reader中移动时钟、插值、造量测或自动修复冲突。完整trainer现已接入该接口，原“未接入CLI”状态已过时。
 
-`align_reference_states`用显式`raw_time - offset`对齐；576个场景offset已逐场景核验并固化，不能由运行时预测误差重新选。每个query按身份/属性独立mask：精确时刻合法才监督；否则只在相邻参考时刻gap≤600且两端属性均合法、无冲突时插值。不外推真值，不跨无效端点，不因缺监督删身份或重抽配对。航向最短弧、180°歧义无效；经度默认历史linear与新显式shortest_arc分别记录，见[经度边界](specs/longitude-boundaries.md)，017不自动改变。
+`association.data.targets.align_reference_states`用显式`raw_time - offset`对齐；576个场景offset已逐场景核验并固化，其中73场景非零、最大2453秒，不能由运行时预测误差重新选。每个query按身份/属性独立mask：精确时刻合法才监督；否则只在相邻参考时刻gap≤600且两端属性均合法、无冲突时插值。不外推真值，不跨无效端点，不因缺监督删身份或重抽配对。航向最短弧、180°歧义无效；经度历史linear与新任务显式shortest_arc分别记录，见[经度边界](specs/longitude-boundaries.md)；已结束017原件不回改。
 
-gap600是用户已批准的首轮规则，可能平滑转弯，不是作者参数或“真实运动必线性”的证明。训练监督覆盖76.7648%、V76.1107%（lat/lon/vel）；约23%缺口绝大多数是query超出该身份实际reference支撑，而非整份真值缺失。目标总人口仍包含无有效节点/参考的标签身份，漏预测留在覆盖分母。完整[时钟/输入/监督证据](results/frozen_input_audit_20261018/README.md)已完成，无须重复扫描。
+gap600是用户已批准的首轮规则，可能平滑转弯，不是作者参数或“真实运动必线性”的证明。训练监督覆盖76.7648%、V76.1107%（lat/lon/vel）；约23%缺口绝大多数是query超出该身份实际reference支撑，而非整份真值缺失。目标总人口仍包含无有效节点/参考的标签身份，漏预测留在覆盖分母。完整[时钟/输入/监督证据](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/README.md)已完成，无须重复扫描。
 
 reference只用于监督、开发评价和已披露离线审计，不进模型forward、推理分组或门控。9001在已审576场景的1,112,337个唯一匹配点四状态与reference相同，限制已有观测降噪主张；不是网络预测成绩或全库无噪声结论。
 

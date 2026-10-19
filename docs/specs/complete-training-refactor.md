@@ -12,13 +12,13 @@
 
 ## 监督、选择与全人口评价
 
-`build_scene_fusion_targets`按显式目标顺序保全部身份，每行query_times等于输入物理网格。每场景offset与最大参考gap显式给定，不能自动按效果搜索。当前已批准cap128/time_unit20/offset/gap600，审计证据见[数据契约](../data_contract.md)和[冻结输入/监督审计](../results/frozen_input_audit_20261018/README.md)。
+`build_scene_fusion_targets`按显式目标顺序保全部身份，每行query_times等于输入物理网格。每场景offset与最大参考gap显式给定，不能自动按效果搜索。当前已批准cap128/time_unit20/offset/gap600，审计证据见[数据契约](../data_contract.md)和[冻结输入/监督审计](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/README.md)。
 
 TAM/joint按原完整V macro-F1选快照及阈值；TFM保留末步，不称“关联最优”就是“融合最优”。选中association可以来自TAM某次验证，而fusion含后续TFM末步；累计训练更新不能全称为选中组成。终评重载selected并核同阈值确定性复算，不偷偷增加模型选择。
 
 完整评价保留全部目标、输出组、单例、重复/漏目标和错并拆分。预测分组不接真实身份，oracle分组独立诊断；baseline singleton只输出已有观测，候选可模型补全，必须披露差别。单源按source固定首有效片段，简单融合先各source再均值，不按reference挑最好片段；经度/航向圆均值，抵消处无效。
 
-位置球面米误差、native速度、圆周航向与覆盖共同报告。共同有效点误差不能替代全人口，零交集为null。新增[实际输入支撑/距离诊断](input-support-evaluation.md)不改主指标、阈值或选模，也不在017活动checkout回填或触发重跑。
+位置球面米误差、native速度、圆周航向与覆盖共同报告。共同有效点误差不能替代全人口，零交集为null。新增[实际输入支撑/距离诊断](input-support-evaluation.md)不改主指标、阈值或选模，不回填旧运行或触发重跑。
 
 ## 一次训练侧CL margin校准
 
@@ -46,6 +46,6 @@ checkpoint包括association/fusion/loss状态、阶段optimizer、sampler/RNG、
 
 ## 已完成验证与限制
 
-原生小型合成ZIP→显式reference→四阶段CPU更新→完整V评价/选定重载已通过；含dropout中断恢复、冻结/解冻、监督分母、无效输入、预算和RNG/模式隔离。独立审查及既有回归完成，历次软件记录可在Git历史与[CPU原日志](../results/frozen_input_audit_20261018/local_cpu_regression.log)追溯。当前整仓累计检查以[实现交接](../../HandOver/Handover.md)为准，不把历史304/347/371项当仍待完成的新工作。
+原生小型合成ZIP→显式reference→四阶段CPU更新→完整V评价/选定重载已通过；含dropout中断恢复、冻结/解冻、监督分母、无效输入、预算和RNG/模式隔离。独立审查及既有回归完成，历次软件记录可在Git历史与[CPU原日志](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/local_cpu_regression.log)追溯。当前整仓累计检查以[实现交接](../../HandOver/Handover.md)为准，不把历史304/347/371项当仍待完成的新工作。
 
 013/014已有真实短训/独立终评证据，017是修正后开发训练，均不能据CPU通过声称完整论文训练成功。实际效果只据运行原件解释；本规格没有新的训练授权。

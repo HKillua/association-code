@@ -1,2 +1,0 @@
-index, uuid, pci.bus_id, memory.used [MiB], utilization.gpu [%]
-1, GPU-6811d9c0-b8a4-b5fd-0175-790964d42afc, 00000000:03:00.0, 12 MiB, 0 %
