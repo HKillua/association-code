@@ -340,6 +340,31 @@ class CompleteTrainingTests(unittest.TestCase):
         with self.assertRaisesRegex(TimeoutError, 'exhausted'):
             self.fit('exhausted', resume_from=self.root / 'first')
         self.assertFalse((self.root / 'exhausted').exists())
+        self.config['time_policy'] = 'advisory'
+        continued = self.fit('advisory-resume', resume_from=self.root / 'first')
+        self.assertEqual(continued['status'], 'COMPLETED')
+        self.assertEqual(continued['cursor']['completed_updates'], 8)
+        self.assertGreaterEqual(continued['elapsed_seconds'], report['elapsed_seconds'])
+        self.assertEqual(continued['config']['time_policy'], 'advisory')
+
+    def test_cli_advisory_covers_preparation_and_complete_training(self):
+        from contextlib import redirect_stderr, redirect_stdout
+        import io
+        from tests.fixtures.native_zip import make_native_zip_fixture
+        from tools.experiments.tmtaff_complete_fit import main
+        fixture = make_native_zip_fixture(self)
+        fixture.config['training']['max_hours'] = 1e-12
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(main(['--device', 'cpu', *fixture.cli_args('hard')]), 1)
+            self.assertFalse((fixture.root/'hard').exists())
+            self.assertEqual(main(['--device', 'cpu', '--time-policy', 'advisory',
+                                   *fixture.cli_args('advisory')]), 0)
+        run = runtime.read_json(fixture.root/'advisory'/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['cursor']['completed_updates'], 4)
+        self.assertEqual(run['config']['time_policy'], 'advisory')
+        prepared = runtime.read_json(fixture.root/'advisory'/'preparation.json')
+        self.assertEqual(prepared['configuration']['training']['time_policy'], 'advisory')
 
 
 if __name__ == '__main__':

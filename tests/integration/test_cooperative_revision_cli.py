@@ -3,6 +3,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import asdict
 import io
 from pathlib import Path
+import signal
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -73,11 +74,13 @@ class CooperativeRevisionCLITests(unittest.TestCase):
     def test_v2_native_zip_keeps_reference_only_scene_in_population(self):
         fixture = native_fixture.make_native_zip_fixture(self)
         fixture.config = self.configuration()
+        fixture.config['training']['max_seconds'] = 1e-12
         self.assertEqual(self.invoke(['fit', '--device', 'cpu', '--cpu-threads', '1',
-                         '--save-predictions', *fixture.cli_args('v2')]), 0)
+                         '--time-policy', 'advisory', '--save-predictions', *fixture.cli_args('v2')]), 0)
         output = fixture.root/'v2'
         run = runtime.read_json(output/'run.json')
         self.assertEqual(run['completed_updates'], 6)
+        self.assertEqual(run['training']['time_policy'], 'advisory')
         preparation = runtime.read_json(output/'execution.json')['preparation']
         self.assertFalse(preparation['test_opened'])
         self.assertEqual(preparation['reference_longitude_policy'], 'shortest_arc')
@@ -104,15 +107,53 @@ class CooperativeRevisionCLITests(unittest.TestCase):
         self.assertEqual(self.invoke([*common, '--phase', 'shared', '--output', str(shared)]), 0)
         self.assertTrue((shared/'shared.pt').is_file())
         self.assertFalse(list(shared.glob('*-evaluation.json')))
+        # Existing 021 endpoints predate the explicit timing-policy field.
+        old_run = runtime.read_json(shared/'run.json')
+        old_run['training'].pop('time_policy')
+        runtime.write_json(shared/'run.json', old_run)
+        old_checkpoint = torch.load(shared/'shared.pt', weights_only=True)
+        old_checkpoint['training'].pop('time_policy')
+        torch.save(old_checkpoint, shared/'shared.pt')
         self.assertEqual(self.invoke([*common, '--phase', 'arm', '--shared-from', str(shared),
+                         '--time-policy', 'advisory',
                          '--route', 'attribute-u', '--save-predictions', '--output', str(arm)]), 0)
         run = runtime.read_json(arm/'run.json')
         self.assertEqual(run['completed_updates'], 1)
         self.assertEqual(run['completed_routes'], ['attribute-u'])
+        self.assertEqual(run['training']['time_policy'], 'advisory')
         self.assertEqual(runtime.read_json(arm/'execution.json')['phase'], 'arm')
         self.assertTrue((arm/'attribute-u-predictions/index.json').is_file())
         self.assertFalse((arm/'teacher.pt').exists())
         self.assertFalse((arm/'utility.pt').exists())
+
+    def test_second_sigterm_during_terminal_write_keeps_original_failure(self):
+        from tools.experiments.tmtaff_complete_fit import main as reference_main
+        for name, entry, update, terminal in (
+                ('reference', reference_main, 'association.training.tmtaff._update', 'FAILED'),
+                ('candidate', main, 'association.training.cooperative.train_batch', 'INTERRUPTED')):
+            with self.subTest(name=name):
+                fixture = native_fixture.make_native_zip_fixture(self)
+                prefix = ['--device', 'cpu']
+                if name == 'candidate':
+                    fixture.config = self.configuration()
+                    prefix.insert(0, 'fit')
+                output = fixture.root/name
+                original_signal = signal.getsignal(signal.SIGTERM)
+                write_json = runtime.write_json
+                repeated = []
+                def write_terminal(path, value):
+                    if Path(path) == output/'run.json' and value.get('status') == terminal:
+                        repeated.append(True)
+                        signal.raise_signal(signal.SIGTERM)
+                    return write_json(path, value)
+                with (patch(update, side_effect=lambda *a, **kw: signal.raise_signal(signal.SIGTERM)),
+                      patch.object(runtime, 'write_json', side_effect=write_terminal),
+                      redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO())):
+                    self.assertEqual(entry([*prefix, *fixture.cli_args(name)]), 1)
+                self.assertEqual(len(repeated), 1)
+                self.assertEqual(runtime.read_json(output/'run.json')['status'], terminal)
+                self.assertEqual(signal.getsignal(signal.SIGTERM), original_signal)
+                self.assertTrue((output/('preparation.json' if name == 'reference' else 'execution.json')).exists())
 
     def test_no_budget_or_inconsistent_variant_fails_before_opening_archive(self):
         cases = []

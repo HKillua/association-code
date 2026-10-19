@@ -184,6 +184,12 @@ class CooperativeTrainingTests(unittest.TestCase):
             with self.assertRaises(TimeoutError):
                 train_cooperative([self.scene], [self.validation], self.config, cfg, interrupted, device='cpu')
             self.assertEqual(json.loads((interrupted / 'run.json').read_text())['status'], 'INTERRUPTED')
+            cfg['time_policy'] = 'advisory'
+            result = train_cooperative([self.scene], [self.validation], self.config, cfg,
+                Path(folder)/'advisory', device='cpu', initial_elapsed_seconds=10.)
+            self.assertEqual(result['status'], 'COMPLETED')
+            self.assertEqual(result['completed_updates'], 5)
+            self.assertGreaterEqual(result['elapsed_seconds'], 10.)
 
     def test_training_contract_rejects_changed_candidates_labels_and_invalid_targets(self):
         changed = []

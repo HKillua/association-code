@@ -326,10 +326,13 @@ def training_configuration(config):
     required = {'seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates',
                 'learning_rate', 'gradient_clip', 'endpoint_fraction', 'utility_epsilon',
                 'error_scale_policy', 'routes', 'max_seconds', 'batch_tracks', 'pair_batch_size'}
-    if not required.issubset(config) or set(config) - required - {'longitude_loss_mode'}:
+    if not required.issubset(config) or set(config) - required - {'longitude_loss_mode', 'time_policy'}:
         raise ValueError('candidate training config must explicitly contain ' + ', '.join(sorted(required)))
     cfg = dict(config)
     cfg.setdefault('longitude_loss_mode', 'linear')
+    cfg.setdefault('time_policy', 'hard')
+    if cfg['time_policy'] not in ('hard', 'advisory'):
+        raise ValueError('time_policy must be hard or advisory')
     if cfg['longitude_loss_mode'] not in ('linear', 'shortest_arc'):
         raise ValueError('longitude_loss_mode must be linear or shortest_arc')
     for key in ('seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates', 'batch_tracks', 'pair_batch_size'):
@@ -458,9 +461,10 @@ def _load_shared(directory, model_config, config, contract, validation_scenes):
                 'identity_selection', 'identity_selection_phase'):
         if payload.get(key) != source.get(key):
             raise ValueError('shared checkpoint/run disagree on ' + key)
-    protocol = lambda cfg: {key: value for key, value in cfg.items() if key != 'max_seconds'}
+    protocol = lambda cfg: {key: value for key, value in cfg.items()
+                            if key not in ('max_seconds', 'time_policy')}
     if protocol(payload['training']) != protocol(config) or payload['model_config'] != asdict(model_config):
-        raise ValueError('shared training/model protocol differs; only job budget may change')
+        raise ValueError('shared training/model protocol differs; only job timing may change')
     if payload['scene_contract'] != contract:
         raise ValueError('shared scene contract differs from current train/validation population')
     if (payload.get('stage') != 'utility' or payload.get('completed_updates') != config['utility_updates']
@@ -539,7 +543,7 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     def bounded():
         if check:
             check()
-        if initial_elapsed_seconds + time.monotonic() - started >= cfg['max_seconds']:
+        if cfg['time_policy'] == 'hard' and initial_elapsed_seconds + time.monotonic() - started >= cfg['max_seconds']:
             raise TimeoutError('cumulative candidate budget exhausted')
     output.mkdir(parents=True, exist_ok=False)
     run = dict(status='RUNNING', device=str(device), training=cfg, model_config=asdict(model_config),

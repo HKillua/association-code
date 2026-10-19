@@ -55,14 +55,17 @@ def _configuration(config):
     config = copy.deepcopy(config)
     config.setdefault('margin_policy', 'fixed')
     config.setdefault('longitude_loss_mode', 'linear')
+    config.setdefault('time_policy', 'hard')
     required = {'updates', 'learning_rates', 'seed', 'branch', 'batch_tracks',
                 'pair_batch_size', 'pair_microbatch', 'track_microbatch',
                 'completion_weight', 'gradient_clip', 'max_hours',
                 'validate_every_updates', 'completion_cache_mib',
                 'position_loss_mode', 'longitude_loss_mode', 'lr_schedule', 'singleton_policy',
-                'validation_batches', 'margin_policy'}
+                'validation_batches', 'margin_policy', 'time_policy'}
     if set(config) != required:
         raise ValueError(f'config requires exactly {sorted(required)}')
+    if config['time_policy'] not in ('hard', 'advisory'):
+        raise ValueError('time_policy must be hard or advisory')
     for field in ('updates', 'learning_rates'):
         if set(config[field]) != set(STAGES):
             raise ValueError(f'{field} must explicitly contain all four stages')
@@ -364,7 +367,11 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         if previous_run.get('status') != 'INTERRUPTED':
             raise ValueError('only an INTERRUPTED run can resume; failed runs are not automatic retries')
         saved = torch.load(previous / 'checkpoint.pt', map_location='cpu', weights_only=True)
-        if (_configuration(saved['config']) != config or saved['model_config'] != asdict(model_config)
+        previous_config = _configuration(saved['config'])
+        # An explicit scheduling-policy change does not change the trained
+        # protocol. Keep all scientific configuration and elapsed accounting.
+        previous_config['time_policy'] = config['time_policy']
+        if (previous_config != config or saved['model_config'] != asdict(model_config)
                 or asdict(PairFusionConfig(**saved['fusion_config'])) != asdict(fusion_config)
                 or saved['data_contract'] != contract
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
@@ -382,7 +389,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                   or (saved['cursor']['stage'] == 1 and saved['cursor']['update'] > 0)):
                 raise ValueError('cannot resume trained TAM without its completed margin calibration')
         spent_before = max(float(saved['elapsed_seconds']), float(previous_run['elapsed_seconds']))
-    if spent_before + initial_elapsed_seconds >= config['max_hours'] * 3600:
+    if config['time_policy'] == 'hard' and spent_before + initial_elapsed_seconds >= config['max_hours'] * 3600:
         raise TimeoutError('cumulative training budget is exhausted')
     output.mkdir(parents=True, exist_ok=False)
     history = [] if saved is None else copy.deepcopy(saved['history'])
@@ -428,7 +435,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         return spent_before + initial_elapsed_seconds + time.monotonic() - started
 
     def check():
-        if elapsed() >= config['max_hours'] * 3600:
+        if config['time_policy'] == 'hard' and elapsed() >= config['max_hours'] * 3600:
             raise TimeoutError('cumulative training budget exceeded')
 
     def write_run(status, **extra):

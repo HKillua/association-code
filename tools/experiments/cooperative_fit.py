@@ -118,6 +118,8 @@ def main(argv=None):
     parser.add_argument('--device', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--time-policy', choices=('hard', 'advisory'),
+                        help='override job timing only; advisory keeps the fixed update plan after the suggested duration')
     parser.add_argument('--model-variant', choices=('legacy', 'support_residual_v2'),
                         help='Synthetic checks only; native fit reads the explicit model variant from config')
     parser.add_argument('--save-predictions', action='store_true',
@@ -133,6 +135,7 @@ def main(argv=None):
     started = time.monotonic()
     previous = signal.getsignal(signal.SIGTERM)
     def interrupted(signum, frame):
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
         raise InterruptedError('SIGTERM; candidate did not complete')
     signal.signal(signal.SIGTERM, interrupted)
     try:
@@ -168,6 +171,8 @@ def main(argv=None):
                     model_variant=variant,
                     support_time_policy='train_absmax_v1' if variant == 'support_residual_v2' else 'legacy')
                 training = synthetic_configuration(variant)
+                if args.time_policy is not None:
+                    training['time_policy'] = args.time_policy
                 train, validation = synthetic_scenes(model)
             else:
                 if not all(getattr(args, key) for key in ('archive', 'manifest', 'alignment', 'config')):
@@ -186,6 +191,8 @@ def main(argv=None):
                     raise ValueError('configuration scope and model_variant disagree')
                 if args.phase != 'full' and model.model_variant != 'support_residual_v2':
                     raise ValueError('shared/arm phases require support_residual_v2')
+                if args.time_policy is not None:
+                    config['training']['time_policy'] = args.time_policy
                 training = training_configuration(config['training'])
                 expected_routes = synthetic_configuration(model.model_variant)['routes']
                 if (model.model_variant == 'support_residual_v2' and training['routes'] != expected_routes
@@ -193,7 +200,7 @@ def main(argv=None):
                         any(route not in (*expected_routes, 'support') for route in training['routes'])):
                     raise ValueError('configuration routes and model_variant disagree')
                 def check():
-                    if time.monotonic()-started >= training['max_seconds']:
+                    if training['time_policy'] == 'hard' and time.monotonic()-started >= training['max_seconds']:
                         raise TimeoutError('candidate budget exhausted during preparation')
                 from association.data.dataset import load_timed_dataset
                 dataset = load_timed_dataset(args.archive, runtime.read_json(args.manifest),

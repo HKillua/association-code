@@ -21,9 +21,10 @@ class DetachedLaunchTests(unittest.TestCase):
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
 
-    def args(self, name, code, *, backend='session', budget=8., grace=.4):
+    def args(self, name, code, *, backend='session', budget=8., grace=.4, time_policy='hard'):
         return ['--backend', backend, '--cwd', str(self.root), '--record-dir', str(self.root/name),
                 '--max-seconds', str(budget), '--grace-seconds', str(grace),
+                '--time-policy', time_policy,
                 '--env', 'DETACHED_TEST_LITERAL=$not_expanded;$(no_shell)',
                 '--', sys.executable, '-c', code]
 
@@ -91,6 +92,39 @@ class DetachedLaunchTests(unittest.TestCase):
         self.assertFalse((self.root/'escaped').exists())
         self.assertTrue((self.root/'cleanup-completed').exists())
 
+    def test_advisory_crossing_continues_the_same_payload_to_completion(self):
+        code = "import time; time.sleep(.6); print('completed after recommendation')"
+        self.assertEqual(self.invoke(self.args('advisory', code, budget=.2, time_policy='advisory')).returncode, 0)
+        record = self.root/'advisory'
+        advisory = json.loads(self.wait_file(record/'time_advisory.json'))
+        result = self.wait_file(record/'status.json', terminal=True)
+        self.assertEqual((result['status'], result['returncode']), ('COMPLETED', 0))
+        self.assertTrue(result['time_advisory_issued'])
+        self.assertFalse(result['timed_out'])
+        self.assertFalse(result['deadline_exceeded'])
+        self.assertTrue(advisory['needs_user_review'])
+        self.assertEqual(advisory['action'], 'continued_current_job')
+        self.assertEqual(advisory['recommended_seconds'], .2)
+        self.assertGreaterEqual(advisory['elapsed_seconds'], .2)
+        self.assertEqual(json.loads((record/'time_advisory.json').read_text()), advisory)
+        self.assertEqual((record/'stdout.log').read_text(), 'completed after recommendation\n')
+        self.assertEqual((record/'worker.stderr.log').read_text().count('TIME ADVISORY:'), 1)
+
+    def test_explicit_stop_after_advisory_still_cleans_payload_group(self):
+        child = "import os,signal,time; from pathlib import Path; signal.signal(signal.SIGTERM,signal.SIG_IGN); Path('advisory-child.pid').write_text(str(os.getpid())); time.sleep(30)"
+        code = "import subprocess,sys,time; subprocess.Popen([sys.executable,'-c',"+repr(child)+"]); time.sleep(30)"
+        self.assertEqual(self.invoke(self.args('stop-advisory', code, budget=.3, grace=.2, time_policy='advisory')).returncode, 0)
+        record = self.root/'stop-advisory'
+        pid = int(self.wait_file(self.root/'advisory-child.pid'))
+        self.wait_file(record/'time_advisory.json')
+        os.kill(int(self.wait_file(record/'worker.pid')), signal.SIGTERM)
+        result = self.wait_file(record/'status.json', terminal=True)
+        self.assertEqual(result['status'], 'INTERRUPTED')
+        self.assertTrue(result['time_advisory_issued'])
+        self.assertFalse(result['timed_out'])
+        state = subprocess.run(['ps', '-p', str(pid), '-o', 'stat='], capture_output=True, text=True).stdout.strip()
+        self.assertTrue(not state or state.startswith('Z'), state)
+
     def test_systemd_uses_detached_service_budget_and_linger_without_shell(self):
         binary = self.root/'bin'
         binary.mkdir()
@@ -115,6 +149,11 @@ class DetachedLaunchTests(unittest.TestCase):
         request = json.loads((self.root/'systemd'/'request.json').read_text())
         self.assertEqual(request['argv'][-1], "print('$literal;$(no_shell)')")
         self.assertFalse((self.root/'systemd'/'status.json').exists())  # No real user manager used.
+        advisory_args = self.args('systemd-advisory', 'pass', backend='systemd', budget=.1, time_policy='advisory')
+        self.assertEqual(self.invoke(advisory_args, env=env).returncode, 0)
+        self.assertIn('--property=RuntimeMaxSec=infinity', json.loads(capture.read_text()))
+        advisory_request = json.loads((self.root/'systemd-advisory'/'request.json').read_text())
+        self.assertIsNone(advisory_request['deadline_monotonic'])
         (binary/'loginctl').write_text('#!'+sys.executable+"\nprint('no')\n")
         self.assertEqual(self.invoke(self.args('no-linger', 'pass', backend='systemd'), env=env).returncode, 1)
         self.assertEqual(json.loads((self.root/'no-linger'/'launch.json').read_text())['status'], 'FAILED')

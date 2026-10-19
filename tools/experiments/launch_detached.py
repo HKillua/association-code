@@ -1,4 +1,4 @@
-"""Launch one bounded job, normally as a detached systemd user service.
+"""Launch one job, normally as a detached systemd user service.
 
 Example (use the separately approved budget, absolute Python and a NEW record):
   python tools/experiments/launch_detached.py --cwd /path/to/checkout \
@@ -8,9 +8,12 @@ Example (use the separately approved budget, absolute Python and a NEW record):
 systemd requires an available user manager and Linger=yes; no silent fallback.
 --backend session only survives parent exit/SIGHUP, NOT runtime tree/cgroup
 reaping. A server-side CPU disconnect check must establish actual persistence.
-The worker's absolute deadline includes launch/preparation/cleanup/result I/O;
+With --time-policy hard (the default), the worker's absolute deadline includes
+launch/preparation/cleanup/result I/O;
 an expired worker never starts its payload. systemd's RuntimeMaxSec is a
 relative activation-time backup, so submission delays shift that backup only.
+With --time-policy advisory, --max-seconds only requests a one-time on-disk
+review notice; the current job keeps running until completion or explicit stop.
 OS stalls or SIGKILL can prevent final records; this is not a real-time guarantee.
 No shell interpolation, retries, resume, or permanently running supervisor.
 """
@@ -60,15 +63,17 @@ def _worker(record):
     def stopped(signum, frame):
         raise InterruptedError(f'supervisor received signal {signum}')
     signal.signal(signal.SIGTERM, stopped)
-    deadline = request['deadline_monotonic']
-    terminate_at = deadline - request['grace_seconds'] - FINALIZE_SECONDS
+    hard_limit = request.get('time_policy', 'hard') == 'hard'
+    deadline = request['deadline_monotonic'] if hard_limit else None
+    terminate_at = deadline - request['grace_seconds'] - FINALIZE_SECONDS if hard_limit else None
     process, timed_out, interrupted, failure = None, False, False, None
     result = dict(status='RUNNING', worker_pid=os.getpid(), payload_pid=None,
                   payload_pgid=None, returncode=None, timed_out=False,
-                  worker_started_at=_utc(), backend=request['backend'])
+                  worker_started_at=_utc(), backend=request['backend'],
+                  time_policy=request.get('time_policy', 'hard'), time_advisory_issued=False)
     _write(record/'status.json', result)
     try:
-        if time.monotonic() >= terminate_at:
+        if hard_limit and time.monotonic() >= terminate_at:
             raise subprocess.TimeoutExpired(request['argv'], 0)
         with (record/'stdout.log').open('xb') as stdout, (record/'stderr.log').open('xb') as stderr:
             process = subprocess.Popen(request['argv'], cwd=request['cwd'],
@@ -76,7 +81,21 @@ def _worker(record):
                 stdout=stdout, stderr=stderr, start_new_session=True, close_fds=True)
             result.update(payload_pid=process.pid, payload_pgid=process.pid, payload_started_at=_utc())
             _write(record/'status.json', result)
-            process.wait(timeout=max(0., terminate_at-time.monotonic()))
+            if hard_limit:
+                process.wait(timeout=max(0., terminate_at-time.monotonic()))
+            else:
+                advisory_at = request['started_monotonic'] + request['max_seconds']
+                try:
+                    process.wait(timeout=max(0., advisory_at-time.monotonic()))
+                except subprocess.TimeoutExpired:
+                    _write(record/'time_advisory.json', dict(
+                        needs_user_review=True, elapsed_seconds=time.monotonic()-request['started_monotonic'],
+                        recommended_seconds=request['max_seconds'], action='continued_current_job', issued_at=_utc()))
+                    result['time_advisory_issued'] = True
+                    _write(record/'status.json', result)
+                    print('TIME ADVISORY: recommended duration reached; current job continues. '
+                          'Ask the user how to proceed; see time_advisory.json.', file=sys.stderr, flush=True)
+                    process.wait()
     except subprocess.TimeoutExpired:
         timed_out = True
     except (Exception, KeyboardInterrupt) as error:
@@ -90,7 +109,9 @@ def _worker(record):
         if process is not None:
             group_remained = _signal_group(process.pid, signal.SIGTERM)
             result['group_cleanup_requested'] = group_remained
-            kill_at = min(time.monotonic()+request['grace_seconds'], deadline-FINALIZE_SECONDS)
+            kill_at = time.monotonic()+request['grace_seconds']
+            if hard_limit:
+                kill_at = min(kill_at, deadline-FINALIZE_SECONDS)
             # The leader can exit before a cooperative child finishes cleanup.
             # This bounded wait concerns only our own process group.
             while time.monotonic() < kill_at:
@@ -100,15 +121,15 @@ def _worker(record):
                 time.sleep(min(.025, max(0., kill_at-time.monotonic())))
             _signal_group(process.pid, signal.SIGKILL)
             try:
-                process.wait(timeout=max(.001, deadline-time.monotonic()))
+                process.wait(timeout=max(.001, deadline-time.monotonic()) if hard_limit else FINALIZE_SECONDS)
             except subprocess.TimeoutExpired:
-                failure = 'payload was sent SIGKILL but no exit status was available before the deadline'
+                failure = 'payload was sent SIGKILL but no exit status was available within the cleanup wait'
             result['returncode'] = process.returncode
         status = ('TIMED_OUT' if timed_out else 'INTERRUPTED' if interrupted else
                   'COMPLETED' if failure is None and result['returncode'] == 0 else 'FAILED')
         result.update(status=status, timed_out=timed_out, failure=failure, ended_at=_utc(),
                       elapsed_seconds=time.monotonic()-request['started_monotonic'],
-                      deadline_exceeded=time.monotonic() > deadline)
+                      deadline_exceeded=hard_limit and time.monotonic() > deadline)
         (record/'exit_code.txt').write_text(
             'UNAVAILABLE\n' if result['returncode'] is None else str(result['returncode'])+'\n')
         _write(record/'status.json', result)
@@ -128,6 +149,8 @@ def main(argv=None):
     parser.add_argument('--record-dir', required=True)
     parser.add_argument('--cwd', required=True)
     parser.add_argument('--max-seconds', type=float, required=True)
+    parser.add_argument('--time-policy', choices=('hard', 'advisory'), default='hard',
+                        help='hard stops at the budget; advisory records a review notice and continues the current job')
     parser.add_argument('--grace-seconds', type=float, default=5.)
     parser.add_argument('--backend', choices=('systemd', 'session'), default='systemd')
     parser.add_argument('--env', action='append', default=[], metavar='NAME=VALUE',
@@ -142,7 +165,9 @@ def main(argv=None):
         if not command or not Path(command[0]).is_absolute():
             raise ValueError('provide -- followed by an argv with an absolute executable path')
         if (not math.isfinite(options.max_seconds) or not math.isfinite(options.grace_seconds)
-                or options.grace_seconds <= 0 or options.max_seconds <= options.grace_seconds+FINALIZE_SECONDS):
+                or options.grace_seconds <= 0 or options.max_seconds <= 0):
+            raise ValueError('duration and grace must be positive and finite')
+        if options.time_policy == 'hard' and options.max_seconds <= options.grace_seconds+FINALIZE_SECONDS:
             raise ValueError('budget must exceed positive grace plus one second reserved for final records')
         cwd = Path(options.cwd).resolve(strict=True)
         if not cwd.is_dir():
@@ -158,24 +183,26 @@ def main(argv=None):
         request = dict(argv=command, cwd=str(cwd), environment=environment,
             backend=options.backend, started_at=_utc(), started_monotonic=started,
             max_seconds=options.max_seconds, grace_seconds=options.grace_seconds,
-            finalize_seconds=FINALIZE_SECONDS, deadline_monotonic=started+options.max_seconds)
+            time_policy=options.time_policy, finalize_seconds=FINALIZE_SECONDS,
+            deadline_monotonic=started+options.max_seconds if options.time_policy == 'hard' else None)
         _write(record/'request.json', request)
         worker = [os.path.abspath(sys.executable), str(Path(__file__).resolve()), '--_worker', str(record)]
         if options.backend == 'systemd':
             # Do not enable persistent host configuration or retry implicitly.
             linger = subprocess.run(['loginctl', 'show-user', str(os.getuid()), '--property=Linger', '--value'],
                 stdin=subprocess.DEVNULL, capture_output=True, text=True, check=True,
-                timeout=min(5., options.max_seconds-options.grace_seconds-FINALIZE_SECONDS))
+                timeout=min(5., options.max_seconds-options.grace_seconds-FINALIZE_SECONDS)
+                    if options.time_policy == 'hard' else 5.)
             launch['linger'] = linger.stdout.strip()
             if launch['linger'] != 'yes':
                 raise RuntimeError('Linger is not yes: user services may stop at logout; configure the user manager before launching')
-            remaining = request['deadline_monotonic']-time.monotonic()
-            if remaining <= options.grace_seconds+FINALIZE_SECONDS:
+            remaining = request['deadline_monotonic']-time.monotonic() if options.time_policy == 'hard' else None
+            if remaining is not None and remaining <= options.grace_seconds+FINALIZE_SECONDS:
                 raise TimeoutError('launch exhausted the total budget')
             unit = 'mtad-'+uuid.uuid4().hex[:12]+'.service'
             launch['unit'] = unit
             properties = ['Type=exec', 'Restart=no', 'KillMode=control-group', 'SendSIGKILL=yes',
-                f'RuntimeMaxSec={remaining-options.grace_seconds:.6f}s',
+                f'RuntimeMaxSec={remaining-options.grace_seconds:.6f}s' if remaining is not None else 'RuntimeMaxSec=infinity',
                 f'TimeoutStopSec={options.grace_seconds:.6f}s', 'StandardInput=null',
                 'WorkingDirectory='+str(cwd).replace('%', '%%'),
                 'StandardOutput=append:'+str(record/'worker.stdout.log').replace('%', '%%'),
@@ -189,7 +216,7 @@ def main(argv=None):
             _write(record/'launch.json', launch)
             with (record/'launch.stdout.log').open('xb') as stdout, (record/'launch.stderr.log').open('xb') as stderr:
                 submitted = subprocess.run(invocation, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
-                    timeout=remaining-options.grace_seconds-FINALIZE_SECONDS, check=True)
+                    timeout=remaining-options.grace_seconds-FINALIZE_SECONDS if remaining is not None else 30., check=True)
             launch['submission_returncode'] = submitted.returncode
         else:
             launch['limitation'] = 'session detachment does not escape AI runtime process-tree or cgroup reclamation'

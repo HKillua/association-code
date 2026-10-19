@@ -363,7 +363,8 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
                      patch('association.evaluation.cooperative.score_cooperative', side_effect=AssertionError('no new scores')), \
                      patch('association.evaluation.association.select_threshold', side_effect=AssertionError('no reselection')):
                     arm = train_cooperative([self.scene], [self.validation], config,
-                        {**cfg, 'max_seconds': 45.}, root/route, device='cpu', phase='arm',
+                        {**cfg, 'max_seconds': 1e-12, 'time_policy': 'advisory'},
+                        root/route, device='cpu', phase='arm',
                         shared_from=root/'shared', route=route, save_predictions=True)
                 self.assertEqual(arm['completed_updates'], cfg['adapt_updates'])
                 self.assertEqual(arm['completed_routes'], [route])

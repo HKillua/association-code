@@ -30,11 +30,16 @@ def main(argv=None):
                         help='save scene-local selected-model physical predictions during final evaluation')
     parser.add_argument('--resume', help='an INTERRUPTED run; output must be a new directory')
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--time-policy', choices=('hard', 'advisory'),
+                        help='override job timing only; advisory keeps the fixed update plan after the suggested duration')
     args = parser.parse_args(argv)
     started = time.monotonic()
     previous_signal = signal.getsignal(signal.SIGTERM)
 
     def terminated(signum, frame):
+        # Preserve terminal evidence on repeated TERM; the service manager can
+        # still enforce its separate grace deadline with KILL.
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
         raise InterruptedError('SIGTERM: preparation/fit interrupted, not completed')
 
     signal.signal(signal.SIGTERM, terminated)
@@ -66,7 +71,10 @@ def main(argv=None):
         # opening the archive; it still constructs no model or training run.
         from association.training.tmtaff import _configuration
         from association.training.calibration import MARGIN_POLICY
+        if args.time_policy is not None:
+            config['training']['time_policy'] = args.time_policy
         training = _configuration(config['training'])
+        config['training'] = training
         if training['margin_policy'] == MARGIN_POLICY and (
                 model.contrastive_positive_power != 1 or config['train_splits'] != ['T_core']):
             raise ValueError('training margin calibration requires p=1 and only T_core scenes')
@@ -79,7 +87,7 @@ def main(argv=None):
                     raise ValueError('Only an INTERRUPTED run may resume')
                 spent = float(prior['elapsed_seconds'])
             def check():
-                if spent + time.monotonic() - started >= training['max_hours'] * 3600:
+                if training['time_policy'] == 'hard' and spent + time.monotonic() - started >= training['max_hours'] * 3600:
                     raise TimeoutError('Cumulative budget exhausted during input preparation')
             check()
         import torch
