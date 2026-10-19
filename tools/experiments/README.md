@@ -32,3 +32,5 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 候选v2可拆成共享阶段与独立融合臂：`fit --phase shared`先保存shared.pt、identity-records/与唯一阈值；随后`fit --phase arm --shared-from /已完成021输出 --route attribute-u --save-predictions --time-policy advisory`（其余臂替换route）。每臂独立输出和耗时，只加载同normalizer/S/模型/loss/身份记录，不重训teacher/u或选阈值。默认full保持旧行为，shared不接受--save-predictions。当前GPU队列以[交接索引](../../HandOver/Handover.md)为准。
 
 `fit --phase teacher --save-predictions`保留原teacher self/cross/BCE训练，在固定端点做完整V独立片段补全，不进入关联选阈值、utility或融合；配置的utility/adapt更新数必须为0。输出`teacher.pt`、`completion-evaluation.json`及`completion-predictions/`逐场NPZ。该NPZ是独立补全格式，按逐属性mask/region统计，不能直接当分组融合格式交给`compare_physical_predictions.py`。`model.speed_output_policy`缺省为原`physical_softplus`；`scaled_log`只对v2生效并要求相应新权重。[031/032 A/B方案](../../docs/proposals/repair_before_retraining/030-repair-analysis.md#6-已实现的第一项与ab2026-10-20)已获用户继续指令，只按当前索引的独立READY执行。
+
+本地收到两组完整结果后，先将gzip JSON和预测tar.gz还原为各自run目录的原层级，再执行`python tools/analysis/compare_completion_predictions.py --left /031结果目录 --right /032结果目录 --output /新的对比.json`。只读取已完成teacher预测，核完整人口与共有真值/mask一致，输出整体、来源、逐场的各区域/距离误差、raw log-speed MSE及速度分布；不重新推理或选阈值。

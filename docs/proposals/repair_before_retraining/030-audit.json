@@ -3735,5 +3735,46 @@
       "030-native-attributes.py",
       "030-baseline-feature.py"
     ]
+  },
+  "baseline_followup_20261020": {
+    "scope": "Metadata-only follow-up of preserved 020 training/coverage and common 021 T_core/V scene contract; no training, inference or test access.",
+    "sources": [
+      "HandOver/results/STAGEWISE-COMPLETION-20261019-028/020/coverage.json.gz",
+      "HandOver/results/STAGEWISE-COMPLETION-20261019-028/020/history.json.gz",
+      "HandOver/results/STAGEWISE-COMPLETION-20261019-028/021/run.json.gz"
+    ],
+    "population": {
+      "T_core": {
+        "scene_count": 512,
+        "fragment_count": 54792,
+        "native_count_2": 1390,
+        "native_count_3": 1519,
+        "native_count_4": 1436,
+        "native_count_ge5": 50447,
+        "h2_eligible_per_direction": 51883,
+        "h3_eligible_per_direction": 50447
+      },
+      "V_select": {
+        "scene_count": 64,
+        "fragment_count": 1635,
+        "native_count_2": 46,
+        "native_count_3": 61,
+        "native_count_4": 52,
+        "native_count_ge5": 1476,
+        "h2_eligible_per_direction": 1528,
+        "h3_eligible_per_direction": 1476
+      }
+    },
+    "tcm": {
+      "updates": 1000,
+      "track_presentations": 64000,
+      "unique_tracks": 37862,
+      "unique_scenes": 512,
+      "unique_track_fraction": 0.6910132866111841,
+      "nominal_presentations_per_training_track": 1.1680537304716017,
+      "pure_update_seconds": 1710.2779557639733
+    },
+    "interpretation": "Incomplete coverage is not proof of undertraining; fixed-step loss plateau does not establish adequate full-protocol baseline. Short free-running and more original-objective updates are separate hypotheses. Paper epoch-to-phase allocation remains unknown.",
+    "new_baseline_training_authorized": false
   }
 }

@@ -9,9 +9,10 @@ MTAD不完整量测下的**补全、关联、融合**研究。当前按**补全�
 - **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
 - **021身份原分数已复核**：teacher1000＋utility200完成，teacher端点开发macro-F1 **.630321**、P .301445、R .835305。比同人口位置控制仅高1.47个百分点，跨源F1没有优势；不能归因于utility或融合，T_test未开启。
 - **030残差取证已完成并复核**：固定4场景86片段，位置残差几乎为片段固定偏移，速度预测集中在41.86–42.34。支撑内9001由1.26米退化至241.62米，9002从4489.32米小幅改善至4449.93米；不能统一清零残差。损失计算未发现分母错误，具体训练根因未证实；022—025仍HOLD。[030复核](docs/proposals/repair_before_retraining/README.md#030逐点残差与损失复核2026-10-19)、[交接索引](HandOver/Handover.md)。
-- **baseline须以论文结果校准**：已补充场景平均与按预测关联数加权的`paper_metrics`及ITSA/MSTSA逐场计数，原指标、阈值选择不变。020是未训练完整的适配参考，报告补齐不代表效果改善，低分不能用于宣称超过TMTAFF。[协议与训练差异](docs/research_brief.md#baseline与论文结果的校准2026-10-19)。
+- **baseline须以论文结果校准**：已补充`paper_metrics`及逐场计数，原指标、阈值选择不变。最新核对020 TCM1000步仅覆盖37,862/54,792条训练片段（69.10%）；未发现next-time/逆序/mask确定错误，训练量不足与递推目标不匹配仍需区分。低分不能用于宣称超过TMTAFF。[协议差异](docs/research_brief.md#baseline与论文结果的校准2026-10-19)、[本地续审](docs/proposals/repair_before_retraining/030-repair-analysis.md#7-本地baseline续审与结果准备2026-10-20)。
 - **030进一步分析已有具体改法**：原量测速度/航向控制优于当前teacher；9002留身份跨源校准oracle位置误差4488.71→722.79米，证明共享偏移有可利用信息，但真值配对收益不是算法成绩。片段平均运动外推整体有效、逐场不稳定；baseline特征MSE主要对航向敏感。推荐先做速度输出坐标单因素修正，再分别验证观测底座、场景校准与动态补全。[数据、方案与复算脚本](docs/proposals/repair_before_retraining/030-repair-analysis.md)。
 - **第一项速度修改已实现，真实收益待验证**：新增可选`scaled_log`输出和`--phase teacher`完整V独立补全评价，旧配置保留原行为；相同采样/初始化、teacher端点一致性及小型CLI流程已检查。[031/032方案](docs/proposals/repair_before_retraining/030-repair-analysis.md#6-已实现的第一项与ab2026-10-20)为两组各1000步、仅改速度公式；用户已回复“继续”，独立READY见[交接索引](HandOver/Handover.md)，不自动恢复020/022—025。
+- 两组返回后可用`tools/analysis/compare_completion_predictions.py`直接比较完整人口的速度、位置、航向及分区域结果；本地工具已做小型端到端检查，真实A/B结论尚未产生。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和旧交接在Git历史中追溯。21分钟窗口未采用，当前先验证已实现修正版。
 
 ## 代码与资料
