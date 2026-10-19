@@ -21,7 +21,7 @@ MTAD不完整量测下的**补全、关联、融合**研究。当前按**补全�
 | `association/evaluation/` | 关联/物理指标、分组、人口覆盖、输入支撑和预测导出 |
 | `association/utils/` | 配置与运行产物处理 |
 | `baselines/` | TSA-cTFER独立关联适配 |
-| `tools/experiments/` | [四个实验入口](tools/experiments/README.md) |
+| `tools/experiments/` | [当前训练与评价入口](tools/experiments/README.md) |
 | `tests/` | 按数据、模型、训练、评价、集成分组的科研正确性检查 |
 | `configs/`、`HandOver/` | 当前实验配置、任务交接和待审回执 |
 

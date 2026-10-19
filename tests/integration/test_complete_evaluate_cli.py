@@ -113,6 +113,53 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         self.assertEqual(self.invoke(self.args()), 1)
         self.assertEqual((self.root/'evaluation'/'run.json').read_bytes(), original_run)
 
+    def test_completion_cli_uses_partial_reference_and_teacher_without_downstream(self):
+        from association.models.cooperative import CooperativeConfig, CooperativeModel
+        from association.data.cooperative import fit_cooperative_normalizer
+        from tools.experiments import completion_check
+        dataset = self.fixture.load(data_config={**self.fixture.data, 'reference_longitude_policy': 'shortest_arc'})
+        saved = copy.deepcopy(self.saved)
+        saved.update(cursor=dict(stage=1, update=300, completed_updates=1300),
+                     effective_margin=saved['model_config']['margin'],
+                     states=saved['selected']['states'],
+                     data_contract=_scenes(dataset['train'], dataset['validation'], 4))
+        torch.save(saved, self.checkpoint)
+        config = CooperativeConfig(length=4, max_observations=4, d_model=8, nhead=2,
+            num_layers=1, dim_feedforward=16, dropout=0, head_hidden=8,
+            model_variant='support_residual_v2', support_time_policy='train_absmax_v1')
+        normalizer = fit_cooperative_normalizer(dataset['train'], config)
+        candidate = CooperativeModel(config, normalizer, support_time_scale=3.)
+        teacher = self.source/'teacher.pt'
+        torch.save(dict(format='cooperative-physical-v2', model_variant='support_residual_v2',
+            representation_version='support_residual_v2', model_config=asdict(config),
+            model_state=candidate.state_dict(), normalizer=normalizer,
+            support_time_scale_tau=3., stage='teacher', completed_updates=1000), teacher)
+        originals = [path.read_bytes() for path in (self.checkpoint, teacher)]
+        args = ['--archive', str(self.fixture.path), '--manifest', str(self.root/'manifest.json'),
+            '--alignment', str(self.root/'alignment.json'), '--reference-checkpoint', str(self.checkpoint),
+            '--candidate-checkpoint', str(teacher), '--output', str(self.root/'completion'),
+            '--device', 'cpu', '--cpu-threads', '1']
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(completion_check, 'SCENE_IDS', ['2', '4']))
+            for target in ('association.training.tmtaff.train_complete', 'association.models.fusion.PairFusion',
+                           'association.training.cooperative.train_cooperative',
+                           'association.data.timed.fit_timed_normalizer',
+                           'association.data.cooperative.fit_cooperative_normalizer',
+                           'association.models.cooperative.CooperativeModel.score_pairs',
+                           'association.evaluation.tmtaff.select_threshold'):
+                stack.enter_context(patch(target, side_effect=AssertionError('forbidden: '+target)))
+            self.assertEqual(completion_check.main(args), 0)
+        report = runtime.read_json(self.root/'completion'/'summary.json')
+        self.assertEqual(report['reference']['fragment_count'], 4)
+        self.assertEqual(report['candidate']['fragment_count'], 4)
+        self.assertEqual(report['reference']['scene_count'], 2)
+        run = runtime.read_json(self.root/'completion'/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['optimizer_updates'], 0)
+        self.assertEqual([row['scene_id'] for row in run['reference_members_read']], ['2', '4'])
+        self.assertFalse(run['test_opened'])
+        self.assertEqual(originals, [path.read_bytes() for path in (self.checkpoint, teacher)])
+
 
     def test_legacy_checkpoint_without_longitude_fields_keeps_exact_contract(self):
         self.saved['config'].pop('longitude_loss_mode', None)

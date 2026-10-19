@@ -16,6 +16,109 @@ from association.evaluation.association import evaluate_scenes, select_threshold
 
 from tests.fixtures.scenes import scene, empty_scene
 
+
+class TCMCompletionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.old_threads = torch.get_num_threads()
+        torch.set_num_threads(1)
+
+    @classmethod
+    def tearDownClass(cls):
+        torch.set_num_threads(cls.old_threads)
+
+    def setUp(self):
+        from association.data.timed import fit_timed_normalizer
+        from association.models.timed import TimedAssociationModel
+        from association.models.tmtaff import ModelConfig
+        from tests.fixtures.scenes import timed_scene
+        self.scene = timed_scene('completion', 'V_select')
+        self.normalizer = fit_timed_normalizer([timed_scene('train', 'T_core')])
+        self.model = TimedAssociationModel(ModelConfig(length=4, d_model=8, nhead=2,
+            num_layers=1, dim_feedforward=16, dropout=0.), 'contrastive', max_observations=3)
+
+    def evaluate(self, scenes=None):
+        from association.evaluation.tmtaff import evaluate_tcm_completion
+        return evaluate_tcm_completion(self.model, self.normalizer,
+            [self.scene] if scenes is None else scenes)
+
+    def test_one_step_matches_training_denominator_and_reference_cannot_change_forward(self):
+        from association.training.common import normalize_scene
+        changed = copy.deepcopy(self.scene)
+        for target in changed['fusion_targets'].values():
+            target['states'][:, 0] += .5
+        outputs = []
+        complete = self.model.complete
+        def capture(values, observed):
+            self.assertEqual(len(values), 1)
+            result = complete(values, observed)
+            outputs.append(result.clone())
+            return result
+        with patch.object(self.model, 'complete', side_effect=capture), \
+             patch.object(self.model.tam_encoder, 'forward', side_effect=AssertionError('no association')):
+            first, second = self.evaluate(), self.evaluate([changed])
+        for original, altered in zip(outputs[:4], outputs[4:]):
+            torch.testing.assert_close(original, altered, atol=0, rtol=0)
+        self.assertEqual(first['one_step'], second['one_step'])
+        self.assertNotEqual(first['query']['model']['regions']['all']['feature_mse'],
+                            second['query']['model']['regions']['all']['feature_mse'])
+        values, observed = normalize_scene(self.scene, self.normalizer)
+        with torch.inference_mode():
+            self.model.requires_grad_(False)
+            expected = self.model.completion_loss(torch.from_numpy(values), torch.from_numpy(observed)).item()
+        total = first['one_step']['model']['all']
+        self.assertEqual(total['feature_elements'], 2 * (self.scene['native_observed'].sum()-4) * 8)
+        self.assertAlmostEqual(total['feature_mse'], expected, places=6)
+        self.assertEqual(first['fragment_count'], 4)  # Two repeated identities retain both fragments.
+
+    def test_endpoint_control_uses_directional_state_with_query_time(self):
+        from association.models.timed import continuous_time_encoding
+        from association.training.common import normalize_scene
+        result = self.evaluate()
+        values, _ = normalize_scene(self.scene, self.normalizer)
+        row = result['per_fragment'][0]  # Two native points, no query inside support.
+        target = self.scene['fusion_targets'][self.scene['identities'][0]]['states']
+        target = torch.tensor((target-np.array(self.normalizer['mean']))/np.array(self.normalizer['std']),
+                              dtype=torch.float32)
+        query = torch.from_numpy(values[0, 3:, 4])
+        with torch.inference_mode():
+            expected_target = torch.relu(self.model.input_embedding(target + continuous_time_encoding(query, 4)))
+            for region, indices, endpoint in (('before_support', [0, 1], 0), ('after_support', [2, 3], 1)):
+                state = torch.from_numpy(values[0, endpoint, :4])
+                held = torch.relu(self.model.input_embedding(state + continuous_time_encoding(query[indices], 4)))
+                expected_sum = (held.double()-expected_target[indices].double()).square().sum().item()
+                actual = row['query']['state_hold']['regions'][region]
+                self.assertEqual(actual['query_count'], 2)
+                self.assertTrue(math.isclose(actual['squared_error_sum'], expected_sum, rel_tol=1e-6, abs_tol=1e-7))
+        self.assertIsNone(row['query']['model']['regions']['inside_support']['feature_mse'])
+        for name in ('model', 'state_hold'):
+            query_report = result['query'][name]
+            self.assertEqual(sum(query_report['regions'][region]['query_count'] for region in
+                ('inside_support', 'before_support', 'after_support')), 16)
+            self.assertEqual(sum(row['query_count'] for row in query_report['input_distance_metrics'].values()), 16)
+        self.assertAlmostEqual(result['query']['model']['regions']['inside_support']['feature_mse'],
+                               result['query']['state_hold']['regions']['inside_support']['feature_mse'], places=6)
+
+    def test_partial_reference_and_empty_scene_keep_population_without_filling_targets(self):
+        from tests.fixtures.scenes import empty_timed_scene
+        del self.scene['fusion_targets']['completion-B']
+        self.scene['fusion_targets']['completion-A']['valid'][0, 1] = False
+        result = self.evaluate([self.scene, empty_timed_scene()])
+        self.assertEqual(result['fragment_count'], 4)
+        self.assertEqual(result['scene_count'], 2)
+        self.assertEqual(result['no_complete_reference_fragment_count'], 2)
+        self.assertEqual(result['per_scene'][1]['reference_targets_without_input'], ['empty-unobserved'])
+        for name in ('model', 'state_hold'):
+            row = result['query'][name]['regions']['all']
+            self.assertEqual(row['query_count'], 16)
+            self.assertEqual(row['evaluable_query_count'], 6)
+            self.assertEqual(row['missing_reference_query_count'], 10)
+            self.assertEqual(row['feature_elements'], 6*8)
+        empty = self.evaluate([empty_timed_scene()])
+        self.assertIsNone(empty['one_step']['model']['all']['feature_mse'])
+        self.assertIsNone(empty['query']['model']['regions']['all']['feature_mse'])
+
+
 class CompleteEvaluationTests(CompleteEvaluationFixture, unittest.TestCase):
     @classmethod
     def setUpClass(cls):

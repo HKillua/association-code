@@ -283,3 +283,133 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                 grouping_policy='anchor_direct', correspondence_policy='anchor_identity_first',
                 elapsed_seconds=time.monotonic()-started, fusion_forward_count=fusion_steps,
                 test_opened=False, scope='V_select development; oracle, simple-fusion and single-source are diagnostics')
+
+
+@stable_evaluation_parameters
+@torch.inference_mode()
+def evaluate_tcm_completion(model, normalizer, scenes, *, device='cpu', check=None, progress=None):
+    """Diagnose the saved native TCM in its own frozen feature space, without TAM.
+
+    Native teacher-forced steps and actual full-query rollout are separate. The
+    state-hold control re-embeds a visible state at the requested target time;
+    it never holds the old time encoding. Inside support both query methods use
+    the existing observation interpolation, which is not a learned prediction.
+    All four reference attributes must be valid for a query feature target.
+    """
+    from association.models.timed import continuous_time_encoding
+    scenes = list(scenes)
+    if (not scenes or len({str(s['scene_id']) for s in scenes}) != len(scenes)
+            or getattr(model, 'input_adapter', None) != 'native_time_v1'):
+        raise ValueError('native TCM and distinct nonempty V scene population required')
+    parameter = next(model.parameters())
+    device = _inference_device(device, parameter.device, parameter.device)
+    dtype, d = parameter.dtype, model.config.d_model
+    model.eval()
+    started, per_fragment, per_scene = time.monotonic(), [], []
+    region_names = ('all', 'inside_support', 'before_support', 'after_support')
+    count_keys = ('query_count', 'evaluable_query_count', 'missing_reference_query_count', 'feature_elements')
+
+    def metric(error, mask, valid):
+        selected = np.asarray(mask, bool) & valid
+        count, total = int(selected.sum()), int(np.asarray(mask).sum())
+        square_sum = float(error[selected].sum())
+        return dict(query_count=total, evaluable_query_count=count,
+                    missing_reference_query_count=total-count, feature_elements=count*d,
+                    squared_error_sum=square_sum, feature_mse=square_sum/(count*d) if count else None,
+                    reference_coverage=count/total if total else None)
+
+    def pool(rows):
+        totals = {key: sum(row[key] for row in rows) for key in count_keys}
+        square_sum = sum(row['squared_error_sum'] for row in rows)
+        return dict(**totals, squared_error_sum=square_sum,
+                    feature_mse=square_sum/totals['feature_elements'] if totals['feature_elements'] else None,
+                    reference_coverage=totals['evaluable_query_count']/totals['query_count'] if totals['query_count'] else None)
+
+    def embed(states, times):
+        return torch.relu(model.input_embedding(states + continuous_time_encoding(times, 4)))
+
+    def errors(prediction, target):
+        if not torch.isfinite(prediction).all() or not torch.isfinite(target).all():
+            raise FloatingPointError('nonfinite TCM completion feature')
+        return (prediction.double()-target.double()).square().sum(-1).cpu().numpy()
+
+    for scene_index, scene in enumerate(scenes):
+        if check:
+            check()
+        if scene.get('input_adapter') != 'native_time_v1':
+            raise ValueError('TCM diagnostic requires native-time scenes')
+        _registered(scene, model.config.length)
+        packed, observed = normalize_scene(scene, normalizer)
+        support = scene_input_support(scene)
+        begin = len(per_fragment)
+        for node, identity in enumerate(scene['identities']):
+            if check:
+                check()
+            x = torch.as_tensor(packed[node:node+1], device=device, dtype=dtype)
+            mask = torch.as_tensor(observed[node:node+1], device=device)
+            count = int(scene['native_observed'][node].sum())
+            native, times = x[:, :count, :4], x[:, :count, 4]
+            embedded = model.embed_inputs(x, mask)[:, :count]
+            one_step = {name: {} for name in ('model', 'state_hold')}
+            for direction, sequence, states, tau in (
+                    ('forward', embedded, native, times),
+                    ('reverse', embedded.flip(1), native.flip(1), times.flip(1))):
+                target = sequence[:, 1:]
+                prediction = model._teacher_predictions(sequence[:, :-1], tau[:, 1:])
+                held = embed(states[:, :-1], tau[:, 1:])
+                full = np.ones(count-1, bool)
+                for name, value in (('model', prediction), ('state_hold', held)):
+                    one_step[name][direction] = metric(errors(value, target)[0], full, full)
+            for result in one_step.values():
+                result['all'] = pool([result['forward'], result['reverse']])
+            completed = model.complete(x, mask)[0]
+            query_tau = x[0, model.max_observations:, 4]
+            before = scene['grid'] < scene['native_times'][node, 0]
+            after = scene['grid'] > scene['native_times'][node, count-1]
+            held_states = x[0, model.max_observations:, :4].clone()
+            held_states[torch.as_tensor(before, device=device)] = native[0, 0]
+            held_states[torch.as_tensor(after, device=device)] = native[0, -1]
+            held = embed(held_states, query_tau)
+            # Reference is read only after all model and control predictions.
+            target_row = scene['fusion_targets'].get(identity)
+            valid = (np.asarray(target_row['valid'], bool).all(-1) if target_row is not None
+                     else np.zeros(model.config.length, bool))
+            target_states = np.zeros((model.config.length, 4), dtype=np.float64)
+            if target_row is not None:
+                target_states[valid] = ((np.asarray(target_row['states'])[valid]-np.asarray(normalizer['mean']))
+                                        / np.asarray(normalizer['std']))
+            target = embed(torch.as_tensor(target_states, device=device, dtype=dtype), query_tau)
+            masks = dict(zip(region_names, (np.ones(model.config.length, bool), support['support'][node], before, after)))
+            nearest = support['nearest_seconds'][node]
+            distances = dict(zip(INPUT_DISTANCE_REGIONS, (nearest <= 300, (nearest > 300) & (nearest <= 600),
+                (nearest > 600) & (nearest <= 1800), (nearest > 1800) & np.isfinite(nearest), ~np.isfinite(nearest))))
+            query = {}
+            for name, prediction in (('model', completed), ('state_hold', held)):
+                error = errors(prediction, target)
+                query[name] = dict(regions={key: metric(error, region, valid) for key, region in masks.items()},
+                    input_distance_metrics={key: metric(error, region, valid) for key, region in distances.items()})
+            per_fragment.append(dict(scene_id=str(scene['scene_id']), node_id=str(scene['node_ids'][node]),
+                node_index=node, identity=str(identity), native_count=count,
+                reference_declared=target_row is not None, has_complete_reference=bool(valid.any()),
+                one_step=one_step, query=query))
+        per_scene.append(dict(scene_id=str(scene['scene_id']), fragment_count=len(per_fragment)-begin,
+            no_complete_reference_fragment_count=sum(not row['has_complete_reference'] for row in per_fragment[begin:]),
+            reference_targets_without_input=[str(identity) for identity in scene['fusion_targets']
+                                             if identity not in set(scene['identities'])]))
+        if progress:
+            progress(dict(stage='tcm_completion', completed_scenes=scene_index+1, total_scenes=len(scenes),
+                          completed_fragments=len(per_fragment), elapsed_seconds=time.monotonic()-started))
+    if check:
+        check()
+    return dict(scene_count=len(scenes), fragment_count=len(per_fragment), per_scene=per_scene, per_fragment=per_fragment,
+        one_step={name: {direction: pool([row['one_step'][name][direction] for row in per_fragment])
+                        for direction in ('all', 'forward', 'reverse')} for name in ('model', 'state_hold')},
+        query={name: {kind: {region: pool([row['query'][name][kind][region] for row in per_fragment])
+                            for region in names} for kind, names in (('regions', region_names),
+                            ('input_distance_metrics', INPUT_DISTANCE_REGIONS))} for name in ('model', 'state_hold')},
+        no_complete_reference_fragment_count=sum(not row['has_complete_reference'] for row in per_fragment),
+        scope='V_select frozen TCM feature diagnostics; no physical decoding, association, training or selection',
+        target_policy='query target requires all four reference attributes; unchanged masks and frozen training normalization',
+        control='visible state re-embedded at next/query tau; endpoint hold outside, shared observation interpolation inside support',
+        interpretation='inside-support query output is observation interpolation, not learned completion; feature MSE is not physical error',
+        elapsed_seconds=time.monotonic()-started, test_opened=False)
