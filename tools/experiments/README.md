@@ -9,6 +9,9 @@
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
 | `completion_check.py` | 固定4个V场景补齐诊断；双模型、候选残差、`--reference-feedback`反馈辨析或`--candidate-dynamics`逐层动态；无训练 |
+| `tam_mode_check.py` | selected TAM固定小批，TCM一次缓存，三模式MC8及单次原fastpath参照；无reference/训练/校准 |
+
+`tam_mode_check.py --archive ZIP --manifest JSON --checkpoint CHECKPOINT.pt --expected-selected-update 600 --output NEW_DIR --device cuda:0 --cpu-threads 4 --advisory-seconds 1800`对应[042](../../HandOver/L2S-20261020-042.md)，只有索引当前READY才由服务器领取。输出`run.json/preparation.json/summary.json/distances.npz`，读selected而非最后快照，同轨副本独立编码，保存正负原CL及小批人口；临时模式/参数标记/dropout/RNG完整恢复。原生运动的CPU入口是`tools/analysis/native_motion_control.py --archive ZIP --manifest JSON --alignment JSON --output NEW_DIR`，固定完整V/Q64/cap128，不需权重或GPU，结果见[R2](../../docs/proposals/repair_before_retraining/native-motion-analysis.md)。
 
 `completion_check.py --candidate-residuals`复用同一入口，只推理既有teacher，每片段一次；参考checkpoint仅用于原数据契约核对。输出逐场景`predictions-*.npz`（预测、位置底座、原真值、逐属性mask及片段/时间/区域）、`residual-diagnostics.json`（最终学习权重、正则、分区域原属性损失）及`candidate-summary.json`。分区域loss为区域内均值，计算全局贡献时乘该属性的区域有效点数/全部有效点数；位置底座没有速度/航向预测。它不还原训练梯度、不生成额外裁剪或改写权重。
 
