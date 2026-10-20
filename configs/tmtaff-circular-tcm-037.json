@@ -1,0 +1,68 @@
+{
+  "scope": "TMTAFF-time-adapted-v1",
+  "model": {
+    "input_dim": 4,
+    "d_model": 128,
+    "nhead": 8,
+    "num_layers": 6,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "length": 64,
+    "margin": 1.0,
+    "contrastive_positive_power": 1,
+    "heading_representation": "circular_sincos"
+  },
+  "fusion": {
+    "fc_hidden": 128,
+    "length": 64,
+    "d_model": 128,
+    "nhead": 8,
+    "num_layers": 6,
+    "dim_feedforward": 256,
+    "dropout": 0.1,
+    "output_parameterization": "train_position_affine"
+  },
+  "training": {
+    "updates": {
+      "TCM": 4000,
+      "TAM_FROZEN": 0,
+      "TFM_FROZEN": 0,
+      "JOINT": 0
+    },
+    "learning_rates": {
+      "TCM": 0.002,
+      "TAM_FROZEN": 0.002,
+      "TFM_FROZEN": 0.002,
+      "JOINT": 0.0002
+    },
+    "seed": 20,
+    "branch": "contrastive",
+    "margin_policy": "train_negative_median_v1",
+    "batch_tracks": 64,
+    "pair_batch_size": 64,
+    "pair_microbatch": 8,
+    "track_microbatch": 4,
+    "completion_weight": 0.1,
+    "gradient_clip": 1.0,
+    "max_hours": 4.0,
+    "validate_every_updates": 100,
+    "completion_cache_mib": 1024,
+    "position_loss_mode": "standard_smooth_l1",
+    "lr_schedule": "constant",
+    "singleton_policy": "observed",
+    "validation_batches": {
+      "tracks": 4,
+      "pairs": 1024
+    },
+    "longitude_loss_mode": "shortest_arc",
+    "time_policy": "advisory"
+  },
+  "data": {
+    "max_observations": 128,
+    "time_unit_seconds": 20.0,
+    "reference_longitude_policy": "shortest_arc"
+  },
+  "train_splits": [
+    "T_core"
+  ]
+}

@@ -115,6 +115,10 @@ class TcmFitCliTests(unittest.TestCase):
         self.assertEqual(self.fit('once')['status'], 'COMPLETED')
         self.assertEqual(self.fit('partial', max_updates_this_call=1)['status'], 'INTERRUPTED')
         self.assertFalse((self.root/'partial'/'completion-evaluation.json').exists())
+        # Old checkpoints predate the explicit default representation field.
+        legacy = self.checkpoint('partial')
+        legacy['model_config'].pop('heading_representation', None)
+        torch.save(legacy, self.root/'partial'/'checkpoint.pt')
         self.assertEqual(self.invoke('resumed', ['--resume', str(self.root/'partial')]), 0)
         self.assert_same_endpoint(self.checkpoint('once'), self.checkpoint('resumed'))
         with self.assertRaisesRegex(ValueError, 'resume phase differs'):
@@ -159,7 +163,10 @@ class TcmFitCliTests(unittest.TestCase):
         for key, value in source['states'][0].items():
             if key.startswith('tam_encoder.'):
                 value.add_(10.)
+        source['model_config'].pop('heading_representation', None)
         torch.save(source, self.root/'source'/'checkpoint.pt')
+        legacy = load_complete_snapshot(self.root/'source'/'checkpoint.pt', selected=False)
+        self.assertEqual(legacy['model'].config.heading_representation, 'linear_zscore')
         self.tam_config()
         from association.training import tmtaff as training
         initial, score_calls = {}, []
@@ -215,6 +222,48 @@ class TcmFitCliTests(unittest.TestCase):
             for actual, original in zip(records, expected):
                 self.assertEqual(actual['scores'].tolist(), original['scores'].tolist())
         self.assertFalse(run['test_opened'])
+
+    def test_circular_tcm_transfers_frozen_representation_and_snapshot_rejects_mismatch(self):
+        from association.training.common import score_reference
+        self.fixture.config['model']['heading_representation'] = 'circular_sincos'
+        self.assertEqual(self.fit('circular-source')['status'], 'COMPLETED')
+        source = self.checkpoint('circular-source')
+        self.assertEqual(source['states'][0]['input_embedding.weight'].shape[1], 5)
+        self.assertIn('heading_mean_std', source['states'][0])
+        self.assertEqual(self.tam_fit('circular-tam',
+            initialize_tcm_from=self.root/'circular-source')['status'], 'COMPLETED')
+        saved = self.checkpoint('circular-tam')
+        self.assertIn('heading_mean_std', saved['initialization']['transferred_buffers'])
+        for key, value in saved['states'][0].items():
+            if key in ('positions', 'heading_mean_std') or key.startswith(
+                    ('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
+                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
+        loaded = load_complete_snapshot(self.root/'circular-tam'/'checkpoint.pt')
+        loaded['model'].validate_normalizer(source['normalizer'])
+        dataset = self.fixture.load()
+        batches = saved['config']['validation_batches']
+        actual = score_reference(loaded['model'], loaded['normalizer'],
+                                 dataset['validation'], 'cpu', batches['tracks'], batches['pairs'])
+        summary = runtime.read_json(self.root/'circular-tam'/'summary.json')
+        selected = next(row for row in summary['validation_score_records']
+                        if row['update'] == saved['selected']['update'])
+        expected = runtime.load_records(selected['records'])
+        for left, right in zip(actual, expected):
+            self.assertEqual(left['scores'].tolist(), right['scores'].tolist())
+
+        changed = copy.deepcopy(loaded['normalizer'])
+        changed['mean'][3] += 1.
+        with self.assertRaisesRegex(ValueError, 'normalizer.*heading'):
+            score_reference(loaded['model'], changed, dataset['validation'], 'cpu', 2, 3)
+        corrupted = copy.deepcopy(saved)
+        corrupted['normalizer'] = changed
+        torch.save(corrupted, self.root/'circular-tam'/'mismatched.pt')
+        with self.assertRaisesRegex(ValueError, 'normalizer.*heading'):
+            load_complete_snapshot(self.root/'circular-tam'/'mismatched.pt')
+        self.fixture.config['model']['heading_representation'] = 'linear_zscore'
+        with self.assertRaisesRegex(ValueError, 'TCM initialization model'):
+            self.tam_fit('different-representation', initialize_tcm_from=self.root/'circular-source')
+        self.assertFalse((self.root/'different-representation').exists())
 
     def test_tam_resume_keeps_frozen_source_and_new_budget_and_rejects_changed_contract(self):
         self.fit('source')

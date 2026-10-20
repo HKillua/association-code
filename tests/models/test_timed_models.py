@@ -1,12 +1,13 @@
 """Native-time conditioning, causal consistency and unchanged learned capacity."""
 import unittest
+from dataclasses import replace
 from unittest.mock import patch
 
 import torch
 from torch.nn import functional as F
 
 from association.models.tmtaff import AssociationModel, ModelConfig
-from association.models.timed import TimedAssociationModel
+from association.models.timed import TimedAssociationModel, continuous_time_encoding
 
 
 class TimedModelTests(unittest.TestCase):
@@ -199,6 +200,95 @@ class TimedModelTests(unittest.TestCase):
             self.assertTrue(gradients)
             self.assertTrue(all(torch.isfinite(g).all() for g in gradients))
             self.assertGreater(sum(float(g.abs().sum()) for g in gradients), 0)
+
+    def test_circular_projection_preserves_other_initialization_and_global_rng(self):
+        config = ModelConfig(length=6, d_model=8, nhead=2, num_layers=2,
+                             dim_feedforward=16, dropout=0)
+        normalizer = {'mean': [1., 2., 3., 173.], 'std': [2., 3., 4., 91.]}
+        torch.manual_seed(20)
+        linear = TimedAssociationModel(config, 'contrastive', max_observations=5)
+        next_random = torch.rand(16)
+        torch.manual_seed(20)
+        circular = TimedAssociationModel(replace(config, heading_representation='circular_sincos'),
+            'contrastive', max_observations=5, normalizer=normalizer)
+        torch.testing.assert_close(torch.rand(16), next_random, rtol=0, atol=0)
+        for key, value in linear.state_dict().items():
+            actual = circular.state_dict()[key]
+            if key == 'input_embedding.weight':
+                actual = actual[:, :4]
+            torch.testing.assert_close(actual, value, rtol=0, atol=0, msg=key)
+        self.assertNotIn('heading_mean_std', linear.state_dict())
+        self.assertEqual(circular.input_embedding.in_features, 5)
+        self.assertEqual(sum(p.numel() for p in circular.parameters()) -
+                         sum(p.numel() for p in linear.parameters()), config.d_model)
+        circular.set_completion_trainable(False)
+        self.assertFalse(circular.input_embedding.weight.requires_grad)
+        self.assertTrue(all(p.requires_grad for p in circular.tam_encoder.parameters()))
+
+    def test_circular_heading_restores_degrees_and_keeps_original_time_frequencies(self):
+        normalizer = {'mean': [1., 2., 3., 173.], 'std': [2., 3., 4., 91.]}
+        torch.manual_seed(20)
+        config = ModelConfig(length=6, d_model=8, nhead=2, num_layers=1,
+            dim_feedforward=16, dropout=0, heading_representation='circular_sincos')
+        model = TimedAssociationModel(config, max_observations=5, normalizer=normalizer).double()
+        degrees = torch.tensor([0., 360., 359., 1., 180.], dtype=torch.float64)
+        states = torch.tensor([.2, -.3, .7, 0.], dtype=torch.float64).repeat(5, 1)
+        states[:, 3] = (degrees - 173.) / 91.
+        times = torch.full((5,), 7.3, dtype=torch.float64)
+        embedded = model.embed_states(states, times)
+        torch.testing.assert_close(embedded[0], embedded[1], rtol=0, atol=1e-14)
+        self.assertLess(float((embedded[2] - embedded[3]).detach().norm()),
+                        float((embedded[0] - embedded[4]).detach().norm()) / 10)
+        # Independent physical-angle construction fixes the time protocol:
+        # PE4 is retained, and the newly added cosine has a zero time channel.
+        physical = torch.cat((states[:, :3], torch.deg2rad(degrees).sin()[:, None],
+                              torch.deg2rad(degrees).cos()[:, None]), dim=-1)
+        time = torch.cat((continuous_time_encoding(times, 4), times[:, None] * 0), dim=-1)
+        expected = F.relu(F.linear(physical + time, model.input_embedding.weight))
+        torch.testing.assert_close(embedded, expected, rtol=1e-13, atol=1e-14)
+        linear = self.model().double()
+        torch.testing.assert_close(linear.embed_states(states, times),
+            F.relu(linear.input_embedding(states + continuous_time_encoding(times, 4))), rtol=0, atol=0)
+
+    def test_circular_normalizer_is_required_fixed_and_persisted(self):
+        config = replace(self.model().config, heading_representation='circular_sincos')
+        normalizer = {'mean': [1., 2., 3., 173.], 'std': [2., 3., 4., 91.]}
+        with self.assertRaisesRegex(ValueError, 'native-time'):
+            AssociationModel(config)
+        for invalid in (None, {}, {'mean': [0.] * 4, 'std': [1., 1., 1., 0.]},
+                        {'mean': [0., 0., 0., float('nan')], 'std': [1.] * 4}):
+            with self.subTest(normalizer=invalid), self.assertRaises(ValueError):
+                TimedAssociationModel(config, max_observations=5, normalizer=invalid)
+        model = TimedAssociationModel(config, max_observations=5, normalizer=normalizer)
+        model.validate_normalizer(normalizer)
+        with self.assertRaisesRegex(ValueError, 'normalizer'):
+            model.validate_normalizer({**normalizer, 'mean': [1., 2., 3., 174.]})
+        restored = TimedAssociationModel(config, max_observations=5, normalizer=normalizer)
+        restored.load_state_dict(model.state_dict())
+        restored.validate_normalizer(normalizer)
+        with torch.no_grad():
+            restored.heading_mean_std[1] += 1.
+        with self.assertRaisesRegex(ValueError, 'normalizer'):
+            restored.validate_normalizer(normalizer)
+
+    def test_circular_invalid_tokens_stay_ignored_during_completion_and_training(self):
+        config = replace(self.model().config, heading_representation='circular_sincos')
+        model = TimedAssociationModel(config, max_observations=5,
+            normalizer={'mean': [0., 0., 0., 180.], 'std': [1., 1., 1., 90.]}).eval()
+        values, observed = self.packed()
+        changed = values.clone()
+        changed[:, :5][~observed[:, :5]] = float('inf')
+        outside = torch.isnan(values[:, 5:, 0])
+        changed[:, 5:, :4][outside] = float('inf')
+        torch.testing.assert_close(model.complete(values, observed), model.complete(changed, observed),
+                                   rtol=0, atol=0)
+        torch.testing.assert_close(model.completion_loss(values, observed),
+                                   model.completion_loss(changed, observed), rtol=0, atol=0)
+        model.input_embedding.weight.requires_grad_(False)
+        model.completion_loss(values, observed).backward()
+        self.assertIsNone(model.input_embedding.weight.grad)
+        self.assertTrue(any(p.grad is not None and p.grad.abs().sum() > 0
+                            for p in model.tcm_encoder.parameters()))
 
 
 if __name__ == '__main__':

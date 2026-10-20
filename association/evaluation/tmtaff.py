@@ -151,6 +151,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     adapter = getattr(model, 'input_adapter', 'registered_v1')
     if any(scene.get('input_adapter', 'registered_v1') != adapter for scene in scenes):
         raise ValueError('all validation scenes must match the model input adapter')
+    if adapter == 'native_time_v1':
+        model.validate_normalizer(normalizer)
     for scene in scenes:
         _registered(scene, model.config.length)
     device = _inference_device(device, next(model.parameters()).device, next(fusion.parameters()).device)
@@ -302,6 +304,7 @@ def evaluate_tcm_feedback(model, normalizer, scenes, *, device='cpu', progress=N
             or getattr(model, 'input_adapter', None) != 'native_time_v1'
             or any(s.get('split') != 'V_select' for s in scenes)):
         raise ValueError('distinct native-time V scenes required; T_test is sealed')
+    model.validate_normalizer(normalizer)
     parameter = next(model.parameters())
     device = _inference_device(device, parameter.device, parameter.device)
     dtype, d = parameter.dtype, model.config.d_model
@@ -323,7 +326,7 @@ def evaluate_tcm_feedback(model, normalizer, scenes, *, device='cpu', progress=N
                     squared_error_sum=total, feature_mse=total/elements if elements else None)
 
     def embed(states, times):
-        return torch.relu(model.input_embedding(states + continuous_time_encoding(times, 4)))
+        return model.embed_states(states, times)
 
     for scene_index, scene in enumerate(scenes):
         packed, _ = normalize_scene(scene, normalizer)
@@ -430,11 +433,11 @@ def evaluate_tcm_completion(model, normalizer, scenes, *, device='cpu', check=No
     the existing observation interpolation, which is not a learned prediction.
     All four reference attributes must be valid for a query feature target.
     """
-    from association.models.timed import continuous_time_encoding
     scenes = list(scenes)
     if (not scenes or len({str(s['scene_id']) for s in scenes}) != len(scenes)
             or getattr(model, 'input_adapter', None) != 'native_time_v1'):
         raise ValueError('native TCM and distinct nonempty V scene population required')
+    model.validate_normalizer(normalizer)
     parameter = next(model.parameters())
     device = _inference_device(device, parameter.device, parameter.device)
     dtype, d = parameter.dtype, model.config.d_model
@@ -460,7 +463,7 @@ def evaluate_tcm_completion(model, normalizer, scenes, *, device='cpu', check=No
                     reference_coverage=totals['evaluable_query_count']/totals['query_count'] if totals['query_count'] else None)
 
     def embed(states, times):
-        return torch.relu(model.input_embedding(states + continuous_time_encoding(times, 4)))
+        return model.embed_states(states, times)
 
     def errors(prediction, target):
         if not torch.isfinite(prediction).all() or not torch.isfinite(target).all():

@@ -1,16 +1,20 @@
 """Explicit native-time adaptation of the TMTAFF-style association model.
 
-The learned layers and parameter shapes are unchanged. Observed states carry
-continuous physical-time encodings, and every decoder position is conditioned
-on the next requested time. This is a disclosed adaptation, not author code.
-The caller scales seconds to tau using the declared scene origin/time unit.
+Observed states carry continuous physical-time encodings, and every decoder
+position is conditioned on the next requested time. The default keeps the old
+four-state projection; an explicit circular-heading variant adds a fifth input
+column while preserving the original time encoding and other initialization.
+This is a disclosed adaptation, not author code. The caller scales seconds to
+tau using the declared scene origin/time unit.
 """
 from __future__ import annotations
 
 import math
+from collections.abc import Mapping
+from dataclasses import replace
 
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 from torch.nn import functional as F
 
 from association.models.tmtaff import AssociationModel, ModelConfig, _causal_mask
@@ -43,13 +47,69 @@ class TimedAssociationModel(AssociationModel):
     """
     input_adapter = 'native_time_v1'
 
-    def __init__(self, config: ModelConfig, branch: str = 'ce', *, max_observations: int):
+    def __init__(self, config: ModelConfig, branch: str = 'ce', *, max_observations: int,
+                 normalizer: Mapping | None = None):
         if isinstance(max_observations, bool) or not isinstance(max_observations, int) or max_observations < 2:
             raise ValueError('max_observations must be an explicit integer >=2')
         if config.input_dim != 4:
             raise ValueError('native-time inputs require exactly four state features')
-        super().__init__(config, branch)
+        heading_statistics = (self._normalizer_heading(normalizer)
+                              if config.heading_representation == 'circular_sincos' else None)
+        # Construct exactly the old model first: changing the projection width
+        # before this point would also change every later random initialization.
+        super().__init__(replace(config, heading_representation='linear_zscore'), branch)
+        self.config = config
         self.max_observations = max_observations
+        if heading_statistics is not None:
+            self.register_buffer('heading_mean_std', heading_statistics)
+            original = self.input_embedding
+            # The added frozen column must not advance the global random stream
+            # used by later modules or training dropout.
+            with torch.random.fork_rng(devices=[]):
+                expanded = nn.Linear(5, config.d_model, bias=False)
+                with torch.no_grad():
+                    expanded.weight[:, :4].copy_(original.weight)
+                    bound = math.sqrt(6.0 / (config.d_model + 4))
+                    expanded.weight[:, 4].uniform_(-bound, bound)
+            self.input_embedding = expanded
+
+    @staticmethod
+    def _normalizer_heading(normalizer: Mapping | None) -> Tensor:
+        if not isinstance(normalizer, Mapping):
+            raise ValueError('circular heading requires the frozen training normalizer')
+        try:
+            mean = torch.as_tensor(normalizer['mean'], dtype=torch.float64)
+            std = torch.as_tensor(normalizer['std'], dtype=torch.float64)
+        except (KeyError, TypeError, ValueError) as error:
+            raise ValueError('normalizer requires four finite means and positive scales') from error
+        if (mean.shape != (4,) or std.shape != (4,)
+                or not torch.isfinite(mean).all() or not torch.isfinite(std).all()
+                or (std <= 0).any()):
+            raise ValueError('normalizer requires four finite means and positive scales')
+        return torch.stack((mean[3], std[3]))
+
+    def validate_normalizer(self, normalizer: Mapping | None) -> None:
+        """Reject a different physical interpretation of saved circular weights."""
+        if self.config.heading_representation == 'linear_zscore':
+            return
+        expected = self._normalizer_heading(normalizer).to(self.heading_mean_std)
+        if not torch.equal(expected, self.heading_mean_std):
+            raise ValueError('normalizer differs from saved circular heading mean/std')
+
+    def embed_states(self, states: Tensor, times: Tensor) -> Tensor:
+        """Embed normalized physical states at explicit times in one shared space."""
+        if states.shape[-1:] != (4,) or states.shape[:-1] != times.shape:
+            raise ValueError('state inputs require four features and matching times')
+        time_encoding = continuous_time_encoding(times, 4)
+        if self.config.heading_representation == 'circular_sincos':
+            mean, std = self.heading_mean_std.to(states).unbind()
+            theta = torch.deg2rad(states[..., 3] * std + mean)
+            states = torch.cat((states[..., :3], theta.sin()[..., None],
+                                theta.cos()[..., None]), dim=-1)
+            # Retain every original PE4 frequency and its projection column;
+            # the added cosine state receives no extra time signal.
+            time_encoding = F.pad(time_encoding, (0, 1))
+        return F.relu(self.input_embedding(states + time_encoding))
 
     def _validate_inputs(self, values: Tensor, observed: Tensor) -> Tensor:
         width = self.max_observations + self.config.length
@@ -93,7 +153,7 @@ class TimedAssociationModel(AssociationModel):
         valid = torch.cat((observed[:, :m], inside), dim=1)
         states = torch.where(valid[..., None], values[..., :4], torch.zeros_like(values[..., :4]))
         times = torch.where(valid, values[..., 4], torch.zeros_like(values[..., 4]))
-        embedded = F.relu(self.input_embedding(states + continuous_time_encoding(times, 4)))
+        embedded = self.embed_states(states, times)
         return torch.where(valid[..., None], embedded, torch.zeros_like(embedded))
 
     def _teacher_predictions(self, history: Tensor, next_times: Tensor) -> Tensor:

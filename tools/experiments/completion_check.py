@@ -147,8 +147,10 @@ def main(argv=None):
             run.update(**reads, fragment_count=sum(len(scene['node_ids']) for scene in scenes))
             config = replace(ModelConfig(**saved['model_config']), margin=saved['effective_margin'])
             reference = TimedAssociationModel(config, saved['config']['branch'],
-                                               max_observations=saved['max_observations'])
+                                               max_observations=saved['max_observations'],
+                                               normalizer=normalizer)
             reference.load_state_dict(saved['states'][0], strict=True)
+            reference.validate_normalizer(normalizer)
             reference.to(device).eval()
             run['stage'] = 'reference_feedback'
             progress(dict(stage=run['stage']))
@@ -188,8 +190,10 @@ def main(argv=None):
         if not args.candidate_residuals:
             config = replace(ModelConfig(**saved['model_config']), margin=saved['effective_margin'])
             reference = TimedAssociationModel(config, saved['config']['branch'],
-                                               max_observations=saved['max_observations'])
+                                               max_observations=saved['max_observations'],
+                                               normalizer=normalizer)
             reference.load_state_dict(saved['states'][0], strict=True)
+            reference.validate_normalizer(normalizer)
             reference.to(device).eval()
             run['stage'] = 'reference_completion'
             progress(dict(stage=run['stage']))

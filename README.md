@@ -8,7 +8,7 @@ MTAD不完整量测下的**补全、关联、融合**研究。用户2026-10-20�
 
 **本轮工作汇报：** [复现程度、论文差距、补齐问题与并行安排](docs/reports/2026-10-20-research-progress.md)。baseline仍为部分复现，候选尚无可靠端到端增益。032新诊断显示消去学习残差的时间变化几乎不影响误差；035已于北京时间12:23在隔离目录启动，冻结033独立训练TAM1000步；034仍无终态回执，TCM继续独立排查。
 
-**TCM排查：** [036已完成并复核](docs/proposals/repair_before_retraining/036-analysis.md)：同目标/时间/固定memory下，h2自身反馈比真实反馈低0.515%，h3高4.310%；短程反馈有代价，但不支持将其视为主要故障。保留035原关联训练，下一改进设计优先考虑表示/任务差异，不自动加free-running训练。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)，当前无新增READY。
+**TCM排查与修正：** [036已完成并复核](docs/proposals/repair_before_retraining/036-analysis.md)：同目标/时间/固定memory下，h2自身反馈比真实反馈低0.515%，h3高4.310%；短程反馈有代价，但不支持将其视为主要故障。用户已要求实施[圆周航向表示](docs/specs/tcm-circular-heading.md)，保留原033/035，统一训练/评价的sin/cos变换并保持原时间编码及其它初始化。拟定[037](HandOver/L2S-20261020-037.md)单卡串行TCM4000→TAM1000，以同预算关联成绩判断收益；新旧特征MSE不可直接排名。代码验证不等于实际效果，新增训练预算待确认，当前无新增READY。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
 
 - **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
 - **021身份原分数已复核**：teacher1000＋utility200完成，teacher端点开发macro-F1 **.630321**、P .301445、R .835305。比同人口位置控制仅高1.47个百分点，跨源F1没有优势；不能归因于utility或融合，T_test未开启。

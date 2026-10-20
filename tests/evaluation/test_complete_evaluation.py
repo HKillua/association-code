@@ -175,6 +175,49 @@ class TCMCompletionTests(unittest.TestCase):
         self.assertAlmostEqual(result['query']['model']['regions']['inside_support']['feature_mse'],
                                result['query']['state_hold']['regions']['inside_support']['feature_mse'], places=6)
 
+    def test_circular_completion_and_feedback_controls_share_saved_heading_representation(self):
+        from dataclasses import replace
+        from association.models.timed import TimedAssociationModel, continuous_time_encoding
+        from association.training.common import normalize_scene
+        from association.evaluation.tmtaff import evaluate_tcm_completion, evaluate_tcm_feedback
+        model = TimedAssociationModel(replace(self.model.config, heading_representation='circular_sincos'),
+            'contrastive', max_observations=3, normalizer=self.normalizer)
+        completion = evaluate_tcm_completion(model, self.normalizer, [self.scene])
+        feedback = evaluate_tcm_feedback(model, self.normalizer, [self.scene])
+        packed, observed = normalize_scene(self.scene, self.normalizer)
+
+        def independent_embed(states, times):
+            angle = torch.deg2rad(states[..., 3]*self.normalizer['std'][3]+self.normalizer['mean'][3])
+            represented = torch.cat((states[..., :3], angle.sin()[..., None], angle.cos()[..., None]), -1)
+            time4 = continuous_time_encoding(times, 4)
+            time5 = torch.cat((time4, torch.zeros_like(time4[..., :1])), -1)
+            return torch.relu(model.input_embedding(represented+time5))
+
+        native_sse = feedback_sse = 0.
+        with torch.inference_mode():
+            for node in range(len(packed)):
+                count = int(observed[node].sum())
+                states = torch.from_numpy(packed[node, :count, :4])
+                times = torch.from_numpy(packed[node, :count, 4])
+                for x, t in ((states, times), (states.flip(0), times.flip(0))):
+                    expected = independent_embed(x[1:], t[1:])
+                    held = independent_embed(x[:-1], t[1:])
+                    native_sse += float((held.double()-expected.double()).square().sum())
+                    horizon = min(3, count-2)
+                    if horizon:
+                        prefix = count-horizon
+                        expected = independent_embed(x[prefix:], t[prefix:])
+                        held = independent_embed(x[prefix-1:prefix].expand(horizon, -1), t[prefix:])
+                        feedback_sse += float((held.double()-expected.double()).square().sum())
+        self.assertAlmostEqual(completion['one_step']['state_hold']['all']['squared_error_sum'], native_sse, places=6)
+        self.assertAlmostEqual(feedback['aggregate']['all']['all_steps']['metrics']['state_hold']['squared_error_sum'],
+                               feedback_sse, places=6)
+        wrong = copy.deepcopy(self.normalizer)
+        wrong['std'][3] *= 2.
+        for evaluator in (evaluate_tcm_completion, evaluate_tcm_feedback):
+            with self.assertRaisesRegex(ValueError, 'normalizer.*heading'):
+                evaluator(model, wrong, [self.scene])
+
     def test_partial_reference_and_empty_scene_keep_population_without_filling_targets(self):
         from tests.fixtures.scenes import empty_timed_scene
         del self.scene['fusion_targets']['completion-B']

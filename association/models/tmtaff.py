@@ -24,6 +24,7 @@ class ModelConfig:
     length: int = 64
     margin: float = 1.0
     contrastive_positive_power: int = 1
+    heading_representation: str = "linear_zscore"
 
     def __post_init__(self):
         for name in ("input_dim", "d_model", "nhead", "num_layers", "dim_feedforward", "length"):
@@ -37,6 +38,8 @@ class ModelConfig:
             raise ValueError("margin must be finite and positive")
         if self.contrastive_positive_power not in (1, 2):
             raise ValueError("contrastive_positive_power must be 1 or 2")
+        if self.heading_representation not in ("linear_zscore", "circular_sincos"):
+            raise ValueError("heading_representation must be linear_zscore or circular_sincos")
 
 
 def _sinusoidal_positions(length: int, dimension: int) -> Tensor:
@@ -68,6 +71,8 @@ class AssociationModel(nn.Module):
         super().__init__()
         if branch not in ("ce", "contrastive"):
             raise ValueError("branch must be 'ce' or 'contrastive'")
+        if config.heading_representation != "linear_zscore":
+            raise ValueError("circular heading representation requires the native-time model")
         self.config = config
         self.branch = branch
         self._completion_frozen = False

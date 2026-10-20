@@ -87,6 +87,8 @@ def score_reference(model, normalizer, prepared_scenes, device, batch_tracks=64,
     """Raw symmetric CE logits / negative distances, with bounded pair memory."""
     if batch_tracks < 1 or pair_batch_size < 1:
         raise ValueError("score batch sizes must be positive")
+    if getattr(model, 'input_adapter', None) == 'native_time_v1':
+        model.validate_normalizer(normalizer)
     device = torch.device(device)
     model.eval()
     records = []

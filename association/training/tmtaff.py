@@ -247,7 +247,8 @@ def load_complete_snapshot(path, *, device='cpu', selected=True):
     if adapter == 'native_time_v1':
         from association.models.timed import TimedAssociationModel
         model = TimedAssociationModel(model_config, payload['config']['branch'],
-                                     max_observations=payload['max_observations'])
+                                     max_observations=payload['max_observations'],
+                                     normalizer=payload['normalizer'])
     elif adapter == 'registered_v1':
         model = AssociationModel(model_config, payload['config']['branch'])
     else:
@@ -256,6 +257,8 @@ def load_complete_snapshot(path, *, device='cpu', selected=True):
     objective = FusionLoss(position_loss_mode=payload['config']['position_loss_mode'],
                            longitude_loss_mode=payload['config'].get('longitude_loss_mode', 'linear'))
     _restore((model, fusion, objective), snapshot['states'])
+    if adapter == 'native_time_v1':
+        model.validate_normalizer(payload['normalizer'])
     for module in (model, fusion, objective):
         module.to(device).eval()
     return dict(model=model, fusion=fusion, objective=objective,
@@ -402,7 +405,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or completion_source['cursor'] != dict(stage=0, update=tcm_updates, completed_updates=tcm_updates)
                 or completion_source.get('selected') is not None):
             raise ValueError('TAM initialization requires a COMPLETED TCM-only endpoint')
-        if (completion_source['model_config'] != asdict(model_config)
+        if (asdict(ModelConfig(**completion_source['model_config'])) != asdict(model_config)
                 or source_config['branch'] != config['branch']
                 or completion_source.get('input_adapter') != 'native_time_v1'
                 or completion_source['max_observations'] != train_scenes[0]['max_observations']
@@ -413,7 +416,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         initialization = dict(source_run=str(previous.resolve()), source_phase='tcm',
             source_tcm_updates=tcm_updates,
             transferred_modules=['input_embedding', 'tcm_encoder', 'tcm_decoder'],
-            transferred_buffers=['positions'],
+            transferred_buffers=(['positions', 'heading_mean_std']
+                if model_config.heading_representation == 'circular_sincos' else ['positions']),
             semantics='frozen completion only; new TAM, optimizer, RNG, history and elapsed budget')
     if resume_from is not None:
         previous = Path(resume_from)
@@ -428,7 +432,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         # An explicit scheduling-policy change does not change the trained
         # protocol. Keep all scientific configuration and elapsed accounting.
         previous_config['time_policy'] = config['time_policy']
-        if (previous_config != config or saved['model_config'] != asdict(model_config)
+        if (previous_config != config or asdict(ModelConfig(**saved['model_config'])) != asdict(model_config)
                 or asdict(PairFusionConfig(**saved['fusion_config'])) != asdict(fusion_config)
                 or saved['data_contract'] != contract
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
@@ -522,7 +526,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         if adapter == 'native_time_v1':
             from association.models.timed import TimedAssociationModel
             model = TimedAssociationModel(replace(model_config, margin=effective_margin), config['branch'],
-                                         max_observations=train_scenes[0]['max_observations'])
+                                         max_observations=train_scenes[0]['max_observations'],
+                                         normalizer=normalizer)
         else:
             model = AssociationModel(replace(model_config, margin=effective_margin), config['branch'])
         modules = (model.to(device),
@@ -536,7 +541,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 prefix = name + '.'
                 getattr(model, name).load_state_dict({key[len(prefix):]: value
                     for key, value in source_state.items() if key.startswith(prefix)})
-            model.positions.copy_(source_state['positions'])
+            for name in initialization['transferred_buffers']:
+                getattr(model, name).copy_(source_state[name])
+            model.validate_normalizer(normalizer)
             del completion_source
         normalized = [normalize_scene(scene, normalizer) for scene in train_scenes]
         track_rng, tfm_rng = np.random.default_rng(config['seed']), np.random.default_rng(config['seed'] + 1)
@@ -549,6 +556,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 # Validate it before resuming any optimizer updates as well.
                 fusion.validate_output_statistics(selected['states'][1])
             _restore(modules, saved['states'])
+            if adapter == 'native_time_v1':
+                model.validate_normalizer(normalizer)
             if cursor['stage'] < stage_limit:
                 phase = STAGES[cursor['stage']]
                 parameters = _stage_parameters(modules, phase)
@@ -596,6 +605,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             if optimizer is None:
                 if phase == 'TFM_FROZEN':
                     model.load_state_dict(selected['states'][0])
+                    if adapter == 'native_time_v1':
+                        model.validate_normalizer(normalizer)
                 parameters = _stage_parameters(modules, phase)
                 optimizer = _optimizer(parameters, {'learning_rate': config['learning_rates'][phase]})
             if phase == 'TAM_FROZEN' and cache is None:
@@ -779,6 +790,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         run['final_evaluation_status'] = 'FAILED'
         try:
             _restore(modules, selected['states'])
+            if adapter == 'native_time_v1':
+                model.validate_normalizer(normalizer)
             model.eval()
             fusion.eval()
             evaluator = evaluate_complete if evaluation_fn is None else evaluation_fn
