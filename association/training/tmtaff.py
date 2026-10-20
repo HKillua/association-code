@@ -52,8 +52,8 @@ def _record_cuda_peaks(run, device):
 
 
 def _configuration(config, *, phase='full'):
-    if phase not in ('full', 'tcm'):
-        raise ValueError('phase must be full or tcm')
+    if phase not in ('full', 'tcm', 'tam'):
+        raise ValueError('phase must be full, tcm or tam')
     config = copy.deepcopy(config)
     config.setdefault('margin_policy', 'fixed')
     config.setdefault('longitude_loss_mode', 'linear')
@@ -74,10 +74,11 @@ def _configuration(config, *, phase='full'):
     for name, value in [('seed', config['seed']), ('completion_cache_mib', config['completion_cache_mib'])]:
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ValueError(f'{name} must be a nonnegative integer')
+    phase_stages = {'full': STAGES, 'tcm': ('TCM',), 'tam': ('TAM_FROZEN',)}[phase]
     for stage, value in config['updates'].items():
-        if phase == 'tcm' and stage != 'TCM':
+        if stage not in phase_stages:
             if isinstance(value, bool) or not isinstance(value, int) or value != 0:
-                raise ValueError(f'{stage} updates must be zero for phase tcm')
+                raise ValueError(f'{stage} updates must be zero for phase {phase}')
         elif isinstance(value, bool) or not isinstance(value, int) or value < 1:
             raise ValueError(f'{stage} updates must be a positive integer')
     for name, value in [(k, config[k]) for k in
@@ -324,7 +325,8 @@ def _targets(scenes, groups, device):
 
 def train_complete(train_scenes, validation_scenes, model_config, fusion_config, config,
                    output, *, device='cpu', resume_from=None, max_updates_this_call=None,
-                   evaluation_fn=None, initial_elapsed_seconds=0.0, save_predictions=False, phase='full'):
+                   evaluation_fn=None, initial_elapsed_seconds=0.0, save_predictions=False, phase='full',
+                   initialize_tcm_from=None):
     """Train supplied physical scenes; native ZIP preparation is a separate caller.
 
     ``fusion_targets`` maps identity strings to states[L,4]/valid[L,4] and
@@ -341,17 +343,26 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     Explicit phase='tcm' ends after the unchanged native TCM updates and full V
     feature diagnostics. Its checkpoint has no association-selected snapshot;
     future stages require a separately specified new run, not an implicit resume.
+    Explicit phase='tam' starts a new TAM from a COMPLETED TCM-only run. Its
+    completion weights/normalizer are frozen; source optimizer, RNG, elapsed
+    time and association weights are not inherited. Final association metrics
+    reuse full-V validation scores without running untrained physical fusion.
     """
     started = time.monotonic()
     requested_phase = phase
     config = _configuration(config, phase=requested_phase)
-    active_stages = STAGES[:1] if requested_phase == 'tcm' else STAGES
+    active_stages = {'full': STAGES, 'tcm': STAGES[:1], 'tam': STAGES[1:2]}[requested_phase]
+    stage_limit = STAGES.index(active_stages[-1]) + 1
+    if initialize_tcm_from is not None and (requested_phase != 'tam' or resume_from is not None):
+        raise ValueError('initialize_tcm_from requires a new phase tam run, not resume')
+    if requested_phase == 'tam' and resume_from is None and initialize_tcm_from is None:
+        raise ValueError('a new phase tam run requires initialize_tcm_from')
     if not isinstance(save_predictions, bool):
         raise ValueError('save_predictions must be boolean')
     if save_predictions and evaluation_fn is not None:
         raise ValueError('save_predictions requires the default complete evaluator')
-    if requested_phase == 'tcm' and (save_predictions or evaluation_fn is not None):
-        raise ValueError('phase tcm uses the native feature diagnostic only; no complete evaluator or prediction export')
+    if requested_phase != 'full' and (save_predictions or evaluation_fn is not None):
+        raise ValueError(f'phase {requested_phase} excludes the complete evaluator and physical prediction export')
     if (isinstance(initial_elapsed_seconds, bool) or not isinstance(initial_elapsed_seconds, (int, float))
             or not math.isfinite(initial_elapsed_seconds) or initial_elapsed_seconds < 0):
         raise ValueError('initial_elapsed_seconds must be finite and nonnegative')
@@ -361,8 +372,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     if (model_config.length, model_config.d_model) != (fusion_config.length, fusion_config.d_model):
         raise ValueError('association and fusion length/dimension must agree')
     contract = _scenes(train_scenes, validation_scenes, model_config.length)
-    if requested_phase == 'tcm' and train_scenes[0].get('input_adapter') != 'native_time_v1':
-        raise ValueError('phase tcm requires native-time scenes for its endpoint diagnostic')
+    if requested_phase != 'full' and train_scenes[0].get('input_adapter') != 'native_time_v1':
+        raise ValueError(f'phase {requested_phase} requires native-time scenes')
     calibrating = config['margin_policy'] == MARGIN_POLICY
     if calibrating and (model_config.contrastive_positive_power != 1
                         or any(scene['split'] != 'T_core' for scene in train_scenes)):
@@ -378,6 +389,32 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         device = torch.device('cpu')
     output = Path(output)
     saved, spent_before = None, 0.0
+    initialization, completion_source = None, None
+    if initialize_tcm_from is not None:
+        previous = Path(initialize_tcm_from)
+        previous_run = runtime.read_json(previous / 'run.json')
+        completion_source = torch.load(previous / 'checkpoint.pt', map_location='cpu', weights_only=True)
+        source_config = _configuration(completion_source['config'], phase='tcm')
+        tcm_updates = source_config['updates']['TCM']
+        if (previous_run.get('status') != 'COMPLETED' or previous_run.get('phase') != 'tcm'
+                or completion_source.get('format_version') != 1 or completion_source.get('phase') != 'tcm'
+                or previous_run['cursor']['completed_updates'] != tcm_updates
+                or completion_source['cursor'] != dict(stage=0, update=tcm_updates, completed_updates=tcm_updates)
+                or completion_source.get('selected') is not None):
+            raise ValueError('TAM initialization requires a COMPLETED TCM-only endpoint')
+        if (completion_source['model_config'] != asdict(model_config)
+                or source_config['branch'] != config['branch']
+                or completion_source.get('input_adapter') != 'native_time_v1'
+                or completion_source['max_observations'] != train_scenes[0]['max_observations']
+                or completion_source['data_contract'] != contract
+                or completion_source['normalizer'] != normalizer):
+            raise ValueError('TCM initialization model, data contract or normalizer differs')
+        normalizer = copy.deepcopy(completion_source['normalizer'])
+        initialization = dict(source_run=str(previous.resolve()), source_phase='tcm',
+            source_tcm_updates=tcm_updates,
+            transferred_modules=['input_embedding', 'tcm_encoder', 'tcm_decoder'],
+            transferred_buffers=['positions'],
+            semantics='frozen completion only; new TAM, optimizer, RNG, history and elapsed budget')
     if resume_from is not None:
         previous = Path(resume_from)
         previous_run = runtime.read_json(previous / 'run.json')
@@ -409,6 +446,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                   or (saved['cursor']['stage'] == 1 and saved['cursor']['update'] > 0)):
                 raise ValueError('cannot resume trained TAM without its completed margin calibration')
         spent_before = max(float(saved['elapsed_seconds']), float(previous_run['elapsed_seconds']))
+        initialization = copy.deepcopy(saved.get('initialization'))
     if config['time_policy'] == 'hard' and spent_before + initial_elapsed_seconds >= config['max_hours'] * 3600:
         raise TimeoutError('cumulative training budget is exhausted')
     output.mkdir(parents=True, exist_ok=False)
@@ -418,7 +456,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                        'unique_scene_count': 0, 'unique_track_count': 0, 'unique_pair_count': 0,
                        'positive_scene_ids': [], 'negative_scene_ids': []} for stage in STAGES} \
                if saved is None else copy.deepcopy(saved['coverage'])
-    cursor = {'stage': 0, 'update': 0, 'completed_updates': 0} if saved is None else dict(saved['cursor'])
+    cursor = {'stage': STAGES.index(active_stages[0]), 'update': 0, 'completed_updates': 0} \
+             if saved is None else dict(saved['cursor'])
     selected = None if saved is None else saved['selected']
     calibration = None if saved is None else copy.deepcopy(saved.get('margin_calibration'))
     effective_margin = model_config.margin if saved is None else saved.get('effective_margin', model_config.margin)
@@ -427,6 +466,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'config': config, 'input_adapter': adapter,
            'requested_model_config': asdict(model_config), 'effective_margin': effective_margin,
            'margin_calibration': calibration,
+           'initialization': initialization,
            'scope': (('TMTAFF time/output-scale-adapted approximate reference'
                       if fusion_config.output_parameterization == 'train_position_affine'
                       else 'TMTAFF time-adapted approximate reference') if adapter == 'native_time_v1'
@@ -450,6 +490,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'final_evaluation_seconds': None, 'final_evaluation_status': 'NOT_STARTED',
            'final_evaluation_scope': ('full V native one-step and natural-query feature diagnostics; excludes summary I/O'
                                       if requested_phase == 'tcm' else
+                                      'selected full V association scores from training validation; no additional inference or physical fusion'
+                                      if requested_phase == 'tam' else
                                       'selected state restore, full association/fusion evaluation and threshold consistency check; excludes summary I/O'),
            'timing_note': 'successful CUDA boundaries synchronize; failed timings stop at exception without waiting for outstanding CUDA work',
            'cuda_process_peak_allocated_bytes': None, 'cuda_process_peak_reserved_bytes': None,
@@ -488,6 +530,14 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                    FusionLoss(position_loss_mode=config['position_loss_mode'],
                               longitude_loss_mode=config['longitude_loss_mode']).to(device))
         model, fusion, objective = modules
+        if completion_source is not None:
+            source_state = completion_source['states'][0]
+            for name in initialization['transferred_modules']:
+                prefix = name + '.'
+                getattr(model, name).load_state_dict({key[len(prefix):]: value
+                    for key, value in source_state.items() if key.startswith(prefix)})
+            model.positions.copy_(source_state['positions'])
+            del completion_source
         normalized = [normalize_scene(scene, normalizer) for scene in train_scenes]
         track_rng, tfm_rng = np.random.default_rng(config['seed']), np.random.default_rng(config['seed'] + 1)
         transitions = [(s, t) for s, (_, masks) in enumerate(normalized)
@@ -499,7 +549,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 # Validate it before resuming any optimizer updates as well.
                 fusion.validate_output_statistics(selected['states'][1])
             _restore(modules, saved['states'])
-            if cursor['stage'] < len(active_stages):
+            if cursor['stage'] < stage_limit:
                 phase = STAGES[cursor['stage']]
                 parameters = _stage_parameters(modules, phase)
                 optimizer = _optimizer(parameters, {'learning_rate': config['learning_rates'][phase]})
@@ -511,6 +561,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             payload = {'format_version': 1, 'phase': requested_phase, 'training_stages': list(active_stages),
                        'config': config, 'model_config': asdict(model_config),
                        'effective_margin': effective_margin, 'margin_calibration': calibration,
+                       'initialization': initialization,
                        'input_adapter': adapter,
                        'max_observations': train_scenes[0].get('max_observations'),
                        'fusion_config': asdict(fusion_config), 'normalizer': normalizer,
@@ -528,7 +579,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             write_run('RUNNING')
 
         calls = 0
-        while cursor['stage'] < len(active_stages):
+        while cursor['stage'] < stage_limit:
             phase = STAGES[cursor['stage']]
             total_updates = config['updates'][phase]
             if cursor['update'] == total_updates:
@@ -639,12 +690,23 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                         config['validation_batches']['tracks'], config['validation_batches']['pairs'], check=check)
                     selection = select_threshold(records)
                     row['selection'] = selection
+                    if requested_phase == 'tam':
+                        row['validation'] = evaluate_scenes(records, selection['threshold'])
+                        score_path = output / 'association-scores' / f'update-{update:06d}'
+                        runtime.save_records(score_path, records,
+                            dict(phase=requested_phase, stage=phase, update=update,
+                                 split='V_select', threshold=selection['threshold'],
+                                 effective_margin=effective_margin, test_opened=False))
+                        row['score_records'] = str(score_path.resolve())
                     if selected is None or selection['macro_f1'] > selected['macro_f1'] + 1e-12:
                         selected = {'macro_f1': selection['macro_f1'], 'threshold': selection['threshold'],
                                     'effective_margin': effective_margin,
                                     'margin_policy': config['margin_policy'],
                                     'stage': phase, 'update': update, 'states': _states(modules),
-                                    'validation': evaluate_scenes(records, selection['threshold'])}
+                                    'validation': (row['validation'] if requested_phase == 'tam'
+                                                   else evaluate_scenes(records, selection['threshold']))}
+                        if requested_phase == 'tam':
+                            selected['score_records'] = row['score_records']
                         timing['selected_snapshot_copied'] = True
                     _synchronize(device)
                     timing['status'] = 'COMPLETED'
@@ -684,6 +746,31 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 completion_evaluation='completion-evaluation.json',
                 evaluation_seconds=run['final_evaluation_seconds'], normalizer=normalizer,
                 coverage=coverage, checkpoint='checkpoint.pt', test_opened=False))
+            check()
+            write_run('COMPLETED')
+            return run
+        if requested_phase == 'tam':
+            evaluation_started = time.monotonic()
+            run['final_evaluation_status'] = 'FAILED'
+            run['selection_performed'] = True
+            try:
+                records = runtime.load_records(selected['score_records'])
+                evaluation = dict(association=evaluate_scenes(records, selected['threshold']),
+                    threshold=selected['threshold'], score_records=selected['score_records'],
+                    inference_reused=True, physical_fusion_evaluated=False, test_opened=False)
+                run['final_evaluation_status'] = 'COMPLETED'
+            finally:
+                run['final_evaluation_seconds'] = time.monotonic() - evaluation_started
+            check()
+            runtime.write_json(output / 'summary.json', dict(phase=requested_phase,
+                selection={k: v for k, v in selected.items() if k != 'states'},
+                selection_scope=run['selection_scope'], evaluation=evaluation,
+                endpoint_score_records=history[-1]['score_records'],
+                validation_score_records=[dict(update=row['update'], records=row['score_records'],
+                    selection=row['selection'], association=row['validation'])
+                    for row in history if 'score_records' in row],
+                evaluation_seconds=run['final_evaluation_seconds'], initialization=initialization,
+                normalizer=normalizer, coverage=coverage, checkpoint='checkpoint.pt', test_opened=False))
             check()
             write_run('COMPLETED')
             return run

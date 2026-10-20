@@ -22,6 +22,7 @@ wandb/
 !HandOver/results/COOPERATIVE-SPEED-20261020-031/completion-predictions.tar.gz
 !HandOver/results/COOPERATIVE-SPEED-20261020-032/completion-predictions.tar.gz
 !HandOver/results/COOPERATIVE-HEADING-20261020-034/completion-predictions.tar.gz
+!HandOver/results/BASELINE-TAM-FROM033-20261020-035/association-scores.tar.gz
 *.7z
 *.pt
 *.pth

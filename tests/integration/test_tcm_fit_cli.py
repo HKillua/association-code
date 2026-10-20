@@ -141,6 +141,115 @@ class TcmFitCliTests(unittest.TestCase):
         for name in ('predictions', 'full-zero', 'nonzero-downstream'):
             self.assertFalse((self.root/name).exists())
 
+    def tam_config(self):
+        self.fixture.config['training']['updates'] = dict(TCM=0, TAM_FROZEN=2, TFM_FROZEN=0, JOINT=0)
+        return self.fixture.config
+
+    def tam_fit(self, name, **kwargs):
+        dataset, config = self.fixture.load(), self.tam_config()
+        return train_complete(dataset['train'], dataset['validation'], ModelConfig(**config['model']),
+            PairFusionConfig(**config['fusion']), config['training'], self.root/name,
+            phase='tam', **kwargs)
+
+    def test_tam_cli_transfers_only_completion_and_reuses_all_validation_scores(self):
+        self.fit('source', initial_elapsed_seconds=50.)
+        source = self.checkpoint('source')
+        # A TCM run contains unused random TAM weights. Deliberately distinguish
+        # them from a fresh initialization to catch accidentally loading all states.
+        for key, value in source['states'][0].items():
+            if key.startswith('tam_encoder.'):
+                value.add_(10.)
+        torch.save(source, self.root/'source'/'checkpoint.pt')
+        self.tam_config()
+        from association.training import tmtaff as training
+        initial, score_calls = {}, []
+        original_parameters, original_score = training._stage_parameters, training.score_reference
+
+        def parameters(modules, stage):
+            initial.update({k: v.detach().clone() for k, v in modules[0].state_dict().items()})
+            return original_parameters(modules, stage)
+
+        def score(*args, **kwargs):
+            records = original_score(*args, **kwargs)
+            score_calls.append(records)
+            return records
+
+        with (patch.object(training, '_stage_parameters', side_effect=parameters),
+              patch.object(training, 'score_reference', side_effect=score),
+              patch.object(training, 'evaluate_complete', side_effect=AssertionError('physical fusion forbidden')),
+              patch.object(training, 'fusion_training_step', side_effect=AssertionError('TFM/JOINT forbidden'))):
+            self.assertEqual(self.invoke('tam', ['--phase', 'tam', '--initialize-tcm-from',
+                                                 str(self.root/'source')]), 0)
+        saved = self.checkpoint('tam')
+        self.assertEqual(saved['training_stages'], ['TAM_FROZEN'])
+        self.assertEqual(saved['cursor'], dict(stage=1, update=2, completed_updates=2))
+        self.assertEqual([row['stage'] for row in saved['history']], ['TAM_FROZEN'] * 2)
+        self.assertEqual(saved['normalizer'], source['normalizer'])
+        self.assertEqual(saved['coverage']['TCM']['track_presentations'], 0)
+        self.assertEqual(len(score_calls), 2)  # No third inference at the endpoint.
+        for key, value in saved['states'][0].items():
+            if key == 'positions' or key.startswith(('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
+                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
+            if key.startswith('tam_encoder.'):
+                self.assertFalse(torch.equal(initial[key], source['states'][0][key]))
+        self.assertTrue(any(not torch.equal(initial[k], v)
+                            for k, v in saved['states'][0].items() if k.startswith('tam_encoder.')))
+        run = runtime.read_json(self.root/'tam'/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['margin_calibration']['status'], 'COMPLETED')
+        self.assertIsNone(run['resume_from'])
+        self.assertLess(run['elapsed_seconds'], 50.)
+        summary = runtime.read_json(self.root/'tam'/'summary.json')
+        self.assertFalse(summary['evaluation']['physical_fusion_evaluated'])
+        association = summary['evaluation']['association']
+        self.assertEqual(association['coverage']['all_scenes'], 2)
+        self.assertEqual(association['pair_count'], 6)
+        self.assertIn('paper_metrics', association['itsa'])
+        self.assertIn('paper_metrics', association['mstsa'])
+        self.assertEqual(len(summary['validation_score_records']), 2)
+        for entry, expected in zip(summary['validation_score_records'], score_calls):
+            self.assertEqual(entry['association']['coverage']['all_scenes'], 2)
+            self.assertIn('paper_metrics', entry['association']['mstsa'])
+            records = runtime.load_records(entry['records'])
+            self.assertEqual([row['scene_id'] for row in records], ['2', '4'])
+            for actual, original in zip(records, expected):
+                self.assertEqual(actual['scores'].tolist(), original['scores'].tolist())
+        self.assertFalse(run['test_opened'])
+
+    def test_tam_resume_keeps_frozen_source_and_new_budget_and_rejects_changed_contract(self):
+        self.fit('source')
+        self.tam_fit('once', initialize_tcm_from=self.root/'source')
+        self.tam_fit('partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
+        self.assertEqual(self.tam_fit('resumed', resume_from=self.root/'partial')['status'], 'COMPLETED')
+        expected, actual = self.checkpoint('once'), self.checkpoint('resumed')
+        for left, right in zip(expected['states'], actual['states']):
+            for key in left:
+                torch.testing.assert_close(left[key], right[key], rtol=0, atol=0)
+        self.assertEqual([row['loss'] for row in expected['history']],
+                         [row['loss'] for row in actual['history']])
+        self.assertEqual(expected['initialization'], actual['initialization'])
+        self.fixture.alignment['2']['time_offset_seconds'] += 1.
+        with self.assertRaisesRegex(ValueError, 'data contract or normalizer differs'):
+            self.tam_fit('different-data', initialize_tcm_from=self.root/'source')
+        self.assertFalse((self.root/'different-data').exists())
+        self.fixture.alignment['2']['time_offset_seconds'] -= 1.
+        source_run = runtime.read_json(self.root/'source'/'run.json')
+        source_run['status'] = 'FAILED'
+        runtime.write_json(self.root/'source'/'run.json', source_run)
+        with self.assertRaisesRegex(ValueError, 'COMPLETED TCM-only'):
+            self.tam_fit('failed-source', initialize_tcm_from=self.root/'source')
+        self.assertFalse((self.root/'failed-source').exists())
+
+    def test_tam_cli_requires_explicit_new_initialization_and_zero_other_stages(self):
+        self.tam_config()
+        with patch.object(cli, 'load_timed_dataset', side_effect=AssertionError('must reject before data')):
+            self.assertEqual(self.invoke('missing-source', ['--phase', 'tam']), 1)
+            self.assertEqual(self.invoke('both', ['--phase', 'tam', '--initialize-tcm-from', 'source',
+                                                '--resume', 'interrupted']), 1)
+            self.fixture.config['training']['updates']['TCM'] = 1
+            self.assertEqual(self.invoke('nonzero-tcm', ['--phase', 'tam',
+                                                       '--initialize-tcm-from', 'source']), 1)
+
 
 if __name__ == '__main__':
     unittest.main()

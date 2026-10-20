@@ -25,12 +25,14 @@ def main(argv=None):
     for name in ('archive', 'manifest', 'alignment', 'config', 'output'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--device', help='required for fit; no automatic CPU/GPU fallback')
-    parser.add_argument('--phase', choices=('full', 'tcm'), default='full',
-                        help='tcm: native TCM only, then full V feature diagnostics; downstream updates must be zero')
+    parser.add_argument('--phase', choices=('full', 'tcm', 'tam'), default='full',
+                        help='tcm: completion only; tam: new frozen-completion association run; inactive updates must be zero')
     parser.add_argument('--inspect-only', action='store_true')
     parser.add_argument('--save-predictions', action='store_true',
                         help='save scene-local selected-model physical predictions during final evaluation')
     parser.add_argument('--resume', help='an INTERRUPTED run; output must be a new directory')
+    parser.add_argument('--initialize-tcm-from',
+                        help='COMPLETED TCM-only run directory; new phase tam initialization, not resume')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--time-policy', choices=('hard', 'advisory'),
                         help='override job timing only; advisory keeps the fixed update plan after the suggested duration')
@@ -50,10 +52,14 @@ def main(argv=None):
             raise ValueError('--cpu-threads must be positive')
         if args.inspect_only and args.resume:
             raise ValueError('--resume applies to fit, not inspect-only')
+        if args.initialize_tcm_from and (args.phase != 'tam' or args.resume):
+            raise ValueError('--initialize-tcm-from requires a new --phase tam run, not --resume')
+        if args.phase == 'tam' and not args.resume and not args.initialize_tcm_from:
+            raise ValueError('--phase tam requires --initialize-tcm-from for a new run')
         if args.inspect_only and args.save_predictions:
             raise ValueError('--save-predictions applies to fit, not inspect-only')
-        if args.phase == 'tcm' and args.save_predictions:
-            raise ValueError('--save-predictions requires --phase full; TCM exports feature diagnostics only')
+        if args.phase != 'full' and args.save_predictions:
+            raise ValueError('--save-predictions requires --phase full')
         if not args.inspect_only and not args.device:
             raise ValueError('--device must be explicit for fit')
         output = Path(args.output)
@@ -100,6 +106,7 @@ def main(argv=None):
             train_splits=config['train_splits'], data_config=data_config,
             alignment_by_scene=runtime.read_json(args.alignment), check=check)
         preparation = {'status': 'INSPECTED' if args.inspect_only else 'PREPARED', 'phase': args.phase,
+                       'initialize_tcm_from': args.initialize_tcm_from,
                        'report_phase': 'input preparation before model construction',
                        'configuration': config, 'cpu_threads': args.cpu_threads,
                        'dataset': dataset['report'], 'elapsed_seconds': time.monotonic()-started,
@@ -115,7 +122,7 @@ def main(argv=None):
                 result = train_complete(dataset['train'], dataset['validation'], model, fusion,
                     training, output, device=args.device, resume_from=args.resume,
                     initial_elapsed_seconds=time.monotonic()-started, save_predictions=args.save_predictions,
-                    phase=args.phase)
+                    phase=args.phase, initialize_tcm_from=args.initialize_tcm_from)
             except BaseException as error:
                 training_error = error
                 raise

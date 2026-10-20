@@ -4,7 +4,7 @@
 
 | 脚本 | 用途 |
 | --- | --- |
-| `tmtaff_complete_fit.py` | 默认完整参考四阶段；可选`--phase tcm`只训TCM并做完整V特征诊断 |
+| `tmtaff_complete_fit.py` | 默认完整参考四阶段；`--phase tcm`只训补齐；`--phase tam --initialize-tcm-from`从已完成TCM开始独立关联训练 |
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
@@ -38,3 +38,5 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 `tmtaff_complete_fit.py --phase tcm`要求非TCM更新全部为0，固定端点输出`completion-evaluation.json`和未选模`checkpoint.pt`；不支持`--save-predictions`。模型仍为原一步TCM，特征误差不能与物理米误差比较。默认`full`保持四阶段。[规格](../../docs/specs/tmtaff-tcm-phase.md)与[033任务](../../HandOver/L2S-20261020-033.md)说明具体范围；用户已批准一次4000更新，只按当前索引READY领取。
 
 候选新可选`model.heading_output_policy=observation_residual`保留anchor可见航向底座并学习圆周修正；默认`learned_absolute`保持。新头需要新训练，不能将032旧权重静默改公式。用户已单独批准[034](../../HandOver/L2S-20261020-034.md)一次1000步及完整V评价；033已完成，不重启；CPU验收不代表实际效果。
+
+`tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。当前[035草案](../../HandOver/L2S-20261020-035.md)1000步的新预算待批准，接口本身不授权执行，详见[规格](../../docs/specs/tmtaff-tam-phase.md)。
