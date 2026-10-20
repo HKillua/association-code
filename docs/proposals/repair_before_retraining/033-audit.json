@@ -42,10 +42,6 @@
     "common_state_hold_equal": true,
     "normalizer_equal": true,
     "config_differences": {
-      "time_policy": {
-        "old": null,
-        "new": "advisory"
-      },
       "updates": {
         "old": {
           "TCM": 1000,
@@ -59,6 +55,10 @@
           "TFM_FROZEN": 0,
           "JOINT": 0
         }
+      },
+      "time_policy": {
+        "old": null,
+        "new": "advisory"
       },
       "max_hours": {
         "old": 23.983333333333334,
@@ -914,6 +914,538 @@
       },
       "endpoint_mse_reduction": 0.19014559394428354
     }
+  },
+  "heterogeneity": {
+    "scope": "Descriptive full-V comparisons to state-hold, not to TCM1000; no new inference or selection.",
+    "fragment_counts": {
+      "one_step": {
+        "better": 1367,
+        "worse": 268
+      },
+      "query": {
+        "worse": 670,
+        "equal": 107,
+        "better": 858
+      }
+    },
+    "one_step_query_joint": [
+      {
+        "one_step": "better",
+        "query": "better",
+        "fragment_count": 767
+      },
+      {
+        "one_step": "better",
+        "query": "equal",
+        "fragment_count": 99
+      },
+      {
+        "one_step": "better",
+        "query": "worse",
+        "fragment_count": 501
+      },
+      {
+        "one_step": "worse",
+        "query": "better",
+        "fragment_count": 91
+      },
+      {
+        "one_step": "worse",
+        "query": "equal",
+        "fragment_count": 8
+      },
+      {
+        "one_step": "worse",
+        "query": "worse",
+        "fragment_count": 169
+      }
+    ],
+    "equal_query_without_evaluable_outside": 107,
+    "by_source": {
+      "9001": {
+        "fragment_count": 890,
+        "metrics": {
+          "one_step/all": {
+            "model": {
+              "query_count": 34300,
+              "evaluable_query_count": 34300,
+              "missing_reference_query_count": 0,
+              "feature_elements": 4390400,
+              "squared_error_sum": 30458.979992642122,
+              "feature_mse": 0.006937632104738092
+            },
+            "state_hold": {
+              "query_count": 34300,
+              "evaluable_query_count": 34300,
+              "missing_reference_query_count": 0,
+              "feature_elements": 4390400,
+              "squared_error_sum": 54365.21229660826,
+              "feature_mse": 0.01238274696989073
+            },
+            "model_vs_hold_reduction": 0.4397340007344661
+          },
+          "query/regions/all": {
+            "model": {
+              "query_count": 56960,
+              "evaluable_query_count": 44548,
+              "missing_reference_query_count": 12412,
+              "feature_elements": 5702144,
+              "squared_error_sum": 30945.04543255619,
+              "feature_mse": 0.005426914057687107
+            },
+            "state_hold": {
+              "query_count": 56960,
+              "evaluable_query_count": 44548,
+              "missing_reference_query_count": 12412,
+              "feature_elements": 5702144,
+              "squared_error_sum": 39069.105637284876,
+              "feature_mse": 0.006851651876431896
+            },
+            "model_vs_hold_reduction": 0.20794077755841023
+          },
+          "query/regions/outside_support": {
+            "model": {
+              "query_count": 42021,
+              "evaluable_query_count": 29609,
+              "missing_reference_query_count": 12412,
+              "feature_elements": 3789952,
+              "squared_error_sum": 30939.17629137655,
+              "feature_mse": 0.00816347444278359
+            },
+            "state_hold": {
+              "query_count": 42021,
+              "evaluable_query_count": 29609,
+              "missing_reference_query_count": 12412,
+              "feature_elements": 3789952,
+              "squared_error_sum": 39063.23649610524,
+              "feature_mse": 0.010307053096214738
+            },
+            "model_vs_hold_reduction": 0.20797202007413507
+          }
+        },
+        "query_fragment_counts": {
+          "worse": 397,
+          "equal": 100,
+          "better": 393
+        }
+      },
+      "9002": {
+        "fragment_count": 745,
+        "metrics": {
+          "one_step/all": {
+            "model": {
+              "query_count": 54532,
+              "evaluable_query_count": 54532,
+              "missing_reference_query_count": 0,
+              "feature_elements": 6980096,
+              "squared_error_sum": 64219.47570926967,
+              "feature_mse": 0.00920037141455786
+            },
+            "state_hold": {
+              "query_count": 54532,
+              "evaluable_query_count": 54532,
+              "missing_reference_query_count": 0,
+              "feature_elements": 6980096,
+              "squared_error_sum": 104343.82538018373,
+              "feature_mse": 0.014948766518423777
+            },
+            "model_vs_hold_reduction": 0.3845397609750103
+          },
+          "query/regions/all": {
+            "model": {
+              "query_count": 47680,
+              "evaluable_query_count": 36659,
+              "missing_reference_query_count": 11021,
+              "feature_elements": 4692352,
+              "squared_error_sum": 40498.66595702917,
+              "feature_mse": 0.008630781739526184
+            },
+            "state_hold": {
+              "query_count": 47680,
+              "evaluable_query_count": 36659,
+              "missing_reference_query_count": 11021,
+              "feature_elements": 4692352,
+              "squared_error_sum": 52184.62161917286,
+              "feature_mse": 0.011121207790714094
+            },
+            "model_vs_hold_reduction": 0.22393485474368602
+          },
+          "query/regions/outside_support": {
+            "model": {
+              "query_count": 35708,
+              "evaluable_query_count": 24696,
+              "missing_reference_query_count": 11012,
+              "feature_elements": 3161088,
+              "squared_error_sum": 28770.574094290994,
+              "feature_mse": 0.009101478381586021
+            },
+            "state_hold": {
+              "query_count": 35708,
+              "evaluable_query_count": 24696,
+              "missing_reference_query_count": 11012,
+              "feature_elements": 3161088,
+              "squared_error_sum": 40456.52975643469,
+              "feature_mse": 0.012798292789202545
+            },
+            "model_vs_hold_reduction": 0.288852151494408
+          }
+        },
+        "query_fragment_counts": {
+          "worse": 273,
+          "better": 465,
+          "equal": 7
+        }
+      }
+    },
+    "equally_weighted_scenes": {
+      "scene_count": 64,
+      "model": 0.007400213981644183,
+      "state_hold": 0.009728816293143656,
+      "model_vs_hold_reduction": 0.23935104141503283,
+      "median_scene_reduction": 0.20843341024929463
+    },
+    "failure_scenes": [
+      {
+        "scene_id": "4618",
+        "query": {
+          "model": {
+            "query_count": 1408,
+            "evaluable_query_count": 1255,
+            "missing_reference_query_count": 153,
+            "feature_elements": 160640,
+            "squared_error_sum": 3953.329907639094,
+            "feature_mse": 0.024609872433012287
+          },
+          "state_hold": {
+            "query_count": 1408,
+            "evaluable_query_count": 1255,
+            "missing_reference_query_count": 153,
+            "feature_elements": 160640,
+            "squared_error_sum": 2726.831801772184,
+            "feature_mse": 0.01697479956282485
+          },
+          "model_vs_hold_reduction": -0.4497886906958475
+        },
+        "squared_error_saved": -1226.49810586691
+      },
+      {
+        "scene_id": "330",
+        "query": {
+          "model": {
+            "query_count": 832,
+            "evaluable_query_count": 819,
+            "missing_reference_query_count": 13,
+            "feature_elements": 104832,
+            "squared_error_sum": 650.9487703612928,
+            "feature_mse": 0.006209447214221733
+          },
+          "state_hold": {
+            "query_count": 832,
+            "evaluable_query_count": 819,
+            "missing_reference_query_count": 13,
+            "feature_elements": 104832,
+            "squared_error_sum": 301.7386823764162,
+            "feature_mse": 0.0028783070281633107
+          },
+          "model_vs_hold_reduction": -1.1573262176217773
+        },
+        "squared_error_saved": -349.21008798487657
+      },
+      {
+        "scene_id": "2882",
+        "query": {
+          "model": {
+            "query_count": 704,
+            "evaluable_query_count": 669,
+            "missing_reference_query_count": 35,
+            "feature_elements": 85632,
+            "squared_error_sum": 885.4841128216069,
+            "feature_mse": 0.01034057493485621
+          },
+          "state_hold": {
+            "query_count": 704,
+            "evaluable_query_count": 669,
+            "missing_reference_query_count": 35,
+            "feature_elements": 85632,
+            "squared_error_sum": 729.1706336518616,
+            "feature_mse": 0.008515165284611614
+          },
+          "model_vs_hold_reduction": -0.21437160515761566
+        },
+        "squared_error_saved": -156.31347916974528
+      },
+      {
+        "scene_id": "3589",
+        "query": {
+          "model": {
+            "query_count": 1472,
+            "evaluable_query_count": 1077,
+            "missing_reference_query_count": 395,
+            "feature_elements": 137856,
+            "squared_error_sum": 853.6307279666443,
+            "feature_mse": 0.006192191329841605
+          },
+          "state_hold": {
+            "query_count": 1472,
+            "evaluable_query_count": 1077,
+            "missing_reference_query_count": 395,
+            "feature_elements": 137856,
+            "squared_error_sum": 710.7465605752484,
+            "feature_mse": 0.005155717274367807
+          },
+          "model_vs_hold_reduction": -0.2010339202707523
+        },
+        "squared_error_saved": -142.88416739139586
+      },
+      {
+        "scene_id": "2345",
+        "query": {
+          "model": {
+            "query_count": 1408,
+            "evaluable_query_count": 1367,
+            "missing_reference_query_count": 41,
+            "feature_elements": 174976,
+            "squared_error_sum": 1039.483466606008,
+            "feature_mse": 0.005940720250811586
+          },
+          "state_hold": {
+            "query_count": 1408,
+            "evaluable_query_count": 1367,
+            "missing_reference_query_count": 41,
+            "feature_elements": 174976,
+            "squared_error_sum": 912.2287951172542,
+            "feature_mse": 0.0052134509596587775
+          },
+          "model_vs_hold_reduction": -0.1394986347393221
+        },
+        "squared_error_saved": -127.25467148875384
+      },
+      {
+        "scene_id": "3349",
+        "query": {
+          "model": {
+            "query_count": 832,
+            "evaluable_query_count": 810,
+            "missing_reference_query_count": 22,
+            "feature_elements": 103680,
+            "squared_error_sum": 369.82836499177205,
+            "feature_mse": 0.0035670174092570605
+          },
+          "state_hold": {
+            "query_count": 832,
+            "evaluable_query_count": 810,
+            "missing_reference_query_count": 22,
+            "feature_elements": 103680,
+            "squared_error_sum": 261.9312596836672,
+            "feature_mse": 0.0025263431682452466
+          },
+          "model_vs_hold_reduction": -0.41192908948100193
+        },
+        "squared_error_saved": -107.89710530810487
+      },
+      {
+        "scene_id": "2261",
+        "query": {
+          "model": {
+            "query_count": 896,
+            "evaluable_query_count": 864,
+            "missing_reference_query_count": 32,
+            "feature_elements": 110592,
+            "squared_error_sum": 363.77670966913587,
+            "feature_mse": 0.00328935826885431
+          },
+          "state_hold": {
+            "query_count": 896,
+            "evaluable_query_count": 864,
+            "missing_reference_query_count": 32,
+            "feature_elements": 110592,
+            "squared_error_sum": 257.5472836903745,
+            "feature_mse": 0.0023288057336007533
+          },
+          "model_vs_hold_reduction": -0.4124657206886766
+        },
+        "squared_error_saved": -106.22942597876136
+      },
+      {
+        "scene_id": "2960",
+        "query": {
+          "model": {
+            "query_count": 1664,
+            "evaluable_query_count": 1210,
+            "missing_reference_query_count": 454,
+            "feature_elements": 154880,
+            "squared_error_sum": 1593.772287058597,
+            "feature_mse": 0.010290368588963048
+          },
+          "state_hold": {
+            "query_count": 1664,
+            "evaluable_query_count": 1210,
+            "missing_reference_query_count": 454,
+            "feature_elements": 154880,
+            "squared_error_sum": 1545.326054812045,
+            "feature_mse": 0.009977570085305042
+          },
+          "model_vs_hold_reduction": -0.0313501685263724
+        },
+        "squared_error_saved": -48.44623224655197
+      },
+      {
+        "scene_id": "2025",
+        "query": {
+          "model": {
+            "query_count": 1664,
+            "evaluable_query_count": 1526,
+            "missing_reference_query_count": 138,
+            "feature_elements": 195328,
+            "squared_error_sum": 1005.2827933193611,
+            "feature_mse": 0.005146639464487227
+          },
+          "state_hold": {
+            "query_count": 1664,
+            "evaluable_query_count": 1526,
+            "missing_reference_query_count": 138,
+            "feature_elements": 195328,
+            "squared_error_sum": 957.4862170250713,
+            "feature_mse": 0.004901940413177175
+          },
+          "model_vs_hold_reduction": -0.04991881391545738
+        },
+        "squared_error_saved": -47.79657629428982
+      },
+      {
+        "scene_id": "3332",
+        "query": {
+          "model": {
+            "query_count": 1280,
+            "evaluable_query_count": 1242,
+            "missing_reference_query_count": 38,
+            "feature_elements": 158976,
+            "squared_error_sum": 1196.8254954345944,
+            "feature_mse": 0.007528340727119782
+          },
+          "state_hold": {
+            "query_count": 1280,
+            "evaluable_query_count": 1242,
+            "missing_reference_query_count": 38,
+            "feature_elements": 158976,
+            "squared_error_sum": 1166.2260792735015,
+            "feature_mse": 0.007335862515558961
+          },
+          "model_vs_hold_reduction": -0.026237979672135925
+        },
+        "squared_error_saved": -30.599416161092904
+      },
+      {
+        "scene_id": "3495",
+        "query": {
+          "model": {
+            "query_count": 832,
+            "evaluable_query_count": 465,
+            "missing_reference_query_count": 367,
+            "feature_elements": 59520,
+            "squared_error_sum": 315.8227581096072,
+            "feature_mse": 0.00530616193060496
+          },
+          "state_hold": {
+            "query_count": 832,
+            "evaluable_query_count": 465,
+            "missing_reference_query_count": 367,
+            "feature_elements": 59520,
+            "squared_error_sum": 304.4467482320177,
+            "feature_mse": 0.00511503273239277
+          },
+          "model_vs_hold_reduction": -0.03736617304554013
+        },
+        "squared_error_saved": -11.376009877589524
+      },
+      {
+        "scene_id": "1374",
+        "query": {
+          "model": {
+            "query_count": 768,
+            "evaluable_query_count": 754,
+            "missing_reference_query_count": 14,
+            "feature_elements": 96512,
+            "squared_error_sum": 407.7279015092478,
+            "feature_mse": 0.0042246342580119335
+          },
+          "state_hold": {
+            "query_count": 768,
+            "evaluable_query_count": 754,
+            "missing_reference_query_count": 14,
+            "feature_elements": 96512,
+            "squared_error_sum": 401.3763715219964,
+            "feature_mse": 0.004158823478137397
+          },
+          "model_vs_hold_reduction": -0.0158243744223574
+        },
+        "squared_error_saved": -6.351529987251354
+      }
+    ],
+    "sensitivity_only": {
+      "exclude_top_1_benefit_scenes": {
+        "removed_scene_ids": [
+          "211"
+        ],
+        "retained_scene_count": 63,
+        "metrics": {
+          "model": {
+            "query_count": 103808,
+            "evaluable_query_count": 80751,
+            "missing_reference_query_count": 23057,
+            "feature_elements": 10336128,
+            "squared_error_sum": 68166.17982649463,
+            "feature_mse": 0.006594943466885726
+          },
+          "state_hold": {
+            "query_count": 103808,
+            "evaluable_query_count": 80751,
+            "missing_reference_query_count": 23057,
+            "feature_elements": 10336128,
+            "squared_error_sum": 84622.71926227829,
+            "feature_mse": 0.008187081203162179
+          },
+          "model_vs_hold_reduction": 0.1944695181063436
+        }
+      },
+      "exclude_top_5_benefit_scenes": {
+        "removed_scene_ids": [
+          "211",
+          "1391",
+          "944",
+          "1396",
+          "3117"
+        ],
+        "retained_scene_count": 59,
+        "metrics": {
+          "model": {
+            "query_count": 88320,
+            "evaluable_query_count": 68993,
+            "missing_reference_query_count": 19327,
+            "feature_elements": 8831104,
+            "squared_error_sum": 57288.778203318216,
+            "feature_mse": 0.006487159272874401
+          },
+          "state_hold": {
+            "query_count": 88320,
+            "evaluable_query_count": 68993,
+            "missing_reference_query_count": 19327,
+            "feature_elements": 8831104,
+            "squared_error_sum": 69016.85607830145,
+            "feature_mse": 0.007815201369874191
+          },
+          "model_vs_hold_reduction": 0.16993063059374103
+        }
+      }
+    },
+    "interpretation": [
+      "All 107 equal-query fragments have no evaluable query outside observed support.",
+      "One-step targets are next native observations; query targets are reference trajectories.",
+      "One-step/query disagreement alone cannot isolate accumulated rollout error from target mismatch.",
+      "Source 9001/reference reuse limits denoising interpretation.",
+      "Post-hoc exclusions are sensitivity checks only; full-population metrics remain primary.",
+      "Scene and fragment counts are correlated development samples, not independent repeats."
+    ]
   },
   "full_V_scene_better_than_hold": {
     "one_step/all": 63,

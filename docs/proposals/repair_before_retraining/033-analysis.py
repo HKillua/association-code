@@ -4,6 +4,7 @@ Compare TCM1000 and TCM4000 only on the same 029 fragments. Report the new
 full-V endpoint separately. No threshold selection or new GPU work.
 """
 from pathlib import Path
+from collections import Counter
 import gzip
 import json
 import math
@@ -66,6 +67,81 @@ def compare(rows):
     outside['model_vs_hold_reduction'] = (1-outside['model']['feature_mse']/outside['state_hold']['feature_mse']) if outside['state_hold']['feature_mse'] else None
     output['query/regions/outside_support'] = outside
     return output
+
+
+def heterogeneity(rows, per_scene):
+    """Describe failures against hold; no filtering of the primary population."""
+    paths = dict(one_step=('one_step', 'model', 'all'),
+                 query=('query', 'model', 'regions', 'all'))
+
+    def outcome(row, path):
+        model = at(row, path)['feature_mse']
+        hold = at(row, (path[0], 'state_hold', *path[2:]))['feature_mse']
+        if model is None or hold is None:
+            return 'not_evaluable'
+        return 'better' if model < hold else 'worse' if model > hold else 'equal'
+
+    counts = {key: dict(Counter(outcome(row, path) for row in rows))
+              for key, path in paths.items()}
+    joint = Counter((outcome(row, paths['one_step']), outcome(row, paths['query']))
+                    for row in rows)
+    equal = [row for row in rows if outcome(row, paths['query']) == 'equal']
+    equal_without_outside = sum(
+        sum(row['query']['model']['regions'][region]['evaluable_query_count']
+            for region in ('before_support', 'after_support')) == 0 for row in equal)
+    assert equal_without_outside == len(equal) == 107
+    # archive.py constructs node_id as scene:source:batch, before evaluation.
+    sources = {}
+    for row in rows:
+        scene, source, _ = row['node_id'].split(':')
+        assert scene == row['scene_id'] and source in ('9001', '9002')
+        sources.setdefault(source, []).append(row)
+    by_source = {}
+    for source, part in sorted(sources.items()):
+        metrics = compare(part)
+        by_source[source] = dict(fragment_count=len(part),
+            metrics={key: metrics[key] for key in
+                     ('one_step/all', 'query/regions/all', 'query/regions/outside_support')},
+            query_fragment_counts=dict(Counter(outcome(row, paths['query']) for row in part)))
+    all_query = compare(rows)['query/regions/all']
+    for method in ('model', 'state_hold'):
+        for key in ('query_count', 'evaluable_query_count', 'feature_elements', 'squared_error_sum'):
+            total = sum(item['metrics']['query/regions/all'][method][key] for item in by_source.values())
+            assert math.isclose(total, all_query[method][key], rel_tol=1e-12, abs_tol=1e-10)
+    scene_query = {sid: metrics['query/regions/all'] for sid, metrics in per_scene.items()}
+    scene_means = {method: statistics.mean(value[method]['feature_mse'] for value in scene_query.values())
+                   for method in ('model', 'state_hold')}
+    savings = {sid: value['state_hold']['squared_error_sum']-value['model']['squared_error_sum']
+               for sid, value in scene_query.items()}
+    ordered = sorted(savings, key=savings.get, reverse=True)
+    sensitivity = {}
+    for count in (1, 5):
+        removed = ordered[:count]
+        remainder = [row for row in rows if row['scene_id'] not in removed]
+        sensitivity[f'exclude_top_{count}_benefit_scenes'] = dict(
+            removed_scene_ids=removed, retained_scene_count=len(scene_query)-count,
+            metrics=compare(remainder)['query/regions/all'])
+    return dict(
+        scope='Descriptive full-V comparisons to state-hold, not to TCM1000; no new inference or selection.',
+        fragment_counts=counts,
+        one_step_query_joint=[dict(one_step=a, query=b, fragment_count=n)
+                             for (a, b), n in sorted(joint.items())],
+        equal_query_without_evaluable_outside=equal_without_outside,
+        by_source=by_source,
+        equally_weighted_scenes=dict(scene_count=len(scene_query), **scene_means,
+            model_vs_hold_reduction=1-scene_means['model']/scene_means['state_hold'],
+            median_scene_reduction=statistics.median(
+                value['model_vs_hold_reduction'] for value in scene_query.values())),
+        failure_scenes=[dict(scene_id=sid, query=scene_query[sid], squared_error_saved=savings[sid])
+                        for sid in sorted(savings, key=savings.get) if savings[sid] < 0],
+        sensitivity_only=sensitivity,
+        interpretation=[
+            'All 107 equal-query fragments have no evaluable query outside observed support.',
+            'One-step targets are next native observations; query targets are reference trajectories.',
+            'One-step/query disagreement alone cannot isolate accumulated rollout error from target mismatch.',
+            'Source 9001/reference reuse limits denoising interpretation.',
+            'Post-hoc exclusions are sensitivity checks only; full-population metrics remain primary.',
+            'Scene and fragment counts are correlated development samples, not independent repeats.'])
 
 
 def main():
@@ -142,6 +218,7 @@ def main():
             first1000_loss_max_difference=max(abs(a['loss']-b['loss']) for a,b in zip(old_tcm,history)),
             first1000_loss_identical_count=sum(a['loss']==b['loss'] for a,b in zip(old_tcm,history))),
         full_V=compare(report['per_fragment']), common_four=changes,
+        heterogeneity=heterogeneity(report['per_fragment'], per_scene),
         full_V_scene_better_than_hold={key: sum(values[key]['model']['feature_mse'] < values[key]['state_hold']['feature_mse']
             for values in per_scene.values()) for key in ('one_step/all', 'query/regions/all')},
         common_fragment_changes={label: {kind: sum(op(at(new_rows[key], path)['feature_mse'], at(row, path)['feature_mse'])
