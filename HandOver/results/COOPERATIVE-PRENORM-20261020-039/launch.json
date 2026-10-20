@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 2228412,
+  "linger": "yes",
+  "unit": "mtad-a4f8fcb47707.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-a4f8fcb47707.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=30.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run039",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-PRENORM-20261020-039-attempt-1-launch/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-PRENORM-20261020-039-attempt-1-launch/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run039/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-PRENORM-20261020-039-attempt-1-launch"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-20T07:19:14.789460+00:00",
+  "elapsed_seconds": 0.07705177273601294
+}

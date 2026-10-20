@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 2283069,
+  "linger": "yes",
+  "unit": "mtad-4dc9c560d966.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-4dc9c560d966.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=30.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run040",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-SHALLOW-20261020-040-attempt-1-dynamics-launch/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-SHALLOW-20261020-040-attempt-1-dynamics-launch/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run040/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-SHALLOW-20261020-040-attempt-1-dynamics-launch"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-20T11:48:06.362262+00:00",
+  "elapsed_seconds": 0.07535871770232916
+}

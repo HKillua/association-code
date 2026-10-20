@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 2231043,
+  "linger": "yes",
+  "unit": "mtad-7cc0d43d519a.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-7cc0d43d519a.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=30.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run041",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-NOBCE-20261020-041-attempt-1-launch/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-NOBCE-20261020-041-attempt-1-launch/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run041/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-NOBCE-20261020-041-attempt-1-launch"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-20T07:29:12.634443+00:00",
+  "elapsed_seconds": 0.078535380307585
+}
