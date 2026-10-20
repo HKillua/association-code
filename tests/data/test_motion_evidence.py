@@ -73,6 +73,8 @@ class MotionEvidenceTests(unittest.TestCase):
         with patch.object(zipfile.ZipFile, 'read', read):
             scenes = prepare_motion_scenes(fixture.path, fixture.manifest, 'V_select',
                                           check=lambda: checks.append(True))
+            enriched = prepare_motion_scenes(fixture.path, fixture.manifest, 'V_select',
+                                             include_evaluation_metadata=True)
         self.assertEqual([s['scene_id'] for s in scenes], ['2', '4'])
         self.assertEqual(len(checks), 4)
         self.assertEqual(len(scenes[0]['pairs']), 6)
@@ -82,6 +84,13 @@ class MotionEvidenceTests(unittest.TestCase):
             'scene_id', 'component_id', 'split', 'node_ids', 'identities', 'sources',
             'pairs', 'labels', 'motion'})
         self.assertFalse(any('真实场景' in name for name in members))
+        for scene, additional in zip(scenes, enriched):
+            np.testing.assert_array_equal(scene['motion']['states'], additional['motion']['states'])
+            np.testing.assert_array_equal(additional['observed'], additional['motion']['support'])
+            self.assertTrue(additional['target_identity_ids'])
+        # Empty/quarantined inputs must not empty the original target registry.
+        self.assertEqual(len(enriched[1]['identities']), 0)
+        self.assertGreater(len(enriched[1]['target_identity_ids']), 0)
         with patch('association.data.motion_evidence.MTADArchive',
                    side_effect=AssertionError('split rejected before I/O')):
             with self.assertRaises(DataError):

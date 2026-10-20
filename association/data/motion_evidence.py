@@ -102,7 +102,7 @@ def build_motion_evidence(native_values, native_times, native_observed, query_se
         exact_observation=control['regions']['exact_observation'])
 
 
-def prepare_motion_scenes(archive_path, manifest, split, check=None):
+def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_evaluation_metadata=False):
     """Prepare one frozen T_core or V_select split, without reading references.
 
     Process one scene at a time; retain only compact motion evidence and original
@@ -111,6 +111,8 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None):
     """
     if split not in ('T_core', 'V_select'):
         raise DataError('motion evidence permits only explicit T_core or V_select; T_test is sealed')
+    if not isinstance(include_evaluation_metadata, bool):
+        raise ValueError('include_evaluation_metadata must be boolean')
     validate_manifest(manifest)
     scenes = []
     with MTADArchive(archive_path) as archive:
@@ -132,10 +134,18 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None):
             prepared = prepare_timed_scene(native, **DATA, query_times=query)
             motion = build_motion_evidence(prepared['native_values'], prepared['native_times'],
                 prepared['native_observed'], prepared['grid'], prepared['sources'])
+            metadata = {}
+            if include_evaluation_metadata:
+                # Evaluation registry uses original labels BEFORE quarantine, as
+                # load_timed_dataset does. It never enters motion construction.
+                labels = archive.read_labels(scene_id)
+                metadata = dict(target_identity_ids=list(dict.fromkeys(
+                    '-'.join(row['mmsi'].split('-')[:2]) for row in labels)),
+                    observed=prepared['observed'].copy())
             scenes.append(dict(
                 **{key: prepared[key] for key in (
                     'scene_id', 'component_id', 'split', 'node_ids', 'identities', 'sources',
-                    'pairs', 'labels')}, motion=motion))
+                    'pairs', 'labels')}, motion=motion, **metadata))
             if check:
                 check()
     return scenes

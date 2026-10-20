@@ -4,13 +4,14 @@
 
 | 脚本 | 用途 |
 | --- | --- |
-| `tmtaff_complete_fit.py` | 默认完整参考四阶段；`--phase tcm`只训补齐；`--phase tam --initialize-tcm-from`从已完成TCM开始独立关联训练 |
+| `tmtaff_complete_fit.py` | 默认完整参考四阶段；`--phase tcm`只训补齐；`--phase tam/tfm --initialize-tcm-from`从已完成TCM开始独立关联/融合阶段 |
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
 | `completion_check.py` | 固定4个V场景补齐诊断；双模型、候选残差、`--reference-feedback`反馈辨析或`--candidate-dynamics`逐层动态；无训练 |
 | `evidence_association_fit.py` | 044几何/045全证据独立小MLP：固定native OLS、无reference、完整V选模及全pair原分数 |
 | `evidence_fusion_fit.py` | 046固定OLS分组、直接物理效用监督与可拒绝权重，完整V监测、固定最终端点 |
+| `evidence_fusion_evaluate.py` | 048冻结046权重、旧实际组/045缓存分数组的零训练2×2；保存逐helper路由及独立唯一目标视图 |
 | `tam_mode_check.py` | selected TAM固定小批，TCM一次缓存，三模式MC8及单次原fastpath参照；无reference/训练/校准 |
 
 `tam_mode_check.py --archive ZIP --manifest JSON --checkpoint CHECKPOINT.pt --expected-selected-update 600 --output NEW_DIR --device cuda:0 --cpu-threads 4 --advisory-seconds 1800`对应已完成的[042](../../HandOver/L2S-20261020-042.md)，原件和[分析](../../docs/proposals/repair_before_retraining/042-analysis.md)已核，不重复领取。输出`run.json/preparation.json/summary.json/distances.npz`，读selected而非最后快照，同轨副本独立编码，保存正负原CL及小批人口；临时模式/参数标记/dropout/RNG完整恢复。原生运动的CPU入口是`tools/analysis/native_motion_control.py --archive ZIP --manifest JSON --alignment JSON --output NEW_DIR`，固定完整V/Q64/cap128，不需权重或GPU，结果见[R2](../../docs/proposals/repair_before_retraining/native-motion-analysis.md)。
@@ -48,7 +49,7 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 
 候选新可选`model.heading_output_policy=observation_residual`保留anchor可见航向底座并学习圆周修正；默认`learned_absolute`保持。新头需要新训练，不能将032旧权重静默改公式。该选项已由[034](../../docs/proposals/repair_before_retraining/034-analysis.md)完成1000步及完整V检验；CPU正确性不代表实际效果。
 
-候选v2可选`model.position_base_policy=native_ols`从本次裁剪后可见点拟合运动，保留实测端点锚与支撑内插值；缺省`native_hold`兼容历史权重。两种底座不能静默交换checkpoint语义。[043配置](../../configs/cooperative-motion-ols.json)相对034仅增加该选项，目前DRAFT，未训练。`tools/analysis/anonymous_calibration_control.py`和`fixed_group_fusion_control.py`是已完成的本地零训练R3/R4入口，支持`--help`；实际命令、结果与限制见[本轮分析](../../docs/proposals/repair_before_retraining/local-readiness-analysis.md)，无需服务器重跑。
+候选v2可选`model.position_base_policy=native_ols`从本次裁剪后可见点拟合运动，保留实测端点锚与支撑内插值；缺省`native_hold`兼容历史权重。两种底座不能静默交换checkpoint语义。[043配置](../../configs/cooperative-motion-ols.json)相对034仅增加该选项，已获服务器端授权并领取，最新状态看交接索引。`tools/analysis/anonymous_calibration_control.py`和`fixed_group_fusion_control.py`是已完成的本地零训练R3/R4入口，支持`--help`；实际命令、结果与限制见[本轮分析](../../docs/proposals/repair_before_retraining/local-readiness-analysis.md)，无需服务器重跑。
 
 候选v2新增三个独立可选消融：`model.decoder_norm_first=true`只改decoder归一化顺序；`model.decoder_num_layers=2`保留原完整初始化后裁decoder、encoder不变；`training.teacher_identity_weight=0`仅使teacher身份BCE贡献为0，仍计算原BCE并保留物理self/cross和全局clip。默认分别false/null/1，旧权重/配置兼容；非默认decoder语义会保存并校验，不能直接换旧checkpoint的forward。teacher日志`identity_bce_raw`为原BCE，`loss_components.identity_bce`为实际加权贡献。[039—041规格](../../docs/specs/cooperative-decoder-ablations.md)及独立交接有完整命令；用户已批准三组各一次1000步、完整V及一次CPU动态读取，按索引READY和正常并发名额执行，不重领。
 
@@ -65,4 +66,6 @@ python tools/experiments/evidence_fusion_fit.py --mode check --device cpu --outp
 
 `check`只读合成数据、三步验证，不能作为MTAD效果。正式关联使用位置参数`fit`；融合使用`--mode fit`并须给alignment。新输出目录不可复用。真实训练仅按用户批准的具体交接执行，T_test封存。
 
-参考模型新增可选`model.tam_dropout`，默认None沿用公共dropout，只改变TAM内部注意力/残差/FFN与CE输出dropout；TCM/TFM独立保持。[047](../../HandOver/L2S-20261021-047.md)用原`tmtaff_complete_fit.py --phase tam --initialize-tcm-from`入口，配置只比035多`tam_dropout=0`，固定033补全，从头TAM1000；DRAFT未运行。原校准规则下margin自然重算。每步history的`tam_train_batch`保存同次前向的正负距离和CL分项，供分析噪声移除后的实际训练行为，无额外推理。旧快照缺字段兼容，恢复不允许换语义。
+参考模型新增可选`model.tam_dropout`，默认None沿用公共dropout，只改变TAM内部注意力/残差/FFN与CE输出dropout；TCM/TFM独立保持。[047](../../HandOver/L2S-20261021-047.md)用原`tmtaff_complete_fit.py --phase tam --initialize-tcm-from`入口，配置只比035多`tam_dropout=0`，固定033补全，从头TAM1000；已获服务器端授权并领取，最新状态看交接索引。原校准规则下margin自然重算。每步history的`tam_train_batch`保存同次前向的正负距离和CL分项，供分析噪声移除后的实际训练行为，无额外推理。旧快照缺字段兼容，恢复不允许换语义。
+
+048和049均已准备，具体执行仍待确认，不能从入口存在推断READY，见[固定方案](../../docs/specs/next-experiments-048-049.md)。048只读取V量测及045/046原缓存，`--device cpu --cpu-threads 4 --advisory-seconds 1800`；旧组复放不一致会保留失败，不现场放宽容差。049用`--phase tfm --initialize-tcm-from /033目录 --save-predictions`，仅TFM300，按配置`fusion_monitor_updates=[0,100,300]`输出`fusion-evaluations/`及`snapshots/`；终点固定，无TAM推理/阈值选择。`oracle_common_support`提供同目标同属性交集比较，全人口覆盖保留于原`fusion`表。它不是COMPLETED硬resume，未实现035/047与049跨checkpoint的预测组合CLI。

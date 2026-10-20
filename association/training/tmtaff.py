@@ -1,7 +1,8 @@
 """Four-stage training on declared registered or native-time development data.
 
 No archive reader, resampling, split construction, CLI, or test-set evaluation.
-Selection is association macro-F1 only; it is not full-task optimality. A bounded
+Full/TAM selection is association macro-F1 only, not full-task optimality; TFM
+uses a fixed endpoint with oracle-only monitoring. A bounded
 INTERRUPTED run can resume into a new directory without resetting elapsed cost.
 """
 from __future__ import annotations
@@ -52,18 +53,19 @@ def _record_cuda_peaks(run, device):
 
 
 def _configuration(config, *, phase='full'):
-    if phase not in ('full', 'tcm', 'tam'):
-        raise ValueError('phase must be full, tcm or tam')
+    if phase not in ('full', 'tcm', 'tam', 'tfm'):
+        raise ValueError('phase must be full, tcm, tam or tfm')
     config = copy.deepcopy(config)
     config.setdefault('margin_policy', 'fixed')
     config.setdefault('longitude_loss_mode', 'linear')
     config.setdefault('time_policy', 'hard')
+    config.setdefault('fusion_monitor_updates', [])
     required = {'updates', 'learning_rates', 'seed', 'branch', 'batch_tracks',
                 'pair_batch_size', 'pair_microbatch', 'track_microbatch',
                 'completion_weight', 'gradient_clip', 'max_hours',
                 'validate_every_updates', 'completion_cache_mib',
                 'position_loss_mode', 'longitude_loss_mode', 'lr_schedule', 'singleton_policy',
-                'validation_batches', 'margin_policy', 'time_policy'}
+                'validation_batches', 'margin_policy', 'time_policy', 'fusion_monitor_updates'}
     if set(config) != required:
         raise ValueError(f'config requires exactly {sorted(required)}')
     if config['time_policy'] not in ('hard', 'advisory'):
@@ -74,7 +76,7 @@ def _configuration(config, *, phase='full'):
     for name, value in [('seed', config['seed']), ('completion_cache_mib', config['completion_cache_mib'])]:
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
             raise ValueError(f'{name} must be a nonnegative integer')
-    phase_stages = {'full': STAGES, 'tcm': ('TCM',), 'tam': ('TAM_FROZEN',)}[phase]
+    phase_stages = {'full': STAGES, 'tcm': ('TCM',), 'tam': ('TAM_FROZEN',), 'tfm': ('TFM_FROZEN',)}[phase]
     for stage, value in config['updates'].items():
         if stage not in phase_stages:
             if isinstance(value, bool) or not isinstance(value, int) or value != 0:
@@ -110,6 +112,16 @@ def _configuration(config, *, phase='full'):
             or any(isinstance(v, bool) or not isinstance(v, int) or v < 1
                    for v in config['validation_batches'].values())):
         raise ValueError('validation_batches requires positive tracks and pairs sizes')
+    monitors = config['fusion_monitor_updates']
+    if (not isinstance(monitors, list)
+            or any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in monitors)
+            or monitors != sorted(set(monitors))):
+        raise ValueError('fusion_monitor_updates must be sorted distinct nonnegative integers')
+    if phase == 'tfm':
+        if not monitors or monitors[0] != 0 or monitors[-1] != config['updates']['TFM_FROZEN']:
+            raise ValueError('phase tfm monitors must include zero and its fixed final update')
+    elif monitors:
+        raise ValueError('fusion_monitor_updates requires phase tfm')
     return config
 
 
@@ -369,21 +381,25 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     completion weights/normalizer are frozen; source optimizer, RNG, elapsed
     time and association weights are not inherited. Final association metrics
     reuse full-V validation scores without running untrained physical fusion.
+    Explicit phase='tfm' transfers only that completed TCM into a fresh frozen-
+    completion fusion run. It trains true pairs, never runs TAM/calibration, and
+    evaluates configured oracle endpoints on full V without checkpoint selection.
     """
     started = time.monotonic()
     requested_phase = phase
     config = _configuration(config, phase=requested_phase)
-    active_stages = {'full': STAGES, 'tcm': STAGES[:1], 'tam': STAGES[1:2]}[requested_phase]
+    active_stages = {'full': STAGES, 'tcm': STAGES[:1], 'tam': STAGES[1:2], 'tfm': STAGES[2:3]}[requested_phase]
     stage_limit = STAGES.index(active_stages[-1]) + 1
-    if initialize_tcm_from is not None and (requested_phase != 'tam' or resume_from is not None):
-        raise ValueError('initialize_tcm_from requires a new phase tam run, not resume')
-    if requested_phase == 'tam' and resume_from is None and initialize_tcm_from is None:
-        raise ValueError('a new phase tam run requires initialize_tcm_from')
+    if initialize_tcm_from is not None and (requested_phase not in ('tam', 'tfm') or resume_from is not None):
+        raise ValueError('initialize_tcm_from requires a new phase tam/tfm run, not resume')
+    if requested_phase in ('tam', 'tfm') and resume_from is None and initialize_tcm_from is None:
+        raise ValueError('a new phase tam/tfm run requires initialize_tcm_from')
     if not isinstance(save_predictions, bool):
         raise ValueError('save_predictions must be boolean')
     if save_predictions and evaluation_fn is not None:
         raise ValueError('save_predictions requires the default complete evaluator')
-    if requested_phase != 'full' and (save_predictions or evaluation_fn is not None):
+    if ((requested_phase not in ('full', 'tfm') and save_predictions)
+            or (requested_phase != 'full' and evaluation_fn is not None)):
         raise ValueError(f'phase {requested_phase} excludes the complete evaluator and physical prediction export')
     if (isinstance(initial_elapsed_seconds, bool) or not isinstance(initial_elapsed_seconds, (int, float))
             or not math.isfinite(initial_elapsed_seconds) or initial_elapsed_seconds < 0):
@@ -423,8 +439,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or previous_run['cursor']['completed_updates'] != tcm_updates
                 or completion_source['cursor'] != dict(stage=0, update=tcm_updates, completed_updates=tcm_updates)
                 or completion_source.get('selected') is not None):
-            raise ValueError('TAM initialization requires a COMPLETED TCM-only endpoint')
-        # TAM is newly initialized; only its dropout may differ from the source.
+            raise ValueError('stage initialization requires a COMPLETED TCM-only endpoint')
+        # TAM is newly initialized (unused for TFM); only its dropout may differ from the source.
         # Do not relax completion architecture, representation, or data checks.
         source_model_config = ModelConfig(**completion_source['model_config'])
         if (asdict(replace(source_model_config, tam_dropout=model_config.tam_dropout)) != asdict(model_config)
@@ -442,7 +458,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             transferred_modules=['input_embedding', 'tcm_encoder', 'tcm_decoder'],
             transferred_buffers=(['positions', 'heading_mean_std']
                 if model_config.heading_representation == 'circular_sincos' else ['positions']),
-            semantics='frozen completion only; new TAM, optimizer, RNG, history and elapsed budget')
+            semantics=('frozen completion only; new TFM/objective, optimizer, RNG, history and elapsed budget; TAM unused'
+                if requested_phase == 'tfm' else
+                'frozen completion only; new TAM, optimizer, RNG, history and elapsed budget'))
     if resume_from is not None:
         previous = Path(resume_from)
         previous_run = runtime.read_json(previous / 'run.json')
@@ -461,7 +479,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or saved['data_contract'] != contract
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
             raise ValueError('resume configuration, registered scene contract, normalizer or device differs')
-        if calibrating:
+        if calibrating and requested_phase != 'tfm':
             calibration = saved.get('margin_calibration')
             done = calibration is not None and calibration.get('status') == 'COMPLETED'
             if done:
@@ -488,6 +506,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
              if saved is None else dict(saved['cursor'])
     selected = None if saved is None else saved['selected']
     calibration = None if saved is None else copy.deepcopy(saved.get('margin_calibration'))
+    fusion_evaluations = [] if saved is None else copy.deepcopy(saved.get('fusion_evaluations', []))
     effective_margin = model_config.margin if saved is None else saved.get('effective_margin', model_config.margin)
     adapter = train_scenes[0].get('input_adapter', 'registered_v1')
     run = {'status': 'RUNNING', 'phase': requested_phase, 'training_stages': list(active_stages),
@@ -502,6 +521,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'fusion_output_parameterization': fusion_config.output_parameterization,
            'selection_scope': ('none; fixed TCM endpoint, no threshold or snapshot selection'
                                if requested_phase == 'tcm' else
+                               'none; fixed final TFM endpoint; intermediate oracle diagnostics do not select weights'
+                               if requested_phase == 'tfm' else
                                'association V_select macro-F1 only; not full-task optimality'),
            'device': str(device),
            'resume_device_changed': saved is not None and saved['device'] != str(device),
@@ -514,12 +535,16 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            # last durable model/optimizer snapshot. They never authorize resume.
            'checkpoint_cursor': None if saved is None else dict(saved['cursor']),
            'validation_timings': [],
-           'validation_timing_scope': 'current invocation; full scoring, threshold selection and selected snapshot CPU copy/metrics; excludes checkpoint I/O',
+           'validation_timing_scope': ('unused for tfm; oracle endpoint timings are in fusion_evaluations, including prediction/metric export but excluding checkpoint I/O'
+               if requested_phase == 'tfm' else
+               'current invocation; full scoring, threshold selection and selected snapshot CPU copy/metrics; excludes checkpoint I/O'),
            'final_evaluation_seconds': None, 'final_evaluation_status': 'NOT_STARTED',
            'final_evaluation_scope': ('full V native one-step and natural-query feature diagnostics; excludes summary I/O'
                                       if requested_phase == 'tcm' else
                                       'selected full V association scores from training validation; no additional inference or physical fusion'
                                       if requested_phase == 'tam' else
+                                      'fixed final full V oracle fusion and ordinary controls; no TAM or threshold selection'
+                                      if requested_phase == 'tfm' else
                                       'selected state restore, full association/fusion evaluation and threshold consistency check; excludes summary I/O'),
            'timing_note': 'successful CUDA boundaries synchronize; failed timings stop at exception without waiting for outstanding CUDA work',
            'cuda_process_peak_allocated_bytes': None, 'cuda_process_peak_reserved_bytes': None,
@@ -602,15 +627,60 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                        'optimizer': optimizer.state_dict() if optimizer is not None else None,
                        'cursor': dict(cursor), 'history': history, 'coverage': coverage,
                        'selected': selected, 'rng': _rng_state(track_rng, tfm_rng, sampler, device),
-                       'elapsed_seconds': elapsed()}
+                       'elapsed_seconds': elapsed(), 'fusion_evaluations': fusion_evaluations}
             temporary = output / 'checkpoint.pt.tmp'
             torch.save(payload, temporary)
             temporary.replace(output / 'checkpoint.pt')
+            if requested_phase == 'tfm' and cursor['update'] in config['fusion_monitor_updates']:
+                endpoint_path = output / 'snapshots' / f"update-{cursor['update']:06d}.pt"
+                endpoint_path.parent.mkdir(exist_ok=True)
+                if not endpoint_path.exists():
+                    torch.save(payload, endpoint_path)
             run['checkpoint_cursor'] = dict(payload['cursor'])
             runtime.write_json(output / 'history.json', history)
             runtime.write_json(output / 'coverage.json', coverage)
             write_run('RUNNING')
 
+        def evaluate_tfm_endpoint(update):
+            _synchronize(device)
+            evaluation_started = time.monotonic()
+            record = dict(update=update, status='FAILED', seconds=None)
+            is_final = update == config['updates']['TFM_FROZEN']
+            if is_final:
+                run['final_evaluation_status'] = 'FAILED'
+            fusion_evaluations.append(record)
+            evaluation_dir = output / 'fusion-evaluations' / f'update-{update:06d}'
+            evaluation_dir.mkdir(parents=True, exist_ok=False)
+            options = {}
+            if save_predictions:
+                from association.evaluation.artifacts import ScenePredictionWriter
+                options['prediction_writer'] = ScenePredictionWriter(evaluation_dir / 'predictions')
+            def progress(item):
+                run['fusion_evaluation_progress'] = dict(update=update, **item)
+                runtime.write_json(output / 'evaluation-progress.json', run['fusion_evaluation_progress'])
+            try:
+                evaluation = evaluate_complete(model, fusion, normalizer, validation_scenes, device=device,
+                    batch_tracks=config['validation_batches']['tracks'],
+                    pair_batch_size=config['validation_batches']['pairs'],
+                    select_on_validation=False, threshold=None, oracle_only=True,
+                    singleton_policy=config['singleton_policy'], check=check, progress=progress, **options)
+                _synchronize(device)
+                runtime.write_json(evaluation_dir / 'evaluation.json', evaluation)
+                record.update(status='COMPLETED', evaluation=str((evaluation_dir / 'evaluation.json').resolve()),
+                    predictions=(str((evaluation_dir / 'predictions' / 'index.json').resolve())
+                                 if save_predictions else None))
+            finally:
+                record['seconds'] = time.monotonic() - evaluation_started
+                run['fusion_evaluations'] = fusion_evaluations
+                if is_final:
+                    run.update(final_evaluation_status=record['status'],
+                               final_evaluation_seconds=record['seconds'])
+            return evaluation
+
+        if requested_phase == 'tfm' and saved is None:
+            checkpoint()  # Preserve the untouched endpoint even if its diagnostic fails.
+            evaluate_tfm_endpoint(0)
+            checkpoint()
         calls = 0
         while cursor['stage'] < stage_limit:
             phase = STAGES[cursor['stage']]
@@ -627,7 +697,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 cursor['update'] = total_updates
                 continue
             if optimizer is None:
-                if phase == 'TFM_FROZEN':
+                if phase == 'TFM_FROZEN' and requested_phase != 'tfm':
                     model.load_state_dict(selected['states'][0])
                     if adapter == 'native_time_v1':
                         model.validate_normalizer(normalizer)
@@ -753,10 +823,17 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 finally:
                     row['validation_seconds'] = timing['seconds'] = time.monotonic() - validation_started
             if phase == 'TFM_FROZEN' and update == total_updates:
-                selected = {**selected, 'states': _states(modules), 'fusion_stage': phase, 'fusion_update': update}
+                selected = {**(selected or {}), 'states': _states(modules), 'fusion_stage': phase, 'fusion_update': update}
+                if requested_phase == 'tfm':
+                    selected.update(stage=phase, update=update, effective_margin=effective_margin,
+                                    selection_performed=False, endpoint_policy='fixed_final')
+            if requested_phase == 'tfm' and update in config['fusion_monitor_updates']:
+                checkpoint()  # Evaluation failure must not lose a completed training endpoint.
+                evaluate_tfm_endpoint(update)
             calls += 1
             interrupted = max_updates_this_call is not None and calls >= max_updates_this_call
-            if update % config['validate_every_updates'] == 0 or update == total_updates or interrupted:
+            if (update % config['validate_every_updates'] == 0 or update == total_updates or interrupted
+                    or (requested_phase == 'tfm' and update in config['fusion_monitor_updates'])):
                 checkpoint()
             if interrupted:
                 if not (phase == active_stages[-1] and update == total_updates):
@@ -786,6 +863,19 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 completion_evaluation='completion-evaluation.json',
                 evaluation_seconds=run['final_evaluation_seconds'], normalizer=normalizer,
                 coverage=coverage, checkpoint='checkpoint.pt', test_opened=False))
+            check()
+            write_run('COMPLETED')
+            return run
+        if requested_phase == 'tfm':
+            endpoint = fusion_evaluations[-1]
+            run.update(selection_performed=False, final_evaluation_status=endpoint['status'],
+                       final_evaluation_seconds=endpoint['seconds'])
+            runtime.write_json(output / 'summary.json', dict(phase=requested_phase,
+                selection_scope=run['selection_scope'], selection_performed=False,
+                fixed_final_update=config['updates']['TFM_FROZEN'],
+                evaluation=runtime.read_json(endpoint['evaluation']),
+                fusion_evaluations=fusion_evaluations, initialization=initialization,
+                normalizer=normalizer, coverage=coverage, checkpoint='checkpoint.pt', test_opened=False))
             check()
             write_run('COMPLETED')
             return run

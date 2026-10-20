@@ -335,6 +335,127 @@ class TcmFitCliTests(unittest.TestCase):
             self.tam_fit('changed-completion-dropout', initialize_tcm_from=self.root/'source')
         self.assertFalse((self.root/'changed-completion-dropout').exists())
 
+    def tfm_config(self):
+        self.fixture.config['training']['updates'] = dict(TCM=0, TAM_FROZEN=0, TFM_FROZEN=2, JOINT=0)
+        self.fixture.config['training']['fusion_monitor_updates'] = [0, 1, 2]
+        return self.fixture.config
+
+    def tfm_fit(self, name, **kwargs):
+        dataset, config = self.fixture.load(), self.tfm_config()
+        return train_complete(dataset['train'], dataset['validation'], ModelConfig(**config['model']),
+            PairFusionConfig(**config['fusion']), config['training'], self.root/name,
+            phase='tfm', **kwargs)
+
+    def test_tfm_transfers_frozen_completion_trains_true_pairs_and_reports_oracle_common_support(self):
+        self.fit('source', initial_elapsed_seconds=50.)
+        source = self.checkpoint('source')
+        self.tfm_config()
+        from association.training import tmtaff as training
+        original_evaluate, original_step = training.evaluate_complete, training.fusion_training_step
+        initial, steps = {}, []
+
+        def evaluate(model, fusion, *args, **kwargs):
+            self.assertTrue(kwargs['oracle_only'])
+            self.assertFalse(kwargs['select_on_validation'])
+            self.assertIsNone(kwargs['threshold'])
+            if not initial:
+                initial['model'] = copy.deepcopy(model.state_dict())
+                initial['fusion'] = copy.deepcopy(fusion.state_dict())
+            with patch.object(model.tam_encoder, 'forward', side_effect=AssertionError('TAM unused')):
+                return original_evaluate(model, fusion, *args, **kwargs)
+
+        def step(*args, **kwargs):
+            self.assertEqual(kwargs['stage'], 'TFM_FROZEN')
+            self.assertTrue((kwargs['labels'] == 1).all())
+            if not steps:
+                self.assertEqual(len(args[3].state), 0)  # A fresh optimizer, not the TCM state.
+            steps.append(kwargs['stage'])
+            return original_step(*args, **kwargs)
+
+        with (patch.object(training, 'evaluate_complete', side_effect=evaluate),
+              patch.object(training, 'fusion_training_step', side_effect=step),
+              patch.object(training, 'score_reference', side_effect=AssertionError('no association scoring')),
+              patch.object(training, 'calibrate_training_margin', side_effect=AssertionError('no calibration')),
+              patch.object(training, 'select_threshold', side_effect=AssertionError('no selection'))):
+            self.assertEqual(self.invoke('tfm', ['--phase', 'tfm', '--initialize-tcm-from',
+                                               str(self.root/'source'), '--save-predictions']), 0)
+        saved = self.checkpoint('tfm')
+        self.assertEqual(saved['cursor'], dict(stage=2, update=2, completed_updates=2))
+        self.assertEqual(saved['training_stages'], ['TFM_FROZEN'])
+        self.assertEqual(saved['normalizer'], source['normalizer'])
+        self.assertIsNone(saved['margin_calibration'])
+        self.assertEqual(saved['selected']['endpoint_policy'], 'fixed_final')
+        self.assertEqual(saved['selected']['update'], 2)
+        self.assertEqual(steps, ['TFM_FROZEN', 'TFM_FROZEN'])
+        for key, value in saved['states'][0].items():
+            torch.testing.assert_close(value, initial['model'][key], rtol=0, atol=0)
+            if key == 'positions' or key.startswith(('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
+                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
+        self.assertTrue(any(not torch.equal(value, initial['fusion'][key])
+                            for key, value in saved['states'][1].items()))
+        summary = runtime.read_json(self.root/'tfm'/'summary.json')
+        self.assertFalse(summary['selection_performed'])
+        self.assertEqual(summary['fixed_final_update'], 2)
+        self.assertEqual([row['update'] for row in summary['fusion_evaluations']], [0, 1, 2])
+        for row in summary['fusion_evaluations']:
+            self.assertEqual(row['status'], 'COMPLETED')
+            evaluation = runtime.read_json(row['evaluation'])
+            self.assertEqual(len(evaluation['per_scene']), 2)
+            self.assertNotIn('predicted', evaluation['fusion'])
+            self.assertIsNone(evaluation['association'])
+            common = evaluation['oracle_common_support']['fusion']
+            for feature in ('position', 'speed', 'heading'):
+                self.assertEqual(common['oracle']['all'][feature]['intersection_count'],
+                                 common['simple_fusion_oracle']['all'][feature]['intersection_count'])
+                self.assertIsNone(common['oracle']['missing'][feature]['mae'])
+            index = runtime.read_json(row['predictions'])
+            self.assertEqual(len(index['scenes']), 2)
+            endpoint = torch.load(self.root/'tfm'/'snapshots'/f"update-{row['update']:06d}.pt",
+                                  weights_only=True)
+            self.assertEqual(endpoint['cursor']['update'], row['update'])
+        run = runtime.read_json(self.root/'tfm'/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertLess(run['elapsed_seconds'], 50.)
+        self.assertFalse(run['test_opened'])
+        loaded = load_complete_snapshot(self.root/'tfm'/'checkpoint.pt')
+        for key, value in loaded['fusion'].state_dict().items():
+            torch.testing.assert_close(value, saved['states'][1][key], rtol=0, atol=0)
+
+    def test_tfm_resume_replays_same_updates_without_repeating_zero_evaluation(self):
+        self.fit('source')
+        self.tfm_fit('once', initialize_tcm_from=self.root/'source')
+        self.tfm_fit('partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
+        self.assertEqual(self.tfm_fit('resumed', resume_from=self.root/'partial')['status'], 'COMPLETED')
+        expected, resumed = self.checkpoint('once'), self.checkpoint('resumed')
+        self.assert_same_endpoint(expected, resumed)
+        self.assertEqual([row['update'] for row in resumed['fusion_evaluations']], [0, 1, 2])
+        self.fixture.config['training']['fusion_monitor_updates'] = [0, 1]
+        with patch.object(cli, 'load_timed_dataset', side_effect=AssertionError('reject before data')):
+            self.assertEqual(self.invoke('invalid', ['--phase', 'tfm', '--initialize-tcm-from',
+                                                    str(self.root/'source')]), 1)
+            self.assertEqual(self.invoke('missing-source', ['--phase', 'tfm']), 1)
+
+    def test_tfm_failed_final_diagnostic_keeps_fixed_endpoint_without_claiming_completion(self):
+        self.fit('source')
+        from association.training import tmtaff as training
+        original = training.evaluate_complete
+        calls = 0
+        def evaluate(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 3:
+                raise RuntimeError('final physical diagnostic failed')
+            return original(*args, **kwargs)
+        with patch.object(training, 'evaluate_complete', side_effect=evaluate):
+            with self.assertRaisesRegex(RuntimeError, 'final physical diagnostic failed'):
+                self.tfm_fit('failed-tfm', initialize_tcm_from=self.root/'source')
+        run = runtime.read_json(self.root/'failed-tfm'/'run.json')
+        self.assertEqual(run['status'], 'FAILED')
+        self.assertEqual(run['final_evaluation_status'], 'FAILED')
+        self.assertEqual(self.checkpoint('failed-tfm')['cursor']['completed_updates'], 2)
+        self.assertTrue((self.root/'failed-tfm'/'snapshots'/'update-000002.pt').is_file())
+        self.assertFalse((self.root/'failed-tfm'/'summary.json').exists())
+
     def test_tam_cli_requires_explicit_new_initialization_and_zero_other_stages(self):
         self.tam_config()
         with patch.object(cli, 'load_timed_dataset', side_effect=AssertionError('must reject before data')):

@@ -11,7 +11,7 @@ import time
 import numpy as np
 import torch
 
-from association.evaluation.scene import evaluate_full_scene, simple_fusion_outputs, single_source_outputs, INPUT_SUPPORT_REGIONS, INPUT_DISTANCE_REGIONS
+from association.evaluation.scene import evaluate_full_scene, simple_fusion_outputs, single_source_outputs, INPUT_SUPPORT_REGIONS, INPUT_DISTANCE_REGIONS, _regions
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
 from association.evaluation.support import build_input_support
 from association.evaluation.association import evaluate_scenes, select_threshold
@@ -116,7 +116,7 @@ def _inference_device(device, model_device, fusion_device):
 def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       batch_tracks, pair_batch_size, select_on_validation,
                       threshold, singleton_policy, check=None, progress=None,
-                      prediction_writer=None):
+                      prediction_writer=None, oracle_only=False):
     """Return full-V association plus predicted/oracle/simple/single-source fusion.
 
     ``singleton_policy`` is explicitly 'missing' or 'observed'. The latter
@@ -133,7 +133,14 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     can preserve the last completed boundary even if evaluation is interrupted.
     An optional prediction_writer receives one scene's actual metric arrays;
     export I/O is within the evaluation budget and never alters the summaries.
+    Explicit oracle_only skips TAM entirely and evaluates only true-identity
+    fusion and its ordinary controls; it is a component diagnostic, not a
+    predicted-association system result.
     """
+    if not isinstance(oracle_only, bool):
+        raise ValueError('oracle_only must be boolean')
+    if oracle_only and (select_on_validation or threshold is not None):
+        raise ValueError('oracle_only excludes association scoring and threshold selection')
     for value in (batch_tracks, pair_batch_size):
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
             raise ValueError('inference batch sizes must be positive integers')
@@ -169,7 +176,7 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     fusion.eval()
     records, cached = [], []
     for scene_index, scene in enumerate(scenes):
-        report_progress('association_scoring', scene_index, str(scene['scene_id']))
+        report_progress('completion' if oracle_only else 'association_scoring', scene_index, str(scene['scene_id']))
         if check:
             check()
         x, mask = normalize_scene(scene, normalizer)
@@ -179,11 +186,12 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                 check()
             latent = model.complete(torch.as_tensor(x[offset:offset+batch_tracks], device=device, dtype=dtype),
                                     torch.as_tensor(mask[offset:offset+batch_tracks], device=device))
-            embedding = model.tam_encoder(latent).flatten(1)
-            if not torch.isfinite(latent).all() or not torch.isfinite(embedding).all():
+            embedding = None if oracle_only else model.tam_encoder(latent).flatten(1)
+            if not torch.isfinite(latent).all() or (embedding is not None and not torch.isfinite(embedding).all()):
                 raise FloatingPointError('nonfinite completed or association features')
             completed.append(latent.cpu())
-            encoded.append(embedding.cpu())
+            if embedding is not None:
+                encoded.append(embedding.cpu())
         latents = torch.cat(completed) if completed else torch.empty(0, model.config.length, model.config.d_model, dtype=dtype)
         embeddings = torch.cat(encoded) if encoded else torch.empty(0, model.embedding_dim, dtype=dtype)
         pairs = np.asarray(scene['pairs'])
@@ -192,7 +200,7 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         if len(pairs) and ((pairs < 0).any() or (pairs >= len(x)).any() or (pairs[:, 0] >= pairs[:, 1]).any()):
             raise ValueError('invalid candidate pair')
         scores = []
-        for offset in range(0, len(pairs), pair_batch_size):
+        for offset in range(0, 0 if oracle_only else len(pairs), pair_batch_size):
             if check:
                 check()
             nodes, inverse = np.unique(pairs[offset:offset+pair_batch_size], return_inverse=True)
@@ -202,15 +210,16 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         record.update(pairs=pairs, scores=np.concatenate(scores) if scores else np.empty(0))
         records.append(record)
         cached.append(latents)
-        report_progress('association_scoring', scene_index+1)
+        report_progress('completion' if oracle_only else 'association_scoring', scene_index+1)
     selection = select_threshold(records) if select_on_validation else None
     if selection is not None:
         threshold = selection['threshold']
-    association = evaluate_scenes(records, threshold)
+    association = None if oracle_only else evaluate_scenes(records, threshold)
     sources = sorted({str(source) for scene in scenes for source in scene['sources']})
-    methods = {key: [] for key in ['predicted', 'oracle', 'simple_fusion_oracle']
+    methods = {key: [] for key in ([] if oracle_only else ['predicted']) + ['oracle', 'simple_fusion_oracle']
                + ['single_source:' + source for source in sources]}
     per_scene = []
+    oracle_common = []
     fusion_steps = 0
     for scene_index, (scene, record, latent) in enumerate(zip(scenes, records, cached)):
         report_progress('physical_fusion', scene_index, str(scene['scene_id']),
@@ -226,14 +235,13 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         common = dict(node_identities=scene['identities'], target_identities=target_ids,
                       target_states=truth, target_valid=valid, node_observed=scene['observed'],
                       split=scene['split'], correspondence_policy='anchor_identity_first',
-                      return_artifact=prediction_writer is not None)
+                      return_artifact=prediction_writer is not None or oracle_only)
         support = scene_input_support(scene)
         outputs = {}
-        groupings = {
-            'predicted': group_predicted_tracks(len(latent), record['pairs'], record['scores'],
-                threshold=threshold, grouping_policy='anchor_direct', node_order='input'),
-            'oracle': group_tracks_by_identity(scene['identities'], node_order='input'),
-        }
+        groupings = {'oracle': group_tracks_by_identity(scene['identities'], node_order='input')}
+        if not oracle_only:
+            groupings = {'predicted': group_predicted_tracks(len(latent), record['pairs'], record['scores'],
+                threshold=threshold, grouping_policy='anchor_direct', node_order='input'), **groupings}
         for kind, groups in groupings.items():
             generated = []
             for members in groups:
@@ -261,13 +269,27 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         for source in sources:
             single = single_source_outputs(scene['values'], node_valid, scene['identities'], scene['sources'], source=source)
             outputs['single_source:' + source] = evaluate_full_scene(single, grouping_kind='oracle', **common)
-        if prediction_writer is not None:
+        if prediction_writer is not None or oracle_only:
             artifacts = {key: report.pop('artifact') for key, report in outputs.items()}
-            if check:
-                check()
-            prediction_writer(scene_index, scene, artifacts)
-            if check:
-                check()
+            if oracle_only:
+                n = len(target_ids)
+                learned, ordinary = artifacts['oracle'], artifacts['simple_fusion_oracle']
+                common_valid = (learned['aligned_prediction_valid'][:n]
+                                & ordinary['aligned_prediction_valid'][:n]
+                                & learned['aligned_truth_valid'][:n])
+                shared = {}
+                for name, artifact in (('oracle', learned), ('simple_fusion_oracle', ordinary)):
+                    shared[name] = {'full_target_metrics': _regions(
+                        artifact['aligned_prediction'][:n], artifact['aligned_truth'][:n],
+                        artifact['aligned_truth_valid'][:n], common_valid,
+                        artifact['aligned_observed'][:n])}
+                oracle_common.append(dict(scene_id=str(scene['scene_id']), methods=shared))
+            if prediction_writer is not None:
+                if check:
+                    check()
+                prediction_writer(scene_index, scene, artifacts)
+                if check:
+                    check()
             del artifacts
         for key, report in outputs.items():
             methods[key].append(report)
@@ -279,8 +301,13 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     if check:
         check()
     report_progress('completed', len(scenes), fusion_forward_count=fusion_steps)
-    return dict(association=association, selection=selection, threshold=threshold, records=records,
-                fusion=fusion_report,
+    return dict(association=association, selection=selection, threshold=threshold, records=[] if oracle_only else records,
+                fusion=fusion_report, oracle_only=oracle_only,
+                **({'oracle_common_support': dict(
+                    policy='per-attribute intersection of TFM, simple fusion and truth on all target rows; no common prediction yields null error; full coverage remains in fusion',
+                    fusion={name: aggregate_fusion_reports([row['methods'][name] for row in oracle_common])
+                            for name in ('oracle', 'simple_fusion_oracle')},
+                    per_scene=oracle_common)} if oracle_only else {}),
                 per_scene=per_scene, singleton_policy=singleton_policy, feedback_policy='fc_memory',
                 grouping_policy='anchor_direct', correspondence_policy='anchor_identity_first',
                 elapsed_seconds=time.monotonic()-started, fusion_forward_count=fusion_steps,

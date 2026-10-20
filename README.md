@@ -18,7 +18,7 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 
 服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。用户已在服务器端批准043—047并由服务器领取；044—046已完成并审计，043/047按最近回执在途，不重复启动。022—025继续HOLD，T_test封存。
 
-**本轮结论与下一步见[044—046分析](docs/proposals/repair_before_retraining/044-046-analysis.md)。** 建议先冻结045/046权重，验证“OLS/045分组 × 普通/046融合”的零训练组合收益；尚未执行或新增任务。按[最新研究路线](docs/research_brief.md#接下来怎么推进)并行准备baseline独立TFM，不把TAM达到理想F1作为其前置；候选先修融合短板再做贡献消融，并补共同的唯一目标/覆盖系统评价。043补全、047 baseline修复仍各自审计，当前未发布新任务。
+**结论见[044—046分析](docs/proposals/repair_before_retraining/044-046-analysis.md)，下一轮具体设计见[048—049方案](docs/specs/next-experiments-048-049.md)。** 本地已准备048冻结2×2及独立唯一目标评价、049固定033独立TFM300（0/100/300正确组物理评价），等待具体执行确认，均为DRAFT而非READY。049不等待TAM分数改善，048不新增训练；先按结果修融合短板，再做贡献消融。043/047继续原任务，不重复启动。
 
 ## 从哪里开始
 
@@ -50,6 +50,7 @@ python tools/experiments/cooperative_fit.py --help
 python tools/experiments/tsactfer_fit.py --help
 python tools/experiments/evidence_association_fit.py --help
 python tools/experiments/evidence_fusion_fit.py --help
+python tools/experiments/evidence_fusion_evaluate.py --help
 python -m unittest discover -s tests
 ```
 
