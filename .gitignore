@@ -24,6 +24,9 @@ wandb/
 !HandOver/results/COOPERATIVE-HEADING-20261020-034/completion-predictions.tar.gz
 !HandOver/results/BASELINE-TAM-FROM033-20261020-035/association-scores.tar.gz
 !HandOver/results/BASELINE-TAM-NODROPOUT-20261021-047/association-scores.tar.gz
+!HandOver/results/EVIDENCE-FUSION-20261021-046/predictions-step-0.tar.gz
+!HandOver/results/EVIDENCE-FUSION-20261021-046/predictions-final.tar.gz
+!HandOver/results/COOPERATIVE-MOTION-20261020-043/completion-predictions.tar.gz
 !HandOver/results/COOPERATIVE-PRENORM-20261020-039/completion-predictions.tar.gz
 !HandOver/results/COOPERATIVE-SHALLOW-20261020-040/completion-predictions.tar.gz
 !HandOver/results/COOPERATIVE-NOBCE-20261020-041/completion-predictions.tar.gz
