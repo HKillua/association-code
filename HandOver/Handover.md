@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | [042 TAM模式核查](L2S-20261020-042.md) | 原035 selected600，固定T_core/V小批，三模式MC8及一次默认fastpath参照；一次单卡FP32/CPU4、0更新，30分钟仅提醒，失败不重试 | 新`TAM-MODE-CHECK-20261020-042-attempt-1`及同名`-launch`，完整命令见独立L2S；无reference、校准/阈值选择、下游或T_test |
 
-R2原生运动控制已经在本地CPU完整V完成，**无需服务器重跑**。OLS位置MAE8849.53→4737.59m，50场好/14场差，普通控制的分析见[原生运动结果](../docs/proposals/repair_before_retraining/native-motion-analysis.md)；不是新训练或关联/融合成绩。
+R2原生运动及关联衔接已经在本地CPU完整V完成，**无需服务器重跑**。OLS位置MAE8849.53→4737.59m；新增同评分全29008对关联F1 .61563→.72717，共用保持阈值也改善，但14场F1退化。见[原生运动](../docs/proposals/repair_before_retraining/native-motion-analysis.md)和[关联衔接](../docs/proposals/repair_before_retraining/motion-association-analysis.md)；普通离线控制，不是新训练、学习贡献或融合成绩。
 
 ## 本轮结果
 
