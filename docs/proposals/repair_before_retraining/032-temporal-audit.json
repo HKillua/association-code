@@ -1,0 +1,93 @@
+{
+  "all": {
+    "fragment_count": 1635,
+    "statistics": {
+      "query_pe_std": {
+        "median": 0.519826358738331,
+        "p90": 0.522511803591702
+      },
+      "predicted_position_residual_time_std_m": {
+        "median": 1.4432434682480075,
+        "p90": 2.1323639629643423
+      },
+      "required_position_residual_time_std_m": {
+        "median": 5446.2043422192255,
+        "p90": 15585.695627986566
+      },
+      "predicted_log_speed_time_std": {
+        "median": 0.0003020180772888765,
+        "p90": 0.0005648587494009671
+      },
+      "target_log_speed_time_std": {
+        "median": 0.5956603143710751,
+        "p90": 0.8967447870171916
+      }
+    }
+  },
+  "9001": {
+    "fragment_count": 890,
+    "statistics": {
+      "query_pe_std": {
+        "median": 0.520114569217562,
+        "p90": 0.522511803591702
+      },
+      "predicted_position_residual_time_std_m": {
+        "median": 1.5682410715603958,
+        "p90": 2.2599388793103246
+      },
+      "required_position_residual_time_std_m": {
+        "median": 5535.824473252947,
+        "p90": 15955.757286208915
+      },
+      "predicted_log_speed_time_std": {
+        "median": 0.00034489566034708757,
+        "p90": 0.0006476600628671518
+      },
+      "target_log_speed_time_std": {
+        "median": 0.600656250191079,
+        "p90": 0.8903596440403422
+      }
+    }
+  },
+  "9002": {
+    "fragment_count": 745,
+    "statistics": {
+      "query_pe_std": {
+        "median": 0.5197651803120831,
+        "p90": 0.5225488793229903
+      },
+      "predicted_position_residual_time_std_m": {
+        "median": 1.278799056291799,
+        "p90": 1.8749890241308007
+      },
+      "required_position_residual_time_std_m": {
+        "median": 5345.600139243545,
+        "p90": 15402.226327140712
+      },
+      "predicted_log_speed_time_std": {
+        "median": 0.0002551766425060256,
+        "p90": 0.0004688703837778814
+      },
+      "target_log_speed_time_std": {
+        "median": 0.5914950194605487,
+        "p90": 0.8989764927881752
+      }
+    }
+  },
+  "pooled": {
+    "original_position_mae": 8926.630234934064,
+    "time_constant_residual_position_mae": 8926.638181919176,
+    "position_count": 81207,
+    "original_log_speed_mse": 0.7195318170421485,
+    "time_constant_log_speed_mse": 0.719526475626411,
+    "speed_count": 81207
+  },
+  "scope": "Saved 032 predictions only, all V; no inference/training. Means use all Q64 without target/mask.",
+  "interpretation": [
+    "Position temporal spread is a local tangent approximation; MAE uses spherical distance.",
+    "Target-required residual is an oracle diagnostic, not a predictor.",
+    "Temporal spreads use the same valid query subset per fragment.",
+    "Query sinusoidal input variation is not a measurement of trained decoder hidden states.",
+    "Negligible output temporal contribution does not isolate decoder, head or objective causes."
+  ]
+}
