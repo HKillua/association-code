@@ -1,0 +1,1099 @@
+{
+  "source": "HandOver/results/CANDIDATE-DYNAMICS-20261020-038",
+  "experiment": "038",
+  "checkpoint_experiment": "034",
+  "scope": "Returned FP32 CPU self-forward summaries only; no new inference, target, training or T_test",
+  "execution": {
+    "exit_code": 0,
+    "cpu_threads": 4,
+    "updates": 0,
+    "reference_members_read": [],
+    "observation_member_count": 8,
+    "status": {
+      "status": "COMPLETED",
+      "worker_pid": 2209663,
+      "payload_pid": 2209667,
+      "payload_pgid": 2209667,
+      "returncode": 0,
+      "timed_out": false,
+      "worker_started_at": "2026-10-20T06:05:07.227850+00:00",
+      "backend": "systemd",
+      "time_policy": "advisory",
+      "time_advisory_issued": false,
+      "payload_started_at": "2026-10-20T06:05:07.229254+00:00",
+      "group_cleanup_requested": false,
+      "failure": null,
+      "ended_at": "2026-10-20T06:05:13.563016+00:00",
+      "elapsed_seconds": 6.450766718015075,
+      "deadline_exceeded": false
+    },
+    "request": {
+      "argv": [
+        "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+        "/home/wangguangjie/djs/association-code/../association-code-run038/tools/experiments/completion_check.py",
+        "--archive",
+        "/home/wangguangjie/djs/data/mtad/数据集level2.zip",
+        "--manifest",
+        "/home/wangguangjie/djs/association-code/runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json",
+        "--alignment",
+        "/home/wangguangjie/djs/association-code/../association-code-run038/configs/tmtaff-time-reference-alignment.json",
+        "--candidate-checkpoint",
+        "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-HEADING-20261020-034-attempt-1/teacher.pt",
+        "--candidate-dynamics",
+        "--output",
+        "/home/wangguangjie/djs/association-code/runs/CANDIDATE-DYNAMICS-20261020-038-attempt-1",
+        "--device",
+        "cpu",
+        "--cpu-threads",
+        "4"
+      ],
+      "cwd": "/home/wangguangjie/djs/association-code-run038",
+      "environment": {
+        "CUDA_VISIBLE_DEVICES": "",
+        "OMP_NUM_THREADS": "4",
+        "MKL_NUM_THREADS": "4",
+        "OPENBLAS_NUM_THREADS": "4"
+      },
+      "backend": "systemd",
+      "started_at": "2026-10-20T06:05:07.112800+00:00",
+      "started_monotonic": 2406718.2062497,
+      "max_seconds": 900.0,
+      "grace_seconds": 30.0,
+      "time_policy": "advisory",
+      "finalize_seconds": 1.0,
+      "deadline_monotonic": null
+    },
+    "payload_elapsed_seconds": 3.532254929188639,
+    "evaluation_elapsed_seconds": 2.4826793912798166
+  },
+  "aggregate_max_abs_recompute_error": 0.0,
+  "overall": {
+    "fragments": 86,
+    "layers": {
+      "decoder_input_centered_rms": {
+        "n": 86,
+        "mean": 0.5283518445093951,
+        "median": 0.5280263502477263,
+        "min": 0.5230353377403081,
+        "max": 0.5335596355974647
+      },
+      "decoder_layer_1_centered_rms": {
+        "n": 86,
+        "mean": 0.41826077845277526,
+        "median": 0.4211550577381473,
+        "min": 0.3558270796448401,
+        "max": 0.4570992563511093
+      },
+      "decoder_layer_2_centered_rms": {
+        "n": 86,
+        "mean": 0.11471687473645545,
+        "median": 0.11375625185918234,
+        "min": 0.09347588515956087,
+        "max": 0.14100772154742613
+      },
+      "decoder_layer_3_centered_rms": {
+        "n": 86,
+        "mean": 0.029956328266538903,
+        "median": 0.029811387572662593,
+        "min": 0.021378371524569426,
+        "max": 0.03846247020658312
+      },
+      "decoder_layer_4_centered_rms": {
+        "n": 86,
+        "mean": 0.009619304978714716,
+        "median": 0.009457041697555735,
+        "min": 0.005303870555983259,
+        "max": 0.013558183855284045
+      },
+      "decoder_layer_5_centered_rms": {
+        "n": 86,
+        "mean": 0.0024892658186640073,
+        "median": 0.002305818918299201,
+        "min": 0.0010958657364567627,
+        "max": 0.004779999236395809
+      },
+      "decoder_layer_6_centered_rms": {
+        "n": 86,
+        "mean": 0.0005841650130361122,
+        "median": 0.000497618309855515,
+        "min": 0.000246768764744917,
+        "max": 0.001381784111789151
+      }
+    },
+    "final_over_input": {
+      "n": 86,
+      "mean": 0.0011053226794780916,
+      "median": 0.000944164173404444,
+      "min": 0.0004646226959870472,
+      "max": 0.0026169704462854757
+    },
+    "input_over_final": {
+      "n": 86,
+      "mean": 1081.351765775644,
+      "median": 1059.2700563498543,
+      "min": 382.12124306539215,
+      "max": 2152.2840116012712
+    },
+    "ratio_of_means": 0.0011056363654385324,
+    "successive_ratios": {
+      "layer_1_over_previous": {
+        "n": 86,
+        "mean": 0.7915857940008897,
+        "median": 0.7942770876604544,
+        "min": 0.669960548778039,
+        "max": 0.8651564609038619
+      },
+      "layer_2_over_previous": {
+        "n": 86,
+        "mean": 0.2740222512612105,
+        "median": 0.2663244228551683,
+        "min": 0.25007587856526997,
+        "max": 0.31794775745232645
+      },
+      "layer_3_over_previous": {
+        "n": 86,
+        "mean": 0.26026279268399066,
+        "median": 0.26267728316901484,
+        "min": 0.22838972440377064,
+        "max": 0.28767256981054107
+      },
+      "layer_4_over_previous": {
+        "n": 86,
+        "mean": 0.31853926376717817,
+        "median": 0.3198187337984273,
+        "min": 0.24809516243497326,
+        "max": 0.38365882548490515
+      },
+      "layer_5_over_previous": {
+        "n": 86,
+        "mean": 0.2522633833172722,
+        "median": 0.24246816446567698,
+        "min": 0.20349850483279,
+        "max": 0.3610557623797421
+      },
+      "layer_6_over_previous": {
+        "n": 86,
+        "mean": 0.22736450224081783,
+        "median": 0.22254829213357474,
+        "min": 0.18951481576914253,
+        "max": 0.3136084075710626
+      }
+    },
+    "all_six_layers_decrease": 86,
+    "query_counts": {
+      "total": 5504,
+      "before": 1841,
+      "inside": 1608,
+      "after": 2055
+    }
+  },
+  "per_scene": {
+    "1671": {
+      "fragments": 18,
+      "layers": {
+        "decoder_input_centered_rms": {
+          "n": 18,
+          "mean": 0.528044451252042,
+          "median": 0.5279276762412669,
+          "min": 0.5234948893411063,
+          "max": 0.5333739145797601
+        },
+        "decoder_layer_1_centered_rms": {
+          "n": 18,
+          "mean": 0.42972851851542504,
+          "median": 0.4309849562318852,
+          "min": 0.38514416334445606,
+          "max": 0.4570992563511093
+        },
+        "decoder_layer_2_centered_rms": {
+          "n": 18,
+          "mean": 0.11228856411459025,
+          "median": 0.11332370511138497,
+          "min": 0.10030302941418795,
+          "max": 0.1173894192686145
+        },
+        "decoder_layer_3_centered_rms": {
+          "n": 18,
+          "mean": 0.029989864560751305,
+          "median": 0.029924941523657884,
+          "min": 0.02364565689395187,
+          "max": 0.033210870207096586
+        },
+        "decoder_layer_4_centered_rms": {
+          "n": 18,
+          "mean": 0.009587726950556694,
+          "median": 0.009477040137558892,
+          "min": 0.006409971548182181,
+          "max": 0.01194957264010664
+        },
+        "decoder_layer_5_centered_rms": {
+          "n": 18,
+          "mean": 0.0023612001821811854,
+          "median": 0.002238526352885342,
+          "min": 0.0013896419401927395,
+          "max": 0.003749672769250746
+        },
+        "decoder_layer_6_centered_rms": {
+          "n": 18,
+          "mean": 0.00054058610526359,
+          "median": 0.0005075193361633169,
+          "min": 0.0003377235814042536,
+          "max": 0.0009969523260419172
+        }
+      },
+      "final_over_input": {
+        "n": 18,
+        "mean": 0.0010234260539468843,
+        "median": 0.000960966172223757,
+        "min": 0.0006451325280927333,
+        "max": 0.0018869419149213737
+      },
+      "input_over_final": {
+        "n": 18,
+        "mean": 1033.0304660269576,
+        "median": 1041.5293836092746,
+        "min": 529.9580194240735,
+        "max": 1550.0691043379804
+      },
+      "ratio_of_means": 0.0010237511330377783,
+      "successive_ratios": {
+        "layer_1_over_previous": {
+          "n": 18,
+          "mean": 0.813737307924689,
+          "median": 0.8162639996453112,
+          "min": 0.7357171410578915,
+          "max": 0.8651564609038619
+        },
+        "layer_2_over_previous": {
+          "n": 18,
+          "mean": 0.2613079039996577,
+          "median": 0.26150118946567624,
+          "min": 0.2513987542599045,
+          "max": 0.2664088800327469
+        },
+        "layer_3_over_previous": {
+          "n": 18,
+          "mean": 0.2667341866274475,
+          "median": 0.2657426074909267,
+          "min": 0.23574220072965382,
+          "max": 0.28767256981054107
+        },
+        "layer_4_over_previous": {
+          "n": 18,
+          "mean": 0.31836282435798113,
+          "median": 0.3147968277718278,
+          "min": 0.2710845199577321,
+          "max": 0.36147667980298603
+        },
+        "layer_5_over_previous": {
+          "n": 18,
+          "mean": 0.24375606778754952,
+          "median": 0.23620295978481842,
+          "min": 0.21679377665675154,
+          "max": 0.31379136996628887
+        },
+        "layer_6_over_previous": {
+          "n": 18,
+          "mean": 0.22774463924183985,
+          "median": 0.2264282975539151,
+          "min": 0.21223150825687556,
+          "max": 0.26587715445930143
+        }
+      },
+      "all_six_layers_decrease": 18,
+      "query_counts": {
+        "total": 1152,
+        "before": 242,
+        "inside": 339,
+        "after": 571
+      }
+    },
+    "2056": {
+      "fragments": 28,
+      "layers": {
+        "decoder_input_centered_rms": {
+          "n": 28,
+          "mean": 0.5285493440788761,
+          "median": 0.528188763318213,
+          "min": 0.5230353377403081,
+          "max": 0.5333234796974242
+        },
+        "decoder_layer_1_centered_rms": {
+          "n": 28,
+          "mean": 0.429844396742987,
+          "median": 0.432343982738878,
+          "min": 0.4020883764336786,
+          "max": 0.4460275772601568
+        },
+        "decoder_layer_2_centered_rms": {
+          "n": 28,
+          "mean": 0.12080412120815875,
+          "median": 0.11666337652402882,
+          "min": 0.10270930583512657,
+          "max": 0.14100772154742613
+        },
+        "decoder_layer_3_centered_rms": {
+          "n": 28,
+          "mean": 0.03178820899700535,
+          "median": 0.03146334826032872,
+          "min": 0.025267393594553017,
+          "max": 0.03846247020658312
+        },
+        "decoder_layer_4_centered_rms": {
+          "n": 28,
+          "mean": 0.010191946908785322,
+          "median": 0.010553581777108011,
+          "min": 0.0073407465968645955,
+          "max": 0.012272574629038807
+        },
+        "decoder_layer_5_centered_rms": {
+          "n": 28,
+          "mean": 0.0027828291430838973,
+          "median": 0.0026319532459027238,
+          "min": 0.0016040271240935426,
+          "max": 0.0042453527215034065
+        },
+        "decoder_layer_6_centered_rms": {
+          "n": 28,
+          "mean": 0.0007016493253864583,
+          "median": 0.0005843616206847283,
+          "min": 0.0003106674970824194,
+          "max": 0.0013313783065681602
+        }
+      },
+      "final_over_input": {
+        "n": 28,
+        "mean": 0.0013280087928162624,
+        "median": 0.0011012786556248047,
+        "min": 0.0005883058766697782,
+        "max": 0.002521341439664589
+      },
+      "input_over_final": {
+        "n": 28,
+        "mean": 929.8678895086584,
+        "median": 908.0770822450785,
+        "min": 396.6142721760956,
+        "max": 1699.7960408974627
+      },
+      "ratio_of_means": 0.0013275001345602847,
+      "successive_ratios": {
+        "layer_1_over_previous": {
+          "n": 28,
+          "mean": 0.81323755953613,
+          "median": 0.8178495735240481,
+          "min": 0.7635381241340525,
+          "max": 0.8446793884437225
+        },
+        "layer_2_over_previous": {
+          "n": 28,
+          "mean": 0.2806563014308241,
+          "median": 0.2726448917558414,
+          "min": 0.25007587856526997,
+          "max": 0.31794775745232645
+        },
+        "layer_3_over_previous": {
+          "n": 28,
+          "mean": 0.26241801380815205,
+          "median": 0.2660540941999623,
+          "min": 0.24132001099311173,
+          "max": 0.28065780162993864
+        },
+        "layer_4_over_previous": {
+          "n": 28,
+          "mean": 0.3196604313644679,
+          "median": 0.3198187337984273,
+          "min": 0.28913631731006884,
+          "max": 0.354678508020416
+        },
+        "layer_5_over_previous": {
+          "n": 28,
+          "mean": 0.26711083752158976,
+          "median": 0.2507736019024699,
+          "min": 0.21851007972113629,
+          "max": 0.3466741214536727
+        },
+        "layer_6_over_previous": {
+          "n": 28,
+          "mean": 0.2400514893920182,
+          "median": 0.2241849098475752,
+          "min": 0.19056983280065176,
+          "max": 0.3136084075710626
+        }
+      },
+      "all_six_layers_decrease": 28,
+      "query_counts": {
+        "total": 1792,
+        "before": 945,
+        "inside": 376,
+        "after": 471
+      }
+    },
+    "290": {
+      "fragments": 24,
+      "layers": {
+        "decoder_input_centered_rms": {
+          "n": 24,
+          "mean": 0.5293928290258333,
+          "median": 0.5288020507920335,
+          "min": 0.5235674342410854,
+          "max": 0.5335596355974647
+        },
+        "decoder_layer_1_centered_rms": {
+          "n": 24,
+          "mean": 0.404744665389767,
+          "median": 0.4128790115095132,
+          "min": 0.3558270796448401,
+          "max": 0.4317559518731535
+        },
+        "decoder_layer_2_centered_rms": {
+          "n": 24,
+          "mean": 0.11439807456917062,
+          "median": 0.1156550153870482,
+          "min": 0.09347588515956087,
+          "max": 0.13162406645148245
+        },
+        "decoder_layer_3_centered_rms": {
+          "n": 24,
+          "mean": 0.02979592191071756,
+          "median": 0.030257648658734128,
+          "min": 0.021378371524569426,
+          "max": 0.03687137055348017
+        },
+        "decoder_layer_4_centered_rms": {
+          "n": 24,
+          "mean": 0.009909487807715205,
+          "median": 0.009958059246357748,
+          "min": 0.005303870555983259,
+          "max": 0.013558183855284045
+        },
+        "decoder_layer_5_centered_rms": {
+          "n": 24,
+          "mean": 0.0026528696623669503,
+          "median": 0.002513624602410617,
+          "min": 0.0010958657364567627,
+          "max": 0.004779999236395809
+        },
+        "decoder_layer_6_centered_rms": {
+          "n": 24,
+          "mean": 0.000609385932727156,
+          "median": 0.0005236388523848446,
+          "min": 0.000246768764744917,
+          "max": 0.001381784111789151
+        }
+      },
+      "final_over_input": {
+        "n": 24,
+        "mean": 0.0011506642371938189,
+        "median": 0.0009877114718465836,
+        "min": 0.0004646226959870472,
+        "max": 0.0026169704462854757
+      },
+      "input_over_final": {
+        "n": 24,
+        "mean": 1052.092201990179,
+        "median": 1013.5727464476934,
+        "min": 382.12124306539215,
+        "max": 2152.2840116012712
+      },
+      "ratio_of_means": 0.0011511034893474524,
+      "successive_ratios": {
+        "layer_1_over_previous": {
+          "n": 24,
+          "mean": 0.7644688911924934,
+          "median": 0.7770618609458524,
+          "min": 0.669960548778039,
+          "max": 0.8177055709497906
+        },
+        "layer_2_over_previous": {
+          "n": 24,
+          "mean": 0.28222472894584266,
+          "median": 0.28668029066980716,
+          "min": 0.2581281878426234,
+          "max": 0.3112850712654654
+        },
+        "layer_3_over_previous": {
+          "n": 24,
+          "mean": 0.25933648709602514,
+          "median": 0.26011311576512464,
+          "min": 0.22838972440377064,
+          "max": 0.2801263594683972
+        },
+        "layer_4_over_previous": {
+          "n": 24,
+          "mean": 0.32801258083872087,
+          "median": 0.33372175389902203,
+          "min": 0.24809516243497326,
+          "max": 0.38365882548490515
+        },
+        "layer_5_over_previous": {
+          "n": 24,
+          "mean": 0.259142181081212,
+          "median": 0.24874211809041397,
+          "min": 0.20349850483279,
+          "max": 0.3610557623797421
+        },
+        "layer_6_over_previous": {
+          "n": 24,
+          "mean": 0.22574269617568823,
+          "median": 0.22564038144084267,
+          "min": 0.19797576066674477,
+          "max": 0.289076220194344
+        }
+      },
+      "all_six_layers_decrease": 24,
+      "query_counts": {
+        "total": 1536,
+        "before": 478,
+        "inside": 517,
+        "after": 541
+      }
+    },
+    "113": {
+      "fragments": 16,
+      "layers": {
+        "decoder_input_centered_rms": {
+          "n": 16,
+          "mean": 0.5267905609026676,
+          "median": 0.5264590920227827,
+          "min": 0.5236001884926804,
+          "max": 0.5327647289658318
+        },
+        "decoder_layer_1_centered_rms": {
+          "n": 16,
+          "mean": 0.4053624084689359,
+          "median": 0.40513613945638904,
+          "min": 0.3785043330159191,
+          "max": 0.4280334783321491
+        },
+        "decoder_layer_2_centered_rms": {
+          "n": 16,
+          "mean": 0.10727424311150016,
+          "median": 0.10570908605600332,
+          "min": 0.09758983502943598,
+          "max": 0.1254845402201942
+        },
+        "decoder_layer_3_centered_rms": {
+          "n": 16,
+          "mean": 0.026953418190965688,
+          "median": 0.0265057096300687,
+          "min": 0.022926018427134102,
+          "max": 0.033373686175315054
+        },
+        "decoder_layer_4_centered_rms": {
+          "n": 16,
+          "mean": 0.008217432639268189,
+          "median": 0.00798808552668101,
+          "min": 0.006224913955389324,
+          "max": 0.011043047774719912
+        },
+        "decoder_layer_5_centered_rms": {
+          "n": 16,
+          "mean": 0.0018741980764179612,
+          "median": 0.0017662978986094625,
+          "min": 0.0012882640706058039,
+          "max": 0.0027328547159062118
+        },
+        "decoder_layer_6_centered_rms": {
+          "n": 16,
+          "mean": 0.0003897623581305289,
+          "median": 0.00035470472763044484,
+          "min": 0.0002669193429403309,
+          "max": 0.0006148036415202739
+        }
+      },
+      "final_over_input": {
+        "n": 16,
+        "mean": 0.0007397433482853074,
+        "median": 0.0006732615691638758,
+        "min": 0.0005057130404687025,
+        "max": 0.001164343105864592
+      },
+      "input_over_final": {
+        "n": 16,
+        "mean": 1444.6993571383384,
+        "median": 1487.0053579510652,
+        "min": 858.8533697354117,
+        "max": 1977.4059990092105
+      },
+      "ratio_of_means": 0.0007398810591113521,
+      "successive_ratios": {
+        "layer_1_over_previous": {
+          "n": 16,
+          "mean": 0.7694501053625393,
+          "median": 0.7705340827402305,
+          "min": 0.718392461257098,
+          "max": 0.8096678191956383
+        },
+        "layer_2_over_previous": {
+          "n": 16,
+          "mean": 0.26441258760668535,
+          "median": 0.2595821696228789,
+          "min": 0.25107998135401016,
+          "max": 0.29316524658106213
+        },
+        "layer_3_over_previous": {
+          "n": 16,
+          "mean": 0.2506002959122675,
+          "median": 0.2488594575621445,
+          "min": 0.23492219676587153,
+          "max": 0.2704296731034721
+        },
+        "layer_4_over_previous": {
+          "n": 16,
+          "mean": 0.302565739199954,
+          "median": 0.29919100409452754,
+          "min": 0.2675228106315651,
+          "max": 0.3409687059503388
+        },
+        "layer_5_over_previous": {
+          "n": 16,
+          "mean": 0.2255328717847448,
+          "median": 0.22234544491343117,
+          "min": 0.20392237326253507,
+          "max": 0.24957958167401098
+        },
+        "layer_6_over_previous": {
+          "n": 16,
+          "mean": 0.20716732969776183,
+          "median": 0.20526487169121918,
+          "min": 0.18951481576914253,
+          "max": 0.2287841113005733
+        }
+      },
+      "all_six_layers_decrease": 16,
+      "query_counts": {
+        "total": 1024,
+        "before": 176,
+        "inside": 376,
+        "after": 472
+      }
+    }
+  },
+  "by_source": {
+    "9001": {
+      "fragments": 45,
+      "layers": {
+        "decoder_input_centered_rms": {
+          "n": 45,
+          "mean": 0.5283567436229626,
+          "median": 0.5283065824196497,
+          "min": 0.5230353377403081,
+          "max": 0.5335596355974647
+        },
+        "decoder_layer_1_centered_rms": {
+          "n": 45,
+          "mean": 0.4123358145152467,
+          "median": 0.4166413177361042,
+          "min": 0.3558270796448401,
+          "max": 0.44575441252743153
+        },
+        "decoder_layer_2_centered_rms": {
+          "n": 45,
+          "mean": 0.11400982245688722,
+          "median": 0.1135237968983087,
+          "min": 0.09347588515956087,
+          "max": 0.13976502892988138
+        },
+        "decoder_layer_3_centered_rms": {
+          "n": 45,
+          "mean": 0.02947417491513074,
+          "median": 0.029693640256289584,
+          "min": 0.021378371524569426,
+          "max": 0.03815208358851842
+        },
+        "decoder_layer_4_centered_rms": {
+          "n": 45,
+          "mean": 0.00929203119204322,
+          "median": 0.009352630169240829,
+          "min": 0.005303870555983259,
+          "max": 0.013558183855284045
+        },
+        "decoder_layer_5_centered_rms": {
+          "n": 45,
+          "mean": 0.0022968022220468914,
+          "median": 0.0022250142439773227,
+          "min": 0.0010958657364567627,
+          "max": 0.0041284702102013906
+        },
+        "decoder_layer_6_centered_rms": {
+          "n": 45,
+          "mean": 0.0005292636013810772,
+          "median": 0.00048218005784781385,
+          "min": 0.000246768764744917,
+          "max": 0.001284014862282638
+        }
+      },
+      "final_over_input": {
+        "n": 45,
+        "mean": 0.0010011872321607574,
+        "median": 0.0009186053645151791,
+        "min": 0.0004646226959870472,
+        "max": 0.0024274219681027593
+      },
+      "input_over_final": {
+        "n": 45,
+        "mean": 1155.825045766522,
+        "median": 1088.6067495673503,
+        "min": 411.9596893907929,
+        "max": 2152.2840116012712
+      },
+      "ratio_of_means": 0.0010017163739633496,
+      "successive_ratios": {
+        "layer_1_over_previous": {
+          "n": 45,
+          "mean": 0.7803350208891547,
+          "median": 0.7880697836889731,
+          "min": 0.669960548778039,
+          "max": 0.8395284196014434
+        },
+        "layer_2_over_previous": {
+          "n": 45,
+          "mean": 0.2762274201294278,
+          "median": 0.2700797168017858,
+          "min": 0.25007587856526997,
+          "max": 0.31686647489432684
+        },
+        "layer_3_over_previous": {
+          "n": 45,
+          "mean": 0.257497857690102,
+          "median": 0.2598416201899717,
+          "min": 0.22838972440377064,
+          "max": 0.2801263594683972
+        },
+        "layer_4_over_previous": {
+          "n": 45,
+          "mean": 0.3121968245110681,
+          "median": 0.3157007063026418,
+          "min": 0.24809516243497326,
+          "max": 0.36771575484612223
+        },
+        "layer_5_over_previous": {
+          "n": 45,
+          "mean": 0.24174318476856507,
+          "median": 0.23575873371465358,
+          "min": 0.20349850483279,
+          "max": 0.33811713297739915
+        },
+        "layer_6_over_previous": {
+          "n": 45,
+          "mean": 0.22565574071790984,
+          "median": 0.221736053385913,
+          "min": 0.19056983280065176,
+          "max": 0.3110146850787141
+        }
+      },
+      "all_six_layers_decrease": 45,
+      "query_counts": {
+        "total": 2880,
+        "before": 939,
+        "inside": 918,
+        "after": 1023
+      }
+    },
+    "9002": {
+      "fragments": 41,
+      "layers": {
+        "decoder_input_centered_rms": {
+          "n": 41,
+          "mean": 0.5283464674335281,
+          "median": 0.527807909981807,
+          "min": 0.523658364007387,
+          "max": 0.5335000006965044
+        },
+        "decoder_layer_1_centered_rms": {
+          "n": 41,
+          "mean": 0.42476378765250156,
+          "median": 0.4261496233040816,
+          "min": 0.3785043330159191,
+          "max": 0.4570992563511093
+        },
+        "decoder_layer_2_centered_rms": {
+          "n": 41,
+          "mean": 0.11549290772622542,
+          "median": 0.11398870682005599,
+          "min": 0.09815196819308339,
+          "max": 0.14100772154742613
+        },
+        "decoder_layer_3_centered_rms": {
+          "n": 41,
+          "mean": 0.030485520969303966,
+          "median": 0.030339210714305277,
+          "min": 0.02351987170812893,
+          "max": 0.03846247020658312
+        },
+        "decoder_layer_4_centered_rms": {
+          "n": 41,
+          "mean": 0.009978507915305378,
+          "median": 0.009801280336071633,
+          "min": 0.006292102185052481,
+          "max": 0.013238950141359115
+        },
+        "decoder_layer_5_centered_rms": {
+          "n": 41,
+          "mean": 0.002700506351536453,
+          "median": 0.002537846683514764,
+          "min": 0.001305311861952054,
+          "max": 0.004779999236395809
+        },
+        "decoder_layer_6_centered_rms": {
+          "n": 41,
+          "mean": 0.0006444226599745654,
+          "median": 0.0005391510891289725,
+          "min": 0.0002669193429403309,
+          "max": 0.001381784111789151
+        }
+      },
+      "final_over_input": {
+        "n": 41,
+        "mean": 0.0012196176826312626,
+        "median": 0.0010205277643846658,
+        "min": 0.0005057130404687025,
+        "max": 0.0026169704462854757
+      },
+      "input_over_final": {
+        "n": 41,
+        "mean": 999.6127999319978,
+        "median": 979.8851485466022,
+        "min": 382.12124306539215,
+        "max": 1977.4059990092105
+      },
+      "ratio_of_means": 0.0012196971110735042,
+      "successive_ratios": {
+        "layer_1_over_previous": {
+          "n": 41,
+          "mean": 0.8039342035137695,
+          "median": 0.8074721788834145,
+          "min": 0.718392461257098,
+          "max": 0.8651564609038619
+        },
+        "layer_2_over_previous": {
+          "n": 41,
+          "mean": 0.2716019439668256,
+          "median": 0.26491226105658433,
+          "min": 0.25107998135401016,
+          "max": 0.31794775745232645
+        },
+        "layer_3_over_previous": {
+          "n": 41,
+          "mean": 0.26329747743338056,
+          "median": 0.2655081645997206,
+          "min": 0.23631961549876265,
+          "max": 0.28767256981054107
+        },
+        "layer_4_over_previous": {
+          "n": 41,
+          "mean": 0.32550047758486,
+          "median": 0.324722258219436,
+          "min": 0.2675228106315651,
+          "max": 0.38365882548490515
+        },
+        "layer_5_over_previous": {
+          "n": 41,
+          "mean": 0.2638099426999995,
+          "median": 0.2514274132135792,
+          "min": 0.20392237326253507,
+          "max": 0.3610557623797421
+        },
+        "layer_6_over_previous": {
+          "n": 41,
+          "mean": 0.22923997220498518,
+          "median": 0.22336053088123647,
+          "min": 0.18951481576914253,
+          "max": 0.3136084075710626
+        }
+      },
+      "all_six_layers_decrease": 41,
+      "query_counts": {
+        "total": 2624,
+        "before": 902,
+        "inside": 690,
+        "after": 1032
+      }
+    }
+  },
+  "native_count": {
+    "n": 86,
+    "mean": 30.197674418604652,
+    "median": 19.5,
+    "min": 2.0,
+    "max": 128.0
+  },
+  "n2_fragments": 4,
+  "ratio_extremes": {
+    "smallest": [
+      [
+        0.0004646226959870472,
+        "290:9001:14"
+      ],
+      [
+        0.0005057130404687025,
+        "113:9002:7"
+      ],
+      [
+        0.0005245641135783253,
+        "290:9001:7"
+      ]
+    ],
+    "largest": [
+      [
+        0.002515469256406904,
+        "2056:9002:1"
+      ],
+      [
+        0.002521341439664589,
+        "2056:9002:11"
+      ],
+      [
+        0.0026169704462854757,
+        "290:9002:7"
+      ]
+    ]
+  },
+  "heads": {
+    "latitude": {
+      "row_norm": {
+        "n": 86,
+        "mean": 0.008536144165333954,
+        "median": 0.008536144165333954,
+        "min": 0.008536144165333954,
+        "max": 0.008536144165333954
+      },
+      "normalized_projection": {
+        "n": 86,
+        "mean": 0.09385555394650903,
+        "median": 0.09404464265612714,
+        "min": 0.07479823742612719,
+        "max": 0.12014988765649091
+      },
+      "residual_std": {
+        "n": 86,
+        "mean": 5.260486145717938e-06,
+        "median": 4.488623000915262e-06,
+        "min": 2.1248352362643635e-06,
+        "max": 1.2550737480603267e-05
+      },
+      "projected_formula_max_abs_error": 1.6940658945086007e-21,
+      "fp32_residual_std_vs_float64_projection_max_abs_error": 1.6053393618517396e-10
+    },
+    "longitude": {
+      "row_norm": {
+        "n": 86,
+        "mean": 0.007642777217809522,
+        "median": 0.007642777217809527,
+        "min": 0.007642777217809527,
+        "max": 0.007642777217809527
+      },
+      "normalized_projection": {
+        "n": 86,
+        "mean": 0.06397931321080143,
+        "median": 0.06367597282734083,
+        "min": 0.04946763400292552,
+        "max": 0.08770641426480824
+      },
+      "residual_std": {
+        "n": 86,
+        "mean": 3.3314279569419034e-06,
+        "median": 2.6915256235994383e-06,
+        "min": 1.1848342198201447e-06,
+        "max": 8.371165133583272e-06
+      },
+      "projected_formula_max_abs_error": 2.541098841762901e-21,
+      "fp32_residual_std_vs_float64_projection_max_abs_error": 2.6134431108659626e-10
+    },
+    "speed": {
+      "row_norm": {
+        "n": 86,
+        "mean": 0.15449006529585743,
+        "median": 0.1544900652958575,
+        "min": 0.1544900652958575,
+        "max": 0.1544900652958575
+      },
+      "normalized_projection": {
+        "n": 86,
+        "mean": 0.15098261969803617,
+        "median": 0.14627163716925534,
+        "min": 0.09664116322155387,
+        "max": 0.23398742831092847
+      },
+      "residual_std": {
+        "n": 86,
+        "mean": 0.00015945558469062239,
+        "median": 0.0001325408929444546,
+        "min": 4.165631967445625e-05,
+        "max": 0.0005467370911489578
+      },
+      "projected_formula_max_abs_error": 1.0842021724855044e-19,
+      "fp32_residual_std_vs_float64_projection_max_abs_error": 2.6575615182772815e-08
+    },
+    "heading": {
+      "row_norm": {
+        "n": 86,
+        "mean": 0.007938621331233107,
+        "median": 0.007938621331233105,
+        "min": 0.007938621331233105,
+        "max": 0.007938621331233105
+      },
+      "normalized_projection": {
+        "n": 86,
+        "mean": 0.09465500267376525,
+        "median": 0.08647801817784545,
+        "min": 0.06150977710255553,
+        "max": 0.2208069749265053
+      },
+      "residual_std": {
+        "n": 86,
+        "mean": 4.737536300808017e-06,
+        "median": 4.320286446416089e-06,
+        "min": 2.027010103945723e-06,
+        "max": 9.998681252333315e-06
+      },
+      "projected_formula_max_abs_error": 1.6940658945086007e-21,
+      "fp32_residual_std_vs_float64_projection_max_abs_error": 8.564653704047654e-10
+    }
+  },
+  "remove_query_residual": {
+    "remove_query_residual_latitude_rms": {
+      "count": 86,
+      "mean": 2.726640649775021e-06,
+      "median": 2.3176853727867155e-06,
+      "min": 1.39020726557858e-06,
+      "max": 6.203466334942669e-06
+    },
+    "remove_query_residual_longitude_rms": {
+      "count": 86,
+      "mean": 3.834918016172307e-06,
+      "median": 0.0,
+      "min": 0.0,
+      "max": 2.191376741996013e-05
+    },
+    "remove_query_residual_speed_rms": {
+      "count": 86,
+      "mean": 0.004609730348555253,
+      "median": 0.003068812400424458,
+      "min": 0.0003476480595889036,
+      "max": 0.03657368432020464
+    },
+    "remove_query_residual_heading_rms": {
+      "count": 86,
+      "mean": 0.0004960274293078019,
+      "median": 0.00045226392058663416,
+      "min": 0.00021243148914959047,
+      "max": 0.00104802559275
+    },
+    "remove_query_residual_position_rms_metres": {
+      "count": 86,
+      "mean": 0.5869157959732079,
+      "median": 0.3246895302200903,
+      "min": 0.15458399498539846,
+      "max": 2.2922102415995154
+    }
+  },
+  "interpretation": [
+    "All six layer boundaries attenuate within-fragment query variation in every measured fragment.",
+    "RMS amplitude loss is not a percent of information, explained variance or prediction accuracy.",
+    "Layer summaries do not isolate self-attention, cross-attention, FFN or LayerNorm.",
+    "Head normalized projection is a norm-normalized scalar projection, not retained information.",
+    "One trained endpoint, four reused development scenes; not independent seeds or full-V layer evidence.",
+    "038 uses true unwrapped pre-physical residuals; 034 full-V posthoc circular approximate-base analysis is complementary, not numerically identical."
+  ]
+}
