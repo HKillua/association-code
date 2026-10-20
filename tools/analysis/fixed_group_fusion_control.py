@@ -34,10 +34,10 @@ import numpy as np
 from association.data.archive import MTADArchive, validate_manifest
 from association.data.native import _record
 from association.data.timed import prepare_timed_scene
+from association.data.motion_evidence import complete_native_attributes
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
-from association.evaluation.native_motion import _short_delta
-from association.evaluation.physical import evaluate_aligned_fusion, group_membership_diagnostics
-from tools.analysis.motion_association_control import rms_haversine_scores
+from association.evaluation.physical import group_membership_diagnostics
+from association.evaluation.fusion_controls import ordinary_fusion, attribute_errors, metrics, rms_haversine_scores
 
 ARMS = ('anchor', 'nearest_observation', 'mean_all', 'mean_supported')
 GROUPINGS = ('oracle_identity', 'predicted_anchor_direct')
@@ -46,114 +46,6 @@ DATA = dict(length=64, max_observations=128, time_unit_seconds=20.)
 
 def write_json(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False)+'\n')
-
-
-def complete_native_attributes(native_values, native_times, native_observed, query, positions):
-    """Only visible native attributes enter predictions; no truth is accepted.
-
-    MTAD canonicalization quarantines any track with an invalid attribute. Check
-    those attributes again explicitly; a true observation bit alone is not proof
-    that speed or course is legal. There is no invented value for missing course.
-    """
-    values, times, visible = map(np.asarray, (native_values, native_times, native_observed))
-    query, positions = np.asarray(query), np.asarray(positions)
-    if (values.ndim != 3 or values.shape[-1] != 4 or times.shape != values.shape[:2]
-            or visible.shape != times.shape or visible.dtype != bool
-            or positions.shape != (len(values), len(query), 2)):
-        raise ValueError('native state, time, observation and position shapes differ')
-    selected = values[visible]
-    if (not np.isfinite(selected).all() or (selected[:, 2] < 0).any()
-            or (selected[:, 3] < 0).any() or (selected[:, 3] > 360).any()):
-        raise ValueError('visible native speed/course must independently be legal')
-    result = np.empty((len(values), len(query), 4), np.float64)
-    result[..., :2] = positions
-    for node in range(len(values)):
-        t, state = times[node, visible[node]], values[node, visible[node]]
-        if len(t) < 2 or not np.isfinite(t).all() or (np.diff(t) <= 0).any():
-            raise ValueError('each anchor needs two increasing visible native times')
-        right = np.searchsorted(t, query).clip(1, len(t)-1)
-        left = right-1
-        fraction = ((query-t[left])/(t[right]-t[left])).clip(0, 1)
-        result[node, :, 2] = state[left, 2]+fraction*(state[right, 2]-state[left, 2])
-        result[node, :, 3] = (state[left, 3]+fraction*_short_delta(state[right, 3]-state[left, 3])) % 360.
-    if not np.isfinite(result).all():
-        raise ValueError('complete predictions must be finite on every retained query')
-    return result
-
-
-def ordinary_fusion(states, nearest_seconds, support, groups):
-    """Prediction-only four-arm calculation: groups are supplied, never inferred from truth."""
-    states = np.asarray(states, np.float64)
-    nearest, support = np.asarray(nearest_seconds), np.asarray(support)
-    n, q, width = states.shape
-    if (width != 4 or nearest.shape != (n, q) or support.shape != (n, q)
-            or support.dtype != bool or not np.isfinite(states).all()
-            or not np.isfinite(nearest).all() or (nearest < 0).any()):
-        raise ValueError('invalid complete states/visible-support arrays')
-    flat = [node for group in groups for node in group]
-    if sorted(flat) != list(range(n)) or any(group != sorted(group) or not group for group in groups):
-        raise ValueError('fixed groups must partition every node once in input order')
-    predictions = {arm: states.copy() for arm in ARMS}
-    selected_nodes = np.empty((n, q), np.int64)
-    helper_support = np.zeros((n, q), bool)
-    membership = np.empty(n, np.int64)
-    audit = {arm: dict(longitude_zero_resultant=0, heading_zero_resultant=0,
-                      no_supported_member_fallback=0) for arm in ARMS}
-    for gid, group in enumerate(groups):
-        members = np.asarray(group, np.int64)
-        membership[members] = gid
-        selected = members[np.argmin(nearest[members], axis=0)]
-        for anchor in members:
-            selected_nodes[anchor] = selected
-            predictions['nearest_observation'][anchor] = states[selected, np.arange(q)]
-            helper_support[anchor] = support[members[members != anchor]].any(0)
-        for arm in ('mean_all', 'mean_supported'):
-            weights = np.ones((len(members), q), bool) if arm == 'mean_all' else support[members]
-            count = weights.sum(0)
-            divisor = np.maximum(count, 1)
-            mean = np.zeros((q, 4))
-            for column in (0, 2):
-                mean[:, column] = (states[members, :, column]*weights).sum(0)/divisor
-            ambiguous = {}
-            for column in (1, 3):
-                radians = np.deg2rad(states[members, :, column])
-                sine = (np.sin(radians)*weights).sum(0)/divisor
-                cosine = (np.cos(radians)*weights).sum(0)/divisor
-                ambiguous[column] = np.hypot(sine, cosine) <= 1e-12
-                angle = np.rad2deg(np.arctan2(sine, cosine))
-                mean[:, column] = (angle+180.) % 360.-180. if column == 1 else angle % 360.
-            for anchor in members:
-                output = mean.copy()
-                output[count == 0] = states[anchor, count == 0]
-                for column, name in ((1, 'longitude'), (3, 'heading')):
-                    fallback = ambiguous[column] & (count > 0)
-                    output[fallback, column] = states[anchor, fallback, column]
-                    audit[arm][name+'_zero_resultant'] += int(fallback.sum())
-                audit[arm]['no_supported_member_fallback'] += int((count == 0).sum())
-                predictions[arm][anchor] = output
-    return dict(predictions=predictions, selected_nodes=selected_nodes,
-                helper_support=helper_support, membership=membership, audit=audit)
-
-
-def attribute_errors(prediction, target):
-    """Errors before masking, used only after all predictions have been fixed."""
-    lat1, lat2 = np.deg2rad(prediction[..., 0]), np.deg2rad(target[..., 0])
-    dlon = np.deg2rad((prediction[..., 1]-target[..., 1]+180.) % 360.-180.)
-    a = np.clip(np.sin((lat1-lat2)/2)**2+np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2, 0, 1)
-    return dict(position=2*6371000.*np.arctan2(np.sqrt(a), np.sqrt(1-a)),
-                speed=np.abs(prediction[..., 2]-target[..., 2]),
-                heading=np.abs((prediction[..., 3]-target[..., 3]+180.) % 360.-180.))
-
-
-def metrics(prediction, target, valid, region):
-    result = evaluate_aligned_fusion(prediction, target, valid,
-        prediction_valid=np.ones(prediction.shape, bool), region_mask=region)
-    errors = attribute_errors(prediction, target)
-    for name, columns in (('position', [0, 1]), ('speed', [2]), ('heading', [3])):
-        mask = valid[..., columns].all(-1) & region
-        selected = errors[name][mask]
-        result[name]['p95'] = float(np.percentile(selected, 95)) if len(selected) else None
-    return {name: result[name] for name in ('position', 'speed', 'heading')}
 
 
 def run(predictions_dir, association_dir, manifest_path, archive_path, output_dir, command=None):

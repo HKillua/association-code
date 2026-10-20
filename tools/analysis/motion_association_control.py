@@ -18,28 +18,12 @@ import numpy as np
 
 from association.data.archive import validate_manifest
 from association.evaluation.association import compare_predictions, evaluate_scenes, select_threshold
+from association.evaluation.fusion_controls import rms_haversine_scores
 from association.evaluation.native_motion import METHODS
 
 
 def _write(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False)+'\n')
-
-
-def rms_haversine_scores(positions, pairs):
-    """Negative RMS metres over every Q64 time; accepts no identity or masks."""
-    positions = np.asarray(positions, dtype=np.float64)
-    pairs = np.asarray(pairs, dtype=np.int64)
-    if positions.ndim != 3 or positions.shape[1:] != (64, 2) or not np.isfinite(positions).all():
-        raise ValueError('positions must be finite [N,64,2]')
-    if pairs.shape != (len(pairs), 2):
-        raise ValueError('pairs must be [E,2]')
-    first, second = positions[pairs[:, 0]], positions[pairs[:, 1]]
-    lat1, lat2 = np.deg2rad(first[..., 0]), np.deg2rad(second[..., 0])
-    dlon = np.deg2rad((first[..., 1]-second[..., 1]+180.) % 360.-180.)
-    a = np.clip(np.sin((lat1-lat2)/2)**2
-                + np.cos(lat1)*np.cos(lat2)*np.sin(dlon/2)**2, 0, 1)
-    distances = 2*6371000.*np.arctan2(np.sqrt(a), np.sqrt(1-a))
-    return -np.sqrt(np.mean(distances**2, axis=1))
 
 
 def auc(labels, scores):

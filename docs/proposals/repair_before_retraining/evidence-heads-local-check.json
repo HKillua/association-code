@@ -1,0 +1,307 @@
+{
+  "scope": "local software and zero-update checks only",
+  "status": "COMPLETED",
+  "real_training_updates": 0,
+  "test_opened": false,
+  "training_motion_preparation": {
+    "split": "T_core",
+    "scenes": 512,
+    "components": 33,
+    "tracks": 54792,
+    "pairs": 18249384,
+    "positive_pairs": 110733,
+    "seconds": 28.765030250011478,
+    "max_rss_bytes": 637321216,
+    "optimizer_updates": 0,
+    "reference_read": false,
+    "test_opened": false
+  },
+  "validation_motion_preparation": {
+    "status": "COMPLETED",
+    "optimizer_updates": 0,
+    "test_opened": false,
+    "reference_opened": false,
+    "split": "V_select",
+    "preparation_seconds": 0.7761461249901913,
+    "elapsed_seconds": 0.8483823330025189,
+    "scene_count": 64,
+    "component_count": 17,
+    "fragment_count": 1635,
+    "pair_count": 29008,
+    "positive_count": 3297,
+    "native_count": 46051,
+    "motion_array_bytes": 4545368,
+    "previous_R2_comparison": "positions/query/node order/support/nearest_seconds/exact mask exactly equal for all scenes",
+    "fit_residual_definition": "RMS Euclidean residual to all-native OLS including intercept, shortest-arc cumulative longitude, local north/east metres with R=6371000 and cos(mean visible latitude)"
+  },
+  "association": {
+    "status": "COMPLETED",
+    "optimizer_updates": 0,
+    "reference_read": false,
+    "test_opened": false,
+    "training_data_read": false,
+    "precision": "native feature calculation/base float64; feature cache float32; training normalizer streaming float64; normalized network input/parameters float32; summed score float64",
+    "fullV_scene_count": 64,
+    "pairs": 29008,
+    "load_seconds": 0.8064799170242622,
+    "feature_seconds": 0.22035162500105798,
+    "elapsed_seconds": 1.1297235420206562,
+    "max_feature_cache_abs_roundoff": 2.3841774865474008e-07,
+    "feature_cache_bytes": 2552704,
+    "base_cache_bytes": 232064,
+    "peak_rss_bytes": 343064576,
+    "zero_residual_exact_base": true,
+    "base_exact_existing_ols": true,
+    "fixed_ols_threshold": -2.7222396114391603,
+    "parameter_count": 5697,
+    "fixed_ols": {
+      "scene_count": 64,
+      "pair_count": 29008,
+      "macro_f1": 0.7271700229532773,
+      "micro_precision": 0.5122588424437299,
+      "micro_recall": 0.7731270852289961,
+      "tp": 2549,
+      "fp": 2427,
+      "fn": 748,
+      "tn": 23284
+    },
+    "grouping": {
+      "policy": "anchor_direct/input; every fragment is an anchor in helper diagnostics",
+      "group_count": 465,
+      "mixed_group_count": 75,
+      "anchors_with_wrong_helper": 608,
+      "directed_wrong_helper_relations": 4770
+    }
+  },
+  "fusion": {
+    "status": "COMPLETED",
+    "device": "cpu",
+    "cpu_threads": 1,
+    "optimizer_updates": 0,
+    "seconds": 7.727849332994083,
+    "scene_count": 64,
+    "component_count": 17,
+    "fragment_count": 1635,
+    "query_count": 104640,
+    "target_valid_by_attribute": [
+      81207,
+      81207,
+      81207,
+      81207
+    ],
+    "control_array_checks": 384,
+    "max_control_difference": 0.0,
+    "step0_learned_equals_anchor": true,
+    "test_opened": false,
+    "reference": "existing R4 targets only for evaluation",
+    "parameter_count": 6147,
+    "controls": {
+      "oracle_identity": {
+        "anchor": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 4737.587847121028,
+            "rmse": 8677.57024149817,
+            "p95": 15908.282963149803
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 30.360352775730306,
+            "rmse": 172.47169509608764,
+            "p95": 80.0578282189592
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 55.93551884469786,
+            "rmse": 77.32816491341998,
+            "p95": 160.88921509905953
+          }
+        },
+        "nearest_observation": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 1928.4346757280305,
+            "rmse": 3134.0773565724153,
+            "p95": 6270.458776520591
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 13.607015098149795,
+            "rmse": 61.55818083816208,
+            "p95": 55.77421486850889
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 27.110834647667538,
+            "rmse": 50.65654789208316,
+            "p95": 130.24668649749376
+          }
+        },
+        "mean_supported": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 2113.6617736261205,
+            "rmse": 3049.9806682025937,
+            "p95": 5516.6305378538855
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 15.055090805934494,
+            "rmse": 71.18062985649614,
+            "p95": 48.3751851258966
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 27.60670182340334,
+            "rmse": 44.05635435197862,
+            "p95": 94.4687609319147
+          }
+        },
+        "learned": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 4737.587847121028,
+            "rmse": 8677.57024149817,
+            "p95": 15908.282963149803
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 30.360352775730306,
+            "rmse": 172.47169509608764,
+            "p95": 80.0578282189592
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 55.93551884469786,
+            "rmse": 77.32816491341998,
+            "p95": 160.88921509905953
+          }
+        }
+      },
+      "predicted_anchor_direct": {
+        "anchor": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 4737.587847121028,
+            "rmse": 8677.57024149817,
+            "p95": 15908.282963149803
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 30.360352775730306,
+            "rmse": 172.47169509608764,
+            "p95": 80.0578282189592
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 55.93551884469786,
+            "rmse": 77.32816491341998,
+            "p95": 160.88921509905953
+          }
+        },
+        "nearest_observation": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 4559.66518167338,
+            "rmse": 8765.783460011608,
+            "p95": 16770.60405730289
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 23.254678127921093,
+            "rmse": 147.5112224124706,
+            "p95": 70.97881706369647
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 42.7379534342888,
+            "rmse": 67.19275350422632,
+            "p95": 155.1574235481125
+          }
+        },
+        "mean_supported": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 4390.747544549925,
+            "rmse": 8318.127046526391,
+            "p95": 14555.861119971674
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 22.606036283677554,
+            "rmse": 147.76089280757694,
+            "p95": 56.647099447994535
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 40.400553666138386,
+            "rmse": 60.03295912360681,
+            "p95": 144.19395200210607
+          }
+        },
+        "learned": {
+          "position": {
+            "coverage": 1.0,
+            "mae": 4737.587847121028,
+            "rmse": 8677.57024149817,
+            "p95": 15908.282963149803
+          },
+          "speed": {
+            "coverage": 1.0,
+            "mae": 30.360352775730306,
+            "rmse": 172.47169509608764,
+            "p95": 80.0578282189592
+          },
+          "heading": {
+            "coverage": 1.0,
+            "mae": 55.93551884469786,
+            "rmse": 77.32816491341998,
+            "p95": 160.88921509905953
+          }
+        }
+      }
+    },
+    "routing": {
+      "oracle_identity": {
+        "helper_query_count": 422016,
+        "rejection_fraction_by_attribute": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "eligible_anchor_query_count": 103424,
+        "all_helpers_rejected_fraction_by_attribute": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      },
+      "predicted_anchor_direct": {
+        "helper_query_count": 611840,
+        "rejection_fraction_by_attribute": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "eligible_anchor_query_count": 95040,
+        "all_helpers_rejected_fraction_by_attribute": [
+          1.0,
+          1.0,
+          1.0
+        ]
+      }
+    }
+  },
+  "verification": {
+    "focused_checks": 18,
+    "independent_review": "passed; checkpoint failure status fix rechecked",
+    "synthetic_cli": "geometry/full association and fusion, 3 steps each; no real MTAD training",
+    "shell_syntax": "044,045,046 passed",
+    "gpu_validation": "not performed; server phase"
+  },
+  "limitations": [
+    "reused development V; not held-out evidence",
+    "step0 checks verify controls, not learned improvement",
+    "complete T_core pair feature preprocessing was not executed locally; bounded chunks verified"
+  ]
+}

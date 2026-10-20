@@ -9,6 +9,8 @@
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
 | `completion_check.py` | 固定4个V场景补齐诊断；双模型、候选残差、`--reference-feedback`反馈辨析或`--candidate-dynamics`逐层动态；无训练 |
+| `evidence_association_fit.py` | 044几何/045全证据独立小MLP：固定native OLS、无reference、完整V选模及全pair原分数 |
+| `evidence_fusion_fit.py` | 046固定OLS分组、直接物理效用监督与可拒绝权重，完整V监测、固定最终端点 |
 | `tam_mode_check.py` | selected TAM固定小批，TCM一次缓存，三模式MC8及单次原fastpath参照；无reference/训练/校准 |
 
 `tam_mode_check.py --archive ZIP --manifest JSON --checkpoint CHECKPOINT.pt --expected-selected-update 600 --output NEW_DIR --device cuda:0 --cpu-threads 4 --advisory-seconds 1800`对应[042](../../HandOver/L2S-20261020-042.md)，只有索引当前READY才由服务器领取。输出`run.json/preparation.json/summary.json/distances.npz`，读selected而非最后快照，同轨副本独立编码，保存正负原CL及小批人口；临时模式/参数标记/dropout/RNG完整恢复。原生运动的CPU入口是`tools/analysis/native_motion_control.py --archive ZIP --manifest JSON --alignment JSON --output NEW_DIR`，固定完整V/Q64/cap128，不需权重或GPU，结果见[R2](../../docs/proposals/repair_before_retraining/native-motion-analysis.md)。
@@ -53,3 +55,12 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 `tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。[035](../../HandOver/L2S-20261020-035.md)按该接口执行，状态和范围只看当前索引，不重复启动；方法见[规格](../../docs/specs/tmtaff-tam-phase.md)。
 
 原生时间模型可显式配置`model.heading_representation=circular_sincos`；缺省`linear_zscore`兼容旧权重。新模式用保存的T_core均值/尺度还原航向并转sin/cos，内部投影为5维，仍用PE4加零列；训练、评价与快照保持同一变换并核对normalizer。跨模式不允许恢复/转移旧权重，需从头训练。新旧特征MSE不可直接比，下游关联另行验证；[规格](../../docs/specs/tcm-circular-heading.md)与[037](../../HandOver/L2S-20261020-037.md)列明已反馈批准的一次TCM4000及完整V命令，无自动TAM。
+
+新证据头详见[固定规格](../../docs/specs/evidence-association-fusion.md)及044—046独立交接；它们不修改旧teacher/TAM语义，也不依赖042/043权重。两者物理底座FP64、MLP FP32，GPU通过显式`--device cuda:0`运行，不能静默CPU回退。CPU软件检查可使用：
+
+```bash
+python tools/experiments/evidence_association_fit.py check --variant full_evidence --device cpu --output /新的合成关联目录
+python tools/experiments/evidence_fusion_fit.py --mode check --device cpu --output /新的合成融合目录
+```
+
+`check`只读合成数据、三步验证，不能作为MTAD效果。正式关联使用位置参数`fit`；融合使用`--mode fit`并须给alignment。新输出目录不可复用。真实训练仅按用户批准的具体交接执行，T_test封存。
