@@ -2,6 +2,8 @@
 
 2026-10-21，plan_version=1。用户授权继续完成本地方法代码、验证与服务器交接；真实训练由用户随后安排。补全043仍独立，baseline042不依赖本方案。本轮不改变旧teacher/TAM执行路径，不训练完整系统。
 
+执行回流：用户随后在服务器端批准043—047及本批四卡执行；044—046已完成，[独立结果分析](../proposals/repair_before_retraining/044-046-analysis.md)记录收益与未通过项。下文保留事前设计，不因结果更改保护要求；当前状态只看[交接索引](../../HandOver/Handover.md)。
+
 ## 研究问题与证据
 
 本页同时是精简的 `IDEA_PACKAGE`（`research-pipeline-contract v1.0`）：Idea ID `MTAD-EVIDENCE-20261021`；来源矩阵 `MC-MTAD-LOCAL-R3R4-20261020`，入口为现象驱动 Pattern 2。来源、原始数值及边界见[本地R3/R4分析](../proposals/repair_before_retraining/local-readiness-analysis.md)。
@@ -83,4 +85,4 @@ step0及每100步完整V仅监测，**正式端点固定1000步，不按V挑最�
 
 完整T_core原生证据准备28.77秒，512场/33组件/54792片段、110733正对，峰值RSS约637MB；尚未在本地执行全T_core的18.25m对特征准备或真实学习，不能把此RSS当完整训练内存。分块和流式统计已用等价性测试核验，服务器记录实际准备成本。机器可读摘要见[本地核查](../proposals/repair_before_retraining/evidence-heads-local-check.json)，详细本地原件留`runs/`，不复制大批日志。
 
-下一步是043补全、044/045关联对照和046融合的真实实验，均是具体DRAFT，按用户随后明确批准的编号执行。[交接索引](../../HandOver/Handover.md)是唯一当前任务入口；本地未启动GPU任务，没有新的真实学习成绩，也尚未证明超过TMTAFF。
+本节记录的是开跑前本地核查；043—047随后已获批领取，044—046的真实成绩见页首回流链接。[交接索引](../../HandOver/Handover.md)是唯一当前任务入口。本地未启动GPU任务，当前尚未证明完整系统超过TMTAFF。
