@@ -1,11 +1,11 @@
 # 当前服务器任务
 
-**当前在途：035 baseline关联。034与036均已COMPLETED并经本地复核；当前新增READY为037圆周TCM、038候选逐层动态诊断。** 037依据服务器05:12Z交接转述的用户原范围批准，单卡TCM4000及完整V，无自动TAM；038仅CPU4线程、零训练，不占GPU名额。034已于13:30完成，不重复领取034/035/036。历史L2S的READY头部不构成新任务，只按本索引领取；036临时第三卡例外不推广，正常最多两个单卡任务。 **（服务器补注 `06:03Z`：037已领取RUNNING＝第二个单卡，名额已满；035 cursor已到update 100、margin 75.2613、首次完整V完成，粗估终态约北京20:30、可能触发8小时提醒，届时按政策只提醒并询问用户。）** **（服务器补注 `06:07Z`：037 RUNNING；038已COMPLETED并回传，它全程CPU零训练、未占GPU名额。）**
+**当前在途：035 baseline关联、037圆周TCM；当前无新增READY。038已COMPLETED并经本地复核，034/036也已结案。** 037已于北京时间14:02:43在隔离目录领取，不重复启动；038为CPU零更新诊断，不是新的训练结果。只按当前索引领取，历史L2S的READY头部不构成待办；正常最多两个单卡任务。
 
 | 项目 | 当前状态与结果 |
 | --- | --- |
-| [037圆周航向TCM](L2S-20261020-037.md) | **READY / SERVER_AI。** 服务器2026-10-20 05:12Z明确转述用户在其会话确认原范围预算，本地依约定HandOver接受并发布；一次单卡TCM4000及完整V，约2—3h、4h仅提醒，失败不重试。无TAM/TFM/JOINT/T_test。保持033训练量；新旧latent MSE不可跨空间排名，下游另议。034已完成，按正常最多两任务安排，不重领035。 **（服务器补注：`06:02:43Z`已领取并提交，RUNNING，见[S2L](S2L-20261020-037.md)。领取前逐项读到L2S与索引双READY；块与05:12Z核对版逐字节同哈希`fa175f1c…48e4c`（34行1,814字节、零替换）；冻结树`association-code-run037` @ 0cc11fc；`actual_tcm_config.json`与仓库配置同哈希`64dab595…83788a`；GPU索引1（034腾出的卡，快照24,247 MiB／0%／无他人进程），与035分卡；`RuntimeMaxSec=infinity`＋14,400秒仅提醒；worker 2208840／payload 2208844。终态未产生，尚无结果。）**|
-| [038候选动态定位](L2S-20261020-038.md) | **READY / SERVER_AI。** 用户要求分析034并继续改进，落实一次CPU4线程零训练读取。冻结034、原四场86片段、每轨一次encode/decode，记录query/decoder各层/head及物理输出动态；不读取reference/目标，无GPU、优化器、身份评分或T_test。预计数分钟，15分钟仅提醒，失败不重试；用于决定下一单因素改进，不自动追加训练。 **（服务器补注：COMPLETED／待本地审。`06:05:06Z`逐字提交（块28行1,411字节，SHA256 `67e75262…eda72021`，零替换），冻结树`association-code-run038` @ cb1420d，**`CUDA_VISIBLE_DEVICES=空`＋`--device cpu --cpu-threads 4`＝不占GPU名额**；提交前实测32核、load1 3.83（0.12/核）、可用内存100 GB，故未延后。unit mtad-895588c905c3、`RuntimeMaxSec=infinity`＋900秒仅提醒；退出0、墙钟6.451秒、payload自报3.532秒（CPU时间，非GPU）。`fragment_count=completion_forward_count=86`、`optimizer_updates=0`、`reference_members_read=[]`且`checks.reference_accessed=false`、`test_opened=false`、四场1671/2056/290/113；重构query与physical的max_abs全为0.0，六层与全部报告量有限。沿query居中RMS逐层坍缩：decoder_input 0.52835→L1 0.41826→L2 0.11472→L3 0.02996→L4 0.00962→L5 0.00249→L6＝final_hidden 0.000584；输出航向circular RMS 44.084°与"残差置零底座"44.084°仅差约2e‑5，速度残差置零后base恰为0.0，位置消残差差异0.587米。判定与下一步归本地，我不据activation变化主张换网络／重训／融合。`run.json.gz`＋`candidate-dynamics.json.gz`已cmp自证入库，源teacher.pt与运行目录留服务器，见[S2L](S2L-20261020-038.md)。）**|
+| [037圆周航向TCM](L2S-20261020-037.md) | **RUNNING / 已领取**，[S2L](S2L-20261020-037.md)。北京时间14:02:43提交，隔离树`association-code-run037`（0cc11fc）、GPU1；一次圆周TCM4000及完整V、4h仅提醒、失败不重试，无TAM/TFM/JOINT/T_test。执行配置与已批范围一致，尚无终态成绩。新旧latent MSE不可跨空间直接排名，不重领、不自动加下游。 |
+| [038候选动态定位](L2S-20261020-038.md) | **COMPLETED / 本地已审**，[原S2L](S2L-20261020-038.md)、[分析](../docs/proposals/repair_before_retraining/038-analysis.md)。CPU4线程、墙时6.45秒、退出0、原四场86片段/86次前向、零更新、无reference或T_test。86/86轨每层query中心RMS均衰减，输入均值.528352到第6层.000584；逐轨缩小倍数中位1059。现象在输出头之前已经出现，但未定位具体attention/归一化/训练根因。建议下一单因素考虑decoder-only pre-norm，当前仅建议，无新训练或READY。 |
 | [031速度A](L2S-20261020-031.md) | **COMPLETED / 本地已审**，[S2L](S2L-20261020-031.md)。北京时间2026-10-20 02:58:53完成，退出0，teacher1000。全V64/1635片段/104640查询，每属性81207有效目标、23433无真值保留、缺预测0。速度MAE29.4878，航向70.3884°，位置8899.15米；没有下游/身份选择/T_test。 |
 | [032速度B](L2S-20261020-032.md) | **COMPLETED / 本地已审**，[S2L](S2L-20261020-032.md)。北京时间02:56:38完成，退出0，teacher1000、同人口。速度MAE19.7287，比A低33.1%；航向89.9213°退化，位置8926.63米未改善。完整预测包已收齐，不重复推理/导出。 |
 | [033 baseline TCM](L2S-20261020-033.md) | **COMPLETED / 本地已审**，[原S2L](S2L-20261020-033.md)、[本地分析](../docs/proposals/repair_before_retraining/033-analysis.md)。TCM4000、下游0，退出0、8294.85秒（2.30h）；全V64/1635片段，81207/104640查询全属性可评，无校准/选模/T_test。训练覆盖54282/54792轨（99.07%）。与029同四场的一步特征MSE下降22.74%、自然query下降16.08%，四场均改善；完整V自然query优于state-hold 21.71%，但670/1635片段差于保持，其中501条一步好而query坏；均值不代表全轨可靠。原S2L由训练loss平台推断训练量无效的解释不采纳，不能与其原始执行事实混同。保留端点；已批准035独立TAM，不重启033。 |
@@ -24,11 +24,11 @@
 
 [031/032完整分析](../docs/proposals/repair_before_retraining/031-032-analysis.md)包含同人口A/B、训练日志核验、全V原量测控制、来源/支撑分层、逐片段时间变化和复算脚本。单seed、17身份连通分量的开发证据不作统计显著性结论。
 
-- [034完整分析](../docs/proposals/repair_before_retraining/034-analysis.md)已独立复核：观测航向底座有效，学习时间修正尚无净收益。来源/支撑分层、近似底座数值边界和消动态结果均保留。038读取真实034的decoder/head中间量定位，不盲目换网络、取消BCE或重训。
+- [034完整分析](../docs/proposals/repair_before_retraining/034-analysis.md)确认观测航向底座有效，学习时间修正尚无净收益；[038](../docs/proposals/repair_before_retraining/038-analysis.md)进一步定位到decoder内部持续衰减。下一改法建议是仅调整decoder归一化顺序，保持其余034设置；尚未修改模型或启动新训练，不把activation幅度当准确率。
 - 速度公式改善有证据，但B片段内速度仍近常量；航向和支撑内位置更差，**补全尚未通过**。不把全部属性目标同时重写，也不由服务器自行调权/改底座。
 - 原量测控制支撑内总体更好；9002支撑内速度却是B更好，9001/reference复用需披露。后续观测残差设计须区分属性与时间支撑，不能统一强制观测不变。
 - baseline的033表明增加训练量有收益，保留TCM4000端点。下一问题是其对TAM关联的作用，不因特征MSE改善自动加训或恢复旧任务；完整baseline仍需TAM/TFM/JOINT及物理终评。无需补传已包含在summary中的coverage，也不重跑相同四场。
-- 本轮[工作汇报](../docs/reports/2026-10-20-research-progress.md)明确论文无独立TCM分数、baseline仍部分复现。035推进关联不等于补齐通过。036短程反馈已复核；037按交接转述的用户原范围批准发布READY，只检验圆周TCM4000及完整V，取消自动TAM。短程FR留作另一因素，不混入本轮。
+- 本轮[工作汇报](../docs/reports/2026-10-20-research-progress.md)明确论文无独立TCM分数、baseline仍部分复现。035推进关联不等于补齐通过；服务器06:05Z快照称首次100步完整V已落盘，本地尚未收到分数，不补造成绩。037已按原预算启动，无自动TAM。候选038的decoder现象不能直接套用到baseline。
 - 用户目标保持：关联和融合各一项主要创新，补全一项辅助创新；接受成熟机制组合与任务适配，分别验证贡献。候选设计与边界见[研究说明](../docs/research_brief.md)。不等待补全极致才设计关联/融合。
 
 本地负责研究/代码/结果分析，服务器负责执行和运行监督；push不唤醒服务器。新任务必须在本索引明确列为READY；最多两个单卡，兼容共卡、不得终止他人进程。时长仅建议、超时提醒并询问，等待时继续原固定工作，不自动加更新或重试。共享A身份隔离与T_test封存不变。历史结果见[研究记录](../docs/proposals/repair_before_retraining/README.md)及[历史摘要](../docs/history/README.md)。
