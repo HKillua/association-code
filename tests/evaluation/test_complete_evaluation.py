@@ -42,6 +42,82 @@ class TCMCompletionTests(unittest.TestCase):
         return evaluate_tcm_completion(self.model, self.normalizer,
             [self.scene] if scenes is None else scenes)
 
+    def test_native_feedback_only_changes_previous_feedback_and_retains_short_tracks(self):
+        from association.data.timed import prepare_timed_scene, fit_timed_normalizer
+        from association.models.timed import TimedAssociationModel, continuous_time_encoding
+        from association.evaluation.tmtaff import evaluate_tcm_feedback
+        from association.training.common import normalize_scene
+        from tests.fixtures.scenes import native_scene
+        native = native_scene('feedback', 'V_select')
+        for index, track in enumerate(native['tracks']):
+            times = np.arange(index+2, dtype=float)*10
+            track['canonical_times'] = times
+            track['canonical_values'] = np.column_stack((30+times*.001, 120+times*.002,
+                                                        5+times*.01, 40+times*.1))
+            native['intervals'][index] = [times[0], times[-1]]
+        example = prepare_timed_scene(native, length=4, max_observations=5, time_unit_seconds=10.)
+        training = copy.deepcopy(example)
+        training.update(scene_id='train-feedback', split='T_core')
+        normalizer = fit_timed_normalizer([training])
+        torch.manual_seed(7)
+        model = TimedAssociationModel(self.model.config, 'contrastive', max_observations=5)
+        original = {key: value.clone() for key, value in model.state_dict().items()}
+        original_flags = [parameter.requires_grad for parameter in model.parameters()]
+        encoded, decoded = [], []
+        encoder, decoder = model.tcm_encoder.forward, model._decode_causal_history
+
+        def encode(history, **kwargs):
+            encoded.append(history.clone())
+            return encoder(history, **kwargs)
+
+        def decode(history, memory):
+            value = decoder(history, memory)
+            decoded.append((history.clone(), memory.clone(), value[:, -1:].clone()))
+            return value
+
+        with patch.object(model.tcm_encoder, 'forward', side_effect=encode), \
+             patch.object(model, '_decode_causal_history', side_effect=decode), \
+             patch.object(model.tam_encoder, 'forward', side_effect=AssertionError('no TAM')):
+            report = evaluate_tcm_feedback(model, normalizer, [example])
+        self.assertEqual(report['fragment_count'], 4)
+        self.assertEqual(report['insufficient_native_fragment_count'], 1)
+        self.assertEqual(report['first_step_check'], dict(direction_count=6, all_identical=True,
+                                                         max_abs_difference=0.))
+        self.assertEqual(report['aggregate']['all']['all_steps']['metrics']['free_feedback']['target_count'], 12)
+        self.assertEqual(report['aggregate']['all']['per_step']['3']['metrics']['free_feedback']['target_count'], 2)
+        self.assertGreater(report['aggregate']['all']['per_step']['2']['feedback_difference']['feature_mse'], 0.)
+        packed, _ = normalize_scene(example, normalizer)
+        cursor, memory_cursor = 0, 0
+        with torch.inference_mode():
+            for node, count in enumerate((2, 3, 4, 5)):
+                if count == 2:
+                    continue
+                states = torch.from_numpy(packed[node:node+1, :count, :4])
+                times = torch.from_numpy(packed[node:node+1, :count, 4])
+                sequence = torch.relu(model.input_embedding(states+continuous_time_encoding(times, 4)))
+                for values, tau in ((sequence, times), (sequence.flip(1), times.flip(1))):
+                    horizon = count-2
+                    torch.testing.assert_close(encoded[memory_cursor], values[:, :2], atol=0, rtol=0)
+                    memory_cursor += 1
+                    oracle_calls = decoded[cursor:cursor+horizon]
+                    free_calls = decoded[cursor+horizon:cursor+2*horizon]
+                    for step, ((oracle_history, memory, _), (free_history, free_memory, _)) in enumerate(zip(oracle_calls, free_calls)):
+                        # Only already predicted targets enter the oracle's history;
+                        # both branches keep the same initial prefix memory.
+                        conditioning = continuous_time_encoding(tau[:, 1:3+step], model.config.d_model)
+                        torch.testing.assert_close(oracle_history, values[:, :2+step]+conditioning, atol=0, rtol=0)
+                        previous = torch.cat([row[2] for row in free_calls[:step]], 1) if step else values[:, :0]
+                        torch.testing.assert_close(free_history, torch.cat((values[:, :2], previous), 1)+conditioning,
+                                                   atol=0, rtol=0)
+                        torch.testing.assert_close(memory, oracle_calls[0][1], atol=0, rtol=0)
+                        torch.testing.assert_close(memory, free_memory, atol=0, rtol=0)
+                    cursor += 2*horizon
+        self.assertEqual(len(encoded), 6)
+        for key, value in model.state_dict().items():
+            torch.testing.assert_close(value, original[key], atol=0, rtol=0)
+        self.assertEqual([parameter.requires_grad for parameter in model.parameters()], original_flags)
+        self.assertTrue(all(parameter.grad is None for parameter in model.parameters()))
+
     def test_one_step_matches_training_denominator_and_reference_cannot_change_forward(self):
         from association.training.common import normalize_scene
         changed = copy.deepcopy(self.scene)

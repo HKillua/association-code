@@ -114,6 +114,36 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         self.assertEqual(self.invoke(self.args()), 1)
         self.assertEqual((self.root/'evaluation'/'run.json').read_bytes(), original_run)
 
+    def test_tcm_feedback_cli_accepts_completed_run_without_candidate_or_reference_reads(self):
+        from tools.experiments import completion_check
+        saved = copy.deepcopy(self.saved)
+        saved.update(phase='tcm', cursor=dict(stage=0, update=2, completed_updates=2), selected=None,
+                     effective_margin=saved['model_config']['margin'], states=self.saved['selected']['states'])
+        saved['config']['updates'] = dict(TCM=2, TAM_FROZEN=0, TFM_FROZEN=0, JOINT=0)
+        torch.save(saved, self.checkpoint)
+        runtime.write_json(self.source/'run.json', dict(status='COMPLETED', phase='tcm',
+            cursor=dict(stage=1, update=0, completed_updates=2)))
+        args = ['--archive', str(self.fixture.path), '--manifest', str(self.root/'manifest.json'),
+            '--alignment', str(self.root/'alignment.json'), '--reference-checkpoint', str(self.source),
+            '--output', str(self.root/'feedback'), '--device', 'cpu', '--cpu-threads', '1']
+        with patch.object(completion_check, 'SCENE_IDS', ['2', '4']), \
+             patch('association.data.reference_states.iter_reference_states', side_effect=AssertionError('no reference')) , \
+             patch('association.training.cooperative.load_cooperative_checkpoint', side_effect=AssertionError('no candidate')), \
+             patch('association.evaluation.tmtaff.evaluate_tcm_completion', side_effect=AssertionError('no query evaluation')), \
+             redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            with self.assertRaises(SystemExit):
+                completion_check.main(args)  # Original mode still requires the candidate.
+            self.assertEqual(completion_check.main(args+['--reference-feedback']), 0)
+        run = runtime.read_json(self.root/'feedback'/'run.json')
+        report = runtime.read_json(self.root/'feedback'/'reference-feedback.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['reference_members_read'], [])
+        self.assertEqual(run['optimizer_updates'], 0)
+        self.assertEqual(report['fragment_count'], 4)
+        self.assertEqual(report['insufficient_native_fragment_count'], 2)
+        self.assertEqual(report['first_step_check']['all_identical'], True)
+        self.assertFalse(run['test_opened'])
+
     def test_completion_cli_uses_partial_reference_and_teacher_without_downstream(self):
         from association.models.cooperative import CooperativeConfig, CooperativeModel
         from association.data.cooperative import fit_cooperative_normalizer

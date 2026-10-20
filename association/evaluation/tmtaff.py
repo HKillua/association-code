@@ -287,6 +287,140 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
 
 @stable_evaluation_parameters
 @torch.inference_mode()
+def evaluate_tcm_feedback(model, normalizer, scenes, *, device='cpu', progress=None):
+    """Compare true/predicted feedback with identical fixed native-prefix memory.
+
+    At most the last three native tokens in each direction are targets; at
+    least two earlier tokens remain visible. No reference or common-query
+    target participates. This is a short native-transition diagnostic, not a
+    natural missing-interval completion benchmark.
+    """
+    from association.models.timed import continuous_time_encoding
+    from association.models.tmtaff import _causal_mask
+    scenes = list(scenes)
+    if (not scenes or len({str(s['scene_id']) for s in scenes}) != len(scenes)
+            or getattr(model, 'input_adapter', None) != 'native_time_v1'
+            or any(s.get('split') != 'V_select' for s in scenes)):
+        raise ValueError('distinct native-time V scenes required; T_test is sealed')
+    parameter = next(model.parameters())
+    device = _inference_device(device, parameter.device, parameter.device)
+    dtype, d = parameter.dtype, model.config.d_model
+    model.eval()
+    per_fragment, per_scene = [], []
+    names = ('oracle_feedback', 'free_feedback', 'state_hold')
+
+    def metric(error):
+        total = float(error.sum().item())
+        count = error.numel()
+        return dict(target_count=count, feature_elements=count*d,
+                    squared_error_sum=total, feature_mse=total/(count*d) if count else None)
+
+    def pool(rows):
+        count = sum(row['target_count'] for row in rows)
+        elements = sum(row['feature_elements'] for row in rows)
+        total = sum(row['squared_error_sum'] for row in rows)
+        return dict(target_count=count, feature_elements=elements,
+                    squared_error_sum=total, feature_mse=total/elements if elements else None)
+
+    def embed(states, times):
+        return torch.relu(model.input_embedding(states + continuous_time_encoding(times, 4)))
+
+    for scene_index, scene in enumerate(scenes):
+        packed, _ = normalize_scene(scene, normalizer)
+        begin = len(per_fragment)
+        for node, node_id in enumerate(scene['node_ids']):
+            count = int(scene['native_observed'][node].sum())
+            horizon = min(3, count-2)
+            prefix_count = count-horizon
+            x = torch.as_tensor(packed[node:node+1, :count], device=device, dtype=dtype)
+            native, times = x[..., :4], x[..., 4]
+            embedded = embed(native, times)
+            directions = {}
+            for direction, sequence, states, tau in (
+                    ('forward', embedded, native, times),
+                    ('reverse', embedded.flip(1), native.flip(1), times.flip(1))):
+                target = sequence[:, prefix_count:]
+                target_times = tau[:, prefix_count:]
+                predictions = {}
+                if horizon:
+                    prefix = sequence[:, :prefix_count]
+                    # Both routes share precisely this memory. Future native
+                    # targets never enter the encoder, including in the oracle.
+                    memory = model.tcm_encoder(prefix, mask=_causal_mask(prefix_count, device))
+                    for name in names[:2]:
+                        history, previous_times = prefix, tau[:, 1:prefix_count]
+                        steps = []
+                        for step in range(horizon):
+                            next_times = torch.cat((previous_times, target_times[:, step:step+1]), dim=1)
+                            conditioned = history + continuous_time_encoding(next_times, d)
+                            prediction = model._decode_causal_history(conditioned, memory)[:, -1:]
+                            steps.append(prediction)
+                            feedback = target[:, step:step+1] if name == 'oracle_feedback' else prediction
+                            history = torch.cat((history, feedback), dim=1)
+                            previous_times = next_times
+                        predictions[name] = torch.cat(steps, dim=1)
+                    predictions['state_hold'] = embed(
+                        states[:, prefix_count-1:prefix_count].expand(-1, horizon, -1), target_times)
+                else:
+                    predictions = {name: target for name in names}
+                if not all(torch.isfinite(value).all() for value in (*predictions.values(), target)):
+                    raise FloatingPointError('nonfinite TCM feedback features')
+                error = {name: (value.double()-target.double()).square().sum(-1)
+                         for name, value in predictions.items()}
+                delta = (predictions['free_feedback'].double()-predictions['oracle_feedback'].double()).square().sum(-1)
+                first_difference = (float((predictions['free_feedback'][:, :1]-predictions['oracle_feedback'][:, :1])
+                                          .abs().max().item()) if horizon else None)
+                seconds = np.asarray(scene['native_times'][node, :count])
+                if direction == 'reverse':
+                    seconds = seconds[::-1]
+                directions[direction] = dict(
+                    prefix_count=prefix_count, target_count=horizon,
+                    prefix_endpoint_seconds=float(seconds[prefix_count-1]),
+                    first_step_max_abs_difference=first_difference,
+                    first_step_identical=first_difference == 0. if horizon else None,
+                    metrics={name: metric(value) for name, value in error.items()},
+                    feedback_difference=metric(delta),
+                    per_step=[dict(step=step+1,
+                        target_seconds=float(seconds[prefix_count+step]),
+                        horizon_seconds=float(abs(seconds[prefix_count+step]-seconds[prefix_count-1])),
+                        metrics={name: metric(value[:, step:step+1]) for name, value in error.items()},
+                        feedback_difference=metric(delta[:, step:step+1])) for step in range(horizon)])
+            per_fragment.append(dict(scene_id=str(scene['scene_id']), node_id=str(node_id),
+                node_index=node, source=str(scene['sources'][node]), native_count=count,
+                status='evaluable' if horizon else 'insufficient_native_context', directions=directions))
+        per_scene.append(dict(scene_id=str(scene['scene_id']), fragment_count=len(per_fragment)-begin))
+        if progress:
+            progress(dict(stage='tcm_feedback', completed_scenes=scene_index+1,
+                          total_scenes=len(scenes), completed_fragments=len(per_fragment)))
+
+    def aggregate(direction, step=None):
+        rows = [row['directions'][key] for row in per_fragment
+                for key in (('forward', 'reverse') if direction == 'all' else (direction,))]
+        if step is not None:
+            rows = [row['per_step'][step-1] for row in rows if row['target_count'] >= step]
+        return dict(metrics={name: pool([row['metrics'][name] for row in rows]) for name in names},
+                    feedback_difference=pool([row['feedback_difference'] for row in rows]))
+
+    first_steps = [direction for row in per_fragment for direction in row['directions'].values()
+                   if direction['target_count']]
+    return dict(scene_count=len(scenes), fragment_count=len(per_fragment), per_scene=per_scene,
+        per_fragment=per_fragment,
+        insufficient_native_fragment_count=sum(row['native_count'] == 2 for row in per_fragment),
+        aggregate={direction: dict(all_steps=aggregate(direction),
+            per_step={str(step): aggregate(direction, step) for step in (1, 2, 3)})
+            for direction in ('all', 'forward', 'reverse')},
+        first_step_check=dict(direction_count=len(first_steps),
+            all_identical=all(row['first_step_identical'] for row in first_steps) if first_steps else None,
+            max_abs_difference=max((row['first_step_max_abs_difference'] for row in first_steps), default=None)),
+        scope='last up to three native transitions per direction, at least two native prefix inputs; not full natural-query completion',
+        target_policy='same sensor native embeddings and times; fixed saved normalization and input projection; no reference targets',
+        memory_policy='one identical fixed initial-prefix encoder memory for oracle and free feedback; oracle sees true tokens only after predicting them',
+        control='fixed initial-prefix endpoint state re-embedded at each target time',
+        optimizer_updates=0, test_opened=False)
+
+
+@stable_evaluation_parameters
+@torch.inference_mode()
 def evaluate_tcm_completion(model, normalizer, scenes, *, device='cpu', check=None, progress=None):
     """Diagnose the saved native TCM in its own frozen feature space, without TAM.
 

@@ -1,4 +1,4 @@
-"""Read existing 020/021 weights and diagnose completion on four fixed V scenes.
+"""Diagnose frozen completion weights on four fixed V scenes.
 
 No training, helper tracks, association, fusion, calibration or threshold search.
 Time is advisory in launch_detached.py; this command has no wall-time kill.
@@ -18,7 +18,7 @@ if __package__ in (None, ''):
 SCENE_IDS = ['1671', '2056', '290', '113']
 
 
-def load_scenes(archive_path, manifest, alignment, data):
+def load_scenes(archive_path, manifest, alignment, data, *, references=True):
     """Read only the fixed development subset, retaining the original manifest."""
     import numpy as np
     from association.data.archive import MTADArchive, validate_manifest
@@ -44,6 +44,8 @@ def load_scenes(archive_path, manifest, alignment, data):
                 '-'.join(row['mmsi'].split('-')[:2]) for row in labels))
             scenes.append(scene)
         members = list(archive.members_read)
+    if not references:
+        return scenes, dict(observation_members_read=members, reference_members_read=[])
     references = []
     for scene, reference in zip(scenes, iter_reference_states(archive_path, manifest,
             split='V_select', scene_ids=SCENE_IDS)):
@@ -59,26 +61,36 @@ def load_scenes(archive_path, manifest, alignment, data):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('archive', 'manifest', 'alignment', 'reference-checkpoint',
-                 'candidate-checkpoint', 'output', 'device'):
+                 'output', 'device'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--candidate-checkpoint')
     parser.add_argument('--cpu-threads', type=int, default=4)
-    parser.add_argument('--candidate-residuals', action='store_true',
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--candidate-residuals', action='store_true',
         help='Only run the candidate; export existing predictions and frozen objective diagnostics')
+    modes.add_argument('--reference-feedback', action='store_true',
+        help='TCM-only native feedback diagnostic; reference-checkpoint accepts a completed TCM run or checkpoint.pt')
     args = parser.parse_args(argv)
+    if not args.reference_feedback and args.candidate_checkpoint is None:
+        parser.error('--candidate-checkpoint is required unless --reference-feedback is used')
+    if args.reference_feedback and args.candidate_checkpoint is not None:
+        parser.error('--reference-feedback does not use --candidate-checkpoint')
     import torch
     from association.utils import runtime
     from association.models.tmtaff import ModelConfig
     from association.models.timed import TimedAssociationModel
     from association.training.cooperative import load_cooperative_checkpoint, resolve_device
-    from association.evaluation.tmtaff import evaluate_tcm_completion
+    from association.evaluation.tmtaff import evaluate_tcm_completion, evaluate_tcm_feedback
     from association.evaluation.cooperative import evaluate_cooperative_completion, completion_objective_report
 
     started, output = time.monotonic(), Path(args.output)
     run = dict(status='RUNNING', stage='loading', command=[sys.executable, __file__, *(argv or sys.argv[1:])],
         sources={name: str(Path(getattr(args, name)).resolve()) for name in
-                 ('archive', 'manifest', 'alignment', 'reference_checkpoint', 'candidate_checkpoint')},
+                 ('archive', 'manifest', 'alignment', 'reference_checkpoint', 'candidate_checkpoint')
+                 if getattr(args, name) is not None},
         device=args.device, cpu_threads=args.cpu_threads, scene_ids=SCENE_IDS,
-        mode='candidate_residuals' if args.candidate_residuals else 'both_models',
+        mode=('reference_feedback' if args.reference_feedback else
+              'candidate_residuals' if args.candidate_residuals else 'both_models'),
         optimizer_updates=0, normalizer_refit=False, margin_recalibrated=False,
         threshold_reselected=False, test_opened=False)
     previous_signal = signal.getsignal(signal.SIGTERM)
@@ -101,10 +113,51 @@ def main(argv=None):
         torch.set_num_threads(args.cpu_threads)
         progress(dict(stage='loading'))
         device = resolve_device(args.device)
-        saved = torch.load(args.reference_checkpoint, map_location='cpu', weights_only=True)
+        reference_path = Path(args.reference_checkpoint)
+        if args.reference_feedback and reference_path.is_dir():
+            reference_path = reference_path/'checkpoint.pt'
+        saved = torch.load(reference_path, map_location='cpu', weights_only=True)
         normalizer = saved['normalizer']
         keys = ('length', 'max_observations', 'time_unit_seconds')
         data = {key: normalizer['adapter_config'][key] for key in keys}
+        if args.reference_feedback:
+            source_run = runtime.read_json(reference_path.parent/'run.json')
+            updates = saved['config']['updates']
+            steps = updates['TCM']
+            if (source_run.get('status') != 'COMPLETED' or source_run.get('phase') != 'tcm'
+                    or saved.get('phase') != 'tcm' or saved.get('input_adapter') != 'native_time_v1'
+                    or saved['max_observations'] != data['max_observations']
+                    or saved['cursor'] != dict(stage=0, update=steps, completed_updates=steps)
+                    or source_run['cursor']['completed_updates'] != steps
+                    or any(value for key, value in updates.items() if key != 'TCM')
+                    or saved.get('selected') is not None):
+                raise ValueError('feedback diagnostic requires a COMPLETED TCM-only endpoint')
+            manifest, alignment = runtime.read_json(args.manifest), runtime.read_json(args.alignment)
+            if (normalizer['training_scene_ids'] != manifest['splits']['T_core']
+                    or normalizer['training_splits'] != ['T_core']):
+                raise ValueError('saved normalization does not match original T_core population')
+            contract = {row['scene_id']: row for row in saved['data_contract'][1]}
+            if any(contract[sid]['split'] != 'V_select'
+                   or contract[sid]['component_id'] != manifest['components'][sid] for sid in SCENE_IDS):
+                raise ValueError('feedback population differs from original V contract')
+            run.update(data=data, reference_cursor=saved['cursor'], reference_normalizer=normalizer,
+                       source_run_status=source_run['status'], stage='preparation')
+            progress(dict(stage='preparation'))
+            scenes, reads = load_scenes(args.archive, manifest, alignment, data, references=False)
+            run.update(**reads, fragment_count=sum(len(scene['node_ids']) for scene in scenes))
+            config = replace(ModelConfig(**saved['model_config']), margin=saved['effective_margin'])
+            reference = TimedAssociationModel(config, saved['config']['branch'],
+                                               max_observations=saved['max_observations'])
+            reference.load_state_dict(saved['states'][0], strict=True)
+            reference.to(device).eval()
+            run['stage'] = 'reference_feedback'
+            progress(dict(stage=run['stage']))
+            report = evaluate_tcm_feedback(reference, normalizer, scenes, device=device, progress=progress)
+            runtime.write_json(output/'reference-feedback.json', report)
+            run.update(status='COMPLETED', stage='completed')
+            progress(dict(stage='completed'))
+            print(f'COMPLETED: {run["fragment_count"]} fragments; {output}')
+            return 0
         candidate, payload = load_cooperative_checkpoint(args.candidate_checkpoint, device='cpu')
         if (saved.get('input_adapter') != 'native_time_v1'
                 or saved['cursor'] != dict(stage=1, update=300, completed_updates=1300)
