@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 2162877,
+  "linger": "yes",
+  "unit": "mtad-9e860a819c92.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-9e860a819c92.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=30.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run034",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-HEADING-20261020-034-attempt-1-launch/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-HEADING-20261020-034-attempt-1-launch/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run034/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-HEADING-20261020-034-attempt-1-launch"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-20T03:00:16.511440+00:00",
+  "elapsed_seconds": 0.07483428390696645
+}
