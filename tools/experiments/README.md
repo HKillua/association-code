@@ -42,7 +42,7 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 
 `fit --phase teacher --save-predictions`保留原teacher self/cross/BCE训练，在固定端点做完整V独立片段补全，不进入关联选阈值、utility或融合；配置的utility/adapt更新数必须为0。输出`teacher.pt`、`completion-evaluation.json`及`completion-predictions/`逐场NPZ。该NPZ是独立补全格式，按逐属性mask/region统计，不能直接当分组融合格式交给`compare_physical_predictions.py`。`model.speed_output_policy`缺省为原`physical_softplus`；`scaled_log`只对v2生效并要求相应新权重。[031/032对照](../../docs/proposals/repair_before_retraining/031-032-analysis.md)已完成，结果保留；新任务只按当前索引领取。
 
-比较两个已完成teacher结果时，将gzip JSON和预测tar.gz还原为各自run目录的原层级，再执行`python tools/analysis/compare_completion_predictions.py --left /031结果目录 --right /032结果目录 --output /新的对比.json`。只读取已完成teacher预测，核完整人口与共有真值/mask一致，输出整体、来源、逐场的各区域/距离误差、raw log-speed MSE及速度分布；不重新推理或选阈值。
+比较两个已完成teacher结果时，将gzip JSON和预测tar.gz还原为各自run目录的原层级，再执行`python tools/analysis/compare_completion_predictions.py --left /034结果目录 --right /043结果目录 --output /新的对比.json`。只读取已完成teacher预测，核完整人口与共有真值/mask/时间/支撑一致，输出整体、来源、逐场的各区域/距离误差、raw log-speed MSE及速度分布；不重新推理或选阈值。两臂位置底座可以不同，另报`position_base`及`position_model_minus_own_base`（模型位置误差减自身底座误差，负MAE差为改善），避免将换底座收益全归给网络。速度/航向没有底座预测，不能从位置底座推算这两项增量。原left/right/right_minus_left指标含义保留。
 
 `tmtaff_complete_fit.py --phase tcm`要求非TCM更新全部为0，固定端点输出`completion-evaluation.json`和未选模`checkpoint.pt`；不支持`--save-predictions`。模型仍为原一步TCM，特征误差不能与物理米误差比较。默认`full`保持四阶段。接口见[规格](../../docs/specs/tmtaff-tcm-phase.md)；033已结案，结果见[分析](../../docs/proposals/repair_before_retraining/033-analysis.md)，不重领。
 

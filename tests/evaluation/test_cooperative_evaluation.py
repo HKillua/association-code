@@ -192,6 +192,19 @@ class CooperativeCompletionTests(unittest.TestCase):
                                       arrays['nearest_seconds'] == 0)
         self.assertEqual(written[1][1]['prediction'].shape, (0, 4, 4))
 
+    def test_position_control_metadata_reports_actual_base_policy(self):
+        from dataclasses import replace
+        from association.models.cooperative import CooperativeModel
+        hold = self.evaluate([empty_timed_scene()])
+        self.assertEqual(hold['position_base_policy'], 'native_hold')
+        self.assertIn('endpoint hold outside', hold['position_control'])
+        self.model = CooperativeModel(replace(self.model.config, position_base_policy='native_ols'),
+                                      self.normalizer, support_time_scale=10.)
+        ols = self.evaluate([empty_timed_scene()])
+        self.assertEqual(ols['position_base_policy'], 'native_ols')
+        self.assertIn('OLS slope anchored at measured endpoints outside', ols['position_control'])
+        self.assertNotIn('endpoint hold outside', ols['position_control'])
+
     def test_every_fragment_kept_and_forward_ignores_helpers_and_reference(self):
         changed = copy.deepcopy(self.scene)
         for target in changed['fusion_targets'].values():

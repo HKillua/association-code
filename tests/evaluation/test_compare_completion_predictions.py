@@ -110,7 +110,7 @@ class CompletionComparisonTests(unittest.TestCase):
 
     def test_partial_index_incomplete_run_or_different_reference_inputs_are_rejected(self):
         left = self.write('left')
-        for key in ('target', 'target_valid', 'nearest_seconds', 'position_base', 'node_ids'):
+        for key in ('target', 'target_valid', 'nearest_seconds', 'node_ids'):
             with self.subTest(key=key):
                 right = self.write('right-'+key)
                 path = right/'completion-predictions/observed.npz'
@@ -135,6 +135,34 @@ class CompletionComparisonTests(unittest.TestCase):
         runtime.write_json(right/'run.json', run)
         with self.assertRaises(ValueError):
             compare(left, right, self.root/'unfinished.json')
+
+    def test_different_bases_report_each_learning_increment_on_identical_population(self):
+        left, right = self.write('hold'), self.write('ols', corrected=True)
+        run = runtime.read_json(right/'run.json')
+        run['model_config']['position_base_policy'] = 'native_ols'
+        runtime.write_json(right/'run.json', run)
+        path = right/'completion-predictions/observed.npz'
+        with np.load(path) as saved:
+            arrays = {key: saved[key] for key in saved.files}
+        arrays['position_base'][0, 0, 0] = .002
+        np.savez_compressed(path, **arrays)
+        result = compare(left, right, self.root/'different-bases.json')
+        overall = result['overall']
+        for side in ('left', 'right'):
+            base = overall['position_base'][side]['regions']['all']
+            learned = overall[side]['regions']['all']['position']
+            delta = overall['position_model_minus_own_base'][side]['regions']['all']
+            self.assertEqual(base['intersection_count'], learned['intersection_count'])
+            self.assertEqual(delta['mae'], learned['mae']-base['mae'])
+        self.assertGreater(overall['position_model_minus_own_base']['left']['regions']['all']['mae'], 0)
+        self.assertLess(overall['position_model_minus_own_base']['right']['regions']['all']['mae'], 0)
+        self.assertIsNone(result['per_scene'][1]['position_model_minus_own_base']['right']['regions']['all']['mae'])
+        self.assertEqual(result['fragment_count'], 3)
+        # Different bases are allowed; a changed target still invalidates this comparison.
+        arrays['target'][0, 0, 0] = .001
+        np.savez_compressed(path, **arrays)
+        with self.assertRaisesRegex(ValueError, 'reference differs: target'):
+            compare(left, right, self.root/'changed-target.json')
 
     def test_two_tiny_native_teacher_runs_compare_through_public_cli(self):
         threads = torch.get_num_threads()

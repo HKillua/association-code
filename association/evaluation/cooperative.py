@@ -488,7 +488,11 @@ def evaluate_cooperative_completion(model, normalizer, scenes, *, device='cpu', 
             input_distance_metrics=_aggregate_regions(reports, 'input_distance_metrics', INPUT_DISTANCE_REGIONS))
             for name, reports in method_reports.items()},
         per_scene=per_scene, per_fragment=per_fragment, completion_forward_count=decoded,
-        position_control='visible native position interpolation within support; endpoint hold outside; no speed/heading control',
+        position_control=('visible native position interpolation within support; '
+            + ('all-visible-point OLS slope anchored at measured endpoints outside'
+               if model.config.position_base_policy == 'native_ols' else 'endpoint hold outside')
+            + '; no speed/heading control'),
+        position_base_policy=model.config.position_base_policy,
         region_definition='per-fragment retained native time span; exact_observation requires identical physical query time; inside_nonobserved includes interpolation and internal gaps',
         error_scope='point-pooled metrics over all fragments, retaining repeated identities and no-reference rows; not target-weighted',
         scope='V_select single-fragment development; no artificial hiding, helpers or identity scores',

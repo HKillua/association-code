@@ -23,7 +23,7 @@ from association.evaluation.scene import INPUT_DISTANCE_REGIONS
 REGIONS = ('all', 'inside_support', 'before_support', 'after_support',
            'exact_observation', 'inside_nonobserved')
 COMMON = ('scene_id', 'node_ids', 'identities', 'sources', 'query_seconds',
-          'target', 'target_valid', 'nearest_seconds', 'position_base')
+          'target', 'target_valid', 'nearest_seconds')
 
 
 def _read(path):
@@ -66,7 +66,7 @@ def _completed(directory):
             raise ValueError('prediction paths must be filenames inside completion-predictions')
         with np.load(directory/'completion-predictions'/name, allow_pickle=False) as saved:
             item = {key: saved[key] for key in saved.files}
-        required = {*COMMON, 'prediction', *('region_'+key for key in REGIONS)}
+        required = {*COMMON, 'prediction', 'position_base', *('region_'+key for key in REGIONS)}
         if not required.issubset(item) or {k for k in item if k.startswith('region_')} != {'region_'+k for k in REGIONS}:
             raise ValueError('completion artifact is missing population, prediction or region arrays')
         n, q = len(expected['node_ids']), len(expected['grid'])
@@ -97,6 +97,12 @@ def _completed(directory):
         # Reuse physical validation, including all predictions even without truth.
         evaluate_aligned_fusion(item['prediction'], item['target'], item['target_valid'],
             prediction_valid=np.ones((n, q, 4), bool), region_mask=item['region_all'])
+        base_valid = np.zeros((n, q, 4), bool)
+        base_valid[..., :2] = True
+        evaluate_aligned_fusion(item['position_base'], item['target'], item['target_valid'],
+            prediction_valid=base_valid, region_mask=item['region_all'])
+        if not np.isnan(item['position_base'][..., 2:]).all():
+            raise ValueError('position_base has no speed or heading prediction')
         arrays.append(item)
     return directory, run, report, arrays
 
@@ -124,13 +130,20 @@ def _region_metrics(data, mask):
             target_evaluable=_speed_statistics(target[..., 2][speed_valid]))}
 
 
-def _metrics(data):
+def _metrics(data, *, position_base=False):
     nearest = data['nearest_seconds']
     distances = (nearest <= 300, (nearest > 300) & (nearest <= 600),
                  (nearest > 600) & (nearest <= 1800),
                  (nearest > 1800) & np.isfinite(nearest), ~np.isfinite(nearest))
-    return dict(regions={key: _region_metrics(data, data['region_'+key]) for key in REGIONS},
-        input_distance_metrics={key: _region_metrics(data, mask)
+    def metric(mask):
+        if not position_base:
+            return _region_metrics(data, mask)
+        available = np.zeros(data['position_base'].shape, bool)
+        available[..., :2] = True
+        return evaluate_aligned_fusion(data['position_base'], data['target'], data['target_valid'],
+            prediction_valid=available, region_mask=mask)['position']
+    return dict(regions={key: metric(data['region_'+key]) for key in REGIONS},
+        input_distance_metrics={key: metric(mask)
                                 for key, mask in zip(INPUT_DISTANCE_REGIONS, distances)})
 
 
@@ -150,8 +163,17 @@ def _difference(left, right):
 
 def _pair(left, right):
     a, b = _metrics(left), _metrics(right)
+    bases = {side: _metrics(data, position_base=True)
+             for side, data in (('left', left), ('right', right))}
+    def learning_delta(side, learned):
+        position = {group: {region: metrics['position'] for region, metrics in reports.items()}
+                    for group, reports in learned.items()}
+        return _difference(bases[side], position)
     return dict(fragment_count=len(left['node_ids']), query_count=left['prediction'].shape[0]*left['prediction'].shape[1],
-                left=a, right=b, right_minus_left=_difference(a, b))
+                left=a, right=b, right_minus_left=_difference(a, b),
+                position_base=bases,
+                position_model_minus_own_base=dict(left=learning_delta('left', a),
+                                                  right=learning_delta('right', b)))
 
 
 def compare(left_directory, right_directory, output):
@@ -170,7 +192,7 @@ def compare(left_directory, right_directory, output):
     widths = {a['prediction'].shape[1] for a in left}
     if len(widths) != 1:
         raise ValueError('teacher evaluation must retain one declared query width')
-    pooled_keys = ('node_ids', 'identities', 'sources', 'prediction', 'target', 'target_valid',
+    pooled_keys = ('node_ids', 'identities', 'sources', 'prediction', 'position_base', 'target', 'target_valid',
                    'nearest_seconds', *('region_'+key for key in REGIONS))
     def pool(rows):
         return {key: np.concatenate([row[key] for row in rows], axis=0) for key in pooled_keys}
@@ -201,6 +223,10 @@ def compare(left_directory, right_directory, output):
         speed_statistics_definition='native units, population std (ddof=0); all emitted predictions and '
                                     'speed-valid target intersection are reported separately',
         difference_definition='right minus left on the same population; descriptive only, no significance or pass threshold',
+        position_learning_delta_definition='model position error minus its own saved position-base error, '
+                                           'on identical target/region masks; negative error deltas mean improvement. '
+                                           'The two arms may use different bases; compare their model errors '
+                                           'separately from each arm learning increment.',
         overall=_pair(lp, rp), by_source=by_source, per_scene=per_scene)
     payload = json.dumps(result, ensure_ascii=False, indent=2, allow_nan=False)+'\n'
     output.parent.mkdir(parents=True, exist_ok=True)
