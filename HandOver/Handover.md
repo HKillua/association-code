@@ -14,12 +14,12 @@
 
 ## 在途任务
 
-按当前收到的回执，尚无035/037终态成绩。发布新交接不改变在途执行目录，也不代表039—041已启动。（服务器补注：039／040／041 亦已于 07:19—07:29Z 起 RUNNING，故在途共五个获批作业。）
+按当前收到的回执，尚无035/037终态成绩。发布新交接不改变在途执行目录，也不代表039—041已启动。（服务器补注：039／040／041 亦已于 07:19—07:29Z 起 RUNNING，故在途共五个获批作业。）（服务器补注 `08:40Z`：037已COMPLETED并全数回传；现剩035／039／040／041在跑。）
 
 | 任务 | 当前回执与范围 |
 | --- | --- |
 | [035 baseline关联](L2S-20261020-035.md) | **RUNNING / 已领取**，[S2L](S2L-20261020-035.md)。12:23在`association-code-run035`、GPU0提交；冻结033，新TAM1000，每100步完整V，8小时仅提醒，无TFM/JOINT/T_test。不得重复提交或自动延长。 |
-| [037圆周TCM](L2S-20261020-037.md) | **RUNNING / 已领取**，[S2L](S2L-20261020-037.md)。14:02:43在`association-code-run037`、GPU1提交；一次TCM4000及完整V，4小时仅提醒，无自动TAM/TFM/JOINT/T_test。新旧latent MSE不可跨空间直接排名。 |
+| [037圆周TCM](L2S-20261020-037.md) | **RUNNING / 已领取**，[S2L](S2L-20261020-037.md)。14:02:43在`association-code-run037`、GPU1提交；一次TCM4000及完整V，4小时仅提醒，无自动TAM/TFM/JOINT/T_test。新旧latent MSE不可跨空间直接排名。 **（服务器补注 `08:37:28Z`：COMPLETED／退出0，见[S2L](S2L-20261020-037.md)第六节。墙钟9,284.789秒（北京14:02:44→16:37:28，2h34m45s），advisory未触发；TCM 4,000更新、约2.068秒/更新（033为2.0737，圆周表示无额外时间代价且本轮独占索引1）、末尾完整V 658.510秒、准备约218.5秒。`updates{TAM,TFM,JOINT}=0`、`selection_performed=false`、`margin 1.0/校准null`、`test_opened=false`、`initialization null`；训练覆盖512场/54,282轨/256,000次呈现＝与033逐数相同；显存峰值0.89 GiB。V人口64/1,635，一步88,832可评（coverage 1.0），query 104,640其中可评81,207、缺真值23,433。本空间读数：一步model 0.0080388 vs state-hold 0.0144914（比值0.5547）；query all 0.0063128/0.0082830（0.7622），inside_support比值**恰1.0000**（该处输出即观测插值，报告自带口径原文已引），before 0.7624、after 0.6970；时距带0.8745/0.6592/0.6871/0.7803。七个gz均cmp自证入库，本trainer不产execution/progress也不产预测包，我未补造；checkpoint.pt 57,773,969 B留服务器登记。不自动进TAM/TFM/JOINT。）**|
 
 022—025继续**HOLD_COMPLETION_REVIEW、未运行**；旧草案已总结清理，不恢复。019—034、036、038已结案并分析，已结束的轮次不得重领；负结果与必要服务器路径见[历史摘要](../docs/history/README.md)，近期比较证据见[分析索引](../docs/proposals/repair_before_retraining/README.md)和[结果说明](results/README.md)。
 
