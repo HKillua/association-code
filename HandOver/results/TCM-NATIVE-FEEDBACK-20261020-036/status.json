@@ -1,0 +1,18 @@
+{
+  "status": "COMPLETED",
+  "worker_pid": 2185868,
+  "payload_pid": 2185872,
+  "payload_pgid": 2185872,
+  "returncode": 0,
+  "timed_out": false,
+  "worker_started_at": "2026-10-20T04:31:30.769501+00:00",
+  "backend": "systemd",
+  "time_policy": "advisory",
+  "time_advisory_issued": false,
+  "payload_started_at": "2026-10-20T04:31:30.771019+00:00",
+  "group_cleanup_requested": false,
+  "failure": null,
+  "ended_at": "2026-10-20T04:31:47.578730+00:00",
+  "elapsed_seconds": 16.935014457907528,
+  "deadline_exceeded": false
+}
