@@ -1,16 +1,16 @@
 # 当前服务器任务
 
-**当前在途：035 baseline关联、037圆周TCM；当前无新增READY。038已COMPLETED并经本地复核，034/036也已结案。** 037已于北京时间14:02:43在隔离目录领取，不重复启动；038为CPU零更新诊断，不是新的训练结果。只按当前索引领取，历史L2S的READY头部不构成待办；正常最多两个单卡任务。
+**当前在途：035 baseline关联、037圆周TCM；新增READY为039—041。038已COMPLETED并经本地复核，034/036也已结案。** 037已于北京时间14:02:43在隔离目录领取，不重复启动；038为CPU零更新诊断，不是新的训练结果。只按当前索引领取，历史L2S的READY头部不构成待办；正常最多两个单卡任务。
 
-用户随后允许多组消融，本地已准备039—041单因素代码、配置与命令；**具体三次1000步预算待确认，目前均DRAFT不可领取**。规格见[三组方案](../docs/specs/cooperative-decoder-ablations.md)，不因文件存在或CPU检查通过启动。
+**用户2026-10-20明确批准039—041三组，现均READY。** 各一次teacher1000＋完整V及正常完成后一次原四场CPU动态读取；合计预计7—8单卡小时，各4h仅提醒，失败不重试。待035/037释放名额，按039→040→041领取，可在正常最多两个单卡内并行；不跑下游或T_test。规格见[三组方案](../docs/specs/cooperative-decoder-ablations.md)，已在途任务不重领。
 
 | 项目 | 当前状态与结果 |
 | --- | --- |
-| [039仅decoder pre-norm](L2S-20261020-039.md) | **DRAFT / USER，未领取。** 原034六层结构与BCE等不变，只改decoder归一化顺序；拟一次teacher1000＋完整V及一次原四场CPU动态读取。 |
-| [040仅decoder两层](L2S-20261020-040.md) | **DRAFT / USER，未领取。** encoder仍六层，decoder保留前两层post-norm，其余034设置不变；保留参数及构造后RNG与034一致，训练dropout路径会变。拟一次teacher1000＋完整V及一次原四场CPU动态读取。 |
-| [041仅关闭teacher BCE](L2S-20261020-041.md) | **DRAFT / USER，未领取。** 原034结构、self/cross物理目标及clip不变，BCE原值仍记录但实际贡献为0；不称已训练关联臂。拟一次teacher1000＋完整V及一次原四场CPU动态读取。三组合计粗估7—8单卡小时，各4h仅提醒、失败不重试，正常最多两个单卡。 |
+| [039仅decoder pre-norm](L2S-20261020-039.md) | **READY / SERVER_AI，待领取。** 原034六层结构与BCE等不变，只改decoder归一化顺序；已批准一次teacher1000＋完整V及一次原四场CPU动态读取。 |
+| [040仅decoder两层](L2S-20261020-040.md) | **READY / SERVER_AI，待领取。** encoder仍六层，decoder保留前两层post-norm，其余034设置不变；保留参数及构造后RNG与034一致，训练dropout路径会变。已批准一次teacher1000＋完整V及一次原四场CPU动态读取。 |
+| [041仅关闭teacher BCE](L2S-20261020-041.md) | **READY / SERVER_AI，待领取。** 原034结构、self/cross物理目标及clip不变，BCE原值仍记录但实际贡献为0；不称已训练关联臂。已批准一次teacher1000＋完整V及一次原四场CPU动态读取。三组合计粗估7—8单卡小时，各4h仅提醒、失败不重试，正常最多两个单卡。 |
 | [037圆周航向TCM](L2S-20261020-037.md) | **RUNNING / 已领取**，[S2L](S2L-20261020-037.md)。北京时间14:02:43提交，隔离树`association-code-run037`（0cc11fc）、GPU1；一次圆周TCM4000及完整V、4h仅提醒、失败不重试，无TAM/TFM/JOINT/T_test。执行配置与已批范围一致，尚无终态成绩。新旧latent MSE不可跨空间直接排名，不重领、不自动加下游。 |
-| [038候选动态定位](L2S-20261020-038.md) | **COMPLETED / 本地已审**，[原S2L](S2L-20261020-038.md)、[分析](../docs/proposals/repair_before_retraining/038-analysis.md)。CPU4线程、墙时6.45秒、退出0、原四场86片段/86次前向、零更新、无reference或T_test。86/86轨每层query中心RMS均衰减，输入均值.528352到第6层.000584；逐轨缩小倍数中位1059。现象在输出头之前已经出现，但未定位具体attention/归一化/训练根因。建议下一单因素考虑decoder-only pre-norm，当前仅建议，无新训练或READY。 |
+| [038候选动态定位](L2S-20261020-038.md) | **COMPLETED / 本地已审**，[原S2L](S2L-20261020-038.md)、[分析](../docs/proposals/repair_before_retraining/038-analysis.md)。CPU4线程、墙时6.45秒、退出0、原四场86片段/86次前向、零更新、无reference或T_test。86/86轨每层query中心RMS均衰减，输入均值.528352到第6层.000584；逐轨缩小倍数中位1059。现象在输出头之前已经出现，但未定位具体attention/归一化/训练根因。038本身不追加训练；其后039—041三组单因素已获批准，见当前READY名单。 |
 | [031速度A](L2S-20261020-031.md) | **COMPLETED / 本地已审**，[S2L](S2L-20261020-031.md)。北京时间2026-10-20 02:58:53完成，退出0，teacher1000。全V64/1635片段/104640查询，每属性81207有效目标、23433无真值保留、缺预测0。速度MAE29.4878，航向70.3884°，位置8899.15米；没有下游/身份选择/T_test。 |
 | [032速度B](L2S-20261020-032.md) | **COMPLETED / 本地已审**，[S2L](S2L-20261020-032.md)。北京时间02:56:38完成，退出0，teacher1000、同人口。速度MAE19.7287，比A低33.1%；航向89.9213°退化，位置8926.63米未改善。完整预测包已收齐，不重复推理/导出。 |
 | [033 baseline TCM](L2S-20261020-033.md) | **COMPLETED / 本地已审**，[原S2L](S2L-20261020-033.md)、[本地分析](../docs/proposals/repair_before_retraining/033-analysis.md)。TCM4000、下游0，退出0、8294.85秒（2.30h）；全V64/1635片段，81207/104640查询全属性可评，无校准/选模/T_test。训练覆盖54282/54792轨（99.07%）。与029同四场的一步特征MSE下降22.74%、自然query下降16.08%，四场均改善；完整V自然query优于state-hold 21.71%，但670/1635片段差于保持，其中501条一步好而query坏；均值不代表全轨可靠。原S2L由训练loss平台推断训练量无效的解释不采纳，不能与其原始执行事实混同。保留端点；已批准035独立TAM，不重启033。 |
@@ -29,7 +29,7 @@
 
 [031/032完整分析](../docs/proposals/repair_before_retraining/031-032-analysis.md)包含同人口A/B、训练日志核验、全V原量测控制、来源/支撑分层、逐片段时间变化和复算脚本。单seed、17身份连通分量的开发证据不作统计显著性结论。
 
-- [034完整分析](../docs/proposals/repair_before_retraining/034-analysis.md)确认观测航向底座有效，学习时间修正尚无净收益；[038](../docs/proposals/repair_before_retraining/038-analysis.md)进一步定位到decoder内部持续衰减。下一改法建议是仅调整decoder归一化顺序，保持其余034设置；尚未修改模型或启动新训练，不把activation幅度当准确率。
+- [034完整分析](../docs/proposals/repair_before_retraining/034-analysis.md)确认观测航向底座有效，学习时间修正尚无净收益；[038](../docs/proposals/repair_before_retraining/038-analysis.md)进一步定位到decoder内部持续衰减。039—041三组单因素代码已完成并获批准：分别调整decoder归一化顺序、深度和teacher身份BCE，保持各自其余034设置；等待服务器名额，不把activation幅度当准确率。
 - 速度公式改善有证据，但B片段内速度仍近常量；航向和支撑内位置更差，**补全尚未通过**。不把全部属性目标同时重写，也不由服务器自行调权/改底座。
 - 原量测控制支撑内总体更好；9002支撑内速度却是B更好，9001/reference复用需披露。后续观测残差设计须区分属性与时间支撑，不能统一强制观测不变。
 - baseline的033表明增加训练量有收益，保留TCM4000端点。下一问题是其对TAM关联的作用，不因特征MSE改善自动加训或恢复旧任务；完整baseline仍需TAM/TFM/JOINT及物理终评。无需补传已包含在summary中的coverage，也不重跑相同四场。

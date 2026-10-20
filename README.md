@@ -8,11 +8,11 @@ MTAD不完整量测下的**补全、关联、融合**研究。用户2026-10-20�
 
 **本轮工作汇报：** [复现程度、论文差距、补齐问题与并行安排](docs/reports/2026-10-20-research-progress.md)。baseline仍为部分复现，候选尚无可靠端到端增益。[034候选已完成并复核](docs/proposals/repair_before_retraining/034-analysis.md)：航向89.9213°→56.6293°，但观测控制55.9361°更好，消去学习部分的时间变化几乎不影响误差。035已于北京时间12:23在隔离目录启动，冻结033独立训练TAM1000步；尚未收到终态成绩。
 
-**最新038结果：** [逐层分析已复核](docs/proposals/repair_before_retraining/038-analysis.md)。冻结034、四场86片段，全部片段每一层的时间变化幅度均下降；decoder输入RMS均值.528352到第6层.000584，逐轨缩小倍数中位1059。变化在输出头前已被压低，具体attention/归一化/优化根因尚未确定。下一单因素建议只改decoder为pre-norm，保持034其余设置；尚未修改生产模型或新增训练。038正常完成，不重跑。
+**最新038结果：** [逐层分析已复核](docs/proposals/repair_before_retraining/038-analysis.md)。冻结034、四场86片段，全部片段每一层的时间变化幅度均下降；decoder输入RMS均值.528352到第6层.000584，逐轨缩小倍数中位1059。变化在输出头前已被压低，具体attention/归一化/优化根因尚未确定。基于该证据，039—041三个独立消融选项已实现并获批准，尚无新实验结果；以完整V误差和动态读取共同判断。038正常完成，不重跑。
 
-**Baseline继续并行：** [037圆周TCM](HandOver/S2L-20261020-037.md)已于北京时间14:02:43在隔离目录、GPU1启动，一次4000步及完整V，无自动TAM；035仍在途，当前无新增READY。新旧特征MSE不可直接排名，下游收益另议。[036](docs/proposals/repair_before_retraining/036-analysis.md)短程反馈未显示为主要故障；候选038现象不能直接套用到baseline。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
+**Baseline继续并行：** [037圆周TCM](HandOver/S2L-20261020-037.md)已于北京时间14:02:43在隔离目录、GPU1启动，一次4000步及完整V，无自动TAM；035仍在途；039—041已获批准并READY，待正常名额后领取。新旧特征MSE不可直接排名，下游收益另议。[036](docs/proposals/repair_before_retraining/036-analysis.md)短程反馈未显示为主要故障；候选038现象不能直接套用到baseline。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
 
-**下一步三组消融已实现，具体预算待确认：** [039—041规格](docs/specs/cooperative-decoder-ablations.md)分别只改decoder pre-norm、只将decoder降为两层、只关闭teacher身份BCE，均对照已完成034，从头1000步及完整V，完成后各一次原四场CPU动态读取。三组配置和独立DRAFT交接已备齐，尚不可领取；累计粗估7—8个单卡小时，各4h仅提醒、失败不重试，最多两个单卡。微型训练验证了零物理头初始时BCE先影响共享encoder的可能路径，但未证明它导致034失效；动态幅度和真实误差分开判断。
+**三组消融已批准并READY：** [039—041规格](docs/specs/cooperative-decoder-ablations.md)分别只改decoder pre-norm、只将decoder降为两层、只关闭teacher身份BCE，均对照已完成034，从头1000步及完整V，完成后各一次原四场CPU动态读取。用户已明确“批准039—041三组”，三份交接现已READY；累计粗估7—8个单卡小时，各4h仅提醒、失败不重试，待035/037释放名额，最多两个单卡，无下游或T_test。微型训练验证了零物理头初始时BCE先影响共享encoder的可能路径，但未证明它导致034失效；动态幅度和真实误差分开判断。
 
 - **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
 - **021身份原分数已复核**：teacher1000＋utility200完成，teacher端点开发macro-F1 **.630321**、P .301445、R .835305。比同人口位置控制仅高1.47个百分点，跨源F1没有优势；不能归因于utility或融合，T_test未开启。
