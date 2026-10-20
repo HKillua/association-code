@@ -1,2 +1,0 @@
-准备工作区（分离头指针 6297a8c）
-SUBMITTED /home/wangguangjie/djs/association-code/runs/COMPLETION-CHECK-20261019-029-attempt-1-launch; status.json is the worker result, not this submission exit code

@@ -6,7 +6,7 @@
 
 ## 1. 执行与证据范围
 
-来源：[L2S038](../../../HandOver/L2S-20261020-038.md)、[原S2L038](../../../HandOver/S2L-20261020-038.md)、[原始结果目录](../../../HandOver/results/CANDIDATE-DYNAMICS-20261020-038/)。比较依据：[034完整V分析](034-analysis.md)，源码为`association/evaluation/cooperative_dynamics.py`和`association/models/cooperative.py`。
+来源：[L2S038](https://github.com/HKillua/association-code/blob/89e75c3/HandOver/L2S-20261020-038.md)、[原S2L038](../../../HandOver/S2L-20261020-038.md)、[原始结果目录](../../../HandOver/results/CANDIDATE-DYNAMICS-20261020-038/)。比较依据：[034完整V分析](034-analysis.md)，源码为`association/evaluation/cooperative_dynamics.py`和`association/models/cooperative.py`。
 
 - 正常退出0，CPU4线程、CUDA不可见；任务墙时6.45077秒，payload自报3.53225秒，其中评价2.48268秒。没有新训练或GPU推理。
 - 固定034已完成teacher1000及normalizer；原四场1671/2056/290/113，分别18/28/24/16片段，共86。节点、来源和原生观测计数与034原数据契约一致。

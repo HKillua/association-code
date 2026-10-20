@@ -1,4 +1,0 @@
-  File "<string>", line 1
-    import json,os,sys,time; from pathlib import Path; r=Path(sys.argv[1]); p=Path("/proc/self/cgroup"); (r/"probe-start.json").write_text(json.dumps({"pid":os.getpid(),"parent_pid":os.getppid(),"cgroup":p.read_text() if p.exists() else None})); time.sleep(5); (r/"payload-survived.txt").write_text("finished after submitting launcher exited\n")); print("CPU payload completed")
-                                                                                                                                                                                                                                                                                                                                                         ^
-SyntaxError: unmatched ')'

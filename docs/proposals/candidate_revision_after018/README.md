@@ -1,81 +1,106 @@
-# 当前候选v2：已完成实现与独立任务训练
+# 候选方法：观测底座、局部关联与属性效用融合
 
-2026-10-19。本文保留v2已实现的方法与原训练设计，不构成继续执行授权。021共享阶段已完成，身份开发macro-F1记录.630321，独立补全效果待029核实；022—025四臂HOLD。用户已取消墙时硬上限，实际任务状态与建议时长以[交接索引](../../../HandOver/Handover.md)为准。下一步按[研究路线](../../research_brief.md)先补全、再关联、再融合；其中新建议仍待确认。历史动机与负结果见[阶段摘要](../../history/README.md)。
+本文统一记录已实现的候选数学、表示与训练边界。它是实验方法说明，尚无可靠端到端收益；当前结果见[研究说明](../../research_brief.md)，执行与预算仅看[交接索引](../../../HandOver/Handover.md)。
 
-## 1. 明确保留的研究条件
+## 表示版本与当前选项
 
-- T_core512/V_select64、共享A隔离、原生A-B身份标签、全部候选和全部有效短轨，T_test封存。
-- cap128、Q64、真实时间/20秒、既有reference offset与gap600；所有合法query监督保留，远端外推和速度尾部不删。
-- 主干d128、6层、8头、FF256、dropout.1；单seed20、FP32、batch64、原scene-pair平衡采样和首尾留出.25、Adam lr1e−4、clip1。
-- 物理目标仍为原生四状态：纬经SmoothL1 beta=.001、速度log差平方、航向圆周cos损失，沿现学习权重；不换速度单位、不新增运动学一致性loss。
-- 现有全人口覆盖、预测/oracle分组、单源/简单融合、位置/速度/航向和关联指标全保留；完整V只作开发。新增解释性分层不替换既有主表、不重选子集阈值。
+`model_variant=support_residual_v2`使用观测位置底座、五维输入、支撑查询与局部身份支路。legacy保留旧四维标准化输入及全状态生成映射，供旧权重复算；不能把legacy权重解释成v2。
 
-## 2. 统一恢复底座：不重新从全局均值生成全部位置
+| 版本或实验 | 速度输出 | 航向输出 | 结构/目标差别 |
+| --- | --- | --- | --- |
+| 021、031及v2缺省 | `physical_softplus` | `learned_absolute` | 原六层decoder、teacher身份BCE系数1 |
+| 032 | `scaled_log` | `learned_absolute` | 031→032只换速度输出坐标 |
+| 034 | `scaled_log` | `observation_residual` | 032→034保留观测航向并预测圆周残差 |
+| 039 | 同034 | 同034 | 仅`decoder_norm_first=true`，decoder pre-norm |
+| 040 | 同034 | 同034 | 仅`decoder_num_layers=2`，encoder仍六层 |
+| 041 | 同034 | 同034 | 仅`teacher_identity_weight=0`，物理self/cross监督保留 |
 
-只从当前可见native token反解原生物理值；不读取query四状态、reference、身份真值或指定源优先级。锚轨沿现分组规则确定。每个query时刻的位置基础值：
+这些是可区分的实验设置，不能统称021已经使用scaled_log或航向底座。非默认decoder语义、速度与航向输出模式随checkpoint保存并核对；同形权重也不能静默换公式。默认旧配置兼容不等于不同模式可以热切换。
 
-1. 位于锚轨可见首尾内：用左右真实可见点线性插值，longitude沿最短圆弧。
-2. 位于可见范围外：保持最近端点作为基础值，网络残差仍可随时间预测变化。不是把持有值当真值，也没有限制最终外推为常值。
-3. 人工端点留出后重新计算基础值和支撑特征，不能复用遮挡前位置。原生至少两点的合同保持。
+## 输入、观测底座与物理输出
 
-`position_out = visible_position_base + train_position_scale * learned_residual`。
+共同条件为T_core512/V64、共享A身份隔离、cap128/Q64、真实时间/20秒、显式offset/gap600逐属性mask、全部有效短轨及候选、T_test封存。主干d128、8头、FF256、dropout.1，原encoder/decoder各六层，040只减decoder。数据规则以[数据契约](../../data_contract.md)为准；底座不对输入点间隔套用reference的600秒监督资格。
 
-纬经残差行零初始化，使初始位置从观测底座出发；纬度合法范围、经度wrap沿现输出语义。此设计可降低重新学习绝对位置的负担，但会继承传感器偏差；不能承诺必然好于简单融合，也不能硬选9001制造零误差。
+v2输入投影前为`[z_lat,z_lon,z_logspeed,sin(theta),cos(theta)]`。仅用T_core cap后可见原生速度拟合`mu_log=mean(log1p(v))`与总体标准差`sigma_log`；标准差小于1e-6时取1并记录常量特征。由原装配数组以float64计算log1p后再转FP32，不从旧FP32速度z反解，不截尾或更换单位。
 
-输入四状态改成五维：标准化lat/lon、训练侧标准化log1p(native speed)、sin(course)、cos(course)。速度统计只由T_core已保留可见原生点拟合一次，与物理normalizer分别保存；不使用V/ref拟合，不改变输入点或标签。航向输出仍原wrap与cos损失，不引入atan2零向量问题。
+外部packed张量仍为`[N,M+Q,5]`（四状态槽加tau）：第三状态槽为z_logspeed，第四槽仍为航向z；encode用保存的原生航向mean/std还原角度再转sin/cos。只读当前observed native token及query时间；query四状态、padding、reference与身份标签不进入运动编码。V不重新拟合统计。
 
-速度输出改为`softplus(raw_speed + b_v)`，取消原生速度std≈415.27直接乘到输出的路径；b_v由训练侧log1p速度均值对应的典型正速度作稳定初始化，具体数值公式见[表示规格](representation.md)。原生速度和速度loss保持，不能把这项数值适配叫创新。新结构使用独立版本，旧018 checkpoint与默认legacy路径仍可加载复算。
+锚片段沿既有组内首成员规则确定，不按来源或reference误差挑选。当前可见点内纬度线性插值，经度沿最短弧插值；位置恰差180°时取−180°方向。支撑外保持最近端点；endpoint留出后重新计算底座与支撑，不能使用被移除的点。
 
-## 3. 三阶段改动固定为一套小结构
+位置输出为`lat_hat=clamp(base_lat+state_std_lat*r_lat,-90,90)`、`lon_hat=wrap180(base_lon+state_std_lon*r_lon)`。底座来自FP32 token反归一化，有舍入误差，不保证原CSV逐位复制。纬经投影行零初始化，使初始输出等于此底座；保留std作为残差尺度。
 
-| 阶段 | 本版具体内容 | 新增参数设计算术 |
-|---|---|---:|
-| 补全 | query加入左/右最近可见点距离、两侧存在标记、inside-span，5→128无bias投影；距离按T_core既有固定时间尺度归一，留出后重算 | 640 |
-| 关联 | 原全局s0加局部对称残差头；每方向最多4对真实token摘要后对称平均，重叠用共同时间范围内最近时刻对，非重叠用早段尾/晚段首；缺证据回退全局分支 | 16,769 |
-| 融合 | 同一self decoder隐藏状态，加每属性辅助摘要残差；一份共享128×128无bias Wc，不建四个decoder | 16,384 |
+速度两种输出共享`v_typ=expm1(mu_log)`（仅恰为0时初始化取1e-6）及稳定inverse-softplus常数`b_v=v_typ+log(-expm1(-v_typ))`。该回退不改观测或标签；`b_v`与log统计为冻结buffer，速度投影行/可学习bias零初始化。
 
-局部头固定260→64→1：对选中配对token的`abs(e_i-e_j)`及`e_i*e_j`分别均值（256维），再加平均绝对时间差/S、是否时间区间重叠、有效配对数/4、非重叠端点间隔/S四维。GELU，最后层零初始化；无配对直接加0。重叠时从双方都位于交叠区间的真实点构造候选：分别以i→j和j→i顺序，按绝对时间差、当前方向的首时刻、次时刻及槽位序排列各取至多4对；分别得到260维特征，再平均两个方向特征后送入同一残差头。这样即使第4名有时间差并列，交换输入也只是交换两个摘要，保持对称；总计至多8对（可重复）。允许某token重复配对，不把它宣称一一匹配；没有交叠内真实点时保留全局分数。所有全局候选都保留，无硬运动门限删边。
+- `physical_softplus`：`v_hat=softplus(r_speed+b_v)`，直接输出原生单位，取消旧原生速度std乘数。这是021/031的映射。
+- `scaled_log`：`v_ref=softplus(b_v)`按原FP32保存，`v_hat=v_ref*exp(sigma_log*r_speed)`，零残差初值与上一模式一致。这是032/034的映射；不设速度上限，非有限输出显式失败。
 
-融合沿既有提案：`c_k=sum_j w_jk*(r_j-r_i)/(1+sum_j w_jk)`，`h_k=h_self+Wc*c_k`；每属性用同一物理投影的对应行，位置再加本节锚轨观测底座。无helper时c=0。Wc使用Xavier初始化、无bias，四臂相同；不同时把Wc和全部状态投影都清零。query_pool成为物理模块，进入teacher训练，之后冻结；这一点与018不同。
+`learned_absolute`航向为`wrap360(state_mean_heading+state_std_heading*r_heading)`，航向行沿原随机初始化。`observation_residual`改为`wrap360(heading_base+state_std_heading*r_heading)`，该行及bias清零。底座仅用anchor当前可见航向：内插取最短弧、外侧保持端点；半周邻域按原始差符号选弧，容差为`8*finfo(dtype).eps*360°`，FP32约.000343°。详见[航向规格](../../specs/cooperative-heading-residual.md)。
 
-输入投影4→5维另增128参数，物理输出维数仍4。完整实例实计2,190,735参数（旧2,156,814＋33,921），约增加1.57%，约为完整参考8,720,132的25.12%；已完成CPU实例化独立计数。未使用头仍保留在实例数中，不将其都算作推理必经路径。
+物理损失保持纬经SmoothL1 beta=.001、速度`[log(v_hat+1e-6)-log(v+1e-6)]²`、航向`1-cos((theta_hat-theta)*pi/180)`及既有学习权重；经度周期损失由实际配置决定。log输入统计不替代utility的原生四维normalizer误差尺度。
 
-## 4. 一次训练里的阶段与对照
+零物理投影行使第一步对应物理loss只能先更新head，不能经零行更新encoder/decoder；后续head非零时链路恢复。034四行均零，而021/031/032航向行非零；BCE可直接更新共享encoder。这个启动边界不等于已经证明真实失败原因。
 
-更新对象、对照定义与选模见[训练规格](training.md)，实际配置和预算见[执行安排](../repair_before_retraining/README.md)：
+## 支撑查询与局部身份分数
 
-| 阶段 | 更新 | 主要更新对象 |
-|---|---:|---|
-| 共享teacher | 1000 | encoder、支撑query、query_pool、decoder、物理输出、Wc、基础/局部身份头；保留self/正对cross物理监督与所有对BCE |
-| 效用学习 | 200 | 只更新utility_head；完整teacher及query_pool冻结，按新teacher生成新的self/cross增益目标 |
-| 四臂适配 | 各300 | 同一初始decoder、物理输出和Wc；learned臂另更新同容量普通门控。身份/encoder/query_pool/u冻结，共用一个身份分数和阈值 |
+query额外使用左/右最近可见点距离、左右存在标记、inside-span五维特征，经无bias的5→128投影加入查询。人工端点留出后重算。手工时间尺度`S=max(1,max(abs(tau)))`仅从T_core有效native及全部query的打包FP32时间拟合一次，各阶段冻结；它不改实际时间、20秒编码或物理支撑。
 
-四臂为plain、scalar-u、attribute-u、learned-attribute。后三臂共享身份概率因子和正数floor；scalar与attribute只差是否平均四属性效用，learned使用同输入同容量普通属性门控。plain是普通融合。全部在同一新残差结构上训练，不拿旧018分数当同期对照。
+身份分数为全局`s0`加局部对称残差。局部头260→64→1、GELU、末层零初始化；无可用配对则残差0，仍保留该全局候选。
 
-teacher终点选定，不看V挑更新数；一次完整V选身份阈值，四臂各在预定300步终点评价并导出预测。保留原合法reference mask与全部输出范围。先用这一张完整表判断整体与属性路由增量，更多baseline、多种子、去各模块的组合消融后置。
+- 重叠轨只在双方交叠区间的真实token中选近邻：分别按i→j、j→i顺序，以绝对时间差、两侧时间及槽位序排序，各取至多4对。两个方向分别构造特征后平均，交换输入保持对称；最多8对，可重复，不是一对一匹配。
+- 非重叠轨使用早段尾/晚段首局部证据；没有交叠内真实点时回退全局分数。全局候选不以硬运动门限删边。
+- 每方向特征为配对编码的`mean(abs(e_i-e_j))`与`mean(e_i*e_j)`共256维，另加平均绝对时间差/S、区间重叠标记、有效配对数/4、非重叠端点间隔/S。
 
-这同时改变了结构、表示与训练量，因此新旧018整体差不能分配给某一项；四臂内部才用于比较路由。1000步不是身份已学好保证；若仍弱，应据实际结果决定，不能自动延长。效用路线有额外200步预训练，须披露，不声称与普通门控总优化预算相等。
+身份支路只读native编码和局部证据，不读取物理decoder预测；补全误差对它主要通过共享encoder及混合训练间接影响，不能把baseline的补全→TAM误差传递直接套用。
 
-## 5. 实现与验证
+## 属性辅助残差与效用监督
 
-实现位于`association/models/cooperative.py`、`association/data/cooperative.py`、`association/training/cooperative.py`和`association/evaluation/cooperative.py`，入口为`tools/experiments/cooperative_fit.py`。
+令`r_i(t)`为query_pool从锚轨编码取得的摘要，`r_j(t)`为辅助摘要，`h_self(t)`为原self decoder隐藏状态。每属性k构造`c_k=sum_j w_jk*(r_j-r_i)/(1+sum_j w_jk)`，再用`h_k=h_self+Wc*c_k`对应的物理投影行输出。位置/航向底座始终属于anchor；helper只沿残差改变输出。无helper时`c_k=0`。
 
-已核验遮挡后无泄漏、短轨/无helper/局部证据缺失的回退、交换对称、圆周边界、速度映射、阶段更新与冻结、四臂共享条件、checkpoint及合成原生ZIP端到端。完整2,190,735参数结构CPU前反向有限；本地无CUDA硬件，不根据CPU秒数承诺真实效果或服务器成本。
+共享`Wc`为128×128无bias、Xavier初始化；不另建四个decoder，也不同时清零Wc与全部物理头。query_pool在v2成为物理模块，进入teacher训练，随后固定。
 
-共享拆分后306项保留CPU检查通过；dropout开启的full与shared＋四独立臂输出/优化器/采样逐值一致，见[当前验证](../repair_before_retraining/verification.json)。旧测试数量和实施流水账已归Git历史，必要检查通过即推进已批准实验。
-
-## 6. 机制来源与海上任务适配
-
-这是跨领域机制的有动机组合与海上适配，不要求每个模块原创；是否有效仍由完整实验与同结构四臂回答。来源定点核验来自已完成research-workflow，不因文档清理重新泛搜。
-
-| 已读来源 | 借鉴与本版具体改动 |
+| 路由臂 | 辅助权重`w_jk` |
 | --- | --- |
-| [GRU-D作者稿](https://arxiv.org/pdf/1606.01865)，§2—2.1 | 使用缺测标记/距观测的时间。这里改为离线查询左右真实点距离与存在标记，条件化Transformer查询；不搬医疗变量向总体均值衰减的假设。 |
-| [CroCo](https://arxiv.org/html/2210.10716v1)，§3 Eq1—2、附录C.2 | 可见自身＋辅助视图恢复被遮内容，改为真实时间、首尾连续留出和四物理属性；不将生成内容伪装为真实量测。 |
-| [SUSHI](https://arxiv.org/html/2212.03038)，§4.2/附录A.1 | 全局表征之外加入最近端点、时间差与运动线索。这里用海上跨源重叠/断段接续的真实局部token，保留全部候选；不搬视觉外观、层级图或硬排除不重叠边。 |
-| [Gekko](https://arxiv.org/html/2609.01530v1)，§3—4 Eq3/8 | self/cross恢复误差差值和停止梯度监督，改成有方向、逐query、四属性物理效用；推理不读reference，不用效用代替身份。 |
-| [MMoE作者页](https://research.google/pubs/modeling-task-relationships-in-multi-task-learning-with-multi-gate-mixture-of-experts/)（官方摘要）、[MTAN作者稿](https://arxiv.org/pdf/1803.10704) §3.1—3.2 | 共享表示、任务专属选择。这里将任务变为物理属性，信息源变为可变数量辅助片段，以身份和效用路由残差；没有复制固定专家库或多层图像mask，不称精确复现。 |
+| plain | 1 |
+| scalar-u | `eps+(1-eps)*sigmoid(s')*clip(mean_k(u_jk),0,1)` |
+| attribute-u | `eps+(1-eps)*sigmoid(s')*clip(u_jk,0,1)` |
+| learned-attribute | `eps+(1-eps)*sigmoid(s')*sigmoid(g_jk)` |
 
-海上近邻[Traj-PathFormer作者仓库](https://github.com/YongshuoLiu/Traj-PathFormer)已有跨源补全、时间查询、局部门控与物理预测，[PTFM](https://doi.org/10.3390/electronics14173461)已有已关联输入的门控/残差融合。候选差异在异步缺段下身份、实际时刻支撑与属性恢复效用的分工，不能称注意力、门控或残差在海上首次。来源借鉴不是迁移有效性的证据。
+后三臂共享身份概率和正floor，表中`eps=gate_floor=.001`；g与u同输入、同隐藏宽度、同四输出，g由物理任务直接训练。scalar与attribute只差是否分属性；plain→scalar同时改变身份和效用，不能独占归因u。
 
-新self＋摘要残差结构本身可能有收益，因此四臂全部采用同一新结构；scalar-u与attribute-u回答属性路由，learned-attribute用于排除普通门控/容量解释。新teacher生成自己的效用标签，不复用018旧标签冒充适配。没有加入零floor拒绝、额外风险头或额外完整self/cross双解码；更多模块归因等整体信号后考虑。
+效用标签来自同一冻结teacher在相同可见输入、query上的self/cross四属性误差，每方向用anchor自己的reference/mask，负辅助不伪造共同目标。误差为物理绝对残差除以T_core原生normalizer对应std，经度/航向取最短弧。
+
+令停止梯度的误差为e0/e1，监督残差`R=(e0-e1)-max(e0,epsilon)*u`，使用`SmoothL1(R,0)`，beta=1、epsilon=.001；每属性按有效监督数归一后四属性平均。负增益参与监督，只在推理路由clip效用；不对小分母直接做比值回归。新teacher生成自己的标签，不复用旧018标签。
+
+## 阶段训练、冻结与比较边界
+
+下表定义已实现训练语义；021原设计为teacher1000、utility200、四臂各300，后续teacher独立实验只运行第一阶段。表格不构成四臂恢复或新增训练预算。
+
+| 阶段 | 更新对象与信号 | 固定对象 |
+| --- | --- | --- |
+| teacher | input projection、encoder、支撑查询、query_pool、decoder、物理head、Wc、实际使用role embedding、基础/局部身份头及物理loss参数；所有采样pair双self恢复、正pair双向cross物理恢复、所有pair BCE | utility与普通门控 |
+| utility | 只训练utility_head；新teacher的self/cross增益监督 | 完整teacher、query_pool、物理loss参数、身份支路 |
+| 各臂adapt | 独立decoder、物理head、Wc、实际role embedding和物理loss参数；learned臂另训g；正pair双向物理恢复 | encoder、输入投影、支撑查询、query_pool、身份、utility及独立teacher |
+
+teacher的BCE系数缺省1；041设0仍计算并记录`identity_bce_raw`，实际贡献记于`loss_components.identity_bce`。self/cross、采样、物理分母与全局clip均保留，不能称self-only或身份关联臂。取消BCE同时影响共享梯度及全局clip，见[消融规格](../../specs/cooperative-decoder-ablations.md)。
+
+基础训练为Adam lr1e−4、clip1、batch64、FP32、单seed20，原scene-pair平衡采样与端点留出.25；阶段/各臂独立优化器，teacher阶段内不周期重置。后续utility/adapt沿原seed21/22；四臂共享初态、统计、采样序列及身份分数/阈值，不能串行继承前一臂。
+
+teacher固定端点，不按V选择更新数；原共享流程在teacher之后一次完整V按macro-F1选身份阈值，utility/adapt不再改变身份分支。独立teacher模式只做完整V补全，不进入身份选阈值。各臂固定终点评价，保留全人口、缺监督、共同有效点及来源/支撑/距离分层，预测分组与oracle分组分报。
+
+utility额外预训练与普通门控的学习机会不同，须披露成本，不称严格等总优化预算。旧018→v2同时改变结构、表示与训练量，不能把差值全归某模块；参数容量相同也不自动排除优化差异。
+
+默认六层v2实例曾实计2,190,735参数，比legacy 2,156,814增加33,921（约1.57%）；039不增参数、040裁层后另计，不能沿用此总数。实际实现为`association/{data,models,training,evaluation}/cooperative.py`，入口为`tools/experiments/cooperative_fit.py`。
+
+## 机制来源与证据限制
+
+以下继承已完成文献核读，不因整理重新检索。来源提供候选机制，尚不证明海上迁移有效或首次；当前贡献由具体任务适配与实证决定。
+
+| 来源与已读范围 | 借鉴及适配 |
+| --- | --- |
+| [GRU-D](https://arxiv.org/pdf/1606.01865)，§2—2.1 | 缺测/距观测时间，改为左右支撑条件化查询，不搬总体均值衰减假设 |
+| [CroCo](https://arxiv.org/html/2210.10716v1)，§3 Eq1—2、附录C.2 | self/cross恢复，改为真实时间、连续端点留出和四物理属性 |
+| [SUSHI](https://arxiv.org/html/2212.03038)，§4.2/附录A.1 | 全局表征加局部端点/时间证据，不搬视觉外观、层级图或硬排除边 |
+| [Gekko](https://arxiv.org/html/2609.01530v1)，§3—4 Eq3/8 | 停止梯度的self/cross误差差值，改为有方向、逐query/属性效用，推理不读reference |
+| [MMoE](https://research.google/pubs/modeling-task-relationships-in-multi-task-learning-with-multi-gate-mixture-of-experts/)（官方摘要）、[MTAN](https://arxiv.org/pdf/1803.10704) §3.1—3.2 | 共享表示与任务专属选择，改为可变辅助片段的物理属性路由，不复制固定专家库 |
+
+近邻[Traj-PathFormer](https://github.com/YongshuoLiu/Traj-PathFormer)已有跨源补全、时间查询与局部门控，[PTFM](https://doi.org/10.3390/electronics14173461)已有门控/残差融合，不能将这些算子称为海上首次。已有034/038证据仍显示学习动态不足；合成正确性检查不等于补全、关联或融合贡献成立。历史负结果见[摘要](../../history/README.md)。

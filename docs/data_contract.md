@@ -44,7 +44,7 @@
 
 另核11篇论文的取样、窗口、过滤与评价，见[MTAD原文协议对照](mtad_data_protocols.md)。短窗跨源关联、共同覆盖的已知关联融合、过滤短轨和全场所有碎片任务不能混为一谈；数量差异不能单独解释性能，论文筛选规则也不自动成为本项目的新清洗规则。
 
-复算来源：[007原manifest](https://github.com/HKillua/association-code/blob/612afea/HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json)、[既有逐场景元数据](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz)，两路独立复核一致，无新ZIP扫描/模型推理/测试量测。029仍在原4场景按已批范围做权重诊断，不因本发现取消或扩大；其结果不能证明全V或全MTAD代表性。后续正式重训若调整选择，先按组件、密度和时间支撑制定与模型分数无关的方案，披露已暴露数据并保留旧结果，用户确认后执行；不看效果后换验证集，也不撤销身份隔离求高分。
+复算来源：[007原manifest](https://github.com/HKillua/association-code/blob/612afea/HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json)、[既有逐场景元数据](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz)，两路独立复核一致，无新ZIP扫描/模型推理/测试量测。029已在原4场景完成权重诊断，其结果不能证明全V或全MTAD代表性。后续正式重训若调整选择，先按组件、密度和时间支撑制定与模型分数无关的方案，披露已暴露数据并保留旧结果，用户确认后执行；不看效果后换验证集，也不撤销身份隔离求高分。
 
 ## 已核人口与监督分母
 

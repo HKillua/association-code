@@ -1,7 +1,0 @@
-stopped_at_utc: 2026-10-19T06:54:24Z
-reason: user authorised stopping 021 and resubmitting on GPU1 because both 020 and 021 auto-selected GPU0 in the same second; contention threatened both caps and 021 gates 022-025
-user_words: 停掉 021 并重新提交到 GPU1
-pre_stop_progress: teacher update 25, 24 completed updates, elapsed 333.78 s, steady 7.55 s/step (first step 13.31 s was warm-up)
-systemd_after_stop: Result=exit-code ExecMainCode=1 ExecMainStatus=130 NRestarts=0 ActiveState=failed SubState=failed
-budget_note: 021 outer cap clock keeps running from the original 06:47:56Z submission; attempt-2 uses --max-seconds computed from ITS OWN start, so the server records both and does not claim extra budget
-worktree: ../association-code-run021 kept at detached 6168f29, clean, reused by attempt-2 so 022-025 references stay valid

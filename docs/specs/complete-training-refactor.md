@@ -46,6 +46,6 @@ checkpoint包括association/fusion/loss状态、阶段optimizer、sampler/RNG、
 
 ## 已完成验证与限制
 
-原生小型合成ZIP→显式reference→四阶段CPU更新→完整V评价/选定重载已通过；含dropout中断恢复、冻结/解冻、监督分母、无效输入、预算和RNG/模式隔离。独立审查及既有回归完成，历次软件记录可在Git历史与[CPU原日志](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/local_cpu_regression.log)追溯。当前整仓累计检查以[实现交接](../../HandOver/Handover.md)为准，不把历史304/347/371项当仍待完成的新工作。
+原生小型合成ZIP→显式reference→四阶段CPU更新→完整V评价/选定重载已通过；含dropout中断恢复、冻结/解冻、监督分母、无效输入、预算和RNG/模式隔离。独立审查及既有回归完成，历次软件记录可在Git历史与[CPU原日志](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/local_cpu_regression.log)追溯。历史检查记录不构成新的准备任务；软件验证与真实效果分开。
 
 013/014已有真实短训/独立终评证据，017是修正后开发训练，均不能据CPU通过声称完整论文训练成功。实际效果只据运行原件解释；本规格没有新的训练授权。
