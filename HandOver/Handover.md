@@ -8,6 +8,8 @@
 
 R2原生运动及关联衔接已经在本地CPU完整V完成，**无需服务器重跑**。OLS位置MAE8849.53→4737.59m；新增同评分全29008对关联F1 .61563→.72717，共用保持阈值也改善，但14场F1退化。见[原生运动](../docs/proposals/repair_before_retraining/native-motion-analysis.md)和[关联衔接](../docs/proposals/repair_before_retraining/motion-association-analysis.md)；普通离线控制，不是新训练、学习贡献或融合成绩。
 
+本地随后完成[补全锚点/局部趋势消融](../docs/proposals/repair_before_retraining/completion-motion-ablations-analysis.md)，零训练/完整V/退出0；两种修改均未改善补全，不替换原底座，不需服务器重跑。此结果不新增READY，042及原额度不变，补全下一训练尚未发布。
+
 ## 本轮结果
 
 | 任务 | 已核终态与研究含义 |
