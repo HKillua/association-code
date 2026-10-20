@@ -1,6 +1,6 @@
-# 033之后的独立TAM阶段（035准备）
+# 033之后的独立TAM阶段（035已批准）
 
-状态：**代码及配置准备，1000步GPU预算待用户确认，不构成开跑授权。**
+状态：**用户已明确“批准035，与034并行”，授权一次单卡1000步与完整V评价；按035交接READY领取。**
 
 问题：固定033的TCM4000端点，学习新的TAM，检验补全特征改善能否支持关联。此阶段没有TFM或JOINT，不能宣称完整TMTAFF已复现。补全缺陷分析与034候选独立进行。
 
@@ -10,7 +10,7 @@
 
 仅复制并冻结`input_embedding`、`tcm_encoder`、`tcm_decoder`及继承的`positions`缓冲。native时间编码是无参数函数，没有遗漏的时间投影；`positions`在native模式不使用，仍复制以保留状态。TAM按当前seed重新初始化，不载入源TAM、融合、optimizer、RNG、history、coverage或累计耗时。不恢复COMPLETED033，也不恢复FAILED020。真正中断的新TAM轮次仍沿用原INTERRUPTED恢复约定和同配置检查。
 
-草案配置：[`configs/tmtaff-tam-035.json`](../../configs/tmtaff-tam-035.json)，TAM1000，其他阶段0；seed20、lr0.002/constant、Adam参数、batch/microbatch、全候选pair、正负平衡采样及T_core负例中位数margin校准均沿用020。每100步用完整V做原macro-F1阈值扫描与最优快照选择。预计约5–7小时，8小时仅提醒，不自动停止、加步或重试。固定T_core512/V64、cap128/Q64、20秒单位与offset/gap/mask；T_test封存。
+固定配置：[`configs/tmtaff-tam-035.json`](../../configs/tmtaff-tam-035.json)，TAM1000，其他阶段0；seed20、lr0.002/constant、Adam参数、batch/microbatch、全候选pair、正负平衡采样及T_core负例中位数margin校准均沿用020。每100步用完整V做原macro-F1阈值扫描与最优快照选择。预计约5–7小时，8小时仅提醒，不自动停止、加步或重试。固定T_core512/V64、cap128/Q64、20秒单位与offset/gap/mask；T_test封存。
 
 ## 输出与比较
 

@@ -39,4 +39,4 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 
 候选新可选`model.heading_output_policy=observation_residual`保留anchor可见航向底座并学习圆周修正；默认`learned_absolute`保持。新头需要新训练，不能将032旧权重静默改公式。用户已单独批准[034](../../HandOver/L2S-20261020-034.md)一次1000步及完整V评价；033已完成，不重启；CPU验收不代表实际效果。
 
-`tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。当前[035草案](../../HandOver/L2S-20261020-035.md)1000步的新预算待批准，接口本身不授权执行，详见[规格](../../docs/specs/tmtaff-tam-phase.md)。
+`tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。用户已批准[035](../../HandOver/L2S-20261020-035.md)一次1000步及完整V评价，可与034并行，按当前索引READY领取，详见[规格](../../docs/specs/tmtaff-tam-phase.md)。
