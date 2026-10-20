@@ -1,4 +1,4 @@
-# 033之后的独立TAM阶段（035已批准）
+# 033之后的独立TAM阶段与047训练策略修复
 
 状态：**035已完成并复核，原授权一次1000步已用完，不重领。** 结果见[035分析](../proposals/repair_before_retraining/035-analysis.md)，下文保留已执行规格。
 
@@ -29,3 +29,13 @@
 | 非COMPLETED源、不同数据契约、跨phase混用被拒绝 | 在目标目录创建前拒绝；CLI无源/多源参数拒绝 |
 
 检查入口：`.venv/bin/python -m unittest tests.integration.test_tcm_fit_cli tests.training.test_complete_training tests.training.test_complete_snapshot`。CPU检查只验证执行语义，真实MTAD关联收益待已批准服务器实验。
+
+## 047：TAM专属dropout修复（待真实实验）
+
+042同输入诊断已完成，依据见[042分析](../proposals/repair_before_retraining/042-analysis.md)。[047配置](../../configs/tmtaff-tam-no-dropout-047.json)相对035只新增`model.tam_dropout=0`；缺省None继承公共dropout，旧配置/权重行为不变。该参数覆盖TAM各层nn.Dropout和MultiheadAttention.dropout，以及CE output_dropout；CL实际不使用CE head。TCM/TFM仍使用各自原dropout，不能改全局dropout冒充只改TAM。
+
+TCM-only转移只豁免TAM专属dropout差异，补全架构、表示、公共dropout、normalizer、数据及其余约束仍严格核对；target TAM独立初始化，不读035权重。相同种子下参数初值/RNG状态相同；训练移除随机mask后的torch RNG经历不同，scene/pair sampler仍用独立NumPy原种子。INTERRUPTED恢复必须保留同一语义，不能边恢复边切dropout；旧checkpoint缺字段按None兼容。selected/final加载保留新参数。
+
+原margin校准规则和4096个T_core展示不变，报告新增实际TAM dropout；移除随机性后margin数值自然重新得到，不强沿用75.26。正d、负hinge²的尺度改变还会改变两类对距离的损失导数平衡（不等于直接测到参数梯度），因此不能按原始loss简单排名或宣称完全隔离了数值margin。每步`history.tam_train_batch`保存同一次前向的正负均距、两类含0.5系数的CL类内均值、负例margin内比例、两类count及有效margin；无新增前向、随机数消费或loss改动。
+
+047仍一次TAM1000、每100完整V与原macro-F1选模/全分数保存，无TCM/TFM/JOINT更新；具体范围、8小时提醒及回传在[047交接](../../HandOver/L2S-20261021-047.md)。参数更新/转移/精确恢复等本地检查及独立审查通过，不等于真实关联改善；无dropout也不保证不同设备/fastpath逐位相同。若确定性距离仍近零或完整V未改善，再据分项诊断定位下一因素，不自动加训或改loss。

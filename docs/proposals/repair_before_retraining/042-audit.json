@@ -1,0 +1,898 @@
+{
+  "scope": "Four fixed scenes, 32 unique selected pairs, MC8; not full-V performance, a training replay, or an estimate of independent sample size.",
+  "loss_formula": "0.5*y*d + 0.5*(1-y)*max(m-d,0)^2; balanced = 0.5*mean(positive term) + 0.5*mean(negative term)",
+  "numeric_policy": "All independent arithmetic uses float64 on returned float32 distances. Source loss reporting used float32 and can differ by rounding.",
+  "effective_margin": 75.2613410949707,
+  "original_distance_acceptance_threshold": 2.635511918924749e-05,
+  "restricted_equal_distance_comparator": {
+    "formula": "min over d>=0 of 0.25*(d+max(m-d,0)^2)",
+    "optimal_distance": 74.7613410949707,
+    "optimal_balanced_loss": 18.752835273742676,
+    "scope": "Only the hypothetical identical fixed distance for both classes; not a global model lower bound or a proved dropout noise floor."
+  },
+  "metadata_checks": {
+    "completed_zero_update": true,
+    "source_selected_update_600": true,
+    "reported_restoration_all_true": true,
+    "reported_no_reference_or_test": true,
+    "reported_no_reselection": true
+  },
+  "partitions": {
+    "T_core": {
+      "scene_ids": [
+        "2606",
+        "1622"
+      ],
+      "unique_pairs": 16,
+      "positive_unique_pairs": 8,
+      "negative_unique_pairs": 8,
+      "modes": {
+        "eval": {
+          "positive_distance": {
+            "presentations": 64,
+            "mean": 1.991846329474356e-05,
+            "std_population": 2.9390945313410245e-06,
+            "min": 1.664802221057471e-05,
+            "median": 1.916805013024714e-05,
+            "p95": 2.700957702472806e-05,
+            "max": 2.700957702472806e-05
+          },
+          "negative_distance": {
+            "presentations": 64,
+            "mean": 7.239327760544256e-05,
+            "std_population": 1.7386449903070818e-05,
+            "min": 4.4415170123102143e-05,
+            "median": 7.31628097128123e-05,
+            "p95": 9.317316289525479e-05,
+            "max": 9.317316289525479e-05
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 144,
+            "mean": 0.0,
+            "std_population": 0.0,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "cross_track_variance": {
+            "presentations": 16,
+            "mean": 1.83656862075929e-13,
+            "std_population": 2.6043739307135734e-14,
+            "min": 1.5761312276879327e-13,
+            "median": 1.83656862075929e-13,
+            "p95": 2.0970060138306474e-13,
+            "max": 2.0970060138306474e-13,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.275142443519453,
+          "positive_over_same_track_noise_mean": null,
+          "negative_over_same_track_noise_mean": null,
+          "positive_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 9.95923164737178e-06,
+            "std_population": 1.4695472656705122e-06,
+            "min": 8.324011105287354e-06,
+            "median": 9.58402506512357e-06,
+            "p95": 1.350478851236403e-05,
+            "max": 1.350478851236403e-05
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 2832.1292832943755,
+            "std_population": 0.001308526312427117,
+            "min": 2832.12771937391,
+            "median": 2832.1292253782995,
+            "p95": 2832.1313889624807,
+            "max": 2832.1313889624807
+          },
+          "positive_balanced_loss_contribution": 4.97961582368589e-06,
+          "negative_balanced_loss_contribution": 1416.0646416471877,
+          "balanced_loss_float64": 1416.0646466268036,
+          "balanced_loss_over_restricted_equal_distance_optimum": 75.51202929882008,
+          "negative_inside_margin_numerator": 64,
+          "negative_inside_margin_denominator_presentations": 64,
+          "negative_inside_margin_fraction": 1.0,
+          "per_repeat_auc_selected_pairs": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "per_pair_repeat_std_mean": 0.0
+        },
+        "train": {
+          "positive_distance": {
+            "presentations": 64,
+            "mean": 76.7569385766983,
+            "std_population": 0.8232674653055838,
+            "min": 74.37726593017578,
+            "median": 76.70341491699219,
+            "p95": 78.049564743042,
+            "max": 78.78388214111328
+          },
+          "negative_distance": {
+            "presentations": 64,
+            "mean": 76.62569642066956,
+            "std_population": 0.9080525203347972,
+            "min": 75.2037124633789,
+            "median": 76.41172790527344,
+            "p95": 78.42365875244141,
+            "max": 78.98696899414062
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 144,
+            "mean": 76.51692056655884,
+            "std_population": 0.9578538960736739,
+            "min": 73.80110168457031,
+            "median": 76.66305541992188,
+            "p95": 77.75738716125488,
+            "max": 78.93685150146484
+          },
+          "cross_track_variance": {
+            "presentations": 16,
+            "mean": 0.3177683355840799,
+            "std_population": 0.0027714921790320695,
+            "min": 0.31442214053135276,
+            "median": 0.31797169257614577,
+            "p95": 0.321645715793154,
+            "max": 0.3247667628645805,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 1.0017127695036954,
+          "positive_over_same_track_noise_mean": 1.0031367965198061,
+          "negative_over_same_track_noise_mean": 1.0014215921564185,
+          "positive_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 38.37846928834915,
+            "std_population": 0.4116337326527919,
+            "min": 37.18863296508789,
+            "median": 38.351707458496094,
+            "p95": 39.024782371521,
+            "max": 39.39194107055664
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 2.594577483705507e-05,
+            "std_population": 0.00020593820337517536,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0016605295895715244
+          },
+          "positive_balanced_loss_contribution": 19.189234644174576,
+          "negative_balanced_loss_contribution": 1.2972887418527534e-05,
+          "balanced_loss_float64": 19.189247617061994,
+          "balanced_loss_over_restricted_equal_distance_optimum": 1.0232718059402128,
+          "negative_inside_margin_numerator": 1,
+          "negative_inside_margin_denominator_presentations": 64,
+          "negative_inside_margin_fraction": 0.015625,
+          "per_repeat_auc_selected_pairs": [
+            0.359375,
+            0.328125,
+            0.640625,
+            0.296875,
+            0.40625,
+            0.46875,
+            0.65625,
+            0.15625
+          ],
+          "per_pair_repeat_std_mean": 0.7997525813118138
+        },
+        "train_all_dropout_zero": {
+          "positive_distance": {
+            "presentations": 64,
+            "mean": 1.991846329474356e-05,
+            "std_population": 2.9390945313410245e-06,
+            "min": 1.664802221057471e-05,
+            "median": 1.916805013024714e-05,
+            "p95": 2.700957702472806e-05,
+            "max": 2.700957702472806e-05
+          },
+          "negative_distance": {
+            "presentations": 64,
+            "mean": 7.239327760544256e-05,
+            "std_population": 1.7386449903070818e-05,
+            "min": 4.4415170123102143e-05,
+            "median": 7.31628097128123e-05,
+            "p95": 9.317316289525479e-05,
+            "max": 9.317316289525479e-05
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 144,
+            "mean": 0.0,
+            "std_population": 0.0,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "cross_track_variance": {
+            "presentations": 16,
+            "mean": 1.83656862075929e-13,
+            "std_population": 2.6043739307135734e-14,
+            "min": 1.5761312276879327e-13,
+            "median": 1.83656862075929e-13,
+            "p95": 2.0970060138306474e-13,
+            "max": 2.0970060138306474e-13,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.275142443519453,
+          "positive_over_same_track_noise_mean": null,
+          "negative_over_same_track_noise_mean": null,
+          "positive_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 9.95923164737178e-06,
+            "std_population": 1.4695472656705122e-06,
+            "min": 8.324011105287354e-06,
+            "median": 9.58402506512357e-06,
+            "p95": 1.350478851236403e-05,
+            "max": 1.350478851236403e-05
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 2832.1292832943755,
+            "std_population": 0.001308526312427117,
+            "min": 2832.12771937391,
+            "median": 2832.1292253782995,
+            "p95": 2832.1313889624807,
+            "max": 2832.1313889624807
+          },
+          "positive_balanced_loss_contribution": 4.97961582368589e-06,
+          "negative_balanced_loss_contribution": 1416.0646416471877,
+          "balanced_loss_float64": 1416.0646466268036,
+          "balanced_loss_over_restricted_equal_distance_optimum": 75.51202929882008,
+          "negative_inside_margin_numerator": 64,
+          "negative_inside_margin_denominator_presentations": 64,
+          "negative_inside_margin_fraction": 1.0,
+          "per_repeat_auc_selected_pairs": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0
+          ],
+          "per_pair_repeat_std_mean": 0.0
+        }
+      },
+      "fastpath": {
+        "max_absolute_distance_difference": 2.14177998714149e-06,
+        "max_relative_to_controlled_distance": 0.1116602113097329,
+        "auc_controlled": 1.0,
+        "auc_default_fastpath": 1.0,
+        "changed_pair_order_comparisons": 7,
+        "pair_order_comparison_denominator": 120,
+        "original_threshold_flips": 0,
+        "controlled_original_threshold_confusion": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 1,
+          "tn": 8
+        },
+        "fastpath_original_threshold_confusion": {
+          "tp": 7,
+          "fp": 0,
+          "fn": 1,
+          "tn": 8
+        },
+        "scope": "Only selected pair scores, no inference or threshold reselection. Small absolute changes can change near-zero score rankings."
+      },
+      "train_vs_eval": {
+        "positive_mean_distance_ratio": 3853557.2469064062,
+        "negative_mean_distance_ratio": 1058464.2518645793,
+        "mean_reported_cross_variance_ratio": 1730228492375.664
+      }
+    },
+    "V_select": {
+      "scene_ids": [
+        "1671",
+        "2056"
+      ],
+      "unique_pairs": 16,
+      "positive_unique_pairs": 8,
+      "negative_unique_pairs": 8,
+      "modes": {
+        "eval": {
+          "positive_distance": {
+            "presentations": 64,
+            "mean": 1.9361422118890914e-05,
+            "std_population": 7.916646115157532e-07,
+            "min": 1.8288859791937284e-05,
+            "median": 1.9231240003136918e-05,
+            "p95": 2.0451318050618283e-05,
+            "max": 2.0451318050618283e-05
+          },
+          "negative_distance": {
+            "presentations": 64,
+            "mean": 4.0986585645441664e-05,
+            "std_population": 4.2449136512561746e-05,
+            "min": 1.7139283954747953e-05,
+            "median": 2.5119738893408794e-05,
+            "p95": 0.0001520629448350519,
+            "max": 0.0001520629448350519
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 144,
+            "mean": 0.0,
+            "std_population": 0.0,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "cross_track_variance": {
+            "presentations": 16,
+            "mean": 1.689727321270267e-13,
+            "std_population": 1.4148373621782848e-13,
+            "min": 2.7488995909198215e-14,
+            "median": 1.689727321270267e-13,
+            "p95": 3.104564683448552e-13,
+            "max": 3.104564683448552e-13,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.472384362200324,
+          "positive_over_same_track_noise_mean": null,
+          "negative_over_same_track_noise_mean": null,
+          "positive_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 9.680711059445457e-06,
+            "std_population": 3.958323057578766e-07,
+            "min": 9.144429895968642e-06,
+            "median": 9.615620001568459e-06,
+            "p95": 1.0225659025309142e-05,
+            "max": 1.0225659025309142e-05
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 2832.131647003101,
+            "std_population": 0.0031947752459585985,
+            "min": 2832.1232872571654,
+            "median": 2832.1328411618415,
+            "p95": 2832.133441781414,
+            "max": 2832.133441781414
+          },
+          "positive_balanced_loss_contribution": 4.8403555297227285e-06,
+          "negative_balanced_loss_contribution": 1416.0658235015508,
+          "balanced_loss_float64": 1416.0658283419064,
+          "balanced_loss_over_restricted_equal_distance_optimum": 75.51209231409673,
+          "negative_inside_margin_numerator": 64,
+          "negative_inside_margin_denominator_presentations": 64,
+          "negative_inside_margin_fraction": 1.0,
+          "per_repeat_auc_selected_pairs": [
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875
+          ],
+          "per_pair_repeat_std_mean": 0.0
+        },
+        "train": {
+          "positive_distance": {
+            "presentations": 64,
+            "mean": 76.75769698619843,
+            "std_population": 1.147814412563909,
+            "min": 73.16387939453125,
+            "median": 76.86164474487305,
+            "p95": 78.71941604614257,
+            "max": 79.33415985107422
+          },
+          "negative_distance": {
+            "presentations": 64,
+            "mean": 76.78342032432556,
+            "std_population": 1.172345125827222,
+            "min": 74.0808334350586,
+            "median": 76.71950149536133,
+            "p95": 78.67374458312989,
+            "max": 78.92266845703125
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 144,
+            "mean": 76.62445916069879,
+            "std_population": 0.9458440800203124,
+            "min": 73.58491516113281,
+            "median": 76.67575073242188,
+            "p95": 78.072993850708,
+            "max": 79.16056060791016
+          },
+          "cross_track_variance": {
+            "presentations": 16,
+            "mean": 0.31971709177445806,
+            "std_population": 0.0019670632143999325,
+            "min": 0.3167861148031484,
+            "median": 0.3194518219401493,
+            "p95": 0.3226023066414,
+            "max": 0.3242933955905982,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.9996649883787609,
+          "positive_over_same_track_noise_mean": 1.001738841969771,
+          "negative_over_same_track_noise_mean": 1.0020745485888962,
+          "positive_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 38.37884849309921,
+            "std_population": 0.5739072062819545,
+            "min": 36.581939697265625,
+            "median": 38.43082237243652,
+            "p95": 39.359708023071285,
+            "max": 39.66707992553711
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 0.02302610236245073,
+            "std_population": 0.09942049840211789,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.16225951552769313,
+            "max": 0.6967991675555822
+          },
+          "positive_balanced_loss_contribution": 19.189424246549606,
+          "negative_balanced_loss_contribution": 0.011513051181225364,
+          "balanced_loss_float64": 19.20093729773083,
+          "balanced_loss_over_restricted_equal_distance_optimum": 1.0238951613154508,
+          "negative_inside_margin_numerator": 7,
+          "negative_inside_margin_denominator_presentations": 64,
+          "negative_inside_margin_fraction": 0.109375,
+          "per_repeat_auc_selected_pairs": [
+            0.546875,
+            0.4375,
+            0.578125,
+            0.265625,
+            0.609375,
+            0.546875,
+            0.53125,
+            0.6875
+          ],
+          "per_pair_repeat_std_mean": 1.0934424030362544
+        },
+        "train_all_dropout_zero": {
+          "positive_distance": {
+            "presentations": 64,
+            "mean": 1.9361422118890914e-05,
+            "std_population": 7.916646115157532e-07,
+            "min": 1.8288859791937284e-05,
+            "median": 1.9231240003136918e-05,
+            "p95": 2.0451318050618283e-05,
+            "max": 2.0451318050618283e-05
+          },
+          "negative_distance": {
+            "presentations": 64,
+            "mean": 4.0986585645441664e-05,
+            "std_population": 4.2449136512561746e-05,
+            "min": 1.7139283954747953e-05,
+            "median": 2.5119738893408794e-05,
+            "p95": 0.0001520629448350519,
+            "max": 0.0001520629448350519
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 144,
+            "mean": 0.0,
+            "std_population": 0.0,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "cross_track_variance": {
+            "presentations": 16,
+            "mean": 1.689727321270267e-13,
+            "std_population": 1.4148373621782848e-13,
+            "min": 2.7488995909198215e-14,
+            "median": 1.689727321270267e-13,
+            "p95": 3.104564683448552e-13,
+            "max": 3.104564683448552e-13,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.472384362200324,
+          "positive_over_same_track_noise_mean": null,
+          "negative_over_same_track_noise_mean": null,
+          "positive_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 9.680711059445457e-06,
+            "std_population": 3.958323057578766e-07,
+            "min": 9.144429895968642e-06,
+            "median": 9.615620001568459e-06,
+            "p95": 1.0225659025309142e-05,
+            "max": 1.0225659025309142e-05
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 64,
+            "mean": 2832.131647003101,
+            "std_population": 0.0031947752459585985,
+            "min": 2832.1232872571654,
+            "median": 2832.1328411618415,
+            "p95": 2832.133441781414,
+            "max": 2832.133441781414
+          },
+          "positive_balanced_loss_contribution": 4.8403555297227285e-06,
+          "negative_balanced_loss_contribution": 1416.0658235015508,
+          "balanced_loss_float64": 1416.0658283419064,
+          "balanced_loss_over_restricted_equal_distance_optimum": 75.51209231409673,
+          "negative_inside_margin_numerator": 64,
+          "negative_inside_margin_denominator_presentations": 64,
+          "negative_inside_margin_fraction": 1.0,
+          "per_repeat_auc_selected_pairs": [
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875,
+            0.796875
+          ],
+          "per_pair_repeat_std_mean": 0.0
+        }
+      },
+      "fastpath": {
+        "max_absolute_distance_difference": 2.5239296519430354e-06,
+        "max_relative_to_controlled_distance": 0.14725992396221735,
+        "auc_controlled": 0.796875,
+        "auc_default_fastpath": 0.875,
+        "changed_pair_order_comparisons": 14,
+        "pair_order_comparison_denominator": 120,
+        "original_threshold_flips": 0,
+        "controlled_original_threshold_confusion": {
+          "tp": 8,
+          "fp": 5,
+          "fn": 0,
+          "tn": 3
+        },
+        "fastpath_original_threshold_confusion": {
+          "tp": 8,
+          "fp": 5,
+          "fn": 0,
+          "tn": 3
+        },
+        "scope": "Only selected pair scores, no inference or threshold reselection. Small absolute changes can change near-zero score rankings."
+      },
+      "train_vs_eval": {
+        "positive_mean_distance_ratio": 3964465.859731762,
+        "negative_mean_distance_ratio": 1873379.280444285,
+        "mean_reported_cross_variance_ratio": 1892122401939.4324
+      }
+    },
+    "combined": {
+      "scene_ids": [
+        "2606",
+        "1622",
+        "1671",
+        "2056"
+      ],
+      "unique_pairs": 32,
+      "positive_unique_pairs": 16,
+      "negative_unique_pairs": 16,
+      "modes": {
+        "eval": {
+          "positive_distance": {
+            "presentations": 128,
+            "mean": 1.9639942706817237e-05,
+            "std_population": 2.1702715218472952e-06,
+            "min": 1.664802221057471e-05,
+            "median": 1.916805013024714e-05,
+            "p95": 2.700957702472806e-05,
+            "max": 2.700957702472806e-05
+          },
+          "negative_distance": {
+            "presentations": 128,
+            "mean": 5.6689931625442114e-05,
+            "std_population": 3.603753585381003e-05,
+            "min": 1.7139283954747953e-05,
+            "median": 4.910608004138339e-05,
+            "p95": 0.0001520629448350519,
+            "max": 0.0001520629448350519
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 288,
+            "mean": 0.0,
+            "std_population": 0.0,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "cross_track_variance": {
+            "presentations": 32,
+            "mean": 1.7631479710147785e-13,
+            "std_population": 1.0198954801211798e-13,
+            "min": 2.7488995909198215e-14,
+            "median": 1.83656862075929e-13,
+            "p95": 3.104564683448552e-13,
+            "max": 3.104564683448552e-13,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.3464449884431144,
+          "positive_over_same_track_noise_mean": null,
+          "negative_over_same_track_noise_mean": null,
+          "positive_conditional_cl_term": {
+            "presentations": 128,
+            "mean": 9.819971353408619e-06,
+            "std_population": 1.0851357609236476e-06,
+            "min": 8.324011105287354e-06,
+            "median": 9.58402506512357e-06,
+            "p95": 1.350478851236403e-05,
+            "max": 1.350478851236403e-05
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 128,
+            "mean": 2832.1304651487385,
+            "std_population": 0.0027122305813145364,
+            "min": 2832.1232872571654,
+            "median": 2832.13103591854,
+            "p95": 2832.133441781414,
+            "max": 2832.133441781414
+          },
+          "positive_balanced_loss_contribution": 4.909985676704309e-06,
+          "negative_balanced_loss_contribution": 1416.065232574369,
+          "balanced_loss_float64": 1416.0652374843546,
+          "balanced_loss_over_restricted_equal_distance_optimum": 75.51206080645838,
+          "negative_inside_margin_numerator": 128,
+          "negative_inside_margin_denominator_presentations": 128,
+          "negative_inside_margin_fraction": 1.0,
+          "per_repeat_auc_selected_pairs": [
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875
+          ],
+          "per_pair_repeat_std_mean": 0.0
+        },
+        "train": {
+          "positive_distance": {
+            "presentations": 128,
+            "mean": 76.75731778144836,
+            "std_population": 0.9988111765275248,
+            "min": 73.16387939453125,
+            "median": 76.7996597290039,
+            "p95": 78.33322563171386,
+            "max": 79.33415985107422
+          },
+          "negative_distance": {
+            "presentations": 128,
+            "mean": 76.70455837249756,
+            "std_population": 1.051520539178733,
+            "min": 74.0808334350586,
+            "median": 76.57242584228516,
+            "p95": 78.50925254821777,
+            "max": 78.98696899414062
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 288,
+            "mean": 76.57068986362881,
+            "std_population": 0.9533853849697366,
+            "min": 73.58491516113281,
+            "median": 76.6645278930664,
+            "p95": 77.98714332580566,
+            "max": 79.16056060791016
+          },
+          "cross_track_variance": {
+            "presentations": 32,
+            "mean": 0.318742713679269,
+            "std_population": 0.0025931960909898293,
+            "min": 0.31442214053135276,
+            "median": 0.31858200976938067,
+            "p95": 0.32305326369451953,
+            "max": 0.3247667628645805,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 1.0006878262527057,
+          "positive_over_same_track_noise_mean": 1.0024373284105437,
+          "negative_over_same_track_noise_mean": 1.0017482996314537,
+          "positive_conditional_cl_term": {
+            "presentations": 128,
+            "mean": 38.37865889072418,
+            "std_population": 0.4994055882637624,
+            "min": 36.581939697265625,
+            "median": 38.39982986450195,
+            "p95": 39.16661281585693,
+            "max": 39.66707992553711
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 128,
+            "mean": 0.011526024068643892,
+            "std_population": 0.07123545997112853,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0070301733721861845,
+            "max": 0.6967991675555822
+          },
+          "positive_balanced_loss_contribution": 19.18932944536209,
+          "negative_balanced_loss_contribution": 0.005763012034321946,
+          "balanced_loss_float64": 19.195092457396413,
+          "balanced_loss_over_restricted_equal_distance_optimum": 1.023583483627832,
+          "negative_inside_margin_numerator": 8,
+          "negative_inside_margin_denominator_presentations": 128,
+          "negative_inside_margin_fraction": 0.0625,
+          "per_repeat_auc_selected_pairs": [
+            0.453125,
+            0.390625,
+            0.62109375,
+            0.27734375,
+            0.51953125,
+            0.49609375,
+            0.5703125,
+            0.375
+          ],
+          "per_pair_repeat_std_mean": 0.9465974921740342
+        },
+        "train_all_dropout_zero": {
+          "positive_distance": {
+            "presentations": 128,
+            "mean": 1.9639942706817237e-05,
+            "std_population": 2.1702715218472952e-06,
+            "min": 1.664802221057471e-05,
+            "median": 1.916805013024714e-05,
+            "p95": 2.700957702472806e-05,
+            "max": 2.700957702472806e-05
+          },
+          "negative_distance": {
+            "presentations": 128,
+            "mean": 5.6689931625442114e-05,
+            "std_population": 3.603753585381003e-05,
+            "min": 1.7139283954747953e-05,
+            "median": 4.910608004138339e-05,
+            "p95": 0.0001520629448350519,
+            "max": 0.0001520629448350519
+          },
+          "same_track_independent_forward_distance": {
+            "presentations": 288,
+            "mean": 0.0,
+            "std_population": 0.0,
+            "min": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "max": 0.0
+          },
+          "cross_track_variance": {
+            "presentations": 32,
+            "mean": 1.7631479710147785e-13,
+            "std_population": 1.0198954801211798e-13,
+            "min": 2.7488995909198215e-14,
+            "median": 1.83656862075929e-13,
+            "p95": 3.104564683448552e-13,
+            "max": 3.104564683448552e-13,
+            "provenance": "Aggregate of returned per-repeat mean coordinate variances, equal sample/repeat weights; raw embeddings unavailable."
+          },
+          "positive_over_negative_mean_distance": 0.3464449884431144,
+          "positive_over_same_track_noise_mean": null,
+          "negative_over_same_track_noise_mean": null,
+          "positive_conditional_cl_term": {
+            "presentations": 128,
+            "mean": 9.819971353408619e-06,
+            "std_population": 1.0851357609236476e-06,
+            "min": 8.324011105287354e-06,
+            "median": 9.58402506512357e-06,
+            "p95": 1.350478851236403e-05,
+            "max": 1.350478851236403e-05
+          },
+          "negative_conditional_cl_term": {
+            "presentations": 128,
+            "mean": 2832.1304651487385,
+            "std_population": 0.0027122305813145364,
+            "min": 2832.1232872571654,
+            "median": 2832.13103591854,
+            "p95": 2832.133441781414,
+            "max": 2832.133441781414
+          },
+          "positive_balanced_loss_contribution": 4.909985676704309e-06,
+          "negative_balanced_loss_contribution": 1416.065232574369,
+          "balanced_loss_float64": 1416.0652374843546,
+          "balanced_loss_over_restricted_equal_distance_optimum": 75.51206080645838,
+          "negative_inside_margin_numerator": 128,
+          "negative_inside_margin_denominator_presentations": 128,
+          "negative_inside_margin_fraction": 1.0,
+          "per_repeat_auc_selected_pairs": [
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875,
+            0.88671875
+          ],
+          "per_pair_repeat_std_mean": 0.0
+        }
+      },
+      "fastpath": {
+        "max_absolute_distance_difference": 2.5239296519430354e-06,
+        "max_relative_to_controlled_distance": 0.14725992396221735,
+        "auc_controlled": 0.88671875,
+        "auc_default_fastpath": 0.9375,
+        "changed_pair_order_comparisons": 41,
+        "pair_order_comparison_denominator": 496,
+        "original_threshold_flips": 0,
+        "controlled_original_threshold_confusion": {
+          "tp": 15,
+          "fp": 5,
+          "fn": 1,
+          "tn": 11
+        },
+        "fastpath_original_threshold_confusion": {
+          "tp": 15,
+          "fp": 5,
+          "fn": 1,
+          "tn": 11
+        },
+        "scope": "Only selected pair scores, no inference or threshold reselection. Small absolute changes can change near-zero score rankings."
+      },
+      "train_vs_eval": {
+        "positive_mean_distance_ratio": 3908225.137276244,
+        "negative_mean_distance_ratio": 1353054.3462160924,
+        "mean_reported_cross_variance_ratio": 1807804670505.4304
+      }
+    }
+  },
+  "per_sample": [
+    {
+      "sample_index": 0,
+      "split": "T_core",
+      "scene_id": "2606",
+      "unique_pair_count": 8,
+      "node_occurrence_count": 9,
+      "eval_identical_across_repeats": true,
+      "eval_equals_train_dropout_zero": true,
+      "max_absolute_eval_vs_train_zero_difference": 0.0,
+      "train_all_presentation_std": 0.8675134896096158,
+      "train_per_pair_repeat_std_mean": 0.8037703695689541,
+      "train_per_repeat_pair_mean_std": 0.5908029991834031
+    },
+    {
+      "sample_index": 1,
+      "split": "T_core",
+      "scene_id": "1622",
+      "unique_pair_count": 8,
+      "node_occurrence_count": 9,
+      "eval_identical_across_repeats": true,
+      "eval_equals_train_dropout_zero": true,
+      "max_absolute_eval_vs_train_zero_difference": 0.0,
+      "train_all_presentation_std": 0.8693384069411773,
+      "train_per_pair_repeat_std_mean": 0.7957347930546737,
+      "train_per_repeat_pair_mean_std": 0.5551786540839624
+    },
+    {
+      "sample_index": 2,
+      "split": "V_select",
+      "scene_id": "1671",
+      "unique_pair_count": 8,
+      "node_occurrence_count": 9,
+      "eval_identical_across_repeats": true,
+      "eval_equals_train_dropout_zero": true,
+      "max_absolute_eval_vs_train_zero_difference": 0.0,
+      "train_all_presentation_std": 0.9493371031885688,
+      "train_per_pair_repeat_std_mean": 0.8890138462000751,
+      "train_per_repeat_pair_mean_std": 0.5162010647453312
+    },
+    {
+      "sample_index": 3,
+      "split": "V_select",
+      "scene_id": "2056",
+      "unique_pair_count": 8,
+      "node_occurrence_count": 9,
+      "eval_identical_across_repeats": true,
+      "eval_equals_train_dropout_zero": true,
+      "max_absolute_eval_vs_train_zero_difference": 0.0,
+      "train_all_presentation_std": 1.332139917566716,
+      "train_per_pair_repeat_std_mean": 1.297870959872434,
+      "train_per_repeat_pair_mean_std": 1.1517063926687694
+    }
+  ],
+  "source_summary_crosschecks": {
+    "max_raw_distance_or_noise_mean_difference": 0.0,
+    "max_float64_loss_difference_from_source_float32": 0.00019350180355104385
+  }
+}

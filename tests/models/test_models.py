@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 
 import torch
 
@@ -89,6 +90,36 @@ class AssociationModelTests(unittest.TestCase):
         zero_scores = model.score_pairs(embeddings, torch.tensor([[0, 1]]))
         model.association_loss(zero_scores, torch.tensor([1.])).backward()
         self.assertTrue(torch.isfinite(embeddings.grad).all())
+
+    def test_tam_only_dropout_keeps_initial_weights_rng_and_completion_unchanged(self):
+        config = replace(self.config, dropout=.35)
+        torch.manual_seed(20)
+        original = AssociationModel(config, 'contrastive')
+        original_rng = torch.get_rng_state().clone()
+        torch.manual_seed(20)
+        changed = AssociationModel(replace(config, tam_dropout=0.), 'contrastive')
+        self.assertTrue(torch.equal(original_rng, torch.get_rng_state()))
+        for key, value in original.state_dict().items():
+            torch.testing.assert_close(value, changed.state_dict()[key], rtol=0, atol=0)
+        for root, expected in ((changed.tcm_encoder, .35), (changed.tcm_decoder, .35),
+                               (changed.tam_encoder, 0.)):
+            for module in root.modules():
+                if isinstance(module, torch.nn.Dropout):
+                    self.assertEqual(module.p, expected)
+                if isinstance(module, torch.nn.MultiheadAttention):
+                    self.assertEqual(module.dropout, expected)
+        self.assertEqual(changed.output_dropout.p, 0.)
+        original.eval()
+        changed.eval()
+        complete = changed.complete(self.values, self.observed).detach()
+        torch.testing.assert_close(complete, original.complete(self.values, self.observed), rtol=0, atol=0)
+        expected = changed.tam_encoder(complete)
+        changed.set_completion_trainable(False)
+        changed.train()
+        self.assertFalse(changed.tcm_encoder.training)
+        self.assertFalse(changed.tcm_decoder.training)
+        torch.testing.assert_close(changed.tam_encoder(complete), expected, rtol=0, atol=0)
+        self.assertEqual(ModelConfig().effective_tam_dropout, ModelConfig().dropout)
 
 
     def test_track_encoding_is_independent_of_batch_neighbors_and_order(self):

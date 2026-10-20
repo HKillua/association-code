@@ -25,6 +25,9 @@ class ModelConfig:
     margin: float = 1.0
     contrastive_positive_power: int = 1
     heading_representation: str = "linear_zscore"
+    # None preserves the historical shared dropout. An explicit value changes
+    # only TAM, so frozen completion can retain its original configuration.
+    tam_dropout: float | None = None
 
     def __post_init__(self):
         for name in ("input_dim", "d_model", "nhead", "num_layers", "dim_feedforward", "length"):
@@ -34,12 +37,21 @@ class ModelConfig:
             raise ValueError("d_model must be divisible by nhead")
         if not 0 <= self.dropout < 1:
             raise ValueError("dropout must be in [0, 1)")
+        if self.tam_dropout is not None and (
+                isinstance(self.tam_dropout, bool)
+                or not isinstance(self.tam_dropout, (float, int))
+                or not math.isfinite(self.tam_dropout) or not 0 <= self.tam_dropout < 1):
+            raise ValueError("tam_dropout must be None or a finite value in [0, 1)")
         if not math.isfinite(self.margin) or self.margin <= 0:
             raise ValueError("margin must be finite and positive")
         if self.contrastive_positive_power not in (1, 2):
             raise ValueError("contrastive_positive_power must be 1 or 2")
         if self.heading_representation not in ("linear_zscore", "circular_sincos"):
             raise ValueError("heading_representation must be linear_zscore or circular_sincos")
+
+    @property
+    def effective_tam_dropout(self) -> float:
+        return self.dropout if self.tam_dropout is None else self.tam_dropout
 
 
 def _sinusoidal_positions(length: int, dimension: int) -> Tensor:
@@ -80,23 +92,23 @@ class AssociationModel(nn.Module):
         self.input_embedding = nn.Linear(config.input_dim, config.d_model, bias=False)
         self.register_buffer("positions", _sinusoidal_positions(config.length, config.input_dim))
 
-        def encoder():
+        def encoder(dropout):
             layer = nn.TransformerEncoderLayer(
                 d_model=config.d_model, nhead=config.nhead,
-                dim_feedforward=config.dim_feedforward, dropout=config.dropout,
+                dim_feedforward=config.dim_feedforward, dropout=dropout,
                 activation="gelu", batch_first=True,
             )
             return nn.TransformerEncoder(layer, config.num_layers, enable_nested_tensor=False)
 
-        self.tcm_encoder = encoder()
+        self.tcm_encoder = encoder(config.dropout)
         decoder_layer = nn.TransformerDecoderLayer(
             d_model=config.d_model, nhead=config.nhead,
             dim_feedforward=config.dim_feedforward, dropout=config.dropout,
             activation="gelu", batch_first=True,
         )
         self.tcm_decoder = nn.TransformerDecoder(decoder_layer, config.num_layers)
-        self.tam_encoder = encoder()
-        self.output_dropout = nn.Dropout(config.dropout)
+        self.tam_encoder = encoder(config.effective_tam_dropout)
+        self.output_dropout = nn.Dropout(config.effective_tam_dropout)
         # Eq.16 specifies an absolute difference and a single linear projection.
         self.ce_classifier = nn.Linear(self.embedding_dim, 1, bias=False) if branch == "ce" else None
         # Transformer containers clone layers; independently initialize their

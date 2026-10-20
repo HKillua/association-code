@@ -13,7 +13,7 @@
 | `evidence_fusion_fit.py` | 046固定OLS分组、直接物理效用监督与可拒绝权重，完整V监测、固定最终端点 |
 | `tam_mode_check.py` | selected TAM固定小批，TCM一次缓存，三模式MC8及单次原fastpath参照；无reference/训练/校准 |
 
-`tam_mode_check.py --archive ZIP --manifest JSON --checkpoint CHECKPOINT.pt --expected-selected-update 600 --output NEW_DIR --device cuda:0 --cpu-threads 4 --advisory-seconds 1800`对应[042](../../HandOver/L2S-20261020-042.md)，只有索引当前READY才由服务器领取。输出`run.json/preparation.json/summary.json/distances.npz`，读selected而非最后快照，同轨副本独立编码，保存正负原CL及小批人口；临时模式/参数标记/dropout/RNG完整恢复。原生运动的CPU入口是`tools/analysis/native_motion_control.py --archive ZIP --manifest JSON --alignment JSON --output NEW_DIR`，固定完整V/Q64/cap128，不需权重或GPU，结果见[R2](../../docs/proposals/repair_before_retraining/native-motion-analysis.md)。
+`tam_mode_check.py --archive ZIP --manifest JSON --checkpoint CHECKPOINT.pt --expected-selected-update 600 --output NEW_DIR --device cuda:0 --cpu-threads 4 --advisory-seconds 1800`对应已完成的[042](../../HandOver/L2S-20261020-042.md)，原件和[分析](../../docs/proposals/repair_before_retraining/042-analysis.md)已核，不重复领取。输出`run.json/preparation.json/summary.json/distances.npz`，读selected而非最后快照，同轨副本独立编码，保存正负原CL及小批人口；临时模式/参数标记/dropout/RNG完整恢复。原生运动的CPU入口是`tools/analysis/native_motion_control.py --archive ZIP --manifest JSON --alignment JSON --output NEW_DIR`，固定完整V/Q64/cap128，不需权重或GPU，结果见[R2](../../docs/proposals/repair_before_retraining/native-motion-analysis.md)。
 
 `completion_check.py --candidate-residuals`复用同一入口，只推理既有teacher，每片段一次；参考checkpoint仅用于原数据契约核对。输出逐场景`predictions-*.npz`（预测、位置底座、原真值、逐属性mask及片段/时间/区域）、`residual-diagnostics.json`（最终学习权重、正则、分区域原属性损失）及`candidate-summary.json`。分区域loss为区域内均值，计算全局贡献时乘该属性的区域有效点数/全部有效点数；位置底座没有速度/航向预测。它不还原训练梯度、不生成额外裁剪或改写权重。
 
@@ -64,3 +64,5 @@ python tools/experiments/evidence_fusion_fit.py --mode check --device cpu --outp
 ```
 
 `check`只读合成数据、三步验证，不能作为MTAD效果。正式关联使用位置参数`fit`；融合使用`--mode fit`并须给alignment。新输出目录不可复用。真实训练仅按用户批准的具体交接执行，T_test封存。
+
+参考模型新增可选`model.tam_dropout`，默认None沿用公共dropout，只改变TAM内部注意力/残差/FFN与CE输出dropout；TCM/TFM独立保持。[047](../../HandOver/L2S-20261021-047.md)用原`tmtaff_complete_fit.py --phase tam --initialize-tcm-from`入口，配置只比035多`tam_dropout=0`，固定033补全，从头TAM1000；DRAFT未运行。原校准规则下margin自然重算。每步history的`tam_train_batch`保存同次前向的正负距离和CL分项，供分析噪声移除后的实际训练行为，无额外推理。旧快照缺字段兼容，恢复不允许换语义。

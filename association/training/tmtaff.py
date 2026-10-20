@@ -225,6 +225,25 @@ def _restore(modules, states):
         module.load_state_dict(state)
 
 
+def _contrastive_batch_diagnostics(scores, labels, model_config):
+    """Describe the existing pre-update forward, without another model call."""
+    distance = -scores.detach()
+    positive, negative = distance[labels == 1], distance[labels == 0]
+    hinge = torch.relu(model_config.margin - negative)
+    values = torch.stack((
+        positive.mean(), negative.mean(),
+        .5 * positive.pow(model_config.contrastive_positive_power).mean(),
+        .5 * hinge.square().mean(),
+        (negative < model_config.margin).to(distance.dtype).mean(),
+    )).cpu().tolist()
+    return dict(zip((
+        'positive_distance_mean', 'negative_distance_mean',
+        'positive_class_loss_mean', 'negative_class_loss_mean',
+        'negative_fraction_inside_margin',
+    ), values), effective_margin=model_config.margin,
+        positive_count=positive.numel(), negative_count=negative.numel())
+
+
 def load_complete_snapshot(path, *, device='cpu', selected=True):
     """Restore an explicit complete snapshot with its original input semantics.
 
@@ -405,7 +424,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or completion_source['cursor'] != dict(stage=0, update=tcm_updates, completed_updates=tcm_updates)
                 or completion_source.get('selected') is not None):
             raise ValueError('TAM initialization requires a COMPLETED TCM-only endpoint')
-        if (asdict(ModelConfig(**completion_source['model_config'])) != asdict(model_config)
+        # TAM is newly initialized; only its dropout may differ from the source.
+        # Do not relax completion architecture, representation, or data checks.
+        source_model_config = ModelConfig(**completion_source['model_config'])
+        if (asdict(replace(source_model_config, tam_dropout=model_config.tam_dropout)) != asdict(model_config)
                 or source_config['branch'] != config['branch']
                 or completion_source.get('input_adapter') != 'native_time_v1'
                 or completion_source['max_observations'] != train_scenes[0]['max_observations']
@@ -415,6 +437,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         normalizer = copy.deepcopy(completion_source['normalizer'])
         initialization = dict(source_run=str(previous.resolve()), source_phase='tcm',
             source_tcm_updates=tcm_updates,
+            source_tam_dropout=source_model_config.effective_tam_dropout,
+            target_tam_dropout=model_config.effective_tam_dropout,
             transferred_modules=['input_embedding', 'tcm_encoder', 'tcm_decoder'],
             transferred_buffers=(['positions', 'heading_mean_std']
                 if model_config.heading_representation == 'circular_sincos' else ['positions']),
@@ -657,9 +681,14 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                     complete = cache.get(keys)
                     encoded = torch.cat([model.tam_encoder(complete[i:i + config['batch_tracks']]).flatten(1)
                                          for i in range(0, len(keys), config['batch_tracks'])])
-                    loss = model.association_loss(model.score_pairs(encoded, pairs), labels)
+                    scores = model.score_pairs(encoded, pairs)
+                    loss = model.association_loss(scores, labels)
+                    diagnostics = (_contrastive_batch_diagnostics(scores, labels, model.config)
+                                   if model.branch == 'contrastive' else None)
                     loss, norm = _update(loss, optimizer, parameters, config['gradient_clip'])
                     row = {'loss': loss, 'association_loss': loss, 'gradient_norm': norm}
+                    if diagnostics is not None:
+                        row['tam_train_batch'] = diagnostics
                 else:
                     target, valid = _targets(train_scenes, groups, device)
                     row = fusion_training_step(*modules, optimizer, stage=phase, values=x, observed=mask,

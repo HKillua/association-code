@@ -269,6 +269,9 @@ class TcmFitCliTests(unittest.TestCase):
         self.fit('source')
         self.tam_fit('once', initialize_tcm_from=self.root/'source')
         self.tam_fit('partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
+        legacy = self.checkpoint('partial')
+        legacy['model_config'].pop('tam_dropout')
+        torch.save(legacy, self.root/'partial'/'checkpoint.pt')
         self.assertEqual(self.tam_fit('resumed', resume_from=self.root/'partial')['status'], 'COMPLETED')
         expected, actual = self.checkpoint('once'), self.checkpoint('resumed')
         for left, right in zip(expected['states'], actual['states']):
@@ -288,6 +291,49 @@ class TcmFitCliTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'COMPLETED TCM-only'):
             self.tam_fit('failed-source', initialize_tcm_from=self.root/'source')
         self.assertFalse((self.root/'failed-source').exists())
+
+    def test_tam_zero_dropout_transfers_legacy_completion_and_preserves_resume_semantics(self):
+        self.fit('source')
+        source = self.checkpoint('source')
+        source['model_config'].pop('tam_dropout')
+        torch.save(source, self.root/'source'/'checkpoint.pt')
+        self.fixture.config['model']['tam_dropout'] = 0.
+        self.tam_fit('zero', initialize_tcm_from=self.root/'source')
+        self.tam_fit('zero-partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
+        self.assertEqual(self.tam_fit('zero-resumed', resume_from=self.root/'zero-partial')['status'], 'COMPLETED')
+        expected, resumed = self.checkpoint('zero'), self.checkpoint('zero-resumed')
+        self.assert_same_endpoint(expected, resumed)
+        self.assertEqual(expected['initialization']['source_tam_dropout'], .1)
+        self.assertEqual(expected['initialization']['target_tam_dropout'], 0.)
+        self.assertEqual(expected['margin_calibration']['tam_dropout'], 0.)
+        self.assertEqual(expected['model_config']['dropout'], .1)
+        for key, value in expected['states'][0].items():
+            if key == 'positions' or key.startswith(('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
+                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
+        for row in expected['history']:
+            diagnostic = row['tam_train_batch']
+            self.assertEqual(diagnostic['effective_margin'], expected['effective_margin'])
+            count = diagnostic['positive_count'] + diagnostic['negative_count']
+            weighted = sum(diagnostic[f'{kind}_class_loss_mean'] * diagnostic[f'{kind}_count']
+                           for kind in ('positive', 'negative')) / count
+            self.assertAlmostEqual(weighted, row['association_loss'], places=6)
+            self.assertGreaterEqual(diagnostic['negative_fraction_inside_margin'], 0.)
+            self.assertLessEqual(diagnostic['negative_fraction_inside_margin'], 1.)
+        for selected in (True, False):
+            loaded = load_complete_snapshot(self.root/'zero'/'checkpoint.pt', selected=selected)
+            self.assertEqual(loaded['model'].config.effective_tam_dropout, 0.)
+            self.assertEqual(loaded['model'].tam_encoder.layers[0].self_attn.dropout, 0.)
+            self.assertEqual(loaded['model'].tcm_encoder.layers[0].self_attn.dropout, .1)
+            self.assertEqual(loaded['fusion'].config.dropout, .1)
+        self.fixture.config['model'].pop('tam_dropout')
+        with self.assertRaisesRegex(ValueError, 'resume configuration'):
+            self.tam_fit('changed-dropout-resume', resume_from=self.root/'zero-partial')
+        self.assertFalse((self.root/'changed-dropout-resume').exists())
+        self.fixture.config['model']['tam_dropout'] = 0.
+        self.fixture.config['model']['dropout'] = 0.
+        with self.assertRaisesRegex(ValueError, 'TCM initialization model'):
+            self.tam_fit('changed-completion-dropout', initialize_tcm_from=self.root/'source')
+        self.assertFalse((self.root/'changed-completion-dropout').exists())
 
     def test_tam_cli_requires_explicit_new_initialization_and_zero_other_stages(self):
         self.tam_config()

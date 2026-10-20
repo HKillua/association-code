@@ -33,7 +33,8 @@ def calibrate_training_margin(model, scenes, normalized, cache, *, device,
     report.update(policy=MARGIN_POLICY, status='RUNNING', seed=CALIBRATION_SEED,
                   batch_count=CALIBRATION_BATCHES, pair_batch_size=CALIBRATION_PAIRS,
                   completed_batches=0, samples=[], seconds=None,
-                  scope='T_core after TCM, before any TAM update; train/dropout TAM, eval frozen TCM; no_grad',
+                  scope='T_core after TCM, before any TAM update; train TAM with configured dropout, eval frozen TCM; no_grad',
+                  tam_dropout=model.config.effective_tam_dropout,
                   cache_before=cache.stats())
     device = torch.device(device)
     cpu_rng = torch.get_rng_state()
