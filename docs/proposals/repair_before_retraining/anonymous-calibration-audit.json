@@ -1,0 +1,154 @@
+{
+  "max_independent_unit_vector_score_difference_m": 9.313225746154785e-10,
+  "max_previous_baseline_score_difference_m": 0.0,
+  "endpoint_ols_shifts_exact": true,
+  "same_source_scores_exact": true,
+  "all_confusion_counts_and_macro_f1_match": true,
+  "physical_node_removal_max_shift_difference_degrees": 0.0,
+  "shift_statistics_ols": {
+    "once": {
+      "count": 14399,
+      "median_m": 3706.8690388575765,
+      "p95_m": 6109.569152227861,
+      "max_m": 147138.25895771984,
+      "over_10km": 11,
+      "over_50km": 3,
+      "over_100km": 3,
+      "vote_min": 6,
+      "vote_median": 37.0,
+      "retained_min": 5,
+      "retained_median": 31.0,
+      "retained_at_most_two": 0
+    },
+    "three": {
+      "count": 14399,
+      "median_m": 3899.4023505618193,
+      "p95_m": 7044.563300507132,
+      "max_m": 183347.59186820642,
+      "over_10km": 13,
+      "over_50km": 3,
+      "over_100km": 3,
+      "vote_min": 6,
+      "vote_median": 37.0,
+      "retained_min": 5,
+      "retained_median": 31.0,
+      "retained_at_most_two": 0
+    }
+  },
+  "largest_scene_shifts_ols": [
+    {
+      "scene_id": "870",
+      "pair": [
+        4,
+        9
+      ],
+      "shift_m": 183347.59186820642,
+      "shift_degrees": [
+        -0.571884751909679,
+        -1.6534900688413927
+      ],
+      "votes": 9,
+      "retained": 7
+    },
+    {
+      "scene_id": "211",
+      "pair": [
+        7,
+        11
+      ],
+      "shift_m": 45144.58451647217,
+      "shift_degrees": [
+        -0.3812287115246633,
+        0.14840296015455579
+      ],
+      "votes": 11,
+      "retained": 11
+    },
+    {
+      "scene_id": "4652",
+      "pair": [
+        5,
+        8
+      ],
+      "shift_m": 32396.349466975684,
+      "shift_degrees": [
+        -0.26944212875448414,
+        0.11768109487635314
+      ],
+      "votes": 10,
+      "retained": 10
+    },
+    {
+      "scene_id": "3117",
+      "pair": [
+        2,
+        16
+      ],
+      "shift_m": 21629.934203344008,
+      "shift_degrees": [
+        0.1924415870676235,
+        0.030223813746010818
+      ],
+      "votes": 15,
+      "retained": 14
+    },
+    {
+      "scene_id": "944",
+      "pair": [
+        5,
+        32
+      ],
+      "shift_m": 7993.875592849609,
+      "shift_degrees": [
+        0.046380905048552634,
+        -0.058389226565964236
+      ],
+      "votes": 35,
+      "retained": 28
+    },
+    {
+      "scene_id": "1456",
+      "pair": [
+        5,
+        23
+      ],
+      "shift_m": 7351.818434264211,
+      "shift_degrees": [
+        0.049480271091915995,
+        -0.046589520855661704
+      ],
+      "votes": 25,
+      "retained": 19
+    },
+    {
+      "scene_id": "4429",
+      "pair": [
+        9,
+        22
+      ],
+      "shift_m": 7310.740278532836,
+      "shift_degrees": [
+        0.04439466282309601,
+        -0.051591814866123575
+      ],
+      "votes": 31,
+      "retained": 25
+    },
+    {
+      "scene_id": "3495",
+      "pair": [
+        6,
+        11
+      ],
+      "shift_m": 7097.608765803941,
+      "shift_degrees": [
+        -0.019644686002720846,
+        -0.0645068255560659
+      ],
+      "votes": 11,
+      "retained": 10
+    }
+  ],
+  "position_truth_read": false,
+  "test_opened": false
+}

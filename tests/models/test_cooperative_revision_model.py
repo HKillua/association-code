@@ -23,12 +23,14 @@ ROUTES = ('plain', 'scalar-u', 'attribute-u', 'learned-attribute')
 
 def revision_model(*, length=7, maximum=6, speed_output_policy='physical_softplus',
                    heading_output_policy='learned_absolute', num_layers=1,
-                   decoder_norm_first=False, decoder_num_layers=None):
+                   decoder_norm_first=False, decoder_num_layers=None,
+                   position_base_policy='native_hold'):
     config = CooperativeConfig(length=length, max_observations=maximum, d_model=8,
         nhead=2, num_layers=num_layers, dim_feedforward=16, dropout=0., head_hidden=6,
         model_variant='support_residual_v2', support_time_policy='train_absmax_v1',
         speed_output_policy=speed_output_policy, heading_output_policy=heading_output_policy,
-        decoder_norm_first=decoder_norm_first, decoder_num_layers=decoder_num_layers)
+        decoder_norm_first=decoder_norm_first, decoder_num_layers=decoder_num_layers,
+        position_base_policy=position_base_policy)
     normalizer = fit_cooperative_normalizer([timed_scene('train', 'T_core')], config)
     # Simple physical scales make the geometry expectations independently exact.
     normalizer['mean'] = [0., 0., 109., 0.]

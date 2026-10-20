@@ -46,6 +46,8 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 
 候选新可选`model.heading_output_policy=observation_residual`保留anchor可见航向底座并学习圆周修正；默认`learned_absolute`保持。新头需要新训练，不能将032旧权重静默改公式。该选项已由[034](../../docs/proposals/repair_before_retraining/034-analysis.md)完成1000步及完整V检验；CPU正确性不代表实际效果。
 
+候选v2可选`model.position_base_policy=native_ols`从本次裁剪后可见点拟合运动，保留实测端点锚与支撑内插值；缺省`native_hold`兼容历史权重。两种底座不能静默交换checkpoint语义。[043配置](../../configs/cooperative-motion-ols.json)相对034仅增加该选项，目前DRAFT，未训练。`tools/analysis/anonymous_calibration_control.py`和`fixed_group_fusion_control.py`是已完成的本地零训练R3/R4入口，支持`--help`；实际命令、结果与限制见[本轮分析](../../docs/proposals/repair_before_retraining/local-readiness-analysis.md)，无需服务器重跑。
+
 候选v2新增三个独立可选消融：`model.decoder_norm_first=true`只改decoder归一化顺序；`model.decoder_num_layers=2`保留原完整初始化后裁decoder、encoder不变；`training.teacher_identity_weight=0`仅使teacher身份BCE贡献为0，仍计算原BCE并保留物理self/cross和全局clip。默认分别false/null/1，旧权重/配置兼容；非默认decoder语义会保存并校验，不能直接换旧checkpoint的forward。teacher日志`identity_bce_raw`为原BCE，`loss_components.identity_bce`为实际加权贡献。[039—041规格](../../docs/specs/cooperative-decoder-ablations.md)及独立交接有完整命令；用户已批准三组各一次1000步、完整V及一次CPU动态读取，按索引READY和正常并发名额执行，不重领。
 
 `tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。[035](../../HandOver/L2S-20261020-035.md)按该接口执行，状态和范围只看当前索引，不重复启动；方法见[规格](../../docs/specs/tmtaff-tam-phase.md)。

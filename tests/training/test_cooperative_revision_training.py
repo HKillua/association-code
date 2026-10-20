@@ -394,6 +394,32 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             torch.testing.assert_close(actual, expected, rtol=0, atol=0)
             self.assertEqual(metadata['format'], 'cooperative-physical-v1')
 
+    def test_motion_teacher_updates_and_restores_explicit_base_without_reinterpreting_weights(self):
+        config = replace(self.config, position_base_policy='native_ols',
+                         speed_output_policy='scaled_log', heading_output_policy='observation_residual')
+        fit = {**self.fit_config(), 'utility_updates': 0, 'adapt_updates': 0}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)/'teacher'
+            run = train_cooperative([self.scene], [self.validation], config, fit, root,
+                                    device='cpu', phase='teacher', save_predictions=True)
+            self.assertEqual(run['completed_updates'], 2)
+            self.assertEqual(run['model_config']['position_base_policy'], 'native_ols')
+            restored, payload = load_cooperative_checkpoint(root/'teacher.pt', device='cpu')
+            self.assertTrue(payload['optimizer_state']['state'])
+            # These position head rows initialize to exactly zero. Their update
+            # proves physical training actually traverses the new base path.
+            self.assertGreater(float(restored.state_projection.weight[:2].detach().abs().max()), 0.)
+            again, _ = load_cooperative_checkpoint(root/'teacher.pt', device='cpu')
+            values, observed = normalize_cooperative_scene(self.validation, payload['normalizer'], config)
+            with torch.no_grad():
+                x, mask = torch.from_numpy(values[:1]), torch.from_numpy(observed[:1])
+                torch.testing.assert_close(restored(x, mask), again(x, mask), rtol=0, atol=0)
+            changed = copy.deepcopy(payload)
+            del changed['model_config']['position_base_policy']
+            torch.save(changed, root/'mislabeled.pt')
+            with self.assertRaisesRegex(ValueError, 'position_base_policy'):
+                load_cooperative_checkpoint(root/'mislabeled.pt', device='cpu')
+
     def test_split_shared_and_four_arms_equal_full_fit_with_real_dropout(self):
         config = replace(self.config, dropout=.25)
         cfg = {**self.fit_config(), 'adapt_updates': 2}

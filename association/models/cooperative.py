@@ -30,6 +30,7 @@ class CooperativeConfig:
     model_variant: str = 'legacy'
     speed_output_policy: str = 'physical_softplus'
     heading_output_policy: str = 'learned_absolute'
+    position_base_policy: str = 'native_hold'
     decoder_norm_first: bool = False
     decoder_num_layers: int | None = None
 
@@ -59,6 +60,10 @@ class CooperativeConfig:
             raise ValueError('heading_output_policy must be learned_absolute or observation_residual')
         if self.heading_output_policy == 'observation_residual' and self.model_variant != 'support_residual_v2':
             raise ValueError('observation_residual heading requires support_residual_v2')
+        if self.position_base_policy not in ('native_hold', 'native_ols'):
+            raise ValueError('position_base_policy must be native_hold or native_ols')
+        if self.position_base_policy == 'native_ols' and self.model_variant != 'support_residual_v2':
+            raise ValueError('native_ols position base requires support_residual_v2')
         if not isinstance(self.decoder_norm_first, bool):
             raise ValueError('decoder_norm_first must be a boolean')
         if self.decoder_num_layers is not None:
@@ -103,6 +108,10 @@ class CooperativeModel(nn.Module):
                 # A constant marker forbids silent reinterpretation without
                 # consuming RNG or changing the input representation.
                 self.register_buffer('heading_base_version', torch.tensor(1, dtype=torch.int64))
+            if config.position_base_policy == 'native_ols':
+                # The residual head has unchanged dimensions but a different
+                # physical base. Refuse silent reuse of hold-trained weights.
+                self.register_buffer('position_base_version', torch.tensor(1, dtype=torch.int64))
         scaled_support = config.support_time_policy == 'train_absmax_v1'
         if support_time_scale is None and not scaled_support:
             support_time_scale = 1.
@@ -194,6 +203,13 @@ class CooperativeModel(nn.Module):
                 raise ValueError('checkpoint heading_base_version disagrees with declared heading_output_policy')
         elif prefix + 'heading_base_version' in state_dict:
             raise ValueError('checkpoint residual heading disagrees with declared heading_output_policy')
+        if self.config.position_base_policy == 'native_ols':
+            incoming = state_dict.get(prefix + 'position_base_version')
+            if (not isinstance(incoming, Tensor) or incoming.shape != () or incoming.dtype != torch.int64
+                    or not torch.equal(incoming.to(self.position_base_version.device), self.position_base_version)):
+                raise ValueError('checkpoint position_base_version disagrees with declared position_base_policy')
+        elif prefix + 'position_base_version' in state_dict:
+            raise ValueError('checkpoint OLS base disagrees with declared position_base_policy')
         if self.config.support_time_policy == 'train_absmax_v1':
             incoming = state_dict.get(prefix + 'support_time_scale')
             expected = self.support_time_scale
@@ -285,7 +301,13 @@ class CooperativeModel(nn.Module):
                             (has_left & has_right).to(delta.dtype)), dim=-1)
 
     def position_base(self, encoded, members):
-        """Visible-token interpolation inside support and endpoint hold outside."""
+        """Visible interpolation and a configured, measured-endpoint extension.
+
+        OLS is recomputed from this encoding's visible tokens, including after
+        training endpoint cropping. It never consumes full-fragment caches.
+        Packed times are tau, so degree/tau slopes times tau offsets retain the
+        same physical prediction for any consistent time-unit conversion.
+        """
         members = torch.as_tensor(members, device=encoded['memory'].device, dtype=torch.long)
         times, valid = encoded['times'][members], encoded['observed'][members]
         query = encoded['queries'][members]
@@ -305,9 +327,46 @@ class CooperativeModel(nn.Module):
         width = tr-tl
         alpha = torch.where(width > 0, (query-tl)/torch.where(width > 0, width, 1.), 0.)
         latitude = pl[..., 0] + alpha*(pr[..., 0]-pl[..., 0])
-        longitude_delta = torch.remainder(pr[..., 1]-pl[..., 1]+180., 360.)-180.
+        raw_longitude_delta = pr[..., 1]-pl[..., 1]
+        longitude_delta = torch.remainder(raw_longitude_delta+180., 360.)-180.
+        if getattr(self.config, 'position_base_policy', 'native_hold') == 'native_ols':
+            # Match the native OLS control's signed half-turn inside support
+            # as well as in slope unwrapping. Historical hold stays unchanged.
+            longitude_delta = torch.where(longitude_delta.abs() == 180.,
+                torch.copysign(longitude_delta.abs(), raw_longitude_delta), longitude_delta)
         longitude = torch.remainder(pl[..., 1]+alpha*longitude_delta+180., 360.)-180.
-        return torch.stack((latitude, longitude), dim=-1)
+        base = torch.stack((latitude, longitude), dim=-1)
+        if getattr(self.config, 'position_base_policy', 'native_hold') == 'native_hold':
+            return base
+
+        # Compact valid rows in their original time order. encode permits holes
+        # in the visible mask; a hidden interior point must not affect unwrap.
+        slots = torch.arange(times.shape[1], device=times.device)[None]
+        order = (slots + (~valid).to(torch.long)*times.shape[1]).argsort(-1)
+        count = valid.sum(-1)
+        keep = slots < count[:, None]
+        t = times.gather(1, order)
+        xy = positions.gather(1, order[..., None].expand(-1, -1, 2))
+        raw_delta = xy[:, 1:, 1]-xy[:, :-1, 1]
+        delta = torch.remainder(raw_delta+180., 360.)-180.
+        delta = torch.where(delta.abs() == 180., torch.copysign(delta.abs(), raw_delta), delta)
+        delta = torch.where(keep[:, 1:], delta, 0.)
+        lon_offset = torch.cat((torch.zeros_like(xy[:, :1, 1]), delta.cumsum(1)), dim=1)
+        # Work in offsets to avoid summing large absolute coordinates/clocks.
+        offsets = torch.stack((xy[..., 0]-xy[:, :1, 0], lon_offset), dim=-1)
+        offsets = torch.where(keep[..., None], offsets, 0.)
+        relative_t = torch.where(keep, t-t[:, :1], 0.)
+        centred_t = torch.where(keep, relative_t-relative_t.sum(1)[:, None]/count[:, None], 0.)
+        centred_xy = offsets-offsets.sum(1)[:, None]/count[:, None, None]
+        slope = (centred_t[..., None]*centred_xy).sum(1)/centred_t.square().sum(1)[:, None]
+        first_t, last_t = times.gather(1, first[:, None]), times.gather(1, last[:, None])
+        dt = torch.where(query < first_t, query-first_t,
+                         torch.where(query > last_t, query-last_t, 0.))
+        outside = (query < first_t) | (query > last_t)
+        extended = base + dt[..., None]*slope[:, None]
+        extended = torch.stack((extended[..., 0].clamp(-90., 90.),
+                                torch.remainder(extended[..., 1]+180., 360.)-180.), dim=-1)
+        return torch.where(outside[..., None], extended, base)
 
     def heading_base(self, encoded, members):
         """Visible native headings, shortest signed arc, endpoint hold outside.
