@@ -1,0 +1,566 @@
+{
+  "status": "PASS",
+  "scope": "Independent scoring, threshold, counts, AUC and paired-error audit; production code reviewed read-only",
+  "population": {
+    "scenes": 64,
+    "components": 17,
+    "nodes": 1635,
+    "pairs": 29008,
+    "positives": 3297,
+    "no_joint_q_support_pairs": 16313
+  },
+  "independent_formula": "6371000 * atan2(norm(cross(unitvector_i, unitvector_j)), dot(unitvector_i, unitvector_j)); negative RMS over all 64 queries",
+  "independent_threshold_algorithm": "Independent event sweep over globally sorted scores, direct per-scene TP/prediction updates, strict macro improvement with 1e-12 tolerance",
+  "score_fields_read": [
+    "node_ids",
+    "native_hold",
+    "native_endpoint",
+    "native_ols",
+    "identities",
+    "sources",
+    "scene_id"
+  ],
+  "position_targets_or_masks_read": false,
+  "same_scene_order": true,
+  "all256_old_control_pairs_labels_sources_node_ids_equal": true,
+  "old_hold_comparison": {
+    "score_max_absolute_difference_metres": 5.806214176118374e-09,
+    "score_mean_absolute_difference_metres": 1.0863075513585225e-09,
+    "selected_metrics_exact_match": true
+  },
+  "methods": {
+    "native_hold": {
+      "score_max_absolute_difference_metres": 2.7939677238464355e-09,
+      "score_mean_absolute_difference_metres": 4.399340838917365e-10,
+      "threshold_absolute_difference_metres": 1.6916601452976465e-09,
+      "metric_max_absolute_difference": 0.0,
+      "own_and_fixed_hold_overall_same_cross_counts_match": true,
+      "all64_per_scene_f1_and_counts_match": true,
+      "pooled_and_same_cross_auc_match": true,
+      "paired_corrected_introduced_fp_fn_match": null,
+      "paired_check_note": "not applicable: reference arm"
+    },
+    "native_endpoint": {
+      "score_max_absolute_difference_metres": 9.022187441587448e-10,
+      "score_mean_absolute_difference_metres": 8.043147027241536e-11,
+      "threshold_absolute_difference_metres": 2.7830537874251604e-10,
+      "metric_max_absolute_difference": 0.0,
+      "own_and_fixed_hold_overall_same_cross_counts_match": true,
+      "all64_per_scene_f1_and_counts_match": true,
+      "pooled_and_same_cross_auc_match": true,
+      "paired_corrected_introduced_fp_fn_match": true
+    },
+    "native_ols": {
+      "score_max_absolute_difference_metres": 7.712515071034431e-10,
+      "score_mean_absolute_difference_metres": 8.276459201749085e-11,
+      "threshold_absolute_difference_metres": 2.546585164964199e-11,
+      "metric_max_absolute_difference": 0.0,
+      "own_and_fixed_hold_overall_same_cross_counts_match": true,
+      "all64_per_scene_f1_and_counts_match": true,
+      "pooled_and_same_cross_auc_match": true,
+      "paired_corrected_introduced_fp_fn_match": true
+    }
+  },
+  "interpretation_limits": [
+    "Known development V; no heldout or significance claim",
+    "Ordinary full-fragment offline controls, not learned method",
+    "Own-threshold OLS beats endpoint slightly; at fixed hold threshold endpoint slightly ahead",
+    "Q-support descriptive only, no filtering or temporal-disjointness claim"
+  ],
+  "details": {
+    "full_report": "motion-association-report.json.gz",
+    "raw_scores": "motion-association-scores.npz",
+    "input_prediction_cache": "runs/NATIVE-MOTION-20261020-R2-local/predictions",
+    "scope": "Independent temporary recomputations summarized here; production raw scores retained for recomputation."
+  },
+  "execution": {
+    "status": "COMPLETED",
+    "command": [
+      "/Users/a1/Projects/association-code/.venv/bin/python",
+      "/Users/a1/Projects/association-code/tools/analysis/motion_association_control.py",
+      "--predictions-dir",
+      "runs/NATIVE-MOTION-20261020-R2-local/predictions",
+      "--manifest",
+      "/tmp/mtad-r1-r2-20261020-manifest.json",
+      "--output-dir",
+      "runs/MOTION-ASSOCIATION-20261020-local"
+    ],
+    "predictions_dir": "/Users/a1/Projects/association-code/runs/NATIVE-MOTION-20261020-R2-local/predictions",
+    "manifest": "/private/tmp/mtad-r1-r2-20261020-manifest.json",
+    "device": "cpu",
+    "optimizer_updates": 0,
+    "reference_read": false,
+    "position_targets_read": false,
+    "test_opened": false,
+    "training_data_read": false,
+    "inference_uses_identity": false,
+    "population": {
+      "scenes": 64,
+      "components": 17,
+      "nodes": 1635,
+      "pairs": 29008,
+      "positives": 3297,
+      "no_joint_q_support_pairs": 16313
+    },
+    "elapsed_seconds": 0.740442084003007,
+    "exit_code": 0
+  },
+  "manifest_git_source": "612afea:HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json",
+  "old_control_query_seconds_arrays_equal": 64,
+  "position_association_scene_comparison": {
+    "both_better": 39,
+    "position_better_assoc_worse": 11,
+    "position_worse_assoc_better": 11,
+    "per_scene": [
+      {
+        "scene_id": "1671",
+        "position_improvement": -525.1896493689519,
+        "hold_f1": 0.5692307692307692,
+        "ols_f1": 0.6578947368421053,
+        "f1_improvement": 0.0886639676113361
+      },
+      {
+        "scene_id": "2056",
+        "position_improvement": 9885.07116129082,
+        "hold_f1": 0.5765765765765766,
+        "ols_f1": 0.6956521739130435,
+        "f1_improvement": 0.11907559733646689
+      },
+      {
+        "scene_id": "290",
+        "position_improvement": 130.31719392244668,
+        "hold_f1": 0.425,
+        "ols_f1": 0.6095238095238096,
+        "f1_improvement": 0.1845238095238096
+      },
+      {
+        "scene_id": "113",
+        "position_improvement": 908.696952693529,
+        "hold_f1": 0.7209302325581395,
+        "ols_f1": 0.6521739130434783,
+        "f1_improvement": -0.06875631951466121
+      },
+      {
+        "scene_id": "2109",
+        "position_improvement": -348.9247797740509,
+        "hold_f1": 0.4392156862745098,
+        "ols_f1": 0.5298013245033113,
+        "f1_improvement": 0.0905856382288015
+      },
+      {
+        "scene_id": "1977",
+        "position_improvement": 2967.6478018795506,
+        "hold_f1": 0.19454679439941047,
+        "ols_f1": 0.3819444444444444,
+        "f1_improvement": 0.18739765004503395
+      },
+      {
+        "scene_id": "2279",
+        "position_improvement": -16.49103058046512,
+        "hold_f1": 0.4444444444444444,
+        "ols_f1": 0.5319148936170213,
+        "f1_improvement": 0.08747044917257685
+      },
+      {
+        "scene_id": "4",
+        "position_improvement": 5299.1387044882595,
+        "hold_f1": 0.5692307692307692,
+        "ols_f1": 0.7289719626168224,
+        "f1_improvement": 0.1597411933860532
+      },
+      {
+        "scene_id": "1456",
+        "position_improvement": 7608.596037105499,
+        "hold_f1": 0.7751937984496124,
+        "ols_f1": 0.926829268292683,
+        "f1_improvement": 0.15163546984307053
+      },
+      {
+        "scene_id": "944",
+        "position_improvement": 3224.0248516329884,
+        "hold_f1": 0.22566371681415928,
+        "ols_f1": 0.3659574468085106,
+        "f1_improvement": 0.14029372999435133
+      },
+      {
+        "scene_id": "1391",
+        "position_improvement": 1857.7246395767825,
+        "hold_f1": 0.17695473251028807,
+        "ols_f1": 0.4745762711864407,
+        "f1_improvement": 0.2976215386761526
+      },
+      {
+        "scene_id": "4618",
+        "position_improvement": 5424.4974992265425,
+        "hold_f1": 0.8444444444444444,
+        "ols_f1": 0.8314606741573034,
+        "f1_improvement": -0.012983770287141039
+      },
+      {
+        "scene_id": "1793",
+        "position_improvement": -304.63481998326006,
+        "hold_f1": 0.43243243243243246,
+        "ols_f1": 0.5081967213114754,
+        "f1_improvement": 0.07576428887904296
+      },
+      {
+        "scene_id": "3829",
+        "position_improvement": 6311.5116858118035,
+        "hold_f1": 0.6440677966101694,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.35593220338983056
+      },
+      {
+        "scene_id": "4652",
+        "position_improvement": 1549.101167423204,
+        "hold_f1": 0.8135593220338984,
+        "ols_f1": 0.5,
+        "f1_improvement": -0.31355932203389836
+      },
+      {
+        "scene_id": "4159",
+        "position_improvement": 5659.341578950939,
+        "hold_f1": 0.676923076923077,
+        "ols_f1": 0.8,
+        "f1_improvement": 0.12307692307692308
+      },
+      {
+        "scene_id": "1331",
+        "position_improvement": 9822.002618869741,
+        "hold_f1": 0.5142857142857142,
+        "ols_f1": 0.5787234042553191,
+        "f1_improvement": 0.06443768996960486
+      },
+      {
+        "scene_id": "2882",
+        "position_improvement": 7549.887577040336,
+        "hold_f1": 0.8888888888888888,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.11111111111111116
+      },
+      {
+        "scene_id": "3117",
+        "position_improvement": 941.2183620826254,
+        "hold_f1": 0.810126582278481,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.189873417721519
+      },
+      {
+        "scene_id": "2996",
+        "position_improvement": 3521.2399103182543,
+        "hold_f1": 0.6111111111111112,
+        "ols_f1": 0.32,
+        "f1_improvement": -0.29111111111111115
+      },
+      {
+        "scene_id": "1398",
+        "position_improvement": -94.4226894895919,
+        "hold_f1": 0.547486033519553,
+        "ols_f1": 0.8155339805825242,
+        "f1_improvement": 0.2680479470629712
+      },
+      {
+        "scene_id": "330",
+        "position_improvement": 18543.15068772069,
+        "hold_f1": 0.5882352941176471,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.4117647058823529
+      },
+      {
+        "scene_id": "3495",
+        "position_improvement": 833.6483439478225,
+        "hold_f1": 0.6233766233766234,
+        "ols_f1": 0.5882352941176471,
+        "f1_improvement": -0.035141329258976284
+      },
+      {
+        "scene_id": "4980",
+        "position_improvement": 4121.011543262894,
+        "hold_f1": 0.8253968253968254,
+        "ols_f1": 0.7792207792207793,
+        "f1_improvement": -0.04617604617604609
+      },
+      {
+        "scene_id": "211",
+        "position_improvement": -4271.997226278578,
+        "hold_f1": 1.0,
+        "ols_f1": 0.47058823529411764,
+        "f1_improvement": -0.5294117647058824
+      },
+      {
+        "scene_id": "1447",
+        "position_improvement": 9765.690954056818,
+        "hold_f1": 0.7397260273972602,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.26027397260273977
+      },
+      {
+        "scene_id": "1893",
+        "position_improvement": 4229.413856244696,
+        "hold_f1": 0.7435897435897436,
+        "ols_f1": 0.7017543859649122,
+        "f1_improvement": -0.04183535762483137
+      },
+      {
+        "scene_id": "3332",
+        "position_improvement": 8299.4579481543,
+        "hold_f1": 0.711864406779661,
+        "ols_f1": 0.9850746268656716,
+        "f1_improvement": 0.2732102200860106
+      },
+      {
+        "scene_id": "870",
+        "position_improvement": 3406.174313835134,
+        "hold_f1": 0.7272727272727273,
+        "ols_f1": 0.46511627906976744,
+        "f1_improvement": -0.26215644820295986
+      },
+      {
+        "scene_id": "2512",
+        "position_improvement": 12607.94207555916,
+        "hold_f1": 0.6,
+        "ols_f1": 0.8611111111111112,
+        "f1_improvement": 0.2611111111111112
+      },
+      {
+        "scene_id": "2995",
+        "position_improvement": 3240.1704403131534,
+        "hold_f1": 0.8088235294117647,
+        "ols_f1": 0.8923076923076924,
+        "f1_improvement": 0.08348416289592764
+      },
+      {
+        "scene_id": "875",
+        "position_improvement": 401.87230023779375,
+        "hold_f1": 0.6292134831460674,
+        "ols_f1": 0.676923076923077,
+        "f1_improvement": 0.04770959377700956
+      },
+      {
+        "scene_id": "4038",
+        "position_improvement": 9473.8274471897,
+        "hold_f1": 0.6380368098159509,
+        "ols_f1": 0.863013698630137,
+        "f1_improvement": 0.2249768888141861
+      },
+      {
+        "scene_id": "2345",
+        "position_improvement": 11154.320056019422,
+        "hold_f1": 0.6736842105263158,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.3263157894736842
+      },
+      {
+        "scene_id": "1587",
+        "position_improvement": 4544.167733506776,
+        "hold_f1": 0.8888888888888888,
+        "ols_f1": 0.9090909090909091,
+        "f1_improvement": 0.02020202020202022
+      },
+      {
+        "scene_id": "3245",
+        "position_improvement": -1163.188360326004,
+        "hold_f1": 0.5384615384615384,
+        "ols_f1": 0.6341463414634146,
+        "f1_improvement": 0.0956848030018762
+      },
+      {
+        "scene_id": "2395",
+        "position_improvement": 3352.2055108138834,
+        "hold_f1": 0.6833333333333333,
+        "ols_f1": 0.8223350253807107,
+        "f1_improvement": 0.13900169204737733
+      },
+      {
+        "scene_id": "3838",
+        "position_improvement": 3446.8095845532707,
+        "hold_f1": 0.41975308641975306,
+        "ols_f1": 0.6813186813186813,
+        "f1_improvement": 0.2615655948989283
+      },
+      {
+        "scene_id": "519",
+        "position_improvement": -361.01834244192787,
+        "hold_f1": 0.6666666666666666,
+        "ols_f1": 0.52,
+        "f1_improvement": -0.1466666666666666
+      },
+      {
+        "scene_id": "2715",
+        "position_improvement": -3000.522042240495,
+        "hold_f1": 0.3439153439153439,
+        "ols_f1": 0.4581005586592179,
+        "f1_improvement": 0.114185214743874
+      },
+      {
+        "scene_id": "3964",
+        "position_improvement": 3135.2570585643216,
+        "hold_f1": 0.7019867549668874,
+        "ols_f1": 0.8253968253968254,
+        "f1_improvement": 0.1234100704299379
+      },
+      {
+        "scene_id": "2261",
+        "position_improvement": 12542.46536758648,
+        "hold_f1": 0.6666666666666666,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.33333333333333337
+      },
+      {
+        "scene_id": "1457",
+        "position_improvement": -1082.367308545628,
+        "hold_f1": 0.24328593996840442,
+        "ols_f1": 0.25116279069767444,
+        "f1_improvement": 0.007876850729270024
+      },
+      {
+        "scene_id": "907",
+        "position_improvement": 3888.072199926788,
+        "hold_f1": 0.5339366515837104,
+        "ols_f1": 0.8472222222222222,
+        "f1_improvement": 0.3132855706385118
+      },
+      {
+        "scene_id": "1022",
+        "position_improvement": 5531.885531660604,
+        "hold_f1": 0.8372093023255814,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.16279069767441856
+      },
+      {
+        "scene_id": "1206",
+        "position_improvement": 6599.76521802672,
+        "hold_f1": 0.7289719626168224,
+        "ols_f1": 0.8990825688073395,
+        "f1_improvement": 0.1701106061905171
+      },
+      {
+        "scene_id": "3879",
+        "position_improvement": 1036.7457470878885,
+        "hold_f1": 0.6428571428571429,
+        "ols_f1": 0.6229508196721312,
+        "f1_improvement": -0.01990632318501173
+      },
+      {
+        "scene_id": "2211",
+        "position_improvement": -341.38971614979437,
+        "hold_f1": 0.6554621848739496,
+        "ols_f1": 0.8947368421052632,
+        "f1_improvement": 0.23927465723131358
+      },
+      {
+        "scene_id": "1058",
+        "position_improvement": 2371.521483104684,
+        "hold_f1": 0.8888888888888888,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.11111111111111116
+      },
+      {
+        "scene_id": "3527",
+        "position_improvement": -210.18632040868033,
+        "hold_f1": 0.4542124542124542,
+        "ols_f1": 0.4835164835164835,
+        "f1_improvement": 0.02930402930402931
+      },
+      {
+        "scene_id": "2708",
+        "position_improvement": 8413.290471467848,
+        "hold_f1": 0.384,
+        "ols_f1": 0.7789473684210526,
+        "f1_improvement": 0.3949473684210526
+      },
+      {
+        "scene_id": "270",
+        "position_improvement": 12015.431140990742,
+        "hold_f1": 0.39285714285714285,
+        "ols_f1": 0.7407407407407407,
+        "f1_improvement": 0.34788359788359785
+      },
+      {
+        "scene_id": "2960",
+        "position_improvement": 4289.733267578971,
+        "hold_f1": 0.8380952380952381,
+        "ols_f1": 0.9278350515463918,
+        "f1_improvement": 0.08973981345115367
+      },
+      {
+        "scene_id": "1089",
+        "position_improvement": -42.276426382230966,
+        "hold_f1": 0.7088607594936709,
+        "ols_f1": 0.6027397260273972,
+        "f1_improvement": -0.10612103346627366
+      },
+      {
+        "scene_id": "1795",
+        "position_improvement": 1644.6940576594511,
+        "hold_f1": 0.6521739130434783,
+        "ols_f1": 0.8064516129032258,
+        "f1_improvement": 0.15427769985974749
+      },
+      {
+        "scene_id": "1374",
+        "position_improvement": 9757.496154360062,
+        "hold_f1": 0.5866666666666667,
+        "ols_f1": 0.8051948051948052,
+        "f1_improvement": 0.21852813852813857
+      },
+      {
+        "scene_id": "1396",
+        "position_improvement": -1245.829151400234,
+        "hold_f1": 0.15188679245283018,
+        "ols_f1": 0.2413793103448276,
+        "f1_improvement": 0.08949251789199741
+      },
+      {
+        "scene_id": "3349",
+        "position_improvement": 12088.964533545637,
+        "hold_f1": 0.6341463414634146,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.36585365853658536
+      },
+      {
+        "scene_id": "1150",
+        "position_improvement": 3718.5875657239317,
+        "hold_f1": 0.7792207792207793,
+        "ols_f1": 1.0,
+        "f1_improvement": 0.22077922077922074
+      },
+      {
+        "scene_id": "3330",
+        "position_improvement": 467.3108634417122,
+        "hold_f1": 0.5806451612903226,
+        "ols_f1": 0.5894736842105263,
+        "f1_improvement": 0.00882852292020364
+      },
+      {
+        "scene_id": "4429",
+        "position_improvement": 9542.945501241615,
+        "hold_f1": 0.5454545454545454,
+        "ols_f1": 0.8152866242038217,
+        "f1_improvement": 0.2698320787492763
+      },
+      {
+        "scene_id": "3589",
+        "position_improvement": 1483.01852363959,
+        "hold_f1": 0.7142857142857143,
+        "ols_f1": 0.6597938144329897,
+        "f1_improvement": -0.05449189985272462
+      },
+      {
+        "scene_id": "2025",
+        "position_improvement": 9289.484670057123,
+        "hold_f1": 0.717391304347826,
+        "ols_f1": 0.9444444444444444,
+        "f1_improvement": 0.22705314009661837
+      },
+      {
+        "scene_id": "4676",
+        "position_improvement": 778.303660333946,
+        "hold_f1": 0.6103896103896104,
+        "ols_f1": 0.5850340136054422,
+        "f1_improvement": -0.02535559678416821
+      }
+    ],
+    "description": "Post-hoc per-scene position MAE versus association macro-selected-threshold F1; both use same exposed V; not a causal or independent-repeat claim. Position metrics read from existing R2 report, never score input."
+  }
+}
