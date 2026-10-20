@@ -8,9 +8,11 @@
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
-| `completion_check.py` | 复用020/021保全权重，固定4个V场景做独立补全诊断；无训练、关联或融合 |
+| `completion_check.py` | 固定4个V场景补齐诊断；原020/021双模型、候选残差，或`--reference-feedback`冻结033辨析反馈；无训练 |
 
 `completion_check.py --candidate-residuals`复用同一入口，只推理既有teacher，每片段一次；参考checkpoint仅用于原数据契约核对。输出逐场景`predictions-*.npz`（预测、位置底座、原真值、逐属性mask及片段/时间/区域）、`residual-diagnostics.json`（最终学习权重、正则、分区域原属性损失）及`candidate-summary.json`。分区域loss为区域内均值，计算全局贡献时乘该属性的区域有效点数/全部有效点数；位置底座没有速度/航向预测。它不还原训练梯度、不生成额外裁剪或改写权重。
+
+`completion_check.py --reference-feedback --reference-checkpoint /已完成033目录`只做原生短程反馈辨析，不需要`--candidate-checkpoint`，其余archive/manifest/alignment/output/device参数沿用原入口。同初始prefix memory、同目标时间，对比真实native历史与预测历史，双向至多3步；第1步检查相同，第2/3步分别报告。`reference-feedback.json`保留所有片段、不可评短轨、逐方向/步SSE和分母，按元素汇总。无reference CSV、自然query重评或参数更新，不能替代完整补齐成绩。范围见[036](../../HandOver/L2S-20261020-036.md)和[综合排查](../../docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
 
 参考完整流程和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
 

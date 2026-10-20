@@ -1,0 +1,587 @@
+{
+  "sources": {
+    "020_history": "HandOver/results/STAGEWISE-COMPLETION-20261019-028/020/history.json.gz",
+    "033_history": "HandOver/results/BASELINE-TCM-COVERAGE-20261020-033/history.json.gz",
+    "common_scene_contract": "HandOver/results/STAGEWISE-COMPLETION-20261019-028/021/run.json.gz",
+    "033_evaluation": "HandOver/results/BASELINE-TCM-COVERAGE-20261020-033/completion-evaluation.json.gz",
+    "loss_implementation": "association/models/timed.py"
+  },
+  "scope": "Existing returned artifacts only; no inference, training, ZIP scan, or T_test.",
+  "training": {
+    "020": {
+      "overall": {
+        "updates": 1000,
+        "loss_mean": 0.10147261539101601,
+        "loss_median": 0.01473343139514327,
+        "loss_max": 1.0281217098236084,
+        "gradient_mean": 0.0952953345393762,
+        "gradient_median": 0.02897184994071722,
+        "gradient_max": 0.39025384187698364,
+        "clip1_exceeded": 0,
+        "top_one_percent_batches": 10,
+        "top_one_percent_loss_share": 0.09025031673490995,
+        "descriptive_trimmed_mean": 0.09324715122430012,
+        "loss_above_point1": 207
+      },
+      "windows": {
+        "1-100": {
+          "updates": 100,
+          "loss_mean": 0.6330405208468437,
+          "loss_median": 0.6273480355739594,
+          "loss_max": 1.0281217098236084,
+          "gradient_mean": 0.2158959637582302,
+          "gradient_median": 0.21071577072143555,
+          "gradient_max": 0.39025384187698364,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 1,
+          "top_one_percent_loss_share": 0.01624100947674327,
+          "descriptive_trimmed_mean": 0.6290498017662703,
+          "loss_above_point1": 100
+        },
+        "101-400": {
+          "updates": 300,
+          "loss_mean": 0.09644295463338494,
+          "loss_median": 0.04525749012827873,
+          "loss_max": 0.42111650109291077,
+          "gradient_mean": 0.20198761158312362,
+          "gradient_median": 0.1992931291460991,
+          "gradient_max": 0.38247281312942505,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 3,
+          "top_one_percent_loss_share": 0.04051838738102397,
+          "descriptive_trimmed_mean": 0.09346994104785751,
+          "loss_above_point1": 99
+        },
+        "401-1000": {
+          "updates": 600,
+          "loss_mean": 0.01539279486052692,
+          "loss_median": 0.011698336340487003,
+          "loss_max": 0.22921490669250488,
+          "gradient_mean": 0.021849091147693494,
+          "gradient_median": 0.019916932098567486,
+          "gradient_max": 0.0939646065235138,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 6,
+          "top_one_percent_loss_share": 0.10240552601498215,
+          "descriptive_trimmed_mean": 0.013956048086862571,
+          "loss_above_point1": 8
+        }
+      }
+    },
+    "033": {
+      "overall": {
+        "updates": 4000,
+        "loss_mean": 0.036050584695767614,
+        "loss_median": 0.009531906340271235,
+        "loss_max": 1.0281217098236084,
+        "gradient_mean": 0.035209728891728444,
+        "gradient_median": 0.014673206489533186,
+        "gradient_max": 0.39025384187698364,
+        "clip1_exceeded": 0,
+        "top_one_percent_batches": 40,
+        "top_one_percent_loss_share": 0.22558915973533175,
+        "descriptive_trimmed_mean": 0.028199963218466653,
+        "loss_above_point1": 252
+      },
+      "windows": {
+        "1-100": {
+          "updates": 100,
+          "loss_mean": 0.6333185589313507,
+          "loss_median": 0.6274387240409851,
+          "loss_max": 1.0281217098236084,
+          "gradient_mean": 0.2161585958302021,
+          "gradient_median": 0.21183589845895767,
+          "gradient_max": 0.39025384187698364,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 1,
+          "top_one_percent_loss_share": 0.01623387938541452,
+          "descriptive_trimmed_mean": 0.6293306483162774,
+          "loss_above_point1": 100
+        },
+        "101-400": {
+          "updates": 300,
+          "loss_mean": 0.09677867137826979,
+          "loss_median": 0.04515739157795906,
+          "loss_max": 0.42133426666259766,
+          "gradient_mean": 0.2067328410471479,
+          "gradient_median": 0.19991464912891388,
+          "gradient_max": 0.38449156284332275,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 3,
+          "top_one_percent_loss_share": 0.040387251592135416,
+          "descriptive_trimmed_mean": 0.0938081281096596,
+          "loss_above_point1": 100
+        },
+        "401-1000": {
+          "updates": 600,
+          "loss_mean": 0.015287505739058058,
+          "loss_median": 0.011546248570084572,
+          "loss_max": 0.2337789237499237,
+          "gradient_mean": 0.020758683839812875,
+          "gradient_median": 0.01946108229458332,
+          "gradient_max": 0.07638976722955704,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 6,
+          "top_one_percent_loss_share": 0.10474167830512138,
+          "descriptive_trimmed_mean": 0.013824511849343375,
+          "loss_above_point1": 8
+        },
+        "1001-2000": {
+          "updates": 1000,
+          "loss_mean": 0.015065275545697658,
+          "loss_median": 0.009364243131130934,
+          "loss_max": 0.9116212725639343,
+          "gradient_mean": 0.015310271809343249,
+          "gradient_median": 0.013655819930136204,
+          "gradient_max": 0.07582569867372513,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 10,
+          "top_one_percent_loss_share": 0.2210317694801065,
+          "descriptive_trimmed_mean": 0.011853910135481545,
+          "loss_above_point1": 15
+        },
+        "2001-3000": {
+          "updates": 1000,
+          "loss_mean": 0.015038709357380867,
+          "loss_median": 0.00889457343146205,
+          "loss_max": 0.733148455619812,
+          "gradient_mean": 0.016160974987782538,
+          "gradient_median": 0.013543643057346344,
+          "gradient_max": 0.25332027673721313,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 10,
+          "top_one_percent_loss_share": 0.20825867345468319,
+          "descriptive_trimmed_mean": 0.01202703807691131,
+          "loss_above_point1": 18
+        },
+        "3001-4000": {
+          "updates": 1000,
+          "loss_mean": 0.012560393129941077,
+          "loss_median": 0.008215003181248903,
+          "loss_max": 0.7291339635848999,
+          "gradient_mean": 0.01327674656873569,
+          "gradient_median": 0.012116123456507921,
+          "gradient_max": 0.10121805220842361,
+          "clip1_exceeded": 0,
+          "top_one_percent_batches": 10,
+          "top_one_percent_loss_share": 0.2021507974071361,
+          "descriptive_trimmed_mean": 0.010122524891895327,
+          "loss_above_point1": 11
+        }
+      }
+    }
+  },
+  "population": {
+    "T_core": {
+      "scene_count": 512,
+      "fragment_count": 54792,
+      "median_native_count": 27.0,
+      "native_transitions": 2255723,
+      "buckets": {
+        "2-4": {
+          "fragment_count": 4345,
+          "fragment_share": 0.07929989779529859,
+          "native_transitions": 8736,
+          "native_transition_share": 0.003872815944156264
+        },
+        "5-15": {
+          "fragment_count": 13589,
+          "fragment_share": 0.24801065849029055,
+          "native_transitions": 118049,
+          "native_transition_share": 0.05233311004941653
+        },
+        "16-31": {
+          "fragment_count": 12001,
+          "fragment_share": 0.21902832530296393,
+          "native_transitions": 261063,
+          "native_transition_share": 0.11573362509492521
+        },
+        "32-63": {
+          "fragment_count": 11815,
+          "fragment_share": 0.21563366914878085,
+          "native_transitions": 521336,
+          "native_transition_share": 0.2311170298835451
+        },
+        "64-128": {
+          "fragment_count": 13042,
+          "fragment_share": 0.23802744926266609,
+          "native_transitions": 1346539,
+          "native_transition_share": 0.5969434190279569
+        }
+      }
+    },
+    "V_select": {
+      "scene_count": 64,
+      "fragment_count": 1635,
+      "median_native_count": 19,
+      "native_transitions": 44416,
+      "buckets": {
+        "2-4": {
+          "fragment_count": 159,
+          "fragment_share": 0.09724770642201835,
+          "native_transitions": 324,
+          "native_transition_share": 0.007294668587896253
+        },
+        "5-15": {
+          "fragment_count": 517,
+          "fragment_share": 0.3162079510703364,
+          "native_transitions": 4458,
+          "native_transition_share": 0.10036923631123919
+        },
+        "16-31": {
+          "fragment_count": 460,
+          "fragment_share": 0.28134556574923547,
+          "native_transitions": 9750,
+          "native_transition_share": 0.21951548991354466
+        },
+        "32-63": {
+          "fragment_count": 334,
+          "fragment_share": 0.20428134556574923,
+          "native_transitions": 14475,
+          "native_transition_share": 0.3258960734870317
+        },
+        "64-128": {
+          "fragment_count": 165,
+          "fragment_share": 0.10091743119266056,
+          "native_transitions": 15409,
+          "native_transition_share": 0.3469245317002882
+        }
+      }
+    }
+  },
+  "validation_buckets": {
+    "2-4": {
+      "fragment_count": 159,
+      "metrics": {
+        "one_step": {
+          "model": {
+            "squared_error_sum": 693.7721685839628,
+            "feature_elements": 82944,
+            "feature_mse": 0.008364344239293532
+          },
+          "state_hold": {
+            "squared_error_sum": 832.7722898600134,
+            "feature_elements": 82944,
+            "feature_mse": 0.010040175176745918
+          },
+          "relative_reduction": 0.16691251974704424,
+          "fragment_changes": {
+            "better": 80,
+            "equal": 0,
+            "worse": 79,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "query": {
+          "model": {
+            "squared_error_sum": 4479.821081694422,
+            "feature_elements": 590208,
+            "feature_mse": 0.007590241205972169
+          },
+          "state_hold": {
+            "squared_error_sum": 5546.529700580102,
+            "feature_elements": 590208,
+            "feature_mse": 0.009397584750766005
+          },
+          "relative_reduction": 0.1923200048444913,
+          "fragment_changes": {
+            "better": 81,
+            "equal": 0,
+            "worse": 78,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "outside_query": {
+          "model": {
+            "squared_error_sum": 4429.3086155109095,
+            "feature_elements": 540032,
+            "feature_mse": 0.008201937321327088
+          },
+          "state_hold": {
+            "squared_error_sum": 5496.017234396589,
+            "feature_elements": 540032,
+            "feature_mse": 0.010177206599602594
+          },
+          "relative_reduction": 0.19408756803194294,
+          "fragment_changes": {
+            "better": 81,
+            "equal": 0,
+            "worse": 78,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        }
+      }
+    },
+    "5-15": {
+      "fragment_count": 517,
+      "metrics": {
+        "one_step": {
+          "model": {
+            "squared_error_sum": 8122.8306450393375,
+            "feature_elements": 1141248,
+            "feature_mse": 0.007117498251948164
+          },
+          "state_hold": {
+            "squared_error_sum": 13268.977739482943,
+            "feature_elements": 1141248,
+            "feature_mse": 0.011626725952188256
+          },
+          "relative_reduction": 0.3878329736834827,
+          "fragment_changes": {
+            "better": 391,
+            "equal": 0,
+            "worse": 126,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "query": {
+          "model": {
+            "squared_error_sum": 19970.28293156873,
+            "feature_elements": 2934528,
+            "feature_mse": 0.006805279394699499
+          },
+          "state_hold": {
+            "squared_error_sum": 27801.232195612847,
+            "feature_elements": 2934528,
+            "feature_mse": 0.00947383435960156
+          },
+          "relative_reduction": 0.28167633754304866,
+          "fragment_changes": {
+            "better": 296,
+            "equal": 9,
+            "worse": 212,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "outside_query": {
+          "model": {
+            "squared_error_sum": 18964.657860299,
+            "feature_elements": 2370560,
+            "feature_mse": 0.008000075028811336
+          },
+          "state_hold": {
+            "squared_error_sum": 26795.607124343103,
+            "feature_elements": 2370560,
+            "feature_mse": 0.011303492476184151
+          },
+          "relative_reduction": 0.29224750264866706,
+          "fragment_changes": {
+            "better": 296,
+            "equal": 0,
+            "worse": 212,
+            "not_evaluable": 9
+          },
+          "equality_tolerance": 1e-14
+        }
+      }
+    },
+    "16-31": {
+      "fragment_count": 460,
+      "metrics": {
+        "one_step": {
+          "model": {
+            "squared_error_sum": 18707.25829339761,
+            "feature_elements": 2496000,
+            "feature_mse": 0.007494895149598401
+          },
+          "state_hold": {
+            "squared_error_sum": 32759.472060601744,
+            "feature_elements": 2496000,
+            "feature_mse": 0.013124788485818006
+          },
+          "relative_reduction": 0.428951166893317,
+          "fragment_changes": {
+            "better": 416,
+            "equal": 0,
+            "worse": 44,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "query": {
+          "model": {
+            "squared_error_sum": 21977.512756020253,
+            "feature_elements": 3155584,
+            "feature_mse": 0.006964641966754887
+          },
+          "state_hold": {
+            "squared_error_sum": 27243.651075722213,
+            "feature_elements": 3155584,
+            "feature_mse": 0.008633473574375524
+          },
+          "relative_reduction": 0.19329781845557414,
+          "fragment_changes": {
+            "better": 241,
+            "equal": 17,
+            "worse": 202,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "outside_query": {
+          "model": {
+            "squared_error_sum": 19468.455249222967,
+            "feature_elements": 2280832,
+            "feature_mse": 0.008535681386977632
+          },
+          "state_hold": {
+            "squared_error_sum": 24734.593568924927,
+            "feature_elements": 2280832,
+            "feature_mse": 0.010844548642304618
+          },
+          "relative_reduction": 0.2129057954814355,
+          "fragment_changes": {
+            "better": 241,
+            "equal": 0,
+            "worse": 202,
+            "not_evaluable": 17
+          },
+          "equality_tolerance": 1e-14
+        }
+      }
+    },
+    "32-63": {
+      "fragment_count": 334,
+      "metrics": {
+        "one_step": {
+          "model": {
+            "squared_error_sum": 28746.646272242808,
+            "feature_elements": 3705600,
+            "feature_mse": 0.0077576225907391
+          },
+          "state_hold": {
+            "squared_error_sum": 50332.26376911044,
+            "feature_elements": 3705600,
+            "feature_mse": 0.013582756846154587
+          },
+          "relative_reduction": 0.42886244091637704,
+          "fragment_changes": {
+            "better": 319,
+            "equal": 0,
+            "worse": 15,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "query": {
+          "model": {
+            "squared_error_sum": 16185.13980285352,
+            "feature_elements": 2467840,
+            "feature_mse": 0.006558423480798399
+          },
+          "state_hold": {
+            "squared_error_sum": 19707.34960684819,
+            "feature_elements": 2467840,
+            "feature_mse": 0.007985667469061281
+          },
+          "relative_reduction": 0.1787256974814474,
+          "fragment_changes": {
+            "better": 167,
+            "equal": 48,
+            "worse": 119,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "outside_query": {
+          "model": {
+            "squared_error_sum": 12654.542995412168,
+            "feature_elements": 1391872,
+            "feature_mse": 0.009091743346667056
+          },
+          "state_hold": {
+            "squared_error_sum": 16176.752799406819,
+            "feature_elements": 1391872,
+            "feature_mse": 0.011622299176509634
+          },
+          "relative_reduction": 0.21773280754613522,
+          "fragment_changes": {
+            "better": 167,
+            "equal": 0,
+            "worse": 119,
+            "not_evaluable": 48
+          },
+          "equality_tolerance": 1e-14
+        }
+      }
+    },
+    "64-128": {
+      "fragment_count": 165,
+      "metrics": {
+        "one_step": {
+          "model": {
+            "squared_error_sum": 38407.94832264811,
+            "feature_elements": 3944704,
+            "feature_mse": 0.009736585640557089
+          },
+          "state_hold": {
+            "squared_error_sum": 61515.551817736865,
+            "feature_elements": 3944704,
+            "feature_mse": 0.015594465850349447
+          },
+          "relative_reduction": 0.37563840057151376,
+          "fragment_changes": {
+            "better": 161,
+            "equal": 0,
+            "worse": 4,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "query": {
+          "model": {
+            "squared_error_sum": 8830.954817448428,
+            "feature_elements": 1246336,
+            "feature_mse": 0.0070855329681951155
+          },
+          "state_hold": {
+            "squared_error_sum": 10954.964677694397,
+            "feature_elements": 1246336,
+            "feature_mse": 0.008789736216954655
+          },
+          "relative_reduction": 0.1938855964155416,
+          "fragment_changes": {
+            "better": 73,
+            "equal": 33,
+            "worse": 59,
+            "not_evaluable": 0
+          },
+          "equality_tolerance": 1e-14
+        },
+        "outside_query": {
+          "model": {
+            "squared_error_sum": 4192.785665222492,
+            "feature_elements": 367744,
+            "feature_mse": 0.011401370695980061
+          },
+          "state_hold": {
+            "squared_error_sum": 6316.795525468459,
+            "feature_elements": 367744,
+            "feature_mse": 0.017177154557160578
+          },
+          "relative_reduction": 0.33624799974642994,
+          "fragment_changes": {
+            "better": 73,
+            "equal": 0,
+            "worse": 59,
+            "not_evaluable": 33
+          },
+          "equality_tolerance": 1e-14
+        }
+      }
+    }
+  },
+  "caveats": [
+    "021 scene_contract is common fixed data metadata, not candidate training results used as baseline evidence.",
+    "Supervision shares count full-library native transitions, not exact cumulative SGD gradient weights; per-batch denominators vary.",
+    "Bucket comparisons are descriptive and confounded by source, scene, observed support and fragment information.",
+    "Better/worse comparisons below are 033 versus state_hold, not 4000 versus 1000 steps.",
+    "Top-tail loss summaries describe batch variation; logs lack per-batch identities and attribute losses.",
+    "Temporary trimmed means diagnose tail influence only; no batch is excluded from training or official metrics."
+  ]
+}
