@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 2518931,
+  "linger": "yes",
+  "unit": "mtad-f8975aab1299.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-f8975aab1299.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=30.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run043",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-MOTION-20261020-043-attempt-1-launch/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/COOPERATIVE-MOTION-20261020-043-attempt-1-launch/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run043/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/COOPERATIVE-MOTION-20261020-043-attempt-1-launch"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-20T18:30:37.011404+00:00",
+  "elapsed_seconds": 0.07453196682035923
+}

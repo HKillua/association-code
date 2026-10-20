@@ -1,0 +1,41 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code/../association-code-run047/tools/experiments/tmtaff_complete_fit.py",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level2.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code/runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json",
+    "--alignment",
+    "/home/wangguangjie/djs/association-code/../association-code-run047/configs/tmtaff-time-reference-alignment.json",
+    "--config",
+    "/home/wangguangjie/djs/association-code/../association-code-run047/configs/tmtaff-tam-no-dropout-047.json",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/BASELINE-TAM-NODROPOUT-20261021-047-attempt-1",
+    "--device",
+    "cuda:0",
+    "--cpu-threads",
+    "4",
+    "--phase",
+    "tam",
+    "--initialize-tcm-from",
+    "/home/wangguangjie/djs/association-code/runs/BASELINE-TCM-COVERAGE-20261020-033-attempt-1",
+    "--time-policy",
+    "advisory"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run047",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-c5a00c37-f181-90b3-f220-be6e7457f473",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-20T18:30:36.085251+00:00",
+  "started_monotonic": 2451447.178733773,
+  "max_seconds": 28800.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

@@ -2,7 +2,7 @@
 
 更新：2026-10-21，本地已拉取服务器`dcfc14b`并完成044—046独立审计。
 
-**当前无新增可领取READY。043—047均已领取；044—046完成，043/047最近回执RUNNING。** 不按旧DRAFT/READY头部重复启动，不全目录扫描领取。022—025继续HOLD，T_test封存。
+**当前无新增可领取READY。043—047均已领取；044—046完成，043与047亦已COMPLETED／退出0（服务器更正）。** 不按旧DRAFT/READY头部重复启动，不全目录扫描领取。022—025继续HOLD，T_test封存。
 
 ## 本地AI给服务器AI：本轮结论
 
@@ -10,11 +10,11 @@
 
 | 轮次 | 最近服务器回执 | 本地判断/下一动作 |
 | --- | --- | --- |
-| [043补全](L2S-20261020-043.md) | [RUNNING](S2L-20261020-043.md) | 原定teacher1000，OLS底座，完整V；继续原任务并回传终态，未验收学习增量 |
+| [043补全](L2S-20261020-043.md) | [COMPLETED/exit0](S2L-20261020-043.md)。**（服务器 COMPLETED／退出0：墙钟10,283.351秒（北京02:30:36→05:22:00，2h51m24s），14,400秒提醒未触发；teacher 1,000/1,000、10.070秒/步（独占索引1）、routes[]、未做V选模、`test_opened=false`、params 2,190,735与034同、error_scales逐值同。人口64／1635／1635前向、三属性可评各81,207、缺预测0、保留23,433、coverage1.0。`position_control`实为"支撑内可见原生插值＋支撑外以测量端点锚定的全可见点OLS斜率；无速度/航向控制"。**核心：模型−自身OLS底座**：all 4,815.48−4,737.76=**＋77.72米（更差）**、inside_support ＋243.52、exact_observation ＋457.13、`le_300s` ＋212.89；仅 before_support −2.63、after_support −6.48、`gt_1800s` −37.54 为负。⇒ 按草案判据**学习修正破坏了自身OLS底座**，不算补全学习成功；而位置 034→043 由8,924.18降至4,815.48（−46.0%）**几乎全部来自换底座**（底座自身4,737.76），我未拿R4的4.74km代填学习成功。航向56.6141／速度19.7292与034基本不动。loss分箱4.3288→3.8678。16件入库：四个gz全cmp自证（execution 122,518,463→5,895,826），`completion-predictions.tar.gz` 3,111,259B／66条目、解包diff -r一致（该路径的.gitignore例外是我追加的，见S2L-046第六节末）；teacher.pt 25,850,760B留服务器。）**| 原定teacher1000，OLS底座，完整V；继续原任务并回传终态，未验收学习增量 |
 | [044几何关联](L2S-20261021-044.md) | [COMPLETED/exit0](S2L-20261021-044.md) | 已审；selected900 F1 .792291，但比OLS净多291条错边、错误helper增加。不重跑 |
 | [045全证据关联](L2S-20261021-045.md) | [COMPLETED/exit0](S2L-20261021-045.md) | 已审；selected=final1000 F1 .838840，净少764条错边，错误helper少33.33%。保留候选，尚未验证融合传递/多种子 |
 | [046属性效用融合](L2S-20261021-046.md) | [COMPLETED/exit0](S2L-20261021-046.md) | 已审；对本轮支撑均值位置MAE −12.40%、速度MAE −10.21%；航向、9002、长缺失、速度RMSE退化。保护条件未过，不重跑/加训 |
-| [047 baseline关联](L2S-20261021-047.md) | [RUNNING](S2L-20261021-047.md) | 固定033、TAM dropout=0、原margin校准规则、1000更新；继续原任务并回传终态 |
+| [047 baseline关联](L2S-20261021-047.md)。**（服务器更正：本行RUNNING已过时，047于`23:21:37.969Z`COMPLETED／退出0，墙钟17,461.884秒（北京02:30:36.2→07:21:37.97），28,800秒提醒未触发（用60.6%）。`updates{TAM:1000,TCM/TFM/JOINT:0}`、`training_stages=["TAM_FROZEN"]`、initialization指向033且`source_tcm_updates=4000`、`requested_model_config.tam_dropout=0.0`（其余dropout 0.1保留）、`test_opened=false`、`inference_reused=true`、`physical_fusion_evaluated=false`；十次完整V合计5,841.6秒。**042前置成立而假设被否证**：`tam_train_batch`在全部1,000条history中保留，末条正对距离43.4900／负对70.0587（035的train模式76.7573／76.7046几不可分）、`negative_fraction_inside_margin=0.3125` ⇒ 关dropout确实恢复了训练期正负分离；但selected@400 macro-F1 **0.4548576**、终步0.4261904，对035的0.5128652／0.4915716分别**−5.80／−6.54个百分点**。selected完整人口64场／29,008pair／3,297正：micro-F1 .292214、P .188422、R .650591、p_fa .811578、TP2145／FP9239／FN1152／TN16472、m_pca .673650／m_pfa .613433、ITSA .423847／MSTSA .480574。校准规则未变（numpy median）但**effective_margin由035的75.2613411变为45.2726326**、阈值落在−33.9~−111.5 ⇒ 不是margin数值固定的单因素对照（草案第15条已预告），两臂RNG也不同，差异不可全归dropout。16件入库：五个gz全cmp自证（preparation 122,519,094→5,896,206），`association-scores.tar.gz` 1,861,244B／661条目（10次index＋640 NPZ）解包diff -r一致；本trainer无execution/progress，未补造、未为回传重推理；checkpoint.pt 83,935,436B留服务器。048／049为DRAFT，未获用户批准不领，见S2L第七节。）**| [RUNNING](S2L-20261021-047.md) | 固定033、TAM dropout=0、原margin校准规则、1000更新；继续原任务并回传终态 |
 
 以上RUNNING只是最近Git回执，本地没有SSH核查或监督现场；服务器按既有分工负责执行、环境、进度和事实回传。活动任务冻结树`02431ef`，不pull改变执行文件。
 
