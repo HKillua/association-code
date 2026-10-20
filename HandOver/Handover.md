@@ -1,10 +1,10 @@
 # 当前服务器任务
 
-**当前仅042为新READY：035 selected600同输入、零更新模式核查。** 未收到领取/在途回执，发布不等于运行。035、037、039—041均已COMPLETED并复核；历史L2S的READY不构成待办，022—025继续HOLD。
+**当前仅042为新READY：035 selected600同输入、零更新模式核查。** 未收到领取/在途回执，发布不等于运行。035、037、039—041均已COMPLETED并复核；历史L2S的READY不构成待办，022—025继续HOLD。 **（服务器补注：042已于`17:18:34Z`领取并于`17:19:03Z`COMPLETED／退出0，见[S2L-042](S2L-20261020-042.md)；**当前无可领取READY**，043—046仍为DRAFT未领。四张卡已无我方进程。）**
 
 | 当前可领取任务 | 范围与预算 | 输出与依据 |
 | --- | --- | --- |
-| [042 TAM模式核查](L2S-20261020-042.md) | 原035 selected600，固定T_core/V小批，三模式MC8及一次默认fastpath参照；一次单卡FP32/CPU4、0更新，30分钟仅提醒，失败不重试 | 新`TAM-MODE-CHECK-20261020-042-attempt-1`及同名`-launch`，完整命令见独立L2S；无reference、校准/阈值选择、下游或T_test |
+| [042 TAM模式核查](L2S-20261020-042.md) | 原035 selected600，固定T_core/V小批，三模式MC8及一次默认fastpath参照；一次单卡FP32/CPU4、0更新，30分钟仅提醒，失败不重试 **（服务器补注 `17:19:03Z`：COMPLETED／退出0，墙钟27.726秒、payload 26.686秒，advisory未触发；块逐字30行1,559字节 SHA256 `cbe5b55f…99e4d7`、零替换；树@3999957、索引0独占。`optimizer_updates=0`、`reference_read=false`、`test_opened=false`、`threshold_reselected/margin_recalibrated/normalizer_refit`全false、repeats 8、seed 2035；selected原样读出update600、margin 75.2613410949707、threshold −2.635511918924749e−05、macro_f1 .5128651743707023；四样本＝T_core 2606/1622＋V_select 1671/2056各首4正4负、shortfall 0；**状态恢复八项全true**。读数：eval 正1.9640e−05／负5.6690e−05；train 正**76.7573**／负**76.7046**（比值1.0007，几乎不可分）；train全关dropout 与 eval **逐位相同**，四样本 `max_absolute_pair_distance_difference_eval_vs_train_zero` **全为0.0**；默认fastpath参照差仅1.3e−6~2.5e−6。⇒ train/eval 差被机械隔离到 dropout 一项，是否即为035精度与loss平台成因、要不要动dropout，按草案归本地，我未改模型或加训练。原件`run/preparation/summary.json.gz`均cmp自证＋`distances.npz`（48数组）已入库，源权重未重传。）**| 新`TAM-MODE-CHECK-20261020-042-attempt-1`及同名`-launch`，完整命令见独立L2S；无reference、校准/阈值选择、下游或T_test |
 
 R2原生运动及关联衔接已经在本地CPU完整V完成，**无需服务器重跑**。OLS位置MAE8849.53→4737.59m；新增同评分全29008对关联F1 .61563→.72717，共用保持阈值也改善，但14场F1退化。见[原生运动](../docs/proposals/repair_before_retraining/native-motion-analysis.md)和[关联衔接](../docs/proposals/repair_before_retraining/motion-association-analysis.md)；普通离线控制，不是新训练、学习贡献或融合成绩。
 
