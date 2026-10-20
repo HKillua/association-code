@@ -6,9 +6,9 @@ MTAD不完整量测下的**补全、关联、融合**研究。用户2026-10-20�
 
 ## 当前状态
 
-**本轮工作汇报：** [复现程度、论文差距、补齐问题与并行安排](docs/reports/2026-10-20-research-progress.md)。baseline仍为部分复现，候选尚无可靠端到端增益。032新诊断显示消去学习残差的时间变化几乎不影响误差；035已于北京时间12:23在隔离目录启动，冻结033独立训练TAM1000步；034仍无终态回执，TCM继续独立排查。
+**本轮工作汇报：** [复现程度、论文差距、补齐问题与并行安排](docs/reports/2026-10-20-research-progress.md)。baseline仍为部分复现，候选尚无可靠端到端增益。[034候选已完成并复核](docs/proposals/repair_before_retraining/034-analysis.md)：航向89.9213°→56.6293°，但观测控制55.9361°更好，消去学习部分的时间变化几乎不影响误差。035已于北京时间12:23在隔离目录启动，冻结033独立训练TAM1000步；尚未收到终态成绩。
 
-**TCM排查与修正：** [036已完成并复核](docs/proposals/repair_before_retraining/036-analysis.md)：同目标/时间/固定memory下，h2自身反馈比真实反馈低0.515%，h3高4.310%；短程反馈有代价，但不支持将其视为主要故障。用户已要求实施[圆周航向表示](docs/specs/tcm-circular-heading.md)，保留原033/035，统一训练/评价的sin/cos变换并保持原时间编码及其它初始化。用户最新要求先只看TCM，[037](HandOver/L2S-20261020-037.md)已缩为单卡TCM4000及完整V，约2—3h，取消自动接TAM；新旧特征MSE不可直接排名，下游关联收益后续另议。代码验证不等于实际效果，新增训练预算待确认，当前无新增READY。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
+**TCM排查与修正：** [036已完成并复核](docs/proposals/repair_before_retraining/036-analysis.md)：同目标/时间/固定memory下，h2自身反馈比真实反馈低0.515%，h3高4.310%；短程反馈有代价，但不支持将其视为主要故障。[037圆周TCM](HandOver/L2S-20261020-037.md)按服务器交接转述的用户原范围批准发布READY：一次单卡4000步及完整V，约2—3h、4h仅提醒，无自动TAM。新旧特征MSE不可直接排名，下游收益后续另议。另有[038](HandOver/L2S-20261020-038.md) CPU零更新定位034的decoder/head时间变化，已READY；无新候选训练预算。代码验证不等于实际效果。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
 
 - **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
 - **021身份原分数已复核**：teacher1000＋utility200完成，teacher端点开发macro-F1 **.630321**、P .301445、R .835305。比同人口位置控制仅高1.47个百分点，跨源F1没有优势；不能归因于utility或融合，T_test未开启。
@@ -17,7 +17,7 @@ MTAD不完整量测下的**补全、关联、融合**研究。用户2026-10-20�
 - **030进一步分析已有具体改法**：原量测速度/航向控制优于当前teacher；9002留身份跨源校准oracle位置误差4488.71→722.79米，证明共享偏移有可利用信息，但真值配对收益不是算法成绩。片段平均运动外推整体有效、逐场不稳定；baseline特征MSE主要对航向敏感。推荐先做速度输出坐标单因素修正，再分别验证观测底座、场景校准与动态补全。[数据、方案与复算脚本](docs/proposals/repair_before_retraining/030-repair-analysis.md)。
 - **031/032已完成并深挖**：各1000步、完整V64。log速度输出使MAE从29.4878降至19.7287（−33.1%），但航向70.3884°→89.9213°、支撑内位置2105.70→2185.77米；片段内部速度仍近常量。不能判为补全通过或恢复四臂。全V原量测控制显示来源/支撑差异，9002支撑内速度反而是神经B更好；不统一复制观测。[完整分析与下一方案](docs/proposals/repair_before_retraining/031-032-analysis.md)。
 - **033 baseline TCM已完成并复核**：4000步、实耗2.30小时；与029同四场相比，一步特征MSE下降22.74%、自然query下降16.08%，四场均改善。完整V单报，尚无新关联/物理融合结果。保留该端点，不自动恢复020/022—025。[033分析](docs/proposals/repair_before_retraining/033-analysis.md)、[交接索引](HandOver/Handover.md)。
-- **候选不等待033**：航向“观测底座＋角度残差”保留032其它设置；已批准的034一次1000步于北京时间11:00:16在隔离目录启动，服务器回执RUNNING。未知对应下场景平移控制与固定分组的效用融合设计可独立推进。[当前本地工作](docs/research_brief.md#不等待033的本地推进2026-10-20)、[航向规格](docs/specs/cooperative-heading-residual.md)。
+- **034属于候选，不是baseline**：1000步及完整V已完成；观测底座避免航向绝对预测失效，但网络仍近似每轨固定修正。下一步038读取原四场真实权重中间量，区分decoder内变化衰减和输出头未利用变化；不盲目加训。[完整分析](docs/proposals/repair_before_retraining/034-analysis.md)、[航向规格](docs/specs/cooperative-heading-residual.md)。未知对应下场景平移控制与固定分组效用融合仍可独立设计。
 - CDF已退役，TSA保留独立关联对照。旧过程与负结果见[历史摘要](docs/history/README.md)，机器证据和旧交接在Git历史中追溯。21分钟窗口未采用，当前先验证已实现修正版。
 
 ## 代码与资料

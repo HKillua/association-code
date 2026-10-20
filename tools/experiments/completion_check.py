@@ -60,9 +60,9 @@ def load_scenes(archive_path, manifest, alignment, data, *, references=True):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('archive', 'manifest', 'alignment', 'reference-checkpoint',
-                 'output', 'device'):
+    for name in ('archive', 'manifest', 'alignment', 'output', 'device'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--reference-checkpoint')
     parser.add_argument('--candidate-checkpoint')
     parser.add_argument('--cpu-threads', type=int, default=4)
     modes = parser.add_mutually_exclusive_group()
@@ -70,11 +70,18 @@ def main(argv=None):
         help='Only run the candidate; export existing predictions and frozen objective diagnostics')
     modes.add_argument('--reference-feedback', action='store_true',
         help='TCM-only native feedback diagnostic; reference-checkpoint accepts a completed TCM run or checkpoint.pt')
+    modes.add_argument('--candidate-dynamics', action='store_true',
+        help='Read candidate decoder/head temporal variation once per fragment, without reference targets')
     args = parser.parse_args(argv)
     if not args.reference_feedback and args.candidate_checkpoint is None:
         parser.error('--candidate-checkpoint is required unless --reference-feedback is used')
     if args.reference_feedback and args.candidate_checkpoint is not None:
         parser.error('--reference-feedback does not use --candidate-checkpoint')
+    if args.candidate_dynamics:
+        if args.reference_checkpoint is not None:
+            parser.error('--candidate-dynamics does not use --reference-checkpoint')
+    elif args.reference_checkpoint is None:
+        parser.error('--reference-checkpoint is required outside --candidate-dynamics')
     import torch
     from association.utils import runtime
     from association.models.tmtaff import ModelConfig
@@ -89,7 +96,8 @@ def main(argv=None):
                  ('archive', 'manifest', 'alignment', 'reference_checkpoint', 'candidate_checkpoint')
                  if getattr(args, name) is not None},
         device=args.device, cpu_threads=args.cpu_threads, scene_ids=SCENE_IDS,
-        mode=('reference_feedback' if args.reference_feedback else
+        mode=('candidate_dynamics' if args.candidate_dynamics else
+              'reference_feedback' if args.reference_feedback else
               'candidate_residuals' if args.candidate_residuals else 'both_models'),
         optimizer_updates=0, normalizer_refit=False, margin_recalibrated=False,
         threshold_reselected=False, test_opened=False)
@@ -113,6 +121,53 @@ def main(argv=None):
         torch.set_num_threads(args.cpu_threads)
         progress(dict(stage='loading'))
         device = resolve_device(args.device)
+        if args.candidate_dynamics:
+            import numpy as np
+            from association.evaluation.cooperative_dynamics import evaluate_cooperative_dynamics
+            candidate_path = Path(args.candidate_checkpoint)
+            candidate, payload = load_cooperative_checkpoint(candidate_path, device='cpu')
+            source_run = runtime.read_json(candidate_path.parent/'run.json')
+            steps = payload['training']['teacher_updates']
+            if (source_run.get('status') != 'COMPLETED' or source_run.get('phase') != 'teacher'
+                    or payload['stage'] != 'teacher' or steps <= 0
+                    or payload['completed_updates'] != steps
+                    or source_run['completed_updates'] != steps
+                    or candidate.config.model_variant != 'support_residual_v2'
+                    or candidate.config.heading_output_policy != 'observation_residual'
+                    or candidate.config.speed_output_policy != 'scaled_log'):
+                raise ValueError('dynamics requires a completed circular-residual teacher endpoint')
+            normalizer = payload['normalizer']
+            manifest = runtime.read_json(args.manifest)
+            if (normalizer['training_scene_ids'] != manifest['splits']['T_core']
+                    or normalizer['training_splits'] != ['T_core']):
+                raise ValueError('saved normalization does not match original T_core population')
+            data = {key: normalizer['adapter_config'][key]
+                    for key in ('length', 'max_observations', 'time_unit_seconds')}
+            contract = {row['scene_id']: row for row in source_run['scene_contract'][1]}
+            if any(contract[sid]['split'] != 'V_select'
+                   or contract[sid]['component_id'] != manifest['components'][sid] for sid in SCENE_IDS):
+                raise ValueError('dynamics population differs from original V contract')
+            run.update(data=data, candidate_stage=payload['stage'], candidate_updates=steps,
+                       candidate_normalizer=normalizer, source_run_status=source_run['status'],
+                       candidate_support_time_scale_tau=payload['support_time_scale_tau'])
+            progress(dict(stage='preparation'))
+            scenes, reads = load_scenes(args.archive, manifest, {}, data, references=False)
+            for scene in scenes:
+                row = contract[scene['scene_id']]
+                if scene['node_ids'] != row['node_ids']:
+                    raise ValueError('dynamics native fragment order differs')
+                np.testing.assert_array_equal(scene['grid'], row['grid'])
+                np.testing.assert_array_equal(scene['native_observed'].sum(1), row['native_observed_counts'])
+            run.update(**reads, fragment_count=sum(len(s['node_ids']) for s in scenes))
+            progress(dict(stage='candidate_dynamics'))
+            candidate.to(device).eval()
+            report = evaluate_cooperative_dynamics(candidate, normalizer, scenes,
+                                                  device=device, progress=progress)
+            runtime.write_json(output/'candidate-dynamics.json', report)
+            run.update(status='COMPLETED', stage='completed')
+            progress(dict(stage='completed'))
+            print(f'COMPLETED: {run["fragment_count"]} fragments; {output}')
+            return 0
         reference_path = Path(args.reference_checkpoint)
         if args.reference_feedback and reference_path.is_dir():
             reference_path = reference_path/'checkpoint.pt'

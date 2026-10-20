@@ -31,4 +31,4 @@ CPU检查只验证程序行为，不证明MTAD改善。已批准的034固定与0
 
 速度时变不足另需比较输入派生速度/运动趋势与学习残差，不能本轮顺手改成端点速度保持（9002支撑内及支撑外已有反例）。位置跨源偏差归入未知对应下场景校准；融合按时间/属性学习可靠性。三个方向不等待033或本项达到极致，也不同时打包进入此次训练。
 
-本地验证完成：`tests.models.test_cooperative_revision_model`、`tests.integration.test_cooperative_revision_cli`、原模型/时间缩放、v2训练、评价六组共58项检查通过；独立复核包含非平凡normalizer的154°↔334°半周往返，已修正浮点选反弧问题。真实MTAD训练尚未执行。
+本地验证完成：`tests.models.test_cooperative_revision_model`、`tests.integration.test_cooperative_revision_cli`、原模型/时间缩放、v2训练、评价六组共58项检查通过；独立复核包含非平凡normalizer的154°↔334°半周往返，已修正浮点选反弧问题。真实034已完成并复核：航向56.6293°，优于032但差于近似观测控制55.9361°，学习残差仍近片段常量；[完整分析](../proposals/repair_before_retraining/034-analysis.md)及[038逐层定位](../../HandOver/L2S-20261020-038.md)明确下一步，不把规格已实现当作效果通过。

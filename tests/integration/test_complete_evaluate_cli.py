@@ -144,6 +144,60 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         self.assertEqual(report['first_step_check']['all_identical'], True)
         self.assertFalse(run['test_opened'])
 
+    def test_candidate_dynamics_cli_reads_only_native_inputs_from_completed_teacher(self):
+        from association.models.cooperative import CooperativeConfig, CooperativeModel
+        from association.data.cooperative import fit_cooperative_normalizer
+        from tools.experiments import completion_check
+        dataset = self.fixture.load()
+        config = CooperativeConfig(length=4, max_observations=4, d_model=8, nhead=2,
+            num_layers=2, dim_feedforward=16, dropout=.1, head_hidden=8,
+            model_variant='support_residual_v2', support_time_policy='train_absmax_v1',
+            heading_output_policy='observation_residual', speed_output_policy='scaled_log')
+        normalizer = fit_cooperative_normalizer(dataset['train'], config)
+        model = CooperativeModel(config, normalizer, support_time_scale=3.)
+        with torch.no_grad():
+            model.state_projection.weight.uniform_(-.01, .01)
+        teacher = self.source/'teacher.pt'
+        torch.save(dict(format='cooperative-physical-v2', model_variant='support_residual_v2',
+            representation_version='support_residual_v2', model_config=asdict(config),
+            model_state=model.state_dict(), normalizer=normalizer,
+            support_time_scale_tau=3., stage='teacher', completed_updates=2,
+            training=dict(teacher_updates=2)), teacher)
+        runtime.write_json(self.source/'run.json', dict(status='COMPLETED', phase='teacher',
+            completed_updates=2, scene_contract=_scenes(dataset['train'], dataset['validation'], 4)))
+        original = teacher.read_bytes()
+        args = ['--archive', str(self.fixture.path), '--manifest', str(self.root/'manifest.json'),
+            '--alignment', str(self.root/'alignment.json'), '--candidate-checkpoint', str(teacher),
+            '--output', str(self.root/'dynamics'), '--device', 'cpu', '--cpu-threads', '1',
+            '--candidate-dynamics']
+        with ExitStack() as stack:
+            stack.enter_context(patch.object(completion_check, 'SCENE_IDS', ['2', '4']))
+            for target in ('association.data.reference_states.iter_reference_states',
+                           'association.training.cooperative.train_cooperative',
+                           'association.data.cooperative.fit_cooperative_normalizer',
+                           'association.models.cooperative.CooperativeModel.score_pairs',
+                           'association.evaluation.cooperative.evaluate_cooperative_completion',
+                           'association.evaluation.tmtaff.evaluate_tcm_completion',
+                           'torch.optim.Adam'):
+                stack.enter_context(patch(target, side_effect=AssertionError('forbidden: '+target)))
+            decode = stack.enter_context(patch.object(CooperativeModel, 'decode_group', autospec=True,
+                side_effect=CooperativeModel.decode_group))
+            stack.enter_context(redirect_stdout(io.StringIO()))
+            stack.enter_context(redirect_stderr(io.StringIO()))
+            self.assertEqual(completion_check.main(args), 0)
+            self.assertEqual(decode.call_count, 4)
+            with self.assertRaises(SystemExit):
+                completion_check.main(args+['--reference-checkpoint', str(self.checkpoint)])
+        report = runtime.read_json(self.root/'dynamics'/'candidate-dynamics.json')
+        self.assertEqual(report['fragment_count'], 4)
+        self.assertEqual(report['completion_forward_count'], 4)
+        run = runtime.read_json(self.root/'dynamics'/'run.json')
+        self.assertEqual(run['status'], 'COMPLETED')
+        self.assertEqual(run['reference_members_read'], [])
+        self.assertEqual(run['optimizer_updates'], 0)
+        self.assertFalse(run['test_opened'])
+        self.assertEqual(teacher.read_bytes(), original)
+
     def test_completion_cli_uses_partial_reference_and_teacher_without_downstream(self):
         from association.models.cooperative import CooperativeConfig, CooperativeModel
         from association.data.cooperative import fit_cooperative_normalizer

@@ -8,11 +8,13 @@
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
 | `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
-| `completion_check.py` | 固定4个V场景补齐诊断；原020/021双模型、候选残差，或`--reference-feedback`冻结033辨析反馈；无训练 |
+| `completion_check.py` | 固定4个V场景补齐诊断；双模型、候选残差、`--reference-feedback`反馈辨析或`--candidate-dynamics`逐层动态；无训练 |
 
 `completion_check.py --candidate-residuals`复用同一入口，只推理既有teacher，每片段一次；参考checkpoint仅用于原数据契约核对。输出逐场景`predictions-*.npz`（预测、位置底座、原真值、逐属性mask及片段/时间/区域）、`residual-diagnostics.json`（最终学习权重、正则、分区域原属性损失）及`candidate-summary.json`。分区域loss为区域内均值，计算全局贡献时乘该属性的区域有效点数/全部有效点数；位置底座没有速度/航向预测。它不还原训练梯度、不生成额外裁剪或改写权重。
 
 `completion_check.py --reference-feedback --reference-checkpoint /已完成033目录`只做原生短程反馈辨析，不需要`--candidate-checkpoint`，其余archive/manifest/alignment/output/device参数沿用原入口。同初始prefix memory、同目标时间，对比真实native历史与预测历史，双向至多3步；第1步检查相同，第2/3步分别报告。`reference-feedback.json`保留所有片段、不可评短轨、逐方向/步SSE和分母，按元素汇总。无reference CSV、自然query重评或参数更新，不能替代完整补齐成绩。范围见[036](../../HandOver/L2S-20261020-036.md)和[综合排查](../../docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
+
+`completion_check.py --candidate-dynamics --candidate-checkpoint /已完成034/teacher.pt --device cpu --cpu-threads 4`只读取已完成teacher的原生输入；不接受reference checkpoint，不读取reference或alignment内容，保留alignment参数仅兼容入口。加载源run.json核数据契约，每片段一次encode/decode，输出`candidate-dynamics.json`记录query、decoder各层、head和物理输出的时间变化及冻结残差均值后的输出差异；无目标、误差评价或训练。现有权重、hooks、冻结标记及模式不变。范围见[038](../../HandOver/L2S-20261020-038.md)及[规格](../../docs/specs/cooperative-dynamics-diagnostic.md)。
 
 参考完整流程和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
 
@@ -43,4 +45,4 @@ python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-d
 
 `tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。用户已批准[035](../../HandOver/L2S-20261020-035.md)一次1000步及完整V评价，可与034并行，按当前索引READY领取，详见[规格](../../docs/specs/tmtaff-tam-phase.md)。
 
-原生时间模型可显式配置`model.heading_representation=circular_sincos`；缺省`linear_zscore`兼容旧权重。新模式用保存的T_core均值/尺度还原航向并转sin/cos，内部投影为5维，仍用PE4加零列；训练、评价与快照保持同一变换并核对normalizer。跨模式不允许恢复/转移旧权重，需从头训练。新旧特征MSE不可直接比，改用相同TAM预算的关联结果；[规格](../../docs/specs/tcm-circular-heading.md)与[037草案](../../HandOver/L2S-20261020-037.md)列明比较及命令，新增训练待确认。
+原生时间模型可显式配置`model.heading_representation=circular_sincos`；缺省`linear_zscore`兼容旧权重。新模式用保存的T_core均值/尺度还原航向并转sin/cos，内部投影为5维，仍用PE4加零列；训练、评价与快照保持同一变换并核对normalizer。跨模式不允许恢复/转移旧权重，需从头训练。新旧特征MSE不可直接比，下游关联另行验证；[规格](../../docs/specs/tcm-circular-heading.md)与[037](../../HandOver/L2S-20261020-037.md)列明已反馈批准的一次TCM4000及完整V命令，无自动TAM。
