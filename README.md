@@ -14,7 +14,7 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 | 关联/融合创新 | 方案与部分原型阶段 | 共享偏差与对应判断相互修正、按时间/属性预测融合效用，尚缺可靠增益证据 |
 | 原生运动控制R2 | **本地完整V已完成** | OLS位置MAE8.85→4.74km；50场好/14场差，支撑内不变。普通控制，不是已成立的学习贡献 |
 
-服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。当前没有新READY或已知在途作业，下一训练需另定方案。022—025继续HOLD，T_test封存。
+服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。当前仅042零更新诊断READY，尚无领取回执；下一训练需另定方案。022—025继续HOLD，T_test封存。
 
 **接下来按[执行路线](docs/research_brief.md#接下来怎么推进)推进：** R1零更新诊断已实现，真实035权重需服务器执行；[R2原生运动已完成](docs/proposals/repair_before_retraining/native-motion-analysis.md)。本地继续匿名校准关联与固定分组普通融合，有信号后再逐项训练学习增量；baseline同步完善，最终进行完整系统验证。
 
