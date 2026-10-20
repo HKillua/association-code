@@ -15,6 +15,8 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 
 服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。当前没有新READY或已知在途作业，下一训练需另定方案。022—025继续HOLD，T_test封存。
 
+**接下来按[执行路线](docs/research_brief.md#接下来怎么推进)推进：** 先并行准备035同输入零更新诊断与原生多点运动控制；随后并行做匿名校准关联、固定分组普通融合；有信号后再逐项训练学习增量；baseline同步完善，最终进行完整系统验证。缓存运动的探索性改善及边界见[综合方案](docs/proposals/repair_before_retraining/method-revision-after041.md)。
+
 ## 从哪里开始
 
 | 文档 | 用途 |
