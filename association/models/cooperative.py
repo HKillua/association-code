@@ -30,6 +30,8 @@ class CooperativeConfig:
     model_variant: str = 'legacy'
     speed_output_policy: str = 'physical_softplus'
     heading_output_policy: str = 'learned_absolute'
+    decoder_norm_first: bool = False
+    decoder_num_layers: int | None = None
 
     def __post_init__(self):
         for name in ('length', 'max_observations', 'd_model', 'nhead',
@@ -57,6 +59,15 @@ class CooperativeConfig:
             raise ValueError('heading_output_policy must be learned_absolute or observation_residual')
         if self.heading_output_policy == 'observation_residual' and self.model_variant != 'support_residual_v2':
             raise ValueError('observation_residual heading requires support_residual_v2')
+        if not isinstance(self.decoder_norm_first, bool):
+            raise ValueError('decoder_norm_first must be a boolean')
+        if self.decoder_num_layers is not None:
+            depth = self.decoder_num_layers
+            if isinstance(depth, bool) or not isinstance(depth, int) or not 1 <= depth <= self.num_layers:
+                raise ValueError('decoder_num_layers must be an integer from 1 through num_layers, or None')
+        if ((self.decoder_norm_first or self.decoder_num_layers is not None)
+                and self.model_variant != 'support_residual_v2'):
+            raise ValueError('decoder ablations require support_residual_v2')
 
 
 def _head(inputs, hidden, outputs):
@@ -111,7 +122,8 @@ class CooperativeModel(nn.Module):
             d, config.nhead, config.dim_feedforward, config.dropout, batch_first=True),
             config.num_layers, enable_nested_tensor=False)
         self.decoder = nn.TransformerDecoder(nn.TransformerDecoderLayer(
-            d, config.nhead, config.dim_feedforward, config.dropout, batch_first=True),
+            d, config.nhead, config.dim_feedforward, config.dropout, batch_first=True,
+            norm_first=config.decoder_norm_first),
             config.num_layers)
         self.state_projection = nn.Linear(d, 4)
         self.role_embedding = nn.Embedding(2, d)
@@ -149,9 +161,30 @@ class CooperativeModel(nn.Module):
                     self.state_projection.bias[3].zero_()
                 self.local_identity[-1].weight.zero_()
                 self.local_identity[-1].bias.zero_()
+        # Initialize the original full stack before removing later decoder
+        # layers. Retained weights, all other modules and subsequent RNG state
+        # then match the full-depth control under the same construction seed.
+        decoder_depth = config.num_layers if config.decoder_num_layers is None else config.decoder_num_layers
+        if decoder_depth != config.num_layers:
+            self.decoder.layers = self.decoder.layers[:decoder_depth]
+            self.decoder.num_layers = decoder_depth
+        if config.decoder_norm_first or decoder_depth != config.num_layers:
+            # Forward semantics are not encoded in same-shaped norm weights.
+            # Default historical checkpoints keep their original state keys.
+            self.register_buffer('decoder_semantics',
+                torch.tensor([1, int(config.decoder_norm_first), decoder_depth], dtype=torch.int64))
 
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                               missing_keys, unexpected_keys, error_msgs):
+        if hasattr(self, 'decoder_semantics'):
+            incoming = state_dict.get(prefix + 'decoder_semantics')
+            expected = self.decoder_semantics
+            if (not isinstance(incoming, Tensor) or incoming.shape != expected.shape
+                    or incoming.dtype != torch.int64
+                    or not torch.equal(incoming.to(expected.device), expected)):
+                raise ValueError('checkpoint decoder_semantics disagrees with declared decoder configuration')
+        elif prefix + 'decoder_semantics' in state_dict:
+            raise ValueError('checkpoint decoder_semantics disagrees with default decoder configuration')
         if self.config.speed_output_policy != 'scaled_log' and prefix + 'speed_reference' in state_dict:
             raise ValueError('checkpoint scaled_log speed disagrees with declared speed_output_policy')
         if self.config.heading_output_policy == 'observation_residual':

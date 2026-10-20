@@ -12,6 +12,8 @@ MTAD不完整量测下的**补全、关联、融合**研究。用户2026-10-20�
 
 **Baseline继续并行：** [037圆周TCM](HandOver/S2L-20261020-037.md)已于北京时间14:02:43在隔离目录、GPU1启动，一次4000步及完整V，无自动TAM；035仍在途，当前无新增READY。新旧特征MSE不可直接排名，下游收益另议。[036](docs/proposals/repair_before_retraining/036-analysis.md)短程反馈未显示为主要故障；候选038现象不能直接套用到baseline。历次证据见[综合排查](docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
 
+**下一步三组消融已实现，具体预算待确认：** [039—041规格](docs/specs/cooperative-decoder-ablations.md)分别只改decoder pre-norm、只将decoder降为两层、只关闭teacher身份BCE，均对照已完成034，从头1000步及完整V，完成后各一次原四场CPU动态读取。三组配置和独立DRAFT交接已备齐，尚不可领取；累计粗估7—8个单卡小时，各4h仅提醒、失败不重试，最多两个单卡。微型训练验证了零物理头初始时BCE先影响共享encoder的可能路径，但未证明它导致034失效；动态幅度和真实误差分开判断。
+
 - **020参考已保全后停止**：保存TCM1000＋TAM300权重，关联开发macro-F1 **.435672**；TAM301—400日志保留但参数未落盘，TFM/JOINT与物理终评未做。此次停止来自用户改变研究顺序，不是模型自然故障。
 - **021身份原分数已复核**：teacher1000＋utility200完成，teacher端点开发macro-F1 **.630321**、P .301445、R .835305。比同人口位置控制仅高1.47个百分点，跨源F1没有优势；不能归因于utility或融合，T_test未开启。
 - **030残差取证已完成并复核**：固定4场景86片段，位置残差几乎为片段固定偏移，速度预测集中在41.86–42.34。支撑内9001由1.26米退化至241.62米，9002从4489.32米小幅改善至4449.93米；不能统一清零残差。损失计算未发现分母错误，具体训练根因未证实；022—025仍HOLD。[030复核](docs/proposals/repair_before_retraining/README.md#030逐点残差与损失复核2026-10-19)、[交接索引](HandOver/Handover.md)。

@@ -218,6 +218,118 @@ class CooperativeRevisionCLITests(unittest.TestCase):
                 else:
                     self.assertEqual(arrays['prediction'].shape, (0, 4, 4))
 
+    def test_native_teacher_decoder_ablations_train_reload_and_export_full_population(self):
+        from association.data.cooperative import normalize_cooperative_scene
+        from association.evaluation.cooperative_dynamics import evaluate_cooperative_dynamics
+        variants = (
+            ('pre-norm', dict(decoder_norm_first=True), 1., 3, True),
+            ('shallow-decoder', dict(decoder_num_layers=2), 1., 2, False),
+            ('without-identity', {}, 0., 3, False),
+        )
+        for name, model_change, identity_weight, decoder_depth, norm_first in variants:
+            with self.subTest(variant=name):
+                fixture = native_fixture.make_native_zip_fixture(self)
+                fixture.config = self.configuration()
+                fixture.config['model'].update(
+                    num_layers=3, speed_output_policy='scaled_log',
+                    heading_output_policy='observation_residual', **model_change)
+                fixture.config['training'].update(
+                    teacher_updates=2, utility_updates=0, adapt_updates=0,
+                    teacher_identity_weight=identity_weight)
+                output = fixture.root/name
+                with (patch('association.evaluation.association.select_threshold',
+                            side_effect=AssertionError('teacher must not select an association threshold')),
+                      patch('association.evaluation.cooperative.score_cooperative',
+                            side_effect=AssertionError('teacher must not score validation associations')),
+                      patch('association.evaluation.cooperative.evaluate_cooperative',
+                            side_effect=AssertionError('teacher must not run grouped fusion'))):
+                    self.assertEqual(self.invoke([
+                        'fit', '--device', 'cpu', '--phase', 'teacher', '--save-predictions',
+                        *fixture.cli_args(name)]), 0)
+                run = runtime.read_json(output/'run.json')
+                self.assertEqual(run['status'], 'COMPLETED')
+                self.assertEqual(run['phase'], 'teacher')
+                self.assertEqual(run['completed_updates'], 2)
+                self.assertEqual(run['completed_routes'], [])
+                self.assertEqual(run['training']['teacher_identity_weight'], identity_weight)
+                self.assertFalse(run['identity_selection_performed'])
+                self.assertNotIn('threshold', run)
+                self.assertEqual(set(run['phases']), {
+                    'external_preparation', 'local_preparation', 'teacher', 'completion_evaluation'})
+                self.assertFalse((output/'shared.pt').exists())
+                self.assertFalse((output/'utility.pt').exists())
+                self.assertFalse(list(output.glob('adapt-*.pt')))
+
+                model, payload = load_cooperative_checkpoint(output/'teacher.pt', device='cpu')
+                self.assertEqual(payload['completed_updates'], 2)
+                self.assertEqual(payload['training']['teacher_identity_weight'], identity_weight)
+                self.assertEqual(len(model.encoder.layers), 3)
+                self.assertEqual(len(model.decoder.layers), decoder_depth)
+                self.assertTrue(all(not layer.norm_first for layer in model.encoder.layers))
+                self.assertTrue(all(layer.norm_first == norm_first for layer in model.decoder.layers))
+                # The residual head starts at zero; nonzero saved weights and
+                # Adam step counters establish actual updates through the CLI.
+                self.assertGreater(torch.count_nonzero(model.state_projection.weight).item(), 0)
+                self.assertTrue(payload['optimizer_state']['state'])
+                self.assertEqual(
+                    {int(state['step']) for state in payload['optimizer_state']['state'].values()}, {2})
+                history = runtime.read_json(output/'history.json')
+                self.assertEqual(len(history), 2)
+                for row in history:
+                    self.assertEqual(row['stage'], 'teacher')
+                    self.assertTrue(np.isfinite(row['gradient_norm']))
+                    components = row['loss_components']
+                    self.assertEqual(row['teacher_identity_weight'], identity_weight)
+                    self.assertGreater(row['identity_bce_raw'], 0.)
+                    self.assertAlmostEqual(components['identity_bce'],
+                                           identity_weight*row['identity_bce_raw'], places=6)
+                    self.assertAlmostEqual(row['loss'],
+                                           components['physical']+components['identity_bce'], places=5)
+
+                report = runtime.read_json(output/'completion-evaluation.json')
+                self.assertEqual(report['scene_count'], 2)
+                self.assertEqual(report['fragment_count'], 4)
+                self.assertEqual(report['completion_forward_count'], 4)
+                self.assertFalse(report['test_opened'])
+                self.assertTrue(report['per_scene'][1]['reference_targets_without_input'])
+                execution = runtime.read_json(output/'execution.json')
+                self.assertFalse(execution['preparation']['test_opened'])
+                self.assertEqual(execution['configuration']['training']['teacher_identity_weight'],
+                                 identity_weight)
+                entries = runtime.read_json(output/'completion-predictions'/'index.json')
+                self.assertEqual([entry['scene_id'] for entry in entries], ['2', '4'])
+                dataset = fixture.load(data_config={
+                    **fixture.data, 'reference_longitude_policy': 'shortest_arc'})
+                model.eval()
+                if name != 'without-identity':
+                    dynamics = evaluate_cooperative_dynamics(
+                        model, payload['normalizer'], dataset['validation'], device='cpu')
+                    self.assertEqual(dynamics['decoder_layer_count'], decoder_depth)
+                    self.assertEqual(dynamics['completion_forward_count'], 4)
+                    self.assertTrue(dynamics['checks']['input_and_physical_reconstruction_exact'])
+                    self.assertEqual(
+                        {key for key in dynamics['aggregate']
+                         if key.startswith('decoder_layer_')},
+                        {f'decoder_layer_{layer}_centered_rms'
+                         for layer in range(1, decoder_depth+1)})
+                for scene, entry in zip(dataset['validation'], entries):
+                    with np.load(output/'completion-predictions'/entry['path']) as arrays:
+                        prediction = arrays['prediction']
+                        self.assertEqual(prediction.shape, (len(scene['node_ids']), 4, 4))
+                        self.assertEqual(arrays['target'].shape, prediction.shape)
+                        self.assertEqual(arrays['target_valid'].shape, prediction.shape)
+                        self.assertTrue(np.isfinite(prediction).all())
+                        if not scene['node_ids']:
+                            continue
+                        values, observed = normalize_cooperative_scene(
+                            scene, payload['normalizer'], model.config)
+                        with torch.no_grad():
+                            encoded = model.encode(torch.as_tensor(values), torch.as_tensor(observed))
+                            reloaded = torch.stack([
+                                model.decode_group(encoded, [node])
+                                for node in range(len(scene['node_ids']))]).numpy()
+                        np.testing.assert_allclose(prediction, reloaded, rtol=1e-6, atol=1e-5)
+
     def test_shared_and_one_independent_arm_use_public_cli(self):
         common = ['check', '--device', 'cpu', '--cpu-threads', '1',
                   '--model-variant', 'support_residual_v2']
@@ -225,16 +337,22 @@ class CooperativeRevisionCLITests(unittest.TestCase):
         self.assertEqual(self.invoke([*common, '--phase', 'shared', '--output', str(shared)]), 0)
         self.assertTrue((shared/'shared.pt').is_file())
         self.assertFalse(list(shared.glob('*-evaluation.json')))
-        # Existing 021 endpoints predate the explicit timing-policy field.
+        # Existing 021 endpoints predate explicit timing/output/ablation fields.
         old_run = runtime.read_json(shared/'run.json')
         old_run['training'].pop('time_policy')
+        old_run['training'].pop('teacher_identity_weight')
         old_run['model_config'].pop('speed_output_policy')
         old_run['model_config'].pop('heading_output_policy')
+        old_run['model_config'].pop('decoder_norm_first')
+        old_run['model_config'].pop('decoder_num_layers')
         runtime.write_json(shared/'run.json', old_run)
         old_checkpoint = torch.load(shared/'shared.pt', weights_only=True)
         old_checkpoint['training'].pop('time_policy')
+        old_checkpoint['training'].pop('teacher_identity_weight')
         old_checkpoint['model_config'].pop('speed_output_policy')
         old_checkpoint['model_config'].pop('heading_output_policy')
+        old_checkpoint['model_config'].pop('decoder_norm_first')
+        old_checkpoint['model_config'].pop('decoder_num_layers')
         torch.save(old_checkpoint, shared/'shared.pt')
         self.assertEqual(self.invoke([*common, '--phase', 'arm', '--shared-from', str(shared),
                          '--time-policy', 'advisory',

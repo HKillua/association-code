@@ -3,6 +3,7 @@
 These exercise physical behavior and information boundaries, not MTAD quality.
 """
 import copy
+from dataclasses import asdict
 import math
 import unittest
 from unittest.mock import patch
@@ -21,11 +22,13 @@ ROUTES = ('plain', 'scalar-u', 'attribute-u', 'learned-attribute')
 
 
 def revision_model(*, length=7, maximum=6, speed_output_policy='physical_softplus',
-                   heading_output_policy='learned_absolute'):
+                   heading_output_policy='learned_absolute', num_layers=1,
+                   decoder_norm_first=False, decoder_num_layers=None):
     config = CooperativeConfig(length=length, max_observations=maximum, d_model=8,
-        nhead=2, num_layers=1, dim_feedforward=16, dropout=0., head_hidden=6,
+        nhead=2, num_layers=num_layers, dim_feedforward=16, dropout=0., head_hidden=6,
         model_variant='support_residual_v2', support_time_policy='train_absmax_v1',
-        speed_output_policy=speed_output_policy, heading_output_policy=heading_output_policy)
+        speed_output_policy=speed_output_policy, heading_output_policy=heading_output_policy,
+        decoder_norm_first=decoder_norm_first, decoder_num_layers=decoder_num_layers)
     normalizer = fit_cooperative_normalizer([timed_scene('train', 'T_core')], config)
     # Simple physical scales make the geometry expectations independently exact.
     normalizer['mean'] = [0., 0., 109., 0.]
@@ -59,6 +62,112 @@ class CooperativeRevisionModelTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         torch.set_num_threads(cls.old_threads)
+
+    def test_decoder_defaults_preserve_historical_configuration_and_weights(self):
+        historical, normalizer = revision_model(length=3, num_layers=6,
+            speed_output_policy='scaled_log', heading_output_policy='observation_residual')
+        old_config = asdict(historical.config)
+        del old_config['decoder_norm_first'], old_config['decoder_num_layers']
+        restored = CooperativeModel(CooperativeConfig(**old_config), normalizer, support_time_scale=10.)
+        explicit, _ = revision_model(length=3, num_layers=6, decoder_norm_first=False,
+            decoder_num_layers=6, speed_output_policy='scaled_log',
+            heading_output_policy='observation_residual')
+        self.assertNotIn('decoder_semantics', historical.state_dict())
+        self.assertEqual(historical.state_dict().keys(), explicit.state_dict().keys())
+        for name, value in historical.state_dict().items():
+            torch.testing.assert_close(value, explicit.state_dict()[name], rtol=0, atol=0)
+        with torch.no_grad():
+            historical.state_projection.weight.fill_(.025)
+        restored.load_state_dict(historical.state_dict())
+        explicit.load_state_dict(historical.state_dict())
+        x, mask = packed(historical, [[(0, 10, 20, 3, 359), (2, 12, 21, 7, 1)]])
+        for model in (historical, restored, explicit):
+            model.eval()
+        with torch.no_grad():
+            expected = historical(x, mask)
+            torch.testing.assert_close(restored(x, mask), expected, rtol=0, atol=0)
+            torch.testing.assert_close(explicit(x, mask), expected, rtol=0, atol=0)
+
+    def test_decoder_ablation_initialization_rng_and_actual_forward(self):
+        options = dict(length=3, num_layers=6, speed_output_policy='scaled_log',
+                       heading_output_policy='observation_residual')
+        control, normalizer = revision_model(**options)
+        control_rng = torch.get_rng_state().clone()
+        before = dict(control.named_parameters())
+        pre, _ = revision_model(**options, decoder_norm_first=True)
+        self.assertTrue(torch.equal(torch.get_rng_state(), control_rng))
+        short, _ = revision_model(**options, decoder_num_layers=2)
+        self.assertTrue(torch.equal(torch.get_rng_state(), control_rng))
+        self.assertEqual(dict(pre.named_parameters()).keys(), before.keys())
+        for model in (pre, short):
+            self.assertEqual(len(model.encoder.layers), 6)
+            self.assertTrue(all(not layer.norm_first for layer in model.encoder.layers))
+            for name, parameter in model.named_parameters():
+                torch.testing.assert_close(parameter, before[name], rtol=0, atol=0)
+        self.assertEqual(len(pre.decoder.layers), 6)
+        self.assertTrue(all(layer.norm_first for layer in pre.decoder.layers))
+        self.assertIsNone(pre.decoder.norm)
+        self.assertEqual(len(short.decoder.layers), 2)
+        self.assertEqual(short.decoder.num_layers, 2)
+        self.assertTrue(all(not layer.norm_first for layer in short.decoder.layers))
+        self.assertFalse(any(name.startswith('decoder.layers.2.') for name, _ in short.named_parameters()))
+        self.assertEqual(set(pre.state_dict()) - set(control.state_dict()), {'decoder_semantics'})
+        x, mask = packed(control, [[(0, 10, 20, 3, 359), (2, 12, 21, 7, 1)]])
+        for model in (control, pre, short):
+            model.eval()
+            with torch.no_grad():
+                # Zero heads hide architecture differences; an identical,
+                # nonzero head exposes the decoder's actual forward behavior.
+                model.state_projection.weight.copy_(torch.arange(32).reshape(4, 8) * .001)
+        with torch.no_grad():
+            original = control(x, mask)
+            for model in (pre, short):
+                actual = model(x, mask)
+                self.assertTrue(torch.isfinite(actual).all())
+                self.assertGreater(float((actual-original).abs().max()), 1e-4)
+        for model in (pre, short):
+            optimizer = torch.optim.SGD(model.parameters(), lr=.001)
+            previous = model.decoder.layers[0].linear1.weight.detach().clone()
+            optimizer.zero_grad()
+            model(x, mask)[:, 0].sum().backward()
+            optimizer.step()
+            self.assertFalse(torch.equal(previous, model.decoder.layers[0].linear1.weight))
+            restored = CooperativeModel(model.config, normalizer, support_time_scale=10.)
+            restored.load_state_dict(model.state_dict())
+            restored.eval()
+            with torch.no_grad():
+                torch.testing.assert_close(restored(x, mask), model(x, mask), rtol=0, atol=0)
+
+    def test_decoder_semantics_cannot_be_cross_loaded_even_non_strictly(self):
+        options = dict(length=3, num_layers=6)
+        control, _ = revision_model(**options)
+        pre, _ = revision_model(**options, decoder_norm_first=True)
+        short, _ = revision_model(**options, decoder_num_layers=2)
+        for strict in (True, False):
+            for destination, source in ((control, pre), (pre, control), (short, control),
+                                        (control, short), (pre, short), (short, pre)):
+                with self.subTest(strict=strict, config=destination.config), \
+                     self.assertRaisesRegex(ValueError, 'decoder_semantics'):
+                    destination.load_state_dict(source.state_dict(), strict=strict)
+        bad = copy.deepcopy(pre.state_dict())
+        bad['decoder_semantics'][1] = 0
+        with self.assertRaisesRegex(ValueError, 'decoder_semantics'):
+            pre.load_state_dict(bad)
+
+    def test_decoder_configuration_rejects_ambiguous_or_unsupported_values(self):
+        defaults = CooperativeConfig()
+        self.assertFalse(defaults.decoder_norm_first)
+        self.assertIsNone(defaults.decoder_num_layers)
+        v2 = dict(model_variant='support_residual_v2', support_time_policy='train_absmax_v1')
+        for invalid in (None, 0, 1, 'true'):
+            with self.subTest(norm=invalid), self.assertRaisesRegex(ValueError, 'must be a boolean'):
+                CooperativeConfig(**v2, decoder_norm_first=invalid)
+        for invalid in (True, False, 0, -1, 7, 2., '2'):
+            with self.subTest(depth=invalid), self.assertRaisesRegex(ValueError, 'decoder_num_layers'):
+                CooperativeConfig(**v2, decoder_num_layers=invalid)
+        for options in ({'decoder_norm_first': True}, {'decoder_num_layers': 2}):
+            with self.assertRaisesRegex(ValueError, 'require support_residual_v2'):
+                CooperativeConfig(**options)
 
     def test_visible_base_interpolation_short_longitude_arc_and_endpoint_hold(self):
         model, normalizer = revision_model()

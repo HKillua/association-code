@@ -224,16 +224,21 @@ def _batch(scenes, packed, sampler, batch_size, device, rng, fraction, maximum):
 
 def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
                 teacher=None, error_scales=None, utility_epsilon=1e-3,
-                gradient_clip=1., check=None):
+                gradient_clip=1., teacher_identity_weight=1., check=None):
     """One effective batch, streaming one sampled pair graph at a time.
 
     Pair streaming does not resample or discard supervision. Denominators are
     computed over the full batch before any backward/optimizer update.
     Detached loss components are diagnostic sums: physical includes its
-    original variance regularizer; identity_bce and utility are separate.
+    original variance regularizer; identity_bce is the actual weighted
+    contribution. Teacher reports also retain the raw BCE before weighting.
     """
     if not items or not math.isfinite(gradient_clip) or gradient_clip <= 0:
         raise ValueError('nonempty batch and positive gradient clip required')
+    if (isinstance(teacher_identity_weight, bool)
+            or not isinstance(teacher_identity_weight, (int, float))
+            or not math.isfinite(teacher_identity_weight) or teacher_identity_weight < 0):
+        raise ValueError('teacher_identity_weight must be finite and nonnegative')
     parameters = stage_parameters(model, stage, routing=routing)
     objective.requires_grad_(stage in ('teacher', 'adapt')).train(stage in ('teacher', 'adapt'))
     objective.zero_grad(set_to_none=True)
@@ -256,7 +261,7 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
     if stage != 'identity' and (counts <= 0).any():
         raise ValueError('no supervision for an effective-batch attribute; no resampling')
     optimizer.zero_grad(set_to_none=True)
-    total, regularized, used = 0., False, 0
+    total, regularized, used, identity_raw_total = 0., False, 0, 0.
     components = dict(physical=0., identity_bce=0., utility=0.)
     try:
         for item in items:
@@ -268,6 +273,7 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
                 continue  # Same preselected positive batch for every fusion arm.
             encoded = model.encode(x, mask)
             item_components = dict.fromkeys(components, None)
+            identity_raw = None
             if stage == 'utility':
                 e0, e1 = teacher_error_pair(teacher, x, mask, target, valid, scales=error_scales)
                 u = model.utility(encoded, pair)[0]
@@ -293,8 +299,13 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
                 if stage == 'teacher':
                     score = model.score_pairs(encoded, pair, use_utility=False)
                     identity_loss = F.binary_cross_entropy_with_logits(score, score.new_tensor([item['label']])) / len(items)
-                    loss = loss + identity_loss
-                    item_components['identity_bce'] = identity_loss
+                    # Keep the default graph/arithmetic unchanged. Weight zero
+                    # still computes the same BCE and retains optimizer members.
+                    weighted_identity = (identity_loss if teacher_identity_weight == 1.
+                                         else teacher_identity_weight * identity_loss)
+                    loss = loss + weighted_identity
+                    item_components['identity_bce'] = weighted_identity
+                    identity_raw = identity_loss
             if not torch.isfinite(loss):
                 raise FloatingPointError('nonfinite candidate objective')
             loss.backward()
@@ -302,10 +313,14 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
             # additional forward, RNG draw, backward or device synchronization.
             detached = [loss.detach()] + [value.detach() if value is not None else loss.new_zeros(())
                                          for value in item_components.values()]
+            if stage == 'teacher':
+                detached.append(identity_raw.detach())
             values = torch.stack(detached).cpu().tolist()
             total += values[0]
-            for key, value in zip(components, values[1:]):
+            for key, value in zip(components, values[1:1+len(components)]):
                 components[key] += value
+            if stage == 'teacher':
+                identity_raw_total += values[-1]
             used += 1
         if not used:
             raise ValueError('no effective training items')
@@ -316,10 +331,13 @@ def train_batch(model, objective, optimizer, items, *, stage, routing='plain',
     except BaseException:
         optimizer.zero_grad(set_to_none=True)
         raise
-    return dict(stage=stage, routing=routing, loss=total, loss_components=components,
-                valid_counts=counts.cpu().tolist(),
-                gradient_norm=float(norm.detach().cpu()), sampled_pairs=len(items), used_pairs=used,
-                removed_observations=sum(sum(x['removed']) for x in items))
+    report = dict(stage=stage, routing=routing, loss=total, loss_components=components,
+                  valid_counts=counts.cpu().tolist(),
+                  gradient_norm=float(norm.detach().cpu()), sampled_pairs=len(items), used_pairs=used,
+                  removed_observations=sum(sum(x['removed']) for x in items))
+    if stage == 'teacher':
+        report.update(identity_bce_raw=identity_raw_total, teacher_identity_weight=teacher_identity_weight)
+    return report
 
 
 def training_configuration(config, *, phase='full'):
@@ -328,11 +346,13 @@ def training_configuration(config, *, phase='full'):
     required = {'seed', 'batch_size', 'teacher_updates', 'utility_updates', 'adapt_updates',
                 'learning_rate', 'gradient_clip', 'endpoint_fraction', 'utility_epsilon',
                 'error_scale_policy', 'routes', 'max_seconds', 'batch_tracks', 'pair_batch_size'}
-    if not required.issubset(config) or set(config) - required - {'longitude_loss_mode', 'time_policy'}:
+    if not required.issubset(config) or set(config) - required - {
+            'longitude_loss_mode', 'time_policy', 'teacher_identity_weight'}:
         raise ValueError('candidate training config must explicitly contain ' + ', '.join(sorted(required)))
     cfg = dict(config)
     cfg.setdefault('longitude_loss_mode', 'linear')
     cfg.setdefault('time_policy', 'hard')
+    cfg.setdefault('teacher_identity_weight', 1.)
     if cfg['time_policy'] not in ('hard', 'advisory'):
         raise ValueError('time_policy must be hard or advisory')
     if cfg['longitude_loss_mode'] not in ('linear', 'shortest_arc'):
@@ -351,6 +371,10 @@ def training_configuration(config, *, phase='full'):
         value = cfg[key]
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value <= 0:
             raise ValueError(key + ' must be positive and finite')
+    weight = cfg['teacher_identity_weight']
+    if (isinstance(weight, bool) or not isinstance(weight, (int, float))
+            or not math.isfinite(weight) or weight < 0):
+        raise ValueError('teacher_identity_weight must be finite and nonnegative')
     fraction = cfg['endpoint_fraction']
     if isinstance(fraction, bool) or not isinstance(fraction, (int, float)) or not math.isfinite(fraction) or not 0 <= fraction < 1:
         raise ValueError('endpoint_fraction must be in [0,1)')
@@ -467,9 +491,12 @@ def _load_shared(directory, model_config, config, contract, validation_scenes):
                 'identity_selection', 'identity_selection_phase'):
         if payload.get(key) != source.get(key):
             raise ValueError('shared checkpoint/run disagree on ' + key)
-    protocol = lambda cfg: {key: value for key, value in cfg.items()
-                            if key not in ('max_seconds', 'time_policy')}
-    # Older snapshots predate optional model fields; compare their resolved
+    def protocol(cfg):
+        resolved = {key: value for key, value in cfg.items()
+                    if key not in ('max_seconds', 'time_policy')}
+        resolved.setdefault('teacher_identity_weight', 1.)
+        return resolved
+    # Older snapshots predate optional model/training fields; compare resolved
     # behavior while retaining the checkpoint/run consistency check above.
     if protocol(payload['training']) != protocol(config) or asdict(model.config) != asdict(model_config):
         raise ValueError('shared training/model protocol differs; only job timing may change')
@@ -503,7 +530,7 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     ``full`` retains the original single-job path. V2 ``shared`` writes the
     teacher/utility endpoint and fixed identity records; ``arm`` loads that
     completed endpoint and performs one fresh, identically seeded adaptation.
-    V2 ``teacher`` stops after the unchanged self/cross/identity objective and
+    V2 ``teacher`` stops after its declared self/cross/weighted-identity objective and
     evaluates every V fragment independently, without identity selection.
     The wall budget covers this job's stages, evaluation and initial data
     preparation. No resume/retry or implicit training schedule is provided.
@@ -679,7 +706,8 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
                 tick = time.monotonic()
                 report = train_batch(target_model, target_objective, optimizer, items, stage=stage,
                     routing=route, teacher=teacher, error_scales=normalizer['std'],
-                    utility_epsilon=cfg['utility_epsilon'], gradient_clip=cfg['gradient_clip'], check=bounded)
+                    utility_epsilon=cfg['utility_epsilon'], gradient_clip=cfg['gradient_clip'],
+                    teacher_identity_weight=cfg['teacher_identity_weight'], check=bounded)
                 if device.type == 'cuda':
                     torch.cuda.synchronize(device)
                 elif device.type == 'mps':

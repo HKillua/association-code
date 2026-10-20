@@ -14,6 +14,7 @@ from association.models.cooperative import CooperativeConfig, CooperativeModel
 from association.data.cooperative import fit_cooperative_normalizer, normalize_cooperative_scene
 from association.training.cooperative import (
     _snapshot, load_cooperative_checkpoint, stage_parameters, train_batch, train_cooperative,
+    training_configuration,
 )
 from association.models.fusion import FusionLoss
 from association.training.common import fit_normalizer, normalize_scene
@@ -188,6 +189,72 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
                 self.assertTrue(any(name.startswith(module+'.') for name in changed))
         self.assertFalse(any(name.startswith(('utility_head.', 'ordinary_gate.', 'identity_with_utility.'))
                              for name in changed))
+
+    def test_teacher_identity_weight_default_matches_explicit_one(self):
+        self.assertEqual(training_configuration(self.fit_config())['teacher_identity_weight'], 1.)
+        for invalid in (-1., float('nan'), float('inf'), True, '0'):
+            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, 'teacher_identity_weight'):
+                training_configuration({**self.fit_config(), 'teacher_identity_weight': invalid})
+        default, explicit = copy.deepcopy(self.model), copy.deepcopy(self.model)
+        objectives = [FusionLoss(position_loss_mode='standard_smooth_l1') for _ in range(2)]
+        optimizers = [self.optimizer(model, objective, 'teacher')
+                      for model, objective in zip((default, explicit), objectives)]
+        first = train_batch(default, objectives[0], optimizers[0], self.items(), stage='teacher')
+        second = train_batch(explicit, objectives[1], optimizers[1], self.items(),
+                             stage='teacher', teacher_identity_weight=1.)
+        self.assertEqual(first, second)
+        self.assertEqual(first['identity_bce_raw'], first['loss_components']['identity_bce'])
+        self.assertAlmostEqual(first['loss'], sum(first['loss_components'].values()), places=5)
+        for name, value in default.state_dict().items():
+            torch.testing.assert_close(value, explicit.state_dict()[name], rtol=0, atol=0)
+        torch.testing.assert_close(objectives[0].log_variance, objectives[1].log_variance, rtol=0, atol=0)
+
+    def test_zero_identity_weight_preserves_physical_pairs_and_exposes_zero_head_start(self):
+        self.config = replace(self.config, speed_output_policy='scaled_log',
+                              heading_output_policy='observation_residual')
+        self.normalizer = fit_cooperative_normalizer([self.scene], self.config)
+        torch.manual_seed(23)
+        physical = CooperativeModel(self.config, self.normalizer, support_time_scale=3.)
+        joint = copy.deepcopy(physical)
+        before = {name: value.detach().clone() for name, value in physical.named_parameters()}
+        items = self.items()
+        objective = FusionLoss(position_loss_mode='standard_smooth_l1')
+        optimizer = self.optimizer(physical, objective, 'teacher')
+        parameter_ids = [id(p) for group in optimizer.param_groups for p in group['params']]
+        expected_counts = sum((item['valid'].sum((0, 1)) * (1 + int(item['label'] == 1))
+                               for item in items), torch.zeros(4, dtype=torch.long))
+        with patch.object(physical, 'decode_group', wraps=physical.decode_group) as decode:
+            first = train_batch(physical, objective, optimizer, items, stage='teacher',
+                                teacher_identity_weight=0.)
+        self.assertEqual(decode.call_count, 6)  # two self per pair; two cross for the positive.
+        self.assertEqual(first['valid_counts'], expected_counts.tolist())
+        self.assertEqual(first['used_pairs'], len(items))
+        self.assertEqual(first['sampled_pairs'], len(items))
+        self.assertGreater(first['identity_bce_raw'], 0.)
+        self.assertEqual(first['loss_components']['identity_bce'], 0.)
+        self.assertEqual(first['loss'], first['loss_components']['physical'])
+        self.assertEqual(first['teacher_identity_weight'], 0.)
+        self.assertTrue(any(not torch.equal(value, before[name])
+                            for name, value in physical.named_parameters()
+                            if name.startswith('state_projection.')))
+        # All four output rows start at zero: the first physical update reaches
+        # the head, but cannot yet propagate through it to these upstream paths.
+        for name, value in physical.named_parameters():
+            if name.startswith(('encoder.', 'input_projection.', 'decoder.', 'fusion_projection.')):
+                torch.testing.assert_close(value, before[name], rtol=0, atol=0)
+        train_batch(physical, objective, optimizer, items, stage='teacher', teacher_identity_weight=0.)
+        self.assertEqual(parameter_ids, [id(p) for group in optimizer.param_groups for p in group['params']])
+        for name, value in physical.named_parameters():
+            if name.startswith(('identity_base.', 'local_identity.')):
+                torch.testing.assert_close(value, before[name], rtol=0, atol=0)
+        self.assertTrue(any(not torch.equal(value, before[name])
+                            for name, value in physical.named_parameters()
+                            if name.startswith('decoder.')))
+        joint_objective = FusionLoss(position_loss_mode='standard_smooth_l1')
+        joint_optimizer = self.optimizer(joint, joint_objective, 'teacher')
+        train_batch(joint, joint_objective, joint_optimizer, items, stage='teacher')
+        self.assertTrue(any(not torch.equal(value, before[name])
+                            for name, value in joint.named_parameters() if name.startswith('encoder.')))
 
     def test_utility_step_changes_only_u_and_not_frozen_teacher_or_query_pool(self):
         model = copy.deepcopy(self.model)
@@ -375,6 +442,8 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             old_bundle = torch.load(root/'shared'/'shared.pt', weights_only=True)
             del old_bundle['model_config']['speed_output_policy']
             del shared['model_config']['speed_output_policy']
+            del old_bundle['training']['teacher_identity_weight']
+            del shared['training']['teacher_identity_weight']
             torch.save(old_bundle, root/'shared'/'shared.pt')
             runtime.write_json(root/'shared'/'run.json', shared)
             for route in ROUTES:
@@ -432,6 +501,7 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             changed = copy.deepcopy(self.scene)
             changed['component_id'] = 'different-component'
             cases = [('protocol', [self.scene], {**cfg, 'learning_rate': cfg['learning_rate']*2}, 'protocol'),
+                     ('identity_weight', [self.scene], {**cfg, 'teacher_identity_weight': 0.}, 'protocol'),
                      ('population', [changed], cfg, 'scene contract')]
             for name, scenes, training, message in cases:
                 with self.subTest(name=name), self.assertRaisesRegex(ValueError, message):
