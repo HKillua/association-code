@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import signal
 import sys
 import time
 
@@ -27,6 +28,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     started = time.monotonic()
     output, owns_output = Path(args.output), False
+    previous_signal = signal.getsignal(signal.SIGTERM)
     run = dict(status='RUNNING', mode='same_input_zero_update_tam_inspection',
         optimizer_updates=0, test_opened=False, reference_read=False,
         threshold_reselected=False, margin_recalibrated=False, normalizer_refit=False,
@@ -49,6 +51,10 @@ def main(argv=None):
             run['advisory_message'] = 'advisory time exceeded; original fixed diagnostic continues without retry'
             write_run('RUNNING')
 
+    def terminated(signum, frame):
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        raise InterruptedError('TAM mode check interrupted by SIGTERM')
+
     try:
         import math
         if (args.cpu_threads < 1 or not math.isfinite(args.advisory_seconds) or args.advisory_seconds <= 0
@@ -56,6 +62,7 @@ def main(argv=None):
             raise ValueError('positive cpu-threads and finite positive advisory-seconds required')
         output.mkdir(parents=True, exist_ok=False)
         owns_output = True
+        signal.signal(signal.SIGTERM, terminated)
         write_run('RUNNING')
         import numpy as np
         import torch
@@ -114,6 +121,8 @@ def main(argv=None):
         print(f'{"INTERRUPTED" if interrupted else "FAILED"} {type(error).__name__}: {error}',
               file=sys.stderr, flush=True)
         return 130 if interrupted else 1
+    finally:
+        signal.signal(signal.SIGTERM, previous_signal)
 
 
 if __name__ == '__main__':

@@ -3,6 +3,10 @@ from contextlib import ExitStack, redirect_stderr, redirect_stdout
 import copy
 from dataclasses import asdict
 import io
+from pathlib import Path
+import signal
+import subprocess
+import sys
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -69,8 +73,12 @@ class TamModeCheckCliTests(unittest.TestCase):
             '--cpu-threads', '1', '--advisory-seconds', '.000001', '--expected-selected-update', '1']
 
     def invoke(self, args):
-        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
-            return cli.main(args)
+        previous_signal = signal.getsignal(signal.SIGTERM)
+        try:
+            with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+                return cli.main(args)
+        finally:
+            self.assertEqual(signal.getsignal(signal.SIGTERM), previous_signal)
 
     def test_native_zip_selected_checkpoint_no_reference_training_or_calibration(self):
         before = self.checkpoint.read_bytes()
@@ -144,6 +152,33 @@ class TamModeCheckCliTests(unittest.TestCase):
         self.assertEqual(run['status'], 'FAILED')
         self.assertIn('observation contract differs', run['failure'])
         self.assertFalse((self.root/'mismatch'/'summary.json').exists())
+
+    def test_sigterm_records_interrupted_without_success_summary(self):
+        script = """
+import os
+import signal
+import sys
+from unittest.mock import patch
+from tools.experiments.tam_mode_check import main
+
+def terminate(*args, **kwargs):
+    os.kill(os.getpid(), signal.SIGTERM)
+    raise AssertionError('SIGTERM did not interrupt the diagnostic')
+
+with patch('association.evaluation.tam_modes.prepare_fixed_samples', side_effect=terminate):
+    raise SystemExit(main(sys.argv[1:]))
+"""
+        result = subprocess.run(
+            [sys.executable, '-c', script, *self.args('sigterm')],
+            cwd=Path(cli.__file__).resolve().parents[2],
+            capture_output=True, text=True, timeout=30)
+        self.assertEqual(result.returncode, 130, result.stderr)
+        run = runtime.read_json(self.root/'sigterm'/'run.json')
+        self.assertEqual(run['status'], 'INTERRUPTED')
+        self.assertEqual(run['failure_type'], 'InterruptedError')
+        self.assertIn('SIGTERM', run['failure'])
+        self.assertEqual(run['optimizer_updates'], 0)
+        self.assertFalse((self.root/'sigterm'/'summary.json').exists())
 
 
 if __name__ == '__main__':
