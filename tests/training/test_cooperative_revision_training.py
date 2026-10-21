@@ -420,6 +420,29 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'position_base_policy'):
                 load_cooperative_checkpoint(root/'mislabeled.pt', device='cpu')
 
+    def test_scene_protocol_teacher_retains_real_components_and_split_contract(self):
+        train, validation = copy.deepcopy(self.scene), copy.deepcopy(self.validation)
+        validation['component_id'] = train['component_id']
+        fit = {**self.fit_config(), 'utility_updates': 0, 'adapt_updates': 0}
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, 'components overlap'):
+                train_cooperative([train], [validation], self.config, fit,
+                                  root/'legacy-overlap', device='cpu', phase='teacher')
+            train['split_unit'] = 'scene'
+            with self.assertRaisesRegex(ValueError, 'split_unit'):
+                train_cooperative([train], [validation], self.config, fit,
+                                  root/'mixed-protocol', device='cpu', phase='teacher')
+            validation['split_unit'] = 'scene'
+            run = train_cooperative([train], [validation], self.config, fit,
+                                    root/'scene-teacher', device='cpu', phase='teacher')
+            self.assertEqual(run['completed_updates'], fit['teacher_updates'])
+            _, checkpoint = load_cooperative_checkpoint(root/'scene-teacher'/'teacher.pt', device='cpu')
+            self.assertEqual(checkpoint['normalizer']['training_scene_ids'], [train['scene_id']])
+            for population in run['scene_contract']:
+                self.assertEqual(population[0]['split_unit'], 'scene')
+                self.assertEqual(population[0]['component_id'], train['component_id'])
+
     def test_split_shared_and_four_arms_equal_full_fit_with_real_dropout(self):
         config = replace(self.config, dropout=.25)
         cfg = {**self.fit_config(), 'adapt_updates': 2}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 import time
 
@@ -18,6 +19,76 @@ FIXED_DISTANCE_THRESHOLD_M = 14214.358367922307
 GROUPINGS = ('oracle_identity', 'predicted_anchor_direct')
 TRAIN_MODES = ('clean', 'clean_plus_wrong', 'wrong_only')
 ARMS = ('anchor', 'nearest_observation', 'mean_supported', 'learned')
+
+
+def utility_sign_weight(config):
+    """An omitted field preserves the original 046 objective exactly."""
+    weight = config['training'].get('utility_sign_weight', 0.)
+    if (isinstance(weight, bool) or not isinstance(weight, (int, float))
+            or not math.isfinite(weight) or weight < 0):
+        raise ValueError('utility_sign_weight must be finite and nonnegative')
+    return float(weight)
+
+
+def loss_semantics(config):
+    return dict(version='evidence-fusion-objective-v1',
+        utility_regression='smooth_l1(log1p(anchor_error/scale)-log1p(helper_error/scale))',
+        utility_regression_weight=1., direct_weight=1.,
+        utility_sign='BCEWithLogits(utility, gain_target>0)',
+        utility_sign_weight=utility_sign_weight(config),
+        utility_sign_enabled=utility_sign_weight(config) > 0,
+        reduction='helper/query mean within each supervised attribute, then attribute mean; anchor batch mean')
+
+
+def training_objective(result, base_states, target, valid, *, sign_weight=0.):
+    """Reuse original targets/masks; optionally add one auxiliary sign objective.
+
+    Zero gain is a nonpositive label. Near-zero gains receive full binary
+    supervision; this is not probability calibration or a margin filter.
+    At weight zero the auxiliary is not evaluated; its logged zero is disabled,
+    not a measurement of the model's sign classification error.
+    """
+    if (isinstance(sign_weight, bool) or not isinstance(sign_weight, (int, float))
+            or not math.isfinite(sign_weight) or sign_weight < 0):
+        raise ValueError('sign_weight must be finite and nonnegative')
+    loss = evidence_fusion_loss(result, base_states, target, valid)
+    zero = result['utility'].sum()*0.
+    terms = []
+    if sign_weight > 0 and len(base_states) > 1:
+        for attribute in range(3):
+            selected = loss['valid_attributes'][:, attribute]
+            if selected.any():
+                logits = result['utility'][:, selected, attribute]
+                labels = (loss['gain_target'][:, selected, attribute] > 0).to(logits.dtype)
+                terms.append(torch.nn.functional.binary_cross_entropy_with_logits(logits, labels))
+    sign_loss = sum(terms, zero)/max(len(terms), 1)
+    weighted = sign_weight*sign_loss
+    original = loss['total']
+    # Avoid even an extra +0 node on the historical training objective.
+    loss.update(total=original if sign_weight == 0 else original+weighted,
+                original_total=original, utility_weighted=loss['utility'],
+                direct_weighted=loss['direct'], utility_sign=sign_loss,
+                utility_sign_weighted=weighted)
+    return loss
+
+
+def validate_training_population(train, validation):
+    """Resolve explicit scene or historical shared-A-component isolation."""
+    if (not train or not validation or any(scene['split'] != 'T_core' for scene in train)
+            or any(scene['split'] != 'V_select' for scene in validation)):
+        raise ValueError('nonempty T_core/V_select populations are required')
+    units = {scene.get('split_unit', 'shared_a_component') for scene in [*train, *validation]}
+    if len(units) != 1 or not units.issubset({'shared_a_component', 'scene'}):
+        raise ValueError('split_unit must be one unmixed scene or shared_a_component protocol')
+    split_unit = next(iter(units))
+    train_ids, validation_ids = [str(s['scene_id']) for s in train], [str(s['scene_id']) for s in validation]
+    if (len(set(train_ids)) != len(train_ids) or len(set(validation_ids)) != len(validation_ids)
+            or set(train_ids) & set(validation_ids)):
+        raise ValueError('scene IDs must be unique within and disjoint across T_core/V_select')
+    if (split_unit == 'shared_a_component'
+            and {s['component_id'] for s in train} & {s['component_id'] for s in validation}):
+        raise ValueError('shared_a_component requires component-isolated T_core/V_select')
+    return split_unit
 
 
 def prepare_evidence_scenes(scenes, check=None):
@@ -52,7 +123,8 @@ def prepare_evidence_scenes(scenes, check=None):
             masks.append(target['valid'])
         q = motion['states'].shape[1]
         result.append(dict(scene_id=scene['scene_id'], component_id=scene['component_id'],
-            split=scene['split'], node_ids=np.asarray(scene['node_ids'], str), identities=identities,
+            split=scene['split'], split_unit=scene.get('split_unit', 'shared_a_component'),
+            node_ids=np.asarray(scene['node_ids'], str), identities=identities,
             sources=np.asarray(scene['sources'], str), motion=motion, distances=distances,
             target=np.asarray(targets, np.float64).reshape(n, q, 4),
             valid=np.asarray(masks, bool).reshape(n, q, 4),
@@ -199,6 +271,7 @@ def evaluate_evidence_fusion(model, scenes, *, device, prediction_dir=None, chec
 
 def save_checkpoint(path, model, optimizer, step, config, rng):
     torch.save(dict(scope='native-evidence-fusion-v1', configuration=config, step=step,
+                    loss_semantics=loss_semantics(config),
                     model=model.state_dict(), optimizer=optimizer.state_dict(),
                     numpy_rng=rng.bit_generator.state, torch_rng=torch.get_rng_state(),
                     cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None), path)
@@ -208,6 +281,11 @@ def load_checkpoint(path, *, device='cpu'):
     state = torch.load(path, map_location='cpu', weights_only=False)
     if state['scope'] != 'native-evidence-fusion-v1':
         raise ValueError('expected an evidence-fusion checkpoint')
+    expected = loss_semantics(state['configuration'])
+    recorded = state.get('loss_semantics')
+    if ((recorded is None and expected['utility_sign_weight'] != 0.)
+            or (recorded is not None and recorded != expected)):
+        raise ValueError('checkpoint loss_semantics disagree with configuration')
     model = EvidenceFusion(**state['configuration']['model']).to(device)
     model.load_state_dict(state['model'], strict=True)
     return model, state
@@ -219,12 +297,14 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     training = config['training']
+    sign_weight = utility_sign_weight(config)
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
     model = EvidenceFusion(**config['model']).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=training['learning_rate'])
     state = dict(status='RUNNING', optimizer_updates=0, test_opened=False, device=str(device),
-        configuration=config, training_scene_ids=[scene['scene_id'] for scene in train],
+        configuration=config, loss_semantics=loss_semantics(config),
+        training_scene_ids=[scene['scene_id'] for scene in train],
         validation_scene_ids=[scene['scene_id'] for scene in validation],
         selection_policy='fixed final step; intermediate full V is monitoring only',
         sampling='uniform scene then uniform anchor, independently for each batch member; repeats possible',
@@ -234,13 +314,12 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
         physical_dtype='float64 native motion and geometry; float32 MLP', advisory_reached=False)
     write_json(output/'run.json', state)
     try:
+        state['split_unit'] = validate_training_population(train, validation)
+        write_json(output/'run.json', state)
         save_checkpoint(output/'step-0.pt', model, optimizer, 0, config, rng)
         train = prepare_evidence_scenes(train, check=check)
         validation = prepare_evidence_scenes(validation, check=check)
-        if (not train or not validation or any(scene['split'] != 'T_core' for scene in train)
-                or any(scene['split'] != 'V_select' for scene in validation)
-                or {scene['component_id'] for scene in train} & {scene['component_id'] for scene in validation}):
-            raise ValueError('nonempty, component-isolated T_core/V_select are required')
+        validate_training_population(train, validation)
         if any(not len(scene['identities']) for scene in train):
             raise ValueError('uniform-scene training has an empty scene; do not silently filter population')
         report = evaluate_evidence_fusion(model, validation, device=device,
@@ -253,7 +332,8 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
             model.train()
             step_started = time.monotonic()
             optimizer.zero_grad(set_to_none=True)
-            logs = dict(total=0., utility=0., direct=0.)
+            logs = dict(total=0., original_total=0., utility=0., utility_weighted=0.,
+                        direct=0., direct_weighted=0., utility_sign=0., utility_sign_weighted=0.)
             mode = TRAIN_MODES[(step-1) % len(TRAIN_MODES)]
             for _ in range(training['batch_size']):
                 scene = train[int(rng.integers(len(train)))]
@@ -267,9 +347,9 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
                 counters['no_wrong_fallback'] += int(mode != 'clean' and not has_wrong)
                 base, features, exact = fusion_inputs(scene['motion'], members, device=device)
                 result = model(base, features, exact)
-                loss = evidence_fusion_loss(result, base,
+                loss = training_objective(result, base,
                     torch.as_tensor(scene['target'][anchor], device=device),
-                    torch.as_tensor(scene['valid'][anchor], device=device))
+                    torch.as_tensor(scene['valid'][anchor], device=device), sign_weight=sign_weight)
                 if not torch.isfinite(loss['total']):
                     raise FloatingPointError('nonfinite evidence fusion loss')
                 (loss['total']/training['batch_size']).backward()

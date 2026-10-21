@@ -30,7 +30,7 @@
 
 检查入口：`.venv/bin/python -m unittest tests.integration.test_tcm_fit_cli tests.training.test_complete_training tests.training.test_complete_snapshot`。CPU检查只验证执行语义，真实MTAD关联收益待已批准服务器实验。
 
-## 047：TAM专属dropout修复（待真实实验）
+## 047：TAM专属dropout适配（已完成，完整V未改善）
 
 042同输入诊断已完成，依据见[042分析](../proposals/repair_before_retraining/042-analysis.md)。[047配置](../../configs/tmtaff-tam-no-dropout-047.json)相对035只新增`model.tam_dropout=0`；缺省None继承公共dropout，旧配置/权重行为不变。该参数覆盖TAM各层nn.Dropout和MultiheadAttention.dropout，以及CE output_dropout；CL实际不使用CE head。TCM/TFM仍使用各自原dropout，不能改全局dropout冒充只改TAM。
 
@@ -39,3 +39,11 @@ TCM-only转移只豁免TAM专属dropout差异，补全架构、表示、公共dr
 原margin校准规则和4096个T_core展示不变，报告新增实际TAM dropout；移除随机性后margin数值自然重新得到，不强沿用75.26。正d、负hinge²的尺度改变还会改变两类对距离的损失导数平衡（不等于直接测到参数梯度），因此不能按原始loss简单排名或宣称完全隔离了数值margin。每步`history.tam_train_batch`保存同一次前向的正负均距、两类含0.5系数的CL类内均值、负例margin内比例、两类count及有效margin；无新增前向、随机数消费或loss改动。
 
 047仍一次TAM1000、每100完整V与原macro-F1选模/全分数保存，无TCM/TFM/JOINT更新；具体范围、8小时提醒及回传在[047交接](../../HandOver/L2S-20261021-047.md)。参数更新/转移/精确恢复等本地检查及独立审查通过，不等于真实关联改善；无dropout也不保证不同设备/fastpath逐位相同。若确定性距离仍近零或完整V未改善，再据分项诊断定位下一因素，不自动加训或改loss。
+
+## 可选目标尺度诊断：仅负项除固定margin
+
+047的负结果见[分析](../proposals/repair_before_retraining/047-analysis.md)。当前本地实现可选`model.contrastive_negative_scale="inverse_margin"`：单例`L*=0.5*[y*d+(1-y)*relu(m-d)^2/m]`，批次取均值；m仍由原训练侧负距中位数一次校准并固定，不由V调节。正项对距离导数保持0.5，负项为`-relu(m-d)/m`，范围[-1,0]；这些不是参数梯度。它等于margin归一化目标乘m，不是把原总loss除m，亦不是论文公式修bug。缺省`"paper"`保留原式；该候选只支持原线性正项。
+
+[提案配置](../../configs/tmtaff-tam-inverse-margin-proposed.json)相对047只新增上述开关，继续冻结033、TAM无dropout、原初始化/采样/校准、lr和完整V选模。1000步只是待批准实验配额，没有新增READY或启动训练，也不切换到新3000场景协议。TCM-only移交允许该TAM损失差异；已训练TAM的resume不能切换目标。校准和训练分项报告使用实际负项权重，selected/final保持同一配置。正式原式baseline仍须另行对齐论文公开的数据与训练呈现，不能用本诊断替代。
+
+训练器以每场景`split_unit`区分协议：缺省`shared_a_component`继续拒绝T/V共享组件；仅一致显式`scene`允许共享真实组件。所有协议仍拒绝重复/跨角色重叠scene_id，混协议拒绝。新checkpoint记录协议和完整场景契约，旧缺字段按组件协议解释；数据或协议变更不能resume或转移旧TCM。此兼容准备不授权新数据训练。

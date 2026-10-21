@@ -46,6 +46,24 @@ def validate_config(config):
     return training
 
 
+def _validate_partitions(train, validation):
+    """Keep scene separation in both protocols; shared-A isolation is explicit."""
+    if (not train or not validation or any(s['split'] != 'T_core' for s in train)
+            or any(s['split'] != 'V_select' for s in validation)):
+        raise ValueError('nonempty T_core/V_select required; T_test sealed')
+    units = {s.get('split_unit', 'shared_a_component') for s in [*train, *validation]}
+    if len(units) != 1 or not units.issubset({'shared_a_component', 'scene'}):
+        raise ValueError('train/validation must use one explicit supported split_unit')
+    unit = next(iter(units))
+    ids = [str(s['scene_id']) for s in [*train, *validation]]
+    if len(ids) != len(set(ids)):
+        raise ValueError('duplicate or training/validation scene_id overlap')
+    if unit == 'shared_a_component' and (
+            {str(s['component_id']) for s in train} & {str(s['component_id']) for s in validation}):
+        raise ValueError('training/validation component_id overlap')
+    return unit
+
+
 def prepare_features(scenes, split, check=lambda: None, pair_chunk_size=4096):
     """Freeze all original pairs; truth enters metadata but not feature calls."""
     if isinstance(pair_chunk_size, bool) or not isinstance(pair_chunk_size, int) or pair_chunk_size < 1:
@@ -89,6 +107,8 @@ def prepare_features(scenes, split, check=lambda: None, pair_chunk_size=4096):
             features=features, base_scores=base,
             feature_cache_max_abs_roundoff=max_roundoff,
             joint_support_queries=joint))
+        if 'split_unit' in scene:
+            result[-1]['split_unit'] = scene['split_unit']
     return result
 
 
@@ -276,9 +296,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                 raise ValueError('native fit must prepare T_core/V_select from explicit archive/manifest')
             train_scenes = prepare_motion_scenes(archive_path, manifest, 'T_core', check)
             validation_scenes = prepare_motion_scenes(archive_path, manifest, 'V_select', check)
-        for key in ('scene_id', 'component_id'):
-            if {str(scene[key]) for scene in train_scenes} & {str(scene[key]) for scene in validation_scenes}:
-                raise ValueError(f'training/validation {key} overlap')
+        split_unit = _validate_partitions(train_scenes, validation_scenes)
         raw_preparation_seconds = time.monotonic()-started
         train = prepare_features(train_scenes, 'T_core', check)
         validation = prepare_features(validation_scenes, 'V_select', check)
@@ -286,7 +304,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         normalizer = fit_normalizer(train)
         sampler = BalancedScenePairSampler(train, config['seed'])
         preparation_seconds = time.monotonic()-started
-        audit = dict(training_scene_ids=[scene['scene_id'] for scene in train],
+        audit = dict(split_unit=split_unit, training_scene_ids=[scene['scene_id'] for scene in train],
             validation_scene_ids=[scene['scene_id'] for scene in validation],
             normalizer=normalizer, sampler=sampler.describe(), data=DATA,
             inference_uses_identity=False, reference_read=False, test_opened=False,
@@ -370,7 +388,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         selected_model, selected_checkpoint = load_checkpoint(run.path/'selected.pt', device)
         selected_records = score_scenes(selected_model, validation, normalizer, device,
                                        settings['inference_batch_size'], check)
-        report = dict(status='COMPLETED', scope=SCOPE, variant=config['variant'],
+        report = dict(status='COMPLETED', scope=SCOPE, variant=config['variant'], split_unit=split_unit,
             synthetic=synthetic, data=DATA, precision=PRECISION,
             score_semantics='association score, not a calibrated probability',
             feature_names=list(FEATURE_NAMES), optimizer_updates=actual_update,

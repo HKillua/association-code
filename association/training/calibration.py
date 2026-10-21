@@ -35,6 +35,7 @@ def calibrate_training_margin(model, scenes, normalized, cache, *, device,
                   completed_batches=0, samples=[], seconds=None,
                   scope='T_core after TCM, before any TAM update; train TAM with configured dropout, eval frozen TCM; no_grad',
                   tam_dropout=model.config.effective_tam_dropout,
+                  contrastive_negative_scale=model.config.contrastive_negative_scale,
                   cache_before=cache.stats())
     device = torch.device(device)
     cpu_rng = torch.get_rng_state()
@@ -105,11 +106,16 @@ def calibrate_training_margin(model, scenes, normalized, cache, *, device,
         training_margin = float(torch.tensor(margin, dtype=distance_dtype).item())
         hinge = torch.relu(margin - torch.tensor(negative, dtype=distance_dtype)).double().numpy()
         unique = len(set(presentations))
-        # l_i=.5[y*d+(1-y)*relu(m-d)^2]. Derivatives below are dl_i/dd,
+        # Optional inverse-margin scaling changes only the reported objective,
+        # never the sampled distances or their median used to select m.
+        negative_divisor = training_margin if model.config.contrastive_negative_scale == 'inverse_margin' else 1.
+        negative_loss = np.square(hinge) / negative_divisor
+        # l_i=.5[y*d+(1-y)*relu(m-d)^2/divisor]. Derivatives below are dl_i/dd,
         # followed by the actual 64-pair batch-mean derivatives (divide by 64).
-        derivative = {'positive': np.full(len(positive), .5), 'negative': -hinge}
+        derivative = {'positive': np.full(len(positive), .5), 'negative': -hinge / negative_divisor}
         report.update(effective_margin=margin, median_rule='numpy median; mean of two central negative presentations',
             training_dtype_margin=training_margin, distance_dtype=str(distance_dtype),
+            training_dtype_negative_divisor=negative_divisor,
             pair_presentations=len(distances), positive_presentations=len(positive), negative_presentations=len(negative),
             unique_pair_count=unique, duplicate_pair_count=len(presentations) - unique,
             unique_scene_count=len({s for s, _ in presentations}),
@@ -120,11 +126,11 @@ def calibrate_training_margin(model, scenes, normalized, cache, *, device,
             mathematical_median_hinge=dict(strict_active_count=int((negative < margin).sum()),
                 strict_active_fraction=float((negative < margin).mean()), ties_count=int((negative == margin).sum())),
             loss=dict(positive_class_mean=float(.5 * positive.mean()),
-                      negative_class_mean=float(.5 * np.square(hinge).mean()),
+                      negative_class_mean=float(.5 * negative_loss.mean()),
                       positive_contribution=float(.25 * positive.mean()),
-                      negative_contribution=float(.25 * np.square(hinge).mean()),
-                      total=float(.25 * (positive.mean() + np.square(hinge).mean())),
-                      reduction='float64 diagnostic mean over 4096 presentations, using the training-dtype hinge; equal class weighting, no parameter gradient'),
+                      negative_contribution=float(.25 * negative_loss.mean()),
+                      total=float(.25 * (positive.mean() + negative_loss.mean())),
+                      reduction='float64 diagnostic mean over 4096 presentations, using the training-dtype hinge/divisor; equal class weighting, no parameter gradient'),
             distance_derivative={name: dict(per_example_mean=float(values.mean()),
                 per_example_quantiles=_quantiles(values), batch_mean_mean=float(values.mean() / 64),
                 batch_mean_quantiles=_quantiles(values / 64)) for name, values in derivative.items()},

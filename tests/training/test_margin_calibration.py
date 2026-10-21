@@ -1,5 +1,6 @@
 """Approved fixed calibration: synthetic CPU math, state isolation and resume."""
 import copy
+from dataclasses import replace
 from pathlib import Path
 import tempfile
 import unittest
@@ -135,6 +136,24 @@ class MarginCalibrationTests(unittest.TestCase):
         self.assertGreater(report['seconds'], 0)
         self.assertTrue(torch.equal(rng, torch.get_rng_state()))
         self.assertFalse(self.model.training)
+
+    def test_inverse_margin_changes_reported_objective_but_not_calibration_samples_or_margin(self):
+        paper, scaled = {}, {}
+        margin = self.calibrate(report=paper)
+        self.model.config = replace(self.model.config, contrastive_negative_scale='inverse_margin')
+        self.assertEqual(self.calibrate(report=scaled), margin)
+        self.assertEqual(paper['samples'], scaled['samples'])
+        divisor = scaled['training_dtype_margin']
+        self.assertEqual(scaled['training_dtype_negative_divisor'], divisor)
+        self.assertEqual(scaled['loss']['positive_class_mean'], paper['loss']['positive_class_mean'])
+        self.assertAlmostEqual(scaled['loss']['negative_class_mean'],
+                               paper['loss']['negative_class_mean'] / divisor)
+        self.assertAlmostEqual(scaled['distance_derivative']['negative']['per_example_mean'],
+                               paper['distance_derivative']['negative']['per_example_mean'] / divisor)
+        self.assertEqual(scaled['distance_derivative']['positive'], paper['distance_derivative']['positive'])
+        quantiles = scaled['distance_derivative']['negative']['per_example_quantiles']
+        self.assertGreaterEqual(quantiles['min'], -1.)
+        self.assertLessEqual(quantiles['max'], 0.)
 
 
     def test_adjacent_float_median_keeps_rule_and_reports_actual_training_hinge(self):

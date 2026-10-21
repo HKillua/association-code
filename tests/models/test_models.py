@@ -91,6 +91,26 @@ class AssociationModelTests(unittest.TestCase):
         model.association_loss(zero_scores, torch.tensor([1.])).backward()
         self.assertTrue(torch.isfinite(embeddings.grad).all())
 
+    def test_inverse_margin_preserves_positive_scale_and_bounds_negative_distance_gradient(self):
+        config = replace(self.config, margin=40., contrastive_negative_scale='inverse_margin')
+        model = AssociationModel(config, 'contrastive')
+        distance = torch.tensor([7., 0., 10., 30., 40., 55.], dtype=torch.float64, requires_grad=True)
+        labels = torch.tensor([1., 0., 0., 0., 0., 0.], dtype=torch.float64)
+        loss = model.association_loss(-distance, labels)
+        loss.backward()
+        # Remove only the batch-mean reduction: these are per-example dL/dd.
+        torch.testing.assert_close(distance.grad * len(distance),
+            torch.tensor([.5, -1., -.75, -.25, 0., 0.], dtype=torch.float64), atol=0, rtol=0)
+        z = distance.detach() / config.margin
+        expected = config.margin * .5 * (labels * z + (1 - labels) * torch.relu(1 - z).square()).mean()
+        torch.testing.assert_close(loss.detach(), expected, atol=1e-14, rtol=1e-14)
+
+        # Missing/default config keys still give the exact historical formula.
+        model.config = replace(config, contrastive_negative_scale=ModelConfig().contrastive_negative_scale)
+        old_loss = .5 * (labels * distance + (1 - labels) * torch.relu(40 - distance).square()).mean()
+        self.assertTrue(torch.equal(model.association_loss(-distance, labels), old_loss))
+        self.assertNotEqual(loss.item(), (old_loss / config.margin).item())
+
     def test_tam_only_dropout_keeps_initial_weights_rng_and_completion_unchanged(self):
         config = replace(self.config, dropout=.35)
         torch.manual_seed(20)

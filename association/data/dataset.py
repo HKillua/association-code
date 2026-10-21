@@ -14,7 +14,7 @@ import numpy as np
 
 from association.data.archive import DataError, MTADArchive, validate_manifest
 from association.data.targets import build_scene_fusion_targets
-from association.data.native import load_native_split_from_archive
+from association.data.native import iter_native_split_from_archive
 from association.data.reference_states import iter_reference_states
 from association.data.timed import _settings, prepare_timed_scene
 
@@ -69,7 +69,7 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
     with MTADArchive(archive_path) as archive:
         for split in splits:
             populations[split] = []
-            native_scenes = load_native_split_from_archive(archive, manifest, split,
+            native_scenes = iter_native_split_from_archive(archive, manifest, split,
                 max_points=data_config['max_observations'], check=check)
             for native in native_scenes:
                 if check:
@@ -102,6 +102,10 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                     prepared['reference_alignment']['longitude_policy'] = longitude_policy
                 populations[split].append(prepared)
                 scenes[sid] = prepared
+                # Timed arrays and audits own everything retained for training.
+                # Release this scene's full canonical tracks before loading next.
+                del native, labels
+                archive._label_cache.pop(sid, None)
             del native_scenes
         archive_members = list(archive.members_read)
     references_read = []
@@ -146,10 +150,14 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
             target_without_reference_count=sum(item['report']['missing_identity'] for item in targets.values()),
             reference_valid_points_per_feature=counts.tolist(), reference_alignment=scene['reference_alignment'],
             input_audit=scene['timed_input_audit'], quarantine_audit=scene['audit']))
+        if scene.get('split_unit') == 'scene':
+            scene_reports[-1]['split_unit'] = 'scene'
     report = dict(scope='TMTAFF-time-adapted-v1', training_splits=list(train_splits), selection_split='V_select',
         training_scene_ids=[s['scene_id'] for s in training], validation_scene_ids=[s['scene_id'] for s in validation],
         data_config=dict(data_config), reference_longitude_policy=longitude_policy,
         scenes=scene_reports, observation_members_read=archive_members,
         reference_members_read=references_read, reference_loading='stream by scene; retain aligned L-by-4 targets only',
         test_opened=False, resampled_with_legacy_scene64=False, elapsed_seconds=time.monotonic()-started)
+    if manifest.get('split_unit') == 'scene':
+        report['split_unit'] = 'scene'
     return dict(train=training, validation=validation, report=report)

@@ -115,9 +115,10 @@ class TcmFitCliTests(unittest.TestCase):
         self.assertEqual(self.fit('once')['status'], 'COMPLETED')
         self.assertEqual(self.fit('partial', max_updates_this_call=1)['status'], 'INTERRUPTED')
         self.assertFalse((self.root/'partial'/'completion-evaluation.json').exists())
-        # Old checkpoints predate the explicit default representation field.
+        # Old checkpoints predate the explicit default representation/sampling fields.
         legacy = self.checkpoint('partial')
         legacy['model_config'].pop('heading_representation', None)
+        legacy['config'].pop('tcm_sampling')
         torch.save(legacy, self.root/'partial'/'checkpoint.pt')
         self.assertEqual(self.invoke('resumed', ['--resume', str(self.root/'partial')]), 0)
         self.assert_same_endpoint(self.checkpoint('once'), self.checkpoint('resumed'))
@@ -135,6 +136,37 @@ class TcmFitCliTests(unittest.TestCase):
         self.assertFalse((self.root/'failed'/'summary.json').exists())
         self.assertEqual(self.invoke('retry', ['--resume', str(self.root/'failed')]), 1)
         self.assertFalse((self.root/'retry').exists())
+
+    def test_ordered_tcm_covers_each_fragment_keeps_tail_and_replays_epoch_boundary(self):
+        self.fixture.config['training'].update(tcm_sampling='ordered_fragment', batch_tracks=3)
+        self.fixture.config['training']['updates']['TCM'] = 4
+        self.fit('ordered')
+        expected = self.checkpoint('ordered')
+        rows = expected['history']
+        self.assertEqual([row['track_presentations'] for row in rows], [3, 1, 3, 1])
+        self.assertEqual([row['tcm_sampling']['epoch'] for row in rows], [1, 1, 2, 2])
+        self.assertEqual([row['tcm_sampling']['batch_in_epoch'] for row in rows], [1, 2, 1, 2])
+        self.assertEqual([(row['tcm_sampling']['pool_start'], row['tcm_sampling']['pool_stop'])
+                          for row in rows], [(0, 3), (3, 4), (0, 3), (3, 4)])
+        # Native lengths 4,2,4,2 give 2*(3+1+3+1)=16 transitions per pass.
+        self.assertEqual([row['transition_presentations'] for row in rows], [14, 2, 14, 2])
+        coverage = expected['coverage']['TCM']
+        self.assertEqual(coverage['unique_track_count'], 4)
+        self.assertEqual(coverage['track_presentations'], 8)
+        self.assertEqual(coverage['transition_presentations'], 32)
+        self.assertEqual(coverage['completed_epochs'], 2)
+        # Interrupt immediately before the short tail and at the epoch boundary.
+        for cut in (1, 2):
+            self.fit(f'ordered-part-{cut}', max_updates_this_call=cut)
+            self.fit(f'ordered-resumed-{cut}', resume_from=self.root/f'ordered-part-{cut}')
+            resumed = self.checkpoint(f'ordered-resumed-{cut}')
+            self.assert_same_endpoint(expected, resumed)
+            self.assertEqual([row['tcm_sampling'] for row in rows],
+                             [row['tcm_sampling'] for row in resumed['history']])
+        self.fixture.config['training'].pop('tcm_sampling')
+        with self.assertRaisesRegex(ValueError, 'resume configuration'):
+            self.fit('sampling-changed', resume_from=self.root/'ordered-part-1')
+        self.assertFalse((self.root/'sampling-changed').exists())
 
     def test_explicit_phase_and_zero_downstream_updates_are_required_before_data_read(self):
         with patch.object(cli, 'load_timed_dataset', side_effect=AssertionError('must reject before data')):
@@ -271,6 +303,8 @@ class TcmFitCliTests(unittest.TestCase):
         self.tam_fit('partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
         legacy = self.checkpoint('partial')
         legacy['model_config'].pop('tam_dropout')
+        legacy['model_config'].pop('contrastive_negative_scale')
+        legacy.pop('split_unit')
         torch.save(legacy, self.root/'partial'/'checkpoint.pt')
         self.assertEqual(self.tam_fit('resumed', resume_from=self.root/'partial')['status'], 'COMPLETED')
         expected, actual = self.checkpoint('once'), self.checkpoint('resumed')
@@ -334,6 +368,55 @@ class TcmFitCliTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'TCM initialization model'):
             self.tam_fit('changed-completion-dropout', initialize_tcm_from=self.root/'source')
         self.assertFalse((self.root/'changed-completion-dropout').exists())
+
+    def test_inverse_margin_tam_transfer_resume_diagnostics_and_protocol_boundaries(self):
+        self.fit('source')
+        source = self.checkpoint('source')
+        source['model_config'].pop('contrastive_negative_scale')
+        source.pop('split_unit')
+        torch.save(source, self.root/'source'/'checkpoint.pt')
+        self.fixture.config['model'].update(tam_dropout=0., contrastive_negative_scale='inverse_margin')
+        self.tam_fit('scaled', initialize_tcm_from=self.root/'source')
+        self.tam_fit('scaled-partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
+        self.tam_fit('scaled-resumed', resume_from=self.root/'scaled-partial')
+        expected, resumed = self.checkpoint('scaled'), self.checkpoint('scaled-resumed')
+        self.assert_same_endpoint(expected, resumed)
+        self.assertEqual(expected['effective_margin'], resumed['effective_margin'])
+        self.assertEqual(expected['initialization']['source_contrastive_negative_scale'], 'paper')
+        self.assertEqual(expected['initialization']['target_contrastive_negative_scale'], 'inverse_margin')
+        self.assertEqual(expected['margin_calibration']['contrastive_negative_scale'], 'inverse_margin')
+        for key, value in expected['states'][0].items():
+            if key == 'positions' or key.startswith(('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
+                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
+        for row in expected['history']:
+            diagnostic = row['tam_train_batch']
+            self.assertEqual(diagnostic['contrastive_negative_scale'], 'inverse_margin')
+            count = diagnostic['positive_count'] + diagnostic['negative_count']
+            weighted = sum(diagnostic[f'{kind}_class_loss_mean'] * diagnostic[f'{kind}_count']
+                           for kind in ('positive', 'negative')) / count
+            self.assertAlmostEqual(weighted, row['association_loss'], places=6)
+        for selected in (True, False):
+            loaded = load_complete_snapshot(self.root/'scaled'/'checkpoint.pt', selected=selected)
+            self.assertEqual(loaded['model'].config.contrastive_negative_scale, 'inverse_margin')
+
+        # Same scenes and tensors cannot silently change the split protocol on
+        # resume or during a TCM transfer; different scene lists also remain bound.
+        dataset = self.fixture.load()
+        for scene in [*dataset['train'], *dataset['validation']]:
+            scene['split_unit'] = 'scene'
+        config = self.tam_config()
+        for name, options in (
+                ('protocol-resume', dict(resume_from=self.root/'scaled-partial')),
+                ('protocol-transfer', dict(initialize_tcm_from=self.root/'source'))):
+            with self.assertRaisesRegex(ValueError, 'resume configuration|TCM initialization model'):
+                train_complete(dataset['train'], dataset['validation'], ModelConfig(**config['model']),
+                    PairFusionConfig(**config['fusion']), config['training'], self.root/name,
+                    phase='tam', **options)
+            self.assertFalse((self.root/name).exists())
+        self.fixture.config['model'].pop('contrastive_negative_scale')
+        with self.assertRaisesRegex(ValueError, 'resume configuration'):
+            self.tam_fit('changed-objective', resume_from=self.root/'scaled-partial')
+        self.assertFalse((self.root/'changed-objective').exists())
 
     def tfm_config(self):
         self.fixture.config['training']['updates'] = dict(TCM=0, TAM_FROZEN=0, TFM_FROZEN=2, JOINT=0)

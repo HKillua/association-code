@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from association.utils import runtime
-from association.training.tmtaff import STAGES, train_complete
+from association.training.tmtaff import STAGES, _ordered_tcm_indices, _scenes, train_complete
 from association.models.fusion import PairFusionConfig
 from association.models.tmtaff import ModelConfig
 
@@ -43,6 +43,42 @@ class CompleteTrainingTests(unittest.TestCase):
 
     def checkpoint(self, name):
         return torch.load(self.root / name / 'checkpoint.pt', weights_only=True)
+
+    def test_scene_protocol_relaxes_only_component_overlap(self):
+        self.validation[0]['component_id'] = self.train[0]['component_id']
+        with self.assertRaisesRegex(ValueError, 'components overlap'):
+            _scenes(self.train, self.validation, self.model.length)
+        for scene in [*self.train, *self.validation]:
+            scene['split_unit'] = 'scene'
+        contract = _scenes(self.train, self.validation, self.model.length)
+        self.assertTrue(all(row['split_unit'] == 'scene' for rows in contract for row in rows))
+        self.assertEqual(contract[0][0]['component_id'], contract[1][0]['component_id'])
+        self.validation[0]['scene_id'] = self.train[0]['scene_id']
+        with self.assertRaisesRegex(ValueError, 'duplicate/overlapping scene'):
+            _scenes(self.train, self.validation, self.model.length)
+
+    def test_ordered_tcm_batches_preserve_cross_scene_order_and_small_population(self):
+        pool = [(0, 0), (0, 1), (1, 0), (1, 1), (1, 2)]
+        first, report = _ordered_tcm_indices(len(pool), 3, 1)
+        tail, tail_report = _ordered_tcm_indices(len(pool), 3, 2)
+        self.assertEqual([pool[int(i)] for i in np.concatenate((first, tail))], pool)
+        self.assertEqual(first.tolist(), [0, 1, 2])
+        self.assertEqual(tail.tolist(), [3, 4])
+        self.assertEqual(report['completed_epochs'], 0)
+        self.assertEqual(tail_report['completed_epochs'], 1)
+        next_epoch, next_report = _ordered_tcm_indices(len(pool), 3, 3)
+        self.assertEqual(next_epoch.tolist(), first.tolist())
+        self.assertEqual(next_report['epoch'], 2)
+        small, small_report = _ordered_tcm_indices(2, 64, 1)
+        self.assertEqual(small.tolist(), [0, 1])
+        self.assertEqual(small_report['completed_epochs'], 1)
+
+    def test_mixed_split_protocol_rejected_and_legacy_contract_unchanged(self):
+        contract = _scenes(self.train, self.validation, self.model.length)
+        self.assertTrue(all('split_unit' not in row for rows in contract for row in rows))
+        self.train[0]['split_unit'] = 'scene'
+        with self.assertRaisesRegex(ValueError, 'one supported split_unit'):
+            _scenes(self.train, self.validation, self.model.length)
 
     def assert_nested_equal(self, left, right):
         if isinstance(left, torch.Tensor):

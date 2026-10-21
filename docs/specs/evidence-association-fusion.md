@@ -86,3 +86,26 @@ step0及每100步完整V仅监测，**正式端点固定1000步，不按V挑最�
 完整T_core原生证据准备28.77秒，512场/33组件/54792片段、110733正对，峰值RSS约637MB；尚未在本地执行全T_core的18.25m对特征准备或真实学习，不能把此RSS当完整训练内存。分块和流式统计已用等价性测试核验，服务器记录实际准备成本。机器可读摘要见[本地核查](../proposals/repair_before_retraining/evidence-heads-local-check.json)，详细本地原件留`runs/`，不复制大批日志。
 
 本节记录的是开跑前本地核查；043—047随后已获批领取，044—046的真实成绩见页首回流链接。[交接索引](../../HandOver/Handover.md)是唯一当前任务入口。本地未启动GPU任务，当前尚未证明完整系统超过TMTAFF。
+
+## 048后最小候选：效用符号辅助监督（本地实现，未执行真实训练）
+
+新增配置 `configs/evidence-fusion-sign.json` 相比046原配置只增加
+`training.utility_sign_weight=0.1`，原1000步、seed、batch、网络、特征、三种训练组构造、
+原回归/物理损失及ReLU权重映射均保留。它不是一次训练授权，也不是已通过融合保护。
+
+原始效用y为对数物理误差的差；本次在trainer内复用原loss返回的y和逐属性mask，加入
+`0.1 * BCEWithLogits(u, 1[y>0])`。每属性在所有有效helper×query上平均，再对有监督属性平均，
+最后按原batch中anchor等权平均；无helper或无合法监督的属性不制造符号标签。零y归非正，
+近零y仍接受完整二分类监督，不称为概率标定或纯排序修复。0.1是事前固定的弱辅助系数：
+在初始化u=0时BCE=ln(2)，加权项约0.0693，与原log1p压缩效用的SmoothL1及物理项共存；
+其量级没有按V调节，也不声称两项梯度自动平衡。不搜索其他lambda。
+
+日志分别保存原效用回归、直接物理项、辅助BCE的原值/加权值及原total/新total。
+缺省lambda=0时直接使用原total，不计算辅助项且其日志为0；这是disabled占位，
+不是符号误差为0。checkpoint记录完整loss语义，加载时核配置；历史无标记checkpoint
+仅按lambda=0兼容，不允许为新正lambda权重缺省解释旧训练。当前trainer仍无resume入口。
+
+数据隔离独立于此单因素候选：每scene显式`split_unit=scene`时允许共享A组件跨场景，
+但T_core/V的scene ID必须互斥且各自不重复；缺省仍为历史`shared_a_component`，另外要求
+组件互斥。混合或未知协议拒绝。准备记录透传split_unit，run写明实际协议；不通过修改
+lambda切换数据协议，也不混报两协议成绩。上述兼容实现不改变原046冻结人口。

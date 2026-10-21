@@ -18,7 +18,7 @@ import torch
 
 from association.data.dataset import load_timed_dataset
 from association.models.cooperative import CooperativeConfig
-from association.training.evidence_fusion import train_evidence_fusion
+from association.training.evidence_fusion import train_evidence_fusion, utility_sign_weight
 from association.utils import runtime
 from tools.experiments.cooperative_fit import synthetic_scenes
 
@@ -35,7 +35,7 @@ def configuration(value):
     training = value['training']
     integers = ('seed', 'updates', 'batch_size', 'evaluate_every')
     positive = ('learning_rate', 'gradient_clip', 'advisory_seconds')
-    if set(training) != {*integers, *positive}:
+    if set(training) - {'utility_sign_weight'} != {*integers, *positive}:
         raise ValueError('unexpected training settings')
     for key in integers:
         if isinstance(training[key], bool) or not isinstance(training[key], int) or training[key] < 1:
@@ -44,6 +44,7 @@ def configuration(value):
         number = training[key]
         if isinstance(number, bool) or not isinstance(number, (int, float)) or not 0 < number < float('inf'):
             raise ValueError(key+' must be finite and positive')
+    utility_sign_weight(value)
     return value
 
 

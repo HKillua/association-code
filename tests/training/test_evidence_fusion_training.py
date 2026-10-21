@@ -1,13 +1,17 @@
+import copy
 import json
+import math
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import torch
 
 from association.models.cooperative import CooperativeConfig
-from association.models.evidence_fusion import fusion_inputs
-from association.training.evidence_fusion import load_checkpoint, prepare_evidence_scenes, train_evidence_fusion
+from association.models.evidence_fusion import evidence_fusion_loss, fusion_inputs
+from association.training.evidence_fusion import (load_checkpoint, prepare_evidence_scenes,
+    train_evidence_fusion, training_objective, validate_training_population)
 from tools.experiments.cooperative_fit import synthetic_scenes
 from tools.experiments.evidence_fusion_fit import configuration
 
@@ -28,6 +32,13 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
             model, state = load_checkpoint(output/'final.pt')
             initial, _ = load_checkpoint(output/'step-0.pt')
             self.assertEqual(state['step'], 3)
+            self.assertEqual(state['loss_semantics']['utility_sign_weight'], 0.)
+            self.assertEqual(report['split_unit'], 'shared_a_component')
+            legacy = copy.deepcopy(state)
+            del legacy['loss_semantics']
+            torch.save(legacy, output/'legacy.pt')
+            old, _ = load_checkpoint(output/'legacy.pt')
+            self.assertTrue(all(torch.equal(a, b) for a, b in zip(model.parameters(), old.parameters())))
             self.assertTrue(any(not torch.equal(a, b)
                                 for a, b in zip(model.parameters(), initial.parameters())))
             scene = prepare_evidence_scenes(validation)[0]
@@ -41,6 +52,105 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
             self.assertEqual(len(evaluation['per_anchor']), 4)
             self.assertFalse(evaluation['test_opened'])
             self.assertTrue((output/'predictions-final/states-synthetic-validation.npz').exists())
+
+
+    def test_sign_auxiliary_uses_original_attribute_mask_and_equal_attribute_reduction(self):
+        base = torch.zeros((3, 2, 4), dtype=torch.float64)
+        base[0, :, 2], base[0, :, 3] = 10., 30.
+        # Equal speed error gives exactly y=0 and must receive the nonpositive label.
+        base[2, :, 2], base[2, :, 3] = 10., 60.
+        target = torch.full((2, 4), float('nan'), dtype=torch.float64)
+        valid = torch.zeros((2, 4), dtype=torch.bool)
+        valid[:, 2], valid[1, 3] = True, True
+        target[valid] = 0.
+        logits = torch.zeros((2, 2, 3), requires_grad=True)
+        result = dict(states=base[0], utility=logits)
+        original = evidence_fusion_loss(result, base, target, valid)
+        # Weight zero performs exactly the old computation, without even evaluating BCE.
+        with patch('torch.nn.functional.binary_cross_entropy_with_logits', side_effect=AssertionError('disabled')):
+            default = training_objective(result, base, target, valid)
+            explicit_zero = training_objective(result, base, target, valid, sign_weight=0.)
+        self.assertTrue(torch.equal(default['total'], original['total']))
+        self.assertTrue(torch.equal(explicit_zero['total'], original['total']))
+        expected_gradient = torch.autograd.grad(original['total'], logits, retain_graph=True)[0]
+        actual_gradient = torch.autograd.grad(default['total'], logits, retain_graph=True)[0]
+        self.assertTrue(torch.equal(expected_gradient, actual_gradient))
+        active = training_objective(result, base, target, valid, sign_weight=.1)
+        self.assertAlmostEqual(float(active['utility_sign'].detach()), math.log(2.), places=6)
+        self.assertAlmostEqual(float(active['utility_sign_weighted'].detach()), .1*math.log(2.), places=6)
+        self.assertTrue(torch.equal(active['total'], active['original_total']+active['utility_sign_weighted']))
+        gradient = torch.autograd.grad(active['utility_sign'], logits)[0]
+        expected = torch.zeros_like(logits)
+        expected[0, :, 1], expected[1, :, 1] = -.0625, .0625
+        expected[0, 1, 2], expected[1, 1, 2] = -.125, .125
+        torch.testing.assert_close(gradient, expected, rtol=0, atol=0)
+        # Empty helpers and all-masked targets do not manufacture binary labels.
+        for count, reference_mask in ((1, valid), (3, torch.zeros_like(valid))):
+            u = torch.zeros((count-1, 2, 3), requires_grad=True)
+            loss = training_objective(dict(states=base[0], utility=u), base[:count],
+                                      target, reference_mask, sign_weight=.1)
+            self.assertEqual(float(loss['utility_sign'].detach()), 0.)
+            self.assertTrue(torch.equal(torch.autograd.grad(loss['utility_sign'], u)[0], torch.zeros_like(u)))
+
+    def test_sign_candidate_updates_logs_and_checkpoint_loss_semantics(self):
+        torch.set_num_threads(1)
+        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        config = configuration(json.loads(Path('configs/evidence-fusion-sign.json').read_text()))
+        reference = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))
+        only_change = copy.deepcopy(config)
+        del only_change['training']['utility_sign_weight']
+        self.assertEqual(only_change, reference)
+        self.assertEqual(config['training']['updates'], 1000)
+        config['training'].update(updates=1, batch_size=1, evaluate_every=1)
+        # Explicit scene isolation permits shared A components without scene overlap.
+        for scene in [*train, *validation]:
+            scene['split_unit'] = 'scene'
+            scene['component_id'] = 'shared-across-different-scenes'
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'fit'
+            report = train_evidence_fusion(train, validation, config, output)
+            self.assertEqual(report['split_unit'], 'scene')
+            model, state = load_checkpoint(output/'final.pt')
+            self.assertEqual(state['loss_semantics']['utility_sign_weight'], .1)
+            self.assertTrue(state['loss_semantics']['utility_sign_enabled'])
+            log = json.loads((output/'training.jsonl').read_text())
+            self.assertGreater(log['utility_sign'], 0.)
+            self.assertAlmostEqual(log['utility_sign_weighted'], .1*log['utility_sign'], places=7)
+            self.assertAlmostEqual(log['total'], log['original_total']+log['utility_sign_weighted'], places=7)
+            initial, _ = load_checkpoint(output/'step-0.pt')
+            self.assertTrue(any(not torch.equal(a, b) for a, b in zip(model.parameters(), initial.parameters())))
+            for kind in ('missing', 'conflicting'):
+                bad = copy.deepcopy(state)
+                if kind == 'missing':
+                    del bad['loss_semantics']
+                else:
+                    bad['configuration']['training']['utility_sign_weight'] = 0.
+                torch.save(bad, output/(kind+'.pt'))
+                with self.assertRaisesRegex(ValueError, 'loss_semantics'):
+                    load_checkpoint(output/(kind+'.pt'))
+        for invalid in (-.1, True, float('nan'), float('inf')):
+            bad = copy.deepcopy(reference)
+            bad['training']['utility_sign_weight'] = invalid
+            with self.assertRaisesRegex(ValueError, 'utility_sign_weight'):
+                configuration(bad)
+
+    def test_scene_and_component_isolation_are_explicit_and_cannot_be_mixed(self):
+        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        self.assertEqual(validate_training_population(train, validation), 'shared_a_component')
+        validation[0]['component_id'] = train[0]['component_id']
+        with self.assertRaisesRegex(ValueError, 'component-isolated'):
+            validate_training_population(train, validation)
+        for scene in [*train, *validation]:
+            scene['split_unit'] = 'scene'
+        self.assertEqual(validate_training_population(train, validation), 'scene')
+        self.assertEqual(prepare_evidence_scenes(train)[0]['split_unit'], 'scene')
+        del validation[0]['split_unit']
+        with self.assertRaisesRegex(ValueError, 'unmixed'):
+            validate_training_population(train, validation)
+        validation[0]['split_unit'] = 'scene'
+        validation[0]['scene_id'] = train[0]['scene_id']
+        with self.assertRaisesRegex(ValueError, 'scene IDs'):
+            validate_training_population(train, validation)
 
 
 if __name__ == '__main__':

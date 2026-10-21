@@ -564,11 +564,12 @@ def train_cooperative(train_scenes, validation_scenes, model_config, training_co
     _validate_training_scenes(train_scenes)
     if not validation_scenes or any(s.get('split') != 'V_select' for s in validation_scenes):
         raise ValueError('nonempty V_select required; T_test sealed')
-    if ({s['scene_id'] for s in train_scenes} & {s['scene_id'] for s in validation_scenes}
-            or {s['component_id'] for s in train_scenes} & {s['component_id'] for s in validation_scenes}):
-        raise ValueError('training and validation scene/components must be disjoint')
+    if {s['scene_id'] for s in train_scenes} & {s['scene_id'] for s in validation_scenes}:
+        raise ValueError('training and validation scenes must be disjoint')
     # Reuse the reference's full native/data contract before any optimizer or
-    # archive-derived training. In particular V errors cannot surface only after
+    # archive-derived training. _scenes also enforces the explicitly declared
+    # split unit: historical component isolation or the new scene protocol.
+    # In particular V errors cannot surface only after
     # spending all teacher updates. This records content, never a SHA gate.
     from association.training.tmtaff import _scenes
     contract = _scenes(train_scenes, validation_scenes, model_config.length)

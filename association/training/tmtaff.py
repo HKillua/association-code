@@ -60,16 +60,19 @@ def _configuration(config, *, phase='full'):
     config.setdefault('longitude_loss_mode', 'linear')
     config.setdefault('time_policy', 'hard')
     config.setdefault('fusion_monitor_updates', [])
+    config.setdefault('tcm_sampling', 'uniform_fragment')
     required = {'updates', 'learning_rates', 'seed', 'branch', 'batch_tracks',
                 'pair_batch_size', 'pair_microbatch', 'track_microbatch',
                 'completion_weight', 'gradient_clip', 'max_hours',
                 'validate_every_updates', 'completion_cache_mib',
                 'position_loss_mode', 'longitude_loss_mode', 'lr_schedule', 'singleton_policy',
-                'validation_batches', 'margin_policy', 'time_policy', 'fusion_monitor_updates'}
+                'validation_batches', 'margin_policy', 'time_policy', 'fusion_monitor_updates', 'tcm_sampling'}
     if set(config) != required:
         raise ValueError(f'config requires exactly {sorted(required)}')
     if config['time_policy'] not in ('hard', 'advisory'):
         raise ValueError('time_policy must be hard or advisory')
+    if config['tcm_sampling'] not in ('uniform_fragment', 'ordered_fragment'):
+        raise ValueError('tcm_sampling must be uniform_fragment or ordered_fragment')
     for field in ('updates', 'learning_rates'):
         if set(config[field]) != set(STAGES):
             raise ValueError(f'{field} must explicitly contain all four stages')
@@ -125,10 +128,29 @@ def _configuration(config, *, phase='full'):
     return config
 
 
+def _ordered_tcm_indices(size, batch_size, update):
+    """One ordered pass per epoch; a short tail never wraps into the next pass.
+
+    The one-based completed-update target determines the entire cursor, so no
+    additional mutable sampler or checkpoint state is needed.
+    """
+    batches = (size + batch_size - 1) // batch_size
+    epoch, batch = divmod(update - 1, batches)
+    start = batch * batch_size
+    stop = min(start + batch_size, size)
+    return np.arange(start, stop), dict(strategy='ordered_fragment', epoch=epoch + 1,
+        batch_in_epoch=batch + 1, batches_per_epoch=batches, eligible_tracks=size,
+        pool_start=start, pool_stop=stop, completed_epochs=epoch + int(stop == size))
+
+
 def _scenes(train, validation, length):
     """Validate declared physical time semantics before constructing a run."""
     if not train or not validation:
         raise ValueError('nonempty training and V_select scenes are required')
+    split_units = {scene.get('split_unit', 'shared_a_component') for scene in [*train, *validation]}
+    if len(split_units) != 1 or not split_units.issubset({'shared_a_component', 'scene'}):
+        raise ValueError('all train/validation scenes must use one supported split_unit')
+    split_unit = next(iter(split_units))
     adapters = {scene.get('input_adapter', 'registered_v1') for scene in [*train, *validation]}
     if len(adapters) != 1 or not adapters.issubset({'registered_v1', 'native_time_v1'}):
         raise ValueError('all train/validation scenes must use one explicit supported input adapter')
@@ -210,6 +232,8 @@ def _scenes(train, validation, length):
                 pair_count=len(pairs), positive_count=int(labels.sum()), intervals=intervals.tolist(),
                 observed_counts=observed.sum(1).tolist(), target_ids=list(targets),
                 input_adapter=scene.get('input_adapter', 'registered_v1'))
+            if split_unit == 'scene':
+                row['split_unit'] = split_unit
             if timed:
                 row.update(max_observations=scene['max_observations'],
                            time_unit_seconds=scene['time_unit_seconds'],
@@ -220,7 +244,7 @@ def _scenes(train, validation, length):
             population_contract.append(row)
         contracts.append(population_contract)
         components.append(component_ids)
-    if components[0] & components[1]:
+    if split_unit == 'shared_a_component' and components[0] & components[1]:
         raise ValueError('training and validation components overlap')
     if not any(len(s['pairs']) for s in validation):
         raise ValueError('V_select requires candidate pairs')
@@ -242,10 +266,13 @@ def _contrastive_batch_diagnostics(scores, labels, model_config):
     distance = -scores.detach()
     positive, negative = distance[labels == 1], distance[labels == 0]
     hinge = torch.relu(model_config.margin - negative)
+    negative_loss = hinge.square()
+    if model_config.contrastive_negative_scale == 'inverse_margin':
+        negative_loss = negative_loss / model_config.margin
     values = torch.stack((
         positive.mean(), negative.mean(),
         .5 * positive.pow(model_config.contrastive_positive_power).mean(),
-        .5 * hinge.square().mean(),
+        .5 * negative_loss.mean(),
         (negative < model_config.margin).to(distance.dtype).mean(),
     )).cpu().tolist()
     return dict(zip((
@@ -253,6 +280,7 @@ def _contrastive_batch_diagnostics(scores, labels, model_config):
         'positive_class_loss_mean', 'negative_class_loss_mean',
         'negative_fraction_inside_margin',
     ), values), effective_margin=model_config.margin,
+        contrastive_negative_scale=model_config.contrastive_negative_scale,
         positive_count=positive.numel(), negative_count=negative.numel())
 
 
@@ -410,6 +438,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     if (model_config.length, model_config.d_model) != (fusion_config.length, fusion_config.d_model):
         raise ValueError('association and fusion length/dimension must agree')
     contract = _scenes(train_scenes, validation_scenes, model_config.length)
+    split_unit = train_scenes[0].get('split_unit', 'shared_a_component')
     if requested_phase != 'full' and train_scenes[0].get('input_adapter') != 'native_time_v1':
         raise ValueError(f'phase {requested_phase} requires native-time scenes')
     calibrating = config['margin_policy'] == MARGIN_POLICY
@@ -440,13 +469,16 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or completion_source['cursor'] != dict(stage=0, update=tcm_updates, completed_updates=tcm_updates)
                 or completion_source.get('selected') is not None):
             raise ValueError('stage initialization requires a COMPLETED TCM-only endpoint')
-        # TAM is newly initialized (unused for TFM); only its dropout may differ from the source.
+        # TAM is newly initialized (unused for TFM); its dropout and negative
+        # loss scale may differ without altering the transferred completion.
         # Do not relax completion architecture, representation, or data checks.
         source_model_config = ModelConfig(**completion_source['model_config'])
-        if (asdict(replace(source_model_config, tam_dropout=model_config.tam_dropout)) != asdict(model_config)
+        if (asdict(replace(source_model_config, tam_dropout=model_config.tam_dropout,
+                          contrastive_negative_scale=model_config.contrastive_negative_scale)) != asdict(model_config)
                 or source_config['branch'] != config['branch']
                 or completion_source.get('input_adapter') != 'native_time_v1'
                 or completion_source['max_observations'] != train_scenes[0]['max_observations']
+                or completion_source.get('split_unit', 'shared_a_component') != split_unit
                 or completion_source['data_contract'] != contract
                 or completion_source['normalizer'] != normalizer):
             raise ValueError('TCM initialization model, data contract or normalizer differs')
@@ -455,6 +487,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             source_tcm_updates=tcm_updates,
             source_tam_dropout=source_model_config.effective_tam_dropout,
             target_tam_dropout=model_config.effective_tam_dropout,
+            source_contrastive_negative_scale=source_model_config.contrastive_negative_scale,
+            target_contrastive_negative_scale=model_config.contrastive_negative_scale,
             transferred_modules=['input_embedding', 'tcm_encoder', 'tcm_decoder'],
             transferred_buffers=(['positions', 'heading_mean_std']
                 if model_config.heading_representation == 'circular_sincos' else ['positions']),
@@ -476,6 +510,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         previous_config['time_policy'] = config['time_policy']
         if (previous_config != config or asdict(ModelConfig(**saved['model_config'])) != asdict(model_config)
                 or asdict(PairFusionConfig(**saved['fusion_config'])) != asdict(fusion_config)
+                or saved.get('split_unit', 'shared_a_component') != split_unit
                 or saved['data_contract'] != contract
                 or saved['normalizer'] != normalizer or not _compatible_device(saved['device'], device)):
             raise ValueError('resume configuration, registered scene contract, normalizer or device differs')
@@ -510,7 +545,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     effective_margin = model_config.margin if saved is None else saved.get('effective_margin', model_config.margin)
     adapter = train_scenes[0].get('input_adapter', 'registered_v1')
     run = {'status': 'RUNNING', 'phase': requested_phase, 'training_stages': list(active_stages),
-           'config': config, 'input_adapter': adapter,
+           'config': config, 'input_adapter': adapter, 'split_unit': split_unit,
            'requested_model_config': asdict(model_config), 'effective_margin': effective_margin,
            'margin_calibration': calibration,
            'initialization': initialization,
@@ -528,7 +563,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
            'resume_device_changed': saved is not None and saved['device'] != str(device),
            'resume_reproducibility': 'bitwise replay requires the same frozen inputs, hardware and software; compatible GPU changes are permitted',
            'sampling': {'association': sampler.describe(),
-                        'tcm': 'uniform over training fragments with at least two observed points',
+                        'tcm': ('ordered over eligible fragments in scene/node input order; short epoch tail, no refill'
+                                if config['tcm_sampling'] == 'ordered_fragment' else
+                                'uniform over training fragments with at least two observed points'),
                         'tfm': 'uniform positive-eligible scene, then uniform positive pair; replacement iff necessary'},
            'test_opened': False, 'resume_from': str(resume_from) if resume_from is not None else None,
            # Diagnostic journals can include completed updates newer than the
@@ -620,7 +657,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                        'config': config, 'model_config': asdict(model_config),
                        'effective_margin': effective_margin, 'margin_calibration': calibration,
                        'initialization': initialization,
-                       'input_adapter': adapter,
+                       'input_adapter': adapter, 'split_unit': split_unit,
                        'max_observations': train_scenes[0].get('max_observations'),
                        'fusion_config': asdict(fusion_config), 'normalizer': normalizer,
                        'data_contract': contract, 'device': str(device), 'states': _states(modules),
@@ -730,13 +767,20 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             groups = []
             if phase == 'TCM':
                 model.train()
-                indices = track_rng.choice(len(transitions), config['batch_tracks'],
-                                           replace=len(transitions) < config['batch_tracks'])
+                if config['tcm_sampling'] == 'ordered_fragment':
+                    indices, tcm_sampling = _ordered_tcm_indices(
+                        len(transitions), config['batch_tracks'], update)
+                else:
+                    indices = track_rng.choice(len(transitions), config['batch_tracks'],
+                                               replace=len(transitions) < config['batch_tracks'])
                 keys = [transitions[int(i)] for i in indices]
                 x = torch.as_tensor(np.stack([normalized[s][0][t] for s, t in keys]), device=device)
                 mask = torch.as_tensor(np.stack([normalized[s][1][t] for s, t in keys]), device=device)
                 loss, norm = _update(model.completion_loss(x, mask), optimizer, parameters, config['gradient_clip'])
                 row = {'loss': loss, 'gradient_norm': norm, 'track_presentations': len(keys)}
+                if config['tcm_sampling'] == 'ordered_fragment':
+                    row.update(tcm_sampling=tcm_sampling,
+                        transition_presentations=2 * sum(int(normalized[s][1][t].sum()) - 1 for s, t in keys))
             else:
                 if phase == 'TFM_FROZEN':
                     si = int(tfm_rng.choice(sampler._eligible[1]))
@@ -775,6 +819,9 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             item['scenes'] = sorted(set(item['scenes']) | {s for s, _ in keys})
             item['tracks'] = sorted(set(map(tuple, item['tracks'])) | set(keys))
             item['track_presentations'] += len(keys)
+            if phase == 'TCM' and config['tcm_sampling'] == 'ordered_fragment':
+                item['transition_presentations'] = item.get('transition_presentations', 0) + row['transition_presentations']
+                item['completed_epochs'] = tcm_sampling['completed_epochs']
             item['pairs'] = sorted(set(map(tuple, item['pairs'])) |
                                    {(s, int(i)) for s, indices in groups for i in indices})
             item['pair_presentations'] += row.get('pair_count', 0)

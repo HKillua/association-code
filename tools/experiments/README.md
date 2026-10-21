@@ -4,7 +4,8 @@
 
 | 脚本 | 用途 |
 | --- | --- |
-| `make_scene_manifest.py` | 仅用旧manifest元数据生成场景级2100/300/600名单；不读ZIP或训练，当前正式训练装配尚未就绪，见[数据约定](../../docs/data_contract.md#2026-10-21正式场景级协议) |
+| `make_scene_manifest.py` | 仅用旧manifest元数据生成场景级2100/300/600名单；不读ZIP或训练，见[数据约定](../../docs/data_contract.md#2026-10-21正式场景级协议) |
+| `prepare_scene_data.py` | 逐场核验训练/验证时钟并统计全人口，输出alignment和summary；不读取测试、不拟合统计或训练，2400场本地已完成无需服务器重复审计 |
 | `tmtaff_complete_fit.py` | 默认完整参考四阶段；`--phase tcm`只训补齐；`--phase tam/tfm --initialize-tcm-from`从已完成TCM开始独立关联/融合阶段 |
 | `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
 | `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
@@ -70,3 +71,14 @@ python tools/experiments/evidence_fusion_fit.py --mode check --device cpu --outp
 参考模型新增可选`model.tam_dropout`，默认None沿用公共dropout，只改变TAM内部注意力/残差/FFN与CE输出dropout；TCM/TFM独立保持。[047](../../HandOver/L2S-20261021-047.md)用原`tmtaff_complete_fit.py --phase tam --initialize-tcm-from`入口，配置只比035多`tam_dropout=0`，固定033补全，从头TAM1000；已获服务器端授权并领取，最新状态看交接索引。原校准规则下margin自然重算。每步history的`tam_train_batch`保存同次前向的正负距离和CL分项，供分析噪声移除后的实际训练行为，无额外推理。旧快照缺字段兼容，恢复不允许换语义。
 
 048已完成并复核，049最新回执RUNNING；两项均已领取，不重复启动，见[固定方案](../../docs/specs/next-experiments-048-049.md)与[交接索引](../../HandOver/Handover.md)。048只读取V量测及045/046原缓存，`--device cpu --cpu-threads 4 --advisory-seconds 1800`；旧组复放不一致会保留失败，不现场放宽容差。049用`--phase tfm --initialize-tcm-from /033目录 --save-predictions`，仅TFM300，按配置`fusion_monitor_updates=[0,100,300]`输出`fusion-evaluations/`及`snapshots/`；终点固定，无TAM推理/阈值选择。`oracle_common_support`提供同目标同属性交集比较，全人口覆盖保留于原`fusion`表。它不是COMPLETED硬resume，未实现035/047与049跨checkpoint的预测组合CLI。
+
+新正式数据使用`configs/data/mtad_scene3000_seed20.json`及`configs/data/mtad_scene3000_seed20_alignment.json`。复现已完成数据准备的入口：
+
+```bash
+python tools/experiments/prepare_scene_data.py --archive /数据路径/数据集level2.zip \
+  --manifest configs/data/mtad_scene3000_seed20.json \
+  --existing-alignment configs/tmtaff-time-reference-alignment.json \
+  --alignment-output /新目录/alignment.json --summary-output /新目录/population.json
+```
+
+本次新增的选项均不改变旧缺省：`training.tcm_sampling=ordered_fragment`按原场景/片段顺序且保留尾批；`model.contrastive_negative_scale=inverse_margin`只将CL负项除以固定margin；`training.utility_sign_weight=0.1`在融合原损失上加效用符号BCE。前者的正式TCM配置为`tmtaff-scene3000-tcm-ordered-proposed.json`；后两者分别见TAM与证据融合规格。它们不是已验证效果或新的READY，不能一次开启所有选项再将差异归给某个机制。

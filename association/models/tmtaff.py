@@ -28,6 +28,8 @@ class ModelConfig:
     # None preserves the historical shared dropout. An explicit value changes
     # only TAM, so frozen completion can retain its original configuration.
     tam_dropout: float | None = None
+    # Explicit objective adaptation; the printed paper formula remains default.
+    contrastive_negative_scale: str = "paper"
 
     def __post_init__(self):
         for name in ("input_dim", "d_model", "nhead", "num_layers", "dim_feedforward", "length"):
@@ -46,6 +48,10 @@ class ModelConfig:
             raise ValueError("margin must be finite and positive")
         if self.contrastive_positive_power not in (1, 2):
             raise ValueError("contrastive_positive_power must be 1 or 2")
+        if self.contrastive_negative_scale not in ("paper", "inverse_margin"):
+            raise ValueError("contrastive_negative_scale must be paper or inverse_margin")
+        if self.contrastive_negative_scale == "inverse_margin" and self.contrastive_positive_power != 1:
+            raise ValueError("inverse_margin requires the linear contrastive positive term")
         if self.heading_representation not in ("linear_zscore", "circular_sincos"):
             raise ValueError("heading_representation must be linear_zscore or circular_sincos")
 
@@ -321,4 +327,6 @@ class AssociationModel(nn.Module):
         distance = -scores
         positive = distance.pow(self.config.contrastive_positive_power)
         negative = F.relu(self.config.margin - distance).square()
+        if self.config.contrastive_negative_scale == "inverse_margin":
+            negative = negative / self.config.margin
         return 0.5 * (labels * positive + (1 - labels) * negative).mean()

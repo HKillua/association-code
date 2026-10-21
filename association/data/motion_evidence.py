@@ -120,7 +120,7 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_
             if check:
                 check()
             native = _record(archive.load_scene(scene_id), manifest['components'][scene_id],
-                             split, DATA['max_observations'])
+                             split, DATA['max_observations'], split_unit=manifest.get('split_unit'))
             query = None
             if not native['tracks']:
                 labels = archive.read_labels(scene_id)
@@ -135,11 +135,13 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_
             motion = build_motion_evidence(prepared['native_values'], prepared['native_times'],
                 prepared['native_observed'], prepared['grid'], prepared['sources'])
             metadata = {}
+            if prepared.get('split_unit') == 'scene':
+                metadata['split_unit'] = 'scene'
             if include_evaluation_metadata:
                 # Evaluation registry uses original labels BEFORE quarantine, as
                 # load_timed_dataset does. It never enters motion construction.
                 labels = archive.read_labels(scene_id)
-                metadata = dict(target_identity_ids=list(dict.fromkeys(
+                metadata.update(target_identity_ids=list(dict.fromkeys(
                     '-'.join(row['mmsi'].split('-')[:2]) for row in labels)),
                     observed=prepared['observed'].copy())
             scenes.append(dict(

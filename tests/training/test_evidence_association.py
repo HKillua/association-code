@@ -8,7 +8,7 @@ import numpy as np
 import torch
 
 from association.training.evidence_association import (
-    fit_evidence_association, fit_normalizer, load_checkpoint, prepare_features, score_scenes)
+    _validate_partitions, fit_evidence_association, fit_normalizer, load_checkpoint, prepare_features, score_scenes)
 from association.models.evidence_association import features_from_motion
 from association.utils import runtime
 from tools.experiments.evidence_association_fit import synthetic_config, synthetic_scenes
@@ -71,6 +71,28 @@ class EvidenceTrainingTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'component_id overlap'):
                 fit_evidence_association(config, Path(directory)/'overlap', 'cpu',
                     train_scenes=train, validation_scenes=validation, synthetic=True)
+
+    def test_scene_protocol_permits_shared_components_but_never_overlapping_scenes(self):
+        train, validation = synthetic_scenes()
+        validation[0]['component_id'] = train[0]['component_id']
+        for scene in train + validation:
+            scene['split_unit'] = 'scene'
+        self.assertEqual(_validate_partitions(train, validation), 'scene')
+        cached = prepare_features(validation, 'V_select')
+        self.assertEqual(cached[0]['split_unit'], 'scene')
+        with tempfile.TemporaryDirectory() as directory:
+            report = fit_evidence_association(synthetic_config('geometry_only'),
+                Path(directory)/'scene-protocol', 'cpu', train_scenes=train,
+                validation_scenes=validation, synthetic=True)
+            self.assertEqual(report['split_unit'], 'scene')
+            self.assertFalse(report['test_opened'])
+        del validation[0]['split_unit']
+        with self.assertRaisesRegex(ValueError, 'split_unit'):
+            _validate_partitions(train, validation)
+        validation[0]['split_unit'] = 'scene'
+        validation[0]['scene_id'] = train[0]['scene_id']
+        with self.assertRaisesRegex(ValueError, 'scene_id overlap'):
+            _validate_partitions(train, validation)
 
 
 if __name__ == '__main__':

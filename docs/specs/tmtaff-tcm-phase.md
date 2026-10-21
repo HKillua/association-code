@@ -34,3 +34,15 @@ checkpoint 的 `selected` 为 null，只能用 `load_complete_snapshot(selected=
 | 明确拒绝混用 | 下游非零、full 的零更新、跨 phase 恢复、tcm 物理预测导出均在启动前拒绝 |
 
 本地测试不读取真实 MTAD、不运行 GPU 训练，不改 README、HandOver 或研究结论。
+
+## 可选有序片段呈现（本地准备，未新增训练授权）
+
+`training.tcm_sampling`缺省`"uniform_fragment"`，保持原随机抽样与RNG消费。显式`"ordered_fragment"`仅作用于TCM：按传入场景顺序、每场原node顺序遍历至少两个有效原生点的片段，跨场边界顺接；每批最多`batch_tracks`条，epoch尾批不足就保留小批，不回填、不丢弃，下一更新开始下一epoch。这是对论文公开顺序组织的局部对齐；具体尾批约定是本项目选择，不声称作者实现已完全复现。
+
+一个epoch定义为全部eligible片段各呈现一次，不等于逐pair遍历或训练更新数。每步记录实际epoch、epoch内批次、输入池首末索引、轨次和双向相邻transition数`2*sum(n_i-1)`；transition不乘embedding维数，teacher loss的元素分母仍为该数乘`d_model`。既有coverage继续记录累计轨次与唯一覆盖，有序模式补累计transition及已完成epoch数。游标由已完成TCM更新数确定，checkpoint保留采样配置；旧缺字段按原随机模式恢复，恢复中切换sampling被拒绝。
+
+本项不改变TAM正负pair采样、CL或其他阶段缓存，也未实现随机截短。现TCM对完整选点序列做双向全部下一点teacher forcing；随机内部crop会改变上下文并裁去部分监督，不能把它直接说成论文随机截短后的缺失段恢复。80epochs的阶段分配仍未知，不把本项epoch定义自行换算成论文训练量。
+
+[正式场景起点提案](../../configs/tmtaff-scene3000-tcm-ordered-proposed.json)基于033，模型/Adam/lr/表示不变，仅改TCM为3356更新、`ordered_fragment`、`time_policy="advisory"`和8小时提醒。配套[正式名单](../../configs/data/mtad_scene3000_seed20.json)与[时钟装配](../../configs/data/mtad_scene3000_seed20_alignment.json)：2100训练场共214739条有效片段均至少两点，batch64遍历一轮为3355个满批加19条尾批，共3356步。新run从当前seed独立初始化，并从新训练人口拟合normalizer，不移交033；TAM/TFM/JOINT更新均为0，300场V仅执行原TCM最终feature评价，600测试场继续封存。
+
+这同时改变数据人口、采样呈现和实际更新数，是新正式协议起点，不是相对033的单因素诊断，也不是论文80epoch复现或已收敛声明。3356更新仅为待批准预算；8小时是提醒，不自动停止、加步或重试。没有新增READY，没有运行真实训练；该配置不与可选CL目标尺度诊断混用。

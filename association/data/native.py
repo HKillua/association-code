@@ -51,7 +51,7 @@ def uniform_observation_indices(point_count, max_points=None):
     return np.asarray([k * (count - 1) // (cap - 1) for k in range(cap)], dtype=np.int64)
 
 
-def _record(scene, component_id, split, max_points):
+def _record(scene, component_id, split, max_points, *, split_unit=None):
     tracks, selection_audits = [], []
     for track in scene.tracks:
         canonical_times = np.asarray(track.times, dtype=np.float64).copy()
@@ -97,7 +97,7 @@ def _record(scene, component_id, split, max_points):
         'interpolated_points': 0, 'invented_points': 0, 'coordinate_extrapolation': False,
         'per_track': selection_audits,
     }
-    return {
+    record = {
         'scene_id': str(scene.scene_id), 'component_id': str(component_id), 'split': split,
         'tracks': tracks, 'node_ids': [track['node_id'] for track in tracks],
         'identities': identities, 'sources': [track['source'] for track in tracks],
@@ -105,6 +105,13 @@ def _record(scene, component_id, split, max_points):
                                 dtype=np.float64).reshape(n, 2),
         'pairs': pairs, 'labels': labels, 'audit': audit,
     }
+    # Preserve historical checkpoint contracts exactly. Only the new explicit
+    # scene protocol adds a field; component_id always remains the real group.
+    if split_unit == 'scene':
+        record['split_unit'] = 'scene'
+    elif split_unit not in (None, 'shared_a_component'):
+        raise DataError('Unknown split unit')
+    return record
 
 
 def _request(split, max_points):
@@ -113,8 +120,8 @@ def _request(split, max_points):
     return _max_points(max_points)
 
 
-def load_native_split_from_archive(archive, manifest, split, *, max_points=None, check=None):
-    """Reuse an open archive and frozen manifest; read only this split's CSVs.
+def iter_native_split_from_archive(archive, manifest, split, *, max_points=None, check=None):
+    """Yield one native scene at a time from an already open archive.
 
     Quarantined fragments retain their original diagnostics in each scene audit.
     Selected views and full canonical arrays are independent copies. Reference
@@ -123,14 +130,19 @@ def load_native_split_from_archive(archive, manifest, split, *, max_points=None,
     """
     cap = _request(split, max_points)
     validate_archive(archive, manifest)
-    records = []
     for sid in manifest['splits'][split]:
         if check:
             check()
-        records.append(_record(archive.load_scene(sid), manifest['components'][sid], split, cap))
+        yield _record(archive.load_scene(sid), manifest['components'][sid], split, cap,
+                      split_unit=manifest.get('split_unit'))
     if check:
         check()
-    return records
+
+
+def load_native_split_from_archive(archive, manifest, split, *, max_points=None, check=None):
+    """Retain the historical list API, scene order, arrays and read/check order."""
+    return list(iter_native_split_from_archive(archive, manifest, split,
+                                               max_points=max_points, check=check))
 
 
 def load_native_split(archive_path, manifest, split, *, max_points=None, check=None):
