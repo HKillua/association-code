@@ -1,0 +1,19 @@
+# 050 保全材料服务器路径与自检（未随交接上传，权重/大日志留服务器）
+
+运行目录：/home/wangguangjie/djs/association-code/runs/BASELINE-SCENE3000-TCM-20261021-050-attempt-1
+冻结checkout：/home/wangguangjie/djs/association-code/../association-code-run050 （commit 6c5c1aa）
+
+runs/BASELINE-SCENE3000-TCM-20261021-050-attempt-1/checkpoint.pt 78242316 字节 2026-10-21 17:53:31.742408797 +0800
+runs/BASELINE-SCENE3000-TCM-20261021-050-attempt-1/history.json 1738928 字节 2026-10-21 19:12:42.045071430 +0800
+runs/BASELINE-SCENE3000-TCM-20261021-050-attempt-1/coverage.json 9090936 字节 2026-10-21 19:12:43.009089699 +0800
+runs/BASELINE-SCENE3000-TCM-20261021-050-attempt-1/run.json 533663 字节 2026-10-21 19:12:43.093091288 +0800
+runs/BASELINE-SCENE3000-TCM-20261021-050-attempt-1/evaluation-progress.json 154 字节 2026-10-21 19:09:23.813216632 +0800
+
+## checkpoint CPU 加载自检（torch 2.5.1+cu121, map_location=cpu）
+torch.load(map_location=cpu) 成功，无异常
+top-level keys: 24 ['config', 'coverage', 'cursor', 'data_contract', 'device', 'effective_margin', 'elapsed_seconds', 'format_version', 'fusion_config', 'fusion_evaluations', 'history', 'initialization', 'input_adapter', 'margin_calibration', 'max_observations', 'model_config', 'normalizer', 'optimizer', 'phase', 'rng', 'selected', 'split_unit', 'states', 'training_stages']
+phase: tcm | cursor: {'stage': 0, 'update': 3356, 'completed_updates': 3356} | history records: 3356
+modules: [(254, 2783232), (261, 5937160), (1, 4)]
+all params finite: True
+normalizer/data_contract/rng/optimizer present: True
+effective_margin: 1.0

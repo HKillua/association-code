@@ -1,0 +1,58 @@
+环境：torch 2.5.1+cu121 | map_location=cpu | weights_only=False（与训练器读取路径一致）
+
+### 049 checkpoint.pt
+  路径 /home/wangguangjie/djs/association-code/runs/BASELINE-TFM-FROM033-20261021-049-attempt-1/checkpoint.pt
+  字节 123987664 | mtime 2026-10-21 15:32:20
+  torch.load 成功 | top-level keys 23 | phase=tfm | cursor={'stage': 2, 'update': 300, 'completed_updates': 300} | effective_margin=1.0
+  三模块 (tensors, params): [(254, 2783232), (261, 5937160), (1, 4)]
+  全部张量有限: True
+  normalizer/data_contract/rng/optimizer/history: [True, True, True, True] | history 300
+  selected: {"fusion_stage": "TFM_FROZEN", "fusion_update": 300, "stage": "TFM_FROZEN", "update": 300, "effective_margin": 1.0, "selection_performed": false, "endpoint_policy": "fixed_final"}
+
+### 049 snapshots/update-000000.pt
+  路径 /home/wangguangjie/djs/association-code/runs/BASELINE-TFM-FROM033-20261021-049-attempt-1/snapshots/update-000000.pt
+  字节 40780450 | mtime 2026-10-21 11:20:01
+  torch.load 成功 | top-level keys 23 | phase=tfm | cursor={'stage': 2, 'update': 0, 'completed_updates': 0} | effective_margin=1.0
+  三模块 (tensors, params): [(254, 2783232), (261, 5937160), (1, 4)]
+  全部张量有限: True
+  normalizer/data_contract/rng/optimizer/history: [True, True, True, True] | history 0
+  selected: None
+
+### 049 snapshots/update-000100.pt
+  路径 /home/wangguangjie/djs/association-code/runs/BASELINE-TFM-FROM033-20261021-049-attempt-1/snapshots/update-000100.pt
+  字节 88664252 | mtime 2026-10-21 12:51:00
+  torch.load 成功 | top-level keys 23 | phase=tfm | cursor={'stage': 2, 'update': 100, 'completed_updates': 100} | effective_margin=1.0
+  三模块 (tensors, params): [(254, 2783232), (261, 5937160), (1, 4)]
+  全部张量有限: True
+  normalizer/data_contract/rng/optimizer/history: [True, True, True, True] | history 100
+  selected: None
+
+### 049 snapshots/update-000300.pt
+  路径 /home/wangguangjie/djs/association-code/runs/BASELINE-TFM-FROM033-20261021-049-attempt-1/snapshots/update-000300.pt
+  字节 123987344 | mtime 2026-10-21 15:12:01
+  torch.load 成功 | top-level keys 23 | phase=tfm | cursor={'stage': 2, 'update': 300, 'completed_updates': 300} | effective_margin=1.0
+  三模块 (tensors, params): [(254, 2783232), (261, 5937160), (1, 4)]
+  全部张量有限: True
+  normalizer/data_contract/rng/optimizer/history: [True, True, True, True] | history 300
+  selected: {"fusion_stage": "TFM_FROZEN", "fusion_update": 300, "stage": "TFM_FROZEN", "update": 300, "effective_margin": 1.0, "selection_performed": false, "endpoint_policy": "fixed_final"}
+
+### 033 checkpoint.pt（TCM来源）
+  路径 /home/wangguangjie/djs/association-code/runs/BASELINE-TCM-COVERAGE-20261020-033-attempt-1/checkpoint.pt
+  字节 57773068 | mtime 2026-10-20 05:44:47
+  torch.load 成功 | top-level keys 21 | phase=tcm | cursor={'stage': 0, 'update': 4000, 'completed_updates': 4000} | effective_margin=1.0
+  三模块 (tensors, params): [(254, 2783232), (261, 5937160), (1, 4)]
+  全部张量有限: True
+  normalizer/data_contract/rng/optimizer/history: [True, True, True, True] | history 4000
+  selected: None
+
+## 冻结与漂移核查（逐张量 torch.equal，float32 比较）
+  TCM(module0) 033 vs 049/update-000000: 张量名集合一致=True 不同张量数=0/254 最大绝对差=0
+  TCM(module0) 033 vs 049/update-000100: 张量名集合一致=True 不同张量数=0/254 最大绝对差=0
+  TCM(module0) 033 vs 049/update-000300: 张量名集合一致=True 不同张量数=0/254 最大绝对差=0
+  TCM(module0) 033 vs 049/checkpoint.pt: 张量名集合一致=True 不同张量数=0/254 最大绝对差=0
+  checkpoint.pt 与 update-000300 全模块逐张量一致： True
+  checkpoint.pt 与 update-000000/100 全模块一致： False False
+  TFM(module1) update0→update300 改变张量 259/261，最大绝对漂移 0.214855
+  log_variance(module2) update0: [0.0, 0.0, 0.0, 0.0] → update300: [-0.41416603326797485, -0.3357439637184143, 0.023699602112174034, -0.005908927880227566]
+
+## 049 run.json：status=COMPLETED phase=tfm cursor={'stage': 3, 'update': 0, 'completed_updates': 300} test_opened=False elapsed=15314.2

@@ -1,0 +1,8 @@
+[0s] members_ok=2000 bytes=6261654 failures=0
+[0s] members_ok=4000 bytes=13156233 failures=0
+[1s] members_ok=6000 bytes=223798869 failures=0
+[3s] members_ok=8000 bytes=683932537 failures=0
+[5s] members_ok=10000 bytes=1093139245 failures=0
+[20s] members_ok=12000 bytes=3813126550 failures=0
+[36s] members_ok=14000 bytes=6806116445 failures=0
+DONE members_ok=15000 uncompressed_bytes=8105212552 failures=0 elapsed=43.1s
