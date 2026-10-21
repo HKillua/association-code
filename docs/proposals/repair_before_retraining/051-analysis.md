@@ -97,4 +97,4 @@
 
 若主要是好helper分不出来，下一候选应给独立的可靠性/运动支持证据或改训练任务，而不是重复符号标签；若排序/符号已足够、正u幅度主导坏尾部，再考虑分离接纳概率与融合份额，并保留046对照。以上是条件路线，**051没有授权新重训，也没有验证一个新方法成功**。
 
-证据入口：[051回执](../../../HandOver/S2L-20261021-051.md)、[051原件](../../../HandOver/results/EVIDENCE-FUSION-SIGN-20261021-051/)、[046原件](../../../HandOver/results/EVIDENCE-FUSION-20261021-046/)、[048分析](048-analysis.md)、[本轮复算结果](051-audit.json)。复算命令：`.venv/bin/python tools/analysis/audit_fusion051.py`；脚本复用046球面误差函数，tar成员只在内存读取，不提取路径或重复保存预测。全量分层/逐场/逐组件/曲线保存在JSON，文中只保留决策需要的数字。
+证据入口：[051回执](https://github.com/HKillua/association-code/blob/404d766/HandOver/S2L-20261021-051.md)、[051原件](../../../HandOver/results/EVIDENCE-FUSION-SIGN-20261021-051/)、[046原件](../../../HandOver/results/EVIDENCE-FUSION-20261021-046/)、[048分析](048-analysis.md)、[本轮复算结果](051-audit.json)。复算命令：`.venv/bin/python tools/analysis/audit_fusion051.py`；脚本复用046球面误差函数，tar成员只在内存读取，不提取路径或重复保存预测。全量分层/逐场/逐组件/曲线保存在JSON，文中只保留决策需要的数字。

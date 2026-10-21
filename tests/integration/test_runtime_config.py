@@ -6,7 +6,7 @@ from unittest.mock import patch
 import numpy as np
 
 from association.utils.runtime import (Run, device_from_string, load_records, read_json,
-                                 save_records, semantic_binding, write_json)
+                                 save_records, write_json)
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -21,7 +21,7 @@ class RuntimeConfigTests(unittest.TestCase):
             device_from_string('mps')
 
 
-    def test_cache_checks_data_and_split_without_hashes(self):
+    def test_cache_checks_actual_data_and_split(self):
         record = dict(scores=np.array([0.3]), labels=np.array([1]), pairs=np.array([[0, 1]]),
                       sources=['a', 'b'], identities=['x', 'x'], intervals=np.array([[0., 1.], [1., 2.]]),
                       scene_id='one', component_id='one', node_ids=['a', 'b'])
@@ -32,14 +32,9 @@ class RuntimeConfigTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 load_records(path, {'split': 'T_test'})
             index = read_json(path/'index.json')
-            index['content_sha256'] = 'stale'
-            index['records'][0]['sha256'] = 'stale'
-            index['binding']['checkpoint_sha256'] = 'stale'
+            index['binding']['legacy_note'] = 'extra metadata is not an execution gate'
             write_json(path/'index.json', index)
             self.assertEqual(load_records(path, {'split': 'T_head'})[0]['scores'][0], .3)
-            write_json(path/'index.json', semantic_binding(index))
-            with patch('association.utils.runtime.digest', side_effect=AssertionError('No hash checks')):
-                self.assertEqual(load_records(path, {'split': 'T_head'})[0]['scores'][0], .3)
             for values, message in (({'labels': np.array([0])}, 'labels disagree'),
                                     ({'labels': np.array([2])}, 'labels binary'),
                                     ({'scores': np.array([.3, .4])}, 'record needs')):

@@ -1,6 +1,6 @@
 # 048：关联收益已传给融合，融合收益取决于输出对象与污染程度
 
-2026-10-21，本轮分析043/047期间拉到服务器`bb51611`。048为一次CPU4冻结评价，COMPLETED/退出0，墙时39.68秒，优化更新0；049仅启动回执RUNNING，不能填作已完成。048没有更换043补全，而是固定普通OLS、045原分数/阈值与046 final。原始证据见[S2L](../../../HandOver/S2L-20261021-048.md)、[结果目录](../../../HandOver/results/FROZEN-EVIDENCE-COMBO-20261021-048/)，事前条件见[048—049规格](../../specs/next-experiments-048-049.md)。
+2026-10-21，本轮分析043/047期间拉到服务器`bb51611`。048为一次CPU4冻结评价，COMPLETED/退出0，墙时39.68秒，优化更新0；049仅启动回执RUNNING，不能填作已完成。048没有更换043补全，而是固定普通OLS、045原分数/阈值与046 final。原始证据见[S2L](https://github.com/HKillua/association-code/blob/404d766/HandOver/S2L-20261021-048.md)、[结果目录](../../../HandOver/results/FROZEN-EVIDENCE-COMBO-20261021-048/)，事前条件见[048—049规格](https://github.com/HKillua/association-code/blob/404d766/docs/specs/next-experiments-048-049.md)。
 
 本页合并实验记录、深挖与Mode C回流：`MC-MTAD-048-20261021`，继承`C-usefulness`；DE为已返回数组和独立复算，机制解释仍为AI/UN。本地复核没有新训练、模型推理、原生ZIP或T_test访问；服务器048曾读取V原生量测重建可见证据并做046 CPU重放。V只有17个相关组件且已反复用于开发，不作独立泛化或显著性结论。
 

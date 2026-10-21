@@ -60,13 +60,6 @@ def validate_tsa_config(config):
     return model
 
 
-def implementation_hashes():
-    root = Path(__file__).resolve().parents[2]
-    names = ["baselines/__init__.py", "baselines/tsactfer.py", "baselines/tsactfer_data.py",
-             "tools/experiments/tsactfer_fit.py"]
-    return {name: runtime.digest(root / name) for name in names}
-
-
 def learning_rate(update, training):
     warmup, total = training["warmup_updates"], training["updates"]
     if update <= warmup:
@@ -144,11 +137,7 @@ def train(archive_path, manifest, protocol_config, config, device, output):
         raise ValueError("TSA slots cannot truncate the common registered input")
     device = torch.device(device)
     training = config["training"]
-    binding = {"scope": config["scope"], "manifest_sha256": manifest.get("manifest_sha256"),
-               "protocol_config_sha256": runtime.object_hash(protocol_config),
-               "tsa_config_sha256": runtime.object_hash(config), "seed": config["seed"],
-               "association_code_sha256": runtime.code_fingerprint(),
-               "tsa_sources": implementation_hashes()}
+    binding = {"scope": config["scope"], "seed": config["seed"]}
     run = runtime.Run(output, {"kind": config["scope"], "binding": binding,
                               "config": config, "provenance": runtime.provenance(device)}, training["max_hours"])
     history, phases = [], {}
@@ -234,7 +223,7 @@ def train(archive_path, manifest, protocol_config, config, device, output):
         run.check()
         start = time.monotonic()
         payload = torch.load(checkpoint, map_location=device, weights_only=True)
-        if runtime.semantic_binding(payload["binding"]) != runtime.semantic_binding(binding):
+        if any(payload["binding"].get(key) != value for key, value in binding.items()):
             raise ValueError("TSA checkpoint binding mismatch")
         if (payload["model_config"] != asdict(model_config) or payload["config"] != config
                 or payload["protocol_config"] != protocol_config or payload["normalizer"] != normalizer):
@@ -244,10 +233,10 @@ def train(archive_path, manifest, protocol_config, config, device, output):
         measured = evaluate_scenes(records, best["threshold"])
         if measured != best["validation"]:
             raise ValueError("Reloaded checkpoint does not reproduce selected validation metrics")
-        cache_binding = {**binding, "checkpoint_sha256": runtime.digest(checkpoint), "split": "V_select"}
+        cache_binding = {**binding, "split": "V_select"}
         runtime.save_records(run.path / "V_select", records, cache_binding)
         phases["cache"] = time.monotonic() - start
-        summary = {**binding, "checkpoint_sha256": cache_binding["checkpoint_sha256"],
+        summary = {**binding,
                    "selected_update": best["update"], "threshold": best["threshold"], "validation": measured,
                    "training_splits": ["T_core"], "selection_split": "V_select", "test_opened": False,
                    "completed_updates": training["updates"], "updates_per_task": training["updates"] // 2,
@@ -261,8 +250,7 @@ def train(archive_path, manifest, protocol_config, config, device, output):
         runtime.write_json(run.path / "summary.json", summary)
         runtime.write_json(run.path / "history.json", history)
         run.check()
-        run.finish(artifacts={name: runtime.digest(run.path / name) for name in
-                              ("summary.json", "checkpoint.pt", "history.json", "data_audit.json", "V_select/index.json")},
+        run.finish(artifacts=["summary.json", "checkpoint.pt", "history.json", "data_audit.json", "V_select/index.json"],
                    phase_seconds=phases)
         return summary
     except BaseException as error:

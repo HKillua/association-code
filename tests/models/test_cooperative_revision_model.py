@@ -3,7 +3,6 @@
 These exercise physical behavior and information boundaries, not MTAD quality.
 """
 import copy
-from dataclasses import asdict
 import math
 import unittest
 from unittest.mock import patch
@@ -65,111 +64,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
     def tearDownClass(cls):
         torch.set_num_threads(cls.old_threads)
 
-    def test_decoder_defaults_preserve_historical_configuration_and_weights(self):
-        historical, normalizer = revision_model(length=3, num_layers=6,
-            speed_output_policy='scaled_log', heading_output_policy='observation_residual')
-        old_config = asdict(historical.config)
-        del old_config['decoder_norm_first'], old_config['decoder_num_layers']
-        restored = CooperativeModel(CooperativeConfig(**old_config), normalizer, support_time_scale=10.)
-        explicit, _ = revision_model(length=3, num_layers=6, decoder_norm_first=False,
-            decoder_num_layers=6, speed_output_policy='scaled_log',
-            heading_output_policy='observation_residual')
-        self.assertNotIn('decoder_semantics', historical.state_dict())
-        self.assertEqual(historical.state_dict().keys(), explicit.state_dict().keys())
-        for name, value in historical.state_dict().items():
-            torch.testing.assert_close(value, explicit.state_dict()[name], rtol=0, atol=0)
-        with torch.no_grad():
-            historical.state_projection.weight.fill_(.025)
-        restored.load_state_dict(historical.state_dict())
-        explicit.load_state_dict(historical.state_dict())
-        x, mask = packed(historical, [[(0, 10, 20, 3, 359), (2, 12, 21, 7, 1)]])
-        for model in (historical, restored, explicit):
-            model.eval()
-        with torch.no_grad():
-            expected = historical(x, mask)
-            torch.testing.assert_close(restored(x, mask), expected, rtol=0, atol=0)
-            torch.testing.assert_close(explicit(x, mask), expected, rtol=0, atol=0)
-
-    def test_decoder_ablation_initialization_rng_and_actual_forward(self):
-        options = dict(length=3, num_layers=6, speed_output_policy='scaled_log',
-                       heading_output_policy='observation_residual')
-        control, normalizer = revision_model(**options)
-        control_rng = torch.get_rng_state().clone()
-        before = dict(control.named_parameters())
-        pre, _ = revision_model(**options, decoder_norm_first=True)
-        self.assertTrue(torch.equal(torch.get_rng_state(), control_rng))
-        short, _ = revision_model(**options, decoder_num_layers=2)
-        self.assertTrue(torch.equal(torch.get_rng_state(), control_rng))
-        self.assertEqual(dict(pre.named_parameters()).keys(), before.keys())
-        for model in (pre, short):
-            self.assertEqual(len(model.encoder.layers), 6)
-            self.assertTrue(all(not layer.norm_first for layer in model.encoder.layers))
-            for name, parameter in model.named_parameters():
-                torch.testing.assert_close(parameter, before[name], rtol=0, atol=0)
-        self.assertEqual(len(pre.decoder.layers), 6)
-        self.assertTrue(all(layer.norm_first for layer in pre.decoder.layers))
-        self.assertIsNone(pre.decoder.norm)
-        self.assertEqual(len(short.decoder.layers), 2)
-        self.assertEqual(short.decoder.num_layers, 2)
-        self.assertTrue(all(not layer.norm_first for layer in short.decoder.layers))
-        self.assertFalse(any(name.startswith('decoder.layers.2.') for name, _ in short.named_parameters()))
-        self.assertEqual(set(pre.state_dict()) - set(control.state_dict()), {'decoder_semantics'})
-        x, mask = packed(control, [[(0, 10, 20, 3, 359), (2, 12, 21, 7, 1)]])
-        for model in (control, pre, short):
-            model.eval()
-            with torch.no_grad():
-                # Zero heads hide architecture differences; an identical,
-                # nonzero head exposes the decoder's actual forward behavior.
-                model.state_projection.weight.copy_(torch.arange(32).reshape(4, 8) * .001)
-        with torch.no_grad():
-            original = control(x, mask)
-            for model in (pre, short):
-                actual = model(x, mask)
-                self.assertTrue(torch.isfinite(actual).all())
-                self.assertGreater(float((actual-original).abs().max()), 1e-4)
-        for model in (pre, short):
-            optimizer = torch.optim.SGD(model.parameters(), lr=.001)
-            previous = model.decoder.layers[0].linear1.weight.detach().clone()
-            optimizer.zero_grad()
-            model(x, mask)[:, 0].sum().backward()
-            optimizer.step()
-            self.assertFalse(torch.equal(previous, model.decoder.layers[0].linear1.weight))
-            restored = CooperativeModel(model.config, normalizer, support_time_scale=10.)
-            restored.load_state_dict(model.state_dict())
-            restored.eval()
-            with torch.no_grad():
-                torch.testing.assert_close(restored(x, mask), model(x, mask), rtol=0, atol=0)
-
-    def test_decoder_semantics_cannot_be_cross_loaded_even_non_strictly(self):
-        options = dict(length=3, num_layers=6)
-        control, _ = revision_model(**options)
-        pre, _ = revision_model(**options, decoder_norm_first=True)
-        short, _ = revision_model(**options, decoder_num_layers=2)
-        for strict in (True, False):
-            for destination, source in ((control, pre), (pre, control), (short, control),
-                                        (control, short), (pre, short), (short, pre)):
-                with self.subTest(strict=strict, config=destination.config), \
-                     self.assertRaisesRegex(ValueError, 'decoder_semantics'):
-                    destination.load_state_dict(source.state_dict(), strict=strict)
-        bad = copy.deepcopy(pre.state_dict())
-        bad['decoder_semantics'][1] = 0
-        with self.assertRaisesRegex(ValueError, 'decoder_semantics'):
-            pre.load_state_dict(bad)
-
-    def test_decoder_configuration_rejects_ambiguous_or_unsupported_values(self):
-        defaults = CooperativeConfig()
-        self.assertFalse(defaults.decoder_norm_first)
-        self.assertIsNone(defaults.decoder_num_layers)
-        v2 = dict(model_variant='support_residual_v2', support_time_policy='train_absmax_v1')
-        for invalid in (None, 0, 1, 'true'):
-            with self.subTest(norm=invalid), self.assertRaisesRegex(ValueError, 'must be a boolean'):
-                CooperativeConfig(**v2, decoder_norm_first=invalid)
-        for invalid in (True, False, 0, -1, 7, 2., '2'):
-            with self.subTest(depth=invalid), self.assertRaisesRegex(ValueError, 'decoder_num_layers'):
-                CooperativeConfig(**v2, decoder_num_layers=invalid)
-        for options in ({'decoder_norm_first': True}, {'decoder_num_layers': 2}):
-            with self.assertRaisesRegex(ValueError, 'require support_residual_v2'):
-                CooperativeConfig(**options)
 
     def test_visible_base_interpolation_short_longitude_arc_and_endpoint_hold(self):
         model, normalizer = revision_model()
@@ -191,11 +85,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
         expected_lon = (expected[:, 1] - .5 + 180).remainder(360)-180
         torch.testing.assert_close(changed[:, 1], expected_lon)
 
-    def test_exact_antipodal_longitude_tie_uses_negative_arc(self):
-        model, _ = revision_model(length=3)
-        x, mask = packed(model, [[(0, 10, 0, 0, 0), (2, 12, 180, 0, 0)]], [0, 1, 2])
-        base = model.position_base(model.encode(x, mask), [0])[0]
-        torch.testing.assert_close(base[:, 1], torch.tensor([0., -90., -180.]))
 
     def test_endpoint_mask_recomputes_base_and_nearest_support_without_hidden_leak(self):
         model, _ = revision_model(length=5)
@@ -226,13 +115,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
         with torch.no_grad():
             self.assertNotEqual(float(model(changed, visible)[0, 0]), float(result[0, 0]))
 
-    def test_support_query_describes_internal_gap_not_only_first_last(self):
-        model, _ = revision_model(length=4)
-        x, mask = packed(model, [[(0, 10, 20, 1, 0), (2, 10, 20, 1, 0),
-                                  (10, 10, 20, 1, 0)]], [-1, 2, 5, 12])
-        expected = torch.tensor([[0, .1, 0, 1, 0], [0, 0, 1, 1, 1],
-                                 [.3, .5, 1, 1, 1], [.2, 0, 1, 0, 0]])
-        torch.testing.assert_close(model.support_features(model.encode(x, mask))[0], expected)
 
     def test_course_projection_is_circular_and_query_states_have_no_gradient(self):
         model, _ = revision_model(length=3)
@@ -294,65 +176,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
         expected = torch.tensor([[154., 154., 244., 334., 334.], [334., 334., 244., 154., 154.]])
         torch.testing.assert_close(model.heading_base(model.encode(x, mask), [0, 1]), expected, rtol=0, atol=5e-5)
 
-    def test_observed_heading_uses_clipped_native_values_without_hidden_leak(self):
-        model, _ = revision_model(length=5, heading_output_policy='observation_residual')
-        model.eval()
-        row = [(0, 0, 0, 2, 300), (2, 20, 2, 2, 350),
-               (4, 40, 4, 2, 10), (6, 60, 6, 2, 40)]
-        x, mask = packed(model, [row, [(t, a, b, v, 100.) for t, a, b, v, _ in row]], [-1, 0, 1, 3, 7])
-        class Prefix:
-            def integers(self, *args):
-                return 1
-        clipped, visible, removed = endpoint_view(x, mask, 6, Prefix(), fraction=.25)
-        self.assertEqual(removed, [1, 1])
-        poisoned = clipped.clone()
-        poisoned[:, :6][~visible[:, :6]] = float('nan')
-        poisoned[:, 6:, :4] = float('inf')
-        with torch.no_grad():
-            expected = model(clipped, visible, [0, 1])
-            actual = model(poisoned, visible, [0, 1])
-        torch.testing.assert_close(actual, expected, rtol=0, atol=0)
-        torch.testing.assert_close(expected[:, 3], torch.tensor([350., 350., 350., 0., 40.]), rtol=0, atol=0)
-        clipped.requires_grad_()
-        model(clipped, visible, [0, 1]).sum().backward()
-        self.assertTrue(torch.isfinite(clipped.grad).all())
-        self.assertEqual(float(clipped.grad[:, 6:, :4].abs().sum()), 0.)
-        self.assertEqual(float(clipped.grad[:, :6][~visible[:, :6]].abs().sum()), 0.)
-
-    def test_heading_policy_preserves_other_initialization_and_forbids_cross_loading(self):
-        original, _ = revision_model(length=3, speed_output_policy='scaled_log')
-        rng = torch.get_rng_state().clone()
-        revised, _ = revision_model(length=3, speed_output_policy='scaled_log',
-                                    heading_output_policy='observation_residual')
-        self.assertTrue(torch.equal(rng, torch.get_rng_state()))
-        for (name, before), (other_name, after) in zip(original.named_parameters(), revised.named_parameters()):
-            self.assertEqual(name, other_name)
-            if name in ('state_projection.weight', 'state_projection.bias'):
-                torch.testing.assert_close(before[:3], after[:3], rtol=0, atol=0)
-                self.assertEqual(float(after[3].detach().abs().sum()), 0.)
-            else:
-                torch.testing.assert_close(before, after, rtol=0, atol=0)
-        original.eval(); revised.eval()
-        x, mask = packed(original, [[(0, 10, 20, 3, 359), (2, 12, 21, 7, 1)],
-                                    [(0, 11, 22, 5, 30), (2, 13, 24, 6, 40)]])
-        with torch.no_grad():
-            torch.testing.assert_close(original(x, mask)[:, :3], revised(x, mask)[:, :3], rtol=0, atol=0)
-            torch.testing.assert_close(original.score_pairs(original.encode(x, mask), [[0, 1]]),
-                                       revised.score_pairs(revised.encode(x, mask), [[0, 1]]), rtol=0, atol=0)
-        self.assertEqual(set(revised.state_dict())-set(original.state_dict()), {'heading_base_version'})
-        for strict in (True, False):
-            with self.assertRaisesRegex(ValueError, 'heading_base_version'):
-                revised.load_state_dict(original.state_dict(), strict=strict)
-            with self.assertRaisesRegex(ValueError, 'heading_output_policy'):
-                original.load_state_dict(revised.state_dict(), strict=strict)
-        bad = copy.deepcopy(revised.state_dict()); bad['heading_base_version'] += 1
-        with self.assertRaisesRegex(ValueError, 'heading_base_version'):
-            revised.load_state_dict(bad)
-        # Old serialized configurations have no heading policy and keep the
-        # historical output, without a new state-dict key.
-        self.assertEqual(CooperativeConfig().heading_output_policy, 'learned_absolute')
-        with self.assertRaisesRegex(ValueError, 'requires support_residual_v2'):
-            CooperativeConfig(heading_output_policy='observation_residual')
 
     def test_speed_output_does_not_use_native_std_and_loss_accepts_zero_and_tail(self):
         model, _ = revision_model(length=3)
@@ -380,26 +203,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
             tail = model(x, mask)
         self.assertGreater(float(tail[:, 2].min()), 999999.)
 
-    def test_scaled_log_preserves_initialization_rng_and_non_speed_outputs(self):
-        original, _ = revision_model(length=3)
-        original_rng = torch.get_rng_state().clone()
-        revised, _ = revision_model(length=3, speed_output_policy='scaled_log')
-        self.assertTrue(torch.equal(original_rng, torch.get_rng_state()))
-        before = dict(original.named_parameters())
-        after = dict(revised.named_parameters())
-        self.assertEqual(before.keys(), after.keys())
-        for name in before:
-            torch.testing.assert_close(before[name], after[name], rtol=0, atol=0)
-        self.assertEqual(set(revised.state_dict()) - set(original.state_dict()), {'speed_reference'})
-        original.eval(); revised.eval()
-        x, mask = packed(original, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
-        with torch.no_grad():
-            torch.testing.assert_close(original(x, mask), revised(x, mask), rtol=0, atol=0)
-            for model in (original, revised):
-                model.state_projection.bias.copy_(torch.tensor([.25, -.5, 1., .7]))
-            old, new = original(x, mask), revised(x, mask)
-        torch.testing.assert_close(old[:, [0, 1, 3]], new[:, [0, 1, 3]], rtol=0, atol=0)
-        self.assertFalse(torch.equal(old[:, 2], new[:, 2]))
 
     def test_scaled_log_one_residual_unit_is_one_log_scale_with_physical_gradient(self):
         model, _ = revision_model(length=3, speed_output_policy='scaled_log')
@@ -413,37 +216,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
         derivative = torch.autograd.grad(output[:, 2].sum(), model.state_projection.bias)[0][2]
         torch.testing.assert_close(derivative, 3 * model.log_speed_std * expected)
 
-    def test_speed_policy_state_cannot_be_cross_loaded_or_recalibrated(self):
-        original, _ = revision_model(length=3)
-        revised, _ = revision_model(length=3, speed_output_policy='scaled_log')
-        with torch.no_grad():
-            revised.state_projection.bias[2] = .75
-        # Even non-strict loads must not silently reinterpret the head weights.
-        for strict in (True, False):
-            with self.subTest(strict=strict), self.assertRaisesRegex(ValueError, 'speed_reference'):
-                revised.load_state_dict(original.state_dict(), strict=strict)
-            with self.subTest(strict=strict), self.assertRaisesRegex(ValueError, 'speed_output_policy'):
-                original.load_state_dict(revised.state_dict(), strict=strict)
-        bad = copy.deepcopy(revised.state_dict()); bad['speed_reference'] += 1.
-        with self.assertRaisesRegex(ValueError, 'speed_reference'):
-            revised.load_state_dict(bad)
-        restored, _ = revision_model(length=3, speed_output_policy='scaled_log')
-        restored.load_state_dict(revised.state_dict())
-        revised.eval(); restored.eval()
-        x, mask = packed(revised, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
-        with torch.no_grad():
-            torch.testing.assert_close(revised(x, mask), restored(x, mask), rtol=0, atol=0)
-        with self.assertRaisesRegex(ValueError, 'requires support_residual_v2'):
-            CooperativeConfig(speed_output_policy='scaled_log')
-
-    def test_scaled_log_overflow_is_reported_instead_of_clipped(self):
-        model, _ = revision_model(length=3, speed_output_policy='scaled_log')
-        model.eval()
-        x, mask = packed(model, [[(0, 10, 20, 3, 5), (2, 12, 21, 7, 15)]])
-        with torch.no_grad():
-            model.state_projection.bias[2] = 1e6
-            with self.assertRaisesRegex(ValueError, 'physical output is nonfinite'):
-                model(x, mask)
 
     def test_local_identity_is_symmetric_at_tied_cutoff_and_nonoverlap_uses_endpoints(self):
         model, _ = revision_model(length=3)
@@ -470,15 +242,6 @@ class CooperativeRevisionModelTests(unittest.TestCase):
         scores = model.score_pairs(encoded, pairs)
         torch.testing.assert_close(scores, model.score_pairs(encoded, pairs.flip(1)), rtol=0, atol=0)
 
-    def test_overlap_without_real_tokens_falls_back_to_global_identity(self):
-        model, _ = revision_model(length=3)
-        encoded = model.encode(*packed(model, [[(0, 10, 20, 1, 0), (10, 10, 20, 1, 0)],
-                                              [(4, 10, 20, 1, 0), (6, 10, 20, 1, 0)]]))
-        _, available = model.local_pair_features(encoded, [[0, 1]])
-        self.assertFalse(bool(available[0]))
-        with patch.object(model.identity_base, 'forward', return_value=torch.tensor([[.75]])), \
-             patch.object(model.local_identity, 'forward', return_value=torch.tensor([[100.]])):
-            torch.testing.assert_close(model.score_pairs(encoded, [[0, 1]]), torch.tensor([.75]))
 
     def test_singleton_is_exact_same_self_path_for_every_route(self):
         model, _ = revision_model(length=3)

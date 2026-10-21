@@ -7,7 +7,6 @@ import torch
 from association.models.evidence_association import (
     EvidenceAssociation, FEATURE_NAMES, features_from_motion)
 from tools.experiments.evidence_association_fit import synthetic_scenes
-from tools.analysis.motion_association_control import rms_haversine_scores
 
 
 class EvidenceAssociationTests(unittest.TestCase):
@@ -23,8 +22,15 @@ class EvidenceAssociationTests(unittest.TestCase):
         self.assertEqual(features[0, 6], 0.)
         self.assertEqual(features[0, 5], 0.)
         self.assertTrue(scene['labels'][0])
-        expected = -np.log1p(-rms_haversine_scores(scene['motion']['states'][..., :2], scene['pairs'])/1000.)
-        np.testing.assert_array_equal(base, expected)
+        radians = np.deg2rad(scene['motion']['states'][..., :2])
+        xyz = np.stack((np.cos(radians[..., 0])*np.cos(radians[..., 1]),
+                        np.cos(radians[..., 0])*np.sin(radians[..., 1]),
+                        np.sin(radians[..., 0])), -1)
+        left, right = (xyz[scene['pairs'][:, k]] for k in (0, 1))
+        metres = 6371000.*np.arctan2(np.linalg.norm(np.cross(left, right), axis=-1),
+                                    (left*right).sum(-1))
+        expected = -np.log1p(np.sqrt(np.mean(metres**2, axis=1))/1000.)
+        np.testing.assert_allclose(base, expected, rtol=1e-12, atol=1e-12)
         scene['motion'].update(target=object(), identities=object(), labels=object())
         again, _ = features_from_motion(scene['motion'], scene['pairs'])
         np.testing.assert_array_equal(features, again)

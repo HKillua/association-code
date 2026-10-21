@@ -102,15 +102,14 @@ class NativeInputsTests(unittest.TestCase):
         json.dumps(record['audit'], allow_nan=False)
 
 
-    def test_reads_only_selected_split_and_never_hashes_or_reads_reference(self):
+    def test_reads_only_selected_split_without_reference(self):
         self.write_fixture(self.two_fragments())
         reads = []
         original_read = zipfile.ZipFile.read
         def read(archive, member, *args, **kwargs):
             reads.append(member.filename)
             return original_read(archive, member, *args, **kwargs)
-        with patch.object(zipfile.ZipFile, 'read', read), \
-                patch.object(MTADArchive, 'archive_sha256', side_effect=AssertionError('No hash gate')):
+        with patch.object(zipfile.ZipFile, 'read', read):
             records = load_native_split(self.path, self.manifest, 'V_select')
         self.assertEqual([row['scene_id'] for row in records], ['2'])
         self.assertEqual(reads, ['数据集level2/关联表/关联结果-2.csv',

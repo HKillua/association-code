@@ -1,7 +1,6 @@
 """Portable run provenance and non-overwriting output handling."""
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 from pathlib import Path
@@ -11,14 +10,6 @@ import time
 
 import numpy as np
 import torch
-
-
-def digest(path):
-    h = hashlib.sha256()
-    with Path(path).open('rb') as f:
-        for chunk in iter(lambda: f.read(4 * 1024 * 1024), b''):
-            h.update(chunk)
-    return h.hexdigest()
 
 
 def jsonable(value):
@@ -48,26 +39,6 @@ def read_json(path):
         return json.load(f)
 
 
-def object_hash(value):
-    return hashlib.sha256(json.dumps(jsonable(value), sort_keys=True, allow_nan=False).encode()).hexdigest()
-
-
-def semantic_binding(value):
-    """Compare experiment content; old checksum/fingerprint fields are optional.
-
-    This also handles nested historical bindings. Hash-based random seeds and
-    split construction are deliberately unrelated to this metadata projection.
-    """
-    if isinstance(value, dict):
-        return {key: semantic_binding(item) for key, item in value.items()
-                if not (isinstance(key, str) and (key == 'sha256' or key.endswith('_sha256')
-                        or key.endswith('_hashes')
-                        or key in ('config_hash', 'code_fingerprint', 'tsa_sources')))}
-    if isinstance(value, (list, tuple)):
-        return [semantic_binding(item) for item in value]
-    return value
-
-
 def seed_everything(seed):
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -92,12 +63,6 @@ def device_from_string(name):
     return device
 
 
-def code_fingerprint():
-    root = Path(__file__).resolve().parents[2]
-    files = sorted((root/'association').rglob('*.py'))
-    return object_hash({str(p.relative_to(root)): digest(p) for p in files})
-
-
 def provenance(device):
     root = Path(__file__).resolve().parents[2]
     def git(*args):
@@ -105,7 +70,7 @@ def provenance(device):
         return result.stdout.strip() if result.returncode == 0 else 'unavailable'
     result = {'python': platform.python_version(), 'torch': torch.__version__, 'numpy': np.__version__,
               'device': str(device), 'git_commit': git('rev-parse', 'HEAD'),
-              'git_dirty': bool(git('status', '--porcelain')), 'code_sha256': code_fingerprint(),
+              'git_dirty': bool(git('status', '--porcelain')),
               'cuda_build': torch.version.cuda, 'cuda_visible_devices': os.environ.get('CUDA_VISIBLE_DEVICES')}
     if device.type == 'cuda':
         props = torch.cuda.get_device_properties(device)
@@ -142,8 +107,8 @@ class Run:
                     extra['cuda_process_peak_allocated_bytes'] = torch.cuda.max_memory_allocated(device_name)
                     extra['cuda_process_peak_reserved_bytes'] = torch.cuda.max_memory_reserved(device_name)
             except Exception as error:
-                # Optional telemetry must not suppress the original failure,
-                # artifact hashes or terminal state. Keep any earlier peaks.
+                # Optional telemetry must not suppress the original failure
+                # or terminal state. Keep any earlier peaks.
                 extra['cuda_memory_measurement_error'] = f'{type(error).__name__}: {error}'
         self.metadata.update(status=status, elapsed_seconds=time.monotonic()-self.started, **extra)
         write_json(self.path/'run.json', self.metadata)
@@ -157,17 +122,17 @@ def save_records(directory, records, binding):
         name = f'scene_{k:06d}.npz'
         np.savez_compressed(directory/name, **{key: np.asarray(record[key]) for key in
                             ['scores', 'labels', 'pairs', 'sources', 'identities', 'intervals']})
-        entries.append({'file': name, 'sha256': digest(directory/name), 'scene_id': record['scene_id'],
+        entries.append({'file': name, 'scene_id': record['scene_id'],
                         'component_id': record['component_id'], 'node_ids': record['node_ids']})
     index = {'schema': 1, 'binding': binding, 'records': entries}
-    index['content_sha256'] = object_hash(index)
     write_json(directory/'index.json', index)
 
 
 def load_records(directory, expected_binding=None):
     directory = Path(directory)
     index = read_json(directory/'index.json')
-    if expected_binding is not None and semantic_binding(index['binding']) != semantic_binding(expected_binding):
+    if expected_binding is not None and any(index['binding'].get(key) != value
+                                            for key, value in expected_binding.items()):
         raise ValueError('Score cache provenance differs from the requested reference/split')
     records = []
     for item in index['records']:

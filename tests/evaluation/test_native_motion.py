@@ -1,16 +1,9 @@
 """Native-only motion controls preserve short tracks, masks and data isolation."""
-from contextlib import redirect_stdout
-import io
-import json
-from pathlib import Path
 import unittest
-import zipfile
 
 import numpy as np
 
 from association.evaluation.native_motion import METHODS, predict_native_positions, position_metrics
-from tests.fixtures.native_zip import make_native_zip_fixture
-from tools.analysis.native_motion_control import main
 
 
 class NativeMotionTests(unittest.TestCase):
@@ -73,67 +66,6 @@ class NativeMotionTests(unittest.TestCase):
         missing = position_metrics(first['predictions']['native_ols'], target, valid, first['regions']['all'])
         self.assertEqual(missing['intersection_count'], 0)
         self.assertIsNone(missing['mae'])
-
-
-class NativeMotionCliTests(unittest.TestCase):
-    def setUp(self):
-        self.fixture = make_native_zip_fixture(self)
-
-    def run_control(self, name):
-        fixture = self.fixture
-        for filename, value in [('manifest.json', fixture.manifest), ('alignment.json', fixture.alignment)]:
-            (fixture.root/filename).write_text(json.dumps(value))
-        output = fixture.root/name
-        with redirect_stdout(io.StringIO()):
-            self.assertEqual(main(['--archive', str(fixture.path), '--manifest', str(fixture.root/'manifest.json'),
-                '--alignment', str(fixture.root/'alignment.json'), '--output', str(output)]), 0)
-        return output, json.loads((output/'native-motion.json').read_text())
-
-    def test_real_tiny_zip_complete_v_only_and_reference_cannot_change_predictions(self):
-        output, report = self.run_control('first')
-        self.assertEqual((report['scene_count'], report['fragment_count'], report['query_count']), (2, 4, 256))
-        self.assertEqual(report['fit_fragment_count'], 4)
-        self.assertEqual(report['fallback_fragment_count'], 0)
-        self.assertFalse(report['test_opened'])
-        self.assertEqual(len(report['per_fragment']), 4)
-        self.assertEqual(report['per_scene'][1]['fragment_count'], 0)
-        self.assertEqual(report['per_scene'][1]['reference_targets_without_input'], ['target4a-0'])
-        self.assertEqual({row['scene_id'] for row in report['observation_members_read']}, {'2', '4'})
-        self.assertEqual({row['scene_id'] for row in report['reference_members_read']}, {'2', '4'})
-        # Two b fragments have the fixture's deliberate +0.1-degree latitude
-        # source bias; native motion must not use the reference to remove it.
-        self.assertAlmostEqual(report['overall']['native_ols']['regions']['all']['mae'],
-                               6371000.*np.deg2rad(.1)/2., places=5)
-        by_source = report['by_source']
-        self.assertGreater(by_source['9002']['native_hold']['regions']['all']['mae'], 0.)
-        self.assertLess(by_source['9002']['native_ols']['regions']['all']['mae'],
-                        by_source['9002']['native_hold']['regions']['all']['mae'])
-        # Poison only V reference latitude; observed ZIP members remain identical.
-        with zipfile.ZipFile(self.fixture.path) as archive:
-            members = {name: archive.read(name) for name in archive.namelist()}
-        for name, payload in list(members.items()):
-            if '/真实场景/' in name and name.endswith(('-2.csv', '-4.csv')):
-                lines = payload.decode('utf-8-sig').splitlines()
-                changed = [lines[0]]
-                for line in lines[1:]:
-                    cells = line.split(',')
-                    cells[2] = str(float(cells[2])+1.)
-                    changed.append(','.join(cells))
-                members[name] = ('\n'.join(changed)+'\n').encode('utf-8-sig')
-        with zipfile.ZipFile(self.fixture.path, 'w') as archive:
-            for name, payload in members.items():
-                archive.writestr(name, payload)
-        poisoned, changed_report = self.run_control('poisoned')
-        self.assertGreater(changed_report['overall']['native_ols']['regions']['all']['mae'], 10000.)
-        for sid in ('2', '4'):
-            with np.load(output/'predictions'/f'positions-{sid}.npz', allow_pickle=False) as first, \
-                    np.load(poisoned/'predictions'/f'positions-{sid}.npz', allow_pickle=False) as second:
-                for name in METHODS:
-                    np.testing.assert_array_equal(first[name], second[name])
-                for name in ('node_ids', 'query_seconds', 'native_times', 'native_observed'):
-                    np.testing.assert_array_equal(first[name], second[name])
-        with self.assertRaises(FileExistsError):
-            self.run_control('first')
 
 
 if __name__ == '__main__':

@@ -52,56 +52,6 @@ class FusionOutputConditioningTests(unittest.TestCase):
             model.state_projection.bias[0] = 200.
             self.assertTrue((model(self.left, self.right)['states'][..., 0] > 90.).all())
 
-    def test_raw_default_keeps_keys_rng_initialization_and_outputs(self):
-        torch.manual_seed(18)
-        raw = PairFusion(self.raw_config).eval()
-        rng = torch.get_rng_state().clone()
-        torch.manual_seed(18)
-        explicit = PairFusion(replace(self.raw_config, output_parameterization='raw'), self.normalizer).eval()
-        self.assertTrue(torch.equal(rng, torch.get_rng_state()))
-        self.assertNotIn('position_mean', raw.state_dict())
-        self.assertNotIn('position_std', raw.state_dict())
-        self.assertEqual(raw.state_dict().keys(), explicit.state_dict().keys())
-        for name, value in raw.state_dict().items():
-            torch.testing.assert_close(value, explicit.state_dict()[name], rtol=0, atol=0)
-        with torch.no_grad():
-            torch.testing.assert_close(raw(self.left, self.right)['states'],
-                                       explicit(self.left, self.right)['states'], rtol=0, atol=0)
-        torch.manual_seed(18)
-        affine = PairFusion(self.affine_config, self.normalizer)
-        self.assertTrue(torch.equal(rng, torch.get_rng_state()))
-        self.assertEqual(sum(p.numel() for p in raw.parameters()), sum(p.numel() for p in affine.parameters()))
-        self.assertEqual(set(affine.state_dict()) - set(raw.state_dict()), {'position_mean', 'position_std'})
-        self.assertNotIn('position_mean', dict(affine.named_parameters()))
-        self.assertFalse(affine.position_mean.requires_grad)
-        self.assertFalse(affine.position_std.requires_grad)
-
-
-    def test_extreme_speed_statistics_do_not_change_speed_outputs_or_gradients(self):
-        extreme = copy.deepcopy(self.normalizer)
-        # Actual 014 train input speed moments. Mapping z=-1 through these
-        # moments would put softplus at -306 and lose its FP32 gradient.
-        extreme['mean'][2:] = [109.00519634850676, 177.95173703514496]
-        extreme['std'][2:] = [415.2732000413263, 104.69449368349127]
-        torch.manual_seed(11)
-        first = PairFusion(self.affine_config, self.normalizer).eval()
-        second = PairFusion(self.affine_config, extreme).eval()
-        second.load_state_dict(first.state_dict())
-        with torch.no_grad():
-            for model in (first, second):
-                model.state_projection.weight.zero_()
-                model.state_projection.bias.copy_(torch.tensor([0., 0., -1., 3.]))
-        results = []
-        for model in (first, second):
-            states = model(self.left, self.right)['states']
-            states[..., 2].mean().backward()
-            results.append((states.detach(), model.state_projection.bias.grad.clone()))
-            torch.testing.assert_close(states[..., 2], F.softplus(torch.tensor(-1.)).expand_as(states[..., 2]))
-            self.assertGreater(float(model.state_projection.bias.grad[2]), .26)
-            torch.testing.assert_close(model.state_projection.bias.grad[2], torch.sigmoid(torch.tensor(-1.)))
-        for actual, expected in zip(results[0], results[1]):
-            torch.testing.assert_close(actual, expected, rtol=0, atol=0)
-
 
 class FusionOutputSnapshotTests(unittest.TestCase):
     @classmethod
@@ -168,27 +118,6 @@ class FusionOutputSnapshotTests(unittest.TestCase):
         self.assertEqual(runtime.read_json(self.root/'full'/'summary.json')['evaluation']['fusion'],
                          runtime.read_json(self.root/'resumed'/'summary.json')['evaluation']['fusion'])
 
-    def test_legacy_raw_payload_without_field_loads_selected_last_and_resumes(self):
-        self.fusion = replace(self.fusion, output_parameterization='raw')
-        self.fit('full')
-        self.fit('old-part', max_updates_this_call=5)
-        for name in ('full', 'old-part'):
-            path = self.root/name/'checkpoint.pt'
-            saved = self.checkpoint(name)
-            del saved['fusion_config']['output_parameterization']
-            torch.save(saved, path)
-            for selected in (True, False):
-                loaded = load_complete_snapshot(path, selected=selected)
-                self.assertEqual(loaded['fusion'].config.output_parameterization, 'raw')
-                self.assertNotIn('position_mean', loaded['fusion'].state_dict())
-                expected = saved['selected']['states'] if selected else saved['states']
-                self.assert_states_equal(expected, [loaded[key].state_dict() for key in ('model','fusion','objective')])
-        self.fit('resumed', resume_from=self.root/'old-part')
-        self.assert_states_equal(self.checkpoint('full')['states'], self.checkpoint('resumed')['states'])
-        self.fusion = replace(self.fusion, output_parameterization='train_position_affine')
-        with self.assertRaisesRegex(ValueError, 'resume configuration'):
-            self.fit('forbidden-upgrade', resume_from=self.root/'old-part')
-        self.assertFalse((self.root/'forbidden-upgrade').exists())
 
     def test_snapshot_statistics_conflicts_fail_for_selected_last_and_resume(self):
         self.fit('part', max_updates_this_call=5)

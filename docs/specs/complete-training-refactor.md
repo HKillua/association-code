@@ -1,6 +1,6 @@
 # 完整参考训练与恢复规格
 
-2026-10-19整理。此处记录已经实现的TMTAFF时间适配近似参考行为，合并早期重构和逐次CPU过程日志。代码、数据规则与已批准运行不因整理改变；实际任务/预算见[交接索引](../../HandOver/Handover.md)，历史失败和成本见[历史摘要](../history/README.md)。软件验证不等于作者精确复现或研究效果。
+2026-10-21整理。此处记录已实现的TMTAFF时间适配参考行为。正式数据现改Level1，历史Level2运行及人口不能作为新数据结果；实际任务/预算见[交接索引](../../HandOver/Handover.md)，历史失败和成本见[历史摘要](../history/README.md)。软件验证不等于作者精确复现或研究效果。
 
 ## 输入与四阶段
 
@@ -8,7 +8,7 @@
 - [真实时间TCM](tmtaff-time-adaptation.md)接收原观测时刻和下一预测时刻；teacher与双向rollout使用一致的因果encoder/decoder memory可见性，含增长history的矩形mask。共同query支持内用物理插值、支持外递推，再进入TAM/TFM。
 - 阶段为TCM→冻结TCM训练TAM→冻结关联训练TFM→联合训练。配置显式给每阶段更新数、微批、预算和验证间隔，不将更新数写成论文epoch或自动保证收敛。
 - TCM从具备时间转移的训练轨迹抽样；TAM/joint沿既有scene→pair平衡分布；TFM均匀正场景→正对。真实场景/轨迹/pair覆盖记录，不按监督好坏删身份或重抽。微批保持整batch监督分母，局部无监督可贡献零，全batch缺必需监督明确失败。
-- 基线原Transformer规模为6层、d128、8头、FF256、Q64，TFM fc_hidden128是明确工程适配。位置连续SmoothL1 beta=.001；TFM/微批/递归的具体数学见[融合规格](tmtaff-fusion.md)。017采用[位置输出affine](tmtaff-output-conditioning.md)，旧raw检查点保留兼容。
+- 基线原Transformer规模为6层、d128、8头、FF256、Q64，TFM fc_hidden128是明确工程适配。位置连续SmoothL1 beta=.001；TFM/微批/递归的具体数学见[融合规格](tmtaff-fusion.md)。017采用[位置输出affine](https://github.com/HKillua/association-code/blob/404d766/docs/specs/tmtaff-output-conditioning.md)，旧raw检查点保留兼容。
 
 ## 监督、选择与全人口评价
 
@@ -18,7 +18,7 @@ TAM/joint按原完整V macro-F1选快照及阈值；TFM保留末步，不称“�
 
 完整评价保留全部目标、输出组、单例、重复/漏目标和错并拆分。预测分组不接真实身份，oracle分组独立诊断；baseline singleton只输出已有观测，候选可模型补全，必须披露差别。单源按source固定首有效片段，简单融合先各source再均值，不按reference挑最好片段；经度/航向圆均值，抵消处无效。
 
-位置球面米误差、native速度、圆周航向与覆盖共同报告。共同有效点误差不能替代全人口，零交集为null。新增[实际输入支撑/距离诊断](input-support-evaluation.md)不改主指标、阈值或选模，不回填旧运行或触发重跑。
+位置球面米误差、native速度、圆周航向与覆盖共同报告。共同有效点误差不能替代全人口，零交集为null。新增[实际输入支撑/距离诊断](https://github.com/HKillua/association-code/blob/404d766/docs/specs/input-support-evaluation.md)不改主指标、阈值或选模，不回填旧运行或触发重跑。
 
 ## 一次训练侧CL margin校准
 

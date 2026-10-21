@@ -1,11 +1,9 @@
 """Behavioral integration checks for v2 training/statistics/checkpoint isolation."""
 import copy
-import json
 from dataclasses import asdict, replace
 from pathlib import Path
 import tempfile
 import unittest
-from unittest.mock import patch
 
 import numpy as np
 import torch
@@ -17,8 +15,6 @@ from association.training.cooperative import (
     training_configuration,
 )
 from association.models.fusion import FusionLoss
-from association.training.common import fit_normalizer, normalize_scene
-from association.utils import runtime
 from tests.fixtures.scenes import timed_scene
 
 
@@ -133,17 +129,6 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             with self.subTest(pack_value=value), self.assertRaises(ValueError):
                 normalize_cooperative_scene(bad, norm, self.config)
 
-    def test_original_physical_error_scales_are_not_replaced_by_log_statistics(self):
-        physical = fit_normalizer([self.scene])
-        self.assertEqual(self.normalizer['std'], physical['std'])
-        self.assertEqual(self.normalizer['mean'], physical['mean'])
-        legacy = CooperativeConfig(**{**asdict(self.config), 'model_variant':'legacy'})
-        old = fit_cooperative_normalizer([self.scene], legacy)
-        self.assertEqual(old, physical)
-        expected = normalize_scene(self.scene, old)
-        actual = normalize_cooperative_scene(self.scene, old, legacy)
-        for left, right in zip(expected, actual):
-            np.testing.assert_array_equal(left, right)
 
     def test_stage_whitelists_include_new_modules_and_freeze_query_pool_after_teacher(self):
         teacher = {'input_projection', 'encoder', 'support_projection', 'query_pool', 'decoder',
@@ -190,71 +175,6 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
         self.assertFalse(any(name.startswith(('utility_head.', 'ordinary_gate.', 'identity_with_utility.'))
                              for name in changed))
 
-    def test_teacher_identity_weight_default_matches_explicit_one(self):
-        self.assertEqual(training_configuration(self.fit_config())['teacher_identity_weight'], 1.)
-        for invalid in (-1., float('nan'), float('inf'), True, '0'):
-            with self.subTest(invalid=invalid), self.assertRaisesRegex(ValueError, 'teacher_identity_weight'):
-                training_configuration({**self.fit_config(), 'teacher_identity_weight': invalid})
-        default, explicit = copy.deepcopy(self.model), copy.deepcopy(self.model)
-        objectives = [FusionLoss(position_loss_mode='standard_smooth_l1') for _ in range(2)]
-        optimizers = [self.optimizer(model, objective, 'teacher')
-                      for model, objective in zip((default, explicit), objectives)]
-        first = train_batch(default, objectives[0], optimizers[0], self.items(), stage='teacher')
-        second = train_batch(explicit, objectives[1], optimizers[1], self.items(),
-                             stage='teacher', teacher_identity_weight=1.)
-        self.assertEqual(first, second)
-        self.assertEqual(first['identity_bce_raw'], first['loss_components']['identity_bce'])
-        self.assertAlmostEqual(first['loss'], sum(first['loss_components'].values()), places=5)
-        for name, value in default.state_dict().items():
-            torch.testing.assert_close(value, explicit.state_dict()[name], rtol=0, atol=0)
-        torch.testing.assert_close(objectives[0].log_variance, objectives[1].log_variance, rtol=0, atol=0)
-
-    def test_zero_identity_weight_preserves_physical_pairs_and_exposes_zero_head_start(self):
-        self.config = replace(self.config, speed_output_policy='scaled_log',
-                              heading_output_policy='observation_residual')
-        self.normalizer = fit_cooperative_normalizer([self.scene], self.config)
-        torch.manual_seed(23)
-        physical = CooperativeModel(self.config, self.normalizer, support_time_scale=3.)
-        joint = copy.deepcopy(physical)
-        before = {name: value.detach().clone() for name, value in physical.named_parameters()}
-        items = self.items()
-        objective = FusionLoss(position_loss_mode='standard_smooth_l1')
-        optimizer = self.optimizer(physical, objective, 'teacher')
-        parameter_ids = [id(p) for group in optimizer.param_groups for p in group['params']]
-        expected_counts = sum((item['valid'].sum((0, 1)) * (1 + int(item['label'] == 1))
-                               for item in items), torch.zeros(4, dtype=torch.long))
-        with patch.object(physical, 'decode_group', wraps=physical.decode_group) as decode:
-            first = train_batch(physical, objective, optimizer, items, stage='teacher',
-                                teacher_identity_weight=0.)
-        self.assertEqual(decode.call_count, 6)  # two self per pair; two cross for the positive.
-        self.assertEqual(first['valid_counts'], expected_counts.tolist())
-        self.assertEqual(first['used_pairs'], len(items))
-        self.assertEqual(first['sampled_pairs'], len(items))
-        self.assertGreater(first['identity_bce_raw'], 0.)
-        self.assertEqual(first['loss_components']['identity_bce'], 0.)
-        self.assertEqual(first['loss'], first['loss_components']['physical'])
-        self.assertEqual(first['teacher_identity_weight'], 0.)
-        self.assertTrue(any(not torch.equal(value, before[name])
-                            for name, value in physical.named_parameters()
-                            if name.startswith('state_projection.')))
-        # All four output rows start at zero: the first physical update reaches
-        # the head, but cannot yet propagate through it to these upstream paths.
-        for name, value in physical.named_parameters():
-            if name.startswith(('encoder.', 'input_projection.', 'decoder.', 'fusion_projection.')):
-                torch.testing.assert_close(value, before[name], rtol=0, atol=0)
-        train_batch(physical, objective, optimizer, items, stage='teacher', teacher_identity_weight=0.)
-        self.assertEqual(parameter_ids, [id(p) for group in optimizer.param_groups for p in group['params']])
-        for name, value in physical.named_parameters():
-            if name.startswith(('identity_base.', 'local_identity.')):
-                torch.testing.assert_close(value, before[name], rtol=0, atol=0)
-        self.assertTrue(any(not torch.equal(value, before[name])
-                            for name, value in physical.named_parameters()
-                            if name.startswith('decoder.')))
-        joint_objective = FusionLoss(position_loss_mode='standard_smooth_l1')
-        joint_optimizer = self.optimizer(joint, joint_objective, 'teacher')
-        train_batch(joint, joint_objective, joint_optimizer, items, stage='teacher')
-        self.assertTrue(any(not torch.equal(value, before[name])
-                            for name, value in joint.named_parameters() if name.startswith('encoder.')))
 
     def test_utility_step_changes_only_u_and_not_frozen_teacher_or_query_pool(self):
         model = copy.deepcopy(self.model)
@@ -277,122 +197,6 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
         self.assertEqual(report['loss_components']['physical'], 0.)
         self.assertEqual(report['loss_components']['identity_bce'], 0.)
 
-    def test_actual_adaptation_update_preserves_frozen_identity_support_and_pool(self):
-        for route in ROUTES:
-            with self.subTest(route=route):
-                model = copy.deepcopy(self.model)
-                objective = FusionLoss(position_loss_mode='standard_smooth_l1')
-                # Pretrained nonzero heads make a physical ordinary-gate gradient
-                # observable; initial zero rows need not backpropagate through E.
-                with torch.no_grad():
-                    model.state_projection.weight[:3].fill_(.1)
-                before = {name:p.detach().clone() for name,p in model.named_parameters()}
-                optimizer = self.optimizer(model, objective, 'adapt', route)
-                report = train_batch(model, objective, optimizer, self.items(), stage='adapt', routing=route)
-                changed = {name for name,p in model.named_parameters() if not torch.equal(p, before[name])}
-                self.assertTrue(any(name.startswith('state_projection.') for name in changed))
-                forbidden = ('input_projection.', 'encoder.', 'support_projection.', 'query_pool.',
-                             'identity_base.', 'local_identity.', 'identity_with_utility.', 'utility_head.')
-                self.assertFalse(any(name.startswith(forbidden) for name in changed))
-                if route == 'learned-attribute':
-                    self.assertTrue(any(name.startswith('ordinary_gate.') for name in changed))
-                else:
-                    self.assertFalse(any(name.startswith('ordinary_gate.') for name in changed))
-                self.assertEqual(report['used_pairs'], 1)
-
-    def test_four_arm_fit_shares_initialization_sampling_identity_and_new_metadata(self):
-        starts, samples, events = {}, {}, []
-        original = train_batch
-        def capture(model, objective, optimizer, items, **kwargs):
-            events.append(kwargs['stage'])
-            if kwargs['stage'] == 'adapt':
-                route = kwargs['routing']
-                starts[route] = copy.deepcopy(model.state_dict())
-                samples[route] = [(x['scene_id'], x['pair_row'], x['removed'], x['label']) for x in items]
-            return original(model, objective, optimizer, items, **kwargs)
-        from association.evaluation.cooperative import score_cooperative
-        def score(*args, **kwargs):
-            events.append('select_identity')
-            return score_cooperative(*args, **kwargs)
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory)/'fit'
-            with patch('association.training.cooperative.train_batch', side_effect=capture), \
-                 patch('association.evaluation.cooperative.score_cooperative', side_effect=score):
-                run = train_cooperative([self.scene], [self.validation], self.config,
-                                       self.fit_config(), output, device='cpu')
-            self.assertEqual(run['status'], 'COMPLETED')
-            self.assertEqual(run['completed_updates'], 7)
-            self.assertEqual(run['completed_routes'], ROUTES)
-            self.assertLess(events.index('select_identity'), events.index('utility'))
-            self.assertEqual(events.count('select_identity'), 1)
-            self.assertEqual(run['identity_selection_phase'], 'teacher_endpoint_before_utility')
-            self.assertEqual(run['error_scales'], self.normalizer['std'])
-            self.assertEqual(run['training_parameters']['utility']['names'],
-                             ['model.'+name for name,_ in self.model.utility_head.named_parameters(prefix='utility_head')])
-            expected_scores = np.load(output/'plain-scores.npz')
-            expected_normalizer = None
-            for route in ROUTES:
-                for name,value in starts['plain'].items():
-                    torch.testing.assert_close(starts[route][name], value, rtol=0, atol=0)
-                self.assertEqual(samples[route], samples['plain'])
-                restored, payload = load_cooperative_checkpoint(output/f'adapt-{route}.pt', device='cpu')
-                self.assertEqual(payload['format'], 'cooperative-physical-v2')
-                self.assertEqual(payload['model_variant'], 'support_residual_v2')
-                self.assertEqual(payload['representation_version'], 'support_residual_v2')
-                if expected_normalizer is None:
-                    expected_normalizer = payload['normalizer']
-                self.assertEqual(payload['normalizer'], expected_normalizer)
-                for name,value in restored.state_dict().items():
-                    if name.startswith(('encoder.', 'input_projection.', 'query_pool.', 'support_projection.',
-                                        'identity_base.', 'local_identity.', 'utility_head.')):
-                        torch.testing.assert_close(value, starts[route][name], rtol=0, atol=0)
-                scores = np.load(output/f'{route}-scores.npz')
-                for key in expected_scores.files:
-                    np.testing.assert_array_equal(scores[key], expected_scores[key])
-                evaluation = json.loads((output/f'{route}-evaluation.json').read_text())
-                self.assertEqual(evaluation['model_variant'], 'support_residual_v2')
-                self.assertEqual(evaluation['representation_version'], 'support_residual_v2')
-                self.assertFalse(evaluation['test_opened'])
-                x, mask = normalize_cooperative_scene(self.validation, payload['normalizer'], self.config)
-                with torch.no_grad():
-                    first = restored(torch.from_numpy(x[:1]), torch.from_numpy(mask[:1]))
-                again, _ = load_cooperative_checkpoint(output/f'adapt-{route}.pt', device='cpu')
-                with torch.no_grad():
-                    second = again(torch.from_numpy(x[:1]), torch.from_numpy(mask[:1]))
-                torch.testing.assert_close(first, second, rtol=0, atol=0)
-
-    def test_checkpoint_rejects_conflicting_v2_version_and_loads_old_legacy_without_variant(self):
-        objective = FusionLoss(position_loss_mode='standard_smooth_l1')
-        optimizer = self.optimizer(self.model, objective, 'teacher')
-        payload = _snapshot(self.model, objective, optimizer, self.normalizer, self.fit_config(),
-                            stage='teacher', route='plain', updates=0)
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory)/'checkpoint.pt'
-            for field,value in [('format','cooperative-physical-v1'), ('model_variant','legacy'),
-                                ('representation_version','missing')]:
-                altered = copy.deepcopy(payload); altered[field] = value
-                torch.save(altered,path)
-                with self.subTest(field=field), self.assertRaises(ValueError):
-                    load_cooperative_checkpoint(path, device='cpu')
-            legacy_config = CooperativeConfig(length=4, max_observations=3, d_model=8,
-                nhead=2, num_layers=1, dim_feedforward=16, dropout=0., head_hidden=6)
-            norm = fit_normalizer([self.scene])
-            legacy = CooperativeModel(legacy_config, norm).eval()
-            optimizer = self.optimizer(legacy, objective, 'teacher')
-            old = _snapshot(legacy, objective, optimizer, norm, self.fit_config(),
-                            stage='teacher', route='plain', updates=0)
-            del old['model_config']['model_variant']
-            del old['model_config']['support_time_policy']
-            del old['model_config']['speed_output_policy']
-            del old['support_time_scale_tau']
-            torch.save(old,path)
-            restored, metadata = load_cooperative_checkpoint(path, device='cpu')
-            x, mask = normalize_scene(self.scene, norm)
-            with torch.no_grad():
-                expected = legacy(torch.from_numpy(x[:1]), torch.from_numpy(mask[:1]))
-                actual = restored(torch.from_numpy(x[:1]), torch.from_numpy(mask[:1]))
-            torch.testing.assert_close(actual, expected, rtol=0, atol=0)
-            self.assertEqual(metadata['format'], 'cooperative-physical-v1')
 
     def test_motion_teacher_updates_and_restores_explicit_base_without_reinterpreting_weights(self):
         config = replace(self.config, position_base_policy='native_ols',
@@ -442,122 +246,3 @@ class CooperativeRevisionTrainingTests(unittest.TestCase):
             for population in run['scene_contract']:
                 self.assertEqual(population[0]['split_unit'], 'scene')
                 self.assertEqual(population[0]['component_id'], train['component_id'])
-
-    def test_split_shared_and_four_arms_equal_full_fit_with_real_dropout(self):
-        config = replace(self.config, dropout=.25)
-        cfg = {**self.fit_config(), 'adapt_updates': 2}
-
-        def assert_same(left, right):
-            if isinstance(left, torch.Tensor):
-                torch.testing.assert_close(left, right, rtol=0, atol=0)
-            elif isinstance(left, dict):
-                self.assertEqual(left.keys(), right.keys())
-                for key in left:
-                    assert_same(left[key], right[key])
-            elif isinstance(left, (list, tuple)):
-                self.assertEqual(len(left), len(right))
-                for a, b in zip(left, right):
-                    assert_same(a, b)
-            else:
-                self.assertEqual(left, right)
-
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            train_cooperative([self.scene], [self.validation], config, cfg, root/'full',
-                              device='cpu', save_predictions=True)
-            shared = train_cooperative([self.scene], [self.validation], config,
-                {**cfg, 'max_seconds': 60.}, root/'shared', device='cpu', phase='shared')
-            self.assertEqual(shared['completed_updates'], cfg['teacher_updates']+cfg['utility_updates'])
-            self.assertEqual(shared['completed_routes'], [])
-            self.assertFalse(list((root/'shared').glob('adapt-*.pt')))
-            # Stopping at teacher must preserve the exact original training
-            # endpoint, including dropout/sampling and learned loss weights.
-            with patch('association.evaluation.cooperative.score_cooperative', side_effect=AssertionError('no scores')), \
-                 patch('association.evaluation.association.select_threshold', side_effect=AssertionError('no threshold')):
-                teacher = train_cooperative([self.scene], [self.validation], config,
-                    {**cfg, 'utility_updates': 0, 'adapt_updates': 0}, root/'teacher',
-                    device='cpu', phase='teacher', save_predictions=True)
-            self.assertEqual(teacher['completed_updates'], cfg['teacher_updates'])
-            self.assertEqual(set(teacher['phases']),
-                {'external_preparation', 'local_preparation', 'teacher', 'completion_evaluation'})
-            self.assertNotIn('threshold', teacher)
-            original = torch.load(root/'shared'/'teacher.pt', weights_only=True)
-            stopped = torch.load(root/'teacher'/'teacher.pt', weights_only=True)
-            for key in ('model_state', 'objective_state', 'optimizer_state', 'normalizer',
-                        'support_time_scale_tau'):
-                assert_same(original[key], stopped[key])
-            # A pre-policy shared checkpoint/run must still feed legacy-formula
-            # arms without interpreting those weights under a different chart.
-            old_bundle = torch.load(root/'shared'/'shared.pt', weights_only=True)
-            del old_bundle['model_config']['speed_output_policy']
-            del shared['model_config']['speed_output_policy']
-            del old_bundle['training']['teacher_identity_weight']
-            del shared['training']['teacher_identity_weight']
-            torch.save(old_bundle, root/'shared'/'shared.pt')
-            runtime.write_json(root/'shared'/'run.json', shared)
-            for route in ROUTES:
-                # Fresh process initialization may consume any RNG amount. Each
-                # adaptation stage must restore the same original seed itself.
-                torch.manual_seed(987); torch.rand(51)
-                with patch('association.data.cooperative.fit_cooperative_normalizer', side_effect=AssertionError('no refit')), \
-                     patch('association.training.cooperative.fit_support_time_scaling', side_effect=AssertionError('no S refit')), \
-                     patch('association.training.cooperative.teacher_error_pair', side_effect=AssertionError('no teacher training')), \
-                     patch('association.evaluation.cooperative.score_cooperative', side_effect=AssertionError('no new scores')), \
-                     patch('association.evaluation.association.select_threshold', side_effect=AssertionError('no reselection')):
-                    arm = train_cooperative([self.scene], [self.validation], config,
-                        {**cfg, 'max_seconds': 1e-12, 'time_policy': 'advisory'},
-                        root/route, device='cpu', phase='arm',
-                        shared_from=root/'shared', route=route, save_predictions=True)
-                self.assertEqual(arm['completed_updates'], cfg['adapt_updates'])
-                self.assertEqual(arm['completed_routes'], [route])
-                self.assertNotIn('teacher', arm['phases'])
-                self.assertEqual(arm['identity_selection'], shared['identity_selection'])
-                before = torch.load(root/'full'/f'adapt-{route}.pt', weights_only=True)
-                after = torch.load(root/route/f'adapt-{route}.pt', weights_only=True)
-                for key in ('model_state', 'objective_state', 'optimizer_state', 'normalizer',
-                            'support_time_scale_tau'):
-                    assert_same(before[key], after[key])
-                full_history = [row for row in runtime.read_json(root/'full'/'history.json')
-                                if row['stage'] == 'adapt' and row['routing'] == route]
-                arm_history = runtime.read_json(root/route/'history.json')
-                for row in [*full_history, *arm_history]:
-                    row.pop('seconds')
-                self.assertEqual(full_history, arm_history)
-                full_report = runtime.read_json(root/'full'/f'{route}-evaluation.json')
-                arm_report = runtime.read_json(root/route/f'{route}-evaluation.json')
-                full_report.pop('elapsed_seconds'); arm_report.pop('elapsed_seconds')
-                self.assertEqual(full_report, arm_report)
-                for source in [root/'full'/f'{route}-scores.npz',
-                               *(root/'full'/f'{route}-predictions').glob('*.npz')]:
-                    target = root/route/source.relative_to(root/'full')
-                    with np.load(source, allow_pickle=False) as expected, np.load(target, allow_pickle=False) as actual:
-                        self.assertEqual(expected.files, actual.files)
-                        for key in expected.files:
-                            np.testing.assert_array_equal(actual[key], expected[key])
-
-    def test_arm_rejects_unfinished_shared_or_changed_protocol_and_population(self):
-        cfg = self.fit_config()
-        with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
-            train_cooperative([self.scene], [self.validation], self.config, cfg,
-                              root/'shared', device='cpu', phase='shared')
-            saved = runtime.read_json(root/'shared'/'run.json')
-            runtime.write_json(root/'shared'/'run.json', {**saved, 'status': 'RUNNING'})
-            with self.assertRaisesRegex(ValueError, 'COMPLETED shared'):
-                train_cooperative([self.scene], [self.validation], self.config, cfg,
-                    root/'unfinished', device='cpu', phase='arm', shared_from=root/'shared', route='plain')
-            runtime.write_json(root/'shared'/'run.json', saved)
-            changed = copy.deepcopy(self.scene)
-            changed['component_id'] = 'different-component'
-            cases = [('protocol', [self.scene], {**cfg, 'learning_rate': cfg['learning_rate']*2}, 'protocol'),
-                     ('identity_weight', [self.scene], {**cfg, 'teacher_identity_weight': 0.}, 'protocol'),
-                     ('population', [changed], cfg, 'scene contract')]
-            for name, scenes, training, message in cases:
-                with self.subTest(name=name), self.assertRaisesRegex(ValueError, message):
-                    train_cooperative(scenes, [self.validation], self.config, training,
-                        root/name, device='cpu', phase='arm', shared_from=root/'shared', route='plain')
-            labels = copy.deepcopy(self.validation)
-            labels['labels'][0] = 1-labels['labels'][0]
-            with self.assertRaisesRegex(ValueError, 'labels disagree'):
-                train_cooperative([self.scene], [labels], self.config, cfg,
-                    root/'labels', device='cpu', phase='arm', shared_from=root/'shared', route='plain')

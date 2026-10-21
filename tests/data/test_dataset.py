@@ -76,9 +76,7 @@ class DatasetTests(unittest.TestCase):
             measurement_scenes = {row["scene_id"] for row in archive.members_read if row["kind"] == "measurements"}
             self.assertEqual(measurement_scenes, set(manifest["splits"]["T_head"]))
             self.assertFalse(any(row["kind"] == "reference" for row in archive.members_read))
-            with patch.object(archive, "archive_sha256", side_effect=AssertionError("No archive hash gate")) as hashed:
-                validate_archive(archive, manifest)
-                hashed.assert_not_called()
+            validate_archive(archive, manifest)
         self.assertEqual([record["scene_id"] for record in records], manifest["splits"]["T_head"])
         again = load_split(self.archive, manifest, "T_head", 6)
         np.testing.assert_array_equal(again[0]["values"], records[0]["values"])

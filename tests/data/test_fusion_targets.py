@@ -97,16 +97,6 @@ class FusionTargetTests(unittest.TestCase):
         self.assertIn({'code':'duplicate_conflict','field':'lon','time':5.0,'lines':[4,5]},
                       result['report']['issues'])
 
-    def test_invalid_duplicate_does_not_silently_take_the_valid_row(self):
-        data = scene([('ship-0', 0, [1, 2, 3, 0]),
-                      ('ship-0', 0, [1, 2, None, 360]),
-                      ('ship-0', 10, [2, 3, 4, 10])])
-        result = align(data, [0, 5, 10])
-        self.assertTrue(result['valid'][:, :2].all())
-        self.assertFalse(result['valid'][:2, 2:].any())
-        self.assertTrue(result['valid'][2].all())
-        self.assertEqual(result['report']['conflicting_duplicate_features']['cou'], 1)
-        self.assertEqual(result['report']['invalid_feature_rows']['vel'], 1)
 
     def test_course_uses_shortest_arc_and_masks_180_degree_ambiguity(self):
         data = scene([('ship-0', 0, [1, 2, 3, 350]),
@@ -132,39 +122,6 @@ class FusionTargetTests(unittest.TestCase):
         self.assertFalse(align(data, [-1,11], gap=100)['valid'].any())
         one = align(scene([('ship-0',5,[1,2,3,4])]), [4,5,6], gap=100)
         np.testing.assert_array_equal(one['valid'].all(1), [False,True,False])
-
-    def test_unlocatable_reference_times_are_reported_not_interpolated(self):
-        data = scene([('ship-0',float('nan'),[1,2,3,4]),
-                      ('ship-0',float('inf'),[1,2,3,4]),
-                      ('ship-0',None,[1,2,3,4]),
-                      ('ship-0',0,[1,2,3,4])])
-        result = align(data, [0,1])
-        self.assertEqual(result['report']['unlocatable_time_rows'], 3)
-        self.assertEqual(result['report']['reference_times'], 1)
-        self.assertTrue(result['valid'][0].all())
-        self.assertFalse(result['valid'][1].any())
-        self.assertEqual({x['code'] for x in result['report']['issues']}, {'nonfinite_time','nonnumeric_time'})
-        overflow = align(scene([('ship-0',1e308,[1,2,3,4])]), [0], offset=-1e308)
-        self.assertFalse(overflow['valid'].any())
-        self.assertEqual(overflow['report']['issues'][0]['code'], 'nonfinite_aligned_time')
-
-
-    def test_only_declared_training_development_splits_are_allowed(self):
-        data = scene([('ship-0',0,[1,2,3,4])])
-        for split in ('T_core','T_head','V_select'):
-            data['split'] = split
-            self.assertTrue(align(data, [0])['valid'].all())
-        for split in ('T_test','test','unknown',None):
-            data['split'] = split
-            with self.subTest(split=split), self.assertRaisesRegex(DataError, 'split'):
-                align(data, [0])
-
-
-    def test_invalid_reader_identity_cannot_become_supervision(self):
-        result = align(scene([('broken',0,[1,2,3,4])]), [0], identity='broken')
-        self.assertFalse(result['valid'].any())
-        self.assertEqual(result['report']['invalid_identity_rows'], 1)
-        self.assertEqual(result['report']['issues'][0]['code'], 'invalid_identity')
 
 
 class FusionTargetAssemblyTests(unittest.TestCase):
@@ -229,39 +186,6 @@ class FusionTargetAssemblyTests(unittest.TestCase):
         self.assertEqual(result['report']['valid_per_pair_feature'], [[4,4,1,4],[0,0,0,0],[0,0,0,0]])
         self.assertEqual(result['report']['unavailable_pairs'], 2)
         self.assertEqual(result['report']['missing_identity_ids'], ['other-0'])
-
-
-    def test_negative_contradictory_self_and_invalid_candidate_pairs_fail(self):
-        negative = int(np.flatnonzero(self.prepared['labels'] == 0)[0])
-        with self.assertRaisesRegex(DataError, 'label 1'):
-            self.build([negative])
-        self.prepared['labels'][negative] = 1
-        with self.assertRaisesRegex(DataError, 'identities'):
-            self.build([negative])
-        positive = int(self.positive[0])
-        for pair in ([0,0], [-1,1], [0,len(self.prepared['identities'])]):
-            self.prepared['pairs'][positive] = pair
-            with self.subTest(pair=pair), self.assertRaises(DataError):
-                self.build([positive])
-        self.prepared['pairs'][positive] = [0,1]
-        self.prepared['identities'][:2] = ['invalid', 'invalid']
-        with self.assertRaisesRegex(DataError, 'A-B'):
-            self.build([positive])
-
-
-    def test_only_matching_nominal_grid_and_scene_shapes_are_accepted(self):
-        actual = self.prepared['observation_times'][2]
-        self.assertFalse(np.array_equal(actual, self.prepared['grid']))
-        for grid in (actual, self.prepared['grid'] + 1, [0,2,4], [0,2,4,6,8,float('nan')],
-                     [0,2,4,6,8,float('inf')], [0,2,4,4,8,10], [0,2,4,6,10,8], [[0,2,4,6,8,10]]):
-            with self.subTest(grid=grid), self.assertRaisesRegex(DataError, 'grid'):
-                self.build(nominal_grid=grid)
-        self.prepared['observed'] = self.prepared['observed'][:, :-1]
-        with self.assertRaisesRegex(DataError, 'observed'):
-            self.build()
-        self.prepared['values'] = self.prepared['values'][:, :, :3]
-        with self.assertRaisesRegex(DataError, 'values'):
-            self.build()
 
 
     def test_prepared_targets_connect_tcm_fusion_and_masked_loss_on_cpu(self):

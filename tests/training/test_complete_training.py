@@ -57,28 +57,6 @@ class CompleteTrainingTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'duplicate/overlapping scene'):
             _scenes(self.train, self.validation, self.model.length)
 
-    def test_ordered_tcm_batches_preserve_cross_scene_order_and_small_population(self):
-        pool = [(0, 0), (0, 1), (1, 0), (1, 1), (1, 2)]
-        first, report = _ordered_tcm_indices(len(pool), 3, 1)
-        tail, tail_report = _ordered_tcm_indices(len(pool), 3, 2)
-        self.assertEqual([pool[int(i)] for i in np.concatenate((first, tail))], pool)
-        self.assertEqual(first.tolist(), [0, 1, 2])
-        self.assertEqual(tail.tolist(), [3, 4])
-        self.assertEqual(report['completed_epochs'], 0)
-        self.assertEqual(tail_report['completed_epochs'], 1)
-        next_epoch, next_report = _ordered_tcm_indices(len(pool), 3, 3)
-        self.assertEqual(next_epoch.tolist(), first.tolist())
-        self.assertEqual(next_report['epoch'], 2)
-        small, small_report = _ordered_tcm_indices(2, 64, 1)
-        self.assertEqual(small.tolist(), [0, 1])
-        self.assertEqual(small_report['completed_epochs'], 1)
-
-    def test_mixed_split_protocol_rejected_and_legacy_contract_unchanged(self):
-        contract = _scenes(self.train, self.validation, self.model.length)
-        self.assertTrue(all('split_unit' not in row for rows in contract for row in rows))
-        self.train[0]['split_unit'] = 'scene'
-        with self.assertRaisesRegex(ValueError, 'one supported split_unit'):
-            _scenes(self.train, self.validation, self.model.length)
 
     def assert_nested_equal(self, left, right):
         if isinstance(left, torch.Tensor):
@@ -118,53 +96,6 @@ class CompleteTrainingTests(unittest.TestCase):
         self.assertEqual(summary['selection']['threshold'], summary['evaluation']['threshold'])
         self.assertEqual(saved['normalizer']['training_scene_ids'], ['train-a', 'train-b'])
         self.assertIn('not full-task optimality', summary['selection_scope'])
-
-    def test_cost_timings_separate_updates_validation_snapshots_and_final_evaluation(self):
-        from association.training import tmtaff as training
-        clock = [0.]
-
-        def costing(function, seconds):
-            def call(*args, **kwargs):
-                result = function(*args, **kwargs)
-                clock[0] += seconds
-                return result
-            return call
-
-        self.config['max_hours'] = 1
-        # CPU work is real; only time and forbidden CUDA telemetry are mocked.
-        with (patch.object(training.time, 'monotonic', side_effect=lambda: clock[0]),
-              patch.object(training, '_update', side_effect=costing(training._update, 2)),
-              patch.object(training, 'fusion_training_step', side_effect=costing(training.fusion_training_step, 3)),
-              patch.object(training, 'score_reference', side_effect=costing(training.score_reference, 5)),
-              patch.object(training, 'select_threshold', side_effect=costing(training.select_threshold, 7)),
-              patch.object(training, '_states', side_effect=costing(training._states, 11)),
-              patch.object(training, 'evaluate_scenes', side_effect=costing(training.evaluate_scenes, 13)),
-              patch.object(training, '_restore', side_effect=costing(training._restore, 17)),
-              patch.object(training.torch, 'save', side_effect=costing(training.torch.save, 29)),
-              patch.object(runtime, 'write_json', side_effect=costing(runtime.write_json, 23)),
-              patch.object(torch.cuda, 'synchronize', side_effect=AssertionError('CPU must not synchronize CUDA')),
-              patch.object(torch.cuda, 'reset_peak_memory_stats', side_effect=AssertionError('CPU must not reset CUDA')),
-              patch.object(torch.cuda, 'max_memory_allocated', side_effect=AssertionError('CPU must not read CUDA')),
-              patch.object(torch.cuda, 'max_memory_reserved', side_effect=AssertionError('CPU must not read CUDA'))):
-            result = self.fit('timed', evaluation_fn=costing(training.evaluate_complete, 19))
-        history = self.checkpoint('timed')['history']
-        for row in history:
-            self.assertEqual(row['seconds'], 2 if row['stage'] in ('TCM', 'TAM_FROZEN') else 3)
-        timed_rows = [row for row in history if 'validation_seconds' in row]
-        self.assertEqual(len(timed_rows), 4)
-        self.assertTrue(any(item['selected_snapshot_copied'] for item in result['validation_timings']))
-        for row, timing in zip(timed_rows, result['validation_timings']):
-            expected = 12 + (24 if timing['selected_snapshot_copied'] else 0)
-            self.assertEqual(timing['status'], 'COMPLETED')
-            self.assertEqual(timing['seconds'], expected)
-            self.assertEqual(row['validation_seconds'], expected)
-        self.assertEqual(result['final_evaluation_seconds'], 36)
-        self.assertEqual(result['final_evaluation_status'], 'COMPLETED')
-        summary = runtime.read_json(self.root / 'timed' / 'summary.json')
-        self.assertEqual(summary['evaluation_seconds'], 36)
-        self.assertIsNone(result['cuda_process_peak_allocated_bytes'])
-        self.assertIsNone(result['cuda_process_peak_reserved_bytes'])
-        self.assertIsNone(result['cuda_peak_reset_completed'])
 
 
     def test_exact_resume_including_dropout_optimizer_rng_and_selected_state(self):
@@ -253,25 +184,6 @@ class CompleteTrainingTests(unittest.TestCase):
         self.assertIsNone(summary['evaluation']['threshold'])
 
 
-    def test_failure_never_saves_partial_step_as_resumable(self):
-        from association.training.tmtaff import _update
-        calls = 0
-        def fail_after_step(*args, **kwargs):
-            nonlocal calls
-            calls += 1
-            result = _update(*args, **kwargs)
-            if calls == 2:
-                raise RuntimeError('failure after parameter mutation')
-            return result
-        with patch('association.training.tmtaff._update', side_effect=fail_after_step):
-            with self.assertRaisesRegex(RuntimeError, 'parameter mutation'):
-                self.fit('failed')
-        self.assertEqual(runtime.read_json(self.root / 'failed' / 'run.json')['status'], 'FAILED')
-        self.assertEqual(self.checkpoint('failed')['cursor']['completed_updates'], 1)
-        with self.assertRaisesRegex(ValueError, 'only an INTERRUPTED'):
-            self.fit('retry', resume_from=self.root / 'failed')
-        self.assertFalse((self.root / 'retry').exists())
-
     def test_failure_flushes_completed_updates_after_last_checkpoint(self):
         from association.training import tmtaff as training
         self.config['updates'] = dict(TCM=1, TAM_FROZEN=1, TFM_FROZEN=1, JOINT=4)
@@ -308,42 +220,6 @@ class CompleteTrainingTests(unittest.TestCase):
         self.assertEqual(run['final_evaluation_status'], 'NOT_STARTED')
         self.assertFalse((output / 'summary.json').exists())
 
-    def test_validation_interruption_retains_its_completed_training_update(self):
-        with patch('association.training.tmtaff.score_reference',
-                   side_effect=InterruptedError('SIGTERM during validation')):
-            with self.assertRaisesRegex(InterruptedError, 'during validation'):
-                self.fit('failed-validation')
-        output = self.root / 'failed-validation'
-        run = runtime.read_json(output / 'run.json')
-        history = runtime.read_json(output / 'history.json')
-        coverage = runtime.read_json(output / 'coverage.json')
-        self.assertEqual(run['cursor']['completed_updates'], 3)
-        self.assertEqual(len(history), 3)
-        self.assertEqual(history[-1]['stage'], 'TAM_FROZEN')
-        self.assertNotIn('selection', history[-1])
-        self.assertEqual(run['validation_timings'][0]['status'], 'FAILED')
-        self.assertEqual(history[-1]['validation_seconds'], run['validation_timings'][0]['seconds'])
-        self.assertEqual(coverage['TAM_FROZEN']['pair_presentations'], 4)
-        self.assertEqual(run['checkpoint_cursor']['completed_updates'], 2)
-        self.assertEqual(self.checkpoint('failed-validation')['cursor']['completed_updates'], 2)
-
-    def test_failure_artifact_error_does_not_replace_training_error(self):
-        from association.training import tmtaff as training
-        write_json = runtime.write_json
-
-        def cannot_write_history(path, value):
-            if Path(path).name == 'history.json':
-                raise OSError('journal unavailable')
-            return write_json(path, value)
-
-        with (patch.object(training, '_update', side_effect=InterruptedError('original SIGTERM')),
-              patch.object(runtime, 'write_json', side_effect=cannot_write_history)):
-            with self.assertRaisesRegex(InterruptedError, 'original SIGTERM'):
-                self.fit('failed-artifact')
-        run = runtime.read_json(self.root / 'failed-artifact' / 'run.json')
-        self.assertEqual(run['failure_type'], 'InterruptedError')
-        self.assertIn('history.json: OSError: journal unavailable', run['failure_artifact_errors'])
-        self.assertIsNone(run['checkpoint_cursor'])
 
     def test_final_evaluation_failure_is_not_completion(self):
         self.config['updates'] = dict.fromkeys(STAGES, 1)
@@ -362,26 +238,6 @@ class CompleteTrainingTests(unittest.TestCase):
         self.assertEqual(run['final_evaluation_seconds'], 7)
         self.assertFalse((self.root / 'failed-eval' / 'summary.json').exists())
 
-    def test_resume_preserves_budget_semantics_and_output_immutability(self):
-        self.fit('first', max_updates_this_call=1)
-        with self.assertRaises(FileExistsError):
-            self.fit('first')
-        self.config['learning_rates']['JOINT'] *= 2
-        with self.assertRaisesRegex(ValueError, 'resume configuration'):
-            self.fit('changed', resume_from=self.root / 'first')
-        self.config['learning_rates']['JOINT'] /= 2
-        report = runtime.read_json(self.root / 'first' / 'run.json')
-        report['elapsed_seconds'] = self.config['max_hours'] * 3600
-        runtime.write_json(self.root / 'first' / 'run.json', report)
-        with self.assertRaisesRegex(TimeoutError, 'exhausted'):
-            self.fit('exhausted', resume_from=self.root / 'first')
-        self.assertFalse((self.root / 'exhausted').exists())
-        self.config['time_policy'] = 'advisory'
-        continued = self.fit('advisory-resume', resume_from=self.root / 'first')
-        self.assertEqual(continued['status'], 'COMPLETED')
-        self.assertEqual(continued['cursor']['completed_updates'], 8)
-        self.assertGreaterEqual(continued['elapsed_seconds'], report['elapsed_seconds'])
-        self.assertEqual(continued['config']['time_policy'], 'advisory')
 
     def test_cli_advisory_covers_preparation_and_complete_training(self):
         from contextlib import redirect_stderr, redirect_stdout

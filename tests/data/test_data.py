@@ -1,5 +1,4 @@
 import csv
-import hashlib
 import io
 import json
 from pathlib import Path
@@ -176,19 +175,17 @@ class DataTests(unittest.TestCase):
         self.assertNotIn(str(self.tmp.name), json.dumps(manifest))
 
 
-    def test_semantic_manifest_corruption_is_rejected_even_with_new_hash(self):
+    def test_manifest_rejects_overlapping_split_roles(self):
         fixture_zip(self.path, {0: basic_scene()})
         with MTADArchive(self.path) as archive:
             manifest = build_manifest(archive, 20, {name: 1 for name in ("T_core", "T_head", "V_select", "T_test")}, [0])
         manifest["splits"]["T_test"] = ["0"]
-        del manifest["manifest_sha256"]
-        manifest["manifest_sha256"] = hashlib.sha256(json.dumps(manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
         with self.assertRaises(DataError):
             validate_manifest(manifest)
 
     def test_cross_level_preview_pins_the_whole_component_and_rejects_stale_manifest(self):
         from association.utils.config import load_config, validate_manifest_config
-        config = load_config(Path(__file__).resolve().parents[2] / 'configs/pilot.json')
+        config = load_config(Path(__file__).resolve().parents[2] / 'configs/first-fit-v2.json')
         specs = {int(s): basic_scene('EXPOSED-0-0')
                  for s in LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES}
         # An unlisted scene sharing A must be pinned too, before scene caps.

@@ -72,8 +72,7 @@ class TimedDatasetTests(NativeZipFixture, unittest.TestCase):
             events.append(('build', scene['scene_id']))
             return build_scene_fusion_targets(scene, *args, **kwargs)
         with patch.object(zipfile.ZipFile, 'read', read), \
-                patch('association.data.dataset.build_scene_fusion_targets', side_effect=build), \
-                patch.object(MTADArchive, 'archive_sha256', side_effect=AssertionError('No hash gate')):
+                patch('association.data.dataset.build_scene_fusion_targets', side_effect=build):
             self.load()
         reads = [name for kind, name in events if kind == 'read']
         self.assertFalse(any(name.endswith(('-1.csv', '-3.csv')) for name in reads))

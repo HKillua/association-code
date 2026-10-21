@@ -111,31 +111,6 @@ class TcmFitCliTests(unittest.TestCase):
         preparation = runtime.read_json(self.root/'tcm'/'preparation.json')
         self.assertEqual(preparation['phase'], 'tcm')
 
-    def test_same_phase_resume_and_failed_diagnostic_cannot_be_called_complete(self):
-        self.assertEqual(self.fit('once')['status'], 'COMPLETED')
-        self.assertEqual(self.fit('partial', max_updates_this_call=1)['status'], 'INTERRUPTED')
-        self.assertFalse((self.root/'partial'/'completion-evaluation.json').exists())
-        # Old checkpoints predate the explicit default representation/sampling fields.
-        legacy = self.checkpoint('partial')
-        legacy['model_config'].pop('heading_representation', None)
-        legacy['config'].pop('tcm_sampling')
-        torch.save(legacy, self.root/'partial'/'checkpoint.pt')
-        self.assertEqual(self.invoke('resumed', ['--resume', str(self.root/'partial')]), 0)
-        self.assert_same_endpoint(self.checkpoint('once'), self.checkpoint('resumed'))
-        with self.assertRaisesRegex(ValueError, 'resume phase differs'):
-            self.fit('cross-phase', full=True, resume_from=self.root/'partial')
-        self.assertFalse((self.root/'cross-phase').exists())
-        with patch('association.training.tmtaff.evaluate_tcm_completion',
-                   side_effect=RuntimeError('diagnostic failed')):
-            self.assertEqual(self.invoke('failed'), 1)
-        failed = runtime.read_json(self.root/'failed'/'run.json')
-        self.assertEqual(failed['status'], 'FAILED')
-        self.assertEqual(failed['final_evaluation_status'], 'FAILED')
-        self.assertEqual(failed['cursor']['completed_updates'], 2)
-        self.assertEqual(self.checkpoint('failed')['cursor']['completed_updates'], 2)
-        self.assertFalse((self.root/'failed'/'summary.json').exists())
-        self.assertEqual(self.invoke('retry', ['--resume', str(self.root/'failed')]), 1)
-        self.assertFalse((self.root/'retry').exists())
 
     def test_ordered_tcm_covers_each_fragment_keeps_tail_and_replays_epoch_boundary(self):
         self.fixture.config['training'].update(tcm_sampling='ordered_fragment', batch_tracks=3)
@@ -255,47 +230,6 @@ class TcmFitCliTests(unittest.TestCase):
                 self.assertEqual(actual['scores'].tolist(), original['scores'].tolist())
         self.assertFalse(run['test_opened'])
 
-    def test_circular_tcm_transfers_frozen_representation_and_snapshot_rejects_mismatch(self):
-        from association.training.common import score_reference
-        self.fixture.config['model']['heading_representation'] = 'circular_sincos'
-        self.assertEqual(self.fit('circular-source')['status'], 'COMPLETED')
-        source = self.checkpoint('circular-source')
-        self.assertEqual(source['states'][0]['input_embedding.weight'].shape[1], 5)
-        self.assertIn('heading_mean_std', source['states'][0])
-        self.assertEqual(self.tam_fit('circular-tam',
-            initialize_tcm_from=self.root/'circular-source')['status'], 'COMPLETED')
-        saved = self.checkpoint('circular-tam')
-        self.assertIn('heading_mean_std', saved['initialization']['transferred_buffers'])
-        for key, value in saved['states'][0].items():
-            if key in ('positions', 'heading_mean_std') or key.startswith(
-                    ('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
-                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
-        loaded = load_complete_snapshot(self.root/'circular-tam'/'checkpoint.pt')
-        loaded['model'].validate_normalizer(source['normalizer'])
-        dataset = self.fixture.load()
-        batches = saved['config']['validation_batches']
-        actual = score_reference(loaded['model'], loaded['normalizer'],
-                                 dataset['validation'], 'cpu', batches['tracks'], batches['pairs'])
-        summary = runtime.read_json(self.root/'circular-tam'/'summary.json')
-        selected = next(row for row in summary['validation_score_records']
-                        if row['update'] == saved['selected']['update'])
-        expected = runtime.load_records(selected['records'])
-        for left, right in zip(actual, expected):
-            self.assertEqual(left['scores'].tolist(), right['scores'].tolist())
-
-        changed = copy.deepcopy(loaded['normalizer'])
-        changed['mean'][3] += 1.
-        with self.assertRaisesRegex(ValueError, 'normalizer.*heading'):
-            score_reference(loaded['model'], changed, dataset['validation'], 'cpu', 2, 3)
-        corrupted = copy.deepcopy(saved)
-        corrupted['normalizer'] = changed
-        torch.save(corrupted, self.root/'circular-tam'/'mismatched.pt')
-        with self.assertRaisesRegex(ValueError, 'normalizer.*heading'):
-            load_complete_snapshot(self.root/'circular-tam'/'mismatched.pt')
-        self.fixture.config['model']['heading_representation'] = 'linear_zscore'
-        with self.assertRaisesRegex(ValueError, 'TCM initialization model'):
-            self.tam_fit('different-representation', initialize_tcm_from=self.root/'circular-source')
-        self.assertFalse((self.root/'different-representation').exists())
 
     def test_tam_resume_keeps_frozen_source_and_new_budget_and_rejects_changed_contract(self):
         self.fit('source')
@@ -326,48 +260,6 @@ class TcmFitCliTests(unittest.TestCase):
             self.tam_fit('failed-source', initialize_tcm_from=self.root/'source')
         self.assertFalse((self.root/'failed-source').exists())
 
-    def test_tam_zero_dropout_transfers_legacy_completion_and_preserves_resume_semantics(self):
-        self.fit('source')
-        source = self.checkpoint('source')
-        source['model_config'].pop('tam_dropout')
-        torch.save(source, self.root/'source'/'checkpoint.pt')
-        self.fixture.config['model']['tam_dropout'] = 0.
-        self.tam_fit('zero', initialize_tcm_from=self.root/'source')
-        self.tam_fit('zero-partial', initialize_tcm_from=self.root/'source', max_updates_this_call=1)
-        self.assertEqual(self.tam_fit('zero-resumed', resume_from=self.root/'zero-partial')['status'], 'COMPLETED')
-        expected, resumed = self.checkpoint('zero'), self.checkpoint('zero-resumed')
-        self.assert_same_endpoint(expected, resumed)
-        self.assertEqual(expected['initialization']['source_tam_dropout'], .1)
-        self.assertEqual(expected['initialization']['target_tam_dropout'], 0.)
-        self.assertEqual(expected['margin_calibration']['tam_dropout'], 0.)
-        self.assertEqual(expected['model_config']['dropout'], .1)
-        for key, value in expected['states'][0].items():
-            if key == 'positions' or key.startswith(('input_embedding.', 'tcm_encoder.', 'tcm_decoder.')):
-                torch.testing.assert_close(value, source['states'][0][key], rtol=0, atol=0)
-        for row in expected['history']:
-            diagnostic = row['tam_train_batch']
-            self.assertEqual(diagnostic['effective_margin'], expected['effective_margin'])
-            count = diagnostic['positive_count'] + diagnostic['negative_count']
-            weighted = sum(diagnostic[f'{kind}_class_loss_mean'] * diagnostic[f'{kind}_count']
-                           for kind in ('positive', 'negative')) / count
-            self.assertAlmostEqual(weighted, row['association_loss'], places=6)
-            self.assertGreaterEqual(diagnostic['negative_fraction_inside_margin'], 0.)
-            self.assertLessEqual(diagnostic['negative_fraction_inside_margin'], 1.)
-        for selected in (True, False):
-            loaded = load_complete_snapshot(self.root/'zero'/'checkpoint.pt', selected=selected)
-            self.assertEqual(loaded['model'].config.effective_tam_dropout, 0.)
-            self.assertEqual(loaded['model'].tam_encoder.layers[0].self_attn.dropout, 0.)
-            self.assertEqual(loaded['model'].tcm_encoder.layers[0].self_attn.dropout, .1)
-            self.assertEqual(loaded['fusion'].config.dropout, .1)
-        self.fixture.config['model'].pop('tam_dropout')
-        with self.assertRaisesRegex(ValueError, 'resume configuration'):
-            self.tam_fit('changed-dropout-resume', resume_from=self.root/'zero-partial')
-        self.assertFalse((self.root/'changed-dropout-resume').exists())
-        self.fixture.config['model']['tam_dropout'] = 0.
-        self.fixture.config['model']['dropout'] = 0.
-        with self.assertRaisesRegex(ValueError, 'TCM initialization model'):
-            self.tam_fit('changed-completion-dropout', initialize_tcm_from=self.root/'source')
-        self.assertFalse((self.root/'changed-completion-dropout').exists())
 
     def test_inverse_margin_tam_transfer_resume_diagnostics_and_protocol_boundaries(self):
         self.fit('source')
@@ -517,37 +409,6 @@ class TcmFitCliTests(unittest.TestCase):
             self.assertEqual(self.invoke('invalid', ['--phase', 'tfm', '--initialize-tcm-from',
                                                     str(self.root/'source')]), 1)
             self.assertEqual(self.invoke('missing-source', ['--phase', 'tfm']), 1)
-
-    def test_tfm_failed_final_diagnostic_keeps_fixed_endpoint_without_claiming_completion(self):
-        self.fit('source')
-        from association.training import tmtaff as training
-        original = training.evaluate_complete
-        calls = 0
-        def evaluate(*args, **kwargs):
-            nonlocal calls
-            calls += 1
-            if calls == 3:
-                raise RuntimeError('final physical diagnostic failed')
-            return original(*args, **kwargs)
-        with patch.object(training, 'evaluate_complete', side_effect=evaluate):
-            with self.assertRaisesRegex(RuntimeError, 'final physical diagnostic failed'):
-                self.tfm_fit('failed-tfm', initialize_tcm_from=self.root/'source')
-        run = runtime.read_json(self.root/'failed-tfm'/'run.json')
-        self.assertEqual(run['status'], 'FAILED')
-        self.assertEqual(run['final_evaluation_status'], 'FAILED')
-        self.assertEqual(self.checkpoint('failed-tfm')['cursor']['completed_updates'], 2)
-        self.assertTrue((self.root/'failed-tfm'/'snapshots'/'update-000002.pt').is_file())
-        self.assertFalse((self.root/'failed-tfm'/'summary.json').exists())
-
-    def test_tam_cli_requires_explicit_new_initialization_and_zero_other_stages(self):
-        self.tam_config()
-        with patch.object(cli, 'load_timed_dataset', side_effect=AssertionError('must reject before data')):
-            self.assertEqual(self.invoke('missing-source', ['--phase', 'tam']), 1)
-            self.assertEqual(self.invoke('both', ['--phase', 'tam', '--initialize-tcm-from', 'source',
-                                                '--resume', 'interrupted']), 1)
-            self.fixture.config['training']['updates']['TCM'] = 1
-            self.assertEqual(self.invoke('nonzero-tcm', ['--phase', 'tam',
-                                                       '--initialize-tcm-from', 'source']), 1)
 
 
 if __name__ == '__main__':

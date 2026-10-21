@@ -1,6 +1,6 @@
 # TMTAFF 单阶段 TCM 入口
 
-本规格描述执行能力；真实预算以当前交接为准，033已获用户批准。沿用 `tmtaff_complete_fit.py`，新增显式
+本规格只定义执行能力，历史033已结束。当前数据为Level1，预算以交接索引为准。沿用`tmtaff_complete_fit.py`，显式
 `--phase tcm`；默认 `full` 保持原四阶段流程、训练量、损失、采样和选模语义。
 
 TCM 配置仍完整声明原配置字段，但 `updates.TCM > 0`，其他三个阶段更新数必须
@@ -18,12 +18,9 @@ JOINT 更新或完整系统评价；`--save-predictions` 不适用于该诊断�
 正常产物保留 `checkpoint.pt`、配置、normalizer、data_contract、权重、优化器/
 RNG、更新游标及 coverage，另有 `summary.json` 和真实 `COMPLETED` 终态。
 checkpoint 的 `selected` 为 null，只能用 `load_complete_snapshot(selected=False)`
-读取实际末端权重；未来阶段使用须另立明确的新 run 方案，本次不实现迁移入口。
+读取实际末端权重；TAM/TFM通过各自显式初始化入口移交TCM，必须建立新run。
 只允许同 phase/config 的 `INTERRUPTED` run 按原规则恢复到新目录；失败 020
 不得恢复，也不改变其历史。保存和终点评价计入已有时间策略；评价失败不能报完成。
-
-本次只做终点诊断，不加中间钩子或端点选优。未来若比较 020 的 1000 步与新 run，
-须披露跨 run 差异和旧端点评价范围；新增 4000 更新预算已获用户批准，按独立033交接执行。
 
 | 可观察要求 | 最小验证 |
 | --- | --- |
@@ -33,9 +30,9 @@ checkpoint 的 `selected` 为 null，只能用 `load_complete_snapshot(selected=
 | 产物可追溯、同阶段可恢复 | 末端 checkpoint 可加载，微型中断恢复与同预算单次执行一致 |
 | 明确拒绝混用 | 下游非零、full 的零更新、跨 phase 恢复、tcm 物理预测导出均在启动前拒绝 |
 
-本地测试不读取真实 MTAD、不运行 GPU 训练，不改 README、HandOver 或研究结论。
+软件测试使用微型合成ZIP，不代表真实MTAD效果。
 
-## 可选有序片段呈现（本地准备，未新增训练授权）
+## 可选有序片段呈现
 
 `training.tcm_sampling`缺省`"uniform_fragment"`，保持原随机抽样与RNG消费。显式`"ordered_fragment"`仅作用于TCM：按传入场景顺序、每场原node顺序遍历至少两个有效原生点的片段，跨场边界顺接；每批最多`batch_tracks`条，epoch尾批不足就保留小批，不回填、不丢弃，下一更新开始下一epoch。这是对论文公开顺序组织的局部对齐；具体尾批约定是本项目选择，不声称作者实现已完全复现。
 
@@ -43,6 +40,4 @@ checkpoint 的 `selected` 为 null，只能用 `load_complete_snapshot(selected=
 
 本项不改变TAM正负pair采样、CL或其他阶段缓存，也未实现随机截短。现TCM对完整选点序列做双向全部下一点teacher forcing；随机内部crop会改变上下文并裁去部分监督，不能把它直接说成论文随机截短后的缺失段恢复。80epochs的阶段分配仍未知，不把本项epoch定义自行换算成论文训练量。
 
-[正式场景起点提案](../../configs/tmtaff-scene3000-tcm-ordered-proposed.json)基于033，模型/Adam/lr/表示不变，仅改TCM为3356更新、`ordered_fragment`、`time_policy="advisory"`和8小时提醒。配套[正式名单](../../configs/data/mtad_scene3000_seed20.json)与[时钟装配](../../configs/data/mtad_scene3000_seed20_alignment.json)：2100训练场共214739条有效片段均至少两点，batch64遍历一轮为3355个满批加19条尾批，共3356步。新run从当前seed独立初始化，并从新训练人口拟合normalizer，不移交033；TAM/TFM/JOINT更新均为0，300场V仅执行原TCM最终feature评价，600测试场继续封存。
-
-这同时改变数据人口、采样呈现和实际更新数，是新正式协议起点，不是相对033的单因素诊断，也不是论文80epoch复现或已收敛声明。用户已批准050的3356更新一次；8小时是提醒，不自动停止、加步或重试。当前已列READY、尚无真实训练启动回执，执行以[050交接](../../HandOver/L2S-20261021-050.md)为准；该配置不与可选CL目标尺度诊断混用。
+050旧Level2曾计划有序3356步，现已请求停止保全，不再READY。采样功能保留；Level1更新数按新有效片段人口计算，不能沿用214739片段或3356步。

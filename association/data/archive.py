@@ -99,10 +99,9 @@ class MTADArchive:
         self.path = Path(path)
         self._zip = zipfile.ZipFile(self.path)
         self._members = {"labels": {}, "measurements": {}}
-        self.label_member_hashes = {}
+        self.label_members = {}
         self.members_read = []
         self._label_cache = {}
-        self._archive_sha256 = None
         try:
             seen = set()
             for info in self._zip.infolist():
@@ -141,15 +140,6 @@ class MTADArchive:
     def scene_ids(self):
         return _numeric_sort(self._members["labels"])
 
-    def archive_sha256(self):
-        if self._archive_sha256 is None:
-            digest = hashlib.sha256()
-            with self.path.open("rb") as handle:
-                for chunk in iter(lambda: handle.read(4 * 1024 * 1024), b""):
-                    digest.update(chunk)
-            self._archive_sha256 = digest.hexdigest()
-        return self._archive_sha256
-
     def _rows(self, scene_id, kind):
         sid = _scene_id(scene_id)
         try:
@@ -159,8 +149,7 @@ class MTADArchive:
         payload = self._zip.read(info)
         self.members_read.append({"kind": kind, "scene_id": sid, "member": name})
         if kind == "labels":
-            self.label_member_hashes[sid] = {"member": name, "bytes": len(payload),
-                                           "sha256": hashlib.sha256(payload).hexdigest()}
+            self.label_members[sid] = {"member": name, "bytes": len(payload)}
         try:
             content = payload.decode("utf-8-sig")
         except UnicodeDecodeError:
@@ -351,20 +340,18 @@ def build_manifest(archive, seed, caps, development_scenes):
                 "component_members": component_members, "component_splits": component_splits,
                 "split_counts": counts, "development_scenes": _numeric_sort(development),
                 "development_forced_components": sorted(forced), "all_scenes": scene_ids,
-                "archive": {"name": archive.path.name, "bytes": archive.path.stat().st_size,
-                            "sha256": archive.archive_sha256()},
-                "label_members": dict(archive.label_member_hashes),
+                "archive": {"name": archive.path.name, "bytes": archive.path.stat().st_size},
+                "label_members": dict(archive.label_members),
                 "split_policy": "whole shared-A components; dev components T_core; remaining hash-sorted cyclic assignment; within-side scene hash caps",
                 "selection_note": "Unselected component members retain their split; no scene moves. Development is never held out, but hash caps may leave a development scene unselected.",
                 "content_coverage": "all labels; selected measurements audited at preprocessing; no reference reads",
                 "unit_contract": UNIT_CONTRACT.copy(), "registration_policy": REGISTRATION_POLICY}
-    manifest["manifest_sha256"] = hashlib.sha256(json.dumps(manifest, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")).hexdigest()
     validate_manifest(manifest)
     return manifest
 
 
 def validate_manifest(manifest):
-    """Check actual split/component structure; historical hashes are metadata."""
+    """Check actual split/component structure."""
     if set(manifest["splits"]) != set(SPLIT_NAMES):
         raise DataError("Invalid manifest split names")
     all_scenes = manifest["all_scenes"]

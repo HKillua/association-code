@@ -2,11 +2,11 @@
 
 2026-10-21，plan_version=1。用户授权继续完成本地方法代码、验证与服务器交接；真实训练由用户随后安排。补全043仍独立，baseline042不依赖本方案。本轮不改变旧teacher/TAM执行路径，不训练完整系统。
 
-执行回流：用户随后在服务器端批准043—047及本批四卡执行；044—046已完成，[独立结果分析](../proposals/repair_before_retraining/044-046-analysis.md)记录收益与未通过项。下文保留事前设计，不因结果更改保护要求；当前状态只看[交接索引](../../HandOver/Handover.md)。
+执行回流：044—046已在历史Level2完成，[独立结果分析](../proposals/repair_before_retraining/044-046-analysis.md)记录收益与未通过项。当前正式数据已改Level1，方法定义保留，旧数据的运行/人口不自动迁移；当前状态只看[交接索引](../../HandOver/Handover.md)。
 
 ## 研究问题与证据
 
-本页同时是精简的 `IDEA_PACKAGE`（`research-pipeline-contract v1.0`）：Idea ID `MTAD-EVIDENCE-20261021`；来源矩阵 `MC-MTAD-LOCAL-R3R4-20261020`，入口为现象驱动 Pattern 2。来源、原始数值及边界见[本地R3/R4分析](../proposals/repair_before_retraining/local-readiness-analysis.md)。
+本页同时是精简的 `IDEA_PACKAGE`（`research-pipeline-contract v1.0`）：Idea ID `MTAD-EVIDENCE-20261021`；来源矩阵 `MC-MTAD-LOCAL-R3R4-20261020`，入口为现象驱动 Pattern 2。来源、原始数值及边界见[本地R3/R4分析](https://github.com/HKillua/association-code/blob/404d766/docs/proposals/repair_before_retraining/local-readiness-analysis.md)。
 
 选定连接 `C-usefulness`：**“距离相近/同船”不足以推出“可以安全融合”，对应判断与逐时刻属性效用需要分别学习。** P-assoc 是 OLS 阈值仍产生2427条FP、75个混杂组；F-assoc 是匿名一次估偏略增F1，却净增52条错误边及错误helper。P-fusion 是同船均值也可能破坏可靠输入；F-fusion 是正确组最近观测位置MAE降至1928.43m，预测组支撑均值仅到4390.75m，且混杂组退化。M 为“运动/支撑证据有助区分相近异船；辅助信息效用随时间与属性改变”，目前是推断，非已确诊因果。E 为完整V普通控制与独立复算（直接证据）；C状态 partial，值得小规模pilot，未赋数值评分。
 
@@ -76,16 +76,6 @@ step0及每100步完整V仅监测，**正式端点固定1000步，不按V挑最�
 - 043单独决定补全学习修正是否可用；关联/融合冻结普通OLS的成功不能代替补全验收，最终接回拟用补全重新验证。
 
 运行只固定次数/步数；时长是提醒，不自动终止、加训或重试。数据/计算故障保留失败事实并停止该次，修复由本地处理。服务器回传实际命令、退出码、配置、训练历史、完整评价及可复算预测；下一skill为`record-experiment`。
-
-## 本地交付核查（不是学习效果）
-
-两项模型、独立训练CLI、配置和交接已完成。CPU合成数据上的几何关联、全证据关联、融合各三步更新完成，验证参数更新、导出与恢复；18项相关检查通过。独立审查修复了融合checkpoint写盘失败可能遗留RUNNING的问题，故障注入复验FAILED/INTERRUPTED均正确。旧普通控制的函数原样移入共享评价模块，无数值变更。
-
-完整V零更新核查保留64场、17组件、1635片段、29008对、104640查询。关联初始分数逐位等于原OLS变换，F1 .72717002295、FP2427/FN748；融合初始learned逐位等于anchor，384项普通控制预测数组比较差值为0，每属性81207有效目标。融合核查耗时7.73秒CPU1；该时间不是GPU训练估计。
-
-完整T_core原生证据准备28.77秒，512场/33组件/54792片段、110733正对，峰值RSS约637MB；尚未在本地执行全T_core的18.25m对特征准备或真实学习，不能把此RSS当完整训练内存。分块和流式统计已用等价性测试核验，服务器记录实际准备成本。机器可读摘要见[本地核查](../proposals/repair_before_retraining/evidence-heads-local-check.json)，详细本地原件留`runs/`，不复制大批日志。
-
-本节记录的是开跑前本地核查；043—047随后已获批领取，044—046的真实成绩见页首回流链接。[交接索引](../../HandOver/Handover.md)是唯一当前任务入口。本地未启动GPU任务，当前尚未证明完整系统超过TMTAFF。
 
 ## 048后最小候选：效用符号辅助监督（051已完成，未改善）
 

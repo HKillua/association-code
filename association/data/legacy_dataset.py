@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from collections import Counter
 import csv
-import hashlib
 import io
 import json
 from pathlib import Path
@@ -126,10 +125,8 @@ def prepare(archive_path, config, output, synthetic=False):
     config = _config(config)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
-    config_sha = hashlib.sha256(json.dumps(config, sort_keys=True, separators=(",", ":"),
-                                          ensure_ascii=False, allow_nan=False).encode("utf-8")).hexdigest()
     audit = {"schema": 1, "status": "RUNNING", "synthetic": bool(synthetic),
-             "scientific_result": False, "config_sha256": config_sha,
+             "scientific_result": False,
              "registration_policy": REGISTRATION_POLICY, "length": config["model"]["length"],
              "units": UNIT_CONTRACT.copy(), "reference_members_read": 0,
              "test_measurements_read": 0, "splits": {},
@@ -143,7 +140,6 @@ def prepare(archive_path, config, output, synthetic=False):
             if empty:
                 raise DataError("Preparation produced empty splits: " + ", ".join(empty))
             _write_json(output / "manifest.json", manifest)
-            audit["manifest_sha256"] = manifest["manifest_sha256"]
             audit["archive"] = manifest["archive"]
             for split in ("T_core", "T_head", "V_select"):
                 # Only one scene is resident at once during the audit.

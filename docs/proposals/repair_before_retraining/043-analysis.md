@@ -2,7 +2,7 @@
 
 2026-10-21，本地复核服务器`c05c238`回传。043正常完成1000次teacher更新，完整V评价结束；不是失败重跑或提前终止。**模型位置MAE由034的8.924km降到4.815km，主要收益来自OLS运动底座。模型仍比自己本轮的4.738km底座差77.72m，42/64场退化，不能把46%的整体改善归为学习补全创新。** 同时存在来源与指标差异：9002小幅改善，整体RMSE/p99也改善，不能说残差处处有害或统一清零。
 
-证据：[原L2S](../../../HandOver/L2S-20261020-043.md)、[原S2L](../../../HandOver/S2L-20261020-043.md)、[原始结果](../../../HandOver/results/COOPERATIVE-MOTION-20261020-043/)、[独立复算脚本](043-audit.py)、[完整机器结果](043-audit.json.gz)。仅读取已回传034/043数组和记录；没有读原生ZIP、加载模型、追加推理、训练或打开T_test。
+证据：[原L2S](https://github.com/HKillua/association-code/blob/404d766/HandOver/L2S-20261020-043.md)、[原S2L](https://github.com/HKillua/association-code/blob/404d766/HandOver/S2L-20261020-043.md)、[原始结果](../../../HandOver/results/COOPERATIVE-MOTION-20261020-043/)、[独立复算脚本](https://github.com/HKillua/association-code/blob/404d766/docs/proposals/repair_before_retraining/043-audit.py)、[完整机器结果](https://github.com/HKillua/association-code/blob/404d766/docs/proposals/repair_before_retraining/043-audit.json.gz)。仅读取已回传034/043数组和记录；没有读原生ZIP、加载模型、追加推理、训练或打开T_test。
 
 ## 实际执行与可比性
 
@@ -62,7 +62,7 @@
 
 043的训练100步窗口physical均值3.7601→3.4254，身份BCE .6640→.4280；1000步全部触发clip1。混合teacher目标还包括self/cross恢复，动态objective权重未回传，且各窗口样本不同；这些记录证明发生优化，不能以loss下降、clip频率解释为已经解决物理恢复或证明任务冲突。
 
-速度MAE034→043为19.72733→19.72924，航向56.62927°→56.61415°，几乎没变。复用此前已审的[034原生观测控制](034-audit.json)（本轮未重读原ZIP）：速度30.36035，航向55.93552°。因此速度相对普通控制已有改善，但不是本轮OLS新增收益；航向仍未胜该控制，也没有因位置改善自动通过。
+速度MAE034→043为19.72733→19.72924，航向56.62927°→56.61415°，几乎没变。复用此前已审的[034原生观测控制](https://github.com/HKillua/association-code/blob/404d766/docs/proposals/repair_before_retraining/034-audit.json)（本轮未重读原ZIP）：速度30.36035，航向55.93552°。因此速度相对普通控制已有改善，但不是本轮OLS新增收益；航向仍未胜该控制，也没有因位置改善自动通过。
 
 ## 下一步与回执边界
 

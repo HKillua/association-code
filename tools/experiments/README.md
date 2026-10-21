@@ -1,84 +1,23 @@
-# 实验入口
+# 运行入口
 
-在仓库根使用 `python tools/experiments/<脚本>.py --help`。真实实验按[当前交接](../../HandOver/Handover.md)中的独立READY运行，接口和历史配置本身不授权训练。
+先看[交接索引](../../HandOver/Handover.md)。当前正式数据为Level1；旧Level2实验已结案或请求停止。模型配置不是训练授权，新任务须有具体交接；不要根据旧命令自行恢复预算。
 
-| 脚本 | 用途 |
+| 入口 | 用途 |
 | --- | --- |
-| `make_scene_manifest.py` | 仅用旧manifest元数据生成场景级2100/300/600名单；不读ZIP或训练，见[数据约定](../../docs/data_contract.md#2026-10-21正式场景级协议) |
-| `prepare_scene_data.py` | 逐场核验训练/验证时钟并统计全人口，输出alignment和summary；不读取测试、不拟合统计或训练，2400场本地已完成无需服务器重复审计 |
-| `tmtaff_complete_fit.py` | 默认完整参考四阶段；`--phase tcm`只训补齐；`--phase tam/tfm --initialize-tcm-from`从已完成TCM开始独立关联/融合阶段 |
-| `tmtaff_complete_evaluate.py` | 加载选中检查点，仅评价，不重新训练/校准/选阈值 |
-| `cooperative_fit.py` | 候选训练；v2支持teacher独立补全评价，以及plain/scalar-u/attribute-u/learned-attribute融合臂 |
-| `tsactfer_fit.py` | TSA-cTFER离线关联适配，不含原在线指派，也不是完整融合系统 |
-| `completion_check.py` | 固定4个V场景补齐诊断；双模型、候选残差、`--reference-feedback`反馈辨析或`--candidate-dynamics`逐层动态；无训练 |
-| `evidence_association_fit.py` | 044几何/045全证据独立小MLP：固定native OLS、无reference、完整V选模及全pair原分数 |
-| `evidence_fusion_fit.py` | 046固定OLS分组、直接物理效用监督与可拒绝权重，完整V监测、固定最终端点 |
-| `evidence_fusion_evaluate.py` | 048冻结046权重、旧实际组/045缓存分数组的零训练2×2；保存逐helper路由及独立唯一目标视图 |
-| `tam_mode_check.py` | selected TAM固定小批，TCM一次缓存，三模式MC8及单次原fastpath参照；无reference/训练/校准 |
+| `tmtaff_complete_fit.py` | 参考模型四阶段，或显式`--phase tcm/tam/tfm`；TAM/TFM用`--initialize-tcm-from`冻结移交，resume只恢复同阶段 |
+| `tmtaff_complete_evaluate.py` | 已有完整快照的冻结评价，不重训或重选阈值 |
+| `cooperative_fit.py` | 候选补全及早期联合结构，`--phase teacher`输出单轨补全及可选预测 |
+| `evidence_association_fit.py` | 普通OLS底座上的几何/全证据关联，`check`只用合成数据，`fit`才读真实数据 |
+| `evidence_fusion_fit.py` | 固定OLS和分组的属性效用融合；`--mode check/fit`区分合成检查和训练 |
+| `evidence_fusion_evaluate.py` | 固定关联分数和融合权重的连接评价，支持完整目标视图 |
+| `tsactfer_fit.py` | 独立TSA-cTFER离线适配，非原在线方法 |
+| `make_scene_manifest.py` | 旧共享A元数据到场景协议的历史转换器；不能拿Level2名单替代Level1准备 |
+| `prepare_scene_data.py` | 已指定场景名单的原生时钟/人口准备；Level1需要自己的名单与映射 |
+| `launch_detached.py` | 使用服务器服务管理器托管一次作业，独立保存进度和退出状态 |
+| `../setup/gpu_allocation.py` | 按明确授权和兼容性选GPU，允许共卡，不终止他人进程 |
 
-`tam_mode_check.py --archive ZIP --manifest JSON --checkpoint CHECKPOINT.pt --expected-selected-update 600 --output NEW_DIR --device cuda:0 --cpu-threads 4 --advisory-seconds 1800`对应已完成的[042](../../HandOver/L2S-20261020-042.md)，原件和[分析](../../docs/proposals/repair_before_retraining/042-analysis.md)已核，不重复领取。输出`run.json/preparation.json/summary.json/distances.npz`，读selected而非最后快照，同轨副本独立编码，保存正负原CL及小批人口；临时模式/参数标记/dropout/RNG完整恢复。原生运动的CPU入口是`tools/analysis/native_motion_control.py --archive ZIP --manifest JSON --alignment JSON --output NEW_DIR`，固定完整V/Q64/cap128，不需权重或GPU，结果见[R2](../../docs/proposals/repair_before_retraining/native-motion-analysis.md)。
+每个入口都支持`--help`。真实训练显式给archive、manifest、alignment、config、新output和设备；CUDA不可用时不静默转CPU。数据集1三个文件是连续分卷，需要先提供可读的完整ZIP或分卷读取支持；目前没有已经生成的Level1正式名单。
 
-`completion_check.py --candidate-residuals`复用同一入口，只推理既有teacher，每片段一次；参考checkpoint仅用于原数据契约核对。输出逐场景`predictions-*.npz`（预测、位置底座、原真值、逐属性mask及片段/时间/区域）、`residual-diagnostics.json`（最终学习权重、正则、分区域原属性损失）及`candidate-summary.json`。分区域loss为区域内均值，计算全局贡献时乘该属性的区域有效点数/全部有效点数；位置底座没有速度/航向预测。它不还原训练梯度、不生成额外裁剪或改写权重。
+保留原生时间、有效短轨和全部候选；不按真值删难例。normalizer只拟合训练，测试保持封存。输出记录真实配置、阶段更新、覆盖、指标和终态；程序正常退出不能代替方法效果。
 
-`completion_check.py --reference-feedback --reference-checkpoint /已完成033目录`只做原生短程反馈辨析，不需要`--candidate-checkpoint`，其余archive/manifest/alignment/output/device参数沿用原入口。同初始prefix memory、同目标时间，对比真实native历史与预测历史，双向至多3步；第1步检查相同，第2/3步分别报告。`reference-feedback.json`保留所有片段、不可评短轨、逐方向/步SSE和分母，按元素汇总。无reference CSV、自然query重评或参数更新，不能替代完整补齐成绩。范围见[036](../../HandOver/L2S-20261020-036.md)和[综合排查](../../docs/proposals/repair_before_retraining/tcm-diagnosis.md)。
-
-`completion_check.py --candidate-dynamics --candidate-checkpoint /已完成034/teacher.pt --device cpu --cpu-threads 4`只读取已完成teacher的原生输入；不接受reference checkpoint，不读取reference或alignment内容，保留alignment参数仅兼容入口。加载源run.json核数据契约，每片段一次encode/decode，输出`candidate-dynamics.json`记录query、decoder各层、head和物理输出的时间变化及冻结残差均值后的输出差异；无目标、误差评价或训练。现有权重、hooks、冻结标记及模式不变。范围见[038](https://github.com/HKillua/association-code/blob/89e75c3/HandOver/L2S-20261020-038.md)及[规格](../../docs/specs/cooperative-dynamics-diagnostic.md)。
-
-参考完整流程和候选可用 `--save-predictions` 保存实际预测、真值、mask及分组，供 `tools/analysis/compare_physical_predictions.py` 做全人口覆盖/共同有效点比较。进度和失败原件保留；不为新增报表重跑已结束实验。
-
-旧pilot/profile/成本probe入口已删除。017、018均已结束；候选修正版和共享/独立臂入口已完成。用户最新把训练时长改为建议与提醒，固定训练计划和当前依赖以[交接索引](../../HandOver/Handover.md)为准。研究方法见[候选规格](../../docs/proposals/candidate_revision_after018/README.md)，旧阶段见[历史摘要](../../docs/history/README.md)。
-
-
-正式服务器训练从`launch_detached.py`的一次性systemd用户服务提交，已启动任务不依赖AI前台会话。示例接口：
-
-```bash
-python tools/experiments/launch_detached.py --cwd /冻结执行目录 --record-dir /新启动记录目录 \
-  --time-policy advisory --max-seconds 建议时长秒数 --grace-seconds 30 \
-  --env CUDA_VISIBLE_DEVICES=GPU-实际UUID --env OMP_NUM_THREADS=4 \
-  -- /既有环境/bin/python tools/experiments/tmtaff_complete_fit.py 完整已批参数 --time-policy advisory
-```
-
-显式传递MKL/OPENBLAS线程等所需环境；服务不继承AI shell全部环境。payload是argv，不通过shell展开。`launch.json`的SUBMITTED不是模型成功；重连读取`status.json`/exit_code及模型run/summary。超建议时长会生成`time_advisory.json`，AI读取后询问用户；AI离线时不能保证即时通知。必须在launcher和训练CLI两层启用advisory，默认hard仍兼容旧任务。在途作业的旧限制不会因仓库更新消失。用户管理器须Linger=yes，`session`只供本地核验。026已经完成服务器托管核实，新队列只看[交接索引](../../HandOver/Handover.md)。
-
-
-候选v2可拆成共享阶段与独立融合臂：`fit --phase shared`先保存shared.pt、identity-records/与唯一阈值；随后`fit --phase arm --shared-from /已完成021输出 --route attribute-u --save-predictions --time-policy advisory`（其余臂替换route）。每臂独立输出和耗时，只加载同normalizer/S/模型/loss/身份记录，不重训teacher/u或选阈值。默认full保持旧行为，shared不接受--save-predictions。当前GPU队列以[交接索引](../../HandOver/Handover.md)为准。
-
-`fit --phase teacher --save-predictions`保留原teacher self/cross/BCE训练，在固定端点做完整V独立片段补全，不进入关联选阈值、utility或融合；配置的utility/adapt更新数必须为0。输出`teacher.pt`、`completion-evaluation.json`及`completion-predictions/`逐场NPZ。该NPZ是独立补全格式，按逐属性mask/region统计，不能直接当分组融合格式交给`compare_physical_predictions.py`。`model.speed_output_policy`缺省为原`physical_softplus`；`scaled_log`只对v2生效并要求相应新权重。[031/032对照](../../docs/proposals/repair_before_retraining/031-032-analysis.md)已完成，结果保留；新任务只按当前索引领取。
-
-比较两个已完成teacher结果时，将gzip JSON和预测tar.gz还原为各自run目录的原层级，再执行`python tools/analysis/compare_completion_predictions.py --left /034结果目录 --right /043结果目录 --output /新的对比.json`。只读取已完成teacher预测，核完整人口与共有真值/mask/时间/支撑一致，输出整体、来源、逐场的各区域/距离误差、raw log-speed MSE及速度分布；不重新推理或选阈值。两臂位置底座可以不同，另报`position_base`及`position_model_minus_own_base`（模型位置误差减自身底座误差，负MAE差为改善），避免将换底座收益全归给网络。速度/航向没有底座预测，不能从位置底座推算这两项增量。原left/right/right_minus_left指标含义保留。
-
-`tmtaff_complete_fit.py --phase tcm`要求非TCM更新全部为0，固定端点输出`completion-evaluation.json`和未选模`checkpoint.pt`；不支持`--save-predictions`。模型仍为原一步TCM，特征误差不能与物理米误差比较。默认`full`保持四阶段。接口见[规格](../../docs/specs/tmtaff-tcm-phase.md)；033已结案，结果见[分析](../../docs/proposals/repair_before_retraining/033-analysis.md)，不重领。
-
-候选新可选`model.heading_output_policy=observation_residual`保留anchor可见航向底座并学习圆周修正；默认`learned_absolute`保持。新头需要新训练，不能将032旧权重静默改公式。该选项已由[034](../../docs/proposals/repair_before_retraining/034-analysis.md)完成1000步及完整V检验；CPU正确性不代表实际效果。
-
-候选v2可选`model.position_base_policy=native_ols`从本次裁剪后可见点拟合运动，保留实测端点锚与支撑内插值；缺省`native_hold`兼容历史权重。两种底座不能静默交换checkpoint语义。[043配置](../../configs/cooperative-motion-ols.json)相对034仅增加该选项，已获服务器端授权并领取，最新状态看交接索引。`tools/analysis/anonymous_calibration_control.py`和`fixed_group_fusion_control.py`是已完成的本地零训练R3/R4入口，支持`--help`；实际命令、结果与限制见[本轮分析](../../docs/proposals/repair_before_retraining/local-readiness-analysis.md)，无需服务器重跑。
-
-候选v2新增三个独立可选消融：`model.decoder_norm_first=true`只改decoder归一化顺序；`model.decoder_num_layers=2`保留原完整初始化后裁decoder、encoder不变；`training.teacher_identity_weight=0`仅使teacher身份BCE贡献为0，仍计算原BCE并保留物理self/cross和全局clip。默认分别false/null/1，旧权重/配置兼容；非默认decoder语义会保存并校验，不能直接换旧checkpoint的forward。teacher日志`identity_bce_raw`为原BCE，`loss_components.identity_bce`为实际加权贡献。[039—041规格](../../docs/specs/cooperative-decoder-ablations.md)及独立交接有完整命令；用户已批准三组各一次1000步、完整V及一次CPU动态读取，按索引READY和正常并发名额执行，不重领。
-
-`tmtaff_complete_fit.py --phase tam --initialize-tcm-from /已完成033输出`只复制并冻结completion与输入embedding，独立初始化TAM/优化器/预算；配置仅`TAM_FROZEN`非零，不接受物理`--save-predictions`。按原规则在T_core校准margin，每次完整V验证保存全部关联原分数及overall/ITSA/MSTSA/paper_metrics，终评读取selected缓存，不重复推理或运行未训练融合。保留源目录及分数缓存；这不是恢复033/020。[035](../../HandOver/L2S-20261020-035.md)按该接口执行，状态和范围只看当前索引，不重复启动；方法见[规格](../../docs/specs/tmtaff-tam-phase.md)。
-
-原生时间模型可显式配置`model.heading_representation=circular_sincos`；缺省`linear_zscore`兼容旧权重。新模式用保存的T_core均值/尺度还原航向并转sin/cos，内部投影为5维，仍用PE4加零列；训练、评价与快照保持同一变换并核对normalizer。跨模式不允许恢复/转移旧权重，需从头训练。新旧特征MSE不可直接比，下游关联另行验证；[规格](../../docs/specs/tcm-circular-heading.md)与[037](../../HandOver/L2S-20261020-037.md)列明已反馈批准的一次TCM4000及完整V命令，无自动TAM。
-
-新证据头详见[固定规格](../../docs/specs/evidence-association-fusion.md)及044—046独立交接；它们不修改旧teacher/TAM语义，也不依赖042/043权重。两者物理底座FP64、MLP FP32，GPU通过显式`--device cuda:0`运行，不能静默CPU回退。CPU软件检查可使用：
-
-```bash
-python tools/experiments/evidence_association_fit.py check --variant full_evidence --device cpu --output /新的合成关联目录
-python tools/experiments/evidence_fusion_fit.py --mode check --device cpu --output /新的合成融合目录
-```
-
-`check`只读合成数据、三步验证，不能作为MTAD效果。正式关联使用位置参数`fit`；融合使用`--mode fit`并须给alignment。新输出目录不可复用。真实训练仅按用户批准的具体交接执行，T_test封存。
-
-参考模型新增可选`model.tam_dropout`，默认None沿用公共dropout，只改变TAM内部注意力/残差/FFN与CE输出dropout；TCM/TFM独立保持。[047](../../HandOver/L2S-20261021-047.md)用原`tmtaff_complete_fit.py --phase tam --initialize-tcm-from`入口，配置只比035多`tam_dropout=0`，固定033补全，从头TAM1000；已获服务器端授权并领取，最新状态看交接索引。原校准规则下margin自然重算。每步history的`tam_train_batch`保存同次前向的正负距离和CL分项，供分析噪声移除后的实际训练行为，无额外推理。旧快照缺字段兼容，恢复不允许换语义。
-
-048已完成并复核，049最新回执RUNNING；两项均已领取，不重复启动，见[固定方案](../../docs/specs/next-experiments-048-049.md)与[交接索引](../../HandOver/Handover.md)。048只读取V量测及045/046原缓存，`--device cpu --cpu-threads 4 --advisory-seconds 1800`；旧组复放不一致会保留失败，不现场放宽容差。049用`--phase tfm --initialize-tcm-from /033目录 --save-predictions`，仅TFM300，按配置`fusion_monitor_updates=[0,100,300]`输出`fusion-evaluations/`及`snapshots/`；终点固定，无TAM推理/阈值选择。`oracle_common_support`提供同目标同属性交集比较，全人口覆盖保留于原`fusion`表。它不是COMPLETED硬resume，未实现035/047与049跨checkpoint的预测组合CLI。
-
-新正式数据使用`configs/data/mtad_scene3000_seed20.json`及`configs/data/mtad_scene3000_seed20_alignment.json`。复现已完成数据准备的入口：
-
-```bash
-python tools/experiments/prepare_scene_data.py --archive /数据路径/数据集level2.zip \
-  --manifest configs/data/mtad_scene3000_seed20.json \
-  --existing-alignment configs/tmtaff-time-reference-alignment.json \
-  --alignment-output /新目录/alignment.json --summary-output /新目录/population.json
-```
-
-本次新增的选项均不改变旧缺省：`training.tcm_sampling=ordered_fragment`按原场景/片段顺序且保留尾批；`model.contrastive_negative_scale=inverse_margin`只将CL负项除以固定margin；`training.utility_sign_weight=0.1`在融合原损失上加效用符号BCE。前者的正式TCM配置为`tmtaff-scene3000-tcm-ordered-proposed.json`；后两者分别见TAM与证据融合规格。050有序TCM与051融合符号监督已分别批准，按当前交接独立领取；CL目标尺度诊断仍未批准。它们尚非已验证效果，不能一次开启所有选项再将差异归给某个机制。
+参考方法细节见[训练规格](../../docs/specs/complete-training-refactor.md)，候选关联/融合见[方法定义](../../docs/specs/evidence-association-fusion.md)。旧消融、执行命令与失败结果从[历史摘要](../../docs/history/README.md)查阅，已完成的一次性诊断入口已删除。

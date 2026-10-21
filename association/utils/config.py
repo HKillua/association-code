@@ -78,7 +78,7 @@ def load_config(path):
 
 
 def validate_manifest_config(manifest, config):
-    """Refuse stale split/preprocessing contracts, even if each hash is valid."""
+    """Validate the actual split and preprocessing contract."""
     from association.data.archive import DEFAULT_DEVELOPMENT_SCENES, REGISTRATION_POLICY, UNIT_CONTRACT, validate_manifest
     validate_manifest(manifest)
     if manifest['seed'] != config['split_seed'] or manifest['caps'] != config['caps']:

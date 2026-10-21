@@ -1,9 +1,0 @@
-{
-  "protocol": "MTAD-Level2-AB-identity-CDF1-implementation-v1",
-  "model": {"input_dim": 4, "d_model": 128, "nhead": 8, "num_layers": 6, "dim_feedforward": 256, "dropout": 0.1, "length": 64, "margin": 1.0},
-  "split_seed": 20261016,
-  "caps": {"T_core": 512, "T_head": 128, "V_select": 64, "T_test": 128},
-  "seeds": [20, 21, 22],
-  "reference": {"tcm_epochs": 80, "tam_epochs": 80, "batch_tracks": 64, "pair_batch_size": 64, "learning_rate": 0.002, "weight_decay": 0.0, "max_hours": 12, "warmup_epochs": 20, "joint_completion": true, "completion_weight": 0.1},
-  "implementation_notes": {"velocity": "native numeric units; no physical conversion or reference-derived calibration", "registration": "quantized endpoint slots with actual in-support interpolation times retained", "epoch_clarification": "80 maximum per TCM and TAM stage; total 12-hour cap includes both and cache preparation. This explicitly clarifies the prior ambiguous 80-epoch reference limit; not an exact author schedule.", "joint_association": "TCM and input embedding may adapt during TAM optimization with an explicit 0.1 completion auxiliary loss; not the original TCM/TAM/TFM joint objective"}
-}
