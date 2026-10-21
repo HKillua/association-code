@@ -19,6 +19,7 @@ from association.models.evidence_association import (
     EvidenceAssociation, FEATURE_NAMES, FIXED_OLS_SCORE, VARIANTS, features_from_motion)
 from association.training.common import _update
 from association.training.sampling import BalancedScenePairSampler
+from association.training.paired_sampling import PairedNegativeIntervention, validate_sampling_config
 from association.utils import runtime
 
 
@@ -40,6 +41,10 @@ def validate_config(config):
             raise ValueError(f'{key} must be positive integer')
     if training['batch_size'] % 2:
         raise ValueError('balanced sampler requires even batch_size')
+    if 'sampling' in config:
+        validate_sampling_config(config['sampling'])
+        if training['batch_size'] != 256:
+            raise ValueError('paired negative intervention requires the frozen batch_size 256')
     for key in ('learning_rate', 'gradient_clip', 'advisory_hours'):
         value = training[key]
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not np.isfinite(value) or value <= 0:
@@ -299,6 +304,21 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
 
     actual_update = 0
     sampler = None
+    intervention = None
+
+    def persist_paired_sampling_audit():
+        if intervention is None:
+            return None
+        coverage = intervention.audit()
+        hard_per_update = 64 if config['sampling']['mode'] == 'hard_negative' else 0
+        if (coverage['completed_batch_count'] != actual_update
+                or coverage['hard_source_slots'] != actual_update * hard_per_update):
+            raise AssertionError('paired sampling counts disagree with successful optimizer updates')
+        coverage.update(actual_optimizer_updates=actual_update,
+                        configured_updates=settings['updates'], batch_size=settings['batch_size'])
+        runtime.write_json(run.path/'paired_sampling_audit.json', coverage)
+        return {key: value for key, value in coverage.items() if key != 'scenes'} | {
+            'per_scene_artifact': 'paired_sampling_audit.json'}
 
     def persist_sampling_audit():
         if sampler is None:
@@ -312,6 +332,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         coverage.update(split='T_core', actual_optimizer_updates=actual_update,
                         configured_updates=settings['updates'], batch_size=settings['batch_size'])
         runtime.write_json(run.path/'sampling_audit.json', coverage)
+        persist_paired_sampling_audit()
         return {key: value for key, value in coverage.items() if key != 'scenes'} | {
             'per_scene_artifact': 'sampling_audit.json'}
 
@@ -337,6 +358,8 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         feature_preparation_seconds = time.monotonic()-started-raw_preparation_seconds
         normalizer = fit_normalizer(train)
         sampler = BalancedScenePairSampler(train, config['seed'])
+        if 'sampling' in config:
+            intervention = PairedNegativeIntervention(train, config['sampling'])
         preparation_seconds = time.monotonic()-started
         audit = dict(split_unit=split_unit, training_scene_ids=[scene['scene_id'] for scene in train],
             validation_scene_ids=[scene['scene_id'] for scene in validation],
@@ -350,6 +373,8 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                 pairs=sum(len(scene['pairs']) for scene in validation),
                 positives=sum(int(np.sum(scene['labels'])) for scene in validation)),
             preparation_seconds=preparation_seconds)
+        if intervention is not None:
+            audit['paired_sampling_config'] = deepcopy(config['sampling'])
         rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
         audit.update(raw_preparation_seconds=raw_preparation_seconds,
             feature_preparation_seconds=feature_preparation_seconds,
@@ -377,6 +402,8 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
             if update:
                 step_started = time.monotonic()
                 groups = sampler.sample(settings['batch_size'])
+                if intervention is not None:
+                    groups, sampling_record = intervention.apply(groups)
                 features = np.concatenate([train[index]['features'][indices] for index, indices in groups])
                 bases = np.concatenate([train[index]['base_scores'][indices] for index, indices in groups])
                 labels = np.concatenate([train[index]['labels'][indices] for index, indices in groups])
@@ -386,8 +413,10 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                 loss = F.binary_cross_entropy_with_logits(score, torch.as_tensor(labels, dtype=torch.float64,
                                                                                   device=device))
                 loss_value, grad_norm = _update(loss, optimizer, model.parameters(), settings['gradient_clip'])
-                sampler.record_completed_batch(groups)
                 actual_update = update
+                sampler.record_completed_batch(groups)
+                if intervention is not None:
+                    intervention.record_completed_batch(groups, sampling_record)
                 row.update(loss=loss_value, gradient_norm=grad_norm,
                            train_seconds=time.monotonic()-step_started)
                 training_seconds += row['train_seconds']
@@ -464,6 +493,8 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
             limitations=['V reused for development checkpoint/threshold selection; not held-out evidence',
                          'frozen ordinary OLS completion, not learned completion or full system',
                          'balanced training score is not a calibrated posterior probability'])
+        if intervention is not None:
+            report['paired_sampling'] = persist_paired_sampling_audit()
         if selected_checkpoint['update'] != best['update']:
             raise AssertionError('restored selected checkpoint differs from selected update')
         runtime.write_json(run.path/'summary.json', report)

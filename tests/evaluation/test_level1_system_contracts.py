@@ -324,54 +324,74 @@ class Level1SystemContractTests(unittest.TestCase):
                         splits=dict(T_core=['t'], V_select=['v'], T_test=['sealed']))
         config = dict(scope='native-ols-evidence-association-v1', variant='full_evidence',
             data=ASSOCIATION_DATA, seed=7, motion_observation_policy=POLICY,
-            training=dict(updates=2, batch_size=2, validate_every=2, inference_batch_size=16,
+            training=dict(updates=2, batch_size=256, validate_every=2, inference_batch_size=16,
                           learning_rate=.001, gradient_clip=1., advisory_hours=1.))
-        with TemporaryDirectory() as temp:
-            root = Path(temp)
-            association = root/'association'
-            with patch('association.training.evidence_association.prepare_motion_scenes',
-                       side_effect=[[training], [validation]]) as motion_loader:
-                fitted = fit_evidence_association(config, association, 'cpu',
-                    archive_path=['synthetic-not-read.zip'], manifest=manifest)
-            self.assertEqual([call.args[2] for call in motion_loader.call_args_list], ['T_core', 'V_select'])
-            self.assertEqual(fitted['optimizer_updates'], 2)
-            self.assertEqual(read_json(association/'run.json')['status'], 'COMPLETED')
-            final = torch.load(association/'final.pt', weights_only=False)
-            self.assertEqual(final['update'], 2)
-            self.assertGreater(float(final['state_dict']['network.4.weight'].abs().sum()), 0.)
-            write_json(root/'manifest.json', manifest)
-            write_json(root/'alignment.json', {})
-            args = SimpleNamespace(device='cpu', cpu_threads=1, archive=['synthetic-not-read.zip'],
-                manifest=root/'manifest.json', alignment=root/'alignment.json',
-                ols_working_point=association/'ols-working-point.json',
-                association_scores=association/'final-scores.npz',
-                association_summary=association/'summary.json',
-                association_data_audit=association/'data_audit.json',
-                association_endpoint='final', association_run=association/'run.json',
-                association_checkpoint=association/'final.pt',
-                ordinary_controls=['anchor', 'mean_supported', 'attribute_hybrid'],
-                fusion_checkpoint=None, fusion_run=None, output=root/'system')
-            with patch('tools.experiments.level1_system_evaluate.load_timed_dataset',
-                       return_value=dict(validation=[validation], report=dict(
-                           validation_scene_ids=['v'], training_scene_ids=[], test_opened=False))) as loader:
-                report = run(args)
-            self.assertTrue(loader.call_args.kwargs['validation_only'])
-            self.assertEqual(report['status'], 'COMPLETED')
-            self.assertEqual(report['association_endpoint_step'], 2)
-            self.assertEqual(report['association_threshold'], fitted['final_selection']['threshold'])
-            self.assertEqual(report['association_score_replay']['max_absolute_difference'], 0.)
-            self.assertEqual(report['association'], fitted['final_result']['metrics'])
-            self.assertEqual(set(report['method_names']), {group+'_'+arm
-                for group in ('ols', 'learned_assoc')
-                for arm in ('anchor', 'mean_supported', 'attribute_hybrid')})
-            with np.load(args.output/'predictions/states-v.npz', allow_pickle=False) as saved:
-                for group in ('ols', 'learned_assoc'):
-                    np.testing.assert_array_equal(saved[group+'_attribute_hybrid'][..., :2],
-                                                  saved[group+'_anchor'][..., :2])
-                    np.testing.assert_array_equal(saved[group+'_attribute_hybrid'][..., 2:],
-                                                  saved[group+'_mean_supported'][..., 2:])
-            self.assertFalse(report['test_opened'])
-            self.assertEqual(report['optimizer_updates'], 0)
+        ordinary_weights = None
+        for mode in (None, 'uniform', 'hard_negative'):
+            with self.subTest(sampling=mode):
+                if mode is not None:
+                    config['sampling'] = dict(mode=mode, intervention_seed=20261023,
+                                              hard_slots=64, hard_fraction=.1)
+                with TemporaryDirectory() as temp:
+                    root = Path(temp)
+                    association = root/'association'
+                    with patch('association.training.evidence_association.prepare_motion_scenes',
+                               side_effect=[[training], [validation]]) as motion_loader:
+                        fitted = fit_evidence_association(config, association, 'cpu',
+                            archive_path=['synthetic-not-read.zip'], manifest=manifest)
+                    self.assertEqual([call.args[2] for call in motion_loader.call_args_list], ['T_core', 'V_select'])
+                    self.assertEqual(fitted['optimizer_updates'], 2)
+                    self.assertEqual(read_json(association/'run.json')['status'], 'COMPLETED')
+                    final = torch.load(association/'final.pt', weights_only=False)
+                    self.assertEqual(final['update'], 2)
+                    self.assertEqual(final['config'], config)
+                    if mode is None:
+                        ordinary_weights = final['state_dict']
+                    elif mode == 'uniform':
+                        for name, values in ordinary_weights.items():
+                            torch.testing.assert_close(final['state_dict'][name], values, rtol=0, atol=0)
+                    if mode is not None:
+                        audit = read_json(association/'paired_sampling_audit.json')
+                        self.assertEqual(audit['completed_batch_count'], 2)
+                        self.assertEqual(audit['actual_optimizer_updates'], 2)
+                        self.assertEqual(audit['hard_source_slots'], 128 if mode == 'hard_negative' else 0)
+                        self.assertEqual(fitted['paired_sampling']['hard_source_slots'], audit['hard_source_slots'])
+                    else:
+                        self.assertFalse((association/'paired_sampling_audit.json').exists())
+                    self.assertGreater(float(final['state_dict']['network.4.weight'].abs().sum()), 0.)
+                    write_json(root/'manifest.json', manifest)
+                    write_json(root/'alignment.json', {})
+                    args = SimpleNamespace(device='cpu', cpu_threads=1, archive=['synthetic-not-read.zip'],
+                        manifest=root/'manifest.json', alignment=root/'alignment.json',
+                        ols_working_point=association/'ols-working-point.json',
+                        association_scores=association/'final-scores.npz',
+                        association_summary=association/'summary.json',
+                        association_data_audit=association/'data_audit.json',
+                        association_endpoint='final', association_run=association/'run.json',
+                        association_checkpoint=association/'final.pt',
+                        ordinary_controls=['anchor', 'mean_supported', 'attribute_hybrid'],
+                        fusion_checkpoint=None, fusion_run=None, output=root/'system')
+                    with patch('tools.experiments.level1_system_evaluate.load_timed_dataset',
+                               return_value=dict(validation=[validation], report=dict(
+                                   validation_scene_ids=['v'], training_scene_ids=[], test_opened=False))) as loader:
+                        report = run(args)
+                    self.assertTrue(loader.call_args.kwargs['validation_only'])
+                    self.assertEqual(report['status'], 'COMPLETED')
+                    self.assertEqual(report['association_endpoint_step'], 2)
+                    self.assertEqual(report['association_threshold'], fitted['final_selection']['threshold'])
+                    self.assertEqual(report['association_score_replay']['max_absolute_difference'], 0.)
+                    self.assertEqual(report['association'], fitted['final_result']['metrics'])
+                    self.assertEqual(set(report['method_names']), {group+'_'+arm
+                        for group in ('ols', 'learned_assoc')
+                        for arm in ('anchor', 'mean_supported', 'attribute_hybrid')})
+                    with np.load(args.output/'predictions/states-v.npz', allow_pickle=False) as saved:
+                        for group in ('ols', 'learned_assoc'):
+                            np.testing.assert_array_equal(saved[group+'_attribute_hybrid'][..., :2],
+                                                          saved[group+'_anchor'][..., :2])
+                            np.testing.assert_array_equal(saved[group+'_attribute_hybrid'][..., 2:],
+                                                          saved[group+'_mean_supported'][..., 2:])
+                    self.assertFalse(report['test_opened'])
+                    self.assertEqual(report['optimizer_updates'], 0)
 
     def test_common_target_intersection_prevents_coverage_artifact(self):
         target = np.array([[[30.,120.,6.,90.]],[[31.,121.,6.,90.]]])

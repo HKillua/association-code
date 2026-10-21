@@ -106,18 +106,31 @@ class EvidenceTrainingTests(unittest.TestCase):
                 raise InterruptedError('cancel second update')
             return _update(*args, **kwargs)
 
-        with tempfile.TemporaryDirectory() as directory:
-            output = Path(directory)/'interrupted'
-            with patch('association.training.evidence_association._update', side_effect=interrupt_second):
-                with self.assertRaisesRegex(InterruptedError, 'second update'):
-                    fit_evidence_association(synthetic_config('full_evidence'), output, 'cpu',
-                        train_scenes=train, validation_scenes=validation, synthetic=True)
-            audit = runtime.read_json(output/'sampling_audit.json')
-            self.assertEqual(audit['completed_batch_count'], 1)
-            self.assertEqual(audit['actual_optimizer_updates'], 1)
-            self.assertEqual(audit['sampled_pair_count'], 8)
-            self.assertEqual(runtime.read_json(output/'run.json')['optimizer_updates'], 1)
-            self.assertEqual(runtime.read_json(output/'run.json')['status'], 'INTERRUPTED')
+        for mode in (None, 'hard_negative'):
+            with self.subTest(sampling=mode):
+                calls = 0
+                config = synthetic_config('full_evidence')
+                if mode is not None:
+                    config['sampling'] = dict(mode=mode, intervention_seed=20261023,
+                                              hard_slots=64, hard_fraction=.1)
+                    config['training']['batch_size'] = 256
+                with tempfile.TemporaryDirectory() as directory:
+                    output = Path(directory)/'interrupted'
+                    with patch('association.training.evidence_association._update', side_effect=interrupt_second):
+                        with self.assertRaisesRegex(InterruptedError, 'second update'):
+                            fit_evidence_association(config, output, 'cpu',
+                                train_scenes=train, validation_scenes=validation, synthetic=True)
+                    audit = runtime.read_json(output/'sampling_audit.json')
+                    self.assertEqual(audit['completed_batch_count'], 1)
+                    self.assertEqual(audit['actual_optimizer_updates'], 1)
+                    self.assertEqual(audit['sampled_pair_count'], config['training']['batch_size'])
+                    if mode is not None:
+                        paired = runtime.read_json(output/'paired_sampling_audit.json')
+                        self.assertEqual(paired['completed_batch_count'], 1)
+                        self.assertEqual(paired['actual_optimizer_updates'], 1)
+                        self.assertEqual(paired['hard_source_slots'], 64)
+                    self.assertEqual(runtime.read_json(output/'run.json')['optimizer_updates'], 1)
+                    self.assertEqual(runtime.read_json(output/'run.json')['status'], 'INTERRUPTED')
 
     def test_interrupt_is_not_completed_and_validation_components_cannot_train(self):
         train, validation = synthetic_scenes()
