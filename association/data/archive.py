@@ -5,6 +5,7 @@ The registration policy is intentionally explicit; see docs/data_contract.md.
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+import copy
 from dataclasses import dataclass
 import csv
 import hashlib
@@ -372,10 +373,14 @@ def validate_manifest(manifest):
     members = [sid for group in manifest["component_members"].values() for sid in group]
     if len(members) != len(set(members)) or set(members) != set(all_scenes):
         raise DataError("Component members must partition the scene inventory")
-    if set(manifest["component_splits"]) != set(manifest["component_members"]):
-        raise DataError("Missing component split assignment")
-    if any(split not in SPLIT_NAMES for split in manifest["component_splits"].values()):
-        raise DataError("Invalid component split assignment")
+    split_unit = manifest.get("split_unit", "shared_a_component")
+    if split_unit not in ("shared_a_component", "scene"):
+        raise DataError("Unknown manifest split unit")
+    if split_unit == "shared_a_component":
+        if set(manifest["component_splits"]) != set(manifest["component_members"]):
+            raise DataError("Missing component split assignment")
+        if any(split not in SPLIT_NAMES for split in manifest["component_splits"].values()):
+            raise DataError("Invalid component split assignment")
     if set(manifest["label_members"]) != set(all_scenes):
         raise DataError("Incomplete label provenance")
     seen = set()
@@ -389,15 +394,129 @@ def validate_manifest(manifest):
                 raise DataError("Selected scene absent from component inventory")
             seen.add(sid)
             cid = manifest["components"][sid]
-            if manifest["component_splits"][cid] != split:
+            if split_unit == "shared_a_component" and manifest["component_splits"][cid] != split:
                 raise DataError("Component crosses split boundary")
-    for sid in manifest["development_scenes"]:
-        if manifest["component_splits"][manifest["components"][sid]] != "T_core":
-            raise DataError("Development component escaped T_core")
+    if split_unit == "shared_a_component":
+        for sid in manifest["development_scenes"]:
+            if manifest["component_splits"][manifest["components"][sid]] != "T_core":
+                raise DataError("Development component escaped T_core")
+    else:
+        _validate_scene_manifest(manifest)
     for cid, members in manifest["component_members"].items():
         if any(manifest["components"].get(sid) != cid for sid in members):
             raise DataError("Inconsistent component membership")
     return True
+
+
+def _historical_scene_roles(manifest):
+    """Direct exposure restrictions; shared-A neighbours are not newly exposed."""
+    history = manifest["historical_usage"]
+    selected = history["selected_splits"]
+    train = set(selected["T_core"]) | set(selected["T_head"]) | set(manifest["development_scenes"])
+    validation = set(selected["V_select"])
+    test = {sid for sid, cid in manifest["components"].items()
+            if history["component_splits"][cid] == "T_test"}
+    return {"T_core": train, "T_head": set(), "V_select": validation, "T_test": test}
+
+
+def _validate_scene_manifest(manifest):
+    """Validate the explicitly selected scene protocol, keeping real components."""
+    if (set(manifest["caps"]) != set(SPLIT_NAMES)
+            or any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in manifest["caps"].values())
+            or manifest["caps"]["T_head"] != 0):
+        raise DataError("Scene protocol requires nonnegative caps and an empty T_head")
+    if any(len(manifest["splits"][split]) != manifest["caps"][split] for split in SPLIT_NAMES):
+        raise DataError("Scene protocol must fill its declared counts exactly")
+    expected_roles = dict.fromkeys(manifest["all_scenes"], "unused")
+    expected_roles.update({sid: split for split, scenes in manifest["splits"].items() for sid in scenes})
+    if manifest["scene_splits"] != expected_roles:
+        raise DataError("Scene role map differs from selected and unused scenes")
+    history = manifest["historical_usage"]
+    if (set(history["component_splits"]) != set(manifest["component_members"])
+            or any(role not in SPLIT_NAMES for role in history["component_splits"].values())
+            or set(history["selected_splits"]) != set(SPLIT_NAMES)):
+        raise DataError("Incomplete historical split provenance")
+    historical_seen = set()
+    for split, scenes in history["selected_splits"].items():
+        for sid in scenes:
+            if (sid not in manifest["components"] or sid in historical_seen
+                    or history["component_splits"][manifest["components"][sid]] != split):
+                raise DataError("Inconsistent historical scene role")
+            historical_seen.add(sid)
+    for sid in manifest["development_scenes"]:
+        if (sid not in manifest["components"]
+                or history["component_splits"][manifest["components"][sid]] != "T_core"):
+            raise DataError("Inconsistent historical development scene")
+    protected = _historical_scene_roles(manifest)
+    for split, scenes in protected.items():
+        if not scenes.issubset(manifest["splits"][split]):
+            raise DataError("Historical scenes must remain in " + split)
+    if manifest["historical_protection_counts"] != {split: len(scenes) for split, scenes in protected.items()}:
+        raise DataError("Historical protection counts differ from actual scenes")
+
+
+def build_scene_manifest(source_manifest, seed=20, caps=None, *, source_description="prior shared-A manifest"):
+    """Select scenes from existing metadata only; never open an MTAD archive.
+
+    Preserve the historical selected training/head/preview, validation and full
+    test-role populations. Fill their deficits from the remaining scene IDs in
+    deterministic seed order. Real shared-A components remain available for
+    dependence reporting, but no longer constrain the new scene split.
+    """
+    validate_manifest(source_manifest)
+    if source_manifest.get("split_unit", "shared_a_component") != "shared_a_component":
+        raise DataError("Scene protocol must start from the historical shared-A manifest")
+    if isinstance(seed, bool) or not isinstance(seed, int):
+        raise DataError("Scene selection seed must be an integer")
+    caps = dict(caps if caps is not None else {"T_core": 2100, "T_head": 0, "V_select": 300, "T_test": 600})
+    if (set(caps) != set(SPLIT_NAMES) or caps["T_head"] != 0
+            or any(isinstance(v, bool) or not isinstance(v, int) or v < 0 for v in caps.values())):
+        raise DataError("Scene protocol requires nonnegative caps and an empty T_head")
+    manifest = {key: copy.deepcopy(source_manifest[key]) for key in (
+        "all_scenes", "components", "component_members", "development_scenes", "label_members")}
+    for key in ("archive", "unit_contract"):
+        if key in source_manifest:
+            manifest[key] = copy.deepcopy(source_manifest[key])
+    manifest.update(manifest_version=2, protocol="MTAD-Level2 scene-level historically constrained v1",
+        split_unit="scene", seed=seed, caps=caps,
+        historical_usage=dict(source=source_description, source_seed=source_manifest.get("seed"),
+            source_protocol=source_manifest.get("protocol"),
+            source_registration_policy=source_manifest.get("registration_policy"),
+            selected_splits=copy.deepcopy(source_manifest["splits"]),
+            component_splits=copy.deepcopy(source_manifest["component_splits"])))
+    protected = _historical_scene_roles(manifest)
+    used = set().union(*protected.values())
+    if len(used) != sum(map(len, protected.values())):
+        raise DataError("Historical exposure restrictions conflict")
+    deficits = {split: caps[split] - len(protected[split]) for split in SPLIT_NAMES}
+    free = sorted(set(manifest["all_scenes"]) - used,
+                  key=lambda sid: (_digest(str(seed) + ":" + sid), int(sid)))
+    if min(deficits.values()) < 0 or sum(deficits.values()) > len(free):
+        raise DataError("Requested counts cannot retain historical populations")
+    splits, offset = {}, 0
+    for split in SPLIT_NAMES:
+        stop = offset + deficits[split]
+        selected = protected[split] | set(free[offset:stop])
+        splits[split] = [sid for sid in manifest["all_scenes"] if sid in selected]
+        offset = stop
+    manifest.update(splits=splits, scene_splits=dict.fromkeys(manifest["all_scenes"], "unused"),
+        historical_protection_counts={split: len(scenes) for split, scenes in protected.items()},
+        split_counts={split: {"selected_scenes": len(scenes),
+            "selected_components": len({manifest["components"][sid] for sid in scenes}),
+            "largest_selected_component_scenes": max(Counter(manifest["components"][sid] for sid in scenes).values(), default=0)}
+            for split, scenes in splits.items()},
+        split_policy="scene-level; retain historical train/head/preview, validation and full test-role scenes; "
+            "sort remaining IDs by SHA256(str(seed)+':'+scene_id), fill T_core then V_select then T_test; remainder unused",
+        selection_note="Historically constrained project selection, not the authors' random scene list. "
+            f"Seed {seed} is our split choice; the paper specifies 20 for weight initialization, not a split seed. "
+            "Shared-A identities may cross splits; components are retained for dependence reporting, not isolation. "
+            "The digest only orders scene IDs and is not an admission gate.",
+        content_coverage="existing manifest metadata only; no new label, measurement or reference reads; "
+            "new train/validation preparation and frozen test evaluation have not run",
+        preparation_status="manifest only; native loader compatible; training component-isolation checks unchanged")
+    manifest["scene_splits"].update({sid: split for split, scenes in splits.items() for sid in scenes})
+    validate_manifest(manifest)
+    return manifest
 
 
 def resample_scene(scene, length=64):
