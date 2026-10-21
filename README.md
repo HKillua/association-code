@@ -18,7 +18,7 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 
 服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。043—047均已完成并审计，不重复启动或加步。022—025继续HOLD，T_test封存。
 
-**最新结论见[043补全](docs/proposals/repair_before_retraining/043-analysis.md)、[047参考关联](docs/proposals/repair_before_retraining/047-analysis.md)与[044—046候选](docs/proposals/repair_before_retraining/044-046-analysis.md)。** [048—049方案](docs/specs/next-experiments-048-049.md)已准备：048冻结分组×融合2×2及独立唯一目标视图，049固定033独立TFM300，等待具体执行确认，均为DRAFT。两项不依赖043/047成功，配置不因本次负结果自动改变；没有新训练或重跑。
+**最新结论见[043补全](docs/proposals/repair_before_retraining/043-analysis.md)、[047参考关联](docs/proposals/repair_before_retraining/047-analysis.md)与[044—046候选](docs/proposals/repair_before_retraining/044-046-analysis.md)。** 用户已明确“批准048和049”，两项已列为[当前READY](HandOver/Handover.md)：048冻结分组×融合2×2及独立唯一目标视图，049固定033独立TFM300。各一次，尚未收到启动回执；配置不因043/047负结果改变，已完成项不重跑。
 
 ## 从哪里开始
 
