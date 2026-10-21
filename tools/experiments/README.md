@@ -27,7 +27,7 @@
 
 系统评价学习关联时，必须提供`--association-run`、`--association-checkpoint`及原scores/summary/data-audit三项；`--association-endpoint final`使用固定终点，`selected`为兼容默认。入口重算对应权重分数，并核验相邻`baseline-scores.npz`/`baseline.json`精确复现OLS；不能混用选中步数的阈值。`baseline`端点不加载权重。`--ordinary-controls anchor mean_supported attribute_hybrid`生成实际三种输出，默认仍只mean；纯OLS调用无须关联权重。详细一次性命令见[056](../../HandOver/L2S-20261022-056.md)。关联`sampling_audit.json`只计成功optimizer更新对应的实际抽样。
 
-融合Level1三配置仅`training.utility_objective`不同：原文件为`helper_quality`，`-direct-only`与`-mixed-action`为两项对照；共享`model.utility_output_bias=0.01`，固定`mixed_action_alpha=0.5`，符号BCE关闭。历史配置省略新字段仍用原初始化/监督。三臂命令和待批预算见[057](../../HandOver/L2S-20261022-057.md)，训练诊断保存在`run.json`。
+融合Level1三配置仅`training.utility_objective`不同：原文件为`helper_quality`，`-direct-only`与`-mixed-action`为两项对照；共享`model.utility_output_bias=0.01`，固定`mixed_action_alpha=0.5`，符号BCE关闭。历史配置省略新字段仍用原初始化/监督。三臂命令和已批预算见[057](../../HandOver/L2S-20261022-057.md)，训练诊断保存在`run.json`。
 
 保留原生时间、有效短轨和全部候选；不按真值删难例。normalizer只拟合训练，测试保持封存。输出记录真实配置、阶段更新、覆盖、指标和终态；程序正常退出不能代替方法效果。
 
