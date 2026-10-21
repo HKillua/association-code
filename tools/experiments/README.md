@@ -13,6 +13,7 @@
 | `level1_ols_working_point.py` | 仅V_select、零训练计算当前Level1纯OLS工作点，不必先运行关联fit |
 | `level1_system_evaluate.py` | 仅读V_select，普通/学习关联×普通/学习融合；完整目标、共同有效点、分组与路由数组保存；可不带任何学习权重 |
 | `../analysis/tfm_information_probe.py` | 049原始验证输入导出TCM特征并检查0/100/300各层及单侧替换响应；CPU零更新，不读reference或测试 |
+| `../analysis/system_attribution.py` | 054A仅复算053A保存数组；完整目标失代归因、独立片段/固定组anchor控制、共同点与覆盖重复代价；无archive/模型/训练入口 |
 | `tsactfer_fit.py` | 独立TSA-cTFER离线适配，非原在线方法 |
 | `make_scene_manifest.py` | `--archive`仅读标签生成Level1新名单；旧`--source-manifest`转换仅供历史兼容 |
 | `prepare_scene_data.py` | 已指定train/V的时钟、人口和原生/选点密度统计；Level1用显式temporal_support策略，不需旧alignment |
