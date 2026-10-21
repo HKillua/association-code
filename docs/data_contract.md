@@ -6,7 +6,7 @@
 
 `association/data/archive.py`直接读取ZIP，支持UTF-8/GBK成员名和UTF-8 BOM/GB18030 CSV；拒绝不安全路径、重复成员、歧义场景、错误列及关联/量测场景集合不符，不解压原包。此关联reader不打开reference；完整流程通过独立的显式reference接口读取已指定训练/开发场景。
 
-节点为`(scene, source, batch)`。每节点须有唯一完整A-B-C标签，冲突即隔离，即使A-B相同也不合并。监督身份为A-B；跨场景隔离用更宽的A。source、batch、identity、标签区间及reference不是运动特征。标签不裁切量测时间范围，同源不同片段可以为正对；完整候选为有效节点全部`i<j`，不按真值误差或时间难度删边。
+节点为`(scene, source, batch)`。每节点须有唯一完整A-B-C标签，冲突即隔离，即使A-B相同也不合并。监督身份为A-B；旧007跨场景隔离用更宽的A，新正式协议按场景划分。source、batch、identity、标签区间及reference不是运动特征。标签不裁切量测时间范围，同源不同片段可以为正对；完整候选为有效节点全部`i<j`，不按真值误差或时间难度删边。
 
 | 字段 | 当前解释与清洗 |
 | --- | --- |
@@ -21,7 +21,7 @@
 
 ## 冻结划分与已知数据暴露
 
-继续复用007原manifest：T_core512、T_head128、V_select64、T_test128；当前完整任务只装配T_core/V_select。任何两场景若共享A，按传递连通组件归同一角色，不能拆组件增加验证量。组件/场景用既有seed排序和cap选择，未选场景不迁移。历史hash排序是原划分算法的一部分；保存的SHA/hash/fingerprint仅为旧来源字段，**不设匹配准入门槛**。核真实角色、组件、场景和内容，缺hash不拒绝。
+既有及在途任务继续复用007原manifest：T_core512、T_head128、V_select64、T_test128；当前完整任务只装配T_core/V_select。在此旧协议中，任何两场景若共享A，按传递连通组件归同一角色，不能拆组件增加验证量。组件/场景用既有seed排序和cap选择，未选场景不迁移。历史hash排序是原划分算法的一部分；保存的SHA/hash/fingerprint仅为旧来源字段，**不设匹配准入门槛**。核真实角色、组件、场景和内容，缺hash不拒绝。
 
 开发锚点共71个：原53个`0,1,2,100,200,…,4900,4999`，加Level1 scene0初次预览所关联的18个Level2场景：`133,878,938,1174,1214,1372,1443,1853,1929,2052,2244,2697,3048,3670,3839,4576,4682,4731`。其共享A组件保守归训练。预览暴露已记录，旧缺锚点manifest不能作为新实验冻结划分；历史结果不改写。
 
@@ -44,7 +44,17 @@
 
 另核11篇论文的取样、窗口、过滤与评价，见[MTAD原文协议对照](mtad_data_protocols.md)。短窗跨源关联、共同覆盖的已知关联融合、过滤短轨和全场所有碎片任务不能混为一谈；数量差异不能单独解释性能，论文筛选规则也不自动成为本项目的新清洗规则。
 
-复算来源：[007原manifest](https://github.com/HKillua/association-code/blob/612afea/HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json)、[既有逐场景元数据](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz)，两路独立复核一致，无新ZIP扫描/模型推理/测试量测。029已在原4场景完成权重诊断，其结果不能证明全V或全MTAD代表性。后续正式重训若调整选择，先按组件、密度和时间支撑制定与模型分数无关的方案，披露已暴露数据并保留旧结果，用户确认后执行；不看效果后换验证集，也不撤销身份隔离求高分。
+复算来源：[007原manifest](https://github.com/HKillua/association-code/blob/612afea/HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json)、[既有逐场景元数据](https://github.com/HKillua/association-code/blob/612afea/docs/results/frozen_input_audit_20261018/native_sampling/attempt2/scene_metadata.jsonl.gz)，两路独立复核一致，无新ZIP扫描/模型推理/测试量测。029已在原4场景完成权重诊断，其结果不能证明全V或全MTAD代表性。历史结果保留；新正式划分按下述最新用户决定，不按模型分数挑选或更换场景。
+
+### 2026-10-21：正式场景级协议
+
+用户明确要求与TMTAFF保持一致，选择其公开的**场景级3000、训练/验证/测试7:1:2**方向；新正式协议允许共享A组件跨集合，不再受旧测试池161/312上限限制。该变化是评价问题的调整，不证明论文存在泄漏或本项目成绩会提高。旧007仍用于既有实验，不能把新结果拼入旧验证表。
+
+新名单固定为2100/300/600，baseline、候选与控制共用。仅从场景元数据选择；保留旧训练/开发直接使用记录，旧测试角色161场不进入训练或验证，已封存128场继续留作测试。已直接训练、开发或预览的场景不得进入新测试。因这些历史约束，选择不是对全部5000场景无条件随机抽样，须披露；作者Level、场景名单及划分种子未公开，当前暂沿用本地Level2，不称作者同一批数据。真实shared-A组件仍保留用于依赖描述，不能把场景级划分误报为身份独立。
+
+已生成并独立复核[正式场景名单](../configs/data/mtad_scene3000_seed20.json)：2100训练、300验证、600测试，2000未选；历史训练/预览保护701场全部在训练、旧V64在验证、整个旧测试角色161在测试。固定seed20仅为本项目划分选择；先保留历史角色，再对其余ID作确定性伪随机排序补足，集合内按原场景顺序排列。真实组件信息未改；31项小型数据/读取边界测试通过，没有读取真实ZIP或模型推理。生成器[make_scene_manifest.py](../tools/experiments/make_scene_manifest.py)仅消费旧metadata，旧007可由`git show 612afea:HandOver/results/EVIDENCE-20261018-012/prepared007/manifest.json`取得；CLI参数为`--source-manifest PATH --source-description SOURCE --seed 20 --output NEW_PATH`，不覆盖现有文件。
+
+正式训练需从头运行并重新拟合训练侧统计；旧权重只作开发证据。**当前仅名单与native读取兼容，训练器的旧组件隔离检查尚未适配，不是可直接开跑的训练配置。** 扩容还须补齐新训练/验证场景的显式时钟映射、输入/监督人口与实际训练呈现量，不能直接复用576场景alignment或把1000步当作80epochs。数据准备不打开测试量测/reference，也不自动增加训练预算；已领取049继续原配置。论文数据与预处理的已知/未知见[协议对照](mtad_data_protocols.md#2026-10-21实际使用量与正式规模目标)。
 
 ## 已核人口与监督分母
 

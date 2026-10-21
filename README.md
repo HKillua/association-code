@@ -19,6 +19,8 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 
 服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。043—047均已完成并审计，不重复启动或加步。022—025继续HOLD，T_test封存。
 
+用户已选择正式数据向TMTAFF的场景级 **2100训练/300验证/600测试** 对齐，旧512/64保留为开发协议。新名单允许跨场共享A并披露，历史已使用场景不进新测试；数据准备与在途049分开，尚不构成新训练任务。见[正式数据约定](docs/data_contract.md#2026-10-21正式场景级协议)。
+
 **最新结论见[研究说明](docs/research_brief.md)、[043补全](docs/proposals/repair_before_retraining/043-analysis.md)、[047参考关联](docs/proposals/repair_before_retraining/047-analysis.md)及[048连接验证](docs/proposals/repair_before_retraining/048-analysis.md)。** 已拉取服务器`bb51611`：048完成，049固定033独立TFM300最新回执RUNNING、尚无训练终态；两项均已领取，当前无新增READY。配置不因043/047负结果改变，已领取项不重跑。
 
 ## 从哪里开始
