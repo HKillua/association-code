@@ -16,6 +16,7 @@
 | `../analysis/system_attribution.py` | 054A仅复算053A保存数组；完整目标失代归因、独立片段/固定组anchor控制、共同点与覆盖重复代价；无archive/模型/训练入口 |
 | `../analysis/group_refinement.py` | 055A复现053原OLS分组/关联统计与054三臂；仅新增原组内first-fit一致性拆分，五臂完整系统及同anchor/helper共同点诊断；CPU零训练 |
 | `../analysis/oracle_diagnostics.py` | 058只读053缓存，原OLS/真值身份分组×四种输出；区分覆盖恢复、代表切换与固定候选选择收益，CPU零训练 |
+| `../analysis/compare_association_duration.py` | 060对056完整系统缓存比较，核同人口/输入与OLS控制，分别报告共同点、同/换代表、新/丢覆盖、G/U/D和场景宏平均；CPU零训练 |
 | `tsactfer_fit.py` | 独立TSA-cTFER离线适配，非原在线方法 |
 | `make_scene_manifest.py` | `--archive`仅读标签生成Level1新名单；旧`--source-manifest`转换仅供历史兼容 |
 | `prepare_scene_data.py` | 已指定train/V的时钟、人口和原生/选点密度统计；Level1用显式temporal_support策略，不需旧alignment |
@@ -29,6 +30,8 @@
 系统评价学习关联时，必须提供`--association-run`、`--association-checkpoint`及原scores/summary/data-audit三项；`--association-endpoint final`使用固定终点，`selected`为兼容默认。入口重算对应权重分数，并核验相邻`baseline-scores.npz`/`baseline.json`精确复现OLS；不能混用选中步数的阈值。`baseline`端点不加载权重。`--ordinary-controls anchor mean_supported attribute_hybrid`生成实际三种输出，默认仍只mean；纯OLS调用无须关联权重。详细一次性命令见[056](../../HandOver/L2S-20261022-056.md)。关联`sampling_audit.json`只计成功optimizer更新对应的实际抽样。
 
 059配对配置为`evidence-association-level1-paired-uniform.json`与`evidence-association-level1-paired-hard-negative.json`，仅`sampling.mode`不同；两臂seed20261022、1000更新，独立干预seed20261023。原采样器不改；B在原batch后将首64负槽改从同场景T内OLS前10%负池抽取，允许抽回原配对或与保留样本重合。`paired_sampling_audit.json`分别记录来源槽数、实际变化数、最终池命中及各来源曝光/重复/分数分布；只计成功更新。无`sampling`字段时保持旧路径，A与同seed原路径逐值兼容。执行权限见[059A](../../HandOver/L2S-20261022-059A.md)/[059B](../../HandOver/L2S-20261022-059B.md)，配置存在不代表已批预算。
+
+060配置`evidence-association-level1-3000.json`与056仅更新数不同；`fit --prefix-reference 056的association目录`只读源final1000核对，绝不续训。1000保存prefix权重/Adam、分数、采样与比较报告；数值差异明确标记，不影响固定3000终点，协议错配失败。普通旧调用无此参数时行为不变。完整命令及新增GPU预算状态见[060](../../HandOver/L2S-20261022-060.md)。
 
 融合Level1三配置仅`training.utility_objective`不同：原文件为`helper_quality`，`-direct-only`与`-mixed-action`为两项对照；共享`model.utility_output_bias=0.01`，固定`mixed_action_alpha=0.5`，符号BCE关闭。历史配置省略新字段仍用原初始化/监督。三臂命令和已批预算见[057](../../HandOver/L2S-20261022-057.md)，训练诊断保存在`run.json`。
 
