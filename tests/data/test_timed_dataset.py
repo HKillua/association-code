@@ -49,6 +49,26 @@ class TimedDatasetTests(NativeZipFixture, unittest.TestCase):
         self.assertTrue(target['report']['missing_identity'])
         self.assertEqual(result['report']['scenes'][0]['target_without_reference_count'], 1)
 
+    def test_dense_candidate_motion_is_compacted_before_tracks_are_released(self):
+        data = {**self.data, 'max_observations': 2}
+        baseline = self.load(data_config=data)
+        candidate = self.load(data_config=data, motion_observation_policy='canonical_all')
+        self.assertNotIn('motion', baseline['train'][0])
+        for old, new in zip(baseline['train'] + baseline['validation'],
+                            candidate['train'] + candidate['validation']):
+            self.assertNotIn('tracks', new)
+            self.assertEqual(new['motion_observation_policy'], 'canonical_all')
+            np.testing.assert_array_equal(old['pairs'], new['pairs'])
+            np.testing.assert_array_equal(old['grid'], new['motion']['query_seconds'])
+            self.assertEqual(new['motion']['states'].shape, (len(new['node_ids']), 4, 4))
+            for identity in old['fusion_targets']:
+                for key in ('states', 'valid'):
+                    np.testing.assert_array_equal(old['fusion_targets'][identity][key],
+                                                  new['fusion_targets'][identity][key])
+        self.assertEqual(candidate['train'][0]['motion']['native_count'].sum(), 12)
+        self.assertEqual(candidate['train'][0]['native_observed'].sum(), 8)
+        self.assertEqual(candidate['report']['motion_observation_policy'], 'canonical_all')
+
     def test_split_and_alignment_validation_precede_any_archive_access(self):
         cases = [dict(train_splits=['T_test']), dict(train_splits=['T_head']),
                  dict(train_splits=['T_head', 'T_core']), dict(alignment_by_scene={}),

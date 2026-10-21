@@ -62,7 +62,8 @@ def main(argv=None):
     parser.add_argument('--output', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--variant', choices=VARIANTS, help='synthetic check only; fit reads config')
-    for name in ('archive', 'manifest', 'config'):
+    parser.add_argument('--archive', nargs='+', help='one ZIP or its ordered continuous parts')
+    for name in ('manifest', 'config'):
         parser.add_argument('--'+name)
     args = parser.parse_args(argv)
     previous = signal.getsignal(signal.SIGTERM)

@@ -10,7 +10,9 @@ import torch
 from association.training.evidence_association import (
     _validate_partitions, fit_evidence_association, fit_normalizer, load_checkpoint, prepare_features, score_scenes)
 from association.models.evidence_association import features_from_motion
+from association.data.motion_evidence import prepare_motion_scenes
 from association.utils import runtime
+from tests.fixtures.native_zip import make_native_zip_fixture
 from tools.experiments.evidence_association_fit import synthetic_config, synthetic_scenes
 
 
@@ -54,6 +56,11 @@ class EvidenceTrainingTests(unittest.TestCase):
             self.assertEqual(report['selected']['update'], 0)  # tie keeps initial perfect OLS
             baseline = runtime.read_json(path/'baseline.json')
             self.assertEqual(baseline['selected_threshold']['metrics']['fp'], 0)
+            point = runtime.read_json(path/'ols-working-point.json')
+            self.assertEqual(point['threshold'], baseline['selection']['threshold'])
+            self.assertEqual(point['validation_scene_ids'], ['validation'])
+            self.assertTrue(point['synthetic'])
+            self.assertEqual(point['motion_observation_policy'], 'selected_cap128')
             self.assertEqual(runtime.read_json(path/'run.json')['status'], 'COMPLETED')
 
     def test_interrupt_is_not_completed_and_validation_components_cannot_train(self):
@@ -71,6 +78,30 @@ class EvidenceTrainingTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'component_id overlap'):
                 fit_evidence_association(config, Path(directory)/'overlap', 'cpu',
                     train_scenes=train, validation_scenes=validation, synthetic=True)
+
+    def test_canonical_motion_training_reload_rejects_old_input_policy(self):
+        fixture = make_native_zip_fixture(self)
+        policy = 'canonical_all'
+        config = synthetic_config('full_evidence')
+        config['motion_observation_policy'] = policy
+        config['training']['updates'] = 1
+        # The fixture's sealed reference/test members remain unreadable.
+        train = prepare_motion_scenes(fixture.path, fixture.manifest, 'T_core', motion_observation_policy=policy)
+        validation = prepare_motion_scenes(fixture.path, fixture.manifest, 'V_select', motion_observation_policy=policy)
+        output = fixture.root/'association'
+        report = fit_evidence_association(config, output, 'cpu', train_scenes=train,
+                                          validation_scenes=validation, synthetic=True)
+        self.assertEqual(report['motion_observation_policy'], policy)
+        model, checkpoint = load_checkpoint(output/'final.pt', 'cpu')
+        packed = prepare_features(validation, 'V_select')
+        score_scenes(model, packed, checkpoint['normalizer'], 'cpu', 16)
+        del packed[0]['motion_observation_policy']
+        with self.assertRaisesRegex(ValueError, 'motion_observation_policy'):
+            score_scenes(model, packed, checkpoint['normalizer'], 'cpu', 16)
+        checkpoint['config']['motion_observation_policy'] = 'selected_cap128'
+        torch.save(checkpoint, output/'wrong-policy.pt')
+        with self.assertRaisesRegex(ValueError, 'motion_observation_policy'):
+            load_checkpoint(output/'wrong-policy.pt', 'cpu')
 
     def test_scene_protocol_permits_shared_components_but_never_overlapping_scenes(self):
         train, validation = synthetic_scenes()

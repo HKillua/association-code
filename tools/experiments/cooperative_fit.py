@@ -132,7 +132,9 @@ def main(argv=None):
     parser.add_argument('--shared-from', help='completed shared phase output, required for --phase arm')
     parser.add_argument('--route', choices=('plain', 'scalar-u', 'attribute-u', 'learned-attribute'),
                         help='one independently initialized comparison arm')
-    for name in ('archive', 'manifest', 'alignment', 'config'):
+    parser.add_argument('--archive', type=Path, nargs='+',
+                        help='one ZIP or all continuous ZIP parts in byte order')
+    for name in ('manifest', 'alignment', 'config'):
         parser.add_argument('--'+name)
     args = parser.parse_args(argv)
     started = time.monotonic()

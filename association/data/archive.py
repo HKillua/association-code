@@ -4,7 +4,10 @@ The registration policy is intentionally explicit; see docs/data_contract.md.
 """
 from __future__ import annotations
 
+from bisect import bisect_right
 from collections import Counter, defaultdict
+from collections.abc import Sequence
+from contextlib import contextmanager, ExitStack
 import copy
 from dataclasses import dataclass
 import csv
@@ -12,6 +15,8 @@ import hashlib
 import io
 import json
 import math
+import operator
+import os
 from pathlib import Path, PurePosixPath
 import re
 import zipfile
@@ -80,12 +85,152 @@ def _scene_id(value):
     return str(int(value))
 
 
+def zip_dataset_level(archive):
+    """Read only member directories; unknown/mixed levels return None.
+
+    External ZIP filenames and scene counts are deliberately not evidence of
+    Level1 versus Level2. Every recognized data member must declare one common
+    level in its parent directories for the result to be usable.
+    """
+    levels = set()
+    for info in archive.infolist():
+        name = _name(info)
+        if info.is_dir() or not re.search(
+                r'(?:^|/)(?:关联表/关联结果|量测场景/场景|真实场景/场景)-\d+\.csv$', name):
+            continue
+        parents = '/'.join(PurePosixPath(name).parts[:-2])
+        markers = set(re.findall(r'(?<![a-z0-9])level([12])(?![a-z0-9])', parents, re.IGNORECASE))
+        if len(markers) != 1:
+            return None
+        levels.update(markers)
+    return 'Level' + next(iter(levels)) if len(levels) == 1 else None
+
+
+def validate_dataset_level(actual_level, manifest):
+    """Bind an explicit level claim to the archive; old unlabeled protocols replay."""
+    expected = manifest.get('dataset_level')
+    if expected is not None and (expected not in ('Level1', 'Level2') or expected != actual_level):
+        raise DataError(f'Archive dataset level {actual_level!r} differs from manifest {expected!r}')
+
+
 def _digest(value):
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
 
 def _numeric_sort(values):
     return sorted(values, key=lambda value: int(value))
+
+
+def _archive_paths(path_or_parts):
+    """Keep the caller's explicit part order; never discover or sort siblings."""
+    if isinstance(path_or_parts, (str, os.PathLike)):
+        paths = (Path(path_or_parts),)
+    elif isinstance(path_or_parts, Sequence) and not isinstance(path_or_parts, bytes):
+        paths = tuple(Path(path) for path in path_or_parts)
+    else:
+        raise DataError("Archive must be one ZIP path or an ordered sequence of ZIP parts")
+    if not paths:
+        raise DataError("Archive parts must be nonempty")
+    if len({path.resolve() for path in paths}) != len(paths):
+        raise DataError("Archive parts contain a repeated path")
+    return paths
+
+
+class _ConcatenatedReader(io.RawIOBase):
+    """Seekable read-only view of a byte-split ZIP, without copying its parts.
+
+    These are consecutive bytes of one ZIP, not independent ZIP archives or
+    the multi-disk ZIP format. ZipFile validates the resulting central directory.
+    """
+
+    def __init__(self, paths):
+        super().__init__()
+        self._files, self._offsets, self._position = [], [0], 0
+        try:
+            for path in paths:
+                handle = Path(path).open("rb")
+                self._files.append(handle)
+                size = os.fstat(handle.fileno()).st_size
+                if not size:
+                    raise DataError("Archive part is empty: " + str(path))
+                self._offsets.append(self._offsets[-1] + size)
+        except BaseException:
+            self.close()
+            raise
+
+    def readable(self):
+        return not self.closed
+
+    def seekable(self):
+        return not self.closed
+
+    def tell(self):
+        self._checkClosed()
+        return self._position
+
+    def seek(self, offset, whence=os.SEEK_SET):
+        self._checkClosed()
+        offset = operator.index(offset)
+        if whence == os.SEEK_SET:
+            position = offset
+        elif whence == os.SEEK_CUR:
+            position = self._position + offset
+        elif whence == os.SEEK_END:
+            position = self._offsets[-1] + offset
+        else:
+            raise ValueError("Invalid seek mode")
+        if position < 0:
+            raise ValueError("Negative seek position")
+        self._position = position
+        return position
+
+    def read(self, size=-1):
+        self._checkClosed()
+        size = -1 if size is None else operator.index(size)
+        available = max(0, self._offsets[-1] - self._position)
+        remaining = available if size < 0 else min(size, available)
+        chunks = []
+        while remaining:
+            part = bisect_right(self._offsets, self._position) - 1
+            offset = self._position - self._offsets[part]
+            count = min(remaining, self._offsets[part + 1] - self._position)
+            handle = self._files[part]
+            handle.seek(offset)
+            chunk = handle.read(count)
+            if len(chunk) != count:
+                raise OSError("Archive part was truncated while reading")
+            chunks.append(chunk)
+            self._position += count
+            remaining -= count
+        return b"".join(chunks)
+
+    def readinto(self, buffer):
+        payload = self.read(len(buffer))
+        buffer[:len(payload)] = payload
+        return len(payload)
+
+    def close(self):
+        try:
+            for handle in self._files:
+                handle.close()
+        finally:
+            super().close()
+
+
+@contextmanager
+def open_mtad_zip(path_or_parts):
+    """Open one ZIP or explicitly ordered continuous parts, closing all handles."""
+    paths = _archive_paths(path_or_parts)
+    with ExitStack() as resources:
+        source = paths[0] if len(paths) == 1 else resources.enter_context(_ConcatenatedReader(paths))
+        archive = resources.enter_context(zipfile.ZipFile(source))
+        # ZipFile can parse a surviving final part's directory while silently
+        # giving earlier members negative offsets. Reject incomplete part sets
+        # before they appear to be a complete scene inventory.
+        if any(info.header_offset < 0 or info.header_offset + 30 + info.compress_size > archive.start_dir
+               for info in archive.infolist()):
+            raise DataError("ZIP member offsets exceed the supplied bytes; check archive parts and order")
+        yield archive
 
 
 class MTADArchive:
@@ -96,13 +241,15 @@ class MTADArchive:
     """
 
     def __init__(self, path):
-        self.path = Path(path)
-        self._zip = zipfile.ZipFile(self.path)
+        self.paths = _archive_paths(path)
+        self.path = self.paths[0]
+        self._resources = ExitStack()
         self._members = {"labels": {}, "measurements": {}}
         self.label_members = {}
         self.members_read = []
         self._label_cache = {}
         try:
+            self._zip = self._resources.enter_context(open_mtad_zip(self.paths))
             seen = set()
             for info in self._zip.infolist():
                 name = _name(info)
@@ -124,8 +271,9 @@ class MTADArchive:
             labels, measurements = map(set, (self._members["labels"], self._members["measurements"]))
             if not labels or labels != measurements:
                 raise DataError("Label and measurement scene sets must be nonempty and identical")
-        except Exception:
-            self._zip.close()
+            self.dataset_level = zip_dataset_level(self._zip)
+        except BaseException:
+            self.close()
             raise
 
     def __enter__(self):
@@ -135,7 +283,14 @@ class MTADArchive:
         self.close()
 
     def close(self):
-        self._zip.close()
+        self._resources.close()
+
+    @property
+    def metadata(self):
+        parts = [{"name": path.name, "bytes": path.stat().st_size} for path in self.paths]
+        if len(parts) == 1:
+            return parts[0]
+        return {"parts": parts, "bytes": sum(part["bytes"] for part in parts)}
 
     def scene_ids(self):
         return _numeric_sort(self._members["labels"])
@@ -340,7 +495,7 @@ def build_manifest(archive, seed, caps, development_scenes):
                 "component_members": component_members, "component_splits": component_splits,
                 "split_counts": counts, "development_scenes": _numeric_sort(development),
                 "development_forced_components": sorted(forced), "all_scenes": scene_ids,
-                "archive": {"name": archive.path.name, "bytes": archive.path.stat().st_size},
+                "archive": archive.metadata,
                 "label_members": dict(archive.label_members),
                 "split_policy": "whole shared-A components; dev components T_core; remaining hash-sorted cyclic assignment; within-side scene hash caps",
                 "selection_note": "Unselected component members retain their split; no scene moves. Development is never held out, but hash caps may leave a development scene unselected.",
@@ -418,6 +573,10 @@ def _validate_scene_manifest(manifest):
     expected_roles.update({sid: split for split, scenes in manifest["splits"].items() for sid in scenes})
     if manifest["scene_splits"] != expected_roles:
         raise DataError("Scene role map differs from selected and unused scenes")
+    if manifest.get("split_origin") == "fresh_archive":
+        from association.data.scene_manifest import validate_fresh_scene_usage
+        validate_fresh_scene_usage(manifest)
+        return
     history = manifest["historical_usage"]
     if (set(history["component_splits"]) != set(manifest["component_members"])
             or any(role not in SPLIT_NAMES for role in history["component_splits"].values())

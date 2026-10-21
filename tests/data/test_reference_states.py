@@ -48,12 +48,16 @@ class ReferenceStatesTests(unittest.TestCase):
                               ("数据集level2/量测场景/场景-0.csv", b"OBSERVATIONS MUST NOT BE READ"),
                               ("数据集level2/关联表/关联结果-0.csv", b"LABELS MUST NOT BE READ")])
         original_bytes, reads = self.path.read_bytes(), []
+        parts = [self.path.with_name(f"part{i}.zip") for i in range(3)]
+        cuts = (0, 7, len(original_bytes) - 9, len(original_bytes))
+        for index, part in enumerate(parts):
+            part.write_bytes(original_bytes[cuts[index]:cuts[index + 1]])
         original_read = zipfile.ZipFile.read
         def read(archive, member, *args, **kwargs):
             reads.append(member.filename)
             return original_read(archive, member, *args, **kwargs)
         with patch.object(zipfile.ZipFile, "read", read):
-            result = read_reference_states(self.path, manifest(), split="T_core", scene_ids=[0])
+            result = read_reference_states(parts, manifest(), split="T_core", scene_ids=[0])
         self.assertEqual(reads, ["数据集level2/真实场景/场景-0.csv"])
         self.assertEqual(self.path.read_bytes(), original_bytes)
         self.assertEqual([r["time"] for r in result[0]["rows"]], [19., 5.])
@@ -66,7 +70,7 @@ class ReferenceStatesTests(unittest.TestCase):
                  ("V_select", [0]), ("T_core", []), ("T_core", [0, "00"]), ("T_core", "0")]
         for split, scenes in cases:
             with self.subTest(split=split, scenes=scenes), \
-                    patch("association.data.reference_states.zipfile.ZipFile", side_effect=AssertionError("No file opened")):
+                    patch("association.data.reference_states.open_mtad_zip", side_effect=AssertionError("No file opened")):
                 with self.assertRaises(DataError):
                     read_reference_states(self.path, manifest(), split=split, scene_ids=scenes)
 

@@ -261,7 +261,8 @@ def train(archive_path, manifest, protocol_config, config, device, output):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--archive", required=True)
+    parser.add_argument("--archive", type=Path, nargs='+', required=True,
+                        help='one ZIP or all continuous ZIP parts in byte order')
     parser.add_argument("--manifest", required=True)
     parser.add_argument("--protocol-config", default="configs/first-fit-v2.json")
     parser.add_argument("--tsa-config", default="configs/tsactfer-first-fit.json")

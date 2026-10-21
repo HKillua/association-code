@@ -7,11 +7,37 @@ import numpy as np
 
 from association.data.archive import DataError
 from association.data.motion_evidence import (
-    EARTH_RADIUS_M, build_motion_evidence, prepare_motion_scenes)
+    EARTH_RADIUS_M, build_motion_evidence, prepare_motion_scenes, scene_motion_evidence)
 from tests.fixtures.native_zip import make_native_zip_fixture
 
 
 class MotionEvidenceTests(unittest.TestCase):
+    def test_canonical_policy_uses_omitted_measurements_and_keeps_queries(self):
+        times = np.arange(9, dtype=float)
+        values = np.tile([20., 120., 5., 359.], (9, 1))
+        values[1] = [20.01, 120.02, 7., 1.]
+        scene = dict(node_ids=['a'], sources=['9001'], grid=np.array([0., 1., 8.]),
+            native_values=values[[0, 8]][None], native_times=times[[0, 8]][None],
+            native_observed=np.ones((1, 2), bool),
+            tracks=[dict(node_id='a', source='9001', canonical_times=times, canonical_values=values)])
+        selected = scene_motion_evidence(scene)
+        canonical = scene_motion_evidence(scene, motion_observation_policy='canonical_all')
+        self.assertEqual(selected['native_count'].tolist(), [2])
+        self.assertEqual(canonical['native_count'].tolist(), [9])
+        np.testing.assert_array_equal(canonical['query_seconds'], selected['query_seconds'])
+        np.testing.assert_array_equal(canonical['states'][0, 1], values[1])
+        self.assertEqual(canonical['nearest_seconds'][0, 1], 0.)
+        self.assertEqual(selected['nearest_seconds'][0, 1], 1.)
+        self.assertNotEqual(canonical['ols_velocity_mps'][0, 0], selected['ols_velocity_mps'][0, 0])
+        scene.update(motion=canonical, motion_observation_policy='canonical_all')
+        del scene['tracks']
+        self.assertIs(scene_motion_evidence(scene, motion_observation_policy='canonical_all'), canonical)
+        with self.assertRaisesRegex(ValueError, 'motion_observation_policy'):
+            scene_motion_evidence(scene)
+        del scene['motion']
+        with self.assertRaisesRegex(ValueError, 'original canonical tracks'):
+            scene_motion_evidence(scene, motion_observation_policy='canonical_all')
+
     def test_two_point_short_track_units_padding_and_exact_observation(self):
         times = np.array([[11., 12., np.nan], [0., 10., 20.]])
         values = np.array([[[20., 120., 4., 350.], [20.001, 120.002, 6., 10.],

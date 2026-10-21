@@ -90,7 +90,9 @@ def _source_settings(saved, manifest, alignment):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('checkpoint', 'archive', 'manifest', 'alignment', 'output', 'device'):
+    parser.add_argument('--archive', type=Path, nargs='+', required=True,
+                        help='one ZIP or all continuous ZIP parts in byte order')
+    for name in ('checkpoint', 'manifest', 'alignment', 'output', 'device'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--max-seconds', type=float, required=True,
                         help='new total budget including loading, preparation, evaluation and result I/O')
@@ -102,7 +104,7 @@ def main(argv=None):
     run = dict(status='RUNNING', mode='selected_snapshot_evaluation_only',
                device=args.device, budget_seconds=args.max_seconds,
                source_checkpoint=str(Path(args.checkpoint).resolve()),
-               archive=str(Path(args.archive).resolve()), manifest=str(Path(args.manifest).resolve()),
+               archive=[str(path.resolve()) for path in args.archive], manifest=str(Path(args.manifest).resolve()),
                alignment=str(Path(args.alignment).resolve()), stage='loading',
                optimizer_updates=0, normalizer_refit=False, margin_recalibrated=False,
                threshold_reselected=False, test_opened=False,

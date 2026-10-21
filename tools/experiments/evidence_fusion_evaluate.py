@@ -28,7 +28,8 @@ from association.utils.runtime import write_json
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('archive', 'manifest', 'association-scores', 'association-summary',
+    parser.add_argument('--archive', nargs='+', required=True)
+    for name in ('manifest', 'association-scores', 'association-summary',
                  'fusion-predictions', 'fusion-checkpoint', 'output'):
         parser.add_argument('--'+name, required=True)
     parser.add_argument('--device', choices=('cpu', 'cuda:0'), default='cpu')
@@ -60,9 +61,10 @@ def main(argv=None):
         output.mkdir(parents=True, exist_ok=False)
         owns_output = True
         write_json(output/'execution.json', dict(command=sys.argv if argv is None else argv,
-            inputs={key: str(Path(getattr(args, key)).resolve()) for key in (
-                'archive', 'manifest', 'association_scores', 'association_summary',
-                'fusion_predictions', 'fusion_checkpoint')},
+            inputs=dict(archive=[str(Path(part).resolve()) for part in args.archive],
+                **{key: str(Path(getattr(args, key)).resolve()) for key in (
+                    'manifest', 'association_scores', 'association_summary',
+                    'fusion_predictions', 'fusion_checkpoint')}),
             advisory_seconds=args.advisory_seconds, device=args.device, cpu_threads=args.cpu_threads))
         write_json(output/'run.json', state)
         summary = read_json(args.association_summary)
@@ -71,6 +73,9 @@ def main(argv=None):
             raise ValueError('expected completed 045 selected update 1000')
         threshold = summary['selected']['selection']['threshold']
         model, saved_checkpoint = load_checkpoint(args.fusion_checkpoint, device=args.device)
+        if (model.motion_observation_policy != 'selected_cap128'
+                or summary.get('motion_observation_policy', 'selected_cap128') != 'selected_cap128'):
+            raise ValueError('historical 048 replay requires selected_cap128 motion observations')
         if saved_checkpoint['step'] != 1000 or saved_checkpoint['configuration']['training']['updates'] != 1000:
             raise ValueError('expected fixed 046 final update 1000')
         saved = read_saved_predictions(args.fusion_predictions)

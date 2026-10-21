@@ -72,8 +72,16 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         self.assertEqual(run['status'], status)
         return run
 
-    def test_full_zip_selected_snapshot_without_training_reselection_or_test_reads(self):
+    def test_multipart_zip_selected_snapshot_without_training_reselection_or_test_reads(self):
         original_source = {p.name: p.read_bytes() for p in self.source.iterdir()}
+        payload = self.fixture.path.read_bytes()
+        parts = [self.root/f'part{i}.zip' for i in range(3)]
+        cuts = (0, len(payload)//3, len(payload)*2//3, len(payload))
+        for index, part in enumerate(parts):
+            part.write_bytes(payload[cuts[index]:cuts[index+1]])
+        args = self.args()
+        archive_index = args.index('--archive') + 1
+        args[archive_index:archive_index+1] = [str(part) for part in parts]
         with ExitStack() as stack:
             for target in ('association.training.tmtaff.train_complete',
                            'association.training.tmtaff._optimizer',
@@ -86,9 +94,10 @@ class CompleteEvaluateCliTests(unittest.TestCase):
                 stack.enter_context(patch(target, side_effect=AssertionError('Forbidden in evaluation: '+target)))
             restored = stack.enter_context(patch('association.training.tmtaff.load_complete_snapshot',
                                                 wraps=load_complete_snapshot))
-            self.assertEqual(self.invoke(self.args()), 0)
+            self.assertEqual(self.invoke(args), 0)
             restored.assert_called_once_with(str(self.checkpoint), device=torch.device('cpu'), selected=True)
         run = self.assert_status('evaluation', 'COMPLETED')
+        self.assertEqual(run['archive'], [str(part.resolve()) for part in parts])
         self.assertEqual(run['source_cursor']['completed_updates'], 8)
         self.assertEqual(run['validation_scene_ids'], ['2', '4'])
         self.assertEqual(run['validation_target_count'], 4)

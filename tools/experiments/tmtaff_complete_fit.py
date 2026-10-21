@@ -22,7 +22,9 @@ from association.data.dataset import load_timed_dataset
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('archive', 'manifest', 'alignment', 'config', 'output'):
+    parser.add_argument('--archive', type=Path, nargs='+', required=True,
+                        help='one ZIP or all continuous ZIP parts in byte order')
+    for name in ('manifest', 'alignment', 'config', 'output'):
         parser.add_argument('--' + name, required=True)
     parser.add_argument('--device', help='required for fit; no automatic CPU/GPU fallback')
     parser.add_argument('--phase', choices=('full', 'tcm', 'tam', 'tfm'), default='full',

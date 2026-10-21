@@ -4,13 +4,14 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 import numpy as np
 
 from association.data.archive import (DEFAULT_DEVELOPMENT_SCENES,
                               LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES, DataError, MTADArchive,
-                              Scene, Track, build_manifest, resample_scene,
+                              Scene, Track, _ConcatenatedReader, build_manifest, resample_scene,
                               validate_manifest)
 
 
@@ -55,6 +56,97 @@ class DataTests(unittest.TestCase):
             self.assertEqual(scene.tracks[0].ancestor_id, "A")
             self.assertEqual({x["kind"] for x in archive.members_read}, {"labels", "measurements"})
             self.assertEqual(scene.audit["reference_members_read"], 0)
+
+    def test_continuous_zip_parts_match_single_zip_and_do_not_read_references(self):
+        fixture_zip(self.path, {0: basic_scene(), 9: basic_scene("B-0-0")})
+        payload = self.path.read_bytes()
+        # Deliberately split a local header and the final directory record.
+        cuts = (0, 11, len(payload) - 11, len(payload))
+        parts = [self.path.with_name(f"part{i}.zip") for i in range(3)]
+        for index, part in enumerate(parts):
+            part.write_bytes(payload[cuts[index]:cuts[index + 1]])
+        with MTADArchive(self.path) as single, MTADArchive(parts) as multipart:
+            self.assertEqual(multipart.scene_ids(), ["0", "9"])
+            self.assertEqual(multipart.metadata["bytes"], len(payload))
+            self.assertEqual([part["name"] for part in multipart.metadata["parts"]],
+                             [part.name for part in parts])
+            self.assertEqual(multipart.members_read, [])
+            for sid in multipart.scene_ids():
+                expected, actual = single.load_scene(sid), multipart.load_scene(sid)
+                self.assertEqual(expected.audit, actual.audit)
+                np.testing.assert_array_equal(expected.tracks[0].values, actual.tracks[0].values)
+            self.assertFalse(any(row["kind"] == "reference" for row in multipart.members_read))
+        with self.assertRaises(zipfile.BadZipFile):
+            MTADArchive(list(reversed(parts)))
+        for incomplete in (parts[1:], parts[-1]):
+            with self.subTest(incomplete=incomplete), self.assertRaises((DataError, zipfile.BadZipFile)):
+                MTADArchive(incomplete)
+
+    def test_continuous_reader_seek_readinto_and_close_across_parts(self):
+        parts = [self.path.with_name(f"part{i}") for i in range(3)]
+        for path, payload in zip(parts, (b"abc", b"defg", b"hi")):
+            path.write_bytes(payload)
+        stream = _ConcatenatedReader(parts)
+        with stream:
+            self.assertEqual(stream.read(4), b"abcd")
+            self.assertEqual(stream.seek(-2, io.SEEK_CUR), 2)
+            buffer = bytearray(5)
+            self.assertEqual(stream.readinto(buffer), 5)
+            self.assertEqual(buffer, b"cdefg")
+            self.assertEqual(stream.seek(-2, io.SEEK_END), 7)
+            self.assertEqual(stream.read(), b"hi")
+            self.assertEqual(stream.read(), b"")
+            self.assertEqual(stream.seek(20), 20)
+            self.assertEqual(stream.read(1), b"")
+            with self.assertRaises(ValueError):
+                stream.seek(-1)
+        self.assertTrue(all(handle.closed for handle in stream._files))
+        with self.assertRaises(ValueError):
+            stream.read()
+
+    def test_continuous_archive_invalid_parts_close_already_open_files(self):
+        self.path.write_bytes(b"not a zip")
+        missing = self.path.with_name("missing.zip")
+        original_open, opened = Path.open, []
+        def track_open(path, *args, **kwargs):
+            handle = original_open(path, *args, **kwargs)
+            opened.append(handle)
+            return handle
+        with patch.object(Path, "open", track_open):
+            with self.assertRaises(FileNotFoundError):
+                MTADArchive([self.path, missing])
+            self.assertTrue(opened and all(handle.closed for handle in opened))
+            missing.write_bytes(b"also not a zip")
+            with self.assertRaises(zipfile.BadZipFile):
+                MTADArchive([self.path, missing])
+            self.assertTrue(all(handle.closed for handle in opened))
+        for invalid in ([], [self.path, self.path], {self.path}):
+            with self.subTest(invalid=invalid), self.assertRaises(DataError):
+                MTADArchive(invalid)
+        missing.write_bytes(b"")
+        with self.assertRaisesRegex(DataError, "empty"):
+            MTADArchive([self.path, missing])
+        fixture_zip(self.path, {0: basic_scene()})
+        payload = self.path.read_bytes()
+        self.path.write_bytes(payload[:len(payload)//2])
+        missing.write_bytes(payload[len(payload)//2:])
+        # Keep the failed object reachable: cleanup must be explicit, not
+        # deferred to garbage collection of an exception traceback.
+        archive = MTADArchive.__new__(MTADArchive)
+        with patch.object(Path, "open", track_open), \
+                patch("association.data.archive._name", side_effect=KeyboardInterrupt):
+            with self.assertRaises(KeyboardInterrupt):
+                archive.__init__([self.path, missing])
+        self.assertTrue(all(handle.closed for handle in opened))
+        self.assertIsNone(archive._zip.fp)
+        def interrupted_open(path, *args, **kwargs):
+            if path == missing:
+                raise KeyboardInterrupt
+            return track_open(path, *args, **kwargs)
+        with patch.object(Path, "open", interrupted_open):
+            with self.assertRaises(KeyboardInterrupt):
+                MTADArchive([self.path, missing])
+        self.assertTrue(all(handle.closed for handle in opened))
 
     def test_legacy_gbk_member_names_and_gb18030_csv(self):
         class GBKInfo(zipfile.ZipInfo):

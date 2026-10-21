@@ -17,6 +17,7 @@ from association.data.targets import build_scene_fusion_targets
 from association.data.native import iter_native_split_from_archive
 from association.data.reference_states import iter_reference_states
 from association.data.timed import _settings, prepare_timed_scene
+from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
 
 
 def _request(manifest, train_splits, data_config, alignment_by_scene):
@@ -50,7 +51,7 @@ def _request(manifest, train_splits, data_config, alignment_by_scene):
 
 
 def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
-                       alignment_by_scene, check=None):
+                       alignment_by_scene, check=None, motion_observation_policy=None):
     """Return train/validation scene lists and a JSON-compatible preparation report.
 
     Every label-derived A-B identity is a target, including targets whose nodes
@@ -60,6 +61,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
     reference values. Optional check bounds preparation between scene reads.
     """
     started = time.monotonic()
+    if motion_observation_policy is not None:
+        validate_motion_observation_policy(motion_observation_policy)
     splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene)
     input_config = {key: data_config[key] for key in ('length', 'max_observations', 'time_unit_seconds')}
     longitude_policy = data_config.get('reference_longitude_policy', 'linear')
@@ -86,6 +89,12 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                         raise DataError(f'Scene {sid}: empty scene label range must have positive duration')
                     query = np.linspace(start, stop, data_config['length'])
                 prepared = prepare_timed_scene(native, **input_config, query_times=query)
+                if motion_observation_policy is not None:
+                    # Compute offline candidate evidence while this scene's
+                    # dense tracks are in memory, then retain only N-by-Q arrays.
+                    prepared['motion'] = scene_motion_evidence(prepared,
+                        motion_observation_policy=motion_observation_policy)
+                    prepared['motion_observation_policy'] = motion_observation_policy
                 # The capped native arrays are sufficient for training. Keep
                 # canonical point/selection diagnostics, not duplicate raw tracks.
                 prepared.pop('tracks', None)
@@ -152,6 +161,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
             input_audit=scene['timed_input_audit'], quarantine_audit=scene['audit']))
         if scene.get('split_unit') == 'scene':
             scene_reports[-1]['split_unit'] = 'scene'
+        if motion_observation_policy is not None:
+            scene_reports[-1]['motion_native_point_count'] = int(scene['motion']['native_count'].sum())
     report = dict(scope='TMTAFF-time-adapted-v1', training_splits=list(train_splits), selection_split='V_select',
         training_scene_ids=[s['scene_id'] for s in training], validation_scene_ids=[s['scene_id'] for s in validation],
         data_config=dict(data_config), reference_longitude_policy=longitude_policy,
@@ -160,4 +171,6 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
         test_opened=False, resampled_with_legacy_scene64=False, elapsed_seconds=time.monotonic()-started)
     if manifest.get('split_unit') == 'scene':
         report['split_unit'] = 'scene'
+    if motion_observation_policy is not None:
+        report['motion_observation_policy'] = motion_observation_policy
     return dict(train=training, validation=validation, report=report)

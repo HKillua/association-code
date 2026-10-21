@@ -12,7 +12,7 @@ import numpy as np
 
 from association.data.archive import (DEFAULT_DEVELOPMENT_SCENES, DataError, MTADArchive,
                               REGISTRATION_POLICY, SPLIT_NAMES, UNIT_CONTRACT,
-                              build_manifest, resample_scene, validate_manifest)
+                              build_manifest, resample_scene, validate_dataset_level, validate_manifest)
 
 
 def _write_json(path, payload):
@@ -41,6 +41,7 @@ def prepare_scene(archive, scene_id, length, component_id):
 def validate_archive(archive, manifest):
     """Check the manifest and actual archive scene inventory, without hashes."""
     validate_manifest(manifest)
+    validate_dataset_level(archive.dataset_level, manifest)
     if archive.scene_ids() != manifest["all_scenes"]:
         raise DataError("Archive scenes differ from frozen manifest")
 

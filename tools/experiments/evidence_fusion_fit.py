@@ -17,14 +17,16 @@ if __package__ in (None, ''):
 import torch
 
 from association.data.dataset import load_timed_dataset
+from association.data.motion_evidence import validate_motion_observation_policy
 from association.models.cooperative import CooperativeConfig
-from association.training.evidence_fusion import train_evidence_fusion, utility_sign_weight
+from association.training.evidence_fusion import (
+    bind_ols_working_point, grouping_configuration, train_evidence_fusion, utility_sign_weight)
 from association.utils import runtime
 from tools.experiments.cooperative_fit import synthetic_scenes
 
 
 def configuration(value):
-    if (set(value) != {'scope', 'data', 'train_splits', 'model', 'training'}
+    if (set(value) - {'motion_observation_policy', 'grouping'} != {'scope', 'data', 'train_splits', 'model', 'training'}
             or value['scope'] != 'native-evidence-fusion-v1'
             or value['train_splits'] != ['T_core']
             or value['data'] != dict(length=64, max_observations=128, time_unit_seconds=20.,
@@ -32,6 +34,8 @@ def configuration(value):
             or set(value['model']) != {'exact_observation_lock'}
             or not isinstance(value['model']['exact_observation_lock'], bool)):
         raise ValueError('explicit native-evidence-fusion-v1 frozen-data configuration required')
+    validate_motion_observation_policy(value.get('motion_observation_policy', 'selected_cap128'))
+    grouping_configuration(value)
     training = value['training']
     integers = ('seed', 'updates', 'batch_size', 'evaluate_every')
     positive = ('learning_rate', 'gradient_clip', 'advisory_seconds')
@@ -51,10 +55,11 @@ def configuration(value):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--mode', choices=('fit', 'check'), required=True)
-    parser.add_argument('--archive')
+    parser.add_argument('--archive', nargs='+', help='one ZIP or its ordered continuous parts')
     parser.add_argument('--manifest')
     parser.add_argument('--alignment')
     parser.add_argument('--config')
+    parser.add_argument('--ols-working-point', help='current pure-OLS V working point; required for Level1')
     parser.add_argument('--device', choices=('cpu', 'cuda:0'), default='cpu')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--output', required=True)
@@ -82,12 +87,21 @@ def main(argv=None):
             if not all(paths):
                 raise ValueError('fit requires archive, manifest, alignment and config')
             config = configuration(runtime.read_json(args.config))
-            dataset = load_timed_dataset(args.archive, runtime.read_json(args.manifest),
+            manifest = runtime.read_json(args.manifest)
+            if manifest.get('dataset_level') == 'Level1' and not args.ols_working_point:
+                raise ValueError('Level1 fit requires --ols-working-point from the current OLS control')
+            if args.ols_working_point:
+                config = configuration(bind_ols_working_point(
+                    config, manifest, runtime.read_json(args.ols_working_point)))
+            elif config.get('grouping') is not None:
+                config = configuration(bind_ols_working_point(config, manifest, config['grouping']['working_point']))
+            dataset = load_timed_dataset(args.archive, manifest,
                 train_splits=config['train_splits'], data_config=config['data'],
-                alignment_by_scene=runtime.read_json(args.alignment))
+                alignment_by_scene=runtime.read_json(args.alignment),
+                motion_observation_policy=config.get('motion_observation_policy', 'selected_cap128'))
             train, validation, preparation = dataset['train'], dataset['validation'], dataset['report']
         else:
-            if any(paths):
+            if any(paths) or args.ols_working_point:
                 raise ValueError('synthetic check must not accept native paths or real configuration')
             config = configuration(runtime.read_json(Path(__file__).resolve().parents[2]
                                                      /'configs/evidence-fusion.json'))

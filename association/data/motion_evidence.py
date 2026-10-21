@@ -10,12 +10,20 @@ import numpy as np
 
 from association.data.archive import DataError, MTADArchive, validate_manifest
 from association.data.native import _record
+from association.data.legacy_dataset import validate_archive
 from association.data.timed import prepare_timed_scene
 from association.evaluation.native_motion import _short_delta, predict_native_positions
 
 
 DATA = dict(length=64, max_observations=128, time_unit_seconds=20.)
 EARTH_RADIUS_M = 6371000.
+MOTION_OBSERVATION_POLICIES = ('selected_cap128', 'canonical_all')
+
+
+def validate_motion_observation_policy(value='selected_cap128'):
+    if value not in MOTION_OBSERVATION_POLICIES:
+        raise ValueError('motion_observation_policy must be selected_cap128 or canonical_all')
+    return value
 
 
 def complete_native_attributes(native_values, native_times, native_observed, query, positions):
@@ -102,7 +110,47 @@ def build_motion_evidence(native_values, native_times, native_observed, query_se
         exact_observation=control['regions']['exact_observation'])
 
 
-def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_evaluation_metadata=False):
+def scene_motion_evidence(scene, *, motion_observation_policy='selected_cap128'):
+    """Build compact evidence from one scene, before releasing its raw tracks.
+
+    ``canonical_all`` uses every valid original point, one fragment at a time;
+    it never creates an N-by-largest-fragment tensor. The shared query grid and
+    fragment order stay unchanged. This is only the offline evidence path: a
+    cropped completion encoder must continue using its own visible tokens.
+    """
+    policy = validate_motion_observation_policy(motion_observation_policy)
+    if 'motion' in scene:
+        if scene.get('motion_observation_policy', 'selected_cap128') != policy:
+            raise ValueError('cached motion_observation_policy differs from requested inputs')
+        motion = scene['motion']
+        if (motion['states'].shape != (len(scene['node_ids']), len(scene['grid']), 4)
+                or not np.array_equal(motion['query_seconds'], scene['grid'])
+                or not np.array_equal(motion['sources'], scene['sources'])):
+            raise ValueError('cached motion differs from scene population, grid or sources')
+        return motion
+    if policy == 'selected_cap128':
+        return build_motion_evidence(scene['native_values'], scene['native_times'],
+            scene['native_observed'], scene['grid'], scene['sources'])
+    if 'tracks' not in scene or len(scene['tracks']) != len(scene['node_ids']):
+        raise ValueError('canonical_all requires original canonical tracks or prepared canonical motion')
+    rows = []
+    for node, track in enumerate(scene['tracks']):
+        if track['node_id'] != scene['node_ids'][node] or track['source'] != scene['sources'][node]:
+            raise ValueError('canonical tracks must retain the original node/source order')
+        times = np.asarray(track['canonical_times'], np.float64)
+        values = np.asarray(track['canonical_values'], np.float64)
+        rows.append(build_motion_evidence(values[None], times[None],
+            np.ones((1, len(times)), bool), scene['grid'], [track['source']]))
+    if not rows:
+        # Preserve the existing empty-scene shapes and declared Q grid.
+        return build_motion_evidence(scene['native_values'], scene['native_times'],
+            scene['native_observed'], scene['grid'], scene['sources'])
+    return {key: (rows[0][key].copy() if key == 'query_seconds'
+                  else np.concatenate([row[key] for row in rows], axis=0)) for key in rows[0]}
+
+
+def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_evaluation_metadata=False,
+                          motion_observation_policy='selected_cap128'):
     """Prepare one frozen T_core or V_select split, without reading references.
 
     Process one scene at a time; retain only compact motion evidence and original
@@ -113,9 +161,11 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_
         raise DataError('motion evidence permits only explicit T_core or V_select; T_test is sealed')
     if not isinstance(include_evaluation_metadata, bool):
         raise ValueError('include_evaluation_metadata must be boolean')
+    policy = validate_motion_observation_policy(motion_observation_policy)
     validate_manifest(manifest)
     scenes = []
     with MTADArchive(archive_path) as archive:
+        validate_archive(archive, manifest)
         for scene_id in manifest['splits'][split]:
             if check:
                 check()
@@ -132,9 +182,10 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_
                     raise DataError(f'Scene {scene_id}: empty scene requires positive-duration label bounds')
                 query = np.linspace(start, stop, DATA['length'])
             prepared = prepare_timed_scene(native, **DATA, query_times=query)
-            motion = build_motion_evidence(prepared['native_values'], prepared['native_times'],
-                prepared['native_observed'], prepared['grid'], prepared['sources'])
+            motion = scene_motion_evidence(prepared, motion_observation_policy=policy)
             metadata = {}
+            if policy != 'selected_cap128':
+                metadata['motion_observation_policy'] = policy
             if prepared.get('split_unit') == 'scene':
                 metadata['split_unit'] = 'scene'
             if include_evaluation_metadata:

@@ -10,9 +10,9 @@ import csv
 import io
 import math
 import re
-import zipfile
 
-from association.data.archive import DataError, _name, _scene_id, validate_manifest
+from association.data.archive import (DataError, _name, _scene_id, open_mtad_zip,
+                                     validate_dataset_level, validate_manifest, zip_dataset_level)
 
 
 REFERENCE_HEADER = ["MMSI", "time", "lat", "lon", "vel", "cou"]
@@ -92,7 +92,8 @@ def iter_reference_states(archive_path, manifest, *, split, scene_ids):
         raise DataError("scene_ids must be nonempty and contain no duplicate scenes")
     if not set(requested).issubset(set(manifest["splits"][split])):
         raise DataError("Requested reference scenes are outside the declared split")
-    with zipfile.ZipFile(archive_path) as archive:
+    with open_mtad_zip(archive_path) as archive:
+        validate_dataset_level(zip_dataset_level(archive), manifest)
         members, seen = {}, set()
         for info in archive.infolist():
             name = _name(info)

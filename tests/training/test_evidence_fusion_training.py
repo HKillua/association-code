@@ -7,16 +7,106 @@ import unittest
 from unittest.mock import patch
 
 import torch
+import numpy as np
 
+from association.data.motion_evidence import scene_motion_evidence
 from association.models.cooperative import CooperativeConfig
 from association.models.evidence_fusion import evidence_fusion_loss, fusion_inputs
+from association.models.evidence_association import features_from_motion
+from association.evaluation.grouping import group_predicted_tracks
 from association.training.evidence_fusion import (load_checkpoint, prepare_evidence_scenes,
-    train_evidence_fusion, training_objective, validate_training_population)
+    train_evidence_fusion, training_objective, validate_training_population, evaluate_evidence_fusion,
+    bind_ols_working_point)
 from tools.experiments.cooperative_fit import synthetic_scenes
-from tools.experiments.evidence_fusion_fit import configuration
+from tools.experiments.evidence_fusion_fit import configuration, main
 
 
 class EvidenceFusionTrainingTests(unittest.TestCase):
+    def test_current_ols_working_point_preserves_edges_and_rejects_other_protocols(self):
+        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        config = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))
+        manifest = dict(dataset_level='Level1', splits=dict(
+            T_core=[s['scene_id'] for s in train], V_select=[s['scene_id'] for s in validation]))
+        scene = validation[0]
+        motion = scene_motion_evidence(scene)
+        pairs = np.column_stack(np.triu_indices(len(scene['node_ids']), 1))
+        _, scores = features_from_motion(motion, pairs)
+        record = dict(scope='ols-working-point-v1', synthetic=False, dataset_level='Level1',
+            motion_observation_policy='selected_cap128',
+            data={key: config['data'][key] for key in ('length', 'max_observations', 'time_unit_seconds')},
+            training_scene_ids=manifest['splits']['T_core'], validation_scene_ids=manifest['splits']['V_select'],
+            score_semantics='-log1p(rms_haversine_m/1000)', selection_split='V_select', threshold=float(scores[0]))
+        # Include an exact-score tie and the explicit all-reject operating point.
+        for threshold in (float(scores[0]), None):
+            point = dict(record, threshold=threshold)
+            bound = configuration(bind_ols_working_point(config, manifest, point))
+            prepared = prepare_evidence_scenes(validation, grouping=bound['grouping'])
+            expected = group_predicted_tracks(len(scene['node_ids']), pairs, scores,
+                threshold=threshold, grouping_policy='anchor_direct', node_order='input')
+            self.assertEqual(prepared[0]['groups']['predicted_anchor_direct'], expected)
+        for key, value in (('dataset_level', 'Level2'), ('validation_scene_ids', ['another']),
+                           ('motion_observation_policy', 'canonical_all'), ('synthetic', True)):
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'current dataset'):
+                bind_ols_working_point(config, manifest, dict(record, **{key: value}))
+        config = bind_ols_working_point(config, manifest, record)
+        config['training'].update(updates=1, batch_size=1, evaluate_every=1)
+        torch.set_num_threads(1)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'fit'
+            train_evidence_fusion(train, validation, config, output)
+            model, _ = load_checkpoint(output/'final.pt')
+            prepared = prepare_evidence_scenes(validation, grouping=config['grouping'])
+            report = evaluate_evidence_fusion(model, prepared, device='cpu')
+            self.assertEqual(report['grouping'], config['grouping'])
+            prepared[0]['grouping'] = None
+            with self.assertRaisesRegex(ValueError, 'OLS grouping'):
+                evaluate_evidence_fusion(model, prepared, device='cpu')
+
+    def test_level1_cli_requires_new_working_point_before_opening_archive(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root/'manifest.json').write_text(json.dumps(dict(dataset_level='Level1')))
+            with patch('tools.experiments.evidence_fusion_fit.load_timed_dataset') as loader:
+                code = main(['--mode', 'fit', '--archive', 'part1.zip', 'part2.zip',
+                    '--manifest', str(root/'manifest.json'), '--alignment', 'unused.json',
+                    '--config', 'configs/evidence-fusion.json', '--output', str(root/'fit')])
+                self.assertEqual(code, 1)
+                loader.assert_not_called()
+                report = json.loads((root/'fit/run.json').read_text())
+                self.assertIn('--ols-working-point', report['error'])
+                self.assertEqual(report['optimizer_updates'], 0)
+
+    def test_canonical_motion_fit_reload_and_wrong_policy_rejection(self):
+        torch.set_num_threads(1)
+        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        for scene in train + validation:
+            scene['tracks'] = [dict(node_id=node_id, source=scene['sources'][node],
+                canonical_values=scene['native_values'][node, scene['native_observed'][node]],
+                canonical_times=scene['native_times'][node, scene['native_observed'][node]])
+                for node, node_id in enumerate(scene['node_ids'])]
+            scene['motion'] = scene_motion_evidence(scene, motion_observation_policy='canonical_all')
+            scene['motion_observation_policy'] = 'canonical_all'
+            del scene['tracks']
+        config = json.loads(Path('configs/evidence-fusion.json').read_text())
+        config['motion_observation_policy'] = 'canonical_all'
+        config['training'].update(updates=1, batch_size=1, evaluate_every=1)
+        configuration(config)
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'canonical'
+            report = train_evidence_fusion(train, validation, config, output)
+            self.assertEqual(report['motion_observation_policy'], 'canonical_all')
+            model, saved = load_checkpoint(output/'final.pt')
+            prepared = prepare_evidence_scenes(validation, motion_observation_policy='canonical_all')
+            evaluation = evaluate_evidence_fusion(model, prepared, device='cpu')
+            self.assertEqual(evaluation['fragment_count'], 4)
+            prepared[0]['motion_observation_policy'] = 'selected_cap128'
+            with self.assertRaisesRegex(ValueError, 'motion_observation_policy'):
+                evaluate_evidence_fusion(model, prepared, device='cpu')
+            saved['configuration'].pop('motion_observation_policy')
+            torch.save(saved, output/'wrong-policy.pt')
+            with self.assertRaisesRegex(ValueError, 'motion_observation_policy'):
+                load_checkpoint(output/'wrong-policy.pt')
+
     def test_three_modes_update_checkpoint_and_full_population(self):
         torch.set_num_threads(1)
         train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))

@@ -9,7 +9,7 @@ import time
 import numpy as np
 import torch
 
-from association.data.motion_evidence import build_motion_evidence
+from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
 from association.evaluation.fusion_controls import ordinary_fusion, metrics, rms_haversine_scores
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
 from association.models.evidence_fusion import EvidenceFusion, evidence_fusion_loss, fusion_inputs
@@ -19,6 +19,51 @@ FIXED_DISTANCE_THRESHOLD_M = 14214.358367922307
 GROUPINGS = ('oracle_identity', 'predicted_anchor_direct')
 TRAIN_MODES = ('clean', 'clean_plus_wrong', 'wrong_only')
 ARMS = ('anchor', 'nearest_observation', 'mean_supported', 'learned')
+
+
+def grouping_configuration(config):
+    """Legacy replay keeps its old distance; new runs carry a current OLS score."""
+    value = config.get('grouping')
+    if value is None:
+        return None
+    if (not isinstance(value, dict) or set(value) != {'ols_score_threshold', 'working_point'}
+            or not isinstance(value['working_point'], dict)):
+        raise ValueError('grouping requires an explicit OLS threshold and its working point')
+    threshold = value['ols_score_threshold']
+    if threshold is not None and (isinstance(threshold, bool) or not isinstance(threshold, (float, int))
+            or not math.isfinite(threshold) or threshold > 0):
+        raise ValueError('OLS score threshold must be finite <=0 or None (all reject)')
+    if threshold != value['working_point'].get('threshold'):
+        raise ValueError('grouping threshold differs from its working point')
+    if threshold is not None and -threshold > math.log(np.finfo(np.float64).max/1000.):
+        raise ValueError('OLS threshold cannot be represented as a finite distance')
+    return value
+
+
+def bind_ols_working_point(config, manifest, record):
+    """Bind a pure-OLS V working point from exactly this data protocol.
+
+    Source coordinates and identities are not used. A matching filename or
+    scene count alone is insufficient; exact split lists and input policy agree.
+    """
+    expected = dict(scope='ols-working-point-v1', synthetic=False,
+        dataset_level=manifest.get('dataset_level'),
+        motion_observation_policy=config.get('motion_observation_policy', 'selected_cap128'),
+        data={key: config['data'][key] for key in ('length', 'max_observations', 'time_unit_seconds')},
+        training_scene_ids=manifest['splits']['T_core'], validation_scene_ids=manifest['splits']['V_select'],
+        score_semantics='-log1p(rms_haversine_m/1000)', selection_split='V_select')
+    if not isinstance(record, dict) or any(record.get(key) != value for key, value in expected.items()):
+        raise ValueError('OLS working point must match current dataset, train/V lists and observation policy')
+    bound = dict(config, grouping=dict(ols_score_threshold=record['threshold'], working_point=dict(record)))
+    grouping_configuration(bound)
+    return bound
+
+
+def _distance_threshold(grouping):
+    if grouping is None:
+        return FIXED_DISTANCE_THRESHOLD_M
+    value = grouping['ols_score_threshold']
+    return None if value is None else float(1000*np.expm1(-value))
 
 
 def utility_sign_weight(config):
@@ -91,16 +136,17 @@ def validate_training_population(train, validation):
     return split_unit
 
 
-def prepare_evidence_scenes(scenes, check=None):
+def prepare_evidence_scenes(scenes, check=None, *, motion_observation_policy='selected_cap128', grouping=None):
     """Separate target-free motion construction from labels and training targets."""
+    policy = validate_motion_observation_policy(motion_observation_policy)
+    grouping_configuration({'grouping': grouping})
     result = []
     for scene in scenes:
         if check:
             check()
         if scene['split'] not in ('T_core', 'V_select'):
             raise ValueError('only T_core and V_select are permitted; T_test remains sealed')
-        motion = build_motion_evidence(scene['native_values'], scene['native_times'],
-            scene['native_observed'], scene['grid'], scene['sources'])
+        motion = scene_motion_evidence(scene, motion_observation_policy=policy)
         n = len(motion['states'])
         pairs = np.column_stack(np.triu_indices(n, 1))
         scores = np.empty(len(pairs), np.float64)
@@ -113,7 +159,9 @@ def prepare_evidence_scenes(scenes, check=None):
         distances = np.full((n, n), np.inf)
         distances[pairs[:, 0], pairs[:, 1]] = -scores
         distances[pairs[:, 1], pairs[:, 0]] = -scores
-        predicted = group_predicted_tracks(n, pairs, scores, threshold=-FIXED_DISTANCE_THRESHOLD_M,
+        group_scores = scores if grouping is None else -np.log1p(-scores/1000.)
+        threshold = -FIXED_DISTANCE_THRESHOLD_M if grouping is None else grouping['ols_score_threshold']
+        predicted = group_predicted_tracks(n, pairs, group_scores, threshold=threshold,
             grouping_policy='anchor_direct', node_order='input')
         identities = np.asarray(scene['identities'], str)
         targets, masks = [], []
@@ -126,8 +174,10 @@ def prepare_evidence_scenes(scenes, check=None):
             split=scene['split'], split_unit=scene.get('split_unit', 'shared_a_component'),
             node_ids=np.asarray(scene['node_ids'], str), identities=identities,
             sources=np.asarray(scene['sources'], str), motion=motion, distances=distances,
+            motion_observation_policy=policy,
             target=np.asarray(targets, np.float64).reshape(n, q, 4),
             valid=np.asarray(masks, bool).reshape(n, q, 4),
+            grouping=grouping,
             groups=dict(oracle_identity=group_tracks_by_identity(identities, node_order='input'),
                         predicted_anchor_direct=predicted)))
     return result
@@ -168,6 +218,11 @@ def evaluate_evidence_fusion(model, scenes, *, device, prediction_dir=None, chec
                 check()
             if scene['split'] != 'V_select':
                 raise ValueError('monitoring requires V_select scenes')
+            if scene.get('motion_observation_policy', 'selected_cap128') != getattr(
+                    model, 'motion_observation_policy', 'selected_cap128'):
+                raise ValueError('fusion model and scene motion_observation_policy differ')
+            if scene.get('grouping') != getattr(model, 'ols_grouping', None):
+                raise ValueError('fusion model and scene OLS grouping differ')
             motion, target, valid = scene['motion'], scene['target'], scene['valid']
             n, q = target.shape[:2]
             regions = _scene_regions(scene)
@@ -258,11 +313,14 @@ def evaluate_evidence_fusion(model, scenes, *, device, prediction_dir=None, chec
         return dict(scene_ids=[scene['scene_id'] for scene in scenes], scene_count=len(scenes),
             component_count=len({scene['component_id'] for scene in scenes}), fragment_count=len(target),
             query_count=len(target)*target.shape[1], target_valid_by_attribute=valid.sum((0, 1)).tolist(),
-            fixed_distance_threshold_m=FIXED_DISTANCE_THRESHOLD_M, grouping_policy='anchor_direct/input',
+            fixed_distance_threshold_m=_distance_threshold(scenes[0].get('grouping')),
+            grouping=scenes[0].get('grouping'),
+            motion_observation_policy=getattr(model, 'motion_observation_policy', 'selected_cap128'),
+            grouping_policy='anchor_direct/input',
             coverage='every original fragment anchor; not unique identity output',
             overall=overall, routing=routing, per_scene=per_scene, per_anchor=per_anchor,
             limitations=['V is repeatedly exposed development data; no independent confirmation',
-                'oracle identity grouping is diagnostic only', '9001/reference reuse limits denoising claims',
+                'oracle identity grouping is diagnostic only', 'measurement/reference reuse must be audited per dataset level',
                 'point-pooled fragment weighting repeats identities with multiple fragments'],
             test_opened=False)
     finally:
@@ -271,6 +329,7 @@ def evaluate_evidence_fusion(model, scenes, *, device, prediction_dir=None, chec
 
 def save_checkpoint(path, model, optimizer, step, config, rng):
     torch.save(dict(scope='native-evidence-fusion-v1', configuration=config, step=step,
+                    motion_observation_policy=config.get('motion_observation_policy', 'selected_cap128'),
                     loss_semantics=loss_semantics(config),
                     model=model.state_dict(), optimizer=optimizer.state_dict(),
                     numpy_rng=rng.bit_generator.state, torch_rng=torch.get_rng_state(),
@@ -281,12 +340,19 @@ def load_checkpoint(path, *, device='cpu'):
     state = torch.load(path, map_location='cpu', weights_only=False)
     if state['scope'] != 'native-evidence-fusion-v1':
         raise ValueError('expected an evidence-fusion checkpoint')
+    policy = validate_motion_observation_policy(state['configuration'].get(
+        'motion_observation_policy', 'selected_cap128'))
+    if state.get('motion_observation_policy', 'selected_cap128') != policy:
+        raise ValueError('checkpoint motion_observation_policy disagrees with configuration')
     expected = loss_semantics(state['configuration'])
+    grouping_configuration(state['configuration'])
     recorded = state.get('loss_semantics')
     if ((recorded is None and expected['utility_sign_weight'] != 0.)
             or (recorded is not None and recorded != expected)):
         raise ValueError('checkpoint loss_semantics disagree with configuration')
     model = EvidenceFusion(**state['configuration']['model']).to(device)
+    model.motion_observation_policy = policy
+    model.ols_grouping = grouping_configuration(state['configuration'])
     model.load_state_dict(state['model'], strict=True)
     return model, state
 
@@ -297,18 +363,23 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     training = config['training']
+    policy = validate_motion_observation_policy(config.get('motion_observation_policy', 'selected_cap128'))
     sign_weight = utility_sign_weight(config)
+    grouping = grouping_configuration(config)
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
     model = EvidenceFusion(**config['model']).to(device)
+    model.motion_observation_policy = policy
+    model.ols_grouping = grouping
     optimizer = torch.optim.Adam(model.parameters(), lr=training['learning_rate'])
     state = dict(status='RUNNING', optimizer_updates=0, test_opened=False, device=str(device),
         configuration=config, loss_semantics=loss_semantics(config),
+        motion_observation_policy=policy,
         training_scene_ids=[scene['scene_id'] for scene in train],
         validation_scene_ids=[scene['scene_id'] for scene in validation],
         selection_policy='fixed final step; intermediate full V is monitoring only',
         sampling='uniform scene then uniform anchor, independently for each batch member; repeats possible',
-        modes=list(TRAIN_MODES), fixed_distance_threshold_m=FIXED_DISTANCE_THRESHOLD_M,
+        modes=list(TRAIN_MODES), fixed_distance_threshold_m=_distance_threshold(grouping), grouping=grouping,
         training_samples={mode: dict(anchors=0, with_helper=0, with_wrong_helper=0,
                                     no_wrong_fallback=0) for mode in TRAIN_MODES},
         physical_dtype='float64 native motion and geometry; float32 MLP', advisory_reached=False)
@@ -317,8 +388,8 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
         state['split_unit'] = validate_training_population(train, validation)
         write_json(output/'run.json', state)
         save_checkpoint(output/'step-0.pt', model, optimizer, 0, config, rng)
-        train = prepare_evidence_scenes(train, check=check)
-        validation = prepare_evidence_scenes(validation, check=check)
+        train = prepare_evidence_scenes(train, check=check, motion_observation_policy=policy, grouping=grouping)
+        validation = prepare_evidence_scenes(validation, check=check, motion_observation_policy=policy, grouping=grouping)
         validate_training_population(train, validation)
         if any(not len(scene['identities']) for scene in train):
             raise ValueError('uniform-scene training has an empty scene; do not silently filter population')

@@ -254,6 +254,9 @@ def evaluate_combo(model, scenes, saved_by_scene, scores_by_scene, threshold, *,
         for scene in scenes:
             if check:
                 check()
+            if scene.get('motion_observation_policy', 'selected_cap128') != getattr(
+                    model, 'motion_observation_policy', 'selected_cap128'):
+                raise ValueError('fusion model and scene motion_observation_policy differ')
             sid = scene['scene_id']
             saved, scores = saved_by_scene[sid], scores_by_scene[sid]
             motion = aligned_motion(scene, saved, scores)

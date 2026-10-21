@@ -11,7 +11,7 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from association.data.motion_evidence import DATA, prepare_motion_scenes
+from association.data.motion_evidence import DATA, prepare_motion_scenes, validate_motion_observation_policy
 from association.evaluation.association import evaluate_scenes, select_threshold
 from association.evaluation.grouping import group_predicted_tracks
 from association.evaluation.physical import group_membership_diagnostics
@@ -31,6 +31,7 @@ def validate_config(config):
     if (config.get('scope') != SCOPE or config.get('variant') not in VARIANTS
             or config.get('data') != DATA):
         raise ValueError('explicit native OLS evidence scope, variant and frozen data settings required')
+    validate_motion_observation_policy(config.get('motion_observation_policy', 'selected_cap128'))
     if isinstance(config.get('seed'), bool) or not isinstance(config.get('seed'), int) or config['seed'] < 0:
         raise ValueError('seed must be a nonnegative integer')
     training = config['training']
@@ -109,6 +110,8 @@ def prepare_features(scenes, split, check=lambda: None, pair_chunk_size=4096):
             joint_support_queries=joint))
         if 'split_unit' in scene:
             result[-1]['split_unit'] = scene['split_unit']
+        if 'motion_observation_policy' in scene:
+            result[-1]['motion_observation_policy'] = validate_motion_observation_policy(scene['motion_observation_policy'])
     return result
 
 
@@ -212,6 +215,9 @@ def score_scenes(model, scenes, normalizer, device, batch_size, check=lambda: No
     model.eval()
     records = []
     for scene in scenes:
+        if scene.get('motion_observation_policy', 'selected_cap128') != getattr(
+                model, 'motion_observation_policy', 'selected_cap128'):
+            raise ValueError('association model and scene motion_observation_policy differ')
         chunks = []
         for start in range(0, len(scene['pairs']), batch_size):
             check()
@@ -238,6 +244,7 @@ def _save_scores(path, records):
 
 def _save_checkpoint(path, model, optimizer, config, normalizer, update, selection):
     snapshot = dict(scope=SCOPE, feature_names=list(FEATURE_NAMES), config=deepcopy(config),
+        motion_observation_policy=config.get('motion_observation_policy', 'selected_cap128'),
         normalizer=deepcopy(normalizer), update=update, selection=deepcopy(selection),
         state_dict={key: value.detach().cpu().clone() for key, value in model.state_dict().items()},
         optimizer_state=deepcopy(optimizer.state_dict()), precision=PRECISION,
@@ -252,8 +259,12 @@ def load_checkpoint(path, device):
     if saved.get('scope') != SCOPE or saved.get('feature_names') != list(FEATURE_NAMES):
         raise ValueError('checkpoint scope or feature order mismatch')
     validate_config(saved['config'])
+    policy = saved['config'].get('motion_observation_policy', 'selected_cap128')
+    if saved.get('motion_observation_policy', 'selected_cap128') != policy:
+        raise ValueError('checkpoint motion_observation_policy disagrees with configuration')
     normalized_features(np.zeros((0, len(FEATURE_NAMES))), saved['normalizer'])
     model = EvidenceAssociation(saved['config']['variant']).to(device)
+    model.motion_observation_policy = policy
     model.load_state_dict(saved['state_dict'], strict=True)
     expected = np.ones(len(FEATURE_NAMES), np.float32)
     if model.variant == 'geometry_only':
@@ -269,6 +280,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                              command=None):
     """One fit; exactly fixed updates, step-zero selection, advisory time only."""
     settings = validate_config(config)
+    policy = config.get('motion_observation_policy', 'selected_cap128')
     device = runtime.device_from_string(str(device))
     run = runtime.Run(output_dir, dict(kind=SCOPE, config=config, command=command,
         provenance=runtime.provenance(device), precision=PRECISION, synthetic=synthetic,
@@ -294,8 +306,13 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         else:
             if archive_path is None or manifest is None or train_scenes is not None or validation_scenes is not None:
                 raise ValueError('native fit must prepare T_core/V_select from explicit archive/manifest')
-            train_scenes = prepare_motion_scenes(archive_path, manifest, 'T_core', check)
-            validation_scenes = prepare_motion_scenes(archive_path, manifest, 'V_select', check)
+            train_scenes = prepare_motion_scenes(archive_path, manifest, 'T_core', check,
+                motion_observation_policy=policy)
+            validation_scenes = prepare_motion_scenes(archive_path, manifest, 'V_select', check,
+                motion_observation_policy=policy)
+        if any(scene.get('motion_observation_policy', 'selected_cap128') != policy
+               for scene in [*train_scenes, *validation_scenes]):
+            raise ValueError('training configuration and prepared motion_observation_policy differ')
         split_unit = _validate_partitions(train_scenes, validation_scenes)
         raw_preparation_seconds = time.monotonic()-started
         train = prepare_features(train_scenes, 'T_core', check)
@@ -306,7 +323,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         preparation_seconds = time.monotonic()-started
         audit = dict(split_unit=split_unit, training_scene_ids=[scene['scene_id'] for scene in train],
             validation_scene_ids=[scene['scene_id'] for scene in validation],
-            normalizer=normalizer, sampler=sampler.describe(), data=DATA,
+            normalizer=normalizer, sampler=sampler.describe(), data=DATA, motion_observation_policy=policy,
             inference_uses_identity=False, reference_read=False, test_opened=False,
             candidate_policy='all original unordered i<j pairs, no source/support filtering',
             training_labels='identity equality only for sampling and BCE; never a feature',
@@ -327,6 +344,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
             preparation_peak_rss_bytes=int(rss if sys.platform == 'darwin' else rss*1024))
         runtime.write_json(run.path/'data_audit.json', audit)
         model = EvidenceAssociation(config['variant']).to(device)
+        model.motion_observation_policy = policy
         optimizer = torch.optim.Adam(model.parameters(), lr=settings['learning_rate'])
         best = None
         history = []
@@ -371,8 +389,17 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                         raise AssertionError('zero residual did not preserve exact OLS scores')
                     _save_scores(run.path/'baseline-scores.npz', final_records)
                     runtime.write_json(run.path/'baseline.json', dict(selection=selection,
+                        motion_observation_policy=policy,
                         selected_threshold=summarize_records(final_records, selection['threshold']),
                         fixed_ols_threshold=summarize_records(final_records, FIXED_OLS_SCORE)))
+                    runtime.write_json(run.path/'ols-working-point.json', dict(
+                        scope='ols-working-point-v1', dataset_level=(manifest or {}).get('dataset_level'),
+                        synthetic=synthetic, motion_observation_policy=policy, data=dict(DATA),
+                        training_scene_ids=[s['scene_id'] for s in train],
+                        validation_scene_ids=[s['scene_id'] for s in validation],
+                        score_semantics='-log1p(rms_haversine_m/1000)',
+                        threshold=selection['threshold'], selection_split='V_select',
+                        selection_rule='pure OLS full V scene macro-F1, before any network update'))
                 row['validation_seconds'] = time.monotonic()-validation_started
                 validation_seconds += row['validation_seconds']
             history.append(row)
@@ -389,6 +416,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         selected_records = score_scenes(selected_model, validation, normalizer, device,
                                        settings['inference_batch_size'], check)
         report = dict(status='COMPLETED', scope=SCOPE, variant=config['variant'], split_unit=split_unit,
+            motion_observation_policy=policy,
             synthetic=synthetic, data=DATA, precision=PRECISION,
             score_semantics='association score, not a calibrated probability',
             feature_names=list(FEATURE_NAMES), optimizer_updates=actual_update,
