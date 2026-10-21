@@ -1,7 +1,7 @@
 ---
 handover_id: L2S-YYYYMMDD-NNN 或 S2L-YYYYMMDD-NNN
 direction: LOCAL_TO_SERVER 或 SERVER_TO_LOCAL
-status: READY 或 RUNNING 或 COMPLETED 或 FAILED 或 BLOCKED
+status: READY 或 RUNNING 或 COMPLETED 或 FAILED 或 STOP_REQUESTED 或 CANCELLED
 updated_by: LOCAL_AI 或 SERVER_AI
 updated_at: 实际时间及偏移
 task_id: 本轮任务
@@ -11,8 +11,8 @@ next_actor: SERVER_AI 或 LOCAL_AI
 # 本轮任务或回执
 
 - 目标与前置：对应方案、配置、现有输入和依赖任务。
-- 资源：累计上限（含准备、失败和清理）、单卡/CPU线程、并发和尝试次数。没有授权不重试。
-- 命令与输出：完整实际命令、唯一新输出目录、托管服务和退出码读取方式。
+- 资源：固定更新/尝试次数及建议时长、单卡/CPU线程、并发和尝试次数。没有授权不重试。
+- 命令与输出：完整实际命令、唯一新输出目录、托管服务和退出码读取方式；不记录文件/代码摘要门槛。
 - 状态与结果：领取/结束时间、实际设备、退出码、完成更新、人口/指标、小型证据及大产物服务器路径。未完成如实记录。
 - 下一步：事实、问题与建议，不代替研究结论或扩大预算。
 
