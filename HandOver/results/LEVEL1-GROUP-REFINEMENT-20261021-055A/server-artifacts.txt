@@ -1,0 +1,18 @@
+# 055A 大产物留服务器（未上传），登记绝对路径与实际文件数
+
+运行目录：/home/wangguangjie/djs/association-code/runs/LEVEL1-GROUP-REFINEMENT-20261021-055A-attempt-1
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-GROUP-REFINEMENT-20261021-055A-attempt-1/run.json  709 字节  2026-10-21 23:39:28.097186005 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-GROUP-REFINEMENT-20261021-055A-attempt-1/summary.json  3392494 字节  2026-10-21 23:39:28.093185996 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-GROUP-REFINEMENT-20261021-055A-attempt-1/scene-summary.json.gz  365746 字节  2026-10-21 23:39:27.897185521 +0800
+
+  scenes/       300 个 scene-*.json.gz（逐场分组/共属/分层原因表）
+  predictions/  300 个 states-*.npz（五臂数组）
+  另存重建边与分数：states-1010.npz states-1043.npz 等同目录 NPZ
+  整目录合计 359M
+
+只读源（未改动）：
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-GROUP-REFINEMENT-20261021-055A-attempt-1
+  /home/wangguangjie/djs/association-code/runs
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1
+
+launcher：/home/wangguangjie/djs/association-code/runs/LEVEL1-GROUP-REFINEMENT-20261021-055A-attempt-1-launch（status COMPLETED、exit_code 0、stderr 空）

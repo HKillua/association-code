@@ -1,0 +1,21 @@
+{
+  "status": "COMPLETED",
+  "scope": "055A-cached-group-refinement",
+  "dataset_level": "Level1",
+  "split": "V_select",
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SYSTEM-20261021-053A-attempt-1/system",
+  "source_attribution": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1",
+  "optimizer_updates": 0,
+  "gpu_used": false,
+  "archive_members_read": 0,
+  "reference_members_read": 0,
+  "cached_reference_used": true,
+  "ols_refitted": false,
+  "threshold_reselected": false,
+  "test_opened": false,
+  "completed_scenes": 300,
+  "total_scenes": 300,
+  "cpu_threads": 4,
+  "last_scene_id": "4968",
+  "elapsed_seconds": 433.6926647000946
+}
