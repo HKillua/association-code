@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/bin/bash",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059A-command.sh",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run059A",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059A-attempt-1",
+    "/home/wangguangjie/djs/association-code"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run059A",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-efbe9d07-0d29-edb6-825b-780e7cc40bca",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-21T18:36:13.881836+00:00",
+  "started_monotonic": 2538184.975377682,
+  "max_seconds": 7200.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}
