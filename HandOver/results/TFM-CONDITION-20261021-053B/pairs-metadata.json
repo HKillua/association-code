@@ -1,0 +1,218 @@
+{
+  "provenance": "exported_from_original_frozen_TCM",
+  "split": "V_select",
+  "scene_ids": [
+    "1671",
+    "2056",
+    "290",
+    "113"
+  ],
+  "pairs": [
+    {
+      "scene_id": "1671",
+      "candidate_index": 0,
+      "node_indices": [
+        0,
+        1
+      ],
+      "node_ids": [
+        "1671:9001:0",
+        "1671:9001:1"
+      ],
+      "sources": [
+        "9001",
+        "9001"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7148.0
+    },
+    {
+      "scene_id": "1671",
+      "candidate_index": 152,
+      "node_indices": [
+        16,
+        17
+      ],
+      "node_ids": [
+        "1671:9002:8",
+        "1671:9002:9"
+      ],
+      "sources": [
+        "9002",
+        "9002"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7148.0
+    },
+    {
+      "scene_id": "2056",
+      "candidate_index": 0,
+      "node_indices": [
+        0,
+        1
+      ],
+      "node_ids": [
+        "2056:9001:1",
+        "2056:9001:10"
+      ],
+      "sources": [
+        "9001",
+        "9001"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7089.0
+    },
+    {
+      "scene_id": "2056",
+      "candidate_index": 377,
+      "node_indices": [
+        26,
+        27
+      ],
+      "node_ids": [
+        "2056:9002:8",
+        "2056:9002:9"
+      ],
+      "sources": [
+        "9002",
+        "9002"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7089.0
+    },
+    {
+      "scene_id": "290",
+      "candidate_index": 0,
+      "node_indices": [
+        0,
+        1
+      ],
+      "node_ids": [
+        "290:9001:0",
+        "290:9001:1"
+      ],
+      "sources": [
+        "9001",
+        "9001"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7176.0
+    },
+    {
+      "scene_id": "290",
+      "candidate_index": 275,
+      "node_indices": [
+        22,
+        23
+      ],
+      "node_ids": [
+        "290:9002:6",
+        "290:9002:7"
+      ],
+      "sources": [
+        "9002",
+        "9002"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7176.0
+    },
+    {
+      "scene_id": "113",
+      "candidate_index": 0,
+      "node_indices": [
+        0,
+        1
+      ],
+      "node_ids": [
+        "113:9001:0",
+        "113:9001:1"
+      ],
+      "sources": [
+        "9001",
+        "9001"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7183.0
+    },
+    {
+      "scene_id": "113",
+      "candidate_index": 119,
+      "node_indices": [
+        14,
+        15
+      ],
+      "node_ids": [
+        "113:9002:7",
+        "113:9002:8"
+      ],
+      "sources": [
+        "9002",
+        "9002"
+      ],
+      "query_start_seconds": 0.0,
+      "query_stop_seconds": 7183.0
+    }
+  ],
+  "selection": "evenly spaced candidate indices, one/two per fixed scene; no label or error selection",
+  "data": {
+    "length": 64,
+    "max_observations": 128,
+    "time_unit_seconds": 20.0
+  },
+  "export_snapshot_cursor": {
+    "stage": 2,
+    "update": 0,
+    "completed_updates": 0
+  },
+  "checkpoint": "/home/wangguangjie/djs/association-code/runs/BASELINE-TFM-FROM033-20261021-049-attempt-1/snapshots/update-000000.pt",
+  "manifest": "/home/wangguangjie/djs/association-code/runs/PREP-NATIVE-20261017-007-attempt-1/manifest.json",
+  "archive": [
+    "/home/wangguangjie/djs/data/mtad/数据集level2.zip"
+  ],
+  "members_read": [
+    {
+      "kind": "labels",
+      "scene_id": "1671",
+      "member": "数据集level2/关联表/关联结果-1671.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "1671",
+      "member": "数据集level2/量测场景/场景-1671.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "2056",
+      "member": "数据集level2/关联表/关联结果-2056.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "2056",
+      "member": "数据集level2/量测场景/场景-2056.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "290",
+      "member": "数据集level2/关联表/关联结果-290.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "290",
+      "member": "数据集level2/量测场景/场景-290.csv"
+    },
+    {
+      "kind": "labels",
+      "scene_id": "113",
+      "member": "数据集level2/关联表/关联结果-113.csv"
+    },
+    {
+      "kind": "measurements",
+      "scene_id": "113",
+      "member": "数据集level2/量测场景/场景-113.csv"
+    }
+  ],
+  "reference_read": false,
+  "test_opened": false,
+  "optimizer_updates": 0,
+  "normalizer_refit": false
+}
