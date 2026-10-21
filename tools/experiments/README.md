@@ -81,4 +81,4 @@ python tools/experiments/prepare_scene_data.py --archive /数据路径/数据集
   --alignment-output /新目录/alignment.json --summary-output /新目录/population.json
 ```
 
-本次新增的选项均不改变旧缺省：`training.tcm_sampling=ordered_fragment`按原场景/片段顺序且保留尾批；`model.contrastive_negative_scale=inverse_margin`只将CL负项除以固定margin；`training.utility_sign_weight=0.1`在融合原损失上加效用符号BCE。前者的正式TCM配置为`tmtaff-scene3000-tcm-ordered-proposed.json`；后两者分别见TAM与证据融合规格。它们不是已验证效果或新的READY，不能一次开启所有选项再将差异归给某个机制。
+本次新增的选项均不改变旧缺省：`training.tcm_sampling=ordered_fragment`按原场景/片段顺序且保留尾批；`model.contrastive_negative_scale=inverse_margin`只将CL负项除以固定margin；`training.utility_sign_weight=0.1`在融合原损失上加效用符号BCE。前者的正式TCM配置为`tmtaff-scene3000-tcm-ordered-proposed.json`；后两者分别见TAM与证据融合规格。050有序TCM与051融合符号监督已分别批准，按当前交接独立领取；CL目标尺度诊断仍未批准。它们尚非已验证效果，不能一次开启所有选项再将差异归给某个机制。

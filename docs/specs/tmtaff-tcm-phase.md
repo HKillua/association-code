@@ -45,4 +45,4 @@ checkpoint 的 `selected` 为 null，只能用 `load_complete_snapshot(selected=
 
 [正式场景起点提案](../../configs/tmtaff-scene3000-tcm-ordered-proposed.json)基于033，模型/Adam/lr/表示不变，仅改TCM为3356更新、`ordered_fragment`、`time_policy="advisory"`和8小时提醒。配套[正式名单](../../configs/data/mtad_scene3000_seed20.json)与[时钟装配](../../configs/data/mtad_scene3000_seed20_alignment.json)：2100训练场共214739条有效片段均至少两点，batch64遍历一轮为3355个满批加19条尾批，共3356步。新run从当前seed独立初始化，并从新训练人口拟合normalizer，不移交033；TAM/TFM/JOINT更新均为0，300场V仅执行原TCM最终feature评价，600测试场继续封存。
 
-这同时改变数据人口、采样呈现和实际更新数，是新正式协议起点，不是相对033的单因素诊断，也不是论文80epoch复现或已收敛声明。3356更新仅为待批准预算；8小时是提醒，不自动停止、加步或重试。没有新增READY，没有运行真实训练；该配置不与可选CL目标尺度诊断混用。
+这同时改变数据人口、采样呈现和实际更新数，是新正式协议起点，不是相对033的单因素诊断，也不是论文80epoch复现或已收敛声明。用户已批准050的3356更新一次；8小时是提醒，不自动停止、加步或重试。当前已列READY、尚无真实训练启动回执，执行以[050交接](../../HandOver/L2S-20261021-050.md)为准；该配置不与可选CL目标尺度诊断混用。
