@@ -25,6 +25,10 @@
 
 候选使用`configs/evidence-association-level1.json`、`configs/evidence-fusion-level1.json`的`canonical_all`政策。关联step0输出`ols-working-point.json`，融合以`--ols-working-point 路径`加载；核同一Level、完整训练/V名单、输入政策与数据设置。此文件的阈值来自纯OLS，不能用学习分数阈值替代。配置预算是模板，不表示训练READY。
 
+系统评价学习关联时，必须提供`--association-run`、`--association-checkpoint`及原scores/summary/data-audit三项；`--association-endpoint final`使用固定终点，`selected`为兼容默认。入口重算对应权重分数，并核验相邻`baseline-scores.npz`/`baseline.json`精确复现OLS；不能混用选中步数的阈值。`baseline`端点不加载权重。`--ordinary-controls anchor mean_supported attribute_hybrid`生成实际三种输出，默认仍只mean；纯OLS调用无须关联权重。详细一次性命令见[056](../../HandOver/L2S-20261022-056.md)。关联`sampling_audit.json`只计成功optimizer更新对应的实际抽样。
+
+融合Level1三配置仅`training.utility_objective`不同：原文件为`helper_quality`，`-direct-only`与`-mixed-action`为两项对照；共享`model.utility_output_bias=0.01`，固定`mixed_action_alpha=0.5`，符号BCE关闭。历史配置省略新字段仍用原初始化/监督。三臂命令和待批预算见[057](../../HandOver/L2S-20261022-057.md)，训练诊断保存在`run.json`。
+
 保留原生时间、有效短轨和全部候选；不按真值删难例。normalizer只拟合训练，测试保持封存。输出记录真实配置、阶段更新、覆盖、指标和终态；程序正常退出不能代替方法效果。
 
 参考方法细节见[训练规格](../../docs/specs/complete-training-refactor.md)，候选关联/融合见[方法定义](../../docs/specs/evidence-association-fusion.md)。旧消融、执行命令与失败结果从[历史摘要](../../docs/history/README.md)查阅，已完成的一次性诊断入口已删除。

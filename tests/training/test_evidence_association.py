@@ -9,7 +9,8 @@ import torch
 
 from association.training.evidence_association import (
     _validate_partitions, fit_evidence_association, fit_normalizer, load_checkpoint, prepare_features, score_scenes)
-from association.models.evidence_association import features_from_motion
+from association.models.evidence_association import FIXED_OLS_SCORE, features_from_motion
+from association.training.common import _update
 from association.data.motion_evidence import prepare_motion_scenes
 from association.utils import runtime
 from tests.fixtures.native_zip import make_native_zip_fixture
@@ -44,6 +45,19 @@ class EvidenceTrainingTests(unittest.TestCase):
             self.assertEqual(report['population']['pairs'], 15)
             self.assertEqual(report['population']['nodes'], 6)
             self.assertFalse(report['test_opened'])
+            sampling = runtime.read_json(path/'sampling_audit.json')
+            self.assertEqual(sampling['actual_optimizer_updates'], 3)
+            self.assertEqual(sampling['completed_batch_count'], 3)
+            self.assertEqual(sampling['sampled_pair_count'], 24)
+            self.assertEqual(sampling['sampled_positive_count'], 12)
+            self.assertEqual(sampling['sampled_negative_count'], 12)
+            self.assertEqual(sampling['eligible_pair_count'], 30)
+            self.assertEqual(sampling['distinct_pair_count'] + sampling['repeated_pair_count'], 24)
+            self.assertEqual(sum(row['sampled_pair_count'] for row in sampling['scenes']), 24)
+            self.assertEqual(report['training_sampling']['visited_scene_count'], sampling['visited_scene_count'])
+            self.assertNotIn('scenes', report['training_sampling'])
+            self.assertEqual(report['fixed_ols_score_threshold'], FIXED_OLS_SCORE)
+            self.assertIn('legacy', report['fixed_ols_threshold_source'])
             final_model, checkpoint = load_checkpoint(path/'final.pt', 'cpu')
             self.assertGreater(torch.count_nonzero(final_model.network[-1].weight).item(), 0)
             records = score_scenes(final_model, prepare_features(validation, 'V_select'),
@@ -62,6 +76,48 @@ class EvidenceTrainingTests(unittest.TestCase):
             self.assertTrue(point['synthetic'])
             self.assertEqual(point['motion_observation_policy'], 'selected_cap128')
             self.assertEqual(runtime.read_json(path/'run.json')['status'], 'COMPLETED')
+
+    def test_level1_fixed_threshold_uses_current_step_zero_working_point(self):
+        train, validation = synthetic_scenes()
+        config = synthetic_config('full_evidence')
+        config['training']['updates'] = 1
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'level1'
+            with patch('association.training.evidence_association.prepare_motion_scenes',
+                       side_effect=[train, validation]):
+                report = fit_evidence_association(config, output, 'cpu',
+                    archive_path='unused-test-archive', manifest={'dataset_level': 'Level1'})
+            baseline = runtime.read_json(output/'baseline.json')
+            threshold = runtime.read_json(output/'ols-working-point.json')['threshold']
+            self.assertNotEqual(threshold, FIXED_OLS_SCORE)
+            self.assertEqual(report['fixed_ols_score_threshold'], threshold)
+            self.assertEqual(baseline['fixed_ols_score_threshold'], threshold)
+            self.assertEqual(baseline['selected_threshold'], baseline['fixed_ols_threshold'])
+            self.assertIn('step-zero', report['fixed_ols_threshold_source'])
+
+    def test_failed_update_does_not_count_as_completed_sampling_exposure(self):
+        train, validation = synthetic_scenes()
+        calls = 0
+
+        def interrupt_second(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 2:
+                raise InterruptedError('cancel second update')
+            return _update(*args, **kwargs)
+
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)/'interrupted'
+            with patch('association.training.evidence_association._update', side_effect=interrupt_second):
+                with self.assertRaisesRegex(InterruptedError, 'second update'):
+                    fit_evidence_association(synthetic_config('full_evidence'), output, 'cpu',
+                        train_scenes=train, validation_scenes=validation, synthetic=True)
+            audit = runtime.read_json(output/'sampling_audit.json')
+            self.assertEqual(audit['completed_batch_count'], 1)
+            self.assertEqual(audit['actual_optimizer_updates'], 1)
+            self.assertEqual(audit['sampled_pair_count'], 8)
+            self.assertEqual(runtime.read_json(output/'run.json')['optimizer_updates'], 1)
+            self.assertEqual(runtime.read_json(output/'run.json')['status'], 'INTERRUPTED')
 
     def test_interrupt_is_not_completed_and_validation_components_cannot_train(self):
         train, validation = synthetic_scenes()

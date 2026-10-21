@@ -56,6 +56,11 @@ class BalancedScenePairSampler:
                    if not len(self._eligible[label])]
         if missing:
             raise ValueError("training scenes contain no " + " or ".join(missing) + " pairs")
+        self._completed_batches = 0
+        self._seen_pairs = [set() for _ in self._scene_ids]
+        self._sampling_counts = [dict(sampled_batch_count=0, positive_batch_count=0,
+            negative_batch_count=0, sampled_positive_count=0, sampled_negative_count=0,
+            distinct_positive_count=0, distinct_negative_count=0) for _ in self._scene_ids]
 
     def sample(self, batch_size):
         """Return at most two ``(scene_index, int64 pair_indices)`` groups.
@@ -159,3 +164,75 @@ class BalancedScenePairSampler:
                            "unique_pair_count", "duplicate_pair_count")},
             "scene_ids": [row["scene_id"] for row in rows], "groups": rows,
         }
+
+    def record_completed_batch(self, groups):
+        """Audit one successful optimizer batch without consuming randomness.
+
+        Call only after the optimizer update succeeds. Distinct pairs are keyed
+        by scene and original pair index; repeated occurrences include both
+        within-batch replacement and repeats across completed updates.
+        """
+        metadata = self.batch_metadata(groups)
+        if not metadata['pair_count'] or metadata['positive_count'] != metadata['negative_count']:
+            raise ValueError('completed sampler audit requires a nonempty balanced batch')
+        merged = {}
+        for scene_index, indices in groups:
+            merged.setdefault(int(scene_index), set()).update(map(int, indices))
+        for row in metadata['groups']:
+            index = row['scene_index']
+            counts = self._sampling_counts[index]
+            new = merged[index] - self._seen_pairs[index]
+            positive = sum(bool(self._labels[index][pair]) for pair in new)
+            counts['sampled_batch_count'] += 1
+            counts['positive_batch_count'] += int(row['positive_count'] > 0)
+            counts['negative_batch_count'] += int(row['negative_count'] > 0)
+            counts['sampled_positive_count'] += row['positive_count']
+            counts['sampled_negative_count'] += row['negative_count']
+            counts['distinct_positive_count'] += positive
+            counts['distinct_negative_count'] += len(new) - positive
+            self._seen_pairs[index].update(new)
+        self._completed_batches += 1
+
+    def coverage(self):
+        """JSON counts of completed training draws, including unvisited scenes.
+
+        This is a cumulative exposure audit, not an epoch claim. No sampled
+        index lists or per-update dumps are returned, and the RNG is untouched.
+        """
+        def add_rates(row):
+            for label in ('positive', 'negative'):
+                row[f'repeated_{label}_count'] = (
+                    row[f'sampled_{label}_count'] - row[f'distinct_{label}_count'])
+                denominator = row[f'eligible_{label}_pair_count']
+                row[f'distinct_{label}_coverage'] = (
+                    row[f'distinct_{label}_count'] / denominator if denominator else None)
+            for prefix in ('sampled', 'distinct', 'repeated'):
+                row[f'{prefix}_pair_count'] = sum(row[f'{prefix}_{label}_count']
+                    for label in ('positive', 'negative'))
+            row['eligible_pair_count'] = row['eligible_positive_pair_count'] + row['eligible_negative_pair_count']
+            row['distinct_pair_coverage'] = (row['distinct_pair_count'] / row['eligible_pair_count']
+                                            if row['eligible_pair_count'] else None)
+            return row
+
+        rows = [add_rates(dict(scene_id=scene_id, scene_index=index,
+            eligible_positive_pair_count=len(self._pools[1][index]),
+            eligible_negative_pair_count=len(self._pools[0][index]),
+            **self._sampling_counts[index])) for index, scene_id in enumerate(self._scene_ids)]
+        totals = add_rates({key: sum(row[key] for row in rows) for key in (
+            'eligible_positive_pair_count', 'eligible_negative_pair_count',
+            'sampled_positive_count', 'sampled_negative_count',
+            'distinct_positive_count', 'distinct_negative_count')})
+        return dict(scope='completed-training-pair-exposure-v1', seed=self._seed,
+            completed_batch_count=self._completed_batches, scene_count=len(rows),
+            eligible_scene_count=sum(row['eligible_pair_count'] > 0 for row in rows),
+            visited_scene_count=sum(row['sampled_batch_count'] > 0 for row in rows),
+            eligible_positive_scene_count=len(self._eligible[1]),
+            eligible_negative_scene_count=len(self._eligible[0]),
+            visited_positive_scene_count=sum(row['positive_batch_count'] > 0 for row in rows),
+            visited_negative_scene_count=sum(row['negative_batch_count'] > 0 for row in rows),
+            scene_batch_count_distribution={name: sum(low <= row['sampled_batch_count'] < high for row in rows)
+                for name, low, high in (('0', 0, 1), ('1', 1, 2), ('2-4', 2, 5),
+                                        ('5-9', 5, 10), ('10+', 10, float('inf')))},
+            **totals, scenes=rows,
+            interpretation='completed optimizer batches only; distinct pair = scene_id + original pair index; '
+                           'repeat count includes replacement and repeated exposure across batches')

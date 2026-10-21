@@ -12,7 +12,8 @@ import torch
 from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
 from association.evaluation.fusion_controls import ordinary_fusion, metrics, rms_haversine_scores
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
-from association.models.evidence_fusion import EvidenceFusion, evidence_fusion_loss, fusion_inputs
+from association.models.evidence_fusion import (ATTRIBUTE_NAMES, EvidenceFusion, evidence_fusion_loss,
+    fusion_inputs, validate_utility_objective, validate_utility_output_bias)
 from association.utils.runtime import write_json
 
 FIXED_DISTANCE_THRESHOLD_M = 14214.358367922307
@@ -75,17 +76,45 @@ def utility_sign_weight(config):
     return float(weight)
 
 
+def utility_configuration(config):
+    training = config['training']
+    objective = training.get('utility_objective', 'helper_quality')
+    alpha = training.get('mixed_action_alpha', .5)
+    validate_utility_objective(objective, alpha)
+    bias = validate_utility_output_bias(config['model'].get('utility_output_bias', 0.))
+    if objective == 'direct_only':
+        if utility_sign_weight(config) != 0:
+            raise ValueError('direct_only cannot enable utility_sign_weight')
+        if bias <= 0:
+            raise ValueError('direct_only requires positive utility_output_bias to escape the zero ReLU gradient')
+    return dict(objective=objective, mixed_action_alpha=float(alpha))
+
+
 def loss_semantics(config):
-    return dict(version='evidence-fusion-objective-v1',
+    objective = utility_configuration(config)
+    result = dict(version='evidence-fusion-objective-v1',
         utility_regression='smooth_l1(log1p(anchor_error/scale)-log1p(helper_error/scale))',
         utility_regression_weight=1., direct_weight=1.,
         utility_sign='BCEWithLogits(utility, gain_target>0)',
         utility_sign_weight=utility_sign_weight(config),
         utility_sign_enabled=utility_sign_weight(config) > 0,
         reduction='helper/query mean within each supervised attribute, then attribute mean; anchor batch mean')
+    if 'utility_objective' in config['training'] or 'mixed_action_alpha' in config['training']:
+        result.update(version='evidence-fusion-objective-v2', **objective,
+            utility_regression_weight=0. if objective['objective'] == 'direct_only' else 1.,
+            diagnostic_gain_target=('fixed_single_helper_mixture' if objective['objective'] == 'mixed_action'
+                                    else 'helper_quality'),
+            labels_split='T_core only; no V labels in training inputs or target statistics')
+        if objective['objective'] == 'mixed_action':
+            result['utility_regression'] = ('smooth_l1(log1p(anchor_error/scale)'
+                '-log1p(fixed_single_helper_mixture_error/scale))')
+        elif objective['objective'] == 'direct_only':
+            result['utility_regression'] = 'disabled; helper-quality gain recorded only as a diagnostic'
+    return result
 
 
-def training_objective(result, base_states, target, valid, *, sign_weight=0.):
+def training_objective(result, base_states, target, valid, *, sign_weight=0.,
+                       objective='helper_quality', mixed_action_alpha=.5):
     """Reuse original targets/masks; optionally add one auxiliary sign objective.
 
     Zero gain is a nonpositive label. Near-zero gains receive full binary
@@ -96,7 +125,10 @@ def training_objective(result, base_states, target, valid, *, sign_weight=0.):
     if (isinstance(sign_weight, bool) or not isinstance(sign_weight, (int, float))
             or not math.isfinite(sign_weight) or sign_weight < 0):
         raise ValueError('sign_weight must be finite and nonnegative')
-    loss = evidence_fusion_loss(result, base_states, target, valid)
+    if objective == 'direct_only' and sign_weight != 0:
+        raise ValueError('direct_only cannot enable auxiliary sign supervision')
+    loss = evidence_fusion_loss(result, base_states, target, valid,
+                               objective=objective, mixed_action_alpha=mixed_action_alpha)
     zero = result['utility'].sum()*0.
     terms = []
     if sign_weight > 0 and len(base_states) > 1:
@@ -115,6 +147,39 @@ def training_objective(result, base_states, target, valid, *, sign_weight=0.):
                 direct_weighted=loss['direct'], utility_sign=sign_loss,
                 utility_sign_weighted=weighted)
     return loss
+
+
+def _training_diagnostics():
+    return dict(split='T_core', interpretation='sampled training examples before each update; repeated samples',
+        by_mode={mode: {name: dict(gain_count=0, gain_positive=0, gain_negative=0, gain_zero=0,
+            gain_sum=0., gain_square_sum=0., gain_min=None, gain_max=None,
+            helper_query_count=0, active_helper_query_count=0,
+            eligible_anchor_query_count=0, total_helper_mass_sum=0.)
+            for name in ATTRIBUTE_NAMES} for mode in TRAIN_MODES})
+
+
+def _record_training_diagnostics(stats, scene, mode, loss, result):
+    if scene['split'] != 'T_core':
+        raise ValueError('training diagnostics must never consume V labels')
+    gain = loss['gain_target'].detach().cpu().numpy()
+    valid = loss['valid_attributes'].detach().cpu().numpy()
+    weights = result['weights'][1:].detach().cpu().numpy()
+    for attribute, name in enumerate(ATTRIBUTE_NAMES):
+        row = stats['by_mode'][mode][name]
+        selected = gain[:, valid[:, attribute], attribute].ravel()
+        row['gain_count'] += len(selected)
+        row['gain_positive'] += int((selected > 0).sum())
+        row['gain_negative'] += int((selected < 0).sum())
+        row['gain_zero'] += int((selected == 0).sum())
+        row['gain_sum'] += float(selected.sum())
+        row['gain_square_sum'] += float(np.square(selected).sum())
+        if len(selected):
+            row['gain_min'] = min(row['gain_min'], float(selected.min())) if row['gain_min'] is not None else float(selected.min())
+            row['gain_max'] = max(row['gain_max'], float(selected.max())) if row['gain_max'] is not None else float(selected.max())
+        row['helper_query_count'] += int(weights.shape[0]*weights.shape[1])
+        row['active_helper_query_count'] += int((weights[..., attribute] > 0).sum())
+        row['eligible_anchor_query_count'] += int(weights.shape[1]) if len(weights) else 0
+        row['total_helper_mass_sum'] += float(weights[..., attribute].sum())
 
 
 def validate_training_population(train, validation):
@@ -328,9 +393,13 @@ def evaluate_evidence_fusion(model, scenes, *, device, prediction_dir=None, chec
 
 
 def save_checkpoint(path, model, optimizer, step, config, rng):
+    initialization = validate_utility_output_bias(config['model'].get('utility_output_bias', 0.))
+    if model.utility_output_bias != initialization:
+        raise ValueError('model initialization disagrees with checkpoint configuration')
     torch.save(dict(scope='native-evidence-fusion-v1', configuration=config, step=step,
                     motion_observation_policy=config.get('motion_observation_policy', 'selected_cap128'),
                     loss_semantics=loss_semantics(config),
+                    model_initialization=dict(utility_output_bias=initialization),
                     model=model.state_dict(), optimizer=optimizer.state_dict(),
                     numpy_rng=rng.bit_generator.state, torch_rng=torch.get_rng_state(),
                     cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None), path)
@@ -347,9 +416,14 @@ def load_checkpoint(path, *, device='cpu'):
     expected = loss_semantics(state['configuration'])
     grouping_configuration(state['configuration'])
     recorded = state.get('loss_semantics')
-    if ((recorded is None and expected['utility_sign_weight'] != 0.)
+    if ((recorded is None and (expected['utility_sign_weight'] != 0.
+                              or expected['version'] != 'evidence-fusion-objective-v1'))
             or (recorded is not None and recorded != expected)):
         raise ValueError('checkpoint loss_semantics disagree with configuration')
+    initialization = dict(utility_output_bias=validate_utility_output_bias(
+        state['configuration']['model'].get('utility_output_bias', 0.)))
+    if state.get('model_initialization', dict(utility_output_bias=0.)) != initialization:
+        raise ValueError('checkpoint model_initialization disagrees with configuration')
     model = EvidenceFusion(**state['configuration']['model']).to(device)
     model.motion_observation_policy = policy
     model.ols_grouping = grouping_configuration(state['configuration'])
@@ -365,6 +439,7 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
     training = config['training']
     policy = validate_motion_observation_policy(config.get('motion_observation_policy', 'selected_cap128'))
     sign_weight = utility_sign_weight(config)
+    objective = utility_configuration(config)
     grouping = grouping_configuration(config)
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
@@ -382,6 +457,8 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
         modes=list(TRAIN_MODES), fixed_distance_threshold_m=_distance_threshold(grouping), grouping=grouping,
         training_samples={mode: dict(anchors=0, with_helper=0, with_wrong_helper=0,
                                     no_wrong_fallback=0) for mode in TRAIN_MODES},
+        training_diagnostics=_training_diagnostics(),
+        model_initialization=dict(utility_output_bias=model.utility_output_bias),
         physical_dtype='float64 native motion and geometry; float32 MLP', advisory_reached=False)
     write_json(output/'run.json', state)
     try:
@@ -420,9 +497,10 @@ def train_evidence_fusion(train, validation, config, output_dir, *, device='cpu'
                 result = model(base, features, exact)
                 loss = training_objective(result, base,
                     torch.as_tensor(scene['target'][anchor], device=device),
-                    torch.as_tensor(scene['valid'][anchor], device=device), sign_weight=sign_weight)
+                    torch.as_tensor(scene['valid'][anchor], device=device), sign_weight=sign_weight, **objective)
                 if not torch.isfinite(loss['total']):
                     raise FloatingPointError('nonfinite evidence fusion loss')
+                _record_training_diagnostics(state['training_diagnostics'], scene, mode, loss, result)
                 (loss['total']/training['batch_size']).backward()
                 for key in logs:
                     logs[key] += float(loss[key].detach())/training['batch_size']

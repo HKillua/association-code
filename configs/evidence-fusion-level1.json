@@ -10,7 +10,8 @@
     "T_core"
   ],
   "model": {
-    "exact_observation_lock": false
+    "exact_observation_lock": false,
+    "utility_output_bias": 0.01
   },
   "training": {
     "seed": 20261021,
@@ -19,7 +20,10 @@
     "learning_rate": 0.001,
     "gradient_clip": 1.0,
     "evaluate_every": 100,
-    "advisory_seconds": 3600.0
+    "advisory_seconds": 3600.0,
+    "utility_objective": "helper_quality",
+    "mixed_action_alpha": 0.5,
+    "utility_sign_weight": 0.0
   },
   "motion_observation_policy": "canonical_all"
 }

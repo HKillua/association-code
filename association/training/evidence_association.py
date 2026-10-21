@@ -298,6 +298,23 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
             advisory_written = True
 
     actual_update = 0
+    sampler = None
+
+    def persist_sampling_audit():
+        if sampler is None:
+            return None
+        coverage = sampler.coverage()
+        if (coverage['completed_batch_count'] != actual_update
+                or coverage['sampled_pair_count'] != actual_update * settings['batch_size']
+                or coverage['sampled_positive_count'] != actual_update * settings['batch_size'] // 2
+                or coverage['sampled_negative_count'] != actual_update * settings['batch_size'] // 2):
+            raise AssertionError('training sampling counts disagree with successful optimizer updates')
+        coverage.update(split='T_core', actual_optimizer_updates=actual_update,
+                        configured_updates=settings['updates'], batch_size=settings['batch_size'])
+        runtime.write_json(run.path/'sampling_audit.json', coverage)
+        return {key: value for key, value in coverage.items() if key != 'scenes'} | {
+            'per_scene_artifact': 'sampling_audit.json'}
+
     try:
         runtime.seed_everything(config['seed'])
         if synthetic:
@@ -350,6 +367,10 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         history = []
         training_seconds = validation_seconds = 0.
         final_records = None
+        level1 = (manifest or {}).get('dataset_level') == 'Level1'
+        fixed_ols_threshold = None if level1 else FIXED_OLS_SCORE
+        fixed_ols_threshold_source = ('step-zero full V pure OLS working point' if level1 else
+                                      'legacy 14.2 km OLS threshold; not a Level1 working point')
         for update in range(settings['updates']+1):
             check()
             row = dict(update=update)
@@ -365,6 +386,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                 loss = F.binary_cross_entropy_with_logits(score, torch.as_tensor(labels, dtype=torch.float64,
                                                                                   device=device))
                 loss_value, grad_norm = _update(loss, optimizer, model.parameters(), settings['gradient_clip'])
+                sampler.record_completed_batch(groups)
                 actual_update = update
                 row.update(loss=loss_value, gradient_norm=grad_norm,
                            train_seconds=time.monotonic()-step_started)
@@ -388,10 +410,14 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                            for record, scene in zip(final_records, validation)):
                         raise AssertionError('zero residual did not preserve exact OLS scores')
                     _save_scores(run.path/'baseline-scores.npz', final_records)
+                    if level1:
+                        fixed_ols_threshold = selection['threshold']
                     runtime.write_json(run.path/'baseline.json', dict(selection=selection,
                         motion_observation_policy=policy,
+                        fixed_ols_score_threshold=fixed_ols_threshold,
+                        fixed_ols_threshold_source=fixed_ols_threshold_source,
                         selected_threshold=summarize_records(final_records, selection['threshold']),
-                        fixed_ols_threshold=summarize_records(final_records, FIXED_OLS_SCORE)))
+                        fixed_ols_threshold=summarize_records(final_records, fixed_ols_threshold)))
                     runtime.write_json(run.path/'ols-working-point.json', dict(
                         scope='ols-working-point-v1', dataset_level=(manifest or {}).get('dataset_level'),
                         synthetic=synthetic, motion_observation_policy=policy, data=dict(DATA),
@@ -402,6 +428,7 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                         selection_rule='pure OLS full V scene macro-F1, before any network update'))
                 row['validation_seconds'] = time.monotonic()-validation_started
                 validation_seconds += row['validation_seconds']
+                persist_sampling_audit()
             history.append(row)
             runtime.write_json(run.path/'history.json', history)
             runtime.write_json(run.path/'progress.json', dict(
@@ -422,13 +449,15 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
             feature_names=list(FEATURE_NAMES), optimizer_updates=actual_update,
             parameter_count=sum(parameter.numel() for parameter in model.parameters()),
             selection_rule='full V scene macro-F1; >= threshold; earliest update wins score ties including step 0',
-            fixed_ols_score_threshold=FIXED_OLS_SCORE,
+            fixed_ols_score_threshold=fixed_ols_threshold,
+            fixed_ols_threshold_source=fixed_ols_threshold_source,
+            training_sampling=persist_sampling_audit(),
             population=audit['validation_population'], selected=best,
             selected_result=summarize_records(selected_records, best['selection']['threshold']),
-            selected_fixed_ols_threshold=summarize_records(selected_records, FIXED_OLS_SCORE),
+            selected_fixed_ols_threshold=summarize_records(selected_records, fixed_ols_threshold),
             final_result=summarize_records(final_records, final_selection['threshold']),
             final_selection=final_selection,
-            final_fixed_ols_threshold=summarize_records(final_records, FIXED_OLS_SCORE),
+            final_fixed_ols_threshold=summarize_records(final_records, fixed_ols_threshold),
             preparation_seconds=preparation_seconds, training_seconds=training_seconds,
             validation_seconds=validation_seconds,
             elapsed_seconds=time.monotonic()-started, reference_read=False, test_opened=False,
@@ -441,6 +470,12 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         run.finish(optimizer_updates=actual_update, selected=best)
         return report
     except BaseException as error:
+        audit_error = None
+        try:
+            persist_sampling_audit()
+        except Exception as audit_failure:
+            audit_error = f'{type(audit_failure).__name__}: {audit_failure}'
         status = 'INTERRUPTED' if isinstance(error, (KeyboardInterrupt, InterruptedError)) else 'FAILED'
-        run.finish(status, optimizer_updates=actual_update, error=f'{type(error).__name__}: {error}')
+        run.finish(status, optimizer_updates=actual_update, error=f'{type(error).__name__}: {error}',
+                   **({'sampling_audit_error': audit_error} if audit_error else {}))
         raise

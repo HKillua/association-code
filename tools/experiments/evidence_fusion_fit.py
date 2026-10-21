@@ -20,7 +20,8 @@ from association.data.dataset import load_timed_dataset
 from association.data.motion_evidence import validate_motion_observation_policy
 from association.models.cooperative import CooperativeConfig
 from association.training.evidence_fusion import (
-    bind_ols_working_point, grouping_configuration, train_evidence_fusion, utility_sign_weight)
+    bind_ols_working_point, grouping_configuration, train_evidence_fusion, utility_sign_weight,
+    utility_configuration)
 from association.utils import runtime
 from tools.experiments.cooperative_fit import synthetic_scenes
 
@@ -31,7 +32,7 @@ def configuration(value):
             or value['train_splits'] != ['T_core']
             or value['data'] != dict(length=64, max_observations=128, time_unit_seconds=20.,
                                      reference_longitude_policy='shortest_arc')
-            or set(value['model']) != {'exact_observation_lock'}
+            or set(value['model']) - {'utility_output_bias'} != {'exact_observation_lock'}
             or not isinstance(value['model']['exact_observation_lock'], bool)):
         raise ValueError('explicit native-evidence-fusion-v1 frozen-data configuration required')
     validate_motion_observation_policy(value.get('motion_observation_policy', 'selected_cap128'))
@@ -39,7 +40,7 @@ def configuration(value):
     training = value['training']
     integers = ('seed', 'updates', 'batch_size', 'evaluate_every')
     positive = ('learning_rate', 'gradient_clip', 'advisory_seconds')
-    if set(training) - {'utility_sign_weight'} != {*integers, *positive}:
+    if set(training) - {'utility_sign_weight', 'utility_objective', 'mixed_action_alpha'} != {*integers, *positive}:
         raise ValueError('unexpected training settings')
     for key in integers:
         if isinstance(training[key], bool) or not isinstance(training[key], int) or training[key] < 1:
@@ -49,6 +50,7 @@ def configuration(value):
         if isinstance(number, bool) or not isinstance(number, (int, float)) or not 0 < number < float('inf'):
             raise ValueError(key+' must be finite and positive')
     utility_sign_weight(value)
+    utility_configuration(value)
     return value
 
 

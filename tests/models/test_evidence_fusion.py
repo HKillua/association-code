@@ -4,13 +4,62 @@ import numpy as np
 import torch
 
 from association.models.evidence_fusion import (
-    EvidenceFusion, evidence_fusion_loss, fusion_inputs, physical_errors)
+    EvidenceFusion, evidence_fusion_loss, fusion_inputs, physical_errors, mixed_helper_states)
 from association.models.cooperative import CooperativeConfig
 from association.training.evidence_fusion import prepare_evidence_scenes, training_members
 from tools.experiments.cooperative_fit import synthetic_scenes
 
 
 class EvidenceFusionTests(unittest.TestCase):
+    def test_mixed_action_can_reward_a_worse_helper_with_circular_masked_targets(self):
+        base = torch.tensor([[[.01, 179., 10., 350.]],
+                             [[-.015, -179., 25., 15.]]], dtype=torch.float64)
+        target = torch.tensor([[0., 180., 10., 0.]], dtype=torch.float64)
+        valid = torch.ones((1, 4), dtype=torch.bool)
+        model = EvidenceFusion(utility_output_bias=.01)
+        result = model(base, torch.ones(1, 1, 27), torch.zeros(1, dtype=torch.bool))
+        mixed = mixed_helper_states(base, .5)
+        torch.testing.assert_close(mixed, torch.tensor([[[-.0025, -180., 17.5, 2.5]]], dtype=torch.float64))
+        old = evidence_fusion_loss(result, base, target, valid)
+        new = evidence_fusion_loss(result, base, target, valid, objective='mixed_action')
+        self.assertLess(old['gain_target'][0, 0, 2].item(), 0.)
+        self.assertGreater(new['gain_target'][0, 0, 2].item(), 0.)
+        self.assertTrue(torch.equal(old['direct'], new['direct']))
+        # Partial position validity must exclude the whole position attribute.
+        target[0, 0] = float('nan')
+        valid[0, 0] = False
+        masked = evidence_fusion_loss(result, base, target, valid, objective='mixed_action')
+        self.assertEqual(masked['valid_attributes'].tolist(), [[False, True, True]])
+        self.assertTrue(torch.isfinite(masked['total']))
+        empty = model(base[:1], torch.ones(0, 1, 27), torch.zeros(1, dtype=torch.bool))
+        loss = evidence_fusion_loss(empty, base[:1], target, valid, objective='mixed_action')
+        self.assertEqual(tuple(loss['gain_target'].shape), (0, 1, 3))
+        self.assertEqual(loss['utility'].item(), 0.)
+
+    def test_shared_positive_initialization_enables_direct_only_gradient(self):
+        base = torch.tensor([[[0., 0., 10., 30.]], [[.01, 0., 20., 90.]]], dtype=torch.float64)
+        features, exact = torch.ones((1, 1, 27)), torch.zeros(1, dtype=torch.bool)
+        initial, predictions = [], []
+        for objective in ('helper_quality', 'direct_only', 'mixed_action'):
+            torch.manual_seed(39)
+            model = EvidenceFusion(utility_output_bias=.01)
+            initial.append({k: v.detach().clone() for k, v in model.state_dict().items()})
+            result = model(base, features, exact)
+            predictions.append(result['states'].detach())
+            loss = evidence_fusion_loss(result, base, base[1], torch.ones((1, 4), dtype=torch.bool),
+                                       objective=objective)
+            if objective == 'direct_only':
+                self.assertEqual(loss['utility'].item(), 0.)
+                self.assertTrue(torch.equal(loss['total'], loss['direct']))
+                loss['total'].backward()
+                self.assertGreater(model.utility[-1].bias.grad.abs().sum().item(), 0.)
+                optimizer = torch.optim.Adam(model.parameters(), lr=.001)
+                optimizer.step()
+                self.assertFalse(torch.equal(initial[-1]['utility.4.bias'], model.utility[-1].bias))
+        for state, prediction in zip(initial[1:], predictions[1:]):
+            self.assertTrue(all(torch.equal(state[key], initial[0][key]) for key in state))
+            self.assertTrue(torch.equal(prediction, predictions[0]))
+
     def test_exact_rejection_circular_convexity_and_optional_native_lock(self):
         model = EvidenceFusion()
         states = torch.tensor([[[30., 179., 10., 359.]], [[31., -179., 20., 1.]]],

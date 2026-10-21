@@ -17,7 +17,7 @@ import numpy as np
 import torch
 
 from association.data.dataset import load_timed_dataset
-from association.evaluation.association import evaluate_scenes
+from association.evaluation.association import evaluate_scenes, predict
 from association.evaluation.evidence_fusion_combo import read_scores, predict_partition
 from association.evaluation.scene import evaluate_full_scene
 from association.evaluation.physical import evaluate_aligned_fusion
@@ -27,11 +27,19 @@ from association.evaluation.tmtaff import aggregate_fusion_reports
 from association.training.evidence_fusion import (
     bind_ols_working_point, load_checkpoint, prepare_evidence_scenes,
 )
+from association.training.evidence_association import (
+    DATA as ASSOCIATION_DATA, load_checkpoint as load_association_checkpoint,
+    prepare_features, score_scenes, validate_config as validate_association_config,
+)
 from association.utils.runtime import read_json, write_json
 
 DATA = dict(length=64, max_observations=128, time_unit_seconds=20.,
             reference_longitude_policy='shortest_arc')
 POLICY = 'canonical_all'
+ORDINARY_CONTROLS = ('anchor', 'mean_supported', 'attribute_hybrid')
+# A CPU replay of a GPU FP32 network can round differently. Even within this
+# fixed tolerance, every accepted/rejected edge must remain exactly identical.
+SCORE_REPLAY_TOLERANCE = dict(atol=2e-6, rtol=2e-6)
 
 
 def exact_score_population(scenes, scores):
@@ -43,11 +51,21 @@ def exact_score_population(scenes, scores):
         for name in ('node_ids', 'sources', 'pairs'):
             if not np.array_equal(row[name], np.asarray(scene[name])):
                 raise ValueError(f'{scene["scene_id"]}: association {name} changed')
-        if not np.isfinite(row['scores']).all():
+        if np.shape(row['scores']) != (len(scene['pairs']),) or not np.isfinite(row['scores']).all():
             raise ValueError('association scores contain nonfinite values')
 
 
-def _validate_assoc(summary, audit, manifest, scores, scenes):
+def validate_association_endpoint(summary, audit, manifest, scores, scenes, *, endpoint,
+                                  working_point, training_run, baseline_scores, baseline,
+                                  checkpoint_path=None, device='cpu'):
+    """Bind a score cache to an actual checkpoint, complete run and fixed V list.
+
+    Recompute scores from native observations and the saved T-only normalizer;
+    never reselect a threshold or refit statistics. The baseline cache is checked
+    independently against the exact OLS base, including when evaluating final.
+    """
+    if endpoint not in ('baseline', 'selected', 'final'):
+        raise ValueError('unknown association endpoint')
     if (summary.get('status') != 'COMPLETED'
             or summary.get('scope') != 'native-ols-evidence-association-v1'
             or summary.get('motion_observation_policy') != POLICY
@@ -55,14 +73,98 @@ def _validate_assoc(summary, audit, manifest, scores, scenes):
             or audit.get('split_unit') != manifest.get('split_unit')
             or audit.get('training_scene_ids') != manifest['splits']['T_core']
             or audit.get('validation_scene_ids') != manifest['splits']['V_select']):
-        raise ValueError('association selected run is not the current complete Level1 population')
+        raise ValueError('association run is not the current complete Level1 population')
+    cfg = training_run.get('config')
+    if not isinstance(cfg, dict):
+        raise ValueError('association completed run must contain its actual configuration')
+    settings = validate_association_config(cfg)
+    updates = settings['updates']
+    if (training_run.get('status') != 'COMPLETED'
+            or type(training_run.get('optimizer_updates')) is not int
+            or type(summary.get('optimizer_updates')) is not int
+            or training_run.get('optimizer_updates') != updates or summary.get('optimizer_updates') != updates
+            or cfg.get('motion_observation_policy') != POLICY
+            or summary.get('data') != ASSOCIATION_DATA
+            or audit.get('data') != ASSOCIATION_DATA
+            or any(record.get('test_opened') is not False for record in (summary, audit, training_run))
+            or any(record.get('reference_read') is not False for record in (summary, audit, training_run))):
+        raise ValueError('association config/updates/COMPLETED run do not agree')
     exact_score_population(scenes, scores)
-    selected_step = summary['selected']['update']
-    if (not isinstance(selected_step, int) or isinstance(selected_step, bool)
-            or selected_step < 0 or selected_step > summary.get('optimizer_updates', -1)):
-        raise ValueError('association selected update is inconsistent with its completed run')
-    threshold = summary['selected']['selection']['threshold']
-    return threshold
+    exact_score_population(scenes, baseline_scores)
+    population = dict(scenes=len(scenes), components=len({s['component_id'] for s in scenes}),
+        nodes=sum(len(s['node_ids']) for s in scenes), pairs=sum(len(s['pairs']) for s in scenes),
+        positives=sum(int(np.sum(s['labels'])) for s in scenes))
+    if summary.get('population') != population or audit.get('validation_population') != population:
+        raise ValueError('association summary/audit population differs from complete current V')
+    features = prepare_features(scenes, 'V_select')
+    for scene in features:
+        if not np.array_equal(baseline_scores[str(scene['scene_id'])]['scores'], scene['base_scores']):
+            raise ValueError('step-zero association scores do not exactly reproduce native OLS')
+    if (baseline.get('motion_observation_policy') != POLICY
+            or baseline['selection']['threshold'] != working_point['threshold']):
+        raise ValueError('step-zero selection differs from the fixed OLS working point')
+    baseline_records = [{**scene, 'scores': scene['base_scores']} for scene in features]
+    _verify_association_metrics(evaluate_scenes(baseline_records, working_point['threshold']),
+                               baseline['selected_threshold']['metrics'])
+    if endpoint == 'baseline':
+        if checkpoint_path is not None:
+            raise ValueError('baseline is exact OLS and does not load an association checkpoint')
+        for scene in features:
+            if not np.array_equal(scores[str(scene['scene_id'])]['scores'], scene['base_scores']):
+                raise ValueError('baseline endpoint must use exact zero-residual OLS scores')
+        return dict(endpoint=endpoint, update=0, threshold=working_point['threshold'],
+            expected_metrics=baseline['selected_threshold']['metrics'],
+            score_replay=dict(exact_ols=True, max_absolute_difference=0., decisions_equal=True))
+    if checkpoint_path is None:
+        raise ValueError('learned association endpoint requires its checkpoint')
+    model, snapshot = load_association_checkpoint(checkpoint_path, device)
+    update = updates if endpoint == 'final' else summary['selected']['update']
+    selection = summary['final_selection'] if endpoint == 'final' else summary['selected']['selection']
+    if (isinstance(update, bool) or not isinstance(update, int) or not 0 <= update <= updates
+            or snapshot.get('update') != update or snapshot.get('config') != cfg
+            or snapshot.get('normalizer') != audit.get('normalizer')
+            or snapshot.get('selection') != selection
+            or summary.get('variant') != cfg.get('variant')
+            or training_run.get('selected') != summary.get('selected')):
+        raise ValueError('association checkpoint/config/update/normalizer/selection does not match endpoint')
+    threshold = selection['threshold']
+    replay = score_scenes(model, features, snapshot['normalizer'], device,
+                          settings['inference_batch_size'])
+    max_delta = 0.
+    for row in replay:
+        cached = scores[str(row['scene_id'])]['scores']
+        maximum = float(np.max(np.abs(cached-row['scores']), initial=0.))
+        max_delta = max(max_delta, maximum)
+        if (not np.allclose(cached, row['scores'], **SCORE_REPLAY_TOLERANCE)
+                or not np.array_equal(predict(cached, threshold), predict(row['scores'], threshold))):
+            raise ValueError('association cached scores do not replay checkpoint values and threshold decisions')
+    return dict(endpoint=endpoint, update=update, threshold=threshold,
+        expected_metrics=summary[endpoint+'_result']['metrics'],
+        score_replay=dict(exact_ols=True, max_absolute_difference=max_delta,
+                          tolerance=SCORE_REPLAY_TOLERANCE, decisions_equal=True))
+
+
+def _verify_association_metrics(actual, expected):
+    if (any(actual[key] != expected[key] for key in ('tp', 'fp', 'fn', 'tn'))
+            or not np.isclose(actual['macro_f1'], expected['macro_f1'], atol=1e-12, rtol=0)):
+        raise ValueError('association score dump does not reproduce endpoint summary')
+
+
+def ordinary_predictions(controls, names):
+    """Attribute control changes predictions only; reference masks stay external.
+
+    Mean's longitude/heading already use the ordinary fusion circular policy.
+    Hybrid copies both anchor position columns, and mean speed/heading together.
+    """
+    if not names or len(names) != len(set(names)) or not set(names).issubset(ORDINARY_CONTROLS):
+        raise ValueError('ordinary controls must be a nonempty unique known list')
+    values = controls['predictions']
+    result = {name: values[name] for name in names if name != 'attribute_hybrid'}
+    if 'attribute_hybrid' in names:
+        hybrid = values['anchor'].copy()
+        hybrid[..., 2:] = values['mean_supported'][..., 2:]
+        result['attribute_hybrid'] = hybrid
+    return result
 
 
 def verify_fusion_snapshot(fusion, checkpoint, run, manifest, grouping):
@@ -215,6 +317,11 @@ def _groups(scene, score_row, selected_threshold):
 
 
 def run(args):
+    endpoint = getattr(args, 'association_endpoint', 'selected')
+    ordinary_controls = getattr(args, 'ordinary_controls', ['mean_supported'])
+    if (not ordinary_controls or len(ordinary_controls) != len(set(ordinary_controls))
+            or not set(ordinary_controls).issubset(ORDINARY_CONTROLS)):
+        raise ValueError('ordinary controls must be a nonempty unique known list')
     if args.device != 'cpu' and not torch.cuda.is_available():
         raise ValueError('requested GPU unavailable; no silent CPU fallback')
     manifest = read_json(args.manifest)
@@ -227,7 +334,11 @@ def run(args):
     if (args.association_scores is None) != (args.association_summary is None):
         raise ValueError('association scores and summary must be provided together')
     if args.association_scores and not args.association_data_audit:
-        raise ValueError('selected association needs its data_audit for split/policy checks')
+        raise ValueError('association needs its data_audit for split/policy checks')
+    if args.association_scores and not getattr(args, 'association_run', None):
+        raise ValueError('association needs its completed run.json')
+    if args.association_scores and endpoint != 'baseline' and not getattr(args, 'association_checkpoint', None):
+        raise ValueError('learned association endpoint needs its checkpoint')
     if bool(args.fusion_checkpoint) != bool(args.fusion_run):
         raise ValueError('fusion checkpoint needs run.json to verify its full scene population')
     if args.cpu_threads < 1:
@@ -239,11 +350,14 @@ def run(args):
     state = dict(status='RUNNING', dataset_level='Level1', split='V_select',
                  optimizer_updates=0, test_opened=False, threshold_reselected=False,
                  normalizer_refitted=False, motion_observation_policy=POLICY,
+                 association_endpoint=endpoint if args.association_scores else None,
+                 ordinary_controls=list(ordinary_controls),
                  stage='validation_preparation', completed_scenes=0,
                  total_scenes=len(manifest['splits']['V_select']),
-                 inputs={key: getattr(args, key) for key in (
+                 inputs={key: getattr(args, key, None) for key in (
                      'archive', 'manifest', 'alignment', 'ols_working_point',
                      'association_scores', 'association_summary', 'association_data_audit',
+                     'association_checkpoint', 'association_run',
                      'fusion_checkpoint', 'fusion_run')})
     write_json(output/'run.json', state)
     try:
@@ -262,10 +376,17 @@ def run(args):
         scores = read_scores(args.association_scores) if args.association_scores else None
         selected_threshold = None
         summary = None
+        binding = None
         if scores is not None:
             summary = read_json(args.association_summary)
-            selected_threshold = _validate_assoc(summary, read_json(args.association_data_audit),
-                                                manifest, scores, scenes)
+            association_root = Path(args.association_summary).parent
+            binding = validate_association_endpoint(summary, read_json(args.association_data_audit),
+                manifest, scores, scenes, endpoint=endpoint, working_point=wp,
+                training_run=read_json(args.association_run),
+                baseline_scores=read_scores(association_root/'baseline-scores.npz'),
+                baseline=read_json(association_root/'baseline.json'),
+                checkpoint_path=getattr(args, 'association_checkpoint', None), device=args.device)
+            selected_threshold = binding['threshold']
         fusion = None
         loaded_fusion_step = None
         if args.fusion_checkpoint:
@@ -292,11 +413,11 @@ def run(args):
                 controls = ordinary_fusion(motion['states'], motion['nearest_seconds'],
                                            motion['support'], groups)
                 memberships[group_name] = controls['membership']
-                by_group[group_name] = {'mean_supported': controls['predictions']['mean_supported']}
+                by_group[group_name] = ordinary_predictions(controls, ordinary_controls)
                 if fusion is not None:
                     learned, routing = predict_partition(fusion, motion, groups, args.device)
                     routing_by_group[group_name] = routing
-                    if not np.array_equal(learned['mean_supported'], by_group[group_name]['mean_supported']):
+                    if not np.array_equal(learned['mean_supported'], controls['predictions']['mean_supported']):
                         raise ValueError(f'{sid}: learned run changed the ordinary control')
                     by_group[group_name]['learned'] = learned['learned']
                 flat.update({group_name+'_'+k: v for k, v in by_group[group_name].items()})
@@ -350,16 +471,19 @@ def run(args):
         if scores is not None:
             # Labels are read for validation only after all predicted partitions exist.
             association = evaluate_scenes(score_records, selected_threshold)
-            expected = summary['selected_result']['metrics']
-            if (any(association[key] != expected[key] for key in ('tp', 'fp', 'fn', 'tn'))
-                    or not np.isclose(association['macro_f1'], expected['macro_f1'], atol=1e-12, rtol=0)):
-                raise ValueError('selected association score dump does not reproduce summary')
+            _verify_association_metrics(association, binding['expected_metrics'])
         reports = dict(status='COMPLETED', dataset_level='Level1', split='V_select',
             scene_ids=ids, scene_count=len(scenes), fragment_count=sum(len(s['node_ids']) for s in scenes),
             method_names=expected_methods, ols_working_point=wp,
             association=association,
             association_selected_step=(summary['selected']['update'] if summary is not None else None),
-            association_evidence='frozen selected-scores; no association model weights loaded',
+            association_endpoint=(endpoint if binding is not None else None),
+            association_endpoint_step=(binding['update'] if binding is not None else None),
+            association_threshold=selected_threshold,
+            association_score_replay=(binding['score_replay'] if binding is not None else None),
+            association_evidence=('frozen cache verified against endpoint checkpoint and native OLS step zero'
+                                  if binding is not None else 'pure native OLS; no association weights'),
+            ordinary_controls=list(ordinary_controls),
             fragment=_pool_fragment(per_scene, expected_methods),
             unique_target={name: aggregate_fusion_reports([row[name] for row in system_rows])
                            for name in expected_methods},
@@ -374,6 +498,7 @@ def run(args):
                          'one-group-one-output follows first-input-anchor correspondence; no truth-based selection',
                          'only V_select payloads read; no refit or training performed',
                          'all original-label targets retained, including identities with no input fragments',
+                         'attribute_hybrid is a V-informed diagnostic control; no kinematic consistency constraint',
                          'ordinary mean_supported falls back to anchor OLS if all members are unsupported'],
             test_opened=False, optimizer_updates=0)
         write_json(output/'summary.json', reports)
@@ -395,8 +520,12 @@ def main(argv=None):
     for key in ('manifest', 'alignment', 'ols-working-point', 'output'):
         parser.add_argument('--'+key, required=True)
     for key in ('association-scores', 'association-summary', 'association-data-audit',
+                'association-checkpoint', 'association-run',
                 'fusion-checkpoint', 'fusion-run'):
         parser.add_argument('--'+key)
+    parser.add_argument('--association-endpoint', choices=('baseline', 'selected', 'final'), default='selected')
+    parser.add_argument('--ordinary-controls', nargs='+', choices=ORDINARY_CONTROLS,
+                        default=['mean_supported'])
     parser.add_argument('--device', default='cpu', choices=('cpu', 'cuda:0'))
     parser.add_argument('--cpu-threads', type=int, default=4)
     args = parser.parse_args(argv)

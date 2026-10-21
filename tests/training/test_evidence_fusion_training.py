@@ -22,6 +22,82 @@ from tools.experiments.evidence_fusion_fit import configuration, main
 
 
 class EvidenceFusionTrainingTests(unittest.TestCase):
+    def test_three_auxiliary_objectives_share_initial_state_and_record_training_only_diagnostics(self):
+        torch.set_num_threads(1)
+        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        base = json.loads(Path('configs/evidence-fusion.json').read_text())
+        base['model']['utility_output_bias'] = .01
+        base['training'].update(updates=3, batch_size=1, evaluate_every=3,
+                                mixed_action_alpha=.5, utility_sign_weight=0.)
+        initials, samples = [], []
+        with tempfile.TemporaryDirectory() as directory:
+            for objective in ('helper_quality', 'direct_only', 'mixed_action'):
+                config = copy.deepcopy(base)
+                config['training']['utility_objective'] = objective
+                configuration(config)
+                output = Path(directory)/objective
+                report = train_evidence_fusion(train, validation, config, output)
+                model, state = load_checkpoint(output/'final.pt')
+                initial, _ = load_checkpoint(output/'step-0.pt')
+                initials.append(initial.state_dict())
+                samples.append(report['training_samples'])
+                self.assertTrue(any(not torch.equal(a, b) for a, b in zip(initial.parameters(), model.parameters())))
+                self.assertEqual(state['loss_semantics']['objective'], objective)
+                self.assertEqual(model.utility_output_bias, .01)
+                stats = report['training_diagnostics']
+                self.assertEqual(stats['split'], 'T_core')
+                self.assertEqual(len(stats['by_mode']), 3)
+                self.assertTrue(all(row['gain_count'] > 0 for mode in stats['by_mode'].values()
+                                    for row in mode.values()))
+                self.assertTrue(all(row['active_helper_query_count'] <= row['helper_query_count']
+                                    for mode in stats['by_mode'].values() for row in mode.values()))
+                if objective == 'direct_only':
+                    logs = [json.loads(row) for row in (output/'training.jsonl').read_text().splitlines()]
+                    self.assertTrue(all(row['utility'] == row['utility_sign'] == 0. for row in logs))
+                    # V truth is used only in monitoring; it cannot affect updates or T-only diagnostics.
+                    altered = copy.deepcopy(validation)
+                    for scene in altered:
+                        for target in scene['fusion_targets'].values():
+                            target['states'][:, 2] += 37.
+                    other = Path(directory)/'direct_altered_V'
+                    repeat = train_evidence_fusion(train, altered, config, other)
+                    clone, _ = load_checkpoint(other/'final.pt')
+                    self.assertEqual(stats, repeat['training_diagnostics'])
+                    self.assertTrue(all(torch.equal(a, b) for a, b in zip(model.parameters(), clone.parameters())))
+                for mutation in ('bias', 'objective', 'missing_semantics'):
+                    bad = copy.deepcopy(state)
+                    if mutation == 'bias':
+                        bad['configuration']['model']['utility_output_bias'] = .02
+                    elif mutation == 'objective':
+                        bad['configuration']['training']['utility_objective'] = (
+                            'mixed_action' if objective != 'mixed_action' else 'helper_quality')
+                    else:
+                        del bad['loss_semantics']
+                    torch.save(bad, output/'bad.pt')
+                    with self.assertRaises(ValueError):
+                        load_checkpoint(output/'bad.pt')
+            self.assertTrue(all(samples[0] == counts for counts in samples[1:]))
+            self.assertTrue(all(all(torch.equal(state[key], initials[0][key]) for key in state)
+                                for state in initials[1:]))
+
+    def test_auxiliary_configuration_rejects_invalid_or_dead_direct_controls(self):
+        base = json.loads(Path('configs/evidence-fusion.json').read_text())
+        for key, value in (('utility_objective', 'unknown'), ('mixed_action_alpha', 0),
+                           ('mixed_action_alpha', 1), ('mixed_action_alpha', True),
+                           ('mixed_action_alpha', float('nan'))):
+            config = copy.deepcopy(base)
+            config['training'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                configuration(config)
+        direct = copy.deepcopy(base)
+        direct['training']['utility_objective'] = 'direct_only'
+        with self.assertRaisesRegex(ValueError, 'positive utility_output_bias'):
+            configuration(direct)
+        direct['model']['utility_output_bias'] = .01
+        direct['training']['utility_sign_weight'] = .1
+        with self.assertRaisesRegex(ValueError, 'direct_only'):
+            configuration(direct)
+
     def test_current_ols_working_point_preserves_edges_and_rejects_other_protocols(self):
         train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
         config = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))

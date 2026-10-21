@@ -108,6 +108,8 @@ class BalancedScenePairSamplerTests(unittest.TestCase):
             left = first.sample(size)
             first.describe()
             first.batch_metadata(left)
+            first.record_completed_batch(left)
+            first.coverage()
             self.assertEqual(serial_groups(left), serial_groups(second.sample(size)))
         other = BalancedScenePairSampler(scenes, seed=124)
         self.assertNotEqual([serial_groups(first.sample(8)) for _ in range(5)],
@@ -135,6 +137,30 @@ class BalancedScenePairSamplerTests(unittest.TestCase):
         self.assertEqual(info["groups"][0]["duplicate_pair_indices"], [0])
         self.assertEqual(info["groups"][0]["duplicate_pair_counts"], [4])
         json.dumps(info, allow_nan=False)
+
+    def test_cumulative_exposure_counts_distinct_pairs_across_completed_batches(self):
+        sampler = BalancedScenePairSampler([make_scene('positive', [1, 1]),
+            make_scene('negative', [0, 0, 0]), make_scene('empty', [])], seed=8)
+        sampler.sample(4)  # a draw alone is not a completed optimizer update
+        self.assertEqual(sampler.coverage()['completed_batch_count'], 0)
+        sampler.record_completed_batch([(0, np.array([0, 0])), (1, np.array([0, 1]))])
+        sampler.record_completed_batch([(0, np.array([0, 1])), (1, np.array([1, 1]))])
+        audit = sampler.coverage()
+        self.assertEqual((audit['completed_batch_count'], audit['sampled_pair_count'],
+            audit['sampled_positive_count'], audit['sampled_negative_count']), (2, 8, 4, 4))
+        self.assertEqual((audit['distinct_pair_count'], audit['repeated_pair_count'],
+                          audit['eligible_pair_count']), (4, 4, 5))
+        self.assertEqual(audit['distinct_pair_coverage'], .8)
+        self.assertEqual(audit['visited_scene_count'], 2)
+        self.assertEqual(audit['scene_batch_count_distribution'],
+                         {'0': 1, '1': 0, '2-4': 2, '5-9': 0, '10+': 0})
+        self.assertEqual(audit['scenes'][0]['distinct_positive_coverage'], 1.)
+        self.assertIsNone(audit['scenes'][2]['distinct_pair_coverage'])
+        self.assertEqual(sum(row['sampled_pair_count'] for row in audit['scenes']), 8)
+        with self.assertRaisesRegex(ValueError, 'balanced'):
+            sampler.record_completed_batch([(0, np.array([0, 1]))])
+        self.assertEqual(sampler.coverage(), audit)  # invalid batches cannot partially change the audit
+        json.dumps(audit, allow_nan=False)
 
 
 if __name__ == "__main__":

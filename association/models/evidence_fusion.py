@@ -8,12 +8,29 @@ completion checkpoint is accepted by the forward path.
 from __future__ import annotations
 
 import numpy as np
+import math
 import torch
 from torch import nn
 
 FEATURE_WIDTH = 27
 ATTRIBUTE_NAMES = ('position', 'speed', 'heading')
 ERROR_SCALES = (1000., 10., 30.)
+UTILITY_OBJECTIVES = ('helper_quality', 'direct_only', 'mixed_action')
+
+
+def validate_utility_objective(objective, mixed_action_alpha):
+    if objective not in UTILITY_OBJECTIVES:
+        raise ValueError('utility_objective must be helper_quality, direct_only or mixed_action')
+    if (isinstance(mixed_action_alpha, bool) or not isinstance(mixed_action_alpha, (int, float))
+            or not math.isfinite(mixed_action_alpha) or not 0 < mixed_action_alpha < 1):
+        raise ValueError('mixed_action_alpha must be finite and strictly between zero and one')
+
+
+def validate_utility_output_bias(value):
+    if (isinstance(value, bool) or not isinstance(value, (int, float))
+            or not math.isfinite(value) or value < 0):
+        raise ValueError('utility_output_bias must be finite and nonnegative')
+    return float(value)
 
 
 def short_delta(value):
@@ -75,15 +92,16 @@ def fusion_inputs(motion, members, *, device='cpu'):
 
 
 class EvidenceFusion(nn.Module):
-    def __init__(self, *, exact_observation_lock=False):
+    def __init__(self, *, exact_observation_lock=False, utility_output_bias=0.):
         super().__init__()
         if not isinstance(exact_observation_lock, bool):
             raise ValueError('exact_observation_lock must be boolean')
         self.exact_observation_lock = exact_observation_lock
+        self.utility_output_bias = validate_utility_output_bias(utility_output_bias)
         self.utility = nn.Sequential(nn.Linear(FEATURE_WIDTH, 64), nn.SiLU(),
                                      nn.Linear(64, 64), nn.SiLU(), nn.Linear(64, 3))
         nn.init.zeros_(self.utility[-1].weight)
-        nn.init.zeros_(self.utility[-1].bias)
+        nn.init.constant_(self.utility[-1].bias, self.utility_output_bias)
 
     def forward(self, states, features, exact_observation):
         if (states.ndim != 3 or states.shape[-1] != 4 or len(states) < 1
@@ -126,12 +144,30 @@ def physical_errors(prediction, target):
                         short_delta(prediction[..., 3]-target[..., 3]).abs()), -1)
 
 
-def evidence_fusion_loss(result, base_states, target, valid):
+def mixed_helper_states(base_states, alpha):
+    """One counterfactual per helper, using the forward path's circular geometry.
+
+    Alpha is a fixed design constant, not a model weight or a validation-selected
+    action. These single-helper actions do not claim joint-helper optimality.
+    """
+    validate_utility_objective('mixed_action', alpha)
+    delta = base_states[1:] - base_states[:1]
+    delta = torch.stack((delta[..., 0], short_delta(delta[..., 1]),
+                         delta[..., 2], short_delta(delta[..., 3])), -1)
+    prediction = base_states[:1] + alpha*delta
+    return torch.stack((prediction[..., 0],
+                        torch.remainder(prediction[..., 1]+180., 360.)-180.,
+                        prediction[..., 2], torch.remainder(prediction[..., 3], 360.)), -1)
+
+
+def evidence_fusion_loss(result, base_states, target, valid, *,
+                         objective='helper_quality', mixed_action_alpha=.5):
     """Reference is only a loss argument, and all helper errors use anchor truth.
 
     Validity is the anchor's per-attribute reference mask. A wrong helper must
     never be supervised against its own identity's reference.
     """
+    validate_utility_objective(objective, mixed_action_alpha)
     if target.shape != base_states.shape[1:] or valid.shape != target.shape or valid.dtype != torch.bool:
         raise ValueError('one anchor reference and per-attribute mask are required')
     mask = torch.stack((valid[:, :2].all(-1), valid[:, 2], valid[:, 3]), -1)
@@ -140,14 +176,19 @@ def evidence_fusion_loss(result, base_states, target, valid):
     zero = result['utility'].sum()*0.
     scales = base_states.new_tensor(ERROR_SCALES)
     errors = torch.log1p(physical_errors(base_states, safe_target)/scales)
-    gain_target = (errors[:1]-errors[1:]).detach()
+    # Direct-only retains helper-quality labels solely for T-only diagnostics;
+    # neither regression nor sign supervision consumes them.
+    helper_errors = (torch.log1p(physical_errors(
+        mixed_helper_states(base_states, mixed_action_alpha), safe_target)/scales)
+        if objective == 'mixed_action' else errors[1:])
+    gain_target = (errors[:1]-helper_errors).detach()
     fused = torch.log1p(physical_errors(result['states'], safe_target)/scales)
     utility_terms, direct_terms = [], []
     for attribute in range(3):
         selected = mask[:, attribute]
         if selected.any():
             direct_terms.append(fused[selected, attribute].mean())
-            if len(base_states) > 1:
+            if len(base_states) > 1 and objective != 'direct_only':
                 utility_terms.append(torch.nn.functional.smooth_l1_loss(
                     result['utility'][:, selected, attribute],
                     gain_target[:, selected, attribute].to(result['utility'].dtype)))
