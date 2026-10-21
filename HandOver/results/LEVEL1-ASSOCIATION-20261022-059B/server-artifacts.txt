@@ -1,0 +1,16 @@
+# 059B 大产物留服务器（未上传），登记绝对路径与数量
+
+运行目录：/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1（整目录 1.3G）
+关联：/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association/final.pt  78760 字节  2026-10-22 03:05:25.086460777 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association/final-scores.npz  45214229 字节  2026-10-22 03:05:30.806469730 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association/selected.pt  78847 字节  2026-10-22 03:05:11.298439027 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association/selected-scores.npz  45214229 字节  2026-10-22 03:05:17.010448066 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association/baseline-scores.npz  44967792 字节  2026-10-22 03:02:00.626110418 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/association/paired_sampling_audit.json  5617065 字节  2026-10-22 03:06:49.606589203 +0800
+系统：/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/system
+  predictions 300 个 NPZ 261M / system-predictions 300 个 NPZ 240M
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/system/summary.json  527543064 字节  2026-10-22 03:15:18.273606265 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1/system/preparation.json  85153502 字节  2026-10-22 03:09:50.418312861 +0800
+
+launcher：/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-059B-attempt-1-launch（COMPLETED 0 2026-10-21T19:15:19.771317+00:00 2339.46 advisory False）
