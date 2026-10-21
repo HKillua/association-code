@@ -1,0 +1,12 @@
+# 058 大产物留服务器（未上传），登记绝对路径与数量
+
+运行目录：/home/wangguangjie/djs/association-code/runs/LEVEL1-ORACLE-20261022-058-attempt-1（整目录 399M）
+  runs/LEVEL1-ORACLE-20261022-058-attempt-1/run.json  595 字节  2026-10-22 02:43:38.013402261 +0800
+  runs/LEVEL1-ORACLE-20261022-058-attempt-1/summary.json  2210366 字节  2026-10-22 02:43:38.013402261 +0800
+  runs/LEVEL1-ORACLE-20261022-058-attempt-1/scene-summary.json.gz  1315172 字节  2026-10-22 02:43:37.873400991 +0800
+  scenes/     300 个 scene-*.json.gz
+  predictions/ 300 个 NPZ
+
+只读源（未改动）：/home/wangguangjie/djs/association-code/runs/LEVEL1-SYSTEM-20261021-053A-attempt-1/system（predictions 与 system-predictions 各 300/300）
+
+launcher：runs/LEVEL1-ORACLE-20261022-058-attempt-1-launch（COMPLETED、exit_code 0、stderr 空）
