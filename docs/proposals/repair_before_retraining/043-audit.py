@@ -118,6 +118,80 @@ def paired(delta):
                 minimum=float(x.min()), maximum=float(x.max()))
 
 
+def fixed_support_gate(row):
+    """One fixed 600-second output diagnostic; no fitting or sweep.
+
+    Construction uses all saved Q64 predictions, bases and native-support
+    distances, never targets, masks, identities or sources. Keep arithmetic
+    in float64 before coordinate subtraction and shortest-arc wrapping.
+    """
+    prediction = row['prediction'].astype(np.float64).copy()
+    base = row['position_base'][..., :2].astype(np.float64)
+    residual = prediction[..., :2] - base
+    residual[..., 1] = arc(residual[..., 1])
+    nearest = row['nearest_seconds'].astype(np.float64)
+    assert np.all(nearest >= 0) and not np.isnan(nearest).any()
+    gate = -np.expm1(-nearest / 600.)
+    prediction[..., :2] = base + gate[..., None] * residual
+    prediction[..., 1] = arc(prediction[..., 1])
+    np.testing.assert_array_equal(prediction[..., 2:], row['prediction'][..., 2:])
+    np.testing.assert_array_equal(prediction[..., :2][nearest == 0], base[nearest == 0])
+    assert np.isfinite(prediction).all()
+    return {**row, 'prediction': prediction}
+
+
+def fixed_support_gate_analysis(rows):
+    gated_rows = [fixed_support_gate(row) for row in rows]
+    data = pool(gated_rows)
+    scene_records, fragment_records = [], []
+    for original, gated in zip(rows, gated_rows):
+        values = dict(base=errors(original, base=True)['position'],
+                      model=errors(original)['position'], gated=errors(gated)['position'])
+        valid = original['target_valid'][..., :2].all(-1)
+        scene_records.append(dict(scene_id=str(original['scene_id']),
+                                  **{key: stats(value[valid]) for key, value in values.items()}))
+        for i, node in enumerate(original['node_ids']):
+            fragment_records.append(dict(scene_id=str(original['scene_id']), node_id=str(node),
+                source=str(original['sources'][i]),
+                **{key: stats(value[i, valid[i]]) for key, value in values.items()}))
+    comparisons = {}
+    for scope, records in (('scene', scene_records), ('fragment', fragment_records)):
+        comparisons[scope] = dict(
+            mean_of_unit_mae={key: float(np.mean([r[key]['mae'] for r in records]))
+                              for key in ('base', 'model', 'gated')},
+            gated_minus_base=paired([r['gated']['mae']-r['base']['mae'] for r in records]),
+            gated_minus_model=paired([r['gated']['mae']-r['model']['mae'] for r in records]))
+    return dict(
+        definition='prediction_xy = base_xy + (1-exp(-nearest_seconds/600)) * '
+                   '(prediction_xy-base_xy); longitude residual uses shortest arc. '
+                   'Applies to all sources and all Q64; speed/heading unchanged.',
+        status='exploratory posthoc full-V output diagnostic, not a trained candidate or held-out result',
+        scale_seconds=600., scale_choice='One fixed existing gap600 scale; no sweep or target-based fit.',
+        construction_uses_targets=False, construction_uses_target_mask=False,
+        construction_uses_source_or_identity=False,
+        inference_calls=0, optimizer_updates=0,
+        input_dtypes={key: sorted({str(row[key].dtype) for row in rows})
+                      for key in ('prediction', 'position_base', 'nearest_seconds')},
+        arithmetic='Cast prediction/base/nearest to float64 before subtraction, wrapping and expm1; '
+                   'reuse this audit\'s independent unit-vector distance and all original masks.',
+        weighting='Pooled metrics weight every valid query equally; per-scene/per-fragment MAE '
+                  'first averages valid queries within that unit, then gives units equal weight. '
+                  'Fragments are not unique target identities.',
+        metrics=metrics(data),
+        by_source={str(s): metrics({key: value[data['sources'] == s] for key, value in data.items()})
+                   for s in sorted(set(data['sources']))},
+        paired=comparisons,
+        original_record_reference='Original base043/model043 metrics and sources are in the root '
+                                  'per_scene/per_fragment records; join by scene_id/node_id.',
+        per_scene=[dict(scene_id=r['scene_id'], gated=r['gated']) for r in scene_records],
+        per_fragment=[dict(scene_id=r['scene_id'], node_id=r['node_id'], gated=r['gated'])
+                      for r in fragment_records],
+        limitations=['600 seconds was not swept, but the diagnostic was motivated by already observed V failures.',
+                     'Finite residuals and a continuous distance gate imply zero correction at native observations; '
+                     'this output cache does not itself verify between-query continuity.',
+                     'A small pooled gain does not establish support protection, learned motion, repeatability or system benefit.'])
+
+
 def training(paths, runs):
     configs = [copy.deepcopy(read(paths[t]/'actual_config.json')) for t in ('034', '043')]
     assert configs[1]['model'].pop('position_base_policy') == 'native_ols'
@@ -237,6 +311,7 @@ def main():
                                 mean_only_metrics=constant_residual_metrics,
                                 definition='Mean latitude and shortest-arc longitude residual over all Q64; no labels/masks. '
                                 'Posthoc output ablation, not new inference/training. Heading/speed kept unchanged.'),
+                  fixed_support_gate_600s=fixed_support_gate_analysis(rows['043']),
                   limitations=['Single seed full development V, not independent test or significance.',
                                'Loss windows use changing minibatches and learned objective weights; no historical gradient-conflict proof.',
                                'Position_base has no speed/heading, so no invented two-attribute residual-gain claim.',

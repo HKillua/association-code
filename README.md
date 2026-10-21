@@ -13,12 +13,13 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 | 039—041消融 | **全部完成并复核** | pre-norm恢复动态但位置更差；两层更小且精度近似；去BCE改善速度但未恢复动态，尚无整体补全优势 |
 | 关联候选 | **044/045完成并独立复算** | 045宏F1 .83884，相对OLS .72717净少764条错边、错误helper少33.33%；044虽F1 .79229却增错边。跨源误报仍待解决 |
 | 融合候选 | **046完成并独立复算，保护条件未通过** | 对本轮支撑均值位置MAE4391.52→3846.96m、速度改善；航向、9002、长缺失及速度RMSE退步。抗污染有价值，正确helper利用仍弱 |
+| 冻结连接048 | **完成并复核，关联收益已传到下游** | 045换组使普通融合位置4391.52→3751.35m；新组学习融合3695.92m但航向/尾部仍差。一组一输出的共同人口三属性MAE改善，覆盖与保护项仍须分开看 |
 | 原生运动控制R2及关联衔接 | **本地完整V已完成** | OLS位置MAE8.85→4.74km，关联F1 .6156→.7272；共用保持阈值也改善，但14场F1退化。普通控制，不是已成立的学习贡献 |
 | OLS模型接入、R3/R4本地控制 | **代码、CPU检查与完整V控制已完成** | 匿名一次校准F1仅.72717→.72845且错误helper增多；正确组最近观测位置4.74→1.93km，预测组支撑均值4.74→4.39km。学习增量仍待验证，详见[本轮分析](docs/proposals/repair_before_retraining/local-readiness-analysis.md) |
 
 服务器领取、预算和状态只维护在 **[HandOver/Handover.md](HandOver/Handover.md)**。043—047均已完成并审计，不重复启动或加步。022—025继续HOLD，T_test封存。
 
-**最新结论见[043补全](docs/proposals/repair_before_retraining/043-analysis.md)、[047参考关联](docs/proposals/repair_before_retraining/047-analysis.md)与[044—046候选](docs/proposals/repair_before_retraining/044-046-analysis.md)。** 用户已明确“批准048和049”，两项已列为[当前READY](HandOver/Handover.md)：048冻结分组×融合2×2及独立唯一目标视图，049固定033独立TFM300。各一次，尚未收到启动回执；配置不因043/047负结果改变，已完成项不重跑。
+**最新结论见[研究说明](docs/research_brief.md)、[043补全](docs/proposals/repair_before_retraining/043-analysis.md)、[047参考关联](docs/proposals/repair_before_retraining/047-analysis.md)及[048连接验证](docs/proposals/repair_before_retraining/048-analysis.md)。** 已拉取服务器`bb51611`：048完成，049固定033独立TFM300最新回执RUNNING、尚无训练终态；两项均已领取，当前无新增READY。配置不因043/047负结果改变，已领取项不重跑。
 
 ## 从哪里开始
 
@@ -29,7 +30,8 @@ MTAD 不完整量测下的**补全、关联、融合**研究。目标是关联�
 | [数据契约](docs/data_contract.md) | 划分、原生时间、单位、mask、全人口和指标 |
 | [论文协议对照](docs/mtad_data_protocols.md) | TMTAFF与其他MTAD方法的数据选择和任务差异 |
 | [当前结果与分析](docs/proposals/repair_before_retraining/README.md) | 补全排查、对照结果、复算脚本和保留证据 |
-| [候选方法](docs/proposals/candidate_revision_after018/README.md) | 当前候选结构、表示和训练阶段 |
+| [候选补全与早期v2](docs/proposals/candidate_revision_after018/README.md) | 043补全及早期cooperative结构；其中旧身份/融合四臂不是045/046 |
+| [证据关联与效用融合](docs/specs/evidence-association-fusion.md) | 044—046独立方法，冻结普通OLS；尚未接入043，045与046的连接已由048评价 |
 | [参考实现规格](docs/specs/complete-training-refactor.md) | TMTAFF适配参考的四阶段训练、选择和恢复；各模块规格从此进入 |
 | [历史摘要](docs/history/README.md) | 已结束实验、负结果、旧方案与Git恢复方法 |
 | [协作约定](AGENTS.md)、[服务器权限](docs/server_autonomy.md) | 本地研究/代码/分析，服务器执行/监控 |

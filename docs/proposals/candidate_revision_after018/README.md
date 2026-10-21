@@ -1,6 +1,8 @@
-# 候选方法：观测底座、局部关联与属性效用融合
+# 候选补全与早期v2：观测底座、局部关联与属性效用融合
 
-本文统一记录已实现的候选数学、表示与训练边界。它是实验方法说明，尚无可靠端到端收益；当前结果见[研究说明](../../research_brief.md)，执行与预算仅看[交接索引](../../../HandOver/Handover.md)。
+本文记录cooperative v2的补全及早期身份/融合四臂的数学、表示与训练边界。043仍沿用这一补全模型；**044/045证据关联与046效用融合是另行实现的独立先导，不使用本页的身份支路或融合四臂**，方法见[证据关联与效用融合规格](../../specs/evidence-association-fusion.md)。
+
+2026-10-21更新：043已完成，学习补全尚未通过；045/046冻结普通OLS，未接入043学习输出，二者的冻结连接已由[048评价](../repair_before_retraining/048-analysis.md)。本页旧四臂定义不表示022—025恢复执行，也不代表三项贡献已经接通。当前结果见[研究说明](../../research_brief.md)，执行与预算仅看[交接索引](../../../HandOver/Handover.md)。
 
 ## 表示版本与当前选项
 
@@ -14,6 +16,7 @@
 | 039 | 同034 | 同034 | 仅`decoder_norm_first=true`，decoder pre-norm |
 | 040 | 同034 | 同034 | 仅`decoder_num_layers=2`，encoder仍六层 |
 | 041 | 同034 | 同034 | 仅`teacher_identity_weight=0`，物理self/cross监督保留 |
+| 043 | 同034 | 同034 | 相对034仅`position_base_policy=native_ols`，未叠加039—041 |
 
 这些是可区分的实验设置，不能统称021已经使用scaled_log或航向底座。非默认decoder语义、速度与航向输出模式随checkpoint保存并核对；同形权重也不能静默换公式。默认旧配置兼容不等于不同模式可以热切换。
 
@@ -25,7 +28,9 @@ v2输入投影前为`[z_lat,z_lon,z_logspeed,sin(theta),cos(theta)]`。仅用T_c
 
 外部packed张量仍为`[N,M+Q,5]`（四状态槽加tau）：第三状态槽为z_logspeed，第四槽仍为航向z；encode用保存的原生航向mean/std还原角度再转sin/cos。只读当前observed native token及query时间；query四状态、padding、reference与身份标签不进入运动编码。V不重新拟合统计。
 
-锚片段沿既有组内首成员规则确定，不按来源或reference误差挑选。当前可见点内纬度线性插值，经度沿最短弧插值；位置恰差180°时取−180°方向。支撑外保持最近端点；endpoint留出后重新计算底座与支撑，不能使用被移除的点。
+锚片段沿既有组内首成员规则确定，不按来源或reference误差挑选。默认`hold`位置底座（上表043之前的候选配置）在可见点内按纬度线性插值、经度最短弧插值；位置恰差180°时取−180°方向，支撑外保持最近端点。endpoint留出后重新计算底座与支撑，不能使用被移除的点。
+
+043的`native_ols`改为从当前可见原生点拟合运动斜率，支撑外从真实端点延伸，支撑内保留插值；点数不足时保留确定回退。新策略的经度半周边界按原差符号选弧，旧`hold`不变。它只替换位置底座，速度、航向及下述训练目标不变；模型自身FP32底座与外部FP64普通控制分开比较。接入与数值边界见[本地实施分析](../repair_before_retraining/local-readiness-analysis.md)，学习效果见[043分析](../repair_before_retraining/043-analysis.md)。
 
 位置输出为`lat_hat=clamp(base_lat+state_std_lat*r_lat,-90,90)`、`lon_hat=wrap180(base_lon+state_std_lon*r_lon)`。底座来自FP32 token反归一化，有舍入误差，不保证原CSV逐位复制。纬经投影行零初始化，使初始输出等于此底座；保留std作为残差尺度。
 
