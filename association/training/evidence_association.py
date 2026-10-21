@@ -20,6 +20,7 @@ from association.models.evidence_association import (
 from association.training.common import _update
 from association.training.sampling import BalancedScenePairSampler
 from association.training.paired_sampling import PairedNegativeIntervention, validate_sampling_config
+from association.training.association_prefix import PrefixReference
 from association.utils import runtime
 
 
@@ -282,7 +283,7 @@ def load_checkpoint(path, device):
 
 def fit_evidence_association(config, output_dir, device, *, archive_path=None, manifest=None,
                              train_scenes=None, validation_scenes=None, synthetic=False,
-                             command=None):
+                             command=None, prefix_reference=None):
     """One fit; exactly fixed updates, step-zero selection, advisory time only."""
     settings = validate_config(config)
     policy = config.get('motion_observation_policy', 'selected_cap128')
@@ -305,6 +306,8 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
     actual_update = 0
     sampler = None
     intervention = None
+    prefix = None
+    prefix_result = None
 
     def persist_paired_sampling_audit():
         if intervention is None:
@@ -337,6 +340,10 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
             'per_scene_artifact': 'sampling_audit.json'}
 
     try:
+        if prefix_reference is not None:
+            prefix = PrefixReference(prefix_reference, config, expected_precision=PRECISION, synthetic=synthetic)
+            run.metadata['prefix_reference'] = str(prefix.path)
+            runtime.write_json(run.path/'run.json', run.metadata)
         runtime.seed_everything(config['seed'])
         if synthetic:
             if archive_path is not None or manifest is not None or train_scenes is None or validation_scenes is None:
@@ -388,6 +395,8 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
         model = EvidenceAssociation(config['variant']).to(device)
         model.motion_observation_policy = policy
         optimizer = torch.optim.Adam(model.parameters(), lr=settings['learning_rate'])
+        if prefix is not None:
+            runtime.write_json(run.path/'prefix-binding.json', prefix.bind(audit, validation, model, optimizer))
         best = None
         history = []
         training_seconds = validation_seconds = 0.
@@ -458,6 +467,17 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                 row['validation_seconds'] = time.monotonic()-validation_started
                 validation_seconds += row['validation_seconds']
                 persist_sampling_audit()
+                if prefix is not None and update == prefix.update:
+                    stem = f'prefix-step-{update}'
+                    _save_checkpoint(run.path/(stem+'.pt'), model, optimizer, config, normalizer, update, selection)
+                    _save_scores(run.path/(stem+'-scores.npz'), final_records)
+                    prefix_sampling = runtime.read_json(run.path/'sampling_audit.json')
+                    runtime.write_json(run.path/(stem+'-sampling_audit.json'), prefix_sampling)
+                    runtime.write_json(run.path/(stem+'.json'), dict(update=update, selection=selection,
+                        result=summarize_records(final_records, selection['threshold']),
+                        checkpoint=stem+'.pt', scores=stem+'-scores.npz'))
+                    prefix_result = prefix.compare(model, optimizer, final_records, selection, prefix_sampling)
+                    runtime.write_json(run.path/'prefix-comparison.json', prefix_result)
             history.append(row)
             runtime.write_json(run.path/'history.json', history)
             runtime.write_json(run.path/'progress.json', dict(
@@ -495,6 +515,13 @@ def fit_evidence_association(config, output_dir, device, *, archive_path=None, m
                          'balanced training score is not a calibrated posterior probability'])
         if intervention is not None:
             report['paired_sampling'] = persist_paired_sampling_audit()
+        if prefix is not None:
+            if prefix_result is None:
+                raise AssertionError('fixed prefix comparison was not completed')
+            report['prefix_comparison'] = {key: prefix_result[key] for key in
+                ('comparison_status', 'causal_attribution_valid', 'bitwise_state_and_scores_equal',
+                 'prefix_update', 'source_directory')}
+            report['prefix_comparison']['artifact'] = 'prefix-comparison.json'
         if selected_checkpoint['update'] != best['update']:
             raise AssertionError('restored selected checkpoint differs from selected update')
         runtime.write_json(run.path/'summary.json', report)

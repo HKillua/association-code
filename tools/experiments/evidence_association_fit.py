@@ -63,6 +63,8 @@ def main(argv=None):
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--variant', choices=VARIANTS, help='synthetic check only; fit reads config')
     parser.add_argument('--archive', nargs='+', help='one ZIP or its ordered continuous parts')
+    parser.add_argument('--prefix-reference', type=Path,
+                        help='060 only: completed056 association directory; compare final1000, never resume')
     for name in ('manifest', 'config'):
         parser.add_argument('--'+name)
     args = parser.parse_args(argv)
@@ -80,10 +82,11 @@ def main(argv=None):
         if args.mode == 'fit':
             if not all((args.archive, args.manifest, args.config)) or args.variant is not None:
                 raise ValueError('fit needs archive, manifest, config; variant comes from config')
-            kwargs = dict(archive_path=args.archive, manifest=runtime.read_json(args.manifest))
+            kwargs = dict(archive_path=args.archive, manifest=runtime.read_json(args.manifest),
+                          prefix_reference=args.prefix_reference)
             config = runtime.read_json(args.config)
         else:
-            if any((args.archive, args.manifest, args.config)):
+            if any((args.archive, args.manifest, args.config, args.prefix_reference)):
                 raise ValueError('synthetic check does not accept native archive/manifest/config')
             train, validation = synthetic_scenes()
             kwargs = dict(train_scenes=train, validation_scenes=validation, synthetic=True)
