@@ -2,7 +2,7 @@
 
 更新：2026-10-21，用户明确批准048/049，现列为READY；043—047均已完成并复核。
 
-**当前仅048、049为可领取READY，各一次；尚未收到启动回执，不代表已经运行。** 043—047全部COMPLETED/退出0并结案，不重领；022—025继续HOLD。其它历史READY/DRAFT不构成待办，T_test封存。
+**当前仅048、049为可领取READY，各一次；两条均已由服务器于03:17Z领取并SUBMITTED、现RUNNING（启动回执见各自S2L）。** 043—047全部COMPLETED/退出0并结案，不重领；022—025继续HOLD。其它历史READY/DRAFT不构成待办，T_test封存。
 
 ## 本地给服务器：本轮结论
 
@@ -32,8 +32,8 @@
 
 | READY任务 | 固定范围 | 资源与目的 |
 | --- | --- | --- |
-| [048冻结连接](L2S-20261021-048.md) | 046实际OLS组/045 selected组 × mean_supported/046 final；同次逐helper路由、片段级与单独一组一输出视图 | CPU4、一次完整V、训练0、30分钟仅提醒；验证关联收益传递及融合利用好信息的问题 |
-| [049独立TFM](L2S-20261021-049.md) | 固定033，新TFM300，0/100/300正确组物理评价，唯一final300；无TAM/JOINT/校准/阈值选择 | 单GPU/CPU4、12小时仅提醒；旧微批1估约10.3h纯训，当前8实速未知。无需等待TAM达到OLS水平 |
+| [048冻结连接](L2S-20261021-048.md) | 046实际OLS组/045 selected组 × mean_supported/046 final；同次逐helper路由、片段级与单独一组一输出视图 | CPU4、一次完整V、训练0、30分钟仅提醒；验证关联收益传递及融合利用好信息的问题 **（服务器 `03:17:04.821Z` 已领取，RUNNING，见[S2L](S2L-20261021-048.md)：块逐字32行1,911字节 SHA256 `e904fbef…b51cacc3`、零替换；树@d2ce3f7；四个输入守卫全过，其中三个消费我上轮回传入库的045/046原件（selected-scores.npz 387,880B／summary.json.gz 110,546B／predictions-final.tar.gz 19,968,003B）＋046/final.pt 86,604B；`--device cpu --cpu-threads 4`＝**不占GPU名额**，与049并行符合草案"可与GPU任务并行"；unit mtad-e766f6456593、`RuntimeMaxSec=infinity`＋1800秒仅提醒；worker 2709392／payload 2709402。终态未产生。）**|
+| [049独立TFM](L2S-20261021-049.md) | 固定033，新TFM300，0/100/300正确组物理评价，唯一final300；无TAM/JOINT/校准/阈值选择 | 单GPU/CPU4、12小时仅提醒；旧微批1估约10.3h纯训，当前8实速未知。无需等待TAM达到OLS水平 **（服务器 `03:17:06.085Z` 已领取，RUNNING，见[S2L](S2L-20261021-049.md)：块逐字35行1,872字节 SHA256 `6f428380…1d65ed35`、零替换、`--device auto` 原样保留（未使用四卡授权，049是**唯一**GPU作业，符合"旧四卡授权不扩大到本项"）；auto快照03:17:05.841Z选索引0 `GPU-c5a00c37…`，24,247MiB空闲／0%／无他人进程；树@d2ce3f7；`actual_config.json`与仓库配置同哈希`9d75df72…6f1a92`，摊平后与033差5项且全属本项范围（TCM 4000→0、TFM_FROZEN 0→300、fusion_monitor_updates→[0,100,300]、max_hours 4→12、time_policy→advisory），结构／损失／batch64／microbatch8／lr .002 constant／seed20未变；unit mtad-24960d5e0c03、`RuntimeMaxSec=infinity`＋43,200秒（12小时）仅提醒；worker 2709416／payload 2709419。microbatch8无实测单价，我不按017的123.611秒/步外推。终态未产生。）**|
 
 完整设计见[048—049方案](../docs/specs/next-experiments-048-049.md)。048仍用普通OLS和045/046，不换043；049仍固定033，不换037或接047预测组。048一次CPU评价、049一次300步单GPU训练，失败不自动重试；均无TAM/JOINT/T_test。048可与049并行，049按实际名额和FIFO调度；30分钟/12小时均仅提醒，不自动kill或追加更新。后续补全受约束运动修正、TAM目标尺度、统一/属性效用及045特征归因不在本次授权内。
 
