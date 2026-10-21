@@ -1,0 +1,77 @@
+{
+  "kind": "native-ols-evidence-association-v1",
+  "config": {
+    "scope": "native-ols-evidence-association-v1",
+    "variant": "full_evidence",
+    "seed": 20261021,
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0
+    },
+    "training": {
+      "updates": 3000,
+      "batch_size": 256,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "validate_every": 100,
+      "inference_batch_size": 8192,
+      "advisory_hours": 1.0
+    },
+    "motion_observation_policy": "canonical_all"
+  },
+  "command": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run060/tools/experiments/evidence_association_fit.py",
+    "fit",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run060/configs/data/mtad-level1-scene3000.json",
+    "--config",
+    "/home/wangguangjie/djs/association-code-run060/configs/evidence-association-level1-3000.json",
+    "--prefix-reference",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association",
+    "--device",
+    "cuda:0",
+    "--cpu-threads",
+    "4",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-060-attempt-1/association"
+  ],
+  "provenance": {
+    "python": "3.11.7",
+    "torch": "2.5.1+cu121",
+    "numpy": "1.26.4",
+    "device": "cuda:0",
+    "git_commit": "a9d31ab658690ff6b8326db97f46ee92406a4624",
+    "git_dirty": false,
+    "cuda_build": "12.1",
+    "cuda_visible_devices": "GPU-c5a00c37-f181-90b3-f220-be6e7457f473",
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "total_memory_bytes": 25438126080
+  },
+  "precision": "native feature calculation/base float64; feature cache float32; training normalizer streaming float64; normalized network input/parameters float32; summed score float64",
+  "synthetic": false,
+  "reference_read": false,
+  "test_opened": false,
+  "optimizer_updates": 3000,
+  "score_semantics": "association score, not a calibrated probability",
+  "status": "COMPLETED",
+  "prefix_reference": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association",
+  "elapsed_seconds": 2288.2338165179826,
+  "selected": {
+    "update": 2700,
+    "selection": {
+      "threshold": 1.2516831812193054,
+      "macro_f1": 0.8175504702016311,
+      "candidate_count": 4439093,
+      "scene_count": 300,
+      "tie_break": "higher threshold, all-reject above all finite scores"
+    }
+  },
+  "cuda_process_peak_allocated_bytes": 23989248,
+  "cuda_process_peak_reserved_bytes": 48234496
+}

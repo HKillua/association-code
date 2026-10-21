@@ -1,0 +1,27 @@
+{
+  "source_directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association",
+  "source_endpoint": "final",
+  "prefix_update": 1000,
+  "source_updates": 1000,
+  "target_updates": 3000,
+  "protocol_valid": true,
+  "normalizer_exact": true,
+  "population_exact": true,
+  "ols_scores_exact": true,
+  "sampler_policy_exact": true,
+  "restores_parameters": false,
+  "restores_optimizer": false,
+  "restores_rng": false,
+  "source_provenance": {
+    "python": "3.11.7",
+    "torch": "2.5.1+cu121",
+    "numpy": "1.26.4",
+    "device": "cuda:0",
+    "git_commit": "3e12df351d898b68ab764cbdb58e0855018d6fbc",
+    "git_dirty": false,
+    "cuda_build": "12.1",
+    "cuda_visible_devices": "GPU-c5a00c37-f181-90b3-f220-be6e7457f473",
+    "gpu_name": "NVIDIA GeForce RTX 3090",
+    "total_memory_bytes": 25438126080
+  }
+}
