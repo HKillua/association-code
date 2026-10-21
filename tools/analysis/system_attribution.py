@@ -92,11 +92,10 @@ def aggregate(rows):
     return result
 
 
-def run(args):
-    source, output = Path(args.source_system).resolve(), Path(args.output).resolve()
-    if source == output or source in output.parents:
-        raise ValueError('054 outputs must not modify the saved053A directory')
-    manifest, original, source_run = read(args.manifest), read(source/'summary.json'), read(source/'run.json')
+def load_source(source, manifest):
+    """Shared complete053A cache contract; reads metadata and source vocabulary."""
+    source = Path(source)
+    original, source_run = read(source/'summary.json'), read(source/'run.json')
     ids = original['scene_ids']
     required = [str(x) for x in manifest['splits']['V_select']]
     wp = original.get('ols_working_point', {})
@@ -127,6 +126,15 @@ def run(args):
     for sid in ids:
         with np.load(source/'predictions'/f'states-{sid}.npz', allow_pickle=False) as f:
             sources.update(str(x) for x in f['sources'])
+    return original, source_run, expected, sorted(sources)
+
+
+def run(args):
+    source, output = Path(args.source_system).resolve(), Path(args.output).resolve()
+    if source == output or source in output.parents:
+        raise ValueError('054 outputs must not modify the saved053A directory')
+    original, source_run, expected, sources = load_source(source, read(args.manifest))
+    ids = original['scene_ids']
     output.mkdir(parents=True, exist_ok=False)
     (output/'scenes').mkdir()
     (output/'predictions').mkdir()
