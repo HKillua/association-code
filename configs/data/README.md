@@ -50,7 +50,7 @@ python tools/experiments/prepare_scene_data.py \
 ## 下一轮配置
 
 - [TCM一遍覆盖模板](../tmtaff-tcm-level1.json)：155134条/每批64=2424步，`ordered_fragment`，固定末尾不足64条不回卷；原TCM架构与损失保持033口径，8小时仅提醒。这是一遍覆盖的起点，不是充分收敛或原论文复现成功的证明。
-- [关联配置](../evidence-association-level1.json)：完整canonical观测，1000更新固定终点；记录实际场景/配对覆盖，step0必须复现053纯OLS工作点。[056交接](../../HandOver/L2S-20261022-056.md)已获用户批准并READY，按可用名额执行一次。
-- [融合helper质量](../evidence-fusion-level1.json)、[Direct-only](../evidence-fusion-level1-direct-only.json)、[固定混合收益](../evidence-fusion-level1-mixed-action.json)：只改变辅助监督，统一正bias初始化、1000更新和α=0.5；必须给当前`--ols-working-point`，不继承旧14.2km或启用051符号辅助损失。[057交接](../../HandOver/L2S-20261022-057.md)已获用户单独批准并READY，可与056按可用名额并行。
+- [关联配置](../evidence-association-level1.json)：完整canonical观测，1000更新固定终点；记录实际场景/配对覆盖，step0必须复现053纯OLS工作点。[056交接](../../HandOver/L2S-20261022-056.md)已获用户批准并领取，服务器回执RUNNING，不重复执行。
+- [融合helper质量](../evidence-fusion-level1.json)、[Direct-only](../evidence-fusion-level1-direct-only.json)、[固定混合收益](../evidence-fusion-level1-mixed-action.json)：只改变辅助监督，统一正bias初始化、1000更新和α=0.5；必须给当前`--ols-working-point`，不继承旧14.2km或启用051符号辅助损失。[057交接](../../HandOver/L2S-20261022-057.md)已获用户单独批准并领取，与056在不同GPU上RUNNING。
 
-当前056关联与057融合均READY，TCM模板不在本次授权内；实际启动状态以服务器回执为准。参考编码器仍cap128/全场Q64，候选完整观测的收益须先与相同输入的OLS比较，再作同预算归因。后续训练预算和执行只看独立交接。
+当前056关联与057融合均RUNNING，TCM模板不在本次授权内；后续进展以服务器回执为准。参考编码器仍cap128/全场Q64，候选完整观测的收益须先与相同输入的OLS比较，再作同预算归因。后续训练预算和执行只看独立交接。
