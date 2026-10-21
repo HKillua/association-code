@@ -1,0 +1,12 @@
+fusion step 50: 0.312 seconds/update; fixed remaining updates ~296.6s, excluding future full-V evaluations; advisory only.
+fusion step 100: total=1.34972; full V complete
+fusion step 200: total=1.10073; full V complete
+fusion step 300: total=1.61884; full V complete
+fusion step 400: total=1.15799; full V complete
+fusion step 500: total=1.16685; full V complete
+fusion step 600: total=1.29939; full V complete
+fusion step 700: total=1.08041; full V complete
+fusion step 800: total=1.17175; full V complete
+fusion step 900: total=1.42025; full V complete
+fusion step 1000: total=1.2459; full V complete
+COMPLETED: /home/wangguangjie/djs/association-code/runs/EVIDENCE-FUSION-SIGN-20261021-051-attempt-1
