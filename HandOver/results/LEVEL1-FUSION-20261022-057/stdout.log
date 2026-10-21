@@ -1,0 +1,42 @@
+fusion step 50: 0.214 seconds/update; fixed remaining updates ~203.6s, excluding future full-V evaluations; advisory only.
+fusion step 100: total=1.48467; full V complete
+fusion step 200: total=1.35653; full V complete
+fusion step 300: total=1.54715; full V complete
+fusion step 400: total=1.17278; full V complete
+fusion step 500: total=1.26334; full V complete
+fusion step 600: total=1.40039; full V complete
+fusion step 700: total=1.13852; full V complete
+fusion step 800: total=1.14826; full V complete
+ADVISORY: suggested duration exceeded; continuing the same fixed updates, no retry.
+fusion step 900: total=1.35944; full V complete
+fusion step 1000: total=1.1756; full V complete
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/fit
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/system
+fusion step 50: 0.152 seconds/update; fixed remaining updates ~144.5s, excluding future full-V evaluations; advisory only.
+fusion step 100: total=1.16199; full V complete
+fusion step 200: total=1.00585; full V complete
+fusion step 300: total=1.20688; full V complete
+fusion step 400: total=0.94268; full V complete
+fusion step 500: total=1.04023; full V complete
+fusion step 600: total=1.10821; full V complete
+fusion step 700: total=0.908442; full V complete
+fusion step 800: total=0.945084; full V complete
+ADVISORY: suggested duration exceeded; continuing the same fixed updates, no retry.
+fusion step 900: total=1.12035; full V complete
+fusion step 1000: total=1.00775; full V complete
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/fit
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/system
+fusion step 50: 0.195 seconds/update; fixed remaining updates ~184.8s, excluding future full-V evaluations; advisory only.
+fusion step 100: total=1.32971; full V complete
+fusion step 200: total=1.21577; full V complete
+fusion step 300: total=1.38506; full V complete
+fusion step 400: total=1.0924; full V complete
+fusion step 500: total=1.1976; full V complete
+fusion step 600: total=1.33471; full V complete
+fusion step 700: total=1.07694; full V complete
+fusion step 800: total=1.11622; full V complete
+ADVISORY: suggested duration exceeded; continuing the same fixed updates, no retry.
+fusion step 900: total=1.29294; full V complete
+fusion step 1000: total=1.11239; full V complete
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/fit
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/system

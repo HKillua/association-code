@@ -1,0 +1,43 @@
+# 057 大产物留服务器（未上传），登记绝对路径与实际字节数
+
+整运行目录：/home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-20261022-057-attempt-1 ＝ 10G；冻结checkout /home/wangguangjie/djs/association-code-run057（detached 3e12df3）
+
+## helper-quality
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/fit/evaluation-step-0.json  441159287 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/fit/evaluation-step-1000.json  441187783 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/fit/execution.json  676958782 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/fit/final.pt  121740 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/fit/step-0.pt  68084 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/system/summary.json  306108632 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/system/preparation.json  85153501 字节
+  system/predictions/  300 个文件  628M
+  system/system-predictions/  300 个文件  145M
+  每100步监测 evaluation-step-{100..900}.json 各 7412837 字节（留在服务器）
+
+## direct-only
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/fit/evaluation-step-0.json  441159287 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/fit/evaluation-step-1000.json  441183418 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/fit/execution.json  676958788 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/fit/final.pt  121740 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/fit/step-0.pt  68084 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/system/summary.json  306110045 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/system/preparation.json  85153502 字节
+  system/predictions/  300 个文件  553M
+  system/system-predictions/  300 个文件  144M
+  每100步监测 evaluation-step-{100..900}.json 各 7409713 字节（留在服务器）
+
+## mixed-action
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/fit/evaluation-step-0.json  441159287 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/fit/evaluation-step-1000.json  441183994 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/fit/execution.json  676958790 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/fit/final.pt  121804 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/fit/step-0.pt  68148 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/system/summary.json  306108139 字节
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/mixed-action/system/preparation.json  85153502 字节
+  system/predictions/  300 个文件  643M
+  system/system-predictions/  300 个文件  145M
+  每100步监测 evaluation-step-{100..900}.json 各 7411330 字节（留在服务器）
+
+注：交接要求的 execution.json／evaluation-step-0／evaluation-step-1000 实测分别约 677 MB／441 MB／441 MB（三臂合计 4.4 GB），全量 gzip 后约 320 MB 会压进仓库；我改为按臂回传 compact-return.json（汇总部分，约 1.4 MB）并在其中列出被剔除的明细键与条数，原件在服务器按上面路径可即时读取。逐场与逐锚点明细、路由、权重、预测 NPZ 均未删除。
+
+launcher：runs/LEVEL1-FUSION-20261022-057-attempt-1-launch（COMPLETED rc 0 2026-10-21T21:29:19.974205+00:00 14888.518 advisory False）
