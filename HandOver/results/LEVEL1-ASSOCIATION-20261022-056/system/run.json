@@ -1,0 +1,48 @@
+{
+  "status": "COMPLETED",
+  "dataset_level": "Level1",
+  "split": "V_select",
+  "optimizer_updates": 0,
+  "test_opened": false,
+  "threshold_reselected": false,
+  "normalizer_refitted": false,
+  "motion_observation_policy": "canonical_all",
+  "association_endpoint": "final",
+  "ordinary_controls": [
+    "anchor",
+    "mean_supported",
+    "attribute_hybrid"
+  ],
+  "stage": "finished",
+  "completed_scenes": 300,
+  "total_scenes": 300,
+  "inputs": {
+    "archive": [
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip"
+    ],
+    "manifest": "/home/wangguangjie/djs/association-code-run056/configs/data/mtad-level1-scene3000.json",
+    "alignment": "/home/wangguangjie/djs/association-code-run056/configs/data/mtad-level1-alignment.json",
+    "ols_working_point": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SYSTEM-20261021-053A-attempt-1/ols/ols-working-point.json",
+    "association_scores": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association/final-scores.npz",
+    "association_summary": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association/summary.json",
+    "association_data_audit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association/data_audit.json",
+    "association_checkpoint": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association/final.pt",
+    "association_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association/run.json",
+    "fusion_checkpoint": null,
+    "fusion_run": null
+  },
+  "preparation_seconds": 303.59443435491994,
+  "last_scene_id": "4968",
+  "elapsed_seconds": 506.3901002588682,
+  "method_names": [
+    "learned_assoc_anchor",
+    "learned_assoc_attribute_hybrid",
+    "learned_assoc_mean_supported",
+    "ols_anchor",
+    "ols_attribute_hybrid",
+    "ols_mean_supported"
+  ],
+  "fusion_checkpoint_step": null
+}
