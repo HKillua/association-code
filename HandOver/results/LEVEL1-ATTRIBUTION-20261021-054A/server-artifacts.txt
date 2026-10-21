@@ -1,0 +1,15 @@
+# 054A 大产物留服务器（未上传），登记绝对路径与实际文件数
+
+运行目录：/home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1/run.json  552 字节  2026-10-21 22:11:38.776396066 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1/summary.json  730502 字节  2026-10-21 22:11:38.776396066 +0800
+  /home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1/scene-summary.json.gz  291091 字节  2026-10-21 22:11:38.732396653 +0800
+
+  scenes/       300 个 scene-*.json.gz（逐目标原因表）
+  predictions/  300 个 states-*.npz（三臂数组）
+  整目录合计 218M
+
+源（只读，未改动）：/home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1
+  predictions 300 个 NPZ／system-predictions 300 个 NPZ，源目录仍 287M
+
+launcher：/home/wangguangjie/djs/association-code/runs/LEVEL1-ATTRIBUTION-20261021-054A-attempt-1-launch（status COMPLETED、exit_code 0、stderr 空）
