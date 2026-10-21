@@ -20,8 +20,10 @@ from association.data.timed import _settings, prepare_timed_scene
 from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
 
 
-def _request(manifest, train_splits, data_config, alignment_by_scene):
+def _request(manifest, train_splits, data_config, alignment_by_scene, *, validation_only=False):
     validate_manifest(manifest)
+    if not isinstance(validation_only, bool):
+        raise DataError('validation_only must be a boolean')
     if not isinstance(train_splits, (tuple, list)) or tuple(train_splits) not in (
             ('T_core',), ('T_core', 'T_head')):
         raise DataError('train_splits must explicitly be T_core or T_core+T_head in that order')
@@ -32,9 +34,9 @@ def _request(manifest, train_splits, data_config, alignment_by_scene):
     _settings(**{key: data_config[key] for key in required})
     if data_config.get('reference_longitude_policy', 'linear') not in ('linear', 'shortest_arc'):
         raise DataError('reference_longitude_policy must be linear or shortest_arc')
-    splits = [*train_splits, 'V_select']
+    splits = ['V_select'] if validation_only else [*train_splits, 'V_select']
     requested = [sid for split in splits for sid in manifest['splits'][split]]
-    if not manifest['splits']['T_core'] or not manifest['splits']['V_select']:
+    if not manifest['splits']['V_select'] or (not validation_only and not manifest['splits']['T_core']):
         raise DataError('Frozen T_core and V_select selections must be nonempty')
     if not isinstance(alignment_by_scene, dict) or not set(requested).issubset(alignment_by_scene):
         raise DataError('Explicit reference alignment must cover every requested scene before reference access')
@@ -51,7 +53,8 @@ def _request(manifest, train_splits, data_config, alignment_by_scene):
 
 
 def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
-                       alignment_by_scene, check=None, motion_observation_policy=None):
+                       alignment_by_scene, check=None, motion_observation_policy=None,
+                       validation_only=False):
     """Return train/validation scene lists and a JSON-compatible preparation report.
 
     Every label-derived A-B identity is a target, including targets whose nodes
@@ -59,11 +62,15 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
     extent; absent or zero-duration bounds fail. Nonempty scenes use native
     observation support. Clock mapping is mandatory and never estimated from
     reference values. Optional check bounds preparation between scene reads.
+    With validation_only=True, read only V_select payloads and return an empty
+    train list. The original manifest stays intact, and alignment is required
+    only for V_select; no training population or statistics are prepared.
     """
     started = time.monotonic()
     if motion_observation_policy is not None:
         validate_motion_observation_policy(motion_observation_policy)
-    splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene)
+    splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene,
+                                validation_only=validation_only)
     input_config = {key: data_config[key] for key in ('length', 'max_observations', 'time_unit_seconds')}
     longitude_policy = data_config.get('reference_longitude_policy', 'linear')
     scenes, populations = {}, {}
@@ -143,7 +150,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                 del reference
     if check:
         check()
-    training = [scene for split in train_splits for scene in populations[split]]
+    loaded_train_splits = [] if validation_only else list(train_splits)
+    training = [scene for split in loaded_train_splits for scene in populations[split]]
     validation = populations['V_select']
     scene_reports = []
     for scene in [*training, *validation]:
@@ -163,7 +171,7 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
             scene_reports[-1]['split_unit'] = 'scene'
         if motion_observation_policy is not None:
             scene_reports[-1]['motion_native_point_count'] = int(scene['motion']['native_count'].sum())
-    report = dict(scope='TMTAFF-time-adapted-v1', training_splits=list(train_splits), selection_split='V_select',
+    report = dict(scope='TMTAFF-time-adapted-v1', training_splits=loaded_train_splits, selection_split='V_select',
         training_scene_ids=[s['scene_id'] for s in training], validation_scene_ids=[s['scene_id'] for s in validation],
         data_config=dict(data_config), reference_longitude_policy=longitude_policy,
         scenes=scene_reports, observation_members_read=archive_members,
