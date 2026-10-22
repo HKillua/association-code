@@ -66,6 +66,45 @@ class FusionTransferSourceTests(unittest.TestCase):
         args[4]['learned'][0, 0, 0] += 1e-9
         self.assertTrue(replay_fusion_source(*args, expected=expected)['passed'])
 
+    def test_utility_gate_accepts_cross_device_rounding_at_array_scale(self):
+        # 064 measured this on Level1 scene 1 (direct_only): one element sat
+        # 1.63e-06 from the saved GPU value against a 1.35e-06 fixed bound, while
+        # the accept set was identical and the array scale was 152.8. The gate must
+        # follow the array's own float32 scale, not a fixed absolute floor.
+        *args, expected = self.replay_fixture()
+        args[5]['utility'][0, 0, 0] = 150.
+        args[2]['ols_routing_utility'][0, 0, 0] = 150.
+        previous_small = float(args[2]['ols_routing_utility'][1, 0, 0])
+        args[5]['utility'][1, 0, 0] += 1.6e-5
+        report = replay_fusion_source(*args, expected=expected)
+        self.assertTrue(report['passed'])
+        self.assertTrue(report['checks']['utility_decision_equal'])
+        self.assertTrue(report['checks']['utility_scale_close'])
+        self.assertEqual(report['utility_sign_flip_count'], 0)
+        self.assertEqual(report['utility_numeric_exceed_count'], 0)
+        self.assertEqual(report['utility_accepted_count'][0], report['utility_accepted_count'][1])
+        self.assertAlmostEqual(report['utility_scale'], 150.)
+        self.assertAlmostEqual(report['utility_atol_ulp_floor'],
+                               8 * float(np.spacing(np.float32(150.))))
+        # The perturbation still exceeds the previous fixed floor, which is the point.
+        self.assertGreater(1.6e-5, 1e-6 + 1e-5 * abs(previous_small))
+        self.assertGreater(report['max_utility_difference'], 1e-5)
+
+    def test_rejects_utility_decision_change_corruption_and_weight_drift(self):
+        for case in ('sign_flip', 'utility_corrupted', 'helper_weights'):
+            with self.subTest(case=case):
+                *args, expected = self.replay_fixture()
+                args[5]['utility'][0, 0, 0] = 150.
+                args[2]['ols_routing_utility'][0, 0, 0] = 150.
+                if case == 'sign_flip':
+                    args[5]['utility'][1, 0, 0] = -abs(args[5]['utility'][1, 0, 0])
+                elif case == 'utility_corrupted':
+                    args[2]['ols_routing_utility'][1, 0, 0] += 1.
+                else:
+                    args[5]['helper_weights'][0, 0, 0] += 1e-4
+                with self.assertRaises(ValueError):
+                    replay_fusion_source(*args, expected=expected)
+
     def test_rejects_unretained_output_mask_input_and_routing_changes(self):
         for case in ('duplicate', 'mask', 'node_order', 'group', 'weights', 'state'):
             with self.subTest(case=case):

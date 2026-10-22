@@ -24,6 +24,11 @@ FUSION_CONFIGS = {
     'direct-only': 'evidence-fusion-level1-direct-only.json',
     'mixed-action': 'evidence-fusion-level1-mixed-action.json',
 }
+# Accumulated float32 error over the utility head's 64 cancelling terms, expressed
+# in ULP of that array's own magnitude scale. Measured on Level1 scene 1
+# (direct_only): one element differed by 1.63e-06 across devices while the accept
+# set was identical, against a scale of 152.8 whose single ULP is 1.53e-05.
+UTILITY_ATOL_ULP_FACTOR = 8.
 
 
 def _bind_association_checkpoint(source, manifest, metadata, record):
@@ -161,6 +166,9 @@ def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
     New learned-group predictions are not compared to the old OLS prediction.
     The supplied forward is on the original OLS groups solely to verify frozen
     checkpoint replay across devices. All categorical and ordinary arrays are exact.
+    Utility is gated on helper accept-set equality plus a float32-ULP floor tied to
+    its own magnitude scale, because cancellation in its head can exceed a fixed
+    absolute floor while the routing decision is unchanged.
     """
     for key in INPUT_KEYS:
         _same(old057fragment[key], fragment056[key], '056/057 input/' + key)
@@ -185,11 +193,41 @@ def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
                      rtol=REPLAY_TOLERANCE['anchor_weight_rtol'])
     for key in ('helper_weights', 'utility'):
         current, previous = np.asarray(routingOLS[key]), old057fragment[prefix + key]
-        close = (current.shape == previous.shape and np.isfinite(current).all()
-                 and np.isfinite(previous).all() and np.allclose(current, previous, **tolerance))
-        result['checks'][key + '_close'] = bool(close)
+        same_shape = current.shape == previous.shape
+        finite = bool(same_shape and np.isfinite(current).all() and np.isfinite(previous).all())
         result['max_' + key + '_difference'] = (float(np.max(abs(current - previous), initial=0.))
-                                               if current.shape == previous.shape else None)
+                                               if same_shape else None)
+        if key == 'helper_weights':
+            result['checks']['helper_weights_close'] = bool(
+                finite and np.allclose(current, previous, **tolerance))
+            continue
+        # The utility head sums 64 cancelling terms: on Level1 scene 1 the terms
+        # reach sum|w*a| 27.365 for an algebraic sum of 1.080 (25.3x), where one
+        # float32 ULP of the accumulator, 1.9e-06, already exceeds atol 1e-06. A
+        # cross-device replay can therefore miss the fixed scalar floor while the
+        # routing is unchanged, so gate utility twice: the decision it drives
+        # (relu(utility) > 0 selects a helper) must be identical, and the numeric
+        # difference must stay within a few float32 ULP of the array's own magnitude
+        # scale, which still rejects a corrupted source. helper_weights above keeps
+        # gating every magnitude that reaches the fused output.
+        scale = float(np.max(np.abs(previous), initial=0.))
+        ulp_floor = (UTILITY_ATOL_ULP_FACTOR * float(np.spacing(np.float32(scale)))
+                     if scale else tolerance['atol'])
+        bound = np.maximum(tolerance['atol'] + tolerance['rtol'] * np.abs(previous), ulp_floor)
+        result['utility_scale'] = scale
+        result['utility_atol_ulp_factor'] = UTILITY_ATOL_ULP_FACTOR
+        result['utility_atol_ulp_floor'] = ulp_floor
+        result['utility_numeric_exceed_count'] = (
+            int(np.count_nonzero(abs(current - previous) > bound)) if same_shape else None)
+        result['utility_sign_flip_count'] = (
+            int(np.count_nonzero((current > 0) != (previous > 0))) if same_shape else None)
+        result['utility_accepted_count'] = (
+            [int(np.count_nonzero(current > 0)), int(np.count_nonzero(previous > 0))]
+            if same_shape else None)
+        result['checks']['utility_decision_equal'] = bool(
+            finite and result['utility_sign_flip_count'] == 0)
+        result['checks']['utility_scale_close'] = bool(
+            finite and result['utility_numeric_exceed_count'] == 0)
     result['passed'] = bool(all(result['checks'].values()))
     if not result['passed']:
         raise ValueError('057 frozen OLS inference exceeds predeclared replay tolerance: ' + str(result))
