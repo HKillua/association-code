@@ -54,6 +54,10 @@
 
 上述阶段的阈值选择、单seed、反复V开发和共享身份限制始终保留。完成次数不当论文贡献，CPU合成测试数不当研究成绩，结果负面不删证据。
 
+## 分支与工作目录归并
+
+2026-10-22经用户同意，当前研究成果快进到main，9个旧本地分支、4个旧远程分支全部由main历史覆盖后退役；本地统一使用`/Users/a1/Projects/association-code`。原tmtaff-complete-v1领先其远程的12个提交也已在main内，没有丢弃独有工作。旧v2目录唯一非缓存忽略文件`runs/LOCAL-NATIVE-INSPECT-20261018-012-attempt-1/preparation.json`已迁入主目录同名runs路径保留；多余工作树移除，不改变服务器数据或活动062。
+
 ## 找回原件
 
 旧文档、交接、完整回传和一次性脚本在[清理前5776cd3](https://github.com/HKillua/association-code/tree/5776cd3)；更早001—018在[612afea](https://github.com/HKillua/association-code/tree/612afea)。Git提交号是历史定位，不是运行校验门槛。按需读取或导出仓库外，不把旧目录整树恢复到当前工作树：
