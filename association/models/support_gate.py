@@ -117,7 +117,7 @@ class SupportGate(nn.Module):
         return dict(states=states, gate=gate, eligible=eligible, logits=logits, mean_states=mean)
 
 
-def support_gate_loss(result, target, valid):
+def support_gate_objectives(result, target, valid):
     """T-only direct position loss on all valid queries, including R-exterior.
 
     Outside R the position is constant, so its loss contributes no gradient.
@@ -129,11 +129,37 @@ def support_gate_loss(result, target, valid):
     if not torch.isfinite(target[:, :2][selected]).all():
         raise ValueError('valid position references must be finite')
     zero = result['logits'].sum() * 0.
-    if not selected.any():
-        return zero
     # Other attributes are not supervised by this head, even when their masks
     # are true. Do not let an unused speed/course value enter the loss graph.
     position_target = torch.where(selected[:, None], target[:, :2], torch.zeros_like(target[:, :2]))
     safe_target = torch.cat((position_target, torch.zeros_like(target[:, 2:])), -1)
     error = physical_errors(result['states'], safe_target)[:, 0]
-    return torch.log1p(error[selected] / 1000.).mean() + zero
+    if not torch.isfinite(error[selected]).all():
+        raise FloatingPointError('nonfinite support-gate valid position error')
+    linear = error / 1000.
+    logarithmic = torch.log1p(linear)
+    # The default graph and denominator are identical to the historical loss.
+    losses = {name: values[selected].mean() + zero if selected.any() else zero
+              for name, values in (('linear', linear), ('log1p', logarithmic))}
+    with torch.no_grad():
+        eligible = result['eligible'] & selected
+        gate = result['gate'][eligible]
+        diagnostics = dict(valid_position_points=int(selected.sum()),
+            eligible_valid_position_points=int(eligible.sum()),
+            all_valid_linear_sum=float(linear[selected].sum()),
+            all_valid_log1p_sum=float(logarithmic[selected].sum()),
+            eligible_valid_linear_sum=float(linear[eligible].sum()),
+            eligible_valid_log1p_sum=float(logarithmic[eligible].sum()),
+            eligible_valid_gate_sum=float(gate.sum()),
+            eligible_valid_gate_zero_count=int((gate == 0).sum()),
+            eligible_valid_gate_one_count=int((gate == 1).sum()),
+            eligible_valid_gate_min=float(gate.min()) if len(gate) else None,
+            eligible_valid_gate_max=float(gate.max()) if len(gate) else None)
+    return losses, diagnostics
+
+
+def support_gate_loss(result, target, valid, *, position_loss='log1p'):
+    """Only transform position errors; keep all valid queries in the mean."""
+    if position_loss not in ('log1p', 'linear'):
+        raise ValueError('position_loss must be log1p or linear')
+    return support_gate_objectives(result, target, valid)[0][position_loss]
