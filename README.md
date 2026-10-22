@@ -22,7 +22,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 - `association/`：数据、当前关联/融合、TMTAFF参考、评价和训练。
 - `baselines/`：TSA-cTFER独立关联对照。
 - `tools/experiments/`：保留的[训练与执行入口](tools/experiments/README.md)。
-- `tools/analysis/`：当前缓存复核、冻结融合迁移、数值重放及067只读融合归因。
+- `tools/analysis/`：缓存复核、冻结融合迁移、067融合归因及069门控目标／参考段核对。
 - `configs/`：当前配置和固定数据名单；文件存在不代表可执行授权。
 - `tests/`：数据划分、时间/单位/mask、参数更新/冻结、评价人口及小型贯通验证。
 
@@ -31,6 +31,7 @@ python tools/experiments/evidence_association_fit.py --help
 python tools/experiments/evidence_fusion_fit.py --help
 python tools/experiments/support_gate_fit.py --help
 python tools/analysis/frozen_fusion_transfer.py --help
+python tools/analysis/support_gate_diagnostics.py --help
 python -m unittest discover -s tests
 ```
 

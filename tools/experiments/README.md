@@ -17,6 +17,7 @@
 | `../analysis/compare_association_duration.py` | 保留共同人口、代表变化、增/失覆盖的跨轮缓存比较；亦提供062源重放函数 |
 | `../analysis/learned_group_oracle.py` | 有限候选Oracle诊断及062来源检查；061已结案，不恢复执行额度 |
 | `../analysis/compare_physical_predictions.py` | 通用物理预测比较 |
+| `../analysis/support_gate_diagnostics.py` | 069：只读068两端点、训练日志及两场预检，重算log目标／曝光／固定reference段贡献，无模型前向 |
 | `../setup/gpu_allocation.py` | 已获批任务的现场资源选择，不终止他人进程 |
 
 所有CLI支持`--help`。分卷输入使用`--archive PART1 PART2 PART3`，顺序固定，无需合并或全面解压。[数据文件与固定人口](../../configs/data/README.md)
