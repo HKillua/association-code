@@ -1,0 +1,7 @@
+[16:23:15Z] 状态 None->RUNNING rc=None advisory=False elapsed=None
+[16:25:15Z] 心跳 stage=None scenes=93/None replays=None advisory=False
+[16:27:45Z] 心跳 stage=None scenes=198/None replays=None advisory=False
+[16:30:15Z] 心跳 stage=None scenes=268/None replays=None advisory=False
+[16:32:45Z] 状态 RUNNING->COMPLETED rc=0 advisory=False elapsed=562.078029747121
+[16:32:45Z] 终态 COMPLETED exit_code存在=True 内容=0
+[16:32:45Z] 监视结束

@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 3528073,
+  "linger": "yes",
+  "unit": "mtad-9392f199143a.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-9392f199143a.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=30.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run067",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-CACHE-20261022-067-attempt-1-launch/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-CACHE-20261022-067-attempt-1-launch/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run067/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-FUSION-CACHE-20261022-067-attempt-1-launch"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-10-22T16:22:56.195574+00:00",
+  "elapsed_seconds": 0.12676370795816183
+}
