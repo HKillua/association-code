@@ -5,6 +5,7 @@ traced. No references, identities, truth-selected rows or model updates enter.
 """
 from __future__ import annotations
 
+import json
 import os
 import platform
 from pathlib import Path
@@ -135,6 +136,46 @@ def _comparison(predictions, routing, old_predictions, old_routing, motion):
                 attribute=('position', 'speed', 'heading')[attribute],
                 location_mapping='current routing, not inferred historical ordering')
     return result
+
+
+def save_replay_failure(model, motion, groups, predictions, routing, old_fragment,
+                        output_dir, *, scene_id, arm, error):
+    """Save the rejected forward as-is, without another model or feature call.
+
+    Raw arrays precede all comparison work, so a missing historical field or
+    malformed comparison cannot erase the original failure evidence. The
+    caller must still re-raise its original rejection, including if saving fails.
+    """
+    _motion(motion)
+    output = Path(output_dir)
+    output.mkdir(parents=True, exist_ok=False)
+    old_predictions = {key: old_fragment['ols_' + key] for key in predictions
+                       if 'ols_' + key in old_fragment}
+    old_routing = {key: old_fragment['ols_routing_' + key] for key in routing
+                   if 'ols_routing_' + key in old_fragment}
+    snapshot = {prefix + key: np.asarray(value) for prefix, values in (
+        ('motion_', motion), ('prediction_', predictions), ('routing_', routing),
+        ('old_ols_', old_predictions), ('old_ols_routing_', old_routing))
+        for key, value in values.items()}
+    snapshot.update(group_offsets=np.cumsum([0] + list(map(len, groups)), dtype=np.int64),
+        group_node_indices=np.asarray([node for group in groups for node in group], np.int64))
+    _save(output/'snapshot.npz', snapshot)
+    report = dict(scope='rejected-frozen-fusion-replay', scene_id=scene_id, arm=arm,
+        error=str(error), error_type=type(error).__name__, snapshot='snapshot.npz',
+        extra_partition_forwards=0, model_updates=0, environment=runtime_environment(model),
+        tolerance=dict(REPLAY_TOLERANCE), first_vs_old=None, comparison_error=None,
+        missing_old_prediction_fields=sorted(set(predictions) - set(old_predictions)),
+        missing_old_routing_fields=sorted(set(routing) - set(old_routing)),
+        limitation='Preserves the rejected forward only; does not override acceptance '
+                   'checks, retry inference or establish the cause of a mismatch.')
+    try:
+        report['first_vs_old'] = _comparison(predictions, routing, old_predictions, old_routing, motion)
+    except Exception as comparison_error:
+        report['comparison_error'] = f'{type(comparison_error).__name__}: {comparison_error}'
+    with (output/'report.json').open('x') as stream:
+        json.dump(report, stream, ensure_ascii=False, indent=2, allow_nan=False)
+        stream.write('\n')
+    return report
 
 
 def _probe_comparison(motion, probe, calls, device):

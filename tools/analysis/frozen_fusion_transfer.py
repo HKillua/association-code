@@ -22,7 +22,7 @@ from association.data.motion_evidence import scene_motion_evidence
 from association.evaluation.evidence_fusion_combo import predict_partition, REPLAY_TOLERANCE
 from association.evaluation.frozen_fusion_transfer import summarize_scene, aggregate
 from association.evaluation.support_control import support_switch_prediction
-from association.evaluation.replay_diagnostics import diagnose_replay
+from association.evaluation.replay_diagnostics import diagnose_replay, save_replay_failure
 from association.evaluation.system_attribution import _same, _metrics, assert_metrics, pool_metrics
 from association.utils.runtime import write_json
 from tools.analysis.compare_association_duration import ARMS, _load_arrays, _replay
@@ -192,8 +192,24 @@ def run(args):
                         elapsed_seconds=time.monotonic()-started)
                     write_json(output/'run.json', state)
                     return result
-                replays[arm] = replay_fusion_source(fragment, saved, old_fragment, old_system,
-                    ordinary_inference, ordinary_route, expected=fusion_metadata[arm]['expected'][sid])
+                try:
+                    replays[arm] = replay_fusion_source(fragment, saved, old_fragment, old_system,
+                        ordinary_inference, ordinary_route, expected=fusion_metadata[arm]['expected'][sid])
+                except Exception as rejection:
+                    # Persist this already-computed rejection, never rerun the
+                    # model or replace the original acceptance/error policy.
+                    failure_dir = output/'replay-failure'
+                    state.update(failed_scene_id=sid, failed_arm=arm,
+                        failed_fusion_source_system=fusion_metadata[arm]['system'],
+                        failure_snapshot_directory=str(failure_dir), failure_snapshot_saved=False)
+                    try:
+                        save_replay_failure(model, scene['motion'], ols_groups,
+                            ordinary_inference, ordinary_route, old_fragment, failure_dir,
+                            scene_id=sid, arm=arm, error=rejection)
+                        state['failure_snapshot_saved'] = True
+                    except Exception as snapshot_error:
+                        state['failure_snapshot_error'] = f'{type(snapshot_error).__name__}: {snapshot_error}'
+                    raise
                 inferred, routes[arm] = predict_partition(model, scene['motion'], groups, 'cpu')
                 _same(inferred['mean_supported'], predictions['mean_supported'], '062 learned-group Mean')
                 predictions[arm] = inferred['learned']
@@ -268,7 +284,11 @@ def run(args):
     except BaseException as error:
         state.update(status='INTERRUPTED' if isinstance(error, (KeyboardInterrupt, InterruptedError)) else 'FAILED',
                      error=f'{type(error).__name__}: {error}', elapsed_seconds=time.monotonic()-started)
-        write_json(output/'run.json', state)
+        try:
+            write_json(output/'run.json', state)
+        except Exception as record_error:
+            if hasattr(error, 'add_note'):
+                error.add_note(f'Failed to persist run.json: {type(record_error).__name__}: {record_error}')
         raise
 
 

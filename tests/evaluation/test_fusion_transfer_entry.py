@@ -107,8 +107,11 @@ class FusionTransferEntryTests(unittest.TestCase):
             before = {name: deepcopy(model.state_dict()) for name, model in binding[1].items()}
             with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
                     patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded) as loader, \
-                    patch('tools.analysis.frozen_fusion_transfer.EXPECTED_SUPPORT_POSITION', expected_support):
+                    patch('tools.analysis.frozen_fusion_transfer.EXPECTED_SUPPORT_POSITION', expected_support), \
+                    patch('tools.analysis.frozen_fusion_transfer.save_replay_failure') as snapshot:
                 result = run(args)
+            snapshot.assert_not_called()
+            self.assertFalse((args.output/'replay-failure').exists())
             self.assertEqual(result['status'], 'COMPLETED')
             self.assertTrue(loader.call_args.kwargs['validation_only'])
             self.assertEqual(read_json(args.output/'run.json')['status'], 'COMPLETED')
@@ -217,10 +220,21 @@ class FusionTransferEntryTests(unittest.TestCase):
                     args.diagnose_first_scene = False
                     args.output = Path(temporary)/'normal-062'
                     with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
-                            patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded):
+                            patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded), \
+                            patch.object(model, 'forward', wraps=model.forward) as normal_forward:
                         with self.assertRaisesRegex(ValueError, 'replay tolerance'):
                             run(args)
-                    self.assertEqual(read_json(args.output/'run.json')['status'], 'FAILED')
+                    self.assertEqual(normal_forward.call_count, len(loaded['validation'][0]['node_ids']))
+                    failure_state = read_json(args.output/'run.json')
+                    self.assertEqual(failure_state['status'], 'FAILED')
+                    self.assertTrue(failure_state['failure_snapshot_saved'])
+                    failure = read_json(args.output/'replay-failure'/'report.json')
+                    self.assertEqual(failure['scene_id'], 'v')
+                    self.assertEqual(failure['arm'], 'helper_quality')
+                    self.assertEqual(failure['extra_partition_forwards'], 0)
+                    self.assertEqual(failure['first_vs_old']['utility']['exceed_count'], 1)
+                    with np.load(args.output/'replay-failure'/'snapshot.npz', allow_pickle=False) as saved:
+                        np.testing.assert_array_equal(saved['old_ols_routing_utility'], arrays['ols_routing_utility'])
 
     def test_diagnostic_safe_probe_is_compared_and_script_is_only_archived(self):
         from tools.analysis.frozen_fusion_transfer import run
@@ -259,6 +273,54 @@ class FusionTransferEntryTests(unittest.TestCase):
             self.assertEqual(read_json(args.output/'run.json')['status'], 'FAILED')
             self.assertFalse((args.output/'diagnostic-summary.json').exists())
             self.assertTrue((args.output/'first-forward.npz').is_file())
+
+    def test_later_arm_failure_is_saved_and_io_failure_preserves_original_rejection(self):
+        from tools.analysis import frozen_fusion_transfer as entry
+        for failure_kind in ('none', 'snapshot', 'run_record'):
+            with self.subTest(failure_kind=failure_kind), TemporaryDirectory() as temporary:
+                args, binding, loaded, _ = self.fixture(Path(temporary))
+                path = Path(binding[2]['direct_only']['system'])/'system-predictions'/'states-v.npz'
+                with np.load(path, allow_pickle=False) as saved:
+                    arrays = {key: saved[key].copy() for key in saved.files}
+                arrays['ols_learned_aligned_group_indices'][0] = -1
+                np.savez_compressed(path, **arrays)
+                original_save = entry.save_replay_failure
+
+                def save_snapshot(*a, **kw):
+                    if failure_kind == 'snapshot':
+                        raise OSError('snapshot disk full')
+                    return original_save(*a, **kw)
+
+                def save_record(path, value):
+                    if failure_kind == 'run_record' and value.get('status') == 'FAILED':
+                        raise OSError('run record disk full')
+                    return write_json(path, value)
+
+                with patch.object(entry, 'bind_sources', return_value=binding), \
+                        patch.object(entry, 'load_timed_dataset', return_value=loaded), \
+                        patch.object(entry, 'save_replay_failure', side_effect=save_snapshot), \
+                        patch.object(entry, 'write_json', side_effect=save_record), \
+                        patch.object(binding[1]['direct_only'], 'forward',
+                                     wraps=binding[1]['direct_only'].forward) as forward, \
+                        patch.object(binding[1]['mixed_action'], 'forward') as later:
+                    with self.assertRaisesRegex(ValueError, 'complete learned system') as caught:
+                        entry.run(args)
+                self.assertEqual(forward.call_count, len(loaded['validation'][0]['node_ids']))
+                later.assert_not_called()
+                self.assertFalse((args.output/'summary.json').exists())
+                if failure_kind == 'run_record':
+                    self.assertTrue(any('run record disk full' in note for note in caught.exception.__notes__))
+                else:
+                    state = read_json(args.output/'run.json')
+                    self.assertEqual(state['status'], 'FAILED')
+                    self.assertEqual(state['failed_arm'], 'direct_only')
+                    self.assertEqual(state['failure_snapshot_saved'], failure_kind == 'none')
+                    if failure_kind == 'snapshot':
+                        self.assertIn('snapshot disk full', state['failure_snapshot_error'])
+                if failure_kind != 'snapshot':
+                    failure = read_json(args.output/'replay-failure'/'report.json')
+                    self.assertEqual(failure['arm'], 'direct_only')
+                    self.assertIn('complete learned system', failure['error'])
 
 
 if __name__ == '__main__':

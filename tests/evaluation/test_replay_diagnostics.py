@@ -11,7 +11,9 @@ import torch
 
 from association.data.motion_evidence import scene_motion_evidence
 from association.evaluation.evidence_fusion_combo import predict_partition
-from association.evaluation.replay_diagnostics import array_difference, diagnose_replay
+from association.evaluation.replay_diagnostics import (
+    array_difference, diagnose_replay, save_replay_failure,
+)
 from association.models.evidence_fusion import EvidenceFusion, fusion_inputs
 from tests.fixtures.scenes import timed_scene
 
@@ -220,6 +222,79 @@ class ReplaySnapshotTests(unittest.TestCase):
                                 self.routing, self.old, self.root)
         self.assertEqual(forward.call_count, 0)
         self.assertEqual({p.name: p.read_bytes() for p in self.root.iterdir()}, original)
+
+    def test_failure_snapshot_saves_the_failed_pass_without_another_forward(self):
+        output = self.root/'failure-replay'
+        original = deepcopy((self.motion, self.groups, self.prediction, self.routing, self.old))
+        parameters = {key: value.detach().clone() for key, value in self.model.state_dict().items()}
+        hooks = self.hook_counts(self.model)
+        with patch.object(self.model, 'forward', side_effect=AssertionError('unexpected inference')) as forward:
+            report = save_replay_failure(self.model, self.motion, self.groups, self.prediction,
+                self.routing, self.old, output, scene_id='diagnostic', arm='helper_quality',
+                error=ValueError('utility replay mismatch'))
+        forward.assert_not_called()
+        self.assertEqual(self.hook_counts(self.model), hooks)
+        self.assertFalse(self.model.training)
+        for key, value in self.model.state_dict().items():
+            self.assertTrue(torch.equal(value, parameters[key]))
+        self.assertEqual(self.groups, original[1])
+        for before, after in zip((original[0], *original[2:]),
+                                 (self.motion, self.prediction, self.routing, self.old)):
+            self.assertEqual(set(before), set(after))
+            for key in before:
+                np.testing.assert_array_equal(after[key], before[key])
+        with np.load(output/'snapshot.npz', allow_pickle=False) as snapshot:
+            for prefix, values in (('motion_', self.motion), ('prediction_', self.prediction),
+                                   ('routing_', self.routing), ('old_', self.old)):
+                for key, value in values.items():
+                    np.testing.assert_array_equal(snapshot[prefix + key], value)
+            np.testing.assert_array_equal(snapshot['group_offsets'], [0, 3, 4])
+            np.testing.assert_array_equal(snapshot['group_node_indices'], [0, 1, 2, 3])
+        saved = json.loads((output/'report.json').read_text())
+        self.assertEqual(saved, report)
+        self.assertEqual(report['scene_id'], 'diagnostic')
+        self.assertEqual(report['arm'], 'helper_quality')
+        self.assertEqual(report['extra_partition_forwards'], 0)
+        self.assertIsNone(report['comparison_error'])
+        failure = report['first_vs_old']['utility']['first_violations'][0]
+        self.assertEqual(failure['index'], [0, 0, 0])
+        self.assertEqual(failure['helper_anchor'], int(self.routing['helper_anchor'][0]))
+        self.assertEqual(failure['helper_node'], int(self.routing['helper_node'][0]))
+        self.assertEqual(failure['previous'], 0.)
+        self.assertEqual(failure['current'], float(self.routing['utility'][0, 0, 0]))
+        self.assertGreater(failure['absolute_difference'], failure['tolerance_bound'])
+        json.dumps(report, allow_nan=False)
+
+    def test_failure_snapshot_does_not_overwrite_existing_evidence(self):
+        output = self.root/'failure-replay'
+        args = (self.model, self.motion, self.groups, self.prediction, self.routing, self.old, output)
+        kwargs = dict(scene_id='diagnostic', arm='helper_quality', error=ValueError('mismatch'))
+        save_replay_failure(*args, **kwargs)
+        original = {p.name: p.read_bytes() for p in output.iterdir()}
+        with patch.object(self.model, 'forward', side_effect=AssertionError('unexpected inference')) as forward:
+            with self.assertRaises(FileExistsError):
+                save_replay_failure(*args, **kwargs)
+        forward.assert_not_called()
+        self.assertEqual({p.name: p.read_bytes() for p in output.iterdir()}, original)
+
+    def test_failure_snapshot_keeps_raw_evidence_when_old_comparison_field_is_missing(self):
+        output = self.root/'failure-replay'
+        old = dict(self.old)
+        del old['ols_routing_utility']
+        with patch.object(self.model, 'forward', side_effect=AssertionError('unexpected inference')) as forward:
+            report = save_replay_failure(self.model, self.motion, self.groups, self.prediction,
+                self.routing, old, output, scene_id='diagnostic', arm='helper_quality',
+                error=ValueError('missing old utility'))
+        forward.assert_not_called()
+        self.assertEqual(report['missing_old_routing_fields'], ['utility'])
+        self.assertIn('utility', str(report['comparison_error']))
+        with np.load(output/'snapshot.npz', allow_pickle=False) as snapshot:
+            np.testing.assert_array_equal(snapshot['routing_utility'], self.routing['utility'])
+            np.testing.assert_array_equal(snapshot['motion_native_count'], self.motion['native_count'])
+            np.testing.assert_array_equal(snapshot['old_ols_learned'], old['ols_learned'])
+            self.assertNotIn('old_ols_routing_utility', snapshot.files)
+        self.assertEqual(json.loads((output/'report.json').read_text()), report)
+        json.dumps(report, allow_nan=False)
 
 
 if __name__ == '__main__':
