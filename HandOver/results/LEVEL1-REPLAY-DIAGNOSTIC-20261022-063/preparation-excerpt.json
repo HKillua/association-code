@@ -1,0 +1,114 @@
+{
+ "note": "完整 preparation.json 85,153,501 字节留服务器；只回传交接要求的简要摘录。",
+ "server_path": "runs/LEVEL1-REPLAY-DIAGNOSTIC-20261022-063-attempt-1/preparation.json",
+ "bytes": 85153501,
+ "excerpt": {
+  "scenes": 300,
+  "reference_members_read": 300,
+  "observation_members_read": 600,
+  "training_scene_ids": [],
+  "test_opened": false,
+  "selection_split": "V_select",
+  "split_unit": "scene",
+  "motion_observation_policy": "canonical_all",
+  "elapsed_seconds": 194.0697154919617,
+  "reference示例": {
+   "scene_id": "1",
+   "split": "V_select",
+   "member": "数据集level1/真实场景/场景-1.csv",
+   "raw_row_count": 2326,
+   "issue_count": 31
+  }
+ },
+ "differs_from_056_report_only_in": [
+  "elapsed_seconds"
+ ],
+ "environment": {
+  "python": "3.11.7",
+  "platform": "Linux-6.2.0-26-generic-x86_64-with-glibc2.35",
+  "numpy": "1.26.4",
+  "torch": "2.5.1+cu121",
+  "torch_build": "PyTorch built with:\n  - GCC 9.3\n  - C++ Version: 201703\n  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications\n  - Intel(R) MKL-DNN v3.5.3 (Git Hash 66f0cb9eb66affd2da3bf5f8d897376f04aae6af)\n  - OpenMP 201511 (a.k.a. OpenMP 4.5)\n  - LAPACK is enabled (usually provided by MKL)\n  - NNPACK is enabled\n  - CPU capability usage: AVX2\n  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=12.1, CUDNN_VERSION=9.1.0, CXX_COMPILER=/opt/rh/devtoolset-9/root/usr/bin/c++, CXX_FLAGS= -D_GLIBCXX_USE_CXX11_ABI=0 -fabi-version=11 -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -DNDEBUG -DUSE_KINETO -DLIBKINETO_NOROCTRACER -DLIBKINETO_NOXPUPTI=ON -DUSE_FBGEMM -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -DSYMBOLICATE_MOBILE_DEBUG_HANDLE -O2 -fPIC -Wall -Wextra -Werror=return-type -Werror=non-virtual-dtor -Werror=bool-operation -Wnarrowing -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-unused-parameter -Wno-strict-overflow -Wno-strict-aliasing -Wno-stringop-overflow -Wsuggest-override -Wno-psabi -Wno-error=old-style-cast -Wno-missing-braces -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, TORCH_VERSION=2.5.1, USE_CUDA=ON, USE_CUDNN=ON, USE_CUSPARSELT=1, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_GLOO=ON, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=1, USE_NNPACK=ON, USE_OPENMP=ON, USE_ROCM=OFF, USE_ROCM_KERNEL_ASSERT=OFF, \n",
+  "threads": 4,
+  "interop_threads": 16,
+  "default_dtype": "torch.float32",
+  "float32_matmul_precision": "highest",
+  "deterministic_algorithms": false,
+  "mkldnn_enabled": true,
+  "cuda_matmul_allow_tf32": false,
+  "model_training": false,
+  "model_device": "cpu",
+  "thread_environment": {
+   "OMP_NUM_THREADS": "4",
+   "MKL_NUM_THREADS": "4",
+   "OPENBLAS_NUM_THREADS": "4",
+   "VECLIB_MAXIMUM_THREADS": null,
+   "NUMEXPR_NUM_THREADS": null
+  }
+ },
+ "diagnostic_scope": {
+  "arm": "helper_quality",
+  "scene_id": "1",
+  "diagnostic_scene_count": 1,
+  "prepared_scene_count": 300,
+  "full_system_evaluation": false,
+  "full_system_completed": false,
+  "source_replay_passed": true,
+  "source_replay_error": null,
+  "model_updates": 0,
+  "optimizer_updates": 0,
+  "gpu_used": false,
+  "test_opened": false,
+  "learned_partition_forwards": 0,
+  "ordinary_partition_forwards": 2,
+  "extra_partition_forwards": 1,
+  "failed_062_arrays_available": false,
+  "historical_057_features_available": false,
+  "probe_input_comparison": {
+   "status": "unavailable",
+   "reason": "No original probe motion/script supplied; no external pickle read."
+  },
+  "probe_source": null,
+  "trace_scope": "Second forward only; first-forward tensors were not intercepted. First inputs can be reconstructed from the saved complete motion.",
+  "limitation": "Numerical diagnostics, not a tolerance override, acceptance result, old failed-job tensor reconstruction or causal attribution.",
+  "tolerance": {
+   "anchor_weight_atol": 1e-06,
+   "anchor_weight_rtol": 1e-05,
+   "state_span_factor": 1e-05,
+   "position_m": 0.25,
+   "speed": 0.001,
+   "heading_deg": 0.001
+  }
+ },
+ "source_replay_checks": {
+  "passed": true,
+  "checks": {
+   "membership_exact": true,
+   "ordinary_control_exact": true,
+   "anchor_weights_close": true,
+   "state_span_close": true,
+   "physical_close": true,
+   "helper_weights_close": true,
+   "utility_close": true
+  },
+  "max_physical_prediction_difference": {
+   "position": 0.0009805400633338597,
+   "speed": 4.6042346326657935e-06,
+   "heading": 1.6031071311317646e-05
+  },
+  "max_anchor_weight_difference": 3.968771636886359e-07,
+  "tolerance": {
+   "anchor_weight_atol": 1e-06,
+   "anchor_weight_rtol": 1e-05,
+   "state_span_factor": 1e-05,
+   "position_m": 0.25,
+   "speed": 0.001,
+   "heading_deg": 0.001
+  },
+  "rationale": "Fixed FP32 cross-device rounding allowance plus absolute physical caps; not a theoretical error bound and never adjusted after replay.",
+  "max_helper_weights_difference": 3.968771637025137e-07,
+  "max_utility_difference": 1.0728836059570312e-06,
+  "complete_inputs_and_ordinary_arrays_exact": true,
+  "complete_old_learned_artifact_exact": true
+ }
+}

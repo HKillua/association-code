@@ -1,0 +1,5 @@
+[07:58:54Z] 状态 None->RUNNING rc=None advisory=False elapsed=None
+[08:01:54Z] 心跳 run.status=RUNNING stage=validation_preparation completed_scenes=0 advisory=False
+[08:02:34Z] 状态 RUNNING->COMPLETED rc=0 advisory=False elapsed=253.78494637971744
+[08:02:34Z] 终态 COMPLETED exit_code文件存在=True 内容=0
+[08:02:34Z] 监视结束

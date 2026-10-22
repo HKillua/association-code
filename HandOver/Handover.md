@@ -4,7 +4,7 @@
 
 | 当前任务 | 状态 | 下一执行方 |
 | --- | --- | --- |
-| [063：首场冻结融合重放诊断](L2S-20261022-063.md) | **RUNNING：服务器已领取并提交，北京时间15:58:17，单元`mtad-5020edc20631`** | 服务器执行和回传；[063回执](S2L-20261022-063.md)，不重复领取 |
+| [063：首场冻结融合重放诊断](L2S-20261022-063.md) | **COMPLETED：退出码 0，253.785 秒，`source_replay_passed=true`，062 的 utility 拒绝未重现（本轮 max 1.0729e-06、越界 0），无任何七臂成绩** | 本地据证据决定口径或另行论证数值契约；[063回执](S2L-20261022-063.md)与[产物](results/LEVEL1-REPLAY-DIAGNOSTIC-20261022-063/)，不重领 |
 | [062：冻结057融合迁移到056学习分组](L2S-20261022-062.md) | **FAILED：一次CPU4已消耗，首场景057源重放 `utility_close=False`，不自动重试、不重领** | 本地核定复核口径或停止；[062回执](S2L-20261022-062.md)与[产物](results/LEVEL1-FROZEN-FUSION-20261022-062/) |
 
 **063已获批READY；当前未收到RUNNING回执，062未授权重试。** 用户于本地会话明确回复“批准063，按可用CPU资源执行”。本次一次CPU4、零GPU／训练、30分钟仅提醒、失败不重试，不继续062完整评价，不打开T_test。056—061全部完成并已审查，不重领；050已停止保全，原运行FAILED。旧052模板和其它历史批准均不恢复执行额度。四卡并发许可只适用于各自已获批的任务。
@@ -15,7 +15,7 @@
 
 062实现冻结于`02c0d1e`：零训练、零GPU，保留056分组/代表/完整人口，比较三个057融合模型及四个普通控制；4小时仅提醒，失败不自动重试。完整输入、命令、容差、产物和停止条件只维护在[062交接](L2S-20261022-062.md)，不在本索引复制。
 
-**服务器回传（063 提交）**：北京 15:58:17 提交，unit `mtad-5020edc20631`，worker 3376929／payload 3376932，checkout detach `28c4d787…`，块 SHA256 `df6788b7…` 执行前后一致、占位符替换 0 处，`--max-seconds 1800 --time-policy advisory`（30 分钟仅提醒）、`--cpu-threads 4`、零 GPU（`CUDA_VISIBLE_DEVICES=` 空，`nvidia-smi` compute apps 为空）。领取前核查 32 核／load 8.82／可用 99 GB／`/home` 可用 806 GB，他人约 8 个 >50% CPU 作业，未终止他人进程。可选 `--probe-motion`／`--probe-script` **未追加，报告 unavailable**：构造脚本与 `/tmp/062_scene1.pkl` 在，但 `/tmp` 下无任何 NPZ，而交接禁止重跑旧探针、禁止直接加载该 pkl、禁止新造输入冒充原探针，故不自行导出。062 失败现场原样保留，本轮不重启 062。详见[063回执](S2L-20261022-063.md)。
+**服务器回传（063 终态）**：北京 15:58:17 提交、16:02:30 结束，unit `mtad-5020edc20631`，checkout detach `28c4d787…`，块 SHA256 `df6788b7…` 执行前后一致、占位符替换 0 处，`--max-seconds 1800 --time-policy advisory`（提醒未触发）、`--cpu-threads 4`、零 GPU。四问实测：**首次未复现原拒绝**（utility `max_abs=1.0728836059570312e-06`、`exceed_count=0`、七项检查全真）；**无真正越界元素**，最大绝对差在 `[50,62,0]` 而最大容差比在 `[42,54,0]`（不同处），062 的越界索引不可核对（`failed_062_arrays_available=false`）；**重复前向与首次逐元素相等**（六类数组 max_abs 全为 0.0）；**完整旧缓存闸门实际走完**（`complete_inputs_and_ordinary_arrays_exact=true`、`complete_old_learned_artifact_exact=true`）。范围守约：`ordinary_partition_forwards=2`、`learned_partition_forwards=0`、`model_updates=0`、`completed_scenes=0`、`full_system_completed=false`，V reference 确有读取（`reference_members_read=300`、`observation_members_read=600`、`training_scene_ids=[]`、`test_opened=false`），062 失败现场保留未动、未重启。可选 `--probe-motion`／`--probe-script` **未追加，报告 unavailable**（安全 motion NPZ 不存在，禁止转造）；hook 只属第二遍。回传 13 件 180 KB，`first-forward.npz`（415,986 B）、`trace-second-forward.npz`（3,635,812 B）、`preparation.json`（85,153,501 B）留服务器只登记路径。详见[063回执](S2L-20261022-063.md)。
 
 本地已审查失败记录与代码：[062判断与下一步](../docs/research_status.md#062首场重放失败尚无组合成绩)。原检查未覆盖全部网络特征，现有探针没有回传构造脚本；暂不能排除输入路径差异或锁定跨设备舍入。[063代码与交接](L2S-20261022-063.md)已完成：保持完整准备和第一次调用，保存首场完整输入／输出，再进行一次逐层诊断；容差、模型不变，不自动重跑V300完整系统。
 
