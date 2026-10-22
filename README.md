@@ -30,6 +30,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 python tools/experiments/evidence_association_fit.py --help
 python tools/experiments/evidence_fusion_fit.py --help
 python tools/experiments/support_gate_fit.py --help
+python tools/experiments/support_gate_linear_fit.py --help
 python tools/analysis/frozen_fusion_transfer.py --help
 python tools/analysis/support_gate_diagnostics.py --help
 python -m unittest discover -s tests
@@ -38,3 +39,5 @@ python -m unittest discover -s tests
 本地AI负责代码和决策，服务器AI按交接执行；push不会唤醒服务器。权限、维护和回传规则见[AGENTS](AGENTS.md)及[现场执行规则](docs/server_autonomy.md)。
 
 068位置门控的冻结实现见[方法契约](docs/specs/evidence-association-fusion.md)：训练前两场原始输入核查，一次1000更新，CPU评价初始化／固定终点；冻结056分组，完整人口与简单支撑规则对照。服务器仅按当前交接领取，不从旧任务额度续跑。
+
+070为同模型的线性位置loss配对对照，逐批核068样本、复用原CPU初始化、仅评价新终点；用户已取消逐次批准，具体执行范围由本地AI写入READY，见[当前交接](HandOver/Handover.md)。
