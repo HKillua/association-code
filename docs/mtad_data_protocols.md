@@ -73,3 +73,28 @@ TMTAFF p16 §3.1.1明确随机3000 unique scenes再7:1:2；p15 §2.5给SL64、80
 - FESR-LSTM、FLNN：`docs/analyses/2026-10-17_mtad_download_round/sources/P05.pdf`、`P10.pdf`及同目录层级`extracted/P05.txt`、`P10.txt`。
 
 本次仅文献原文复读与已有结果解释；没有扫描新数据、打开T_test或新增模型运行。
+
+## 2026-10-23：深度学习竞争方法与复现可行性复核
+
+本轮针对“不能只与OLS和简单规则比较”的建议，复读上述五篇MTAD论文的相关全文，并在线核查出版社／作者来源及代码可用性。结论支持增加学习竞争方法，但**论文真实、架构可写、作者实现可运行、同任务复现成功是四个不同状态**。这里不发布新实验，也不把以下清单逐项变成必跑任务。
+
+| 方法与正式来源 | 本轮核实的输入／用途 | 作者实现与当前复现状态 |
+| --- | --- | --- |
+| **MVW-GNN**，*MVW-GNN: a multiview graph representation learning method for multisource track association*，MST 36, 096308，2025-09-18；[DOI](https://doi.org/10.1088/1361-6501/ae0497) | MTAD Level1关联；VMD、双视角图及残差注意力GCN。先筛>100点轨迹、去单轨目标，再对齐；非当前全片段人口。 | 全文及本轮检索未定位作者代码链接。可做有披露的重实现，但不能许诺直接clone复现；去掉VMD／筛选／图结构后只保留GCN，不应沿用原方法名宣称完整复现。 |
+| **MIS-GNN**，*A multilevel interactive framework based Siamese graph networks for multisource track association*，MST 37, 316104，2026-08-05；[DOI](https://doi.org/10.1088/1361-6501/ae8929) | MTAD关联；共享GraphSAGE、跨轨交互、图到节点及多尺度相似性，最终Hungarian。原始Level未明。 | 本轮未定位作者代码。原文数据声明为向作者合理请求；它不等于代码已公开。32节点、100秒聚合的窗口推进细节仍缺。其方法语义较适合作为优先审查的领域图关联参考，尚不是已具备可执行原版的基线。 |
+| **IAGM-TAN**，*IAGM-TAN: An interactive attention graph matching network for multi-target track association*，Neurocomputing 698, 134264，2026；[出版社](https://www.sciencedirect.com/science/article/pii/S0925231226016620)／[DOI](https://doi.org/10.1016/j.neucom.2026.134264) | MTAD、BiLSTM＋交互图＋带拒配槽Sinkhorn；保留全局匹配才保留其重要方法内容。 | 全文§5.2承诺出版后一个月内发布GitHub源码，但没有仓库URL；本轮按方法名与作者信息搜索未找到可核实仓库。不能把发布承诺写成已公开代码。训练5000／测试1000与80%／20%矛盾仍未澄清。 |
+| **GMvA**，*Graph Learning-Driven Multi-Vessel Association: Fusing Multimodal Data for Maritime Intelligence*，T-ITS 27(5), 5739–5754，2026-05-01；[作者机构记录](https://research.polyu.edu.hk/en/publications/graph-learning-driven-multi-vessel-association-fusing-multimodal-/)／[DOI](https://doi.org/10.1109/TITS.2026.3655007) | AIS＋CCTV、MaritimeMmD；图时空表征及Hungarian。MLP不确定性用于关联相似度，不是经纬度／速度／航向状态融合器。 | 确有[作者仓库](https://github.com/LouisYxLu/GMvA)。但当前递归文件树无`train.py`，`main.py`仍导入`train_model`；README称完整数据计划2027-12-31发布，可申请提前访问。未运行其训练，不能认定仓库已经能完整复现。改成MTAD航迹输入属于任务适配。 |
+| **PTFM**，*Multi-Radar Track Fusion Method Based on Parallel Track Fusion Model*，Electronics 14(17), 3461，2025-08-29；[出版社全文](https://www.mdpi.com/2079-9292/14/17/3461)／[DOI](https://doi.org/10.3390/electronics14173461) | 已关联双源、共同覆盖窗；双源4→32→64特征增强，16维时间编码，特征注意力与64单元LSTM并行，门控残差融合、四属性输出及辅助任务权重。 | 原文结构较具体，可实施声明清楚的参考适配；本轮未定位作者代码。多helper、无共同覆盖、错误组和整场Q64输出不属于其已验证原协议。 |
+| **TMTAFF**，*A Transformer-Based Unified Framework for Multiple Target Track Association and Fusion Under Incomplete Measurements*，Applied Sciences 16(14), 7251，2026-07-20；[DOI](https://doi.org/10.3390/app16147251) | 离线补全—关联—融合，含同源中断关联，最接近项目整体任务。 | 本轮未定位作者代码；现存代码明确为时间适配近似参考，完整有效复现仍未完成。不能以随机权重、坍缩TFM或未充分训练的参考成绩充当强深度学习对照。 |
+
+**检索边界。** 2026-10-23使用方法全名／缩写、作者信息及GitHub域名检索，并对`IAGM-TAN`、`MVW-GNN`、`MIS-GNN track`、`TMTAFF`、`PTFM radar`执行GitHub repository search，均未返回匹配仓库；这是有界检索的阴性结果，不是“源码不存在”的证明。IOP在线全文访问受限、MDPI直接打开曾429，因此细节来自已有出版社PDF全文，网页用于补核元数据／链接；不将搜索摘要当作完整重读。GMvA本轮阅读作者仓库与机构记录，未精读其正式期刊全部页；仓库核查对象为2026-08-17更新的`main`，未复制或执行第三方代码，当前树亦未列LICENSE。
+
+**PTFM还不能直接称作无歧义原版。** §2.6输出208维，§2.7又称用于权重头的128维特征，中间投影细节未完整定义；PDF第9页Eq21的`ln`后额外求和无明确索引，原图也如此，不能仅按提取错误略过。参考适配必须逐项记录采用的解释。其任务权重是用于训练时平衡位置／速度／航向损失，不能直接说成我们逐helper物理融合权重。原训练为TensorFlow 2.15、Adam 0.001、batch32、最多150epochs，带验证早停／学习率衰减；不能以我们的1000更新未经充分性检查就宣布超过原算法。
+
+对建议的严格修正如下：
+
+- **必要的是有代表性且可信的学习竞争证据，不是“GNN＋LSTM＋Transformer＋PTFM”标签齐全。** Generic骨干基线与领域方法是两类证据。把现有门控MLP换成LSTM／Transformer、仍限制在Anchor—Mean线段及同一支撑先验，只能检验骨干增量，不能代表可直接回归状态的深度融合方法或PTFM。
+- **模块比较与完整系统比较互补，但含义不同。** 固定候选集／输入／分组适合隔离评分或状态恢复能力；原版Sinkhorn／Hungarian属于方法贡献，不能删掉后仍称完整原版。反之，在允许同源多碎片的任务中强套跨源一对一，也会改变可恢复人口。需预先说明适配或另设原生任务分析，不能以真值筛正确组后混入全人口系统表。
+- **训练预算应公平而非机械相同。** 同样1000更新是有界筛选，不是所有架构已充分优化的保证。后续正式比较要公开数据呈现量、容量、耗时、验证选择规则和调参次数，给各方法合理且事前声明的优化机会；不能只给候选多轮调试而让竞争基线一次失配后定案。
+- **物理控制仍保留。** 支撑规则与固定0.95初始化已是强解释；赢学习对照却输这些控制，仍不能证明复杂性必要。弱学习基线的失败不代替强领域比较，原文／重实现／适配结果分栏记录。
+- **当前适宜先冻结比较问题，再决定最小实现集合。** 070仍只回答损失单因素；现有资料足够准备学习baseline契约，无需现在向用户索取重复PDF。优先核清一个直接状态恢复参考与一个领域关联参考的可执行差距，不立即并行实现上述全部方法，也不使用T_test挑模型。
