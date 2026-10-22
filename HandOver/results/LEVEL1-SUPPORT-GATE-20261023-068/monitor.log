@@ -1,0 +1,13 @@
+[17:24:18Z] 状态 None->RUNNING rc=None advisory=False elapsed=None
+[17:28:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:- initial:- final:- 磁盘=801GB free
+[17:33:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:- initial:- final:- 磁盘=801GB free
+[17:38:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:- initial:- final:- 磁盘=801GB free
+[17:43:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:- initial:- final:- 磁盘=801GB free
+[17:48:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:- initial:- final:- 磁盘=801GB free
+[17:53:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:RUNNING initial:- final:- 磁盘=800GB free
+[17:58:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:RUNNING initial:- final:- 磁盘=800GB free
+[18:03:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:COMPLETED initial:RUNNING final:- 磁盘=800GB free
+[18:08:18Z] 心跳 top=None/RUNNING 阶段=preflight:- fit:COMPLETED initial:COMPLETED final:RUNNING 磁盘=800GB free
+[18:12:18Z] 状态 RUNNING->COMPLETED rc=0 advisory=False elapsed=2912.265233591199
+[18:12:18Z] 终态 COMPLETED exit_code存在=True 内容=0 阶段=preflight:- fit:COMPLETED initial:COMPLETED final:COMPLETED 磁盘=800GB free
+[18:12:18Z] 监视结束

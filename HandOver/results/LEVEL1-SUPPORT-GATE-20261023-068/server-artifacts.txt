@@ -1,0 +1,40 @@
+# 068 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1  总计 1.4G
+  preparation.json 622925339 字节
+  summary.json 4737638 字节
+  endpoint-comparison.json 4469541 字节
+  fit/training.jsonl 1607064 字节
+  fit/final.pt 107660 字节
+  fit/step-0.pt 40692 字节
+  initial/scene-summary.json.gz 1215199 字节
+  final/scene-summary.json.gz 1217803 字节
+  preflight/scene-3035-evidence.npz 2644435 字节
+  preflight/scene-2535-evidence.npz 300043 字节
+  initial/scenes/ 300 个文件 2.3M
+  initial/predictions/ 300 个文件 163M
+  initial/system-predictions/ 300 个文件 222M
+  final/scenes/ 300 个文件 2.3M
+  final/predictions/ 300 个文件 166M
+  final/system-predictions/ 300 个文件 222M
+
+launcher: /home/wangguangjie/djs/association-code/runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1-launch
+  status.json 527 字节
+  exit_code.txt 2 字节
+  stdout.log 278 字节
+  stderr.log 0 字节
+  request.json 1514 字节
+  launch.json 1307 字节
+  worker.stdout.log 0 字节
+  worker.stderr.log 0 字节
+  gpu-allocation: 3163 字节
+
+只读源与旧现场（mtime/大小未变）:
+  runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1/../../runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/association/final.pt 78568 mtime=2026-10-22 01:48:42.614281346 +0800
+  runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1/../../runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system/summary.json 523770716 mtime=2026-10-22 01:58:30.098490199 +0800
+2.9G	runs/LEVEL1-FROZEN-FUSION-20261022-066-attempt-1
+8.4M	runs/LEVEL1-FUSION-CACHE-20261022-067-attempt-1
+
+checkout: /home/wangguangjie/djs/association-code-run068 HEAD=11a70a5251d2a1a281a69d804cb4ee1146ec73b3
+单元: mtad-e12d2d25ee1b（systemd-user transient，已结束）
+磁盘: /dev/sda        7.3T  6.1T  800G   89% /home
