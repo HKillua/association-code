@@ -1,6 +1,6 @@
 # 当前交接
 
-2026-10-22，统一协作分支`main`。状态来自Git回执，不代表实时监控。**066已获批READY：用户批准完整审计流程及一次CPU4执行。实施提交`e6c137e`，362项测试与独立审查通过；服务器已于北京时间22:27:12提交一次，23:09:14 收终态：300/300 场、900 项审计、`acceptance=REJECTED`。**
+2026-10-22，统一协作分支`main`。状态来自Git回执，不代表实时监控。**066已结束：300/300场、900项审计收齐，FAILED／REJECTED；本地已复核回传数据。当前无READY任务，不重领066，不追加完整V300前向。**
 
 | 当前任务 | 状态 | 下一执行方 |
 | --- | --- | --- |
@@ -12,11 +12,11 @@
 
 ## 本地决定
 
-证据、勘误和判断只维护在[研究状态](../docs/research_status.md)，不在本索引复制原始回执。065旧契约失败事实保留；已完成2场不能作为V300成绩。不合并服务器8倍ULP候选，不继续按本场所需数值调容差。
+证据、勘误和判断只维护在[研究状态](../docs/research_status.md)，不在本索引复制原始回执。062／064／065／066原失败状态保留；063单臂诊断通过的边界不变。不合并服务器8倍ULP候选，不继续按本场所需数值调容差。
 
-066显式采用output验收域：内部raw/ReLU／符号变化全部记录，实际权重、state-span及物理原容差不变。有限且结构正确的数值超差在一次作业中全量收集；来源／shape／非有限／人口或缓存损坏仍立即停止。全部验收通过才写正式summary；否则FAILED并保留明确未验收汇总。每场保存完整OLS重放数组，后续复核无需重新准备数据或前向。任务不是保证放行，而是结束逐个微差重跑。
+066未训练，人口及缓存结构核验通过；拒绝来自46场direct_only速度helper权重和scene2535/helper_quality速度输出。七臂聚合为**未验收探索性数据**，不能当正式成绩；普通控制复现及support_switch解析核验通过。下一步只建议用066／057现有缓存定位实际输出受影响程度与极端误差路由，不读原始数据、不加载模型、不再前向。尚未发布新的执行交接或预算申请。
 
-**服务器回传（066 终态）**：北京 22:27:12 提交、23:09:14 结束，`FAILED`／退出码 1／`elapsed_seconds=2522.4209690531716`（约 42 分钟，约 7.5 秒／场），`timed_out=false`、4 小时提醒未触发；**`completed_scenes=300/300`、`analysis_complete=true`、`acceptance=REJECTED`、`utility_replay_domain="output"`**，stderr 末行即工具自述 `output replay rejected: 47/900 sources; full audit saved, unvalidated-summary.json is not an accepted system result`；**无 `summary.json`、无 `replay-failure/`**（output 域不逐场中断，非保全失败）。人口与核验全数达成：`scene_count=300`、`fragment_count=24599`、`component_count=38`、`ordinary_source_replay_exact=true`、`support_control_analytical_verified=true`（与 061 解析预期 `442263`／`MAE 729.9808435828807`／`RMSE 3332.536401612317` 在 `rtol1e-10/atol1e-9` 下一致）、`threshold=1.7320103112387182` 原值、`test_opened=false`、`optimizer_updates=0`、`gpu_used=false`、容差原值未动。**47 项拒绝的构成**：`helper_weights_close` **46 项全在 direct_only**，越界元素合计 65 个、最坏容差比 min/中位/max `1.0422/1.3221/3.1805`、**65 个越界元素全部落在 speed 分量（索引 1）**；`physical_close` **1 项 = scene 2535 的 helper_quality**，逐属性最大绝对差 lat `9.792e-09`／lon `1.593e-08` 度、**speed `1.690933e-03`（上限 0.001，超 69%）**、heading `1.820e-05`；`membership_exact`／`ordinary_control_exact`／`anchor_weights_close`／`state_span_close` 在 900 项中零失败。utility 诊断照实保留不作中止：direct_only raw 140 场／929 元素、relu 107 场／475 元素、翻转 0；helper_quality raw 1 场／2、relu 1 场／1、**翻转 2**；mixed_action 全 0。幅度全部由 066 新存的 `source057_*` 数组对只读 057 缓存直接复算，**未重跑任何前向**（明细见 `rejection-margins.json` 与 47 场 `rejected-scene-rows.json`）。最坏项 scene 4771：prev `0.007905518`／cur `0.007902086`、差 `3.431970e-06`、界 `1.079055e-06`、比 `3.1805`。服务器**不建议把 atol 调到刚好通过、不提任何新容差数字**，也不引用 `unvalidated-summary.json` 里任何方法指标当成绩（七臂聚合已算出但未验收，253 个未拒场不冒充全量）。V reference 确有读取（300／600，训练为空）。未重试、未跳场、未改门槛、未加探针；056／057 只读，062／063／064／065 现场未动，只写全新 066 目录。回传 15 件 1.1 MB；`preparation.json` 85 MB、`scene-summary.json.gz` 9.87 MB、`scenes/` 300 个 11 MB、`predictions/` 300 个 2.4 GB、`system-predictions/` 300 个 316 MB 留服务器登记（run 目录 2.9 GB，磁盘余 801 GB）。详见[066回执](S2L-20261022-066.md)。
+研究上保留简单支撑规则为位置强控制，保留Direct-only速度收益线索；Mixed-action暂不晋升。完整数值、分层、组件异质性及限制见[研究状态](../docs/research_status.md)，执行事实只见[066回执](S2L-20261022-066.md)。
 
 ## 执行与回传
 

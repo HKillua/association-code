@@ -22,7 +22,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 - `association/`：数据、当前关联/融合、TMTAFF参考、评价和训练。
 - `baselines/`：TSA-cTFER独立关联对照。
 - `tools/experiments/`：保留的[训练与执行入口](tools/experiments/README.md)。
-- `tools/analysis/`：当前缓存复核、062冻结迁移及063首场重放诊断。
+- `tools/analysis/`：当前缓存复核、冻结融合迁移及数值重放审计。
 - `configs/`：当前配置和固定数据名单；文件存在不代表可执行授权。
 - `tests/`：数据划分、时间/单位/mask、参数更新/冻结、评价人口及小型贯通验证。
 
