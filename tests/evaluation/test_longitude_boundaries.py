@@ -10,8 +10,7 @@ import torch
 
 from association.data.archive import DataError
 from association.models.fusion import FusionLoss
-from association.data.targets import (align_reference_states, build_fusion_targets,
-                                        build_scene_fusion_targets)
+from association.data.targets import align_reference_states, build_scene_fusion_targets
 
 
 def reference(longitudes=(179., -179.), *, identity='ship-0'):
@@ -63,18 +62,16 @@ class LongitudeBoundaryTests(unittest.TestCase):
         with self.assertRaisesRegex(DataError, 'longitude_policy'):
             align(reference(), [5.], longitude_policy='guess')
 
-    def test_pair_and_all_identity_builders_forward_longitude_policy(self):
+    def test_all_identity_builder_forwards_longitude_policy(self):
         prepared = dict(scene_id='synthetic', split='T_core', grid=np.array([0., 5., 10.]),
             values=np.zeros((2, 3, 4)), observed=np.ones((2, 3), bool),
             identities=np.array(['ship-0', 'ship-0']), pairs=np.array([[0, 1]]), labels=np.array([1.]))
         refs = reference()
         refs['rows'] += reference((-179., 179.), identity='other-0')['rows']
-        pairs = build_fusion_targets(prepared, refs, [0], split='T_core', nominal_grid=prepared['grid'],
-            time_offset_seconds=0., max_gap_seconds=10., longitude_policy='shortest_arc')
-        self.assertEqual(pairs['states'][0, 1, 1], -180.)
         all_targets = build_scene_fusion_targets(prepared, refs,
             target_identity_ids=['ship-0', 'other-0', 'absent-0'], time_offset_seconds=0.,
             max_gap_seconds=10., longitude_policy='shortest_arc')
+        self.assertEqual(all_targets['ship-0']['states'][1, 1], -180.)
         self.assertEqual(all_targets['other-0']['states'][1, 1], -180.)
         self.assertFalse(all_targets['absent-0']['valid'].any())
         self.assertTrue(all(item['report']['longitude_policy'] == 'shortest_arc'

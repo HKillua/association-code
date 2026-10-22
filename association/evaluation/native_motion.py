@@ -17,7 +17,6 @@ from association.evaluation.support import build_input_support
 METHODS = ('native_hold', 'native_endpoint', 'native_ols')
 REGIONS = ('all', 'inside_support', 'outside_support', 'before_support',
            'after_support', 'exact_observation', 'inside_nonobserved')
-DISTANCE_REGIONS = ('le_300s', 'gt_300_le_600s', 'gt_600_le_1800s', 'gt_1800s', 'no_input')
 
 
 def _short_delta(delta):
@@ -126,16 +125,3 @@ def position_metrics(prediction, target, target_valid, region):
     available[..., :2] = True
     return evaluate_aligned_fusion(states, target, target_valid,
         prediction_valid=available, region_mask=region)['position']
-
-
-def summarize_positions(predictions, target, target_valid, regions, nearest_seconds):
-    """Point-pooled position metrics on common support and distance partitions."""
-    nearest = np.asarray(nearest_seconds)
-    distances = (nearest <= 300., (nearest > 300.) & (nearest <= 600.),
-                 (nearest > 600.) & (nearest <= 1800.),
-                 (nearest > 1800.) & np.isfinite(nearest), ~np.isfinite(nearest))
-    return {name: dict(regions={key: position_metrics(prediction, target, target_valid, mask)
-                               for key, mask in regions.items()},
-                       input_distance_metrics={key: position_metrics(prediction, target, target_valid, mask)
-                                               for key, mask in zip(DISTANCE_REGIONS, distances)})
-            for name, prediction in predictions.items()}

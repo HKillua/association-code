@@ -175,17 +175,3 @@ def load_records(directory, expected_binding=None):
         if not np.array_equal(record['labels'], identities[pairs[:, 0]] == identities[pairs[:, 1]]):
             raise ValueError('Score cache labels disagree with identity pairs')
     return records
-
-
-def validate_record_split(records, manifest, split):
-    """Check a cache against the actual selected scene/component population."""
-    actual = [str(record['scene_id']) for record in records]
-    expected = [str(scene) for scene in manifest['splits'][split]]
-    if len(actual) != len(expected) or set(actual) != set(expected):
-        raise ValueError(f'{split} cache scenes differ from manifest')
-    for record in records:
-        if str(record['component_id']) != str(manifest['components'][str(record['scene_id'])]):
-            raise ValueError(f'{split} cache component differs from manifest')
-        n = len(record['sources'])
-        if len(record['pairs']) != n * (n - 1) // 2:
-            raise ValueError(f'{split} cache does not contain all candidate pairs')

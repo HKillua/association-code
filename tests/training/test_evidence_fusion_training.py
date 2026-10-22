@@ -257,16 +257,13 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
             self.assertEqual(float(loss['utility_sign'].detach()), 0.)
             self.assertTrue(torch.equal(torch.autograd.grad(loss['utility_sign'], u)[0], torch.zeros_like(u)))
 
-    def test_sign_candidate_updates_logs_and_checkpoint_loss_semantics(self):
+    def test_sign_auxiliary_updates_logs_and_checkpoint_loss_semantics(self):
         torch.set_num_threads(1)
         train, validation = synthetic_scenes(length=64, max_observations=4)
-        config = configuration(json.loads(Path('configs/evidence-fusion-sign.json').read_text()))
         reference = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))
-        only_change = copy.deepcopy(config)
-        del only_change['training']['utility_sign_weight']
-        self.assertEqual(only_change, reference)
-        self.assertEqual(config['training']['updates'], 1000)
-        config['training'].update(updates=1, batch_size=1, evaluate_every=1)
+        config = copy.deepcopy(reference)
+        config['training'].update(updates=1, batch_size=1, evaluate_every=1, utility_sign_weight=.1)
+        configuration(config)
         # Explicit scene isolation permits shared A components without scene overlap.
         for scene in [*train, *validation]:
             scene['split_unit'] = 'scene'

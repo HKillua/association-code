@@ -1,15 +1,12 @@
 """Hand-calculated supervision alignment; no archive or native data access."""
 import json
-from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
 
 import numpy as np
 
-from association.data.archive import DataError, Scene, Track
-from association.data.legacy_dataset import prepare_scene
+from association.data.archive import DataError
 from association.data.targets import (
-    align_reference_states, build_fusion_targets, build_scene_fusion_targets,
+    align_reference_states, build_scene_fusion_targets,
 )
 
 
@@ -122,115 +119,6 @@ class FusionTargetTests(unittest.TestCase):
         self.assertFalse(align(data, [-1,11], gap=100)['valid'].any())
         one = align(scene([('ship-0',5,[1,2,3,4])]), [4,5,6], gap=100)
         np.testing.assert_array_equal(one['valid'].all(1), [False,True,False])
-
-
-class FusionTargetAssemblyTests(unittest.TestCase):
-    def setUp(self):
-        tracks = []
-        for index, (identity, start, stop) in enumerate((('ship-0', 0, 4), ('ship-0', 2, 8),
-                                                       ('other-0', 1, 7), ('other-0', 6, 10))):
-            tracks.append(Track(node_id=f'node-{index}', source=str(index), batch=str(index),
-                                identity_id=identity, ancestor_id=identity.split('-')[0],
-                                times=np.asarray([start, stop], dtype=float),
-                                values=np.asarray([[10 + index, 20, 4, 350],
-                                                   [12 + index, 24, 6, 10]], dtype=float)))
-        raw = Scene('synthetic', tracks, {})
-        # Execute real preparation/registration without opening any archive.
-        archive = SimpleNamespace(load_scene=lambda scene_id: raw)
-        self.prepared = prepare_scene(archive, 'synthetic', 6, 'synthetic-component')
-        self.positive = np.flatnonzero(self.prepared['labels'] == 1)
-        self.reference = scene([('ship-0', 100, [10, 20, 4, 350]),
-                                ('ship-0', 110, [20, 40, 8, 10]),
-                                ('other-0', 100, [30, 50, 10, 20]),
-                                ('other-0', 110, [40, 70, 20, 40])])
-
-    def build(self, indices=None, **overrides):
-        arguments = {'split': 'T_core', 'nominal_grid': self.prepared['grid'],
-                     'time_offset_seconds': 100, 'max_gap_seconds': 10}
-        arguments.update(overrides)
-        return build_fusion_targets(self.prepared, self.reference,
-                                    self.positive if indices is None else indices, **arguments)
-
-    def test_real_preparation_repeated_pair_order_and_one_alignment_per_identity(self):
-        indices = self.positive[[1, 0, 1]]
-        original = indices.copy()
-        with patch('association.data.targets.align_reference_states', wraps=align_reference_states) as aligner:
-            result = self.build(indices)
-        self.assertEqual(aligner.call_count, 2)
-        self.assertEqual([call.args[1] for call in aligner.call_args_list], ['other-0', 'ship-0'])
-        np.testing.assert_array_equal(result['pairs'], self.prepared['pairs'][indices])
-        np.testing.assert_array_equal(result['query_times'], [0, 2, 4, 6, 8, 10])
-        np.testing.assert_array_equal(indices, original)
-        self.assertEqual(result['identity_ids'], ['other-0', 'ship-0', 'other-0'])
-        self.assertEqual(result['states'].shape, (3, 6, 4))
-        np.testing.assert_allclose(result['states'][1, 1], [12, 24, 4.8, 354])
-        np.testing.assert_array_equal(result['states'][0], result['states'][2])
-        self.assertTrue(result['valid'].all())
-        self.assertEqual(result['report']['pair_count'], 3)
-        self.assertEqual(result['report']['unique_identity_count'], 2)
-        self.assertEqual(result['report']['repeated_selection_count'], 1)
-        self.assertEqual(result['report']['valid_per_feature'], dict.fromkeys(('lat','lon','vel','cou'), 18))
-        result['states'][0] = -999
-        self.assertFalse((result['states'][2] == -999).any())
-
-    def test_partial_and_missing_supervision_retain_every_selected_pair(self):
-        self.reference = scene([('ship-0', 102, [10, 20, 4, 350]),
-                                ('ship-0', 108, [16, 32, None, 10])])
-        result = self.build(self.positive[[0, 1, 1]])
-        self.assertEqual(result['pairs'].shape, (3, 2))
-        np.testing.assert_array_equal(result['valid'][0, :, 0], [False, True, True, True, True, False])
-        np.testing.assert_array_equal(result['valid'][0, :, 2], [False, True, False, False, False, False])
-        self.assertFalse(result['valid'][1:].any())
-        self.assertTrue(np.isnan(result['states'][1:]).all())
-        self.assertTrue(np.isnan(result['states'][~result['valid']]).all())
-        self.assertEqual(result['report']['valid_per_pair_feature'], [[4,4,1,4],[0,0,0,0],[0,0,0,0]])
-        self.assertEqual(result['report']['unavailable_pairs'], 2)
-        self.assertEqual(result['report']['missing_identity_ids'], ['other-0'])
-
-
-    def test_prepared_targets_connect_tcm_fusion_and_masked_loss_on_cpu(self):
-        import torch
-        from association.models.fusion import FusionLoss, PairFusion, PairFusionConfig
-        from association.models.tmtaff import AssociationModel, ModelConfig
-        from association.training.common import fit_normalizer, normalize_scene
-
-        # The selected pair remains present with partial reference support. Only
-        # observed measurements fit the normalizer; reference states stay native.
-        self.reference = scene([('ship-0', 102, [10, 20, 4, 350]),
-                                ('ship-0', 108, [16, 32, 6, 10])])
-        assembled = self.build([int(self.positive[0])])
-        normalized, observed = normalize_scene(self.prepared, fit_normalizer([self.prepared]))
-        self.assertTrue((~observed[:2]).any())
-        self.assertTrue(np.isnan(assembled['states']).any())
-        previous_threads = torch.get_num_threads()
-        torch.set_num_threads(1)
-        try:
-            with torch.random.fork_rng(devices=[]):
-                torch.manual_seed(20)
-                association = AssociationModel(ModelConfig(length=6, d_model=8, nhead=2,
-                                               num_layers=1, dim_feedforward=16, dropout=0))
-                fusion = PairFusion(PairFusionConfig(fc_hidden=12, length=6, d_model=8,
-                                     nhead=2, num_layers=1, dim_feedforward=16, dropout=0))
-                objective = FusionLoss(position_loss_mode='standard_smooth_l1')
-                complete = association.complete(torch.from_numpy(normalized), torch.from_numpy(observed))
-                complete.retain_grad()
-                prediction = fusion.forward_pairs(complete, torch.from_numpy(assembled['pairs']))['states']
-                target = torch.as_tensor(assembled['states'], dtype=prediction.dtype)
-                mask = torch.from_numpy(assembled['valid'])
-                total = objective(prediction, target, mask)['total']
-                self.assertTrue(torch.isfinite(total))
-                total.backward()
-                for module in (association.tcm_encoder, association.tcm_decoder,
-                               fusion.left_encoder, fusion.right_encoder, fusion.decoder,
-                               fusion.state_projection, objective):
-                    gradients = [p.grad for p in module.parameters() if p.grad is not None]
-                    self.assertTrue(gradients)
-                    self.assertTrue(all(torch.isfinite(g).all() for g in gradients))
-                    self.assertGreater(sum(g.abs().sum().item() for g in gradients), 0)
-                self.assertGreater(complete.grad[:2][~torch.from_numpy(observed[:2])].abs().sum().item(), 0)
-                self.assertTrue(all(p.grad is None for p in association.tam_encoder.parameters()))
-        finally:
-            torch.set_num_threads(previous_threads)
 
 
 class SceneFusionTargetGroupingTests(unittest.TestCase):

@@ -10,12 +10,12 @@ from association.models.tmtaff import ModelConfig
 from association.models.fusion import PairFusionConfig
 from association.data.dataset import load_timed_dataset
 
-def csv_bytes(header, rows):
+def csv_bytes(header, rows, encoding='utf-8-sig'):
     stream = io.StringIO(newline='')
     writer = csv.writer(stream)
     writer.writerow(header)
     writer.writerows(rows)
-    return stream.getvalue().encode('utf-8-sig')
+    return stream.getvalue().encode(encoding)
 
 def frozen_manifest():
     splits = {'T_core': ['0'], 'T_head': ['1'], 'V_select': ['2', '4'], 'T_test': ['3']}

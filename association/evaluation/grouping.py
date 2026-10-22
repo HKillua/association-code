@@ -1,20 +1,16 @@
-"""Explicit anchor grouping and recursive TFM inference, without reference data.
+"""Fixed-order direct-anchor partitions, separate from identity-only diagnostics.
 
-The fixed-order, direct-anchor rule and FC-memory feedback implement the stated
-Algorithm 1 adaptation. They are explicit call arguments, not a claim that the
-paper resolves its recursive-feedback ambiguity. Identity grouping is a separate
-evaluation helper; predicted grouping and fusion never read identities/targets.
+Prediction accepts only node indices and edge scores. Full-system TFM inference
+lives in evaluation.tmtaff; identity grouping is an explicit Oracle control.
 """
 from __future__ import annotations
 
 import math
 
 import numpy as np
-import torch
 from torch import Tensor
 
 from association.data.archive import DataError
-from association.models.fusion import PairFusion
 from association.evaluation.association import predict
 
 
@@ -134,51 +130,3 @@ def _partition(groups, node_count):
     if len(seen) != node_count:
         raise DataError('groups must cover every input node, including singletons')
     return copied
-
-
-@torch.inference_mode()
-def fuse_track_groups(fusion: PairFusion, completed_tracks: Tensor, groups, *,
-                      feedback_policy, singleton_policy):
-    """Fuse each full partition group using the explicit FC-memory recurrence.
-
-    ``fusion`` must already be in eval mode; this function does not change model
-    modes or weights. Completed tracks are ``[N,L,d]`` TCM outputs in fixed input
-    node order. At every step the accumulated FC memory is the *left* input and
-    the next original completed fragment is the *right* input. The final step's
-    decoder states are the group's physical output. No state or true identity
-    is fed back into the model.
-
-    Return one record per group, preserving mixed-identity predicted groups and
-    singletons. A singleton has ``status='singleton_missing'`` and both tensor
-    outputs ``None``; the caller must handle its observed single-source baseline.
-    It is never self-fused or silently excluded. No reference, label, threshold,
-    normalization, or file access is part of this function.
-    """
-    if feedback_policy != 'fc_memory':
-        raise DataError("feedback_policy must explicitly be 'fc_memory'")
-    if singleton_policy != 'missing':
-        raise DataError("singleton_policy must explicitly be 'missing'")
-    if not isinstance(fusion, PairFusion):
-        raise DataError('fusion must be a PairFusion model')
-    if any(module.training for module in fusion.modules()):
-        raise DataError('PairFusion must already be in eval mode for inference')
-    if not isinstance(completed_tracks, Tensor):
-        raise DataError('completed_tracks must be a tensor')
-    # Reuse the model's feature/device/dtype contract even for all-singleton or
-    # empty scenes, where no call to PairFusion.forward would otherwise occur.
-    fusion._validate_features(completed_tracks)
-    partition = _partition(groups, len(completed_tracks))
-    records = []
-    for members in partition:
-        record = {'node_indices': members, 'anchor': members[0],
-                  'fusion_steps': len(members) - 1, 'states': None, 'fused_features': None,
-                  'status': 'singleton_missing' if len(members) == 1 else 'fused'}
-        if len(members) > 1:
-            memory = completed_tracks[members[0]:members[0] + 1]
-            for index in members[1:]:
-                result = fusion(memory, completed_tracks[index:index + 1])
-                memory = result['fused_features']
-            record['states'] = result['states'][0].clone()
-            record['fused_features'] = memory[0].clone()
-        records.append(record)
-    return records

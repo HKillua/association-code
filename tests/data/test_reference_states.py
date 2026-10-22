@@ -1,5 +1,3 @@
-import csv
-import io
 import math
 from pathlib import Path
 import tempfile
@@ -9,14 +7,11 @@ import zipfile
 
 from association.data.archive import DataError
 from association.data.reference_states import REFERENCE_HEADER, read_reference_states
+from tests.fixtures.native_zip import csv_bytes
 
 
 def payload(rows, encoding="utf-8-sig", header=REFERENCE_HEADER):
-    stream = io.StringIO(newline="")
-    writer = csv.writer(stream)
-    writer.writerow(header)
-    writer.writerows(rows)
-    return stream.getvalue().encode(encoding)
+    return csv_bytes(header, rows, encoding)
 
 
 def manifest():

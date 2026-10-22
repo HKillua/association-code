@@ -1,4 +1,3 @@
-import csv
 import io
 import json
 from pathlib import Path
@@ -13,14 +12,7 @@ from association.data.archive import (DEFAULT_DEVELOPMENT_SCENES,
                               LEVEL1_PREVIEW_RELATED_LEVEL2_SCENES, DataError, MTADArchive,
                               Scene, Track, _ConcatenatedReader, build_manifest, resample_scene,
                               validate_manifest)
-
-
-def csv_payload(header, rows):
-    buffer = io.StringIO(newline="")
-    writer = csv.writer(buffer)
-    writer.writerow(header)
-    writer.writerows(rows)
-    return buffer.getvalue().encode("utf-8-sig")
+from tests.fixtures.native_zip import csv_bytes as csv_payload
 
 
 def fixture_zip(path, specs, extra=None):

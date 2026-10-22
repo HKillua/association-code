@@ -48,7 +48,7 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
                         node_input_support=None):
     """Evaluate all targets and all fixed-order predicted groups without I/O.
 
-    ``group_outputs`` accepts the records from ``fuse_track_groups``: each has
+    ``group_outputs`` contains one prediction record per emitted group: each has
     ``node_indices`` and physical ``states[L,4]`` (or None for no output).
     Optional ``prediction_valid[L,4]`` explicitly marks available features;
     otherwise all output values are declared valid, so NaNs fail validation.

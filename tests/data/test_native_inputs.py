@@ -1,6 +1,4 @@
 import copy
-import csv
-import io
 import json
 from pathlib import Path
 import tempfile
@@ -12,6 +10,7 @@ import numpy as np
 
 from association.data.archive import DataError, MTADArchive
 from association.data.native import load_native_split, load_native_split_from_archive
+from tests.fixtures.native_zip import csv_bytes
 
 
 def frozen_fixture_manifest():
@@ -22,14 +21,6 @@ def frozen_fixture_manifest():
             'component_splits': {group[0]: split for split, group in splits.items()},
             'label_members': {sid: {} for sid in ids}, 'caps': {key: 1 for key in splits},
             'development_scenes': ['0']}
-
-
-def csv_bytes(header, rows):
-    stream = io.StringIO(newline='')
-    writer = csv.writer(stream)
-    writer.writerow(header)
-    writer.writerows(rows)
-    return stream.getvalue().encode('utf-8-sig')
 
 
 def fragment(identity, source, batch, times):
