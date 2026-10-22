@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-10-23，统一协作分支`main`。执行状态以Git回执为准，不代表实时监控。**067已获用户独立批准，READY待服务器确认可用CPU资源领取一次；当前尚无启动回执。066已结束，FAILED／REJECTED保持，不重领或追加完整V前向。**
+2026-10-23，统一协作分支`main`。执行状态以Git回执为准，不代表实时监控。**067已获用户独立批准，服务器已按 `a208767` 领取一次（北京00:22:56提交，RUNNING），启动记录已回传。066已结束，FAILED／REJECTED保持，不重领或追加完整V前向。**
 
 | 当前任务 | 状态 | 下一执行方 |
 | --- | --- | --- |
-| [067：只读缓存数值影响／融合归因](L2S-20261022-067.md) | **READY：用户批准一次CPU4；实施a208767，382项测试及独立审查通过；零GPU／训练／模型前向，无压缩卷读取** | 服务器确认CPU、内存与I/O后领取一次；1小时仅提醒，失败停止不重试 |
+| [067：只读缓存数值影响／融合机会归因](L2S-20261022-067.md) | **RUNNING：服务器已领取并提交，北京2026-10-23 00:22:56，单元`mtad-9392f199143a`，checkout `a208767`** | 服务器执行和回传；[067回执](S2L-20261022-067.md)，不重复领取 |
 | [066：输出层验收＋全量数值审计](L2S-20261022-066.md) | **FAILED／REJECTED：300/300 场跑完、900 项审计收齐，42 分钟，退出码 1；47 项拒绝＝46×direct_only `helper_weights_close`＋1×helper_quality `physical_close`(scene 2535)，无 `summary.json`** | 本地按全量清单定位（已保存数组可无模型复审计）；[066回执](S2L-20261022-066.md)与[产物](results/LEVEL1-FROZEN-FUSION-20261022-066/)，不重领 |
 | [065：ReLU重放](L2S-20261022-065.md) | **FAILED：完成2/300，scene5/direct_only两个正utility微超差，权重及物理检查通过** | [回执](S2L-20261022-065.md)已审，额度耗尽，不重领 |
 | [064：保全拒绝现场](L2S-20261022-064.md) | **FAILED：首场direct_only负utility拒绝，0/300** | [回执](S2L-20261022-064.md)，不重领 |
@@ -19,6 +19,7 @@
 
 研究上保留简单支撑规则为位置强控制，保留Direct-only速度收益线索；Mixed-action暂不晋升。完整数值、分层、组件异质性及限制见[研究状态](../docs/research_status.md)，执行事实只见[066回执](S2L-20261022-066.md)。
 
+**服务器回传（067 提交）**：块 SHA256 `644ab900…` 前后一致、占位符替换 0 处；块内无 `--archive`（不读压缩卷）、无诊断／探针参数，入口 `tools/analysis/fusion_cache_attribution.py`；worker 3528076／payload 3528077，`--max-seconds 3600 --time-policy advisory`、`--cpu-threads 4`、零 GPU。领取前 32 核／load 16.94／available 94 GB／`/home` 可用 802 GB，他人约 16 个 >50% CPU 作业，未终止他人进程。RUNNING 中实测旗标：`source_acceptance=REJECTED`、`method_result_accepted=false`、`checkpoint_loaded=false`、`model_forwards=0`、`archive_members_read=0`、`cached_reference_used=true`、`test_opened=false`；进度 27/300 场／46.6 秒（约 1.7 秒／场，外推全程约 9 分钟）。066／056／057 缓存只读未动。详见[067回执](S2L-20261022-067.md)。
 ## 执行与回传
 
 服务器只领取本索引当前**获明确批准的LOCAL_TO_SERVER / READY**；DRAFT不可运行，历史批准不恢复额度。全局最多四个获批单卡任务，CPU预算按各交接；具体托管和失败规则见[服务器规则](../docs/server_autonomy.md)。一次尝试、失败停止、不自动重试，T_test封存。
