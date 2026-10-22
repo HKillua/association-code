@@ -4,11 +4,13 @@
 
 | 当前任务 | 状态 | 下一执行方 |
 | --- | --- | --- |
-| [062：冻结057融合迁移到056学习分组](L2S-20261022-062.md) | **RUNNING：已获一次CPU4预算并提交** | 服务器执行和回传；[062领取／提交回执](S2L-20261022-062.md)，不重复领取 |
+| [062：冻结057融合迁移到056学习分组](L2S-20261022-062.md) | **FAILED：一次CPU4已消耗，首场景057源重放 `utility_close=False`，不自动重试、不重领** | 本地核定复核口径或停止；[062回执](S2L-20261022-062.md)与[产物](results/LEVEL1-FROZEN-FUSION-20261022-062/) |
 
 **062是当前唯一活动任务；本轮精简不新增任务或预算。** 056—061全部完成并已审查，不重领；050已停止保全，原运行FAILED。旧052模板和其它历史批准均不恢复执行额度。四卡并发许可只适用于各自已获批的任务。
 
 062已由用户在服务器会话批准“给062分配CPU4预算并执行交接”，服务器于北京时间14:49:33提交，单元`mtad-3374238ad9d0`。本地已核对并接受授权记录；该状态来自Git回执，并非实时进程检查。
+
+**服务器回传（062 终态，事实细节只在回执与产物，不在本索引累积）**：北京时间 14:49:33 提交、14:53:16 结束，`FAILED`／退出码 1／`elapsed_seconds=222.47886635409668`，`timed_out=false`、4 小时提醒未触发。失败在第 1 场（`completed_scenes=0`，`stage=frozen_inference_and_cache_replay`）的 helper_quality 原 OLS 组重放：七项检查只有 `utility_close=False`（`max_utility_difference=1.52587890625e-05`，恰 2^-16），`membership_exact`／`ordinary_control_exact`／`anchor_weights_close`／`state_span_close`／`physical_close`／`helper_weights_close` 均为真，物理位置差恰为 `0.0 m`。`summary.json` 与 `scene-summary.json.gz` 未生成，本轮**没有任何七臂成绩**。V reference 确有读取（`reference_members_read=300`、`observation_members_read=600`、`test_opened=false`、`optimizer_updates=0`、`gpu_used=false`）。三次独立只读重建（独立进程／线程 1…32／内存偏移 0…7／复刻单元的 `OMP/MKL/OPENBLAS=4` 环境）都得到 `max_utility_diff=1.072884e-06`、超容差元素 0/9984、最坏点只用容差的 39.3%，**作业那次的 1.53e-05 未被复现，机制未定**。服务器未放宽容差、未删难场、未提交第二次；056／057 源件只读未变。
 
 062实现冻结于`02c0d1e`：零训练、零GPU，保留056分组/代表/完整人口，比较三个057融合模型及四个普通控制；4小时仅提醒，失败不自动重试。完整输入、命令、容差、产物和停止条件只维护在[062交接](L2S-20261022-062.md)，不在本索引复制。
 

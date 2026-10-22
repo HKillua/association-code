@@ -1,0 +1,13 @@
+{
+ "baseline_forward": "max_diff=1.072884e-06 worst_ratio=0.393 ratio>0.5元素=0/9984",
+ "thread_sweep": "threads 1/2/4/8/16/32 max_diff 7.152557e-07~1.072884e-06 全部超容差元素=0",
+ "alignment_sweep": "首轴偏移0..7 max_diff恒为1.072884e-06 与基准逐位相同",
+ "unit_env_repro": "OMP/MKL/OPENBLAS=4且未手动set_num_threads：max_diff=1.072884e-06 utility_close=True",
+ "attempt_observed": {
+  "max_utility_difference": 1.52587890625e-05,
+  "max_anchor_weight_difference": 8.233261279411153e-07,
+  "max_helper_weights_difference": 8.23326127861318e-07,
+  "结论": "三次独立只读重建（不同进程/线程/内存布局）都落在容差内且最坏点仅为容差的39%，未能复现该1.53e-05；机制未定，不据此声称已定位。"
+ },
+ "written_outside_tmp": "无（探针不写runs目录，未改容差，未重跑任务）"
+}
