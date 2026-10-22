@@ -1,0 +1,36 @@
+# 066 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-FUSION-20261022-066-attempt-1  总计 2.9G
+  run.json 1098 字节
+  replay-audit.json 11821 字节
+  unvalidated-summary.json 13144442 字节
+  preparation.json 85153501 字节
+  scene-summary.json.gz 9866286 字节
+  scenes/ 300 个文件 11M
+  predictions/ 300 个文件 2.4G（每场含 source057_{arm}_prediction_*与routing_*，可无模型复审计）
+  system-predictions/ 300 个文件 316M
+  summary.json：不存在（acceptance=REJECTED，按规则不生成正式summary）
+  replay-failure/：不存在（output域数值拒绝走全量收集，不逐场中断，故无单场快照）
+
+launcher目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-FUSION-20261022-066-attempt-1-launch
+  status.json 525 字节
+  exit_code.txt 2 字节
+  stdout.log 0 字节
+  stderr.log 638 字节
+  request.json 1502 字节
+  launch.json 1310 字节
+  worker.stdout.log 0 字节
+  worker.stderr.log 0 字节
+
+只读源件与旧现场（mtime未变）:
+  runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system/summary.json 523770716 字节 mtime=2026-10-22 01:58:30.098490199 +0800
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/direct-only/system/predictions/states-1.npz 286459 字节 mtime=2026-10-22 04:06:03.459126827 +0800
+  runs/LEVEL1-FUSION-20261022-057-attempt-1/helper-quality/system/predictions/states-2535.npz 218831 字节 mtime=2026-10-22 02:46:12.638631325 +0800
+82M	runs/LEVEL1-FROZEN-FUSION-20261022-062-attempt-1
+86M	runs/LEVEL1-REPLAY-DIAGNOSTIC-20261022-063-attempt-1
+82M	runs/LEVEL1-FROZEN-FUSION-20261022-064-attempt-1
+88M	runs/LEVEL1-FROZEN-FUSION-20261022-065-attempt-1
+
+磁盘: /dev/sda        7.3T  6.1T  802G   89% /home
+checkout: /home/wangguangjie/djs/association-code-run066 HEAD=e6c137e5aedece6071c107cf72e94eb9d7f37d37
+单元: mtad-db94ed8cd218 (systemd-user, transient, 现 failed)

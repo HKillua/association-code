@@ -1,0 +1,6 @@
+[14:27:33Z] 状态 None->RUNNING rc=None advisory=False elapsed=None
+[14:41:33Z] 心跳 stage=frozen_inference_and_cache_replay scenes=82/300 last=1393 acceptance=PENDING complete=False advisory=False 磁盘=803GB free
+[14:56:33Z] 心跳 stage=frozen_inference_and_cache_replay scenes=227/300 last=3916 acceptance=PENDING complete=False advisory=False 磁盘=802GB free
+[15:09:33Z] 状态 RUNNING->FAILED rc=1 advisory=False elapsed=2522.4209690531716
+[15:09:33Z] 终态 FAILED exit_code文件存在=True 内容=1 磁盘=801GB free
+[15:09:33Z] 监视结束
