@@ -87,6 +87,11 @@ def run(args):
     output = Path(args.output).resolve()
     _check_output(output, (source.parent, fusion_source))
     diagnostic = getattr(args, 'diagnose_first_scene', False)
+    utility_domain = getattr(args, 'utility_replay_domain', 'raw')
+    if utility_domain not in ('raw', 'relu'):
+        raise ValueError('utility replay domain must be raw or relu')
+    if diagnostic and utility_domain != 'raw':
+        raise ValueError('063 diagnostic retains its original raw utility contract')
     probe_path, probe_script = getattr(args, 'probe_motion', None), getattr(args, 'probe_script', None)
     if bool(probe_path) != bool(probe_script) or (probe_path and not diagnostic):
         raise ValueError('probe-motion and probe-script must be supplied together in diagnostic mode')
@@ -100,6 +105,7 @@ def run(args):
         dataset_level='Level1', split='V_select', source_system=str(source),
         source_fusion=str(fusion_source), optimizer_updates=0, gpu_used=False,
         device='cpu', cpu_threads=args.cpu_threads, test_opened=False,
+        utility_replay_domain=utility_domain,
         scores_recomputed=False, groups_recomputed=False, threshold_reselected=False,
         normalizer_refitted=False, native_evidence_reconstructed=True,
         stage='source_binding', completed_scenes=0)
@@ -194,7 +200,8 @@ def run(args):
                     return result
                 try:
                     replays[arm] = replay_fusion_source(fragment, saved, old_fragment, old_system,
-                        ordinary_inference, ordinary_route, expected=fusion_metadata[arm]['expected'][sid])
+                        ordinary_inference, ordinary_route, expected=fusion_metadata[arm]['expected'][sid],
+                        utility_replay_domain=utility_domain)
                 except Exception as rejection:
                     # Persist this already-computed rejection, never rerun the
                     # model or replace the original acceptance/error policy.
@@ -262,6 +269,7 @@ def run(args):
             association_threshold=metadata['association_threshold'], ols_working_point=metadata['ols_working_point'],
             ordinary_source_replay_exact=True, fusion_source_replay_passed=True,
             fusion_replay_tolerance=REPLAY_TOLERANCE, support_control_analytical_verified=True,
+            utility_replay_domain=utility_domain,
             support_control_analytical_expected=EXPECTED_SUPPORT_POSITION,
             metric_tolerance=METRIC_TOLERANCE, optimizer_updates=0, gpu_used=False, test_opened=False,
             scores_recomputed=False, groups_recomputed=False, threshold_reselected=False,
@@ -275,7 +283,16 @@ def run(args):
                 'full-fragment/offline evidence can use measurements after the query time',
                 'shared-identity components are descriptive dependence groups, not independent ship validation',
                 'no Oracle choice enters inference; this is a frozen transfer test, not new training',
+                'relu replay, when selected, verifies pre-lock active utility, weights and outputs; '
+                'finite negative raw utility differences remain diagnostic, not a raw-head identity guarantee',
                 'negative or attribute-specific results do not justify retuning, retries or extra updates'])
+        result['utility_replay_audit'] = {arm: dict(
+            raw_failed_scene_ids=[row['scene_id'] for row in rows
+                if not row['source057_replay'][arm]['utility_diagnostics']['raw']['passed']],
+            raw_exceed_count=sum(row['source057_replay'][arm]['utility_diagnostics']['raw']['exceed_count']
+                                 for row in rows),
+            activation_flip_count=sum(row['source057_replay'][arm]['utility_diagnostics']['activation_flip_count']
+                                       for row in rows)) for arm in LEARNED}
         write_gzip(output/'scene-summary.json.gz', rows)
         write_json(output/'summary.json', result)
         state.update(status='COMPLETED', stage='finished', elapsed_seconds=time.monotonic()-started)
@@ -298,6 +315,9 @@ def main():
         parser.add_argument('--'+key, type=Path, required=True)
     parser.add_argument('--archive', nargs='+', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--utility-replay-domain', choices=('raw', 'relu'), default='raw',
+                        help='default raw preserves062/064;065 opt-in relu checks activation sets '
+                             'and ReLU magnitudes with the original tolerances; raw differences stay diagnostic')
     parser.add_argument('--diagnose-first-scene', action='store_true',
                         help='063: same V preparation, first helper-quality OLS call plus one traced repeat; no system evaluation')
     parser.add_argument('--probe-motion', type=Path, help='optional safe NPZ of complete visible motion; never pickle')

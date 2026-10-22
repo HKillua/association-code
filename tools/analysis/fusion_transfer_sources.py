@@ -9,6 +9,7 @@ from association.evaluation.evidence_fusion_combo import (
     REPLAY_TOLERANCE, read_scores, replay_check,
 )
 from association.evaluation.scene import evaluate_full_scene
+from association.evaluation.replay_diagnostics import array_difference
 from association.evaluation.system_attribution import _same, assert_metrics
 from association.training.evidence_association import load_checkpoint as load_association
 from association.training.evidence_fusion import bind_ols_working_point, load_checkpoint
@@ -155,13 +156,19 @@ def bind_sources(source056, source057, manifest, device='cpu'):
 
 
 def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
-                         predictionsOLS, routingOLS, *, expected=None):
+                         predictionsOLS, routingOLS, *, expected=None, utility_replay_domain='raw'):
     """Verify all old OLS output groups, including duplicate/non-retained groups.
 
     New learned-group predictions are not compared to the old OLS prediction.
     The supplied forward is on the original OLS groups solely to verify frozen
     checkpoint replay across devices. All categorical and ordinary arrays are exact.
+    The opt-in relu contract checks inference equivalence, not raw-head replay:
+    pre-lock activation sets must match and positive magnitudes retain the original
+    tolerance. Finite negative magnitudes do not affect inference; their differences
+    remain diagnostic. No scene-wide scale can loosen positive-value tolerances.
     """
+    if utility_replay_domain not in ('raw', 'relu'):
+        raise ValueError('utility replay domain must be raw or relu')
     for key in INPUT_KEYS:
         _same(old057fragment[key], fragment056[key], '056/057 input/' + key)
     for key in fragment056:
@@ -183,13 +190,29 @@ def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
     result = replay_check(adapted, predictionsOLS, routingOLS)
     tolerance = dict(atol=REPLAY_TOLERANCE['anchor_weight_atol'],
                      rtol=REPLAY_TOLERANCE['anchor_weight_rtol'])
-    for key in ('helper_weights', 'utility'):
-        current, previous = np.asarray(routingOLS[key]), old057fragment[prefix + key]
-        close = (current.shape == previous.shape and np.isfinite(current).all()
-                 and np.isfinite(previous).all() and np.allclose(current, previous, **tolerance))
-        result['checks'][key + '_close'] = bool(close)
-        result['max_' + key + '_difference'] = (float(np.max(abs(current - previous), initial=0.))
+    current, previous = np.asarray(routingOLS['helper_weights']), old057fragment[prefix + 'helper_weights']
+    close = (current.shape == previous.shape and np.isfinite(current).all()
+             and np.isfinite(previous).all() and np.allclose(current, previous, **tolerance))
+    result['checks']['helper_weights_close'] = bool(close)
+    result['max_helper_weights_difference'] = (float(np.max(abs(current - previous), initial=0.))
                                                if current.shape == previous.shape else None)
+    current = np.asarray(routingOLS['utility'])
+    previous = np.asarray(old057fragment[prefix + 'utility'])
+    raw = array_difference(current, previous, **tolerance)
+    effective = array_difference(np.maximum(current, 0.), np.maximum(previous, 0.), **tolerance)
+    finite = (raw['shape_equal'] and raw['current_nonfinite_count'] == 0
+              and raw['previous_nonfinite_count'] == 0)
+    flips = int(np.count_nonzero((current > 0) != (previous > 0))) if raw['shape_equal'] else None
+    result.update(utility_replay_domain=utility_replay_domain,
+        utility_diagnostics=dict(raw=raw, relu=effective, activation_flip_count=flips),
+        max_utility_difference=(raw['max_absolute_difference']['absolute_difference']
+                                if raw['max_absolute_difference'] is not None else None))
+    if utility_replay_domain == 'raw':
+        result['checks']['utility_close'] = raw['passed']
+    else:
+        # Check finite raw values too: ReLU would otherwise hide -inf corruption.
+        result['checks'].update(utility_activation_equal=bool(finite and flips == 0),
+                                utility_relu_close=bool(finite and effective['passed']))
     result['passed'] = bool(all(result['checks'].values()))
     if not result['passed']:
         raise ValueError('057 frozen OLS inference exceeds predeclared replay tolerance: ' + str(result))

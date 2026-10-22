@@ -62,9 +62,73 @@ class FusionTransferSourceTests(unittest.TestCase):
         *args, expected = self.replay_fixture()
         report = replay_fusion_source(*args, expected=expected)
         self.assertTrue(report['passed'])
+        self.assertEqual(report['utility_replay_domain'], 'raw')
+        self.assertTrue(report['checks']['utility_close'])
         self.assertTrue(report['complete_old_learned_artifact_exact'])
         args[4]['learned'][0, 0, 0] += 1e-9
         self.assertTrue(replay_fusion_source(*args, expected=expected)['passed'])
+
+    def test_relu_contract_preserves_raw_failure_for_inactive_utility(self):
+        for current, previous in ((-0.035231105983257294, -0.03522947430610657),
+                                  (-100., -0.01)):
+            with self.subTest(current=current, previous=previous):
+                *args, expected = self.replay_fixture()
+                # ReLU discards the magnitude in both cases. The second case
+                # explicitly documents inference equivalence, not head replay.
+                # This isolates the utility gate; unchanged fixture weights are
+                # not recomputed. The entry test covers real zero-weight inference.
+                args[5]['utility'][0, 0, 0] = current
+                args[2]['ols_routing_utility'][0, 0, 0] = previous
+                with self.assertRaisesRegex(ValueError, 'replay tolerance'):
+                    replay_fusion_source(*args, expected=expected)
+                report = replay_fusion_source(*args, expected=expected, utility_replay_domain='relu')
+                self.assertTrue(report['passed'])
+                self.assertEqual(report['utility_replay_domain'], 'relu')
+                self.assertNotIn('utility_close', report['checks'])
+                self.assertTrue(report['checks']['utility_activation_equal'])
+                self.assertTrue(report['checks']['utility_relu_close'])
+                self.assertFalse(report['utility_diagnostics']['raw']['passed'])
+                self.assertEqual(report['utility_diagnostics']['raw']['exceed_count'], 1)
+                self.assertTrue(report['utility_diagnostics']['relu']['passed'])
+                self.assertEqual(report['utility_diagnostics']['activation_flip_count'], 0)
+
+    def test_relu_contract_rejects_activation_changes_and_positive_drift(self):
+        for previous, current in ((-1e-8, 1e-8), (0., 1e-8), (1e-8, 0.),
+                                  (1. / 3., 1. / 3. + 1.6e-5)):
+            with self.subTest(previous=previous, current=current):
+                *args, expected = self.replay_fixture()
+                # An unrelated large value must not enlarge the scalar bound.
+                args[5]['utility'][1, 0, 0] = 150.
+                args[2]['ols_routing_utility'][1, 0, 0] = 150.
+                args[5]['utility'][0, 0, 0] = current
+                args[2]['ols_routing_utility'][0, 0, 0] = previous
+                with self.assertRaisesRegex(ValueError, 'replay tolerance'):
+                    replay_fusion_source(*args, expected=expected, utility_replay_domain='relu')
+
+    def test_relu_contract_rejects_nonfinite_and_shape_mismatch(self):
+        for side in ('current', 'previous'):
+            for bad in (np.nan, np.inf, -np.inf, 'shape'):
+                with self.subTest(side=side, bad=bad):
+                    *args, expected = self.replay_fixture()
+                    container, key = ((args[5], 'utility') if side == 'current'
+                                      else (args[2], 'ols_routing_utility'))
+                    if bad == 'shape':
+                        container[key] = container[key][:-1]
+                    else:
+                        container[key][0, 0, 0] = bad
+                    with self.assertRaisesRegex(ValueError, 'replay tolerance'):
+                        replay_fusion_source(*args, expected=expected, utility_replay_domain='relu')
+
+    def test_relu_contract_keeps_weight_and_physical_gates(self):
+        for case in ('helper_weights', 'anchor_weights', 'physical_state'):
+            with self.subTest(case=case):
+                *args, expected = self.replay_fixture()
+                if case == 'physical_state':
+                    args[4]['learned'][0, 0, 0] += 1.
+                else:
+                    args[5][case][0, 0, 0] += 1e-4
+                with self.assertRaisesRegex(ValueError, 'replay tolerance'):
+                    replay_fusion_source(*args, expected=expected, utility_replay_domain='relu')
 
     def test_rejects_unretained_output_mask_input_and_routing_changes(self):
         for case in ('duplicate', 'mask', 'node_order', 'group', 'weights', 'state'):

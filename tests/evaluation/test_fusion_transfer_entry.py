@@ -17,7 +17,7 @@ import torch
 from association.models.evidence_fusion import EvidenceFusion
 from association.evaluation.fusion_controls import attribute_errors
 from association.training.evidence_fusion import bind_ols_working_point, save_checkpoint
-from association.utils.runtime import read_json, write_json
+from association.utils.runtime import read_json, read_json_or_gzip, write_json
 from tests.evaluation import test_level1_system_contracts as system_fixture
 from tools.analysis.compare_association_duration import _load_metadata
 from tools.experiments.level1_system_evaluate import DATA, POLICY, run as system_run
@@ -113,8 +113,10 @@ class FusionTransferEntryTests(unittest.TestCase):
             snapshot.assert_not_called()
             self.assertFalse((args.output/'replay-failure').exists())
             self.assertEqual(result['status'], 'COMPLETED')
+            self.assertEqual(result['utility_replay_domain'], 'raw')
             self.assertTrue(loader.call_args.kwargs['validation_only'])
             self.assertEqual(read_json(args.output/'run.json')['status'], 'COMPLETED')
+            self.assertEqual(read_json(args.output/'run.json')['utility_replay_domain'], 'raw')
             self.assertFalse(result['test_opened'])
             self.assertEqual(result['optimizer_updates'], 0)
             self.assertEqual(set(result['methods']), {'anchor', 'mean_supported', 'attribute_hybrid',
@@ -146,6 +148,44 @@ class FusionTransferEntryTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 run(args)
             self.assertEqual(read_json(args.output/'run.json')['status'], 'COMPLETED')
+
+    def test_relu_transfer_records_raw_disagreement_without_changing_outputs(self):
+        from tools.analysis.frozen_fusion_transfer import run
+        with TemporaryDirectory() as temporary:
+            args, binding, loaded, expected_support = self.fixture(Path(temporary))
+            args.utility_replay_domain = 'relu'
+            path = Path(binding[2]['direct_only']['system'])/'predictions'/'states-v.npz'
+            with np.load(path, allow_pickle=False) as saved:
+                arrays = {key: saved[key].copy() for key in saved.files}
+            # The real frozen direct-only model emits zero utility and zero
+            # helper weight. A saved negative utility has the same ReLU output.
+            arrays['ols_routing_utility'][0, 0, 0] = -0.03522947430610657
+            self.assertEqual(arrays['ols_routing_helper_weights'][0, 0, 0], 0.)
+            np.savez_compressed(path, **arrays)
+            with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
+                    patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded), \
+                    patch('tools.analysis.frozen_fusion_transfer.EXPECTED_SUPPORT_POSITION', expected_support), \
+                    patch('tools.analysis.frozen_fusion_transfer.save_replay_failure') as snapshot:
+                result = run(args)
+            snapshot.assert_not_called()
+            self.assertEqual(result['status'], 'COMPLETED')
+            for record in (result, read_json(args.output/'run.json'), read_json(args.output/'summary.json')):
+                self.assertEqual(record['utility_replay_domain'], 'relu')
+                self.assertFalse(record['test_opened'])
+                self.assertEqual(record['optimizer_updates'], 0)
+            row = read_json_or_gzip(args.output/'scenes'/'scene-v.json.gz')
+            replay = row['source057_replay']['direct_only']
+            self.assertTrue(replay['passed'])
+            self.assertEqual(replay['utility_replay_domain'], 'relu')
+            self.assertTrue(replay['checks']['utility_activation_equal'])
+            self.assertTrue(replay['checks']['utility_relu_close'])
+            self.assertFalse(replay['utility_diagnostics']['raw']['passed'])
+            self.assertEqual(replay['utility_diagnostics']['raw']['exceed_count'], 1)
+            self.assertEqual(replay['utility_diagnostics']['activation_flip_count'], 0)
+            self.assertEqual(set(result['methods']), {'anchor', 'mean_supported', 'attribute_hybrid',
+                'support_switch', 'helper_quality', 'direct_only', 'mixed_action'})
+            with np.load(args.output/'predictions'/'states-v.npz', allow_pickle=False) as saved:
+                np.testing.assert_array_equal(saved['output_direct_only'], saved['native_states'])
 
     def test_tampered_ordinary_cache_and_native_inputs_fail_without_success_report(self):
         from tools.analysis.frozen_fusion_transfer import run
