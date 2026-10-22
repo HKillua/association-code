@@ -1,0 +1,79 @@
+{
+ "note": "服务器现场只读排查（用户2026-10-22授权'如果修改难度不大，你可以在现场排查'）。只用已保全的 snapshot.npz 与冻结 057 权重，CPU、零GPU、不写 runs、不改容差、不重跑任务、不新增诊断前向到任务内。",
+ "violating_element": {
+  "index": [
+   46,
+   8,
+   1
+  ],
+  "helper_anchor": 11,
+  "helper_node": 12,
+  "group": [
+   11,
+   12,
+   15
+  ],
+  "query_index": 8,
+  "query_seconds": 913.6507936507936,
+  "attribute": "speed",
+  "cpu_float32_current": -0.035231105983257294,
+  "gpu_float32_previous_057": -0.03522947430610657,
+  "cpu_float64_recomputed": -0.03522998870843787,
+  "abs_f64_minus_f32cpu": 1.117275e-06,
+  "abs_f64_minus_gpu": 5.144023e-07,
+  "abs_f32cpu_minus_gpu": 1.6316771507263184e-06,
+  "f64_between_the_two_float32": true,
+  "cpu_float32_recompute_bit_identical_to_snapshot_current": true
+ },
+ "utility_head_conditioning": {
+  "last_layer_terms": 64,
+  "sum_abs_terms": 27.365243,
+  "algebraic_sum": 1.079951396,
+  "bias": 0.018278,
+  "cancellation_amplification": 25.3,
+  "float32_ulp_at_sum_abs_terms": 1.907e-06,
+  "expected_abs_error_64_terms": 2.605e-05,
+  "gate_atol_floor": 1e-06,
+  "conclusion": "闸门 atol=1e-6 小于该 utility 头累加器量级上的一个 float32 ULP（1.907e-06），因此任何跨设备比较都可能天然越界"
+ },
+ "decision_level_impact": {
+  "violating_element_helper_weight_current": 0.0,
+  "violating_element_helper_weight_previous": 0.0,
+  "helper_rejected_on_both_sides": true,
+  "sign_flips": 0,
+  "accepted_set_identical": true,
+  "accepted_count_current": 4425,
+  "accepted_count_previous": 4425,
+  "helper_weights_max_abs_diff": 8.23326127861318e-07,
+  "anchor_weights_max_abs_diff": 8.233261279411153e-07,
+  "prediction_learned_max_abs_diff_by_attribute": {
+   "lat": 0.0,
+   "lon": 0.0,
+   "speed": 6.218480990582975e-06,
+   "heading": 2.7815516887130798e-05
+  },
+  "mean_supported_max_abs_diff": 0.0,
+  "median_abs_utility_both_sides": 1.451460838317871
+ },
+ "code_identity_057_vs_064": {
+  "057_execution_commit": "3e12df351d898b68ab764cbdb58e0855018d6fbc",
+  "064_execution_commit": "34106d5ac32cb68481e441f1fdde07ba2c5dbe27",
+  "byte_identical": [
+   "association/data/motion_evidence.py",
+   "association/models/evidence_fusion.py",
+   "association/evaluation/fusion_controls.py",
+   "association/training/evidence_fusion.py",
+   "association/data/dataset.py",
+   "association/evaluation/physical.py",
+   "predict_partition（函数体逐字相同，所在文件仅退役048期包装器）"
+  ],
+  "device_difference": "057 system 阶段命令为 --device cuda:0（runs/LEVEL1-FUSION-20261022-057-command.sh 第26行），064 为 CPU"
+ },
+ "not_claimed": [
+  "未定位到任何数据／特征／权重／分组／checkpoint 不一致",
+  "未修改容差或验收",
+  "未重跑062/064",
+  "未使用GPU",
+  "不声称这证明057或064任一方'错'：两者都是同一真值的 float32 舍入"
+ ]
+}
