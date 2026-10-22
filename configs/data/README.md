@@ -1,6 +1,6 @@
 # 当前数据选择：Level1
 
-用户2026-10-21决定改用数据集1。旧Level2结果只作开发历史；050已另请求停止保全，实际回执看[交接索引](../../HandOver/Handover.md)。
+用户2026-10-21决定改用数据集1。旧Level2结果只作开发历史；050已停止保全（FAILED），当前任务看[交接索引](../../HandOver/Handover.md)。
 
 ## 已完成的本地准备
 
@@ -10,9 +10,9 @@
 | [mtad-level1-alignment.json](mtad-level1-alignment.json) | 仅训练/验证2400场的offset与gap600；不含测试映射 |
 | [mtad-level1-population.json](mtad-level1-population.json) | 真实CPU准备报告：2400/2400通过时间一致性检查，零训练更新、零测试量测/reference读取 |
 
-数据准备逐场检查实际用了约357秒。训练155134条、验证24599条合法片段，均无量测节点隔离；训练27632584候选对、验证4439092对。全部原生观测分别43020903和6810574点。该准备阶段没有拟合normalizer或训练模型；后续053—055已得到普通系统开发结果，见[交接索引](../../HandOver/Handover.md)，当前仍无Level1学习模型成绩。
+数据准备逐场检查实际用了约357秒。训练155134条、验证24599条合法片段，均无量测节点隔离；训练27632584候选对、验证4439092对。全部原生观测分别43020903和6810574点。该准备阶段没有拟合normalizer或训练模型；后续普通系统、学习关联和融合已完成多轮开发评价，当前结论见[研究状态](../../docs/research_status.md)。
 
-仓库保留可执行名单/映射与约15KB的全人口汇总；重复的2400场成功时钟细节留本地`outputs/level1-preparation/population-full.json`，不另堆日志。汇总保留全部计数、失败列表和可行偏移唯一性统计；下方命令可独立复算完整证据。
+仓库保留可执行名单/映射与约15KB的全人口汇总；重复的2400场时钟细节不常驻当前仓库，可按下方命令另存复核，不另堆日志。汇总保留全部计数、失败列表和可行偏移唯一性统计；下方命令可独立复算完整证据。
 
 | 训练侧统计 | 9001 | 9002 |
 | --- | ---: | ---: |
@@ -47,10 +47,10 @@ python tools/experiments/prepare_scene_data.py \
 
 `PART1 PART2 PART3`须替换为实际有序路径；命令不训练、不读测试。不要覆盖已固定名单，也不要把Level2编号、offset、统计或optimizer用于Level1。
 
-## 下一轮配置
+## 保留的配置
 
-- [TCM一遍覆盖模板](../tmtaff-tcm-level1.json)：155134条/每批64=2424步，`ordered_fragment`，固定末尾不足64条不回卷；原TCM架构与损失保持033口径，8小时仅提醒。这是一遍覆盖的起点，不是充分收敛或原论文复现成功的证明。
-- [关联配置](../evidence-association-level1.json)：完整canonical观测，1000更新固定终点；记录实际场景/配对覆盖，step0必须复现053纯OLS工作点。[056交接](../../HandOver/L2S-20261022-056.md)已获用户批准并领取，服务器回执RUNNING，不重复执行。
-- [融合helper质量](../evidence-fusion-level1.json)、[Direct-only](../evidence-fusion-level1-direct-only.json)、[固定混合收益](../evidence-fusion-level1-mixed-action.json)：只改变辅助监督，统一正bias初始化、1000更新和α=0.5；必须给当前`--ols-working-point`，不继承旧14.2km或启用051符号辅助损失。[057交接](../../HandOver/L2S-20261022-057.md)已获用户单独批准并领取，与056在不同GPU上RUNNING。
+- [TCM一遍覆盖模板](../tmtaff-tcm-level1.json)：2424更新对应训练片段的一遍起点，不代表充分收敛；尚无新的执行授权。
+- [关联配置](../evidence-association-level1.json)：056的完整canonical观测、1000更新固定终点；普通/困难采样与3000更新配置保留作已完成对照定义。
+- [融合helper质量](../evidence-fusion-level1.json)、[Direct-only](../evidence-fusion-level1-direct-only.json)、[固定混合收益](../evidence-fusion-level1-mixed-action.json)：057三臂，仅改变辅助监督，共享正bias初始化和固定α=0.5；实际训练/评价配置绑定当前OLS工作点。
 
-当前056关联与057融合均RUNNING，TCM模板不在本次授权内；后续进展以服务器回执为准。参考编码器仍cap128/全场Q64，候选完整观测的收益须先与相同输入的OLS比较，再作同预算归因。后续训练预算和执行只看独立交接。
+056—061均已完成；062冻结模型评价已获CPU4预算，服务器已提交。参考编码器仍cap128，候选完整观测收益须与同输入OLS比较。当前执行只看[交接索引](../../HandOver/Handover.md)，配置存在不恢复任何历史额度。

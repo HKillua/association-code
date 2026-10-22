@@ -10,21 +10,20 @@ import torch
 import numpy as np
 
 from association.data.motion_evidence import scene_motion_evidence
-from association.models.cooperative import CooperativeConfig
 from association.models.evidence_fusion import evidence_fusion_loss, fusion_inputs
 from association.models.evidence_association import features_from_motion
 from association.evaluation.grouping import group_predicted_tracks
 from association.training.evidence_fusion import (load_checkpoint, prepare_evidence_scenes,
     train_evidence_fusion, training_objective, validate_training_population, evaluate_evidence_fusion,
     bind_ols_working_point)
-from tools.experiments.cooperative_fit import synthetic_scenes
+from tools.experiments.evidence_fusion_fit import synthetic_scenes
 from tools.experiments.evidence_fusion_fit import configuration, main
 
 
 class EvidenceFusionTrainingTests(unittest.TestCase):
     def test_three_auxiliary_objectives_share_initial_state_and_record_training_only_diagnostics(self):
         torch.set_num_threads(1)
-        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, validation = synthetic_scenes(length=64, max_observations=4)
         base = json.loads(Path('configs/evidence-fusion.json').read_text())
         base['model']['utility_output_bias'] = .01
         base['training'].update(updates=3, batch_size=1, evaluate_every=3,
@@ -99,7 +98,7 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
             configuration(direct)
 
     def test_current_ols_working_point_preserves_edges_and_rejects_other_protocols(self):
-        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, validation = synthetic_scenes(length=64, max_observations=4)
         config = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))
         manifest = dict(dataset_level='Level1', splits=dict(
             T_core=[s['scene_id'] for s in train], V_select=[s['scene_id'] for s in validation]))
@@ -154,7 +153,7 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
 
     def test_canonical_motion_fit_reload_and_wrong_policy_rejection(self):
         torch.set_num_threads(1)
-        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, validation = synthetic_scenes(length=64, max_observations=4)
         for scene in train + validation:
             scene['tracks'] = [dict(node_id=node_id, source=scene['sources'][node],
                 canonical_values=scene['native_values'][node, scene['native_observed'][node]],
@@ -185,7 +184,7 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
 
     def test_three_modes_update_checkpoint_and_full_population(self):
         torch.set_num_threads(1)
-        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, validation = synthetic_scenes(length=64, max_observations=4)
         config = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))
         config['training'].update(updates=3, batch_size=2, evaluate_every=3)
         with tempfile.TemporaryDirectory() as directory:
@@ -260,7 +259,7 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
 
     def test_sign_candidate_updates_logs_and_checkpoint_loss_semantics(self):
         torch.set_num_threads(1)
-        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, validation = synthetic_scenes(length=64, max_observations=4)
         config = configuration(json.loads(Path('configs/evidence-fusion-sign.json').read_text()))
         reference = configuration(json.loads(Path('configs/evidence-fusion.json').read_text()))
         only_change = copy.deepcopy(config)
@@ -301,7 +300,7 @@ class EvidenceFusionTrainingTests(unittest.TestCase):
                 configuration(bad)
 
     def test_scene_and_component_isolation_are_explicit_and_cannot_be_mixed(self):
-        train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, validation = synthetic_scenes(length=64, max_observations=4)
         self.assertEqual(validate_training_population(train, validation), 'shared_a_component')
         validation[0]['component_id'] = train[0]['component_id']
         with self.assertRaisesRegex(ValueError, 'component-isolated'):

@@ -12,8 +12,6 @@ from association.data.archive import DataError
 from association.models.fusion import FusionLoss
 from association.data.targets import (align_reference_states, build_fusion_targets,
                                         build_scene_fusion_targets)
-from association.training.cooperative import training_configuration
-from tools.experiments.cooperative_fit import synthetic_configuration
 
 
 def reference(longitudes=(179., -179.), *, identity='ship-0'):
@@ -136,17 +134,6 @@ class LongitudeBoundaryTests(unittest.TestCase):
                                 regularizer_weight=float(i == 0))['total'] for i in range(2))
         torch.testing.assert_close(streamed, full, rtol=1e-14, atol=1e-14)
         torch.testing.assert_close(torch.autograd.grad(streamed, pred)[0], grad, rtol=0, atol=0)
-
-    def test_training_default_and_v2_synthetic_are_explicit(self):
-        old = training_configuration(synthetic_configuration())
-        self.assertEqual(old['longitude_loss_mode'], 'linear')
-        new = training_configuration(synthetic_configuration('support_residual_v2'))
-        self.assertEqual(new['longitude_loss_mode'], 'shortest_arc')
-        for value in ('guess', None, True):
-            with self.subTest(value=value), self.assertRaises(ValueError):
-                training_configuration(dict(old, longitude_loss_mode=value))
-        with self.assertRaises(ValueError):
-            FusionLoss(position_loss_mode='standard_smooth_l1', longitude_loss_mode='guess')
 
     def test_timed_loader_forwards_policy_before_reference_assembly(self):
         from tests.fixtures import native_zip as fixture_module

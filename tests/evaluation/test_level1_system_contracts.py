@@ -1,4 +1,4 @@
-"""Contract tests for Level1 frozen comparison and 049 activation audit."""
+"""Contract tests for Level1 frozen comparison and complete population."""
 import unittest
 from copy import deepcopy
 from pathlib import Path
@@ -26,9 +26,6 @@ from tools.experiments.level1_system_evaluate import (
     _pool_fragment, exact_score_population, verify_fusion_snapshot,
     evaluate_unique_population, common_target_metrics,
     ordinary_predictions, validate_association_endpoint,
-)
-from tools.analysis.tfm_information_probe import (
-    _dispersion, _physical_output_dispersion, _heading_dispersion,
 )
 
 
@@ -410,23 +407,6 @@ class Level1SystemContractTests(unittest.TestCase):
             self.assertEqual(metric['intersection_count'],1)
             self.assertEqual(metric['coverage'],.5)
 
-    def test_physical_attributes_have_separate_diagnostics(self):
-        states=np.zeros((2,4,4))
-        states[...,0]=30.; states[...,1]=120.
-        states[0,:,2]=4.; states[1,:,2]=12.
-        states[0,:,3]=359.; states[1,:,3]=1.
-        stat=_physical_output_dispersion(states)
-        self.assertEqual(stat['position_metres']['max_pair_0_1_separation_metres'],0.)
-        self.assertGreater(stat['speed_native']['cross_sample_centered_rms'],0.)
-        self.assertAlmostEqual(stat['heading_circular']['pair_0_1_mean_absolute_short_arc_deg'],2.)
-        self.assertLess(_heading_dispersion(states[...,3])['cross_sample_mean_circular_std_deg'],5.)
-
-    def test_activation_dispersion_not_called_information_loss(self):
-        a = np.array([[[0., 1.], [1., 0.]], [[2., 3.], [3., 2.]]])
-        result = _dispersion(a)
-        self.assertGreater(result['cross_sample_centered_rms'], 0)
-        self.assertGreater(result['within_sample_time_centered_rms'], 0)
-        self.assertEqual(result['shape'], [2, 2, 2])
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ from association.evaluation.fusion_controls import ordinary_fusion
 from association.evaluation.tmtaff import aggregate_fusion_reports
 from association.utils.runtime import read_json, write_json
 from tools.analysis.compare_association_duration import ARMS, METHODS, run
-from tools.analysis.system_attribution import read
+from association.utils.runtime import read_json_or_gzip as read
 from tools.experiments.level1_system_evaluate import evaluate_unique_population, ordinary_predictions
 
 

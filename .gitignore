@@ -18,7 +18,6 @@ wandb/
 *.zip
 *.tar
 *.tar.gz
-!HandOver/results/**/*.tar.gz
 *.7z
 *.pt
 *.pth
@@ -26,3 +25,4 @@ wandb/
 *.safetensors
 *.pdf
 HandOver/results/**/raw/
+HandOver/results/**/*.npz

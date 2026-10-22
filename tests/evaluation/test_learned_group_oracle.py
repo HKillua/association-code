@@ -15,17 +15,17 @@ from association.evaluation.system_attribution import ATTRIBUTES
 from association.utils.runtime import read_json, write_json
 from tools.analysis.compare_association_duration import _replay
 from tools.analysis.learned_group_oracle import CONFIG, SOURCE_RUN, run
-from tools.analysis.system_attribution import read
+from association.utils.runtime import read_json_or_gzip as read
 from tools.experiments.level1_system_evaluate import evaluate_unique_population, ordinary_predictions
 from tests.evaluation import test_association_duration as duration_fixture
-from tests.evaluation import test_oracle_diagnostics as oracle_fixture
+from tests.fixtures.scenes import duplicate_missing_target_fixture
 
 
 class LearnedGroupOracleTests(unittest.TestCase):
     @staticmethod
     def fixture(sparse_reference=False):
         """Reuse058's swallowed target/duplicate layout, expanded to the Q64 cache."""
-        fragment, _, _ = oracle_fixture.OracleDiagnosticsTests.fixture()
+        fragment, _, _ = duplicate_missing_target_fixture()
         native = np.repeat(fragment['native_states'], 16, axis=1)
         truth = np.broadcast_to(np.array([[30., 120., 5., 1.], [30.01, 120., 6., 1.],
             [30.02, 120., 7., 2.], [30.03, 120., 8., 180.], [30.04, 120., 9., 90.]])[:, None],

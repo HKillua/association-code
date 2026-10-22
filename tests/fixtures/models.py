@@ -1,15 +1,11 @@
 """Lightweight setup mixins shared by numeric and integration tests."""
-import copy
-import numpy as np
 import torch
 from association.models.tmtaff import AssociationModel, ModelConfig
 from association.models.fusion import FusionLoss, PairFusion, PairFusionConfig
 from association.training.fusion import fusion_training_parameters
 from association.evaluation.tmtaff import evaluate_complete
-from association.models.cooperative import CooperativeConfig, CooperativeModel
-from association.evaluation.cooperative import evaluate_cooperative
 from association.training.common import fit_normalizer
-from tests.fixtures.scenes import scene, timed_scene
+from tests.fixtures.scenes import scene
 
 class CompleteEvaluationFixture:
     def setUp(self):
@@ -24,31 +20,6 @@ class CompleteEvaluationFixture:
         return evaluate_complete(self.model, self.fusion, self.normalizer, scenes, device='cpu',
                                  batch_tracks=2, pair_batch_size=2, select_on_validation=select,
                                  threshold=threshold, singleton_policy=singleton, **kwargs)
-
-
-class CooperativeEvaluationFixture:
-    def setUp(self):
-        torch.manual_seed(42)
-        self.train = timed_scene('train', 'T_core')
-        self.scene = timed_scene('validation', 'V_select')
-        self.normalizer = fit_normalizer([self.train])
-        self.model = CooperativeModel(CooperativeConfig(length=4, max_observations=3,
-            d_model=8, nhead=2, num_layers=1, dim_feedforward=16, dropout=.1, head_hidden=8),
-            self.normalizer)
-
-    def evaluate(self, scenes=None, **kwargs):
-        options = dict(device='cpu', batch_tracks=2, pair_batch_size=2,
-                       select_on_validation=False, threshold=None, routing='plain')
-        options.update(kwargs)
-        return evaluate_cooperative(self.model, self.normalizer,
-                                    [self.scene] if scenes is None else scenes, **options)
-
-    def fixed(self, scene=None):
-        scene = self.scene if scene is None else scene
-        keys = ('scene_id', 'component_id', 'node_ids', 'identities', 'sources', 'intervals', 'labels', 'pairs')
-        record = {key: copy.deepcopy(scene[key]) for key in keys}
-        record['scores'] = np.where(scene['labels'], 2., -2.)
-        return record
 
 
 class FusionTrainingFixture:

@@ -2,7 +2,7 @@
 
 ## 当前选择与入口
 
-**2026-10-21用户明确改用数据集1（Level1）。** 既有029—051训练/诊断来自Level2，保留为开发历史，不能当Level1结果。050原Level2任务已请求停止保全，尚无停止确认，状态只看[交接索引](../HandOver/Handover.md)。
+**2026-10-21用户明确改用数据集1（Level1）。** 既有029—051训练/诊断来自Level2，保留为开发历史，不能当Level1结果。050已停止保全，训练3356步完成、V300终评154场中断，终态FAILED。056—061当前结果见[研究状态](research_status.md)，执行只看[交接索引](../HandOver/Handover.md)。
 
 本地Level1文件位于`/Users/a1/Downloads/02_金海豚竞赛_航迹关联/数据集/`：`MTAD航迹关联数据集_level1_part1.zip`、`part2.zip`、`part3.zip`，合计2,681,532,343字节。它们是同一ZIP的连续分卷，reader现接受单个完整ZIP或有序路径列表，通过可seek的连续字节读取，不合并大文件或全面解压。模型CLI可直接给三个路径，缺卷/错序在目录或成员读取时失败。
 
@@ -14,7 +14,7 @@
 
 `association/data/archive.py`直接读ZIP，不全面解压；支持UTF-8/GBK成员名和UTF-8 BOM/GB18030 CSV。关联reader只读标签/量测，reference通过单独显式接口按已指定角色读取。重复/歧义成员、错误表头和场景集合不符报错。
 
-节点是`(scene, source, batch)`，监督身份A-B，冲突完整A-B-C标签隔离。同源不同片段可以为正对；有效节点保留全部i<j候选。source、identity、batch、标签区间和reference不进入运动特征。标签区间不裁量测，短轨和无共同query支撑的配对不能按难度删除。
+节点是`(scene, source, batch)`，监督身份A-B，冲突完整A-B-C标签隔离。同源不同片段可以为正对；有效节点保留全部i<j候选。原始source编号、identity、batch、标签区间和reference不进入运动特征；关联允许可见的“同源／异源”关系。标签区间不裁量测，短轨和无共同query支撑的配对不能按难度删除。
 
 | 字段 | 单位与规则 |
 | --- | --- |
@@ -48,7 +48,9 @@
 
 关联完整场景平均F1与P/R、FP/FN、AUC同时报告。mPCA=场景平均召回，mPFA=场景平均(1−precision)，不是F1或FP/(FP+TN)；mwPCA按预测量加权，不混成pool recall。开发阈值固定后不在测试重选。
 
-正常退出、loss下降、CPU检查或单个oracle改善不构成模块验收。已暴露V可做开发探索，但不能给独立测试/普遍显著性结论；共享A组件与训练种子不确定性须区分。方法对照和验收见[研究说明](research_brief.md)。
+正常退出、loss下降、CPU检查或单个oracle改善不构成模块验收。已暴露V可做开发探索，但不能给独立测试/普遍显著性结论；共享A组件与训练种子不确定性须区分。方法对照和验收见[研究状态](research_status.md)。
+
+现manifest的T/V共享A键6053、T/test8634、V/test3437，58组件跨划分，`identity_independent=false`。A为原始MMSI，监督使用A-B任务身份；这些数不是重复A-B实例或重复量测数，不能直接量化泄漏收益。V300有38共享A组件，最大130场、次大59场；组件bootstrap不消除开发选择或跨split来源依赖。当前600个测试场与T及V组件均不交的仅9组件/10场，不能承诺从现测试中取出充分的身份独立验证；本核对只读名单，未打开测试量测/reference。
 
 ## 论文协议与历史
 

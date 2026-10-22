@@ -14,7 +14,7 @@ from association.training.evidence_association import load_checkpoint as load_as
 from association.training.evidence_fusion import bind_ols_working_point, load_checkpoint
 from tools.analysis.compare_association_duration import ARMS, INPUT_KEYS, _load_metadata
 from tools.analysis.learned_group_oracle import _bind_source
-from tools.analysis.system_attribution import read
+from association.utils.runtime import read_json_or_gzip as read
 from tools.experiments.level1_system_evaluate import verify_fusion_snapshot, _verify_association_metrics
 
 FUSION_TASK = 'LEVEL1-FUSION-20261022-057-attempt-1'

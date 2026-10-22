@@ -16,7 +16,7 @@ from association.utils.runtime import write_json
 from tools.analysis.fusion_transfer_sources import (
     CONFIG_ROOT, _bind_association_checkpoint, _bind_fusion_arm, replay_fusion_source,
 )
-from tools.analysis.system_attribution import read
+from association.utils.runtime import read_json_or_gzip as read
 from tests.evaluation import test_learned_group_oracle as oracle_fixture
 
 

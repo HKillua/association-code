@@ -129,3 +129,60 @@ def artifact_for(example):
         node_observed=example['observed'], split=example['split'], grouping_kind='predicted',
         correspondence_policy='anchor_identity_first')
     return outputs, kwargs
+
+
+def duplicate_missing_target_fixture():
+    """A's first fragment is swallowed by X; A has later duplicate anchors.
+
+    B has input but no predicted representative; C has no input. D has an
+    output without valid reference. Truth grouping switches A's anchor.
+    """
+    from association.evaluation.fusion_controls import ordinary_fusion
+    from association.evaluation.scene import evaluate_full_scene
+    from association.evaluation.system_attribution import BASE
+
+    q = 4
+    nodes = np.asarray(['x', 'a', 'a', 'b', 'a', 'd'])
+    targets = np.asarray(['x', 'a', 'b', 'c', 'd'])
+    truth = np.broadcast_to(np.array([
+        [30., 120., 5., 1.], [30.01, 120.01, 6., 359.],
+        [30.02, 120.02, 7., 2.], [30.03, 120.03, 8., 180.],
+        [30.04, 120.04, 9., 90.],
+    ])[:, None], (5, q, 4)).copy()
+    valid = np.ones_like(truth, bool)
+    indices = np.array([0, 1, 1, 2, 1, 4])
+    native = truth[indices].copy()
+    native[0, :, 0] += .003
+    native[1, :, 0] += .001
+    native[2, :, 0] += .006
+    native[4, :, 0] -= .001
+    native[1, :, 3] = 1.
+    native[2, :, 3] = 355.
+    native[4, :, 3] = 359.
+    native[2, :, 2] += 4.
+    valid[1, 1, :2] = False
+    valid[2, 2, 3] = False
+    valid[4] = False
+    truth[~valid] = np.nan
+    support = np.ones((6, q), bool)
+    support[:, -1] = False
+    nearest = np.broadcast_to(np.array([0., 60., 600., 2000.]), (6, q)).copy()
+    groups = [[0, 1], [2, 3], [4], [5]]
+    ordinary = ordinary_fusion(native, nearest, support, groups)
+    mean = ordinary['predictions']['mean_supported']
+    fragment = dict(node_ids=np.asarray([f'node-{i}' for i in range(6)]),
+        identities=nodes, sources=np.asarray(['1', '2', '1', '2', '3', '1']),
+        target_identity_ids=targets, query_seconds=np.array([0., 60., 600., 2000.]),
+        target=truth[indices], target_valid=valid[indices], native_states=native,
+        nearest_seconds=nearest, support=support, exact_observation=nearest == 0,
+        ols_mean_supported=mean, ols_membership=ordinary['membership'],
+        ols_group_offsets=np.asarray([0, 2, 4, 5, 6]),
+        ols_group_node_indices=np.asarray([0, 1, 2, 3, 4, 5]))
+    system = evaluate_full_scene([dict(node_indices=g, states=mean[g[0]]) for g in groups],
+        node_identities=nodes, target_identities=targets, target_states=truth, target_valid=valid,
+        node_observed=support, split='V_select', grouping_kind='predicted',
+        correspondence_policy='anchor_identity_first', return_artifact=True,
+        node_input_support=dict(support=support, nearest_seconds=nearest))
+    saved = system.pop('artifact')
+    expected = dict(scene_id='1', component_id='1', unique_target={BASE: system})
+    return fragment, saved, expected

@@ -19,7 +19,7 @@ from association.evaluation.system_attribution import (
     ATTRIBUTES, _metrics, _regions, _same, assert_metrics, pool_metrics,
 )
 from association.utils.runtime import write_json
-from tools.analysis.system_attribution import read, write_gzip
+from association.utils.runtime import read_json_or_gzip as read, write_json_gzip as write_gzip
 
 ARMS = ('anchor', 'mean_supported', 'attribute_hybrid')
 METHODS = sorted(group + '_' + arm for group in ('ols', 'learned_assoc') for arm in ARMS)

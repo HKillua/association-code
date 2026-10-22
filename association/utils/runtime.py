@@ -1,6 +1,7 @@
 """Portable run provenance and non-overwriting output handling."""
 from __future__ import annotations
 
+import gzip
 import json
 import os
 from pathlib import Path
@@ -37,6 +38,21 @@ def write_json(path, value):
 def read_json(path):
     with Path(path).open(encoding='utf-8') as f:
         return json.load(f)
+
+
+def read_json_or_gzip(path):
+    """Read a report JSON or its compressed sibling without changing its data."""
+    path = Path(path)
+    if not path.exists():
+        path = path.with_suffix(path.suffix+'.gz')
+    with (gzip.open(path, 'rt', encoding='utf-8') if path.suffix == '.gz'
+          else path.open(encoding='utf-8')) as stream:
+        return json.load(stream)
+
+
+def write_json_gzip(path, value):
+    with gzip.open(path, 'wt', encoding='utf-8') as stream:
+        json.dump(jsonable(value), stream, ensure_ascii=False, allow_nan=False)
 
 
 def seed_everything(seed):

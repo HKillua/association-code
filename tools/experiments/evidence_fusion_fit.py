@@ -14,16 +14,49 @@ import time
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+import numpy as np
 import torch
 
 from association.data.dataset import load_timed_dataset
 from association.data.motion_evidence import validate_motion_observation_policy
-from association.models.cooperative import CooperativeConfig
+from association.data.timed import prepare_timed_scene
 from association.training.evidence_fusion import (
     bind_ols_working_point, grouping_configuration, train_evidence_fusion, utility_sign_weight,
     utility_configuration)
 from association.utils import runtime
-from tools.experiments.cooperative_fit import synthetic_scenes
+
+
+def synthetic_scenes(*, length=64, max_observations=4):
+    """Independent tiny training/development identities, original native format."""
+    scenes = []
+    for name, split in (('synthetic-train', 'T_core'), ('synthetic-validation', 'V_select')):
+        tracks = []
+        clocks = ([12., 13.], np.linspace(0., 30., max_observations),
+                  np.linspace(2., 27., max(2, max_observations//2)),
+                  np.linspace(3., 29., max(2, max_observations//3)))
+        identities = [name+'-A', name+'-A', name+'-B', name+'-B']
+        sources = ['9001', '9002', '9001', '9002']
+        for index, clock in enumerate(clocks):
+            clock = np.asarray(clock, dtype=np.float64)
+            states = np.column_stack((30.+clock*.0001+(index//2)*.01, 120.+clock*.0002,
+                                      5.+clock*.01+index*.1, 40.+clock*.1+index))
+            tracks.append(dict(node_id=name+':'+str(index), identity_id=identities[index], source=sources[index],
+                               canonical_times=clock, canonical_values=states))
+        pairs = np.column_stack(np.triu_indices(4, 1)).astype(np.int64)
+        native = dict(scene_id=name, component_id=name+'-component', split=split, tracks=tracks,
+                      node_ids=[x['node_id'] for x in tracks], identities=np.array(identities), sources=sources,
+                      intervals=np.array([[x['canonical_times'][0], x['canonical_times'][-1]] for x in tracks]),
+                      pairs=pairs, labels=np.array([identities[a] == identities[b] for a, b in pairs], dtype=np.float32))
+        prepared = prepare_timed_scene(native, length=length,
+            max_observations=max_observations, time_unit_seconds=20.)
+        targets = {}
+        for index, identity in enumerate(dict.fromkeys(identities)):
+            t = prepared['grid']
+            values = np.column_stack((30.+t*.0001+index*.01, 120.+t*.0002, 5.+t*.01, 40.+t*.1))
+            targets[identity] = dict(states=values, valid=np.ones_like(values, dtype=bool), query_times=t.copy())
+        prepared['fusion_targets'] = targets
+        scenes.append(prepared)
+    return [scenes[0]], [scenes[1]]
 
 
 def configuration(value):
@@ -108,7 +141,7 @@ def main(argv=None):
             config = configuration(runtime.read_json(Path(__file__).resolve().parents[2]
                                                      /'configs/evidence-fusion.json'))
             config['training'].update(updates=3, batch_size=2, evaluate_every=3, advisory_seconds=300.)
-            train, validation = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+            train, validation = synthetic_scenes(length=64, max_observations=4)
             preparation = None
         try:
             report = train_evidence_fusion(train, validation, config, args.output, device=args.device,

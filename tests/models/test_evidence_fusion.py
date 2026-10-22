@@ -5,9 +5,8 @@ import torch
 
 from association.models.evidence_fusion import (
     EvidenceFusion, evidence_fusion_loss, fusion_inputs, physical_errors, mixed_helper_states)
-from association.models.cooperative import CooperativeConfig
 from association.training.evidence_fusion import prepare_evidence_scenes, training_members
-from tools.experiments.cooperative_fit import synthetic_scenes
+from tools.experiments.evidence_fusion_fit import synthetic_scenes
 
 
 class EvidenceFusionTests(unittest.TestCase):
@@ -114,7 +113,7 @@ class EvidenceFusionTests(unittest.TestCase):
         self.assertTrue(torch.isfinite(prediction.grad).all())
 
     def test_visible_features_and_hard_wrong_helper_ignore_reference(self):
-        train, _ = synthetic_scenes(CooperativeConfig(length=64, max_observations=4))
+        train, _ = synthetic_scenes(length=64, max_observations=4)
         scene = prepare_evidence_scenes(train)[0]
         members = training_members(scene, 0, 'clean_plus_wrong')
         self.assertEqual(members[:2], [0, 1])

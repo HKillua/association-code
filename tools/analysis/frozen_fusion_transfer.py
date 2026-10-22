@@ -26,7 +26,7 @@ from association.evaluation.system_attribution import _same, _metrics, assert_me
 from association.utils.runtime import write_json
 from tools.analysis.compare_association_duration import ARMS, _load_arrays, _replay
 from tools.analysis.fusion_transfer_sources import bind_sources, replay_fusion_source
-from tools.analysis.system_attribution import read, write_gzip
+from association.utils.runtime import read_json_or_gzip as read, write_json_gzip as write_gzip
 from tools.experiments.level1_system_evaluate import DATA, POLICY, evaluate_unique_population
 
 LEARNED = ('helper_quality', 'direct_only', 'mixed_action')
