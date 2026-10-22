@@ -4,7 +4,7 @@
 
 | 当前任务 | 状态 | 下一执行方 |
 | --- | --- | --- |
-| [063：首场冻结融合重放诊断](L2S-20261022-063.md) | **READY：用户已批准一次CPU4，尚无启动回执** | 服务器按可用CPU／内存／I/O领取；零GPU／训练，不重启062 |
+| [063：首场冻结融合重放诊断](L2S-20261022-063.md) | **RUNNING：服务器已领取并提交，北京时间15:58:17，单元`mtad-5020edc20631`** | 服务器执行和回传；[063回执](S2L-20261022-063.md)，不重复领取 |
 | [062：冻结057融合迁移到056学习分组](L2S-20261022-062.md) | **FAILED：一次CPU4已消耗，首场景057源重放 `utility_close=False`，不自动重试、不重领** | 本地核定复核口径或停止；[062回执](S2L-20261022-062.md)与[产物](results/LEVEL1-FROZEN-FUSION-20261022-062/) |
 
 **063已获批READY；当前未收到RUNNING回执，062未授权重试。** 用户于本地会话明确回复“批准063，按可用CPU资源执行”。本次一次CPU4、零GPU／训练、30分钟仅提醒、失败不重试，不继续062完整评价，不打开T_test。056—061全部完成并已审查，不重领；050已停止保全，原运行FAILED。旧052模板和其它历史批准均不恢复执行额度。四卡并发许可只适用于各自已获批的任务。
@@ -14,6 +14,8 @@
 **服务器回传（062 终态，事实细节只在回执与产物，不在本索引累积）**：北京时间 14:49:33 提交、14:53:16 结束，`FAILED`／退出码 1／`elapsed_seconds=222.47886635409668`，`timed_out=false`、4 小时提醒未触发。失败在第 1 场（`completed_scenes=0`，`stage=frozen_inference_and_cache_replay`）的 helper_quality 原 OLS 组重放：七项检查只有 `utility_close=False`（`max_utility_difference=1.52587890625e-05`，恰 2^-16），`membership_exact`／`ordinary_control_exact`／`anchor_weights_close`／`state_span_close`／`physical_close`／`helper_weights_close` 均为真，物理位置差恰为 `0.0 m`。`summary.json` 与 `scene-summary.json.gz` 未生成，本轮**没有任何七臂成绩**。V reference 确有读取（`reference_members_read=300`、`observation_members_read=600`、`test_opened=false`、`optimizer_updates=0`、`gpu_used=false`）。三次独立只读重建（独立进程／线程 1…32／内存偏移 0…7／复刻单元的 `OMP/MKL/OPENBLAS=4` 环境）都得到 `max_utility_diff=1.072884e-06`、超容差元素 0/9984、最坏点只用容差的 39.3%，**作业那次的 1.53e-05 未被复现，机制未定**。服务器未放宽容差、未删难场、未提交第二次；056／057 源件只读未变。
 
 062实现冻结于`02c0d1e`：零训练、零GPU，保留056分组/代表/完整人口，比较三个057融合模型及四个普通控制；4小时仅提醒，失败不自动重试。完整输入、命令、容差、产物和停止条件只维护在[062交接](L2S-20261022-062.md)，不在本索引复制。
+
+**服务器回传（063 提交）**：北京 15:58:17 提交，unit `mtad-5020edc20631`，worker 3376929／payload 3376932，checkout detach `28c4d787…`，块 SHA256 `df6788b7…` 执行前后一致、占位符替换 0 处，`--max-seconds 1800 --time-policy advisory`（30 分钟仅提醒）、`--cpu-threads 4`、零 GPU（`CUDA_VISIBLE_DEVICES=` 空，`nvidia-smi` compute apps 为空）。领取前核查 32 核／load 8.82／可用 99 GB／`/home` 可用 806 GB，他人约 8 个 >50% CPU 作业，未终止他人进程。可选 `--probe-motion`／`--probe-script` **未追加，报告 unavailable**：构造脚本与 `/tmp/062_scene1.pkl` 在，但 `/tmp` 下无任何 NPZ，而交接禁止重跑旧探针、禁止直接加载该 pkl、禁止新造输入冒充原探针，故不自行导出。062 失败现场原样保留，本轮不重启 062。详见[063回执](S2L-20261022-063.md)。
 
 本地已审查失败记录与代码：[062判断与下一步](../docs/research_status.md#062首场重放失败尚无组合成绩)。原检查未覆盖全部网络特征，现有探针没有回传构造脚本；暂不能排除输入路径差异或锁定跨设备舍入。[063代码与交接](L2S-20261022-063.md)已完成：保持完整准备和第一次调用，保存首场完整输入／输出，再进行一次逐层诊断；容差、模型不变，不自动重跑V300完整系统。
 
