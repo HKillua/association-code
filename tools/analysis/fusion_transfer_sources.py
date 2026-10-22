@@ -155,6 +155,42 @@ def bind_sources(source056, source057, manifest, device='cpu'):
     return base, models, metadata
 
 
+def _validate_output_replay_arrays(fragment, previous, predictions, routing):
+    """Reject malformed/nonfinite output contracts before numerical comparison."""
+    native = np.asarray(fragment['native_states'])
+    if (native.ndim != 3 or native.shape[-1] != 4 or native.dtype.kind not in 'uif'
+            or not np.isfinite(native).all()):
+        raise ValueError('057 output replay requires finite native states[N,Q,4]')
+    n, q = native.shape[:2]
+    anchors = np.asarray(routing['helper_anchor'])
+    helpers = np.asarray(routing['helper_node'])
+    if (anchors.ndim != 1 or helpers.shape != anchors.shape
+            or any(value.dtype.kind not in 'iu' for value in (anchors, helpers))
+            or any(((value < 0) | (value >= n)).any() for value in (anchors, helpers))):
+        raise ValueError('057 output replay helper routing indices are invalid')
+    count = len(anchors)
+    tolerance = dict(atol=REPLAY_TOLERANCE['anchor_weight_atol'],
+                     rtol=REPLAY_TOLERANCE['anchor_weight_rtol'])
+    for side in ('current', 'previous'):
+        arrays = {name: np.asarray(predictions[name] if side == 'current' else previous['ols_' + name])
+                  for name in ('learned', 'mean_supported')}
+        arrays.update({name: np.asarray(routing[name] if side == 'current'
+                                       else previous['ols_routing_' + name])
+                       for name in ('utility', 'helper_weights', 'anchor_weights')})
+        shapes = dict(learned=(n, q, 4), mean_supported=(n, q, 4),
+                      utility=(count, q, 3), helper_weights=(count, q, 3), anchor_weights=(n, q, 3))
+        for name, value in arrays.items():
+            if value.shape != shapes[name] or value.dtype.kind not in 'uif' or not np.isfinite(value).all():
+                raise ValueError('057 output replay invalid shape/nonfinite array: ' + side + '/' + name)
+        own, weights = arrays['anchor_weights'], arrays['helper_weights']
+        if any(((value < 0.) | (value > 1.)).any() for value in (own, weights)):
+            raise ValueError('057 output replay weights must be in [0,1]: ' + side)
+        mass = own.astype(np.float64, copy=True)
+        np.add.at(mass, anchors, weights)
+        if not np.allclose(mass, 1., **tolerance):
+            raise ValueError('057 output replay weights must sum to one: ' + side)
+
+
 def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
                          predictionsOLS, routingOLS, *, expected=None, utility_replay_domain='raw'):
     """Verify all old OLS output groups, including duplicate/non-retained groups.
@@ -166,9 +202,14 @@ def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
     pre-lock activation sets must match and positive magnitudes retain the original
     tolerance. Finite negative magnitudes do not affect inference; their differences
     remain diagnostic. No scene-wide scale can loosen positive-value tolerances.
+    The opt-in output contract instead checks the actual normalized weights and
+    physical outputs at the unchanged tolerances. Raw/ReLU/sign differences are
+    diagnostic only, not claims of identical utility or activation sets. Finite
+    numerical output mismatches return passed=False only after all old artifacts
+    are validated; malformed inputs, invalid weights and corrupt caches still raise.
     """
-    if utility_replay_domain not in ('raw', 'relu'):
-        raise ValueError('utility replay domain must be raw or relu')
+    if utility_replay_domain not in ('raw', 'relu', 'output'):
+        raise ValueError('utility replay domain must be raw, relu or output')
     for key in INPUT_KEYS:
         _same(old057fragment[key], fragment056[key], '056/057 input/' + key)
     for key in fragment056:
@@ -180,6 +221,8 @@ def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
     prefix = 'ols_routing_'
     for key in ('helper_anchor', 'helper_node', 'membership'):
         _same(routingOLS[key], old057fragment[prefix + key], '057 routing/' + key)
+    if utility_replay_domain == 'output':
+        _validate_output_replay_arrays(fragment056, old057fragment, predictionsOLS, routingOLS)
     adapted = dict(native_states=fragment056['native_states'])
     for key, value in (
             ('learned', old057fragment['ols_learned']),
@@ -209,12 +252,17 @@ def replay_fusion_source(fragment056, saved056, old057fragment, old057system,
                                 if raw['max_absolute_difference'] is not None else None))
     if utility_replay_domain == 'raw':
         result['checks']['utility_close'] = raw['passed']
-    else:
+    elif utility_replay_domain == 'relu':
         # Check finite raw values too: ReLU would otherwise hide -inf corruption.
         result['checks'].update(utility_activation_equal=bool(finite and flips == 0),
                                 utility_relu_close=bool(finite and effective['passed']))
     result['passed'] = bool(all(result['checks'].values()))
-    if not result['passed']:
+    if utility_replay_domain == 'output':
+        # Categorical/ordinary outputs are never a deferrable numerical failure.
+        for key in ('membership_exact', 'ordinary_control_exact'):
+            if not result['checks'][key]:
+                raise ValueError('057 output replay changed structural/ordinary output: ' + key)
+    elif not result['passed']:
         raise ValueError('057 frozen OLS inference exceeds predeclared replay tolerance: ' + str(result))
     # Reconstruct the old learned artifact from its complete saved prediction,
     # not just its retained target rows. This detects duplicate-group corruption.

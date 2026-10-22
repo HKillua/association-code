@@ -16,6 +16,7 @@ import torch
 
 from association.models.evidence_fusion import EvidenceFusion
 from association.evaluation.fusion_controls import attribute_errors
+from association.evaluation.system_attribution import pool_metrics
 from association.training.evidence_fusion import bind_ols_working_point, save_checkpoint
 from association.utils.runtime import read_json, read_json_or_gzip, write_json
 from tests.evaluation import test_level1_system_contracts as system_fixture
@@ -99,6 +100,32 @@ class FusionTransferEntryTests(unittest.TestCase):
             archive=['synthetic-not-read.zip'], manifest=root/'manifest.json',
             alignment=root/'alignment.json', output=root/'062-output', cpu_threads=1)
         return entry, (metadata, models, fusion_metadata), loaded, expected_support
+
+    @classmethod
+    def two_scene_fixture(cls, root):
+        """Duplicate visible inputs under a second scene ID, retaining real forwards."""
+        args, binding, loaded, expected_support = cls.fixture(root)
+        metadata, _, fusion_metadata = binding
+        second = deepcopy(loaded['validation'][0])
+        second.update(scene_id='w', component_id='w')
+        loaded['validation'].append(second)
+        loaded['report']['validation_scene_ids'].append('w')
+        manifest = read_json(args.manifest)
+        manifest['splits']['V_select'].append('w')
+        write_json(args.manifest, manifest)
+        metadata['scene_ids'] = ['v', 'w']
+        metadata['expected']['w'] = deepcopy(metadata['expected']['v'])
+        metadata['component_ids']['w'] = 'w'
+        metadata['fragment_count'] *= 2
+        metadata['pooled'] = {name: pool_metrics([metrics, metrics])
+                              for name, metrics in metadata['pooled'].items()}
+        for item in fusion_metadata.values():
+            item['expected']['w'] = deepcopy(item['expected']['v'])
+        for source in (args.source_system, *(Path(item['system']) for item in fusion_metadata.values())):
+            for directory in ('predictions', 'system-predictions'):
+                (source/directory/'states-w.npz').write_bytes((source/directory/'states-v.npz').read_bytes())
+        expected_support['intersection_count'] *= 2
+        return args, binding, loaded, expected_support
 
     def test_real_frozen_inference_replay_alignment_and_saved_predictions(self):
         from tools.analysis.frozen_fusion_transfer import run
@@ -186,6 +213,147 @@ class FusionTransferEntryTests(unittest.TestCase):
                 'support_switch', 'helper_quality', 'direct_only', 'mixed_action'})
             with np.load(args.output/'predictions'/'states-v.npz', allow_pickle=False) as saved:
                 np.testing.assert_array_equal(saved['output_direct_only'], saved['native_states'])
+
+    def test_output_contract_saves_complete_ols_replay_and_accepts_all_scenes(self):
+        from tools.analysis import frozen_fusion_transfer as entry
+        with TemporaryDirectory() as temporary:
+            args, binding, loaded, expected_support = self.two_scene_fixture(Path(temporary))
+            args.utility_replay_domain = 'output'
+            with patch.object(entry, 'bind_sources', return_value=binding), \
+                    patch.object(entry, 'load_timed_dataset', return_value=loaded), \
+                    patch.object(entry, 'EXPECTED_SUPPORT_POSITION', expected_support), \
+                    patch.object(entry, 'predict_partition', wraps=entry.predict_partition) as forward, \
+                    patch.object(entry, 'save_replay_failure') as snapshot:
+                result = entry.run(args)
+            self.assertEqual(forward.call_count, 12)  # Two partitions × three arms × two scenes.
+            snapshot.assert_not_called()
+            for record in (result, read_json(args.output/'summary.json'), read_json(args.output/'run.json')):
+                self.assertEqual(record['status'], 'COMPLETED')
+                self.assertEqual(record['acceptance'], 'ACCEPTED')
+                self.assertTrue(record['analysis_complete'])
+            self.assertEqual(read_json(args.output/'run.json')['completed_scenes'], 2)
+            self.assertFalse((args.output/'unvalidated-summary.json').exists())
+            for sid in ('v', 'w'):
+                row = read_json_or_gzip(args.output/'scenes'/f'scene-{sid}.json.gz')
+                self.assertEqual(row['acceptance'], 'PENDING')
+                with np.load(args.output/'predictions'/f'states-{sid}.npz', allow_pickle=False) as saved:
+                    for arm in entry.LEARNED:
+                        prefix = f'source057_{arm}_'
+                        with np.load(Path(binding[2][arm]['system'])/'predictions'/f'states-{sid}.npz',
+                                     allow_pickle=False) as original:
+                            for key in ('learned', 'mean_supported'):
+                                np.testing.assert_array_equal(saved[prefix+'prediction_'+key], original['ols_'+key])
+                            for key in ('helper_anchor', 'helper_node', 'membership', 'anchor_weights',
+                                        'helper_weights', 'utility'):
+                                np.testing.assert_array_equal(saved[prefix+'routing_'+key],
+                                                              original['ols_routing_'+key])
+                            old_fragment = {key: original[key].copy() for key in original.files}
+                        with np.load(args.source_system/'system-predictions'/f'states-{sid}.npz',
+                                     allow_pickle=False) as original:
+                            original056system = {key: original[key].copy() for key in original.files}
+                        with np.load(Path(binding[2][arm]['system'])/'system-predictions'/f'states-{sid}.npz',
+                                     allow_pickle=False) as original:
+                            original057system = {key: original[key].copy() for key in original.files}
+                        cached_fragment = {key: saved[key].copy() for key in saved.files}
+                        cached_prediction = {key.removeprefix(prefix+'prediction_'): saved[key].copy()
+                                             for key in saved.files if key.startswith(prefix+'prediction_')}
+                        cached_routing = {key.removeprefix(prefix+'routing_'): saved[key].copy()
+                                          for key in saved.files if key.startswith(prefix+'routing_')}
+                        # The saved output is sufficient for a fresh full replay
+                        # audit: no native data preparation or model call needed.
+                        with patch.object(entry, 'predict_partition', side_effect=AssertionError('no forward')), \
+                                patch.object(entry, 'load_timed_dataset', side_effect=AssertionError('no prepare')):
+                            replay = entry.replay_fusion_source(cached_fragment, original056system,
+                                old_fragment, original057system, cached_prediction, cached_routing,
+                                expected=binding[2][arm]['expected'][sid], utility_replay_domain='output')
+                        self.assertTrue(replay['passed'])
+                        self.assertTrue(replay['complete_old_learned_artifact_exact'])
+
+    def test_output_numerical_rejection_finishes_all_arms_and_scenes_before_rejecting(self):
+        from tools.analysis import frozen_fusion_transfer as entry
+        with TemporaryDirectory() as temporary:
+            args, binding, loaded, expected_support = self.two_scene_fixture(Path(temporary))
+            args.utility_replay_domain = 'output'
+            original_replay = entry.replay_fusion_source
+            audited = []
+
+            def numerical_rejection(*a, **kw):
+                # Real input/artifact verification executes for all six calls;
+                # only the numerical verdict is injected to isolate scheduling.
+                result = original_replay(*a, **kw)
+                audited.append(result)
+                if len(audited) == 2:  # First scene, direct_only.
+                    result['checks']['physical_close'] = False
+                    result['max_physical_prediction_difference']['position'] = 1.
+                    result['passed'] = False
+                return result
+
+            with patch.object(entry, 'bind_sources', return_value=binding), \
+                    patch.object(entry, 'load_timed_dataset', return_value=loaded), \
+                    patch.object(entry, 'EXPECTED_SUPPORT_POSITION', expected_support), \
+                    patch.object(entry, 'replay_fusion_source', side_effect=numerical_rejection), \
+                    patch.object(entry, 'predict_partition', wraps=entry.predict_partition) as forward:
+                with self.assertRaisesRegex(ValueError, 'output replay rejected'):
+                    entry.run(args)
+            self.assertEqual(len(audited), 6)
+            self.assertEqual(forward.call_count, 12)
+            self.assertTrue(all(item['complete_old_learned_artifact_exact'] for item in audited))
+            state = read_json(args.output/'run.json')
+            self.assertEqual(state['completed_scenes'], 2)
+            self.assertEqual(state['last_scene_id'], 'w')
+            provisional = read_json(args.output/'unvalidated-summary.json')
+            for record in (state, provisional):
+                self.assertEqual(record['status'], 'FAILED')
+                self.assertEqual(record['acceptance'], 'REJECTED')
+                self.assertTrue(record['analysis_complete'])
+            self.assertFalse((args.output/'summary.json').exists())
+            audit = read_json(args.output/'replay-audit.json')
+            self.assertEqual(audit['total_replays'], 6)
+            self.assertEqual(audit['rejected_replays'], 1)
+            self.assertEqual(audit['rejected'], [dict(scene_id='v', arm='direct_only',
+                                                     failed_checks=['physical_close'])])
+            self.assertEqual(provisional['source_replay_audit'], audit)
+            rows = read_json_or_gzip(args.output/'scene-summary.json.gz')
+            self.assertEqual([row['scene_id'] for row in rows], ['v', 'w'])
+            self.assertFalse(rows[0]['source057_replay']['direct_only']['passed'])
+            self.assertTrue(rows[0]['source057_replay']['mixed_action']['passed'])
+            self.assertTrue(all(row['acceptance'] == 'PENDING' for row in rows))
+            self.assertTrue(all(item['passed'] for item in rows[1]['source057_replay'].values()))
+            for directory in ('scenes', 'predictions', 'system-predictions'):
+                self.assertEqual(len(list((args.output/directory).iterdir())), 2)
+
+    def test_output_structural_or_nonfinite_rejection_stops_immediately(self):
+        from tools.analysis import frozen_fusion_transfer as entry
+        for case in ('artifact', 'nonfinite'):
+            with self.subTest(case=case), TemporaryDirectory() as temporary:
+                args, binding, loaded, expected_support = self.two_scene_fixture(Path(temporary))
+                args.utility_replay_domain = 'output'
+                directory = 'system-predictions' if case == 'artifact' else 'predictions'
+                path = Path(binding[2]['direct_only']['system'])/directory/'states-v.npz'
+                with np.load(path, allow_pickle=False) as saved:
+                    arrays = {key: saved[key].copy() for key in saved.files}
+                if case == 'artifact':
+                    arrays['ols_learned_aligned_group_indices'][0] = -1
+                else:
+                    arrays['ols_routing_utility'][0, 0, 0] = np.nan
+                np.savez_compressed(path, **arrays)
+                with patch.object(entry, 'bind_sources', return_value=binding), \
+                        patch.object(entry, 'load_timed_dataset', return_value=loaded), \
+                        patch.object(entry, 'EXPECTED_SUPPORT_POSITION', expected_support), \
+                        patch.object(entry, 'predict_partition', wraps=entry.predict_partition) as forward, \
+                        patch.object(binding[1]['mixed_action'], 'forward') as later:
+                    with self.assertRaises(ValueError):
+                        entry.run(args)
+                self.assertEqual(forward.call_count, 3)  # HQ OLS+transfer; direct_only OLS.
+                later.assert_not_called()
+                state = read_json(args.output/'run.json')
+                self.assertEqual(state['status'], 'FAILED')
+                self.assertFalse(state['analysis_complete'])
+                self.assertEqual(state['completed_scenes'], 0)
+                self.assertEqual(state['failed_arm'], 'direct_only')
+                self.assertTrue(state['failure_snapshot_saved'])
+                for name in ('summary.json', 'unvalidated-summary.json', 'scene-summary.json.gz'):
+                    self.assertFalse((args.output/name).exists())
 
     def test_tampered_ordinary_cache_and_native_inputs_fail_without_success_report(self):
         from tools.analysis.frozen_fusion_transfer import run

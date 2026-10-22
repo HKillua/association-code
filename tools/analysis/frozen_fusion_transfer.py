@@ -1,4 +1,4 @@
-"""062 transfer, or063 first-scene replay diagnostic with --diagnose-first-scene.
+"""Frozen transfer;066 output-domain audit, or063 first-scene diagnostic.
 
 CPU inference only. Native evidence is rebuilt once from V measurements because
 056 did not cache all27 fusion features. Association scores/groups are never
@@ -88,8 +88,8 @@ def run(args):
     _check_output(output, (source.parent, fusion_source))
     diagnostic = getattr(args, 'diagnose_first_scene', False)
     utility_domain = getattr(args, 'utility_replay_domain', 'raw')
-    if utility_domain not in ('raw', 'relu'):
-        raise ValueError('utility replay domain must be raw or relu')
+    if utility_domain not in ('raw', 'relu', 'output'):
+        raise ValueError('utility replay domain must be raw, relu or output')
     if diagnostic and utility_domain != 'raw':
         raise ValueError('063 diagnostic retains its original raw utility contract')
     probe_path, probe_script = getattr(args, 'probe_motion', None), getattr(args, 'probe_script', None)
@@ -106,6 +106,7 @@ def run(args):
         source_fusion=str(fusion_source), optimizer_updates=0, gpu_used=False,
         device='cpu', cpu_threads=args.cpu_threads, test_opened=False,
         utility_replay_domain=utility_domain,
+        analysis_complete=False, acceptance='PENDING',
         scores_recomputed=False, groups_recomputed=False, threshold_reselected=False,
         normalizer_refitted=False, native_evidence_reconstructed=True,
         stage='source_binding', completed_scenes=0)
@@ -149,8 +150,9 @@ def run(args):
             predictions = {arm: fragment['learned_assoc_'+arm] for arm in ARMS}
             predictions['support_switch'], switch = support_switch_prediction(
                 predictions['anchor'], predictions['mean_supported'], fragment['support'], groups)
-            routes, replays = {}, {}
+            routes, replays, replay_arrays = {}, {}, {}
             for arm in LEARNED:
+                state.update(current_scene_id=sid, current_arm=arm)
                 model = models[arm]
                 model.eval()
                 old_fragment, old_system = _load_arrays(Path(fusion_metadata[arm]['system']), sid)
@@ -217,7 +219,17 @@ def run(args):
                     except Exception as snapshot_error:
                         state['failure_snapshot_error'] = f'{type(snapshot_error).__name__}: {snapshot_error}'
                     raise
+                # Retain the complete original-group forward for array-only
+                # re-audit: no archive preparation or model execution is needed.
+                replay_arrays.update({f'source057_{arm}_prediction_{key}': value
+                                      for key, value in ordinary_inference.items()})
+                replay_arrays.update({f'source057_{arm}_routing_{key}': value
+                                      for key, value in ordinary_route.items()})
                 inferred, routes[arm] = predict_partition(model, scene['motion'], groups, 'cpu')
+                if utility_domain == 'output':
+                    for kind, arrays in (('prediction', inferred), ('routing', routes[arm])):
+                        if any(not np.isfinite(value).all() for value in arrays.values()):
+                            raise ValueError(f'nonfinite transfer {kind}: scene {sid}, arm {arm}')
                 _same(inferred['mean_supported'], predictions['mean_supported'], '062 learned-group Mean')
                 predictions[arm] = inferred['learned']
             reports, artifacts = evaluate_unique_population(scene, dict(learned_assoc=groups),
@@ -241,9 +253,11 @@ def run(args):
             row['fragment_metrics'] = {arm: _metrics(value, fragment['target'], fragment['target_valid'],
                 np.isfinite(value), fragment_regions) for arm, value in predictions.items()}
             row['source057_replay'] = replays
+            # These metrics are provisional until every scene/source is audited.
+            row['acceptance'] = 'PENDING'
             write_gzip(output/'scenes'/f'scene-{sid}.json.gz', row)
             payload = dict(fragment, **{'output_'+key: value for key, value in predictions.items()},
-                           support_switch_position_mask=switch)
+                           support_switch_position_mask=switch, **replay_arrays)
             for arm, routing in routes.items():
                 payload.update({arm+'_routing_'+key: value for key, value in routing.items()})
             np.savez_compressed(output/'predictions'/f'states-{sid}.npz', **payload)
@@ -285,21 +299,53 @@ def run(args):
                 'no Oracle choice enters inference; this is a frozen transfer test, not new training',
                 'relu replay, when selected, verifies pre-lock active utility, weights and outputs; '
                 'finite negative raw utility differences remain diagnostic, not a raw-head identity guarantee',
+                'output replay, when selected, checks actual weights and physical states with original limits; '
+                'raw/relu utility and activation differences are diagnostic, not equality guarantees; '
+                'any output replay rejection invalidates the complete result despite completed analysis',
                 'negative or attribute-specific results do not justify retuning, retries or extra updates'])
         result['utility_replay_audit'] = {arm: dict(
             raw_failed_scene_ids=[row['scene_id'] for row in rows
                 if not row['source057_replay'][arm]['utility_diagnostics']['raw']['passed']],
             raw_exceed_count=sum(row['source057_replay'][arm]['utility_diagnostics']['raw']['exceed_count']
                                  for row in rows),
+            relu_failed_scene_ids=[row['scene_id'] for row in rows
+                if not row['source057_replay'][arm]['utility_diagnostics']['relu']['passed']],
+            relu_exceed_count=sum(row['source057_replay'][arm]['utility_diagnostics']['relu']['exceed_count']
+                                  for row in rows),
             activation_flip_count=sum(row['source057_replay'][arm]['utility_diagnostics']['activation_flip_count']
                                        for row in rows)) for arm in LEARNED}
+        rejected = [dict(scene_id=row['scene_id'], arm=arm,
+                         failed_checks=[key for key, passed in row['source057_replay'][arm]['checks'].items()
+                                        if not passed])
+                    for row in rows for arm in LEARNED if not row['source057_replay'][arm]['passed']]
+        audit = dict(utility_replay_domain=utility_domain, total_replays=len(rows)*len(LEARNED),
+            rejected_replays=len(rejected), rejected=rejected,
+            utility_diagnostics=result['utility_replay_audit'],
+            tolerance=REPLAY_TOLERANCE,
+            maxima={arm: dict(
+                physical={attribute: max(row['source057_replay'][arm]['max_physical_prediction_difference'][attribute]
+                                         for row in rows) for attribute in ('position', 'speed', 'heading')},
+                anchor_weight=max(row['source057_replay'][arm]['max_anchor_weight_difference'] for row in rows),
+                helper_weight=max(row['source057_replay'][arm]['max_helper_weights_difference'] for row in rows))
+                for arm in LEARNED})
+        accepted = not rejected
+        result.update(status='COMPLETED' if accepted else 'FAILED', analysis_complete=True,
+                      acceptance='ACCEPTED' if accepted else 'REJECTED',
+                      fusion_source_replay_passed=accepted, source_replay_audit=audit)
+        write_json(output/'replay-audit.json', audit)
         write_gzip(output/'scene-summary.json.gz', rows)
-        write_json(output/'summary.json', result)
-        state.update(status='COMPLETED', stage='finished', elapsed_seconds=time.monotonic()-started)
+        write_json(output/('summary.json' if accepted else 'unvalidated-summary.json'), result)
+        state.update(status=result['status'], stage='finished' if accepted else 'finished_rejected',
+                     analysis_complete=True, acceptance=result['acceptance'],
+                     rejected_replays=len(rejected), elapsed_seconds=time.monotonic()-started)
         write_json(output/'run.json', state)
+        if not accepted:
+            raise ValueError(f'output replay rejected: {len(rejected)}/{audit["total_replays"]} sources; '
+                             'full audit saved, unvalidated-summary.json is not an accepted system result')
         return result
     except BaseException as error:
         state.update(status='INTERRUPTED' if isinstance(error, (KeyboardInterrupt, InterruptedError)) else 'FAILED',
+                     acceptance='REJECTED',
                      error=f'{type(error).__name__}: {error}', elapsed_seconds=time.monotonic()-started)
         try:
             write_json(output/'run.json', state)
@@ -315,9 +361,10 @@ def main():
         parser.add_argument('--'+key, type=Path, required=True)
     parser.add_argument('--archive', nargs='+', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
-    parser.add_argument('--utility-replay-domain', choices=('raw', 'relu'), default='raw',
+    parser.add_argument('--utility-replay-domain', choices=('raw', 'relu', 'output'), default='raw',
                         help='default raw preserves062/064;065 opt-in relu checks activation sets '
-                             'and ReLU magnitudes with the original tolerances; raw differences stay diagnostic')
+                             'and ReLU magnitudes;066 output audits utilities diagnostically and collects '
+                             'all output-level numerical failures before final acceptance')
     parser.add_argument('--diagnose-first-scene', action='store_true',
                         help='063: same V preparation, first helper-quality OLS call plus one traced repeat; no system evaluation')
     parser.add_argument('--probe-motion', type=Path, help='optional safe NPZ of complete visible motion; never pickle')

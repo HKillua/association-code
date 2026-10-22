@@ -130,6 +130,95 @@ class FusionTransferSourceTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'replay tolerance'):
                     replay_fusion_source(*args, expected=expected, utility_replay_domain='relu')
 
+    def test_output_contract_accepts_internal_drift_and_sign_flip_with_real_weights(self):
+        for previous, current in ((.12807676196098328, .12807908654212952), (-1e-8, 1e-8)):
+            with self.subTest(previous=previous, current=current):
+                *args, _ = self.replay_fixture()
+                fragment, saved, old, old_saved, predictions, routing = args
+                # Recompute actual normalized weights and speed predictions on
+                # both sides; utility drift is not paired with invented routes.
+                anchor, helper = routing['helper_anchor'][0], routing['helper_node'][0]
+                for value, utility, weights, own, states in (
+                        (previous, old['ols_routing_utility'], old['ols_routing_helper_weights'],
+                         old['ols_routing_anchor_weights'], old['ols_learned']),
+                        (current, routing['utility'], routing['helper_weights'],
+                         routing['anchor_weights'], predictions['learned'])):
+                    weight = max(value, 0.) / (1. + max(value, 0.))
+                    utility[0, 0, 1] = value
+                    weights[0, 0, 1], own[anchor, 0, 1] = weight, 1. - weight
+                    a, h = fragment['native_states'][[anchor, helper], 0, 2]
+                    states[anchor, 0, 2] = a + weight * (h - a)
+                offsets, flat = fragment['ols_group_offsets'], fragment['ols_group_node_indices']
+                groups = [flat[a:b].tolist() for a, b in zip(offsets[:-1], offsets[1:])]
+                targets = fragment['target_identity_ids']
+                original = evaluate_full_scene(
+                    [dict(node_indices=group, states=old['ols_learned'][group[0]]) for group in groups],
+                    node_identities=fragment['identities'], target_identities=targets,
+                    target_states=saved['ols_anchor_aligned_truth'][:len(targets)],
+                    target_valid=saved['ols_anchor_aligned_truth_valid'][:len(targets)],
+                    node_observed=fragment['support'], split='V_select', grouping_kind='predicted',
+                    correspondence_policy='anchor_identity_first', return_artifact=True,
+                    node_input_support=dict(support=fragment['support'], nearest_seconds=fragment['nearest_seconds']))
+                old_saved.update({'ols_learned_' + key: value for key, value in original.pop('artifact').items()})
+                with self.assertRaisesRegex(ValueError, 'replay tolerance'):
+                    replay_fusion_source(*args, utility_replay_domain='relu')
+                result = replay_fusion_source(*args, expected=original['full_target_metrics'],
+                                              utility_replay_domain='output')
+                self.assertTrue(result['passed'])
+                self.assertTrue(result['complete_old_learned_artifact_exact'])
+                self.assertFalse(any(key.startswith('utility') for key in result['checks']))
+                if previous > 0:
+                    self.assertFalse(result['utility_diagnostics']['relu']['passed'])
+                else:
+                    self.assertEqual(result['utility_diagnostics']['activation_flip_count'], 1)
+
+    def test_output_contract_collects_numerical_failures_but_still_checks_old_artifact(self):
+        for case in ('weights', 'physical'):
+            with self.subTest(case=case):
+                *args, expected = self.replay_fixture()
+                if case == 'weights':
+                    args[5]['helper_weights'][0, 0, 0] += 1e-4
+                    anchor = args[5]['helper_anchor'][0]
+                    args[5]['anchor_weights'][anchor, 0, 0] -= 1e-4
+                else:
+                    args[4]['learned'][0, 0, 0] += 1.
+                result = replay_fusion_source(*args, expected=expected, utility_replay_domain='output')
+                self.assertFalse(result['passed'])
+                self.assertFalse(result['checks']['helper_weights_close' if case == 'weights' else 'physical_close'])
+                self.assertTrue(result['complete_old_learned_artifact_exact'])
+                # A numerical mismatch never skips the old complete-output audit.
+                args[3]['ols_learned_group_states'][2, 0, 0] += .1
+                with self.assertRaisesRegex(ValueError, '057 complete learned system'):
+                    replay_fusion_source(*args, expected=expected, utility_replay_domain='output')
+
+    def test_output_contract_rejects_malformed_nonfinite_and_invalid_weights(self):
+        for side in ('current', 'previous'):
+            for name in ('learned', 'mean_supported', 'utility', 'helper_weights', 'anchor_weights'):
+                for bad in ('shape', np.nan, np.inf, -np.inf):
+                    with self.subTest(side=side, name=name, bad=bad):
+                        *args, expected = self.replay_fixture()
+                        prediction = name in ('learned', 'mean_supported')
+                        container, key = ((args[4] if prediction else args[5], name)
+                            if side == 'current' else (args[2], ('ols_' if prediction else 'ols_routing_') + name))
+                        if bad == 'shape':
+                            container[key] = container[key][:-1]
+                        else:
+                            container[key][0, 0, 0] = bad
+                        with self.assertRaises(ValueError):
+                            replay_fusion_source(*args, expected=expected, utility_replay_domain='output')
+            for value in (-1e-12, 1.000000000001, .8):
+                with self.subTest(side=side, invalid_weight=value):
+                    *args, expected = self.replay_fixture()
+                    container, key = ((args[5], 'helper_weights') if side == 'current'
+                                      else (args[2], 'ols_routing_helper_weights'))
+                    container[key][0, 0, 0] = value
+                    with self.assertRaisesRegex(ValueError, 'weights must'):
+                        replay_fusion_source(*args, expected=expected, utility_replay_domain='output')
+        *args, expected = self.replay_fixture()
+        args[4]['mean_supported'][0, 0, 0] += .01
+        with self.assertRaisesRegex(ValueError, 'structural/ordinary'):
+            replay_fusion_source(*args, expected=expected, utility_replay_domain='output')
+
     def test_rejects_unretained_output_mask_input_and_routing_changes(self):
         for case in ('duplicate', 'mask', 'node_order', 'group', 'weights', 'state'):
             with self.subTest(case=case):
