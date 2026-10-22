@@ -7,7 +7,7 @@
 | [063：首场冻结融合重放诊断](L2S-20261022-063.md) | **COMPLETED：退出码 0，253.785 秒，`source_replay_passed=true`，062 的 utility 拒绝未重现（本轮 max 1.0729e-06、越界 0），无任何七臂成绩** | 本地据证据决定口径或另行论证数值契约；[063回执](S2L-20261022-063.md)与[产物](results/LEVEL1-REPLAY-DIAGNOSTIC-20261022-063/)，不重领 |
 | [062：冻结057融合迁移到056学习分组](L2S-20261022-062.md) | **FAILED：一次CPU4已消耗，首场景057源重放 `utility_close=False`，不自动重试、不重领** | 本地核定复核口径或停止；[062回执](S2L-20261022-062.md)与[产物](results/LEVEL1-FROZEN-FUSION-20261022-062/) |
 
-**063已获批READY；当前未收到RUNNING回执，062未授权重试。** 用户于本地会话明确回复“批准063，按可用CPU资源执行”。本次一次CPU4、零GPU／训练、30分钟仅提醒、失败不重试，不继续062完整评价，不打开T_test。056—061全部完成并已审查，不重领；050已停止保全，原运行FAILED。旧052模板和其它历史批准均不恢复执行额度。四卡并发许可只适用于各自已获批的任务。
+**063诊断已验收结束，当前无READY或RUNNING任务；062保持FAILED，未授权重试。** 063首场旧源重放通过，但未重现062故障、无完整七臂成绩。下一步建议补首次拒绝现场保存后，另行准备一次原协议完整评价；不放宽容差、不转换旧pickle开展额外探针、不新增训练。056—061及历史额度均不重领。
 
 062已由用户在服务器会话批准“给062分配CPU4预算并执行交接”，服务器于北京时间14:49:33提交，单元`mtad-3374238ad9d0`。本地已核对并接受授权记录；该状态来自Git回执，并非实时进程检查。
 
@@ -15,9 +15,9 @@
 
 062实现冻结于`02c0d1e`：零训练、零GPU，保留056分组/代表/完整人口，比较三个057融合模型及四个普通控制；4小时仅提醒，失败不自动重试。完整输入、命令、容差、产物和停止条件只维护在[062交接](L2S-20261022-062.md)，不在本索引复制。
 
-**服务器回传（063 终态）**：北京 15:58:17 提交、16:02:30 结束，unit `mtad-5020edc20631`，checkout detach `28c4d787…`，块 SHA256 `df6788b7…` 执行前后一致、占位符替换 0 处，`--max-seconds 1800 --time-policy advisory`（提醒未触发）、`--cpu-threads 4`、零 GPU。四问实测：**首次未复现原拒绝**（utility `max_abs=1.0728836059570312e-06`、`exceed_count=0`、七项检查全真）；**无真正越界元素**，最大绝对差在 `[50,62,0]` 而最大容差比在 `[42,54,0]`（不同处），062 的越界索引不可核对（`failed_062_arrays_available=false`）；**重复前向与首次逐元素相等**（六类数组 max_abs 全为 0.0）；**完整旧缓存闸门实际走完**（`complete_inputs_and_ordinary_arrays_exact=true`、`complete_old_learned_artifact_exact=true`）。范围守约：`ordinary_partition_forwards=2`、`learned_partition_forwards=0`、`model_updates=0`、`completed_scenes=0`、`full_system_completed=false`，V reference 确有读取（`reference_members_read=300`、`observation_members_read=600`、`training_scene_ids=[]`、`test_opened=false`），062 失败现场保留未动、未重启。可选 `--probe-motion`／`--probe-script` **未追加，报告 unavailable**（安全 motion NPZ 不存在，禁止转造）；hook 只属第二遍。回传 13 件 180 KB，`first-forward.npz`（415,986 B）、`trace-second-forward.npz`（3,635,812 B）、`preparation.json`（85,153,501 B）留服务器只登记路径。详见[063回执](S2L-20261022-063.md)。
+**063本地审查：** 首场helper_quality旧OLS重放七项通过，utility越界0，最坏容差比0.39346；第二遍与首次输出、utility及权重逐值相等。当前CPU学习输出相对057缓存仍有微小差异，最大位置差0.98054毫米，不能写成逐位相同。完整旧产物核验已执行，仅代表旧缓存自身复算一致。[063回执](S2L-20261022-063.md)保留原记录，完整NPZ仍在服务器。
 
-本地已审查失败记录与代码：[062判断与下一步](../docs/research_status.md#062首场重放失败尚无组合成绩)。原检查未覆盖全部网络特征，现有探针没有回传构造脚本；暂不能排除输入路径差异或锁定跨设备舍入。[063代码与交接](L2S-20261022-063.md)已完成：保持完整准备和第一次调用，保存首场完整输入／输出，再进行一次逐层诊断；容差、模型不变，不自动重跑V300完整系统。
+详细数值、未排除假设与下一步见[研究状态](../docs/research_status.md#063原入口首场通过但062根因未定)。首场通过不保证其余场景和另外两臂；未回传的062失败数组和057历史特征不能补造。
 
 ## 分支归并交接
 
