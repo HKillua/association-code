@@ -18,6 +18,7 @@
 | `../analysis/oracle_diagnostics.py` | 058只读053缓存，原OLS/真值身份分组×四种输出；区分覆盖恢复、代表切换与固定候选选择收益，CPU零训练 |
 | `../analysis/compare_association_duration.py` | 060对056完整系统缓存比较，核同人口/输入与OLS控制，分别报告共同点、同/换代表、新/丢覆盖、G/U/D和场景宏平均；CPU零训练 |
 | `../analysis/learned_group_oracle.py` | 061只读056 final1000缓存，逐数组复现三普通控制，固定学习分组/代表作Anchor/Mean受限选择；报告组/唯一目标分母、可见支撑与点级分位数，CPU零训练 |
+| `../analysis/frozen_fusion_transfer.py` | 062固定056缓存分组与057三个final1000，CPU冻结融合迁移；重建V可见特征并严格复现源，生成支撑控制、全目标及终点路由/尾部统计，无新训练/重分组 |
 | `tsactfer_fit.py` | 独立TSA-cTFER离线适配，非原在线方法 |
 | `make_scene_manifest.py` | `--archive`仅读标签生成Level1新名单；旧`--source-manifest`转换仅供历史兼容 |
 | `prepare_scene_data.py` | 已指定train/V的时钟、人口和原生/选点密度统计；Level1用显式temporal_support策略，不需旧alignment |
