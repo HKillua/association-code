@@ -56,6 +56,20 @@ OLS与学习按相同规则选择阈值：完整V的场景Macro-F1、相同分�
 
 ## 普通控制、冻结组合与科研解释
 
+### 068：受限位置门控（冻结实施契约）
+
+问题：在056固定学习分组下，从支撑规则附近初始化的组级门控，训练后能否同时超过自己的step0和support_switch？这是一项新位置头pilot，不是相对057的单因素ReLU消融，也不证明支撑先验的独立贡献。
+
+- 保留全部输入、056 final1000分组／阈值／首代表／目标与mask，Q64、canonical_all。机会区`R=(~anchor_support)&any(helper_support)`；R外位置逐值Anchor，R内`p=anchor+sigmoid(logit)*(mean_supported-anchor)`，经度沿最短弧。严格复用ordinary_fusion的Mean及回退，速度／航向始终取Mean，不拼接057模型属性。
+- 只聚合有支撑helper的27维可见pair特征，逐查询mean和max各27维，加log1p(helper数)、log1p(相对Mean的局部米制位置RMS分歧/1000)，共56维。无helper时置零；不输入真实身份／reference／mask／绝对坐标。56→64→64→1 SiLU，末层weight=0、bias=log(19)，初始g=.95；不是精确规则，必须实际评价step0。
+- T_core2100均匀选场及anchor，batch8，clean/clean_plus_wrong/wrong_only按更新轮换，复用原训练组构造；seed20261021、Adam .001、clip1、固定1000更新。只用最终位置`log1p(Haversine_m/1000)`，每anchor有效Q平均、batch等权，无utility标签或辅助loss。记录每次成功更新实际场景／anchor／模式／有效机会点与零梯度曝光；零机会batch不偷偷重抽或追加更新。
+- 训练前仅核查3035、2535原始观测／标签／reference与056缓存，保存极端目标及其组的时间／位置／速度／OLS证据。结构或缓存不一致即停，不训练；巨大但合法数值保留并报告，复现通过不等于原始数据物理无误。不以V核查生成训练选择规则。
+- 一个GPU训练，step0与final1000各用独立CPU模型做完整V300五臂：Anchor、Mean、Hybrid、support_switch、新门控。没有中途V选模，不重关联或选阈值。新scope/routing/config/实际更新严格绑定；CPU作为本轮统一推理参考，不加载057/066模型或沿用跨设备utility门槛，066仍REJECTED。
+- 每组先产生输出（含重复组），再按既定真值对应评价。保存完整输出、g及生效mask、全部目标与有效mask。报告三属性MAE/RMSE/P95/P99、覆盖／重复、逐场及共享身份组件、三种可见支撑分层、相对规则的改善／伤害量及3035目标留一敏感性。全人口主结果不删除难例。
+- 验收测试：g端点／跨日期线、无helper／R外不变、helper置换不变、reference不进输入；T-only监督、成功曝光、失败不重试、checkpoint语义；合成训练→step0/final→完整人口评价，重复／未采用组与mask；两场原始读取边界及缓存不一致阻断。正式服务器资源与入口见068交接。
+
+晋升须同时说明相对step0及support_switch的位置增量与尾部代价；仅救3035、其它场景普遍受损，或不能超过强控制，不自动加步数／扩大网络。此门控只能沿Anchor—Mean线段，不能选择单个helper；061二端点Oracle不是其误差下界。V已反复用于开发、共享身份有依赖、单seed且离线输入，结果不作独立泛化或超过TMTAFF的证据。
+
 [ordinary_fusion](../../association/evaluation/fusion_controls.py)的Mean supported只平均查询时刻有支撑成员，全部无支撑时回anchor；圆周抵消按既定回退。属性拼接是开发控制，不声称动力学一致或新算法。
 
 062的单一[支撑控制](../../association/evaluation/support_control.py)仅在anchor无支撑且预测组helper有支撑时复制Mean位置，其余保留Anchor，速度／航向取Mean；先对全部预测组输出，再做真值对应。冻结056＋057组合的精确来源／容差／输出见[062交接](../../HandOver/L2S-20261022-062.md)。它不重新训练、打分、分组或搜索阈值。

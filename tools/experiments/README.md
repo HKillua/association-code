@@ -6,6 +6,7 @@
 | --- | --- |
 | `evidence_association_fit.py` | OLS证据关联训练；固定终点、普通/配对困难采样和实际曝光审计 |
 | `evidence_fusion_fit.py` | 属性utility融合训练；`check`为合成检查，Level1真实fit绑定当前OLS工作点 |
+| `support_gate_fit.py` | 068：3035／2535输入预核→T_core受限位置门控1000更新→固定056分组CPU初始化及终点评价；一条失败即停的链 |
 | `level1_system_evaluate.py` | 普通/学习关联与普通/学习融合的完整系统评价；保存全部目标、分组、mask和路由 |
 | `level1_ols_working_point.py` | Level1纯OLS开发工作点，不加载学习权重 |
 | `tmtaff_complete_fit.py` / `tmtaff_complete_evaluate.py` | TMTAFF参考各阶段训练和冻结评价，保留完整baseline实现 |
