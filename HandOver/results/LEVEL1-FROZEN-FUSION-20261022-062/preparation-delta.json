@@ -1,0 +1,26 @@
+{
+ "note": "062的preparation.json未逐字节回传：它与已回传的056 preparation.json 只有一个顶层键不同，300个逐场条目完全相同。原件留在服务器，需要时可即时补传gzip（5,327,633字节）。",
+ "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-FUSION-20261022-062-attempt-1/preparation.json",
+ "bytes": 85153502,
+ "differs_from_056_only_in": {
+  "elapsed_seconds": {
+   "062": 176.57599317096174,
+   "056": 171.53283033380285
+  }
+ },
+ "identical": {
+  "scenes条目数": 300,
+  "逐场不同的场景数": 0,
+  "顶层其它键": "全部相同"
+ },
+ "facts_in_062_preparation": {
+  "test_opened": false,
+  "training_scene_ids": [],
+  "reference_members_read": 300,
+  "observation_members_read": 600,
+  "selection_split": "V_select",
+  "split_unit": "scene",
+  "motion_observation_policy": "canonical_all",
+  "reference_members_read示例": "数据集level1/真实场景/场景-1.csv raw_row_count=2326 issue_count=31"
+ }
+}
