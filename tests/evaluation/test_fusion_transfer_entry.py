@@ -175,6 +175,91 @@ class FusionTransferEntryTests(unittest.TestCase):
                 self.assertEqual(read_json(args.output/'run.json')['status'], 'FAILED')
                 self.assertFalse((args.output/'summary.json').exists())
 
+    def test_diagnostic_preserves_rejection_without_continuing_system_evaluation(self):
+        from tools.analysis.frozen_fusion_transfer import run
+        for corrupt_utility in (False, True):
+            with self.subTest(corrupt_utility=corrupt_utility), TemporaryDirectory() as temporary:
+                args, binding, loaded, _ = self.fixture(Path(temporary))
+                args.diagnose_first_scene = True
+                path = Path(binding[2]['helper_quality']['system'])/'predictions'/'states-v.npz'
+                if corrupt_utility:
+                    with np.load(path, allow_pickle=False) as saved:
+                        arrays = {key: saved[key].copy() for key in saved.files}
+                    arrays['ols_routing_utility'][0, 0, 0] += 1.
+                    np.savez_compressed(path, **arrays)
+                model = binding[1]['helper_quality']
+                with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
+                        patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded) as loader, \
+                        patch.object(model, 'forward', wraps=model.forward) as forward, \
+                        patch.object(binding[1]['direct_only'], 'forward', side_effect=AssertionError('second arm')), \
+                        patch.object(binding[1]['mixed_action'], 'forward', side_effect=AssertionError('third arm')), \
+                        patch('tools.analysis.frozen_fusion_transfer.evaluate_unique_population',
+                              side_effect=AssertionError('full system evaluation')):
+                    result = run(args)
+                self.assertTrue(loader.call_args.kwargs['validation_only'])
+                self.assertEqual(forward.call_count, 2 * len(loaded['validation'][0]['node_ids']))
+                self.assertEqual(result['source_replay_passed'], not corrupt_utility)
+                self.assertEqual(result['first_vs_old']['utility']['passed'], not corrupt_utility)
+                self.assertTrue(result['repeat_vs_first']['utility']['passed'])
+                self.assertFalse(result['full_system_evaluation'])
+                self.assertEqual(result['learned_partition_forwards'], 0)
+                self.assertEqual(result['diagnostic_scene_count'], 1)
+                state = read_json(args.output/'run.json')
+                self.assertEqual(state['status'], 'COMPLETED')
+                self.assertEqual(state['completed_scenes'], 0)
+                self.assertFalse((args.output/'summary.json').exists())
+                self.assertFalse((args.output/'system-predictions').exists())
+                self.assertTrue((args.output/'first-forward.npz').is_file())
+                self.assertTrue((args.output/'trace-second-forward.npz').is_file())
+                self.assertTrue((args.output/'diagnostic-summary.json').is_file())
+                if corrupt_utility:
+                    # Diagnostic completion must not weaken the normal062 gate.
+                    args.diagnose_first_scene = False
+                    args.output = Path(temporary)/'normal-062'
+                    with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
+                            patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded):
+                        with self.assertRaisesRegex(ValueError, 'replay tolerance'):
+                            run(args)
+                    self.assertEqual(read_json(args.output/'run.json')['status'], 'FAILED')
+
+    def test_diagnostic_safe_probe_is_compared_and_script_is_only_archived(self):
+        from tools.analysis.frozen_fusion_transfer import run
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            args, binding, loaded, _ = self.fixture(root)
+            args.diagnose_first_scene = True
+            args.probe_motion, args.probe_script = root/'probe.npz', root/'probe.py'
+            probe = deepcopy(loaded['validation'][0]['motion'])
+            probe['native_count'][0] += 1
+            np.savez_compressed(args.probe_motion, **probe)
+            args.probe_script.write_text('raise RuntimeError("must never execute")\n')
+            with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
+                    patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded):
+                result = run(args)
+            self.assertEqual(result['probe_input_comparison']['status'], 'compared')
+            self.assertFalse(result['probe_input_comparison']['fields']['native_count']['passed'])
+            self.assertTrue(result['probe_input_comparison']['fields']['states']['passed'])
+            self.assertFalse(result['probe_source']['script_executed'])
+            self.assertEqual((args.output/'supplied-probe-script.txt').read_text(), args.probe_script.read_text())
+
+    def test_diagnostic_does_not_accept_corrupt_source_artifacts(self):
+        from tools.analysis.frozen_fusion_transfer import run
+        with TemporaryDirectory() as temporary:
+            args, binding, loaded, _ = self.fixture(Path(temporary))
+            args.diagnose_first_scene = True
+            path = Path(binding[2]['helper_quality']['system'])/'system-predictions'/'states-v.npz'
+            with np.load(path, allow_pickle=False) as saved:
+                arrays = {key: saved[key].copy() for key in saved.files}
+            arrays['ols_learned_aligned_group_indices'][0] = -1
+            np.savez_compressed(path, **arrays)
+            with patch('tools.analysis.frozen_fusion_transfer.bind_sources', return_value=binding), \
+                    patch('tools.analysis.frozen_fusion_transfer.load_timed_dataset', return_value=loaded):
+                with self.assertRaisesRegex(ValueError, 'complete learned system'):
+                    run(args)
+            self.assertEqual(read_json(args.output/'run.json')['status'], 'FAILED')
+            self.assertFalse((args.output/'diagnostic-summary.json').exists())
+            self.assertTrue((args.output/'first-forward.npz').is_file())
+
 
 if __name__ == '__main__':
     unittest.main()

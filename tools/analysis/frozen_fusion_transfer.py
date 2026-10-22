@@ -1,4 +1,4 @@
-"""062: frozen057 fusion on original056 groups, with an observable support control.
+"""062 transfer, or063 first-scene replay diagnostic with --diagnose-first-scene.
 
 CPU inference only. Native evidence is rebuilt once from V measurements because
 056 did not cache all27 fusion features. Association scores/groups are never
@@ -22,6 +22,7 @@ from association.data.motion_evidence import scene_motion_evidence
 from association.evaluation.evidence_fusion_combo import predict_partition, REPLAY_TOLERANCE
 from association.evaluation.frozen_fusion_transfer import summarize_scene, aggregate
 from association.evaluation.support_control import support_switch_prediction
+from association.evaluation.replay_diagnostics import diagnose_replay
 from association.evaluation.system_attribution import _same, _metrics, assert_metrics, pool_metrics
 from association.utils.runtime import write_json
 from tools.analysis.compare_association_duration import ARMS, _load_arrays, _replay
@@ -85,18 +86,25 @@ def run(args):
     fusion_source = Path(args.source_fusion).resolve()
     output = Path(args.output).resolve()
     _check_output(output, (source.parent, fusion_source))
+    diagnostic = getattr(args, 'diagnose_first_scene', False)
+    probe_path, probe_script = getattr(args, 'probe_motion', None), getattr(args, 'probe_script', None)
+    if bool(probe_path) != bool(probe_script) or (probe_path and not diagnostic):
+        raise ValueError('probe-motion and probe-script must be supplied together in diagnostic mode')
     if type(args.cpu_threads) is not int or args.cpu_threads < 1:
         raise ValueError('positive CPU thread count required')
     torch.set_num_threads(args.cpu_threads)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    state = dict(status='RUNNING', scope='062-frozen057-on056-fusion-transfer',
+    state = dict(status='RUNNING', scope=('063-first-scene-replay-diagnostic' if diagnostic
+                 else '062-frozen057-on056-fusion-transfer'),
         dataset_level='Level1', split='V_select', source_system=str(source),
         source_fusion=str(fusion_source), optimizer_updates=0, gpu_used=False,
         device='cpu', cpu_threads=args.cpu_threads, test_opened=False,
         scores_recomputed=False, groups_recomputed=False, threshold_reselected=False,
         normalizer_refitted=False, native_evidence_reconstructed=True,
         stage='source_binding', completed_scenes=0)
+    if diagnostic:
+        state.update(full_system_evaluation=False, full_system_completed=False)
     write_json(output/'run.json', state)
     try:
         manifest = read(args.manifest)
@@ -116,8 +124,9 @@ def run(args):
                 or [str(scene['scene_id']) for scene in loaded['validation']] != ids):
             raise ValueError('062 must read exactly V_select and no training/test payloads')
         write_json(output/'preparation.json', preparation)
-        for directory in ('scenes', 'predictions', 'system-predictions'):
-            (output/directory).mkdir()
+        if not diagnostic:
+            for directory in ('scenes', 'predictions', 'system-predictions'):
+                (output/directory).mkdir()
         rows, point_arrays = [], []
         fragment_count = 0
         state.update(stage='frozen_inference_and_cache_replay')
@@ -140,6 +149,49 @@ def run(args):
                 model.eval()
                 old_fragment, old_system = _load_arrays(Path(fusion_metadata[arm]['system']), sid)
                 ordinary_inference, ordinary_route = predict_partition(model, scene['motion'], ols_groups, 'cpu')
+                if diagnostic:
+                    # Same source binding, full-V preparation and unhooked first
+                    # call as062. Only after that call is instrumentation used.
+                    if sid != ids[0] or arm != LEARNED[0]:
+                        raise ValueError('063 may diagnose only the first scene/helper_quality')
+                    def load_probe():
+                        # Deferred until the first output has been persisted.
+                        with np.load(probe_path, allow_pickle=False) as archive:
+                            probe = {key.removeprefix('motion_'): archive[key].copy() for key in archive.files}
+                        (output/'supplied-probe-script.txt').write_text(Path(probe_script).read_text())
+                        return probe
+                    result = diagnose_replay(model, scene['motion'], ols_groups,
+                        ordinary_inference, ordinary_route, old_fragment, output,
+                        probe_motion=load_probe if probe_path else None)
+                    # A replay rejection is the diagnostic observation. Other
+                    # errors still fail this job; the original062 gate is intact.
+                    try:
+                        check = replay_fusion_source(fragment, saved, old_fragment, old_system,
+                            ordinary_inference, ordinary_route, expected=fusion_metadata[arm]['expected'][sid])
+                        accepted, error = True, None
+                    except ValueError as rejection:
+                        if not str(rejection).startswith(
+                                '057 frozen OLS inference exceeds predeclared replay tolerance: '):
+                            raise
+                        check, accepted, error = None, False, str(rejection)
+                    result.update(status='COMPLETED', scope=state['scope'], scene_id=sid, arm=arm,
+                        source_system=str(source), source_fusion={key: value for key, value in
+                            fusion_metadata[arm].items() if key not in ('expected', 'component_ids', 'scene_ids', 'summary')},
+                        source_replay_passed=accepted, source_replay_checks=check, source_replay_error=error,
+                        full_system_evaluation=False, full_system_completed=False,
+                        prepared_scene_count=len(ids), diagnostic_scene_count=1,
+                        ordinary_partition_forwards=2, learned_partition_forwards=0,
+                        optimizer_updates=0, gpu_used=False, test_opened=False,
+                        probe_source=None if probe_path is None else dict(motion=str(probe_path),
+                            script=str(probe_script), script_executed=False,
+                            provenance_verified=False))
+                    write_json(output/'diagnostic-summary.json', result)
+                    state.update(status='COMPLETED', stage='diagnostic_complete',
+                        diagnostic_scene_count=1, diagnostic_scene_id=sid,
+                        source_replay_passed=accepted, full_system_evaluation=False,
+                        elapsed_seconds=time.monotonic()-started)
+                    write_json(output/'run.json', state)
+                    return result
                 replays[arm] = replay_fusion_source(fragment, saved, old_fragment, old_system,
                     ordinary_inference, ordinary_route, expected=fusion_metadata[arm]['expected'][sid])
                 inferred, routes[arm] = predict_partition(model, scene['motion'], groups, 'cpu')
@@ -226,9 +278,14 @@ def main():
         parser.add_argument('--'+key, type=Path, required=True)
     parser.add_argument('--archive', nargs='+', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--diagnose-first-scene', action='store_true',
+                        help='063: same V preparation, first helper-quality OLS call plus one traced repeat; no system evaluation')
+    parser.add_argument('--probe-motion', type=Path, help='optional safe NPZ of complete visible motion; never pickle')
+    parser.add_argument('--probe-script', type=Path, help='original probe construction script, archived as text, never executed')
     args = parser.parse_args()
     run(args)
-    print(f'COMPLETED: {args.output}/summary.json')
+    name = 'diagnostic-summary.json' if args.diagnose_first_scene else 'summary.json'
+    print(f'COMPLETED: {args.output}/{name}')
 
 
 if __name__ == '__main__':
