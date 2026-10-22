@@ -1,0 +1,22 @@
+{
+  "scope": "069-support-gate-cache-diagnostics",
+  "status": "COMPLETED",
+  "source_068": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1",
+  "cpu_threads": 4,
+  "gpu_used": false,
+  "checkpoint_loaded": false,
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "raw_archives_opened": false,
+  "test_opened": false,
+  "groups_recomputed": false,
+  "threshold_reselected": false,
+  "old066_acceptance": "REJECTED",
+  "retries": 0,
+  "completed_scenes": 300,
+  "advisory_reached": false,
+  "last_scene_id": "4968",
+  "elapsed_seconds": 69.87114037713036,
+  "source_metrics_reproduced": true,
+  "scientific_status": "development diagnostics; no method promotion"
+}
