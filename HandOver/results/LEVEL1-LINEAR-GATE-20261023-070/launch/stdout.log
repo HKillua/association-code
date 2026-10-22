@@ -1,0 +1,6 @@
+070 phase: bind068_cached_controls
+070 phase: prepare_T2100_V300
+070 phase: fit1000_paired_linear
+070 phase: evaluate_cpu_final
+070 phase: paired_cached_comparisons
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-LINEAR-GATE-20261023-070-attempt-1

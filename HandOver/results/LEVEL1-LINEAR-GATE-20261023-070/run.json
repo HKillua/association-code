@@ -1,0 +1,53 @@
+{
+  "scope": "070-paired-linear-position-pilot",
+  "status": "COMPLETED",
+  "phase": "completed",
+  "configuration": {
+    "scope": "support-gate-v1",
+    "routing_semantics": "supported-mean-position-gate-v1",
+    "position_loss": "linear",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "initial_gate": 0.95
+    },
+    "training": {
+      "seed": 20261021,
+      "updates": 1000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 14400.0
+    }
+  },
+  "loss_semantics": "mean_valid_position_linear_haversine_m_div_1000_all_queries_no_auxiliary",
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "source_068": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1",
+  "train_device": "cuda:0",
+  "inference_device": "cpu",
+  "cpu_threads": 4,
+  "optimizer_updates": 1000,
+  "test_opened": false,
+  "old066_acceptance": "REJECTED",
+  "retries": 0,
+  "association_recomputed": false,
+  "threshold_reselected": false,
+  "validation_groups_recomputed": false,
+  "validation_selection": false,
+  "advisory_reached": false,
+  "completed_endpoints": [
+    "final"
+  ],
+  "initial_evaluation_reused": true,
+  "raw_preflight_repeated": false,
+  "time_policy": "advisory",
+  "elapsed_seconds": 2682.9106211792678
+}
