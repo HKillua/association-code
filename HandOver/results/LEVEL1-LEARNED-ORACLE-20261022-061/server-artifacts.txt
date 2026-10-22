@@ -1,0 +1,13 @@
+# 061 大产物留服务器（未上传），登记绝对路径与数量
+
+运行目录：/home/wangguangjie/djs/association-code/runs/LEVEL1-LEARNED-ORACLE-20261022-061-attempt-1（整目录 59M）
+冻结checkout：/home/wangguangjie/djs/association-code-run061（detached 71a133e）
+  runs/LEVEL1-LEARNED-ORACLE-20261022-061-attempt-1/run.json  830 字节  2026-10-22 12:54:50.213226075 +0800
+  runs/LEVEL1-LEARNED-ORACLE-20261022-061-attempt-1/summary.json  1500517 字节  2026-10-22 12:54:50.209225987 +0800
+  runs/LEVEL1-LEARNED-ORACLE-20261022-061-attempt-1/scene-summary.json.gz  10192774 字节  2026-10-22 12:54:50.117223947 +0800
+  scenes/      300 个 scene-*.json.gz
+  predictions/ 300 个 NPZ（选择、有效掩码、目标/组对应、helper 参与、逐点位置误差与 Oracle 组输出）
+
+只读源（未改动）：/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system；该 run 整目录 1.2G，本轮只读，未复制未修改
+
+launcher：runs/LEVEL1-LEARNED-ORACLE-20261022-061-attempt-1-launch（COMPLETED、exit_code 0、stderr 0 字节）
