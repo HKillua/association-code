@@ -27,7 +27,8 @@ FUSION_CONFIGS = {
 # Accumulated float32 error over the utility head's 64 cancelling terms, expressed
 # in ULP of that array's own magnitude scale. Measured on Level1 scene 1
 # (direct_only): one element differed by 1.63e-06 across devices while the accept
-# set was identical, against a scale of 152.8 whose single ULP is 1.53e-05.
+# set was identical, against a scene scale of 92.881 whose single float32 ULP is
+# 7.63e-06, so this factor leaves a 6.10e-05 floor and a 20x margin there.
 UTILITY_ATOL_ULP_FACTOR = 8.
 
 
