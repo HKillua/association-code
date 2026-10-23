@@ -39,6 +39,7 @@ python tools/analysis/ptfm_speed_diagnostics.py --help
 python tools/experiments/tsactfer_level1_fit.py --help
 python tools/experiments/constant_gate_fit.py --help
 python tools/analysis/compare_position_benchmarks.py --help
+python tools/analysis/compare_residual_shrink.py --help
 python tools/analysis/frozen_fusion_transfer.py --help
 python tools/analysis/support_gate_diagnostics.py --help
 python tools/analysis/tsactfer_score_diagnostics.py --help
