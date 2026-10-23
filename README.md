@@ -33,6 +33,8 @@ python tools/experiments/support_gate_fit.py --help
 python tools/experiments/support_gate_linear_fit.py --help
 python tools/experiments/support_gate_replication.py --help
 python tools/experiments/sequence_position_fit.py --help
+python tools/experiments/ptfm_fit.py --help
+python tools/experiments/tsactfer_level1_fit.py --help
 python tools/experiments/constant_gate_fit.py --help
 python tools/analysis/compare_position_benchmarks.py --help
 python tools/analysis/frozen_fusion_transfer.py --help
@@ -42,4 +44,4 @@ python -m unittest discover -s tests
 
 本地AI负责代码和决策，服务器AI按交接执行；push不会唤醒服务器。权限、维护和回传规则见[AGENTS](AGENTS.md)及[现场执行规则](docs/server_autonomy.md)。
 
-073已完成并复核：同4000更新、两个seed下Transformer的MAE均优于门控（590.744／606.624m对646.750／635.776m），满足预定晋级条件，采用其为后续位置恢复底座；RMSE和部分尾部仍有代价，门控保留为对照。固定056分组、97.21%覆盖与610重复；速度／航向统一Mean。领域PTFM／TSA及有效完整TMTAFF仍缺，T_test封存。074A/B已发布READY：两seed相对初值退化惩罚；PTFM/TSA适配开发中。详见[研究决策](docs/research_status.md#073审查与后续方向2026-10-23)与[交接](HandOver/Handover.md)。
+073已完成并复核：同4000更新、两个seed下Transformer的MAE均优于门控（590.744／606.624m对646.750／635.776m），满足预定晋级条件，采用其为后续位置恢复底座；RMSE和部分尾部仍有代价，门控保留为对照。固定056分组、97.21%覆盖与610重复；速度／航向统一Mean。领域PTFM／TSA及有效完整TMTAFF仍缺，T_test封存。074A/B/C/D均已发布READY：两seed相对初值退化惩罚＋PTFM四状态融合适配＋TSA原生时间关联适配，可按资源独立并行。代码就绪不等于已取得领域基线成绩。详见[研究决策](docs/research_status.md#073审查与后续方向2026-10-23)与[交接](HandOver/Handover.md)。

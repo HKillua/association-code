@@ -1,13 +1,14 @@
 # 当前交接
 
-2026-10-23。本地已审服务器`9761a84`：**073A/B/C及CPU整表均COMPLETED／退出0，科研验收通过、结案。按实验前的MAE判据，接受Transformer4000为后续位置恢复底座，保留门控为小容量／尾部对照。** 两seed的点MAE、四种MAE加权及最大组件外方向全一致；点RMSE两seed均略差，P99方向翻转，不能称全面更可靠。依据与回执勘误见[研究状态073节](../docs/research_status.md#073审查与后续方向2026-10-23)／[本地复算](results/LEVEL1-POSITION-REPLICATION-20261023-073-summary/local-audit.json)。**074A/B已完成代码与检查，现分别LOCAL_TO_SERVER / READY；C/D独立开发中，暂不可领取。旧READY不得重领。**
+2026-10-24。本地已审服务器`9761a84`：**073A/B/C及CPU整表均COMPLETED／退出0，科研验收通过、结案。按实验前的MAE判据，接受Transformer4000为后续位置恢复底座，保留门控为小容量／尾部对照。** 两seed的点MAE、四种MAE加权及最大组件外方向全一致；点RMSE两seed均略差，P99方向翻转，不能称全面更可靠。依据与回执勘误见[研究状态073节](../docs/research_status.md#073审查与后续方向2026-10-23)／[本地复算](results/LEVEL1-POSITION-REPLICATION-20261023-073-summary/local-audit.json)。**074A/B/C/D均已完成代码、贯通测试与审查，现分别LOCAL_TO_SERVER / READY；四项可按资源并行独立领取。旧READY不得重领。**
 
 | 当前074任务 | 状态 | 执行范围 |
 |---|---|---|
 | [074A/B](L2S-20261023-074AB.md) | **LOCAL_TO_SERVER / READY**，冻结417c90d，分别独立领取 | 两seed Transformer相对初值退化惩罚，各fresh4000、单GPU/CPU4；CPU两端点及各自同seed缓存对照 |
-| 074C PTFM / 074D TSA | **DEVELOPING，不可领取** | 完成各自适配、贯通和审查后独立发布，不等待A/B结果 |
+| [074C PTFM](L2S-20261023-074CD.md) | **LOCAL_TO_SERVER / READY**，冻结ecac88e | 单GPU/CPU4、fresh4000、四状态多任务，CPU两端点及072C同人口对照 |
+| [074D TSA](L2S-20261023-074CD.md) | **LOCAL_TO_SERVER / READY**，冻结ecac88e | 单GPU/CPU4、1000次双头交替Adam调用，固定final全候选评分与六臂系统/056共同点 |
 
-全局最多四个已发布单卡任务；074A/B不占用另外两槽的授权范围，C/D未READY不得提前运行。A/B一次尝试、不自动重试、4小时仅提醒；完成后各一次CPU缓存表预算已含。push不唤醒服务器，READY不等于RUNNING。详细研究边界见[074契约](../docs/specs/evidence-association-fusion.md#074相对初值退化惩罚与领域对照)。
+全局最多四个已发布单卡任务，准备和I/O可错峰、训练可重叠。A/B/C各4小时、D为6小时仅提醒；各一次尝试、失败保全、不自动重试或加步。各自CPU评价/缓存表预算已含。push不唤醒服务器，READY不等于RUNNING。详细研究边界见[074契约](../docs/specs/evidence-association-fusion.md#074相对初值退化惩罚与领域对照)。
 
 ## 073历史结案记录
 
