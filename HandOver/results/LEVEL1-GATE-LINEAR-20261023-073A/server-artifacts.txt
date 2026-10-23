@@ -1,0 +1,42 @@
+# LEVEL1-GATE-LINEAR-20261023-073A 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-GATE-LINEAR-20261023-073A-attempt-1  总计 1.4G
+  execution.json  1685 字节  mtime=2026-10-23 19:25:47
+  preparation.json  622925339 字节  mtime=2026-10-23 18:53:25
+  run.json  1494 字节  mtime=2026-10-23 19:25:47
+  summary.json  1860 字节  mtime=2026-10-23 19:25:47
+  comparison/objective-summary.json.gz  416743 字节  mtime=2026-10-23 19:25:43
+  comparison/scene-summary.json.gz  1187048 字节  mtime=2026-10-23 19:25:46
+  final/run.json  5192 字节  mtime=2026-10-23 19:23:51
+  final/scene-summary.json.gz  1216940 字节  mtime=2026-10-23 19:23:50
+  final/summary.json  6867235 字节  mtime=2026-10-23 19:23:51
+  final/predictions/  300 个文件 166M
+  final/scenes/  300 个文件 2.3M
+  final/system-predictions/  300 个文件 222M
+  fit/final.pt  107660 字节  mtime=2026-10-23 19:12:33
+  fit/run.json  660834 字节  mtime=2026-10-23 19:12:33
+  fit/step-0.pt  40756 字节  mtime=2026-10-23 18:53:27
+  fit/training.jsonl  9090072 字节  mtime=2026-10-23 19:12:33
+  initial/run.json  5186 字节  mtime=2026-10-23 19:18:12
+  initial/scene-summary.json.gz  1215199 字节  mtime=2026-10-23 19:18:11
+  initial/summary.json  6867222 字节  mtime=2026-10-23 19:18:12
+  initial/predictions/  300 个文件 163M
+  initial/scenes/  300 个文件 2.3M
+  initial/system-predictions/  300 个文件 222M
+
+launcher: /home/wangguangjie/djs/association-code/runs/LEVEL1-GATE-LINEAR-20261023-073A-attempt-1-launch
+  exit_code.txt  2 字节
+  launch.json  1308 字节
+  launch.stderr.log  43 字节
+  launch.stdout.log  0 字节
+  request.json  1628 字节
+  status.json  528 字节
+  stderr.log  0 字节
+  stdout.log  305 字节
+  worker.pid  8 字节
+  worker.stderr.log  0 字节
+  worker.stdout.log  0 字节
+
+执行checkout: /home/wangguangjie/djs/association-code-run073A HEAD=e08b97424a06d41d9bbbcccc99cc03db5e72ede1（detach 于交接冻结代码 e08b974，只读）
+只读输入未写入；未回传逐场 NPZ、模型权重 .pt、fit/training.jsonl 逐行日志、preparation.json 与 predictions／system-predictions 数组。
+本目录 Git 回传（不含本清单自身）: 25 个文件 / 2806537 字节（程序原件紧凑副本或 .gz，未替换任何执行输入）
