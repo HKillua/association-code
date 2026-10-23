@@ -1,0 +1,81 @@
+{
+ "registered_at_utc": "2026-10-23T18:36:59.549791Z",
+ "note": "以下原件保留在服务器本地，未复制入Git；本清单只登记路径／字节／修改时间。Git回传件不含本清单自身。",
+ "server_originals": [
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1/report.md",
+   "bytes": 2763,
+   "mtime_utc": "2026-10-23T18:34:54.145045Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1/run.json",
+   "bytes": 603,
+   "mtime_utc": "2026-10-23T18:34:54.149045Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1/scene-summary.json.gz",
+   "bytes": 3207129,
+   "mtime_utc": "2026-10-23T18:34:54.145045Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1/summary.json.gz",
+   "bytes": 428828,
+   "mtime_utc": "2026-10-23T18:34:48.208883Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1-launch/status.json",
+   "bytes": 528,
+   "mtime_utc": "2026-10-23T18:34:56.061097Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-23T18:34:56.061097Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1-launch/request.json",
+   "bytes": 883,
+   "mtime_utc": "2026-10-23T18:30:21.223469Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1-launch/launch.json",
+   "bytes": 1305,
+   "mtime_utc": "2026-10-23T18:30:21.311473Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-SPEED-20261024-076A-attempt-1-launch/worker.pid",
+   "bytes": 8,
+   "mtime_utc": "2026-10-23T18:30:21.459480Z"
+  }
+ ],
+ "server_originals_total_bytes": 3642049,
+ "git_returned": [
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/report.md",
+   "bytes": 2763,
+   "mtime_utc": "2026-10-23T18:36:50.015882Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/run.json",
+   "bytes": 603,
+   "mtime_utc": "2026-10-23T18:36:50.015882Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/scene-summary.json.gz",
+   "bytes": 3207129,
+   "mtime_utc": "2026-10-23T18:36:50.023883Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/speed-diagnostics-key-metrics.json",
+   "bytes": 18570,
+   "mtime_utc": "2026-10-23T18:36:50.095884Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/summary.json.gz",
+   "bytes": 428828,
+   "mtime_utc": "2026-10-23T18:36:50.019882Z"
+  }
+ ],
+ "git_returned_total_bytes": 3657893,
+ "git_returned_file_count": 5
+}
