@@ -1,7 +1,7 @@
 """Fixed-budget generic LSTM/Transformer position recovery runs.
 
 One fixed from-scratch run, then independent CPU step0/final full V evaluation.
-The default 071 pilot uses 1000 updates; extended4000 uses a fresh 4000.
+The default071 pilot uses1000 updates; extended4000 and replica4000 use fresh4000.
 No V-based training selection, association inference, regrouping, test access,
 old fusion checkpoint, source modification or automatic retry.
 """
@@ -32,9 +32,12 @@ ROOT = Path(__file__).resolve().parents[2]
 def production_contract(config, manifest, alignment, profile='pilot1000'):
     configuration(config)
     backbone = config['model']['backbone']
-    suffixes = {'pilot1000': 'level1', 'extended4000': 'extended-level1'}
+    suffixes = {'pilot1000': 'level1', 'extended4000': 'extended-level1',
+                'replica4000': 'extended-replica-level1'}
     if profile not in suffixes:
         raise ValueError('unknown sequence training profile')
+    if profile == 'replica4000' and backbone != 'transformer':
+        raise ValueError('073 replica4000 declares the Transformer backbone only')
     if config != read_json(ROOT/f'configs/sequence-position-{backbone}-{suffixes[profile]}.json'):
         updates = 1000 if profile == 'pilot1000' else 4000
         raise ValueError(f'{profile} requires the frozen backbone-specific {updates}-update configuration')
@@ -74,8 +77,9 @@ def run(args):
     production_contract(config, manifest, alignment, profile=profile)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    scope = ('071-generic-sequence-position-pilot' if profile == 'pilot1000'
-             else '072-generic-sequence-position-extended4000')
+    scope = {'pilot1000': '071-generic-sequence-position-pilot',
+             'extended4000': '072-generic-sequence-position-extended4000',
+             'replica4000': '073-generic-sequence-position-replica4000'}[profile]
     state = dict(scope=scope, profile=profile, status='RUNNING', phase='source_binding',
         configuration=config, backbone=config['model']['backbone'], source_system=str(source),
         train_device=args.device, inference_device='cpu', cpu_threads=4, optimizer_updates=0,
@@ -174,8 +178,8 @@ def main(argv=None):
     parser.add_argument('--device', choices=('cpu', 'cuda:0'), default='cuda:0')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--time-policy', choices=('advisory',), default='advisory')
-    parser.add_argument('--profile', choices=('pilot1000', 'extended4000'), default='pilot1000',
-                        help='explicit fresh training budget; extended4000 is not a resumed pilot')
+    parser.add_argument('--profile', choices=('pilot1000', 'extended4000', 'replica4000'), default='pilot1000',
+                        help='explicit fresh budget/seed; extended profiles are not resumed pilots')
     args = parser.parse_args(argv)
 
     def cancel(signum, frame):

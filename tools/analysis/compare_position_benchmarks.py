@@ -40,6 +40,11 @@ EXTENDED_CONFIGS = {
     '072B_lstm4000': 'sequence-position-lstm-extended-level1.json',
     '072C_transformer4000': 'sequence-position-transformer-extended-level1.json',
 }
+REPLICATION_CONFIGS = {
+    '073A_gate4000_seed23': 'support-gate-linear-extended-level1.json',
+    '073B_gate4000_seed21': 'support-gate-linear-extended-replica-level1.json',
+    '073C_transformer4000_seed21': 'sequence-position-transformer-extended-replica-level1.json',
+}
 CONSTANT_METHOD = '072A_constant'
 OPTIONAL_INPUTS = ('constant_run072A', 'lstm_run072B', 'transformer_run072C')
 INPUT_KEYS = ('node_ids', 'identities', 'target_identity_ids', 'native_states', 'support',
@@ -163,8 +168,8 @@ def verify_extended_sampling(lstm_fit, transformer_fit, previous_lstm, previous_
 def _metadata(path, arm):
     path = Path(path).resolve()
     run, summary, fit = [read_json(path/name) for name in ('run.json', 'summary.json', 'fit/run.json')]
-    extended = arm in EXTENDED_CONFIGS
-    config = read_json(ROOT/'configs'/({**ARM_CONFIGS, **EXTENDED_CONFIGS}[arm]))
+    extended = arm in EXTENDED_CONFIGS or arm in REPLICATION_CONFIGS
+    config = read_json(ROOT/'configs'/({**ARM_CONFIGS, **EXTENDED_CONFIGS, **REPLICATION_CONFIGS}[arm]))
     steps = 4000 if extended else 1000
     if config['training']['updates'] != steps:
         raise ValueError(f'comparison requires declared{steps}-update budgets')
@@ -178,7 +183,7 @@ def _metadata(path, arm):
     expected_endpoints = ['final'] if arm == '070_linear' else ['initial', 'final']
     if run.get('completed_endpoints') != expected_endpoints:
         raise ValueError('full required endpoint chain has not completed')
-    sequence = arm in ('071C_lstm', '071D_transformer') or extended
+    sequence = 'backbone' in config['model']
     loader = sequence_checkpoint if sequence else gate_checkpoint
     with torch.random.fork_rng(devices=[]):
         model, checkpoint = loader(path/'fit/final.pt', device='cpu')
@@ -294,7 +299,7 @@ def _arrays(directory, sid):
 
 def scene_arrays(arms, sid, initial_directory):
     """Both schemas share actual full-scene artifacts, not summary claims."""
-    reference, system = _arrays(arms['071A_log']['path']/'final', sid)
+    reference, system = _arrays(next(iter(arms.values()))['path']/'final', sid)
     base = _artifact(system, 'anchor')
     _, _, regions, population = _structure(reference, base)
     data = {'region_'+key: value for key, value in regions.items()}

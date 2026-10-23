@@ -197,6 +197,16 @@ class SequencePositionEvaluationTests(unittest.TestCase):
                     entry.production_contract(extended, manifest, alignment)
                 with self.assertRaisesRegex(ValueError, '4000-update'):
                     entry.production_contract(pilot, manifest, alignment, profile='extended4000')
+        replica = read_json(entry.ROOT/'configs/sequence-position-transformer-extended-replica-level1.json')
+        expected = read_json(entry.ROOT/'configs/sequence-position-transformer-extended-level1.json')
+        expected['training']['seed'] = 20261021
+        self.assertEqual(replica, expected)
+        entry.production_contract(replica, manifest, alignment, profile='replica4000')
+        with self.assertRaisesRegex(ValueError, '4000-update'):
+            entry.production_contract(replica, manifest, alignment, profile='extended4000')
+        lstm = read_json(entry.ROOT/'configs/sequence-position-lstm-extended-level1.json')
+        with self.assertRaisesRegex(ValueError, 'Transformer'):
+            entry.production_contract(lstm, manifest, alignment, profile='replica4000')
 
     def test_real_small_cli_run_preserves_fixed_endpoints_without_validation_selection(self):
         from tests.training.test_support_gate import tiny_train
@@ -205,7 +215,7 @@ class SequencePositionEvaluationTests(unittest.TestCase):
             root = Path(directory)
             source, metadata, validation = support_gate_cache_fixture(root)
             training = tiny_train()
-            config = read_json(entry.ROOT/'configs/sequence-position-lstm-level1.json')
+            config = read_json(entry.ROOT/'configs/sequence-position-transformer-extended-replica-level1.json')
             config['training'].update(updates=2, batch_size=2)
             manifest = dict(splits={'T_core': [str(scene['scene_id']) for scene in training],
                                     'V_select': ['3035']}, components={'3035': 'shared'})
@@ -213,7 +223,8 @@ class SequencePositionEvaluationTests(unittest.TestCase):
                 write_json(root/(name+'.json'), value)
             args = Namespace(source_system=str(source), output=str(root/'out'), archive=['not-opened.zip'],
                 manifest=str(root/'manifest.json'), alignment=str(root/'alignment.json'),
-                config=str(root/'config.json'), device='cpu', cpu_threads=4, time_policy='advisory')
+                config=str(root/'config.json'), device='cpu', cpu_threads=4, time_policy='advisory',
+                profile='replica4000')
             # Only data I/O and large production-manifest binding are substituted.
             # Actual training, checkpoints, all-group inference, source-cache
             # replay, full-target evaluation and endpoint comparison all execute.
@@ -225,6 +236,7 @@ class SequencePositionEvaluationTests(unittest.TestCase):
                 result = entry.run(args)
             self.assertEqual(result['status'], 'COMPLETED')
             self.assertEqual(result['optimizer_updates'], 2)
+            self.assertEqual(result['scope'], '073-generic-sequence-position-replica4000')
             self.assertTrue(result['limitations'][0].startswith('2 updates'))
             self.assertEqual(read_json(root/'out/run.json')['completed_endpoints'], ['initial', 'final'])
             self.assertFalse(read_json(root/'out/run.json')['validation_selection'])

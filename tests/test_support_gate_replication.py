@@ -44,6 +44,22 @@ class SupportGateReplicationTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     entry.production_contract(changed, manifest, alignment)
 
+    def test073_profiles_only_change_declared_seed_and_update_count(self):
+        manifest = read_json(entry.ROOT/'configs/data/mtad-level1-scene3000.json')
+        alignment = read_json(entry.ROOT/'configs/data/mtad-level1-alignment.json')
+        pilot = read_json(entry.ROOT/'configs/support-gate-replica-linear-level1.json')
+        for profile, suffix, seed in (('extended4000', 'extended', 20261023),
+                                      ('replica4000', 'extended-replica', 20261021)):
+            config = read_json(entry.ROOT/f'configs/support-gate-linear-{suffix}-level1.json')
+            expected = deepcopy(pilot); expected['training'].update(updates=4000, seed=seed)
+            self.assertEqual(config, expected)
+            entry.production_contract(config, manifest, alignment, profile=profile)
+            with self.assertRaisesRegex(ValueError, 'frozen'):
+                entry.production_contract(config, manifest, alignment)
+            wrong = deepcopy(config); wrong['training']['seed'] += 1
+            with self.assertRaisesRegex(ValueError, 'frozen'):
+                entry.production_contract(wrong, manifest, alignment, profile=profile)
+
     def test_independent_real_training_exact_pair_and_tamper_refusal(self):
         with TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -155,6 +171,39 @@ class SupportGateReplicationTests(unittest.TestCase):
             prepare.assert_not_called(); train.assert_not_called()
             self.assertEqual(read_json(root/'out/run.json')['status'], 'FAILED')
             self.assertFalse((root/'out/summary.json').exists())
+
+    def test073_real_tiny_entry_preserves_endpoints_and_linear_scope(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            source, metadata, validation = support_gate_cache_fixture(root)
+            training = tiny_train()
+            config = read_json(entry.ROOT/'configs/support-gate-linear-extended-replica-level1.json')
+            config['training'].update(updates=3, batch_size=2)
+            manifest = dict(splits={'T_core': [str(s['scene_id']) for s in training],
+                                    'V_select': ['3035']}, components={'3035': 'shared'})
+            for name, value in (('config', config), ('manifest', manifest), ('alignment', {})):
+                write_json(root/(name+'.json'), value)
+            args = Namespace(source_system=str(source), output=str(root/'out'), archive=['not-opened.zip'],
+                manifest=str(root/'manifest.json'), alignment=str(root/'alignment.json'),
+                config=str(root/'config.json'), device='cpu', cpu_threads=4, time_policy='advisory',
+                profile='replica4000')
+            with patch.object(entry, 'production_contract'), patch.object(entry, '_bind_source'), \
+                    patch.object(entry, '_load_metadata', return_value=metadata), \
+                    patch.object(entry, 'load_timed_dataset', return_value=dict(train=training,
+                        validation=validation, report={'fixture': True})), \
+                    patch('association.evaluation.support_gate.frozen_motion', side_effect=lambda raw, *_: raw):
+                result = entry.run(args)
+            self.assertEqual(result['status'], 'COMPLETED')
+            self.assertEqual(result['optimizer_updates'], 3)
+            self.assertEqual(result['scope'], '073-linear-position-gate4000')
+            self.assertIn('not a log/linear intervention', result['scientific_status'])
+            run = read_json(root/'out/run.json')
+            self.assertEqual(run['completed_endpoints'], ['initial', 'final'])
+            self.assertFalse(run['validation_selection'])
+            for label, step in (('initial', 0), ('final', 3)):
+                endpoint = read_json(root/'out'/label/'run.json')
+                self.assertEqual(endpoint['checkpoint']['actual_updates'], step)
+                self.assertEqual(endpoint['scope'], '073-linear-position-gate4000-evaluation')
 
 
 if __name__ == '__main__':

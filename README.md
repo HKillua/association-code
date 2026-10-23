@@ -42,4 +42,4 @@ python -m unittest discover -s tests
 
 本地AI负责代码和决策，服务器AI按交接执行；push不会唤醒服务器。权限、维护和回传规则见[AGENTS](AGENTS.md)及[现场执行规则](docs/server_autonomy.md)。
 
-071四臂已完成：线性位置门控两个seed均胜固定控制，第二个seed MAE633.590m；LSTM/Transformer也有学习收益，但仍是有界开发比较。072增加训练侧全局恒定权重控制，并给两时序基线固定4000更新的独立训练机会。固定056分组与完整人口，速度／航向统一Mean，T_test封存；只按[当前交接](HandOver/Handover.md)领取，不从旧任务续跑。
+072已完成并复核：Transformer4000的位置MAE590.744m胜门控1000的633.590m，门控总体RMSE/P99略好。073用三个新任务补齐两seed×两方法的同4000更新比较，复用已完成072C；不换新骨干、不挑最好seed。固定056分组与完整人口，速度／航向统一Mean，T_test封存；只按[当前交接](HandOver/Handover.md)领取。

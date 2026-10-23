@@ -1,4 +1,4 @@
-"""071 independent log/linear seed replication and post-completion CPU pairing."""
+"""Fixed gate fits:071 log/linear replication or073 linear4000 profiles."""
 from __future__ import annotations
 
 import argparse
@@ -25,21 +25,31 @@ from tools.experiments.support_gate_fit import endpoint_model, production_contra
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def production_contract(config, manifest, alignment):
+def production_contract(config, manifest, alignment, profile='pilot1000'):
     configuration(config)
     kind = config.get('position_loss')
     if kind not in ('log1p', 'linear'):
         raise ValueError('071 explicitly declares log1p or linear loss')
-    name = 'log' if kind == 'log1p' else 'linear'
-    if config != read_json(ROOT/f'configs/support-gate-replica-{name}-level1.json'):
-        raise ValueError('071 requires its frozen seed20261023/1000-update configuration')
+    if profile == 'pilot1000':
+        name = 'log' if kind == 'log1p' else 'linear'
+        filename = f'support-gate-replica-{name}-level1.json'
+    elif profile in ('extended4000', 'replica4000'):
+        if kind != 'linear':
+            raise ValueError('073 profiles retain the linear position loss')
+        suffix = 'extended' if profile == 'extended4000' else 'extended-replica'
+        filename = f'support-gate-linear-{suffix}-level1.json'
+    else:
+        raise ValueError('unknown gate training profile')
+    if config != read_json(ROOT/'configs'/filename):
+        raise ValueError(f'{profile} requires its frozen seed/update configuration')
     original = deepcopy(config)
     original.pop('position_loss')
     original['training']['seed'] = 20261021
+    original['training']['updates'] = 1000
     original_contract(original, manifest, alignment)
 
 
-def annotate_endpoint(directory, config, step):
+def annotate_endpoint(directory, config, step, *, scope=SCOPE):
     """Publish checkpoint binding identically for both endpoint records."""
     directory = Path(directory)
     filename = 'step-0.pt' if step == 0 else 'final.pt'
@@ -48,12 +58,13 @@ def annotate_endpoint(directory, config, step):
         loss_semantics=loss_semantics(config))
     for name in ('run.json', 'summary.json'):
         record = read_json(directory/name)
-        record.update(scope=SCOPE+'-evaluation', checkpoint=checkpoint,
+        record.update(scope=scope+'-evaluation', checkpoint=checkpoint,
                       configuration=config, position_loss=config['position_loss'])
         write_json(directory/name, record)
 
 
 def run(args):
+    profile = getattr(args, 'profile', 'pilot1000')
     source, output = Path(args.source_system).resolve(), Path(args.output).resolve()
     protected = source.parent
     if output == protected or output in protected.parents or protected in output.parents:
@@ -61,15 +72,16 @@ def run(args):
     if output.exists():
         raise FileExistsError('output already exists; no reuse or automatic retry')
     if args.cpu_threads != 4 or args.time_policy != 'advisory':
-        raise ValueError('071 fixes CPU4 and advisory-only wall time')
+        raise ValueError('gate training fixes CPU4 and advisory-only wall time')
     torch.set_num_threads(4)
     if args.device == 'cuda:0' and not torch.cuda.is_available():
         raise ValueError('requested CUDA unavailable; no fallback')
     config, manifest, alignment = map(read_json, (args.config, args.manifest, args.alignment))
-    production_contract(config, manifest, alignment)
+    production_contract(config, manifest, alignment, profile=profile)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    state = dict(scope=SCOPE, status='RUNNING', phase='source_binding', configuration=config,
+    scope = SCOPE if profile == 'pilot1000' else '073-linear-position-gate4000'
+    state = dict(scope=scope, profile=profile, status='RUNNING', phase='source_binding', configuration=config,
         source_system=str(source), loss_semantics=loss_semantics(config), train_device=args.device,
         inference_device='cpu', cpu_threads=4, optimizer_updates=0, test_opened=False, retries=0,
         old066_acceptance='REJECTED', association_recomputed=False, threshold_reselected=False,
@@ -84,7 +96,7 @@ def run(args):
     def phase(name):
         state.update(phase=name, elapsed_seconds=time.monotonic()-started)
         write_json(output/'run.json', state)
-        print('071 phase: '+name, flush=True)
+        print(f'{profile} phase: '+name, flush=True)
         check()
     try:
         _bind_source(source)
@@ -113,21 +125,27 @@ def run(args):
             model = endpoint_model(output/'fit'/filename, step, config, fit)
             resources['parameter_count'] = sum(p.numel() for p in model.parameters())
             evaluate_support_gate(model, dataset['validation'], source, metadata, output/label, check=check)
-            annotate_endpoint(output/label, config, step)
+            annotate_endpoint(output/label, config, step, scope=scope)
             state['completed_endpoints'].append(label)
             del model
         phase('own_endpoint_comparison')
         comparison = compare_cached_endpoints(output/'initial', output/'final', metadata['component_ids'],
                                                output/'comparison', check=check)
-        summary = dict(scope=SCOPE, status='COMPLETED', configuration=config, source_system=str(source),
+        scientific_status = ('Independent arm on second seed; paired claim waits for actual-batch audit.'
+            if profile == 'pilot1000' else
+            'Fresh linear4000 arm; cross-method comparison waits for actual-batch and fixed-population audit, not a log/linear intervention.')
+        optimization_limit = ('Loss changes amplitude weighting and optimization dynamics; neither is separately isolated.'
+            if profile == 'pilot1000' else
+            'Fixed4000 updates with unchanged Adam and clipping do not prove convergence or equal capacity.')
+        summary = dict(scope=scope, profile=profile, status='COMPLETED', configuration=config, source_system=str(source),
             optimizer_updates=fit['optimizer_updates'], test_opened=False, inference_device='cpu',
             resources=resources,
             pairing_status='NOT_YET_AUDITED', other_arm_dependency=False,
             own_comparison_status=comparison['status'], comparison_directory=str(output/'comparison'),
-            scientific_status='Independent arm on second seed; paired claim waits for actual-batch audit.',
+            scientific_status=scientific_status,
             limitations=['Reused development V and cross-scene shared identities; no independent generalization.',
                 'Frozen056 grouping, offline whole-fragment inputs and synthetic training groups.',
-                'Loss changes amplitude weighting and optimization dynamics; neither is separately isolated.',
+                optimization_limit,
                 'Original066 remains REJECTED. Speed/course remain ordinary Mean outputs.'])
         write_json(output/'summary.json', summary)
         state.update(status='COMPLETED', phase='completed', elapsed_seconds=time.monotonic()-started)
@@ -155,6 +173,8 @@ def main(argv=None):
     fit.add_argument('--device', choices=('cpu', 'cuda:0'), default='cuda:0')
     fit.add_argument('--cpu-threads', type=int, default=4)
     fit.add_argument('--time-policy', choices=('advisory',), default='advisory')
+    fit.add_argument('--profile', choices=('pilot1000', 'extended4000', 'replica4000'), default='pilot1000',
+                     help='fresh fixed budget/seed; default retains071 log/linear replication')
     paired = sub.add_parser('compare', help='CPU audit only after both complete arms exist')
     for key in ('log-run', 'linear-run', 'output'):
         paired.add_argument('--'+key, required=True)

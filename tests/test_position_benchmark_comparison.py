@@ -21,12 +21,71 @@ from tests.evaluation.test_support_gate import support_gate_cache_fixture
 from tests.test_sequence_position import tiny_configuration, tiny_training
 from tests.training.test_support_gate import tiny_config, tiny_train
 from tools.analysis import compare_position_benchmarks as entry
+from tools.analysis import compare_position_replication as replication
 from tools.experiments.support_gate_replication import annotate_endpoint
 
 
 class PositionBenchmarkComparisonTests(unittest.TestCase):
     def setUp(self):
         torch.set_num_threads(1)
+
+    def test073_actual_sampling_and_gate_budget_prefix(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            cfg = tiny_config(); cfg['position_loss'] = 'linear'
+            cfg['training']['seed'] = 20261023
+            cfg['training']['updates'] = 2
+            train_support_gate(tiny_train(), cfg, root/'old')
+            cfg['training']['updates'] = 3
+            train_support_gate(tiny_train(), cfg, root/'new')
+            seq = tiny_configuration('transformer')
+            # Common scientific settings, including wall-time policy, match.
+            seq['training'] = deepcopy(cfg['training'])
+            train_sequence_position(tiny_training(), seq, root/'seq')
+            result = replication.verify_gate_prefix(root/'new', root/'old')
+            self.assertEqual(result['matched_prefix_updates'], 2)
+            self.assertTrue(result['initial_parameters_exact'])
+            pair = replication.verify_method_sampling(root/'new', root/'seq')
+            self.assertEqual(pair['matched_updates'], 3)
+            self.assertEqual(pair['matched_anchors'], 6)
+            # Same exposure totals alone must not hide changed group membership.
+            path = root/'seq/training.jsonl'
+            rows = [json.loads(line) for line in path.read_text().splitlines()]
+            rows[0]['batch'][0]['members'].append(999)
+            path.write_text(''.join(json.dumps(row)+'\n' for row in rows))
+            with self.assertRaisesRegex(ValueError, 'actual gate/sequence batches'):
+                replication.verify_method_sampling(root/'new', root/'seq')
+            checkpoint = torch.load(root/'new/step-0.pt', weights_only=False)
+            first = next(iter(checkpoint['model']))
+            checkpoint['model'][first].add_(.01)
+            torch.save(checkpoint, root/'new/step-0.pt')
+            with self.assertRaisesRegex(ValueError, 'initial parameters'):
+                replication.verify_gate_prefix(root/'new', root/'old')
+
+    def test073_two_seed_table_reuses_real_cache_schemas(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve(); old = self.fixture(root)
+            current = dict(zip(replication.ARMS, (old['071A_log'], old['071B_linear'],
+                                                  old['071D_transformer'], old['071C_lstm'])))
+            args = Namespace(gate_run073A=str(current[replication.ARMS[0]]['path']),
+                gate_run073B=str(current[replication.ARMS[1]]['path']),
+                transformer_run073C=str(current[replication.ARMS[2]]['path']),
+                transformer_run072C=str(current[replication.ARMS[3]]['path']),
+                source071B=str(old['071B_linear']['path']), source070=str(old['070_linear']['path']),
+                output=str(root/'table073'), cpu_threads=4)
+            with patch.object(replication, '_metadata', side_effect=lambda path, name: current[name]), \
+                    patch.object(replication, 'verify_method_sampling', return_value={'status': 'PAIR_VERIFIED'}), \
+                    patch.object(replication, 'verify_gate_prefix', return_value={'initial_parameters_exact': True,
+                                                                               'matched_prefix_updates': 1000}):
+                result = replication.run(args)
+            self.assertEqual(result['status'], 'COMPLETED')
+            self.assertEqual(len(result['methods']), 9)
+            self.assertEqual(set(result['pairing']), {'20261021', '20261023'})
+            self.assertEqual(result['population']['duplicate_prediction_group_count'], 1)
+            for name in replication.ARMS:
+                self.assertEqual(result['position_weightings']['all'][name]['point_equal']['unit_count'], 127)
+            self.assertEqual(result['model_forwards'], 0)
+            self.assertFalse(result['test_opened'])
 
     def fixture(self, root):
         source, metadata, validation = support_gate_cache_fixture(root)
