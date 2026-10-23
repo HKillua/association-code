@@ -1,0 +1,36 @@
+# LEVEL1-CONSTANT-GATE-20261023-072A 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-CONSTANT-GATE-20261023-072A-attempt-1  总计 995M
+  execution.json  1397 字节  mtime=2026-10-23 17:06:56
+  fit-sampling.json  2447673 字节  mtime=2026-10-23 16:57:48
+  fit.json  98533 字节  mtime=2026-10-23 16:57:48
+  preparation.json  622925339 字节  mtime=2026-10-23 16:52:11
+  run.json  1110 字节  mtime=2026-10-23 17:06:56
+  summary.json  1342 字节  mtime=2026-10-23 17:06:56
+  final/run.json  4799 字节  mtime=2026-10-23 17:03:05
+  final/scene-summary.json.gz  1215098 字节  mtime=2026-10-23 17:03:05
+  final/summary.json  6866332 字节  mtime=2026-10-23 17:03:06
+  final/predictions/  300 个文件 163M
+  final/scenes/  300 个文件 2.3M
+  final/system-predictions/  300 个文件 222M
+  versus_fixed095/objective-summary.json.gz  417188 字节  mtime=2026-10-23 17:05:00
+  versus_fixed095/scene-summary.json.gz  1186359 字节  mtime=2026-10-23 17:05:04
+  versus_learned071B/objective-summary.json.gz  417912 字节  mtime=2026-10-23 17:06:52
+  versus_learned071B/scene-summary.json.gz  1188899 字节  mtime=2026-10-23 17:06:56
+
+launcher: /home/wangguangjie/djs/association-code/runs/LEVEL1-CONSTANT-GATE-20261023-072A-attempt-1-launch
+  exit_code.txt  2 字节
+  launch.json  1315 字节
+  launch.stderr.log  43 字节
+  launch.stdout.log  0 字节
+  request.json  1480 字节
+  status.json  527 字节
+  stderr.log  0 字节
+  stdout.log  338 字节
+  worker.pid  8 字节
+  worker.stderr.log  0 字节
+  worker.stdout.log  0 字节
+
+执行checkout: association-code-run072A HEAD=258bb260fa9fddd16fe5cccd692935588e5147e4（detach 于交接冻结代码 258bb26，只读，三个 checkout 同一 SHA）
+未回传：逐场 NPZ、模型权重 .pt、fit/training.jsonl 逐行日志、preparation.json、system-predictions 与 predictions 数组。
+本目录 Git 回传（不含本清单自身）: 17 个文件 / 3332649 字节（程序原件紧凑副本或 .gz，未替换任何执行输入）

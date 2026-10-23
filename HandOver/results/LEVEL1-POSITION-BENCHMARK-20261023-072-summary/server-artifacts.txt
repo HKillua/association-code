@@ -1,0 +1,24 @@
+# LEVEL1-POSITION-BENCHMARK-20261023-072-summary 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-POSITION-BENCHMARK-20261023-072-summary-attempt-1  总计 1.6M
+  report.md  1338 字节  mtime=2026-10-23 17:41:57
+  run.json  411 字节  mtime=2026-10-23 17:41:57
+  scene-summary.json.gz  1230560 字节  mtime=2026-10-23 17:41:56
+  summary.json.gz  348047 字节  mtime=2026-10-23 17:41:57
+
+launcher: /home/wangguangjie/djs/association-code/runs/LEVEL1-POSITION-BENCHMARK-20261023-072-summary-attempt-1-launch
+  exit_code.txt  2 字节
+  launch.json  1351 字节
+  launch.stderr.log  43 字节
+  launch.stdout.log  0 字节
+  request.json  1767 字节
+  status.json  528 字节
+  stderr.log  0 字节
+  stdout.log  113 字节
+  worker.pid  8 字节
+  worker.stderr.log  0 字节
+  worker.stdout.log  0 字节
+
+执行checkout: association-code-run072A HEAD=258bb260fa9fddd16fe5cccd692935588e5147e4（detach 于交接冻结代码 258bb26，只读，三个 checkout 同一 SHA）
+未回传：逐场 NPZ、模型权重 .pt、fit/training.jsonl 逐行日志、preparation.json、system-predictions 与 predictions 数组。
+本目录 Git 回传（不含本清单自身）: 16 个文件 / 1585592 字节（程序原件紧凑副本或 .gz，未替换任何执行输入）
