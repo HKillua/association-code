@@ -1,0 +1,244 @@
+{
+ "registered_at_utc": "2026-10-23T22:38:55.215348Z",
+ "note": "078A 原件保留服务器：checkpoint（step-0/final.pt）、training.jsonl、preparation.json 与两端点逐场 NPZ 未入Git。endpoint-comparison.json 原件为未压缩JSON，Git内以gzip副本回传且gunzip逐字节相同（sha256见下）。comparison的.gz为逐字节复制，未再压缩。",
+ "endpoint_comparison_original_sha256": "e1dd6e97f2babf4111b161c3a42bdff1983370d592519bf082ca8428e84f83dc",
+ "gunzip_equals_original": true,
+ "server_originals": [
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/run.json",
+   "bytes": 1584,
+   "mtime_utc": "2026-10-23T22:31:40.774673Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/summary.json",
+   "bytes": 3430,
+   "mtime_utc": "2026-10-23T22:31:40.774673Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/execution.json",
+   "bytes": 2004,
+   "mtime_utc": "2026-10-23T22:31:40.774673Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/endpoint-comparison.json",
+   "bytes": 4163137,
+   "mtime_utc": "2026-10-23T22:31:40.762673Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/fit/final.pt",
+   "bytes": 1332226,
+   "note": "权重留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/fit/step-0.pt",
+   "bytes": 447810,
+   "note": "权重留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/fit/training.jsonl",
+   "bytes": 11894126,
+   "note": "逐更新日志留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/preparation.json",
+   "bytes": 622925339,
+   "mtime_utc": "2026-10-23T21:54:27.019419Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/run.json",
+   "bytes": 5226,
+   "mtime_utc": "2026-10-23T22:24:17.007910Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/summary.json",
+   "bytes": 4856418,
+   "mtime_utc": "2026-10-23T22:24:16.987910Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/scene-summary.json.gz",
+   "bytes": 756899,
+   "mtime_utc": "2026-10-23T22:24:04.451823Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/helper-population.json.gz",
+   "bytes": 183170,
+   "mtime_utc": "2026-10-23T22:24:16.223905Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/predictions",
+   "bytes": 195920455,
+   "files": 300,
+   "note": "逐场数组留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/system-predictions",
+   "bytes": 279150575,
+   "files": 300,
+   "note": "逐场数组留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/initial/scenes",
+   "bytes": 938156,
+   "files": 300,
+   "note": "逐场数组留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/run.json",
+   "bytes": 5231,
+   "mtime_utc": "2026-10-23T22:30:58.479141Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/summary.json",
+   "bytes": 4893711,
+   "mtime_utc": "2026-10-23T22:30:58.455142Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/scene-summary.json.gz",
+   "bytes": 903202,
+   "mtime_utc": "2026-10-23T22:30:45.659293Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/helper-population.json.gz",
+   "bytes": 230421,
+   "mtime_utc": "2026-10-23T22:30:57.579152Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/predictions",
+   "bytes": 202181609,
+   "files": 300,
+   "note": "逐场数组留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/system-predictions",
+   "bytes": 279149674,
+   "files": 300,
+   "note": "逐场数组留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1/final/scenes",
+   "bytes": 1087002,
+   "files": 300,
+   "note": "逐场数组留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison/run.json",
+   "bytes": 351,
+   "mtime_utc": "2026-10-23T22:36:32.012536Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison/report.md",
+   "bytes": 804,
+   "mtime_utc": "2026-10-23T22:36:32.012536Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison/summary.json.gz",
+   "bytes": 272407,
+   "mtime_utc": "2026-10-23T22:36:28.892551Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison/scene-summary.json.gz",
+   "bytes": 1695137,
+   "mtime_utc": "2026-10-23T22:36:32.012536Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-launch/status.json",
+   "bytes": 527,
+   "mtime_utc": "2026-10-23T22:31:42.470655Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-23T22:31:42.470655Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-launch/request.json",
+   "bytes": 1704,
+   "mtime_utc": "2026-10-23T21:24:57.415455Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-launch/launch.json",
+   "bytes": 1321,
+   "mtime_utc": "2026-10-23T21:24:57.559454Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison-launch/status.json",
+   "bytes": 528,
+   "mtime_utc": "2026-10-23T22:36:32.460534Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-23T22:36:32.460534Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison-launch/request.json",
+   "bytes": 1034,
+   "mtime_utc": "2026-10-23T22:33:16.801778Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-SEQUENCE-20261024-078A-attempt-1-comparison-launch/launch.json",
+   "bytes": 1354,
+   "mtime_utc": "2026-10-23T22:33:16.877777Z"
+  }
+ ],
+ "server_originals_total_bytes": 1613006576,
+ "git_returned": [
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/endpoint-comparison.json.gz",
+   "bytes": 444034,
+   "mtime_utc": "2026-10-23T22:38:55.143998Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/execution.json",
+   "bytes": 2004,
+   "mtime_utc": "2026-10-23T22:38:54.823999Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/report.md",
+   "bytes": 804,
+   "mtime_utc": "2026-10-23T22:38:55.171998Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/run.json",
+   "bytes": 351,
+   "mtime_utc": "2026-10-23T22:38:55.171998Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/scene-summary.json.gz",
+   "bytes": 1695137,
+   "mtime_utc": "2026-10-23T22:38:55.175998Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/summary.json",
+   "bytes": 3430,
+   "mtime_utc": "2026-10-23T22:38:54.823999Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/summary.json.gz",
+   "bytes": 272407,
+   "mtime_utc": "2026-10-23T22:38:55.171998Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/initial/run.json",
+   "bytes": 5226,
+   "mtime_utc": "2026-10-23T22:38:54.823999Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/fit/run.json",
+   "bytes": 661857,
+   "mtime_utc": "2026-10-23T22:38:54.823999Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/fit/training-windows.json",
+   "bytes": 14296,
+   "mtime_utc": "2026-10-23T22:38:54.823999Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-SEQUENCE-20261024-078A/final/run.json",
+   "bytes": 5231,
+   "mtime_utc": "2026-10-23T22:38:54.823999Z"
+  }
+ ],
+ "git_returned_total_bytes": 3104777,
+ "git_returned_file_count": 11
+}
