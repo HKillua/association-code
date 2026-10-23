@@ -1,0 +1,624 @@
+{
+  "scope": "Summary/scene/component reaggregation only; raw server NPZ not independently replayed.",
+  "comparisons": {
+    "074C": {
+      "position": {
+        "mae": {
+          "current": 1609.060118019752,
+          "control": 1845.3842969291773,
+          "scenes": {
+            "better": 245,
+            "worse": 55,
+            "tie": 0
+          },
+          "components": {
+            "better": 30,
+            "worse": 8,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 3778.407188217133,
+          "control": 6559.955864203137,
+          "scenes": {
+            "better": 221,
+            "worse": 79,
+            "tie": 0
+          },
+          "components": {
+            "better": 25,
+            "worse": 13,
+            "tie": 0
+          }
+        }
+      },
+      "speed": {
+        "mae": {
+          "current": 1.4424308795740575,
+          "control": 1.4609045948941977,
+          "scenes": {
+            "better": 152,
+            "worse": 148,
+            "tie": 0
+          },
+          "components": {
+            "better": 21,
+            "worse": 17,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 1.9524004336081968,
+          "control": 2.0488039456534652,
+          "scenes": {
+            "better": 163,
+            "worse": 137,
+            "tie": 0
+          },
+          "components": {
+            "better": 25,
+            "worse": 13,
+            "tie": 0
+          }
+        }
+      },
+      "heading": {
+        "mae": {
+          "current": 60.780845066388935,
+          "control": 61.50502696591376,
+          "scenes": {
+            "better": 185,
+            "worse": 115,
+            "tie": 0
+          },
+          "components": {
+            "better": 19,
+            "worse": 19,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 78.09771838661986,
+          "control": 78.57747277800298,
+          "scenes": {
+            "better": 180,
+            "worse": 120,
+            "tie": 0
+          },
+          "components": {
+            "better": 22,
+            "worse": 16,
+            "tie": 0
+          }
+        }
+      }
+    },
+    "072C": {
+      "position": {
+        "mae": {
+          "current": 1609.060118019752,
+          "control": 590.7435832803362,
+          "scenes": {
+            "better": 0,
+            "worse": 300,
+            "tie": 0
+          },
+          "components": {
+            "better": 0,
+            "worse": 38,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 3778.407188217133,
+          "control": 3289.214443910104,
+          "scenes": {
+            "better": 16,
+            "worse": 284,
+            "tie": 0
+          },
+          "components": {
+            "better": 3,
+            "worse": 35,
+            "tie": 0
+          }
+        }
+      },
+      "speed": {
+        "mae": {
+          "current": 1.4424308795740575,
+          "control": 53.85100816606454,
+          "scenes": {
+            "better": 300,
+            "worse": 0,
+            "tie": 0
+          },
+          "components": {
+            "better": 38,
+            "worse": 0,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 1.9524004336081968,
+          "control": 195.08047366622097,
+          "scenes": {
+            "better": 300,
+            "worse": 0,
+            "tie": 0
+          },
+          "components": {
+            "better": 38,
+            "worse": 0,
+            "tie": 0
+          }
+        }
+      },
+      "heading": {
+        "mae": {
+          "current": 60.780845066388935,
+          "control": 75.93638207929187,
+          "scenes": {
+            "better": 286,
+            "worse": 14,
+            "tie": 0
+          },
+          "components": {
+            "better": 33,
+            "worse": 5,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 78.09771838661986,
+          "control": 91.71769192083656,
+          "scenes": {
+            "better": 285,
+            "worse": 15,
+            "tie": 0
+          },
+          "components": {
+            "better": 33,
+            "worse": 5,
+            "tie": 0
+          }
+        }
+      }
+    },
+    "initial_endpoint": {
+      "position": {
+        "mae": {
+          "current": 1609.060118019752,
+          "control": 721.1744818949835,
+          "scenes": {
+            "better": 0,
+            "worse": 300,
+            "tie": 0
+          },
+          "components": {
+            "better": 0,
+            "worse": 38,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 3778.407188217133,
+          "control": 3326.2426785266703,
+          "scenes": {
+            "better": 19,
+            "worse": 281,
+            "tie": 0
+          },
+          "components": {
+            "better": 2,
+            "worse": 36,
+            "tie": 0
+          }
+        }
+      },
+      "speed": {
+        "mae": {
+          "current": 1.4424308795740575,
+          "control": 98.91717395778177,
+          "scenes": {
+            "better": 300,
+            "worse": 0,
+            "tie": 0
+          },
+          "components": {
+            "better": 38,
+            "worse": 0,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 1.9524004336081968,
+          "control": 101.47104919111621,
+          "scenes": {
+            "better": 300,
+            "worse": 0,
+            "tie": 0
+          },
+          "components": {
+            "better": 38,
+            "worse": 0,
+            "tie": 0
+          }
+        }
+      },
+      "heading": {
+        "mae": {
+          "current": 60.780845066388935,
+          "control": 83.98238248792514,
+          "scenes": {
+            "better": 284,
+            "worse": 16,
+            "tie": 0
+          },
+          "components": {
+            "better": 36,
+            "worse": 2,
+            "tie": 0
+          }
+        },
+        "rmse": {
+          "current": 78.09771838661986,
+          "control": 98.96352750195075,
+          "scenes": {
+            "better": 279,
+            "worse": 21,
+            "tie": 0
+          },
+          "components": {
+            "better": 36,
+            "worse": 2,
+            "tie": 0
+          }
+        }
+      },
+      "description": "Only position equals fixed prior .95. Speed/heading are untrained PTFM outputs, identical to old 074C initial; do not interpret these as ordinary physical controls."
+    }
+  },
+  "support_vs_prior": {
+    "anchor_inside_support": {
+      "n": 322953,
+      "current_mae": 1098.6787037165652,
+      "prior_mae": 249.08026800561868,
+      "delta_mae": 849.5984357109465,
+      "net_sae_increase": 274380363.60815734,
+      "net_sae_share": 0.6987396524936561,
+      "global_mae_increase": 620.4009008399015,
+      "delta_mse": 994013.040901266
+    },
+    "anchor_outside_helper_supported": {
+      "n": 90769,
+      "current_mae": 2651.854551972111,
+      "prior_mae": 1674.211364639708,
+      "delta_mae": 977.6431873324029,
+      "net_sae_increase": 88739694.47097488,
+      "net_sae_share": 0.2259853528206301,
+      "global_mae_increase": 200.6491487440163,
+      "delta_mse": 10323911.563412873
+    },
+    "predicted_group_no_support": {
+      "n": 28541,
+      "current_mae": 4067.831741929863,
+      "prior_mae": 3032.167013633785,
+      "delta_mae": 1035.664728296078,
+      "net_sae_increase": 29558907.010298364,
+      "net_sae_share": 0.07527499468571348,
+      "global_mae_increase": 66.83558654081025,
+      "delta_mse": 5698687.1113542095
+    }
+  },
+  "population": {
+    "target_identity_count": 9100,
+    "predicted_group_count": 9353,
+    "duplicate_prediction_group_count": 610,
+    "anchor_matched_target_count": 8743,
+    "reference_unavailable_target_count": 1
+  },
+  "checks_passed": 2974,
+  "all_attributes_current": {
+    "position": {
+      "ptfm_adapted": {
+        "unit_count": 442263,
+        "mae": 1609.060118019752,
+        "mse": 14276360.8799709,
+        "rmse": 3778.407188217133,
+        "point_count": 442263,
+        "p95": 4006.63981949095,
+        "p99": 9402.11911294858
+      },
+      "ptfm_control": {
+        "unit_count": 442263,
+        "mae": 1845.3842969291773,
+        "mse": 43033020.940293126,
+        "rmse": 6559.955864203137,
+        "point_count": 442263,
+        "p95": 4314.238247555654,
+        "p99": 10674.032433617764
+      }
+    },
+    "speed": {
+      "ptfm_adapted": {
+        "unit_count": 442476,
+        "mae": 1.4424308795740575,
+        "mse": 3.8118674531534746,
+        "rmse": 1.9524004336081968,
+        "point_count": 442476,
+        "p95": 3.6834768871693706,
+        "p99": 5.343175240684339
+      },
+      "ptfm_control": {
+        "unit_count": 442476,
+        "mae": 1.4609045948941977,
+        "mse": 4.197597607725207,
+        "rmse": 2.0488039456534652,
+        "point_count": 442476,
+        "p95": 3.777299221155113,
+        "p99": 5.6862486585172425
+      }
+    },
+    "heading": {
+      "ptfm_adapted": {
+        "unit_count": 442000,
+        "mae": 60.780845066388935,
+        "mse": 6099.253617195782,
+        "rmse": 78.09771838661986,
+        "point_count": 442000,
+        "p95": 160.01888821721943,
+        "p99": 176.097685417719
+      },
+      "ptfm_control": {
+        "unit_count": 442000,
+        "mae": 61.50502696591376,
+        "mse": 6174.4192281778,
+        "rmse": 78.57747277800298,
+        "point_count": 442000,
+        "p95": 160.24806749192476,
+        "p99": 175.95619806991235
+      }
+    }
+  },
+  "global_metrics": {
+    "fixed_prior095": {
+      "point_equal": {
+        "unit_count": 442263,
+        "mae": 721.1744818949835,
+        "mse": 11063890.356452279,
+        "rmse": 3326.2426785266703,
+        "point_count": 442263,
+        "p95": 2774.378869294392,
+        "p99": 8060.926321783925
+      },
+      "scene_target_equal": {
+        "unit_count": 8742,
+        "mae": 717.6225213519601,
+        "mse": 11065366.957714753,
+        "rmse": 3326.4646334682043
+      },
+      "scene_equal_point_mean": {
+        "unit_count": 300,
+        "mae": 841.1186597198725,
+        "mse": 19335771.051661313,
+        "rmse": 4397.245848444378
+      },
+      "scene_equal_target_mean": {
+        "unit_count": 300,
+        "mae": 814.594046403503,
+        "mse": 16710810.444821123,
+        "rmse": 4087.885816020443
+      }
+    },
+    "ptfm_adapted": {
+      "point_equal": {
+        "unit_count": 442263,
+        "mae": 1609.060118019752,
+        "mse": 14276360.8799709,
+        "rmse": 3778.407188217133,
+        "point_count": 442263,
+        "p95": 4006.63981949095,
+        "p99": 9402.11911294858
+      },
+      "scene_target_equal": {
+        "unit_count": 8742,
+        "mae": 1599.1211571510162,
+        "mse": 14260827.32669248,
+        "rmse": 3776.3510597788018
+      },
+      "scene_equal_point_mean": {
+        "unit_count": 300,
+        "mae": 1807.2242910074478,
+        "mse": 21653111.978238992,
+        "rmse": 4653.290446365775
+      },
+      "scene_equal_target_mean": {
+        "unit_count": 300,
+        "mae": 1770.5268537833347,
+        "mse": 19480455.416043464,
+        "rmse": 4413.66689001826
+      }
+    }
+  },
+  "endpoint": {
+    "position": {
+      "common_point_count": 442263,
+      "better_point_count": 37672,
+      "worse_point_count": 404591,
+      "tied_point_count": 0,
+      "improvement_sum": 34632677.19151516,
+      "harm_sum": 427311642.28094584,
+      "signed_error_change_sum": 392678965.0894307,
+      "mean_error_change": 887.8856361247282,
+      "positive_delta_tail": {
+        "point_count": 404591,
+        "p95": 2411.478003769792,
+        "p99": 4559.592581865549
+      }
+    },
+    "speed": {
+      "common_point_count": 442476,
+      "better_point_count": 442469,
+      "worse_point_count": 7,
+      "tied_point_count": 0,
+      "improvement_sum": 43130273.63250373,
+      "harm_sum": 39.21422869020142,
+      "signed_error_change_sum": -43130234.41827503,
+      "mean_error_change": -97.47474307821221,
+      "positive_delta_tail": {
+        "point_count": 7,
+        "p95": 12.63703032685465,
+        "p99": 13.920417214116787
+      }
+    },
+    "heading": {
+      "common_point_count": 442000,
+      "better_point_count": 283815,
+      "worse_point_count": 158185,
+      "tied_point_count": 0,
+      "improvement_sum": 16518403.551862838,
+      "harm_sum": 6263324.011543362,
+      "signed_error_change_sum": -10255079.540319473,
+      "mean_error_change": -23.201537421537267,
+      "positive_delta_tail": {
+        "point_count": 158185,
+        "p95": 98.88963095268682,
+        "p99": 127.9079870411109
+      }
+    }
+  },
+  "support_vs_prior_point_deltas": {
+    "all": {
+      "common_point_count": 442263,
+      "better_point_count": 37672,
+      "worse_point_count": 404591,
+      "tied_point_count": 0,
+      "improvement_sum": 34632677.19151516,
+      "harm_sum": 427311642.28094584,
+      "signed_error_change_sum": 392678965.0894307,
+      "mean_error_change": 887.8856361247282,
+      "positive_delta_tail": {
+        "point_count": 404591,
+        "p95": 2411.478003769792,
+        "p99": 4559.592581865549
+      }
+    },
+    "anchor_inside_support": {
+      "common_point_count": 322953,
+      "better_point_count": 4995,
+      "worse_point_count": 317958,
+      "tied_point_count": 0,
+      "improvement_sum": 1823664.7022234625,
+      "harm_sum": 276204028.3103832,
+      "signed_error_change_sum": 274380363.6081598,
+      "mean_error_change": 849.5984357109542,
+      "positive_delta_tail": {
+        "point_count": 317958,
+        "p95": 1604.5769272389377,
+        "p99": 2018.3761198012596
+      }
+    },
+    "anchor_outside_helper_supported": {
+      "common_point_count": 90769,
+      "better_point_count": 26808,
+      "worse_point_count": 63961,
+      "tied_point_count": 0,
+      "improvement_sum": 28414353.81738901,
+      "harm_sum": 117154048.28836215,
+      "signed_error_change_sum": 88739694.47097312,
+      "mean_error_change": 977.6431873323835,
+      "positive_delta_tail": {
+        "point_count": 63961,
+        "p95": 4802.630475727478,
+        "p99": 9173.3075725461
+      }
+    },
+    "predicted_group_no_support": {
+      "common_point_count": 28541,
+      "better_point_count": 5869,
+      "worse_point_count": 22672,
+      "tied_point_count": 0,
+      "improvement_sum": 4394658.671902686,
+      "harm_sum": 33953565.682200484,
+      "signed_error_change_sum": 29558907.010297798,
+      "mean_error_change": 1035.6647282960582,
+      "positive_delta_tail": {
+        "point_count": 22672,
+        "p95": 3655.989917993233,
+        "p99": 5008.984410887958
+      }
+    }
+  },
+  "partial_reaggregation_limits": "P95/P99 quoted from committed pooled summary, not recalculated from per-scene quantiles.",
+  "sensitivity_excluding_scene_3035": {
+    "074C": {
+      "current": {
+        "point_count": 438649,
+        "mae": 1595.14572287239,
+        "rmse": 3335.3783145299553
+      },
+      "control": {
+        "point_count": 438649,
+        "mae": 1784.8219699167214,
+        "rmse": 3196.9960179289287
+      },
+      "scene3035_share_of_net_sse_difference": 1.0311781031912692,
+      "scene3035_share_of_net_sae_difference": 0.2039482040369113
+    },
+    "072C": {
+      "current": {
+        "point_count": 438649,
+        "mae": 1595.14572287239,
+        "rmse": 3335.3783145299553
+      },
+      "control": {
+        "point_count": 438649,
+        "mae": 583.008252049,
+        "rmse": 2928.50995004315
+      },
+      "scene3035_share_of_net_sse_difference": 0.26889262791588453,
+      "scene3035_share_of_net_sae_difference": 0.014189944262687023
+    },
+    "prior095": {
+      "current": {
+        "point_count": 438649,
+        "mae": 1595.14572287239,
+        "rmse": 3335.3783145299553
+      },
+      "control": {
+        "point_count": 438649,
+        "mae": 714.3550375283301,
+        "rmse": 2987.07827500035
+      },
+      "scene3035_share_of_net_sse_difference": 0.32011295719014765,
+      "scene3035_share_of_net_sae_difference": 0.01609714885675678
+    }
+  },
+  "interpretation_corrections": [
+    "V mean Haversine distance cannot determine T standardized coordinate MSE; first-100-update averaged loss does not establish first-update baseline or continuous departure. No conclusion that position standardized MSE is intrinsically insensitive to meter error is supported.",
+    "076B beats 074C pooled position metrics but all 300 scenes and 38 components have worse MAE than its own fixed physical position initial state; retain the preregistered stop condition.",
+    "076B speed MAE gain over 074C occurs in only 152/300 scenes; heading MAE gains in 185/300 scenes but 19/38 components. Not uniformly improved all-attribute recovery.",
+    "076B vs 072C speed and heading compares learned PTFM outputs with unchanged Mean control attributes, not a Transformer trained for speed or heading.",
+    "076A within-target speed dynamics findings belong to 074C weights; cannot inherit them as an actual measured 076B dynamics result.",
+    "Scene3035 contributes 103.12 percent of pooled SSE gain versus 074C; excluding it reverses RMSE ordering, with MAE gain retained. This is sensitivity analysis only, not a replacement ranking or justification to discard difficult targets."
+  ],
+  "sources": [
+    "initial-ptfm-comparison.json.gz",
+    "ptfm-comparison.json.gz",
+    "transformer-comparison.json.gz",
+    "initial-summary.json.gz",
+    "final-summary.json.gz",
+    "endpoint-comparison.json"
+  ],
+  "recomputation": "For each comparison, sum n*MAE and n*MSE across scenes for each stratum/attribute/arm and assert pooled equality; independently aggregate four position weightings by their unit_count; sum population counters; reconstruct component all-attribute moments from member scenes. Global percentiles are quoted, not reconstructed.",
+  "source_commit": "50796bd",
+  "execution_verdict": "accepted completed experiment",
+  "research_verdict": "negative; do not promote or extend unchanged recipe",
+  "code_checks": {
+    "command": ".venv/bin/python -m unittest tests.test_ptfm_residual tests.test_ptfm_residual_fit",
+    "tests": 9,
+    "result": "PASS",
+    "scope": "synthetic contracts; not server array replay"
+  }
+}
