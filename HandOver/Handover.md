@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-10-24，本地已同步`2f4f885`。**078A/B/C及080全部COMPLETED并通过执行/聚合审查，新081A/B、082发布LOCAL_TO_SERVER / READY，冻结实施`d46f7e8`，573项测试及独立审查通过，尚无新领取回执。** 原linear仍为位置底座；078C仅保留相对初值伤害下降的灰区信号，没有晋级。TSA输入对齐为一次有依据的有限修复，不是080已锁定根因。详见[078/080审查](../docs/research_status.md#078080完成复核与081082决定2026-10-24)。
+2026-10-24，本地已同步`2f4f885`。**078A/B/C及080全部COMPLETED并通过执行/聚合审查，新081A/B、082发布LOCAL_TO_SERVER / READY，冻结实施`d46f7e8`，573项测试及独立审查通过，尚无新领取回执。** 原linear仍为位置底座；078C仅保留相对初值伤害下降的灰区信号，没有晋级。TSA输入对齐为一次有依据的有限修复，不是080已锁定根因。详见[078/080审查](../docs/research_status.md#078080完成复核与081082决定2026-10-24)。**服务器补登（23:33:53Z）：081A／081B／082 已各自按冻结原块领取一次，三个不同 GPU UUID（index0／1／2），均 RUNNING、零重试；第2／3块（每臂 CPU 比较与双臂整表）按既定前置条件待续。上句 READY 为本地发布时状态，现以上方三行与回执为准。T_test 封存，066 保持 REJECTED。**
 
 | 当前任务 | 状态 | 范围 |
 |---|---|---|
-|[081A pre_pool复验](L2S-20261024-081.md)|LOCAL_TO_SERVER / READY|单GPU/CPU4，seed20261021、fresh4000，参考073C；CPU完整V300及比较 |
-|[081B weighted_pool复验](L2S-20261024-081.md)|LOCAL_TO_SERVER / READY|与081A同配置/实际曝光，仅latent权重不同；不补078A |
-|[082 TSA训练视图对齐](L2S-20261024-082.md)|LOCAL_TO_SERVER / READY|单GPU/CPU4、1000调用；原采样及crop计划保留，只改实际输入为full native128；完整系统及074D/056共同点 |
+|[081A pre_pool复验](L2S-20261024-081.md)|**SERVER_TO_LOCAL / RUNNING**，23:33:23Z按原块领取（`d46f7e8`、`mtad-30a52c2cc966`、PID3832392、`GPU-c5a00c37…`index0快照24,247MiB／0%；`--profile replica081`、对照073C；配置19键相对078B只差`training.seed→20261021`；块SHA `143e5074…`前后相同），见[回执](S2L-20261024-081A.md)|单GPU/CPU4，seed20261021、fresh4000，参考073C；CPU完整V300及比较 |
+|[081B weighted_pool复验](L2S-20261024-081.md)|**SERVER_TO_LOCAL / RUNNING**，23:33:38Z按原块领取（`mtad-ddb8ad527abc`、PID3832465、`GPU-6811d9c0…`index1快照24,247MiB／0%；相对081A仅`model.aggregation`不同、相对078C仅seed不同），见[回执](S2L-20261024-081B.md)|与081A同配置/实际曝光，仅latent权重不同；不补078A |
+|[082 TSA训练视图对齐](L2S-20261024-082.md)|**SERVER_TO_LOCAL / RUNNING**，23:33:53Z按原块领取（`mtad-6075f8e10a21`、PID3832543、`GPU-efbe9d07…`index2共卡1个他人进程未触碰）；074D的fit／JSONL／step0／final／pool-audit原件实核在位；配置21键相对074D只差`data.training_view=full_native`与`scope`，块SHA `46f4f423…`前后相同，6小时仅提醒），见[回执](S2L-20261024-082.md)|单GPU/CPU4、1000调用；原采样及crop计划保留，只改实际输入为full native128；完整系统及074D/056共同点 |
 
 三项各一次、失败保全不自动重试；用户已授权自主预算，无需再批准。准备阶段CPU/内存/IO错峰，按现场FIFO最多四单卡，不为第四卡添加新配置。081各4小时、082 6小时仅提醒；078实际约67—71分钟，旧074D约26分钟，仅供预计，新配置/共卡耗时未知。代码push不唤醒服务器，READY也不等于RUNNING；本地不SSH监控。
 
