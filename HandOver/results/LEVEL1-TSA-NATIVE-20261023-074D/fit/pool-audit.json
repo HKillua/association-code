@@ -1,0 +1,14 @@
+{
+  "scene_count": 2100,
+  "candidate_pair_count": 27632584,
+  "positive_pair_count": 155159,
+  "eligible_pair_counts": {
+    "ITSA": 51224,
+    "MSTSA": 85088
+  },
+  "eligible_identity_counts": {
+    "ITSA": 22437,
+    "MSTSA": 24402
+  },
+  "sampling": "uniform global A-B identities without replacement, then uniform eligible pair"
+}

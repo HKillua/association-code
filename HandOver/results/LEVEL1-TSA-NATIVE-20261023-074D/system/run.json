@@ -1,0 +1,20 @@
+{
+  "status": "COMPLETED",
+  "scope": "074D-tsa-full-system",
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "test_opened": false,
+  "threshold_reselected": false,
+  "completed_scenes": 300,
+  "total_scenes": 300,
+  "method_names": [
+    "ols_anchor",
+    "ols_mean_supported",
+    "ols_attribute_hybrid",
+    "tsa_anchor",
+    "tsa_mean_supported",
+    "tsa_attribute_hybrid"
+  ],
+  "elapsed_seconds": 406.40923456894234
+}

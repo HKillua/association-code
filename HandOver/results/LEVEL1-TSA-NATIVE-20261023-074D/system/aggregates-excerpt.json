@@ -1,0 +1,396 @@
+{
+ "derived_by": "SERVER_AI excerpt; full per-scene and per-component detail is inside system/summary.json.gz",
+ "association": {
+  "ols": {},
+  "tsa": {},
+  "reference056": {}
+ },
+ "group_comembership": {
+  "ols": {
+   "scene_count": 300,
+   "pair_count": 4439092,
+   "macro_f1": 0.6701414363318533,
+   "positive_scene_macro_f1": 0.6701414363318533,
+   "positive_scene_count": 300,
+   "negative_scene_count": 0,
+   "negative_scene_false_acceptance_rate": null,
+   "micro_f1": 0.24269912838412736,
+   "micro_precision": 0.14538318297107267,
+   "micro_recall": 0.7340628166160081,
+   "tp": 18113,
+   "fp": 106475,
+   "fn": 6562,
+   "tn": 4307942,
+   "threshold": 0.5,
+   "paper_metrics": {
+    "eligible_scene_count": 300,
+    "m_pca": 0.7677543152763636,
+    "m_pfa": 0.3129870723437354,
+    "mw_pca": 0.7075782770874888,
+    "mw_pfa": 0.8546168170289273,
+    "defined_only_mean": {
+     "m_pca": 0.7677543152763636,
+     "m_pfa": 0.3129870723437354
+    },
+    "predicted_positive_count": 124588,
+    "definition": "eligible: pair_count > 0; m: equal scene weights; PCA=TP/(TP+FN), PFA=FP/(TP+FP); mw: weights TP+FP; any undefined positive-weight term makes the population metric null"
+   }
+  },
+  "tsa": {
+   "scene_count": 300,
+   "pair_count": 4439092,
+   "macro_f1": 0.3208924974268361,
+   "positive_scene_macro_f1": 0.3208924974268361,
+   "positive_scene_count": 300,
+   "negative_scene_count": 0,
+   "negative_scene_false_acceptance_rate": null,
+   "micro_f1": 0.04236660541439683,
+   "micro_precision": 0.022069646139550026,
+   "micro_recall": 0.5274569402228977,
+   "tp": 13015,
+   "fp": 576709,
+   "fn": 11660,
+   "tn": 3837708,
+   "threshold": 0.5,
+   "paper_metrics": {
+    "eligible_scene_count": 300,
+    "m_pca": 0.562490067600461,
+    "m_pfa": 0.7204766362463354,
+    "mw_pca": 0.5547223141638732,
+    "mw_pfa": 0.97793035386045,
+    "defined_only_mean": {
+     "m_pca": 0.562490067600461,
+     "m_pfa": 0.7204766362463354
+    },
+    "predicted_positive_count": 589724,
+    "definition": "eligible: pair_count > 0; m: equal scene weights; PCA=TP/(TP+FN), PFA=FP/(TP+FP); mw: weights TP+FP; any undefined positive-weight term makes the population metric null"
+   }
+  },
+  "reference056": {
+   "scene_count": 300,
+   "pair_count": 4439092,
+   "macro_f1": 0.7656567785944534,
+   "positive_scene_macro_f1": 0.7656567785944534,
+   "positive_scene_count": 300,
+   "negative_scene_count": 0,
+   "negative_scene_false_acceptance_rate": null,
+   "micro_f1": 0.4187760986955753,
+   "micro_precision": 0.31516665301777086,
+   "micro_recall": 0.62387031408308,
+   "tp": 15394,
+   "fp": 33450,
+   "fn": 9281,
+   "tn": 4380967,
+   "threshold": 0.5,
+   "paper_metrics": {
+    "eligible_scene_count": 300,
+    "m_pca": 0.7896392170398069,
+    "m_pfa": 0.23050025720355014,
+    "mw_pca": 0.5515341848980567,
+    "mw_pfa": 0.6848333469822291,
+    "defined_only_mean": {
+     "m_pca": 0.7896392170398069,
+     "m_pfa": 0.23050025720355014
+    },
+    "predicted_positive_count": 48844,
+    "definition": "eligible: pair_count > 0; m: equal scene weights; PCA=TP/(TP+FN), PFA=FP/(TP+FP); mw: weights TP+FP; any undefined positive-weight term makes the population metric null"
+   }
+  }
+ },
+ "comparisons_to_056_all_region": {
+  "anchor": {
+   "tsa": {
+    "available_target_count": 454952,
+    "available_prediction_count": 177152,
+    "intersection_count": 126631,
+    "missing_prediction_count": 328321,
+    "prediction_without_target_count": 50521,
+    "available_target_trajectory_count": 9099,
+    "covered_target_trajectory_count": 2767,
+    "missing_target_trajectory_count": 6332,
+    "mae": 1939.6348262697488,
+    "mse": 125736828.86396217,
+    "rmse": 11213.24345869482,
+    "coverage": 0.2783392533717843,
+    "trajectory_coverage": 0.3040993515770964,
+    "unit": "metres"
+   },
+   "reference056": {
+    "available_target_count": 454952,
+    "available_prediction_count": 177152,
+    "intersection_count": 126631,
+    "missing_prediction_count": 328321,
+    "prediction_without_target_count": 50521,
+    "available_target_trajectory_count": 9099,
+    "covered_target_trajectory_count": 2767,
+    "missing_target_trajectory_count": 6332,
+    "mae": 1205.7553075965666,
+    "mse": 121860345.43077862,
+    "rmse": 11039.037341669726,
+    "coverage": 0.2783392533717843,
+    "trajectory_coverage": 0.3040993515770964,
+    "unit": "metres"
+   }
+  },
+  "mean_supported": {
+   "tsa": {
+    "available_target_count": 454952,
+    "available_prediction_count": 177152,
+    "intersection_count": 126631,
+    "missing_prediction_count": 328321,
+    "prediction_without_target_count": 50521,
+    "available_target_trajectory_count": 9099,
+    "covered_target_trajectory_count": 2767,
+    "missing_target_trajectory_count": 6332,
+    "mae": 8178.881995418046,
+    "mse": 293565109.25720835,
+    "rmse": 17133.741834672554,
+    "coverage": 0.2783392533717843,
+    "trajectory_coverage": 0.3040993515770964,
+    "unit": "metres"
+   },
+   "reference056": {
+    "available_target_count": 454952,
+    "available_prediction_count": 177152,
+    "intersection_count": 126631,
+    "missing_prediction_count": 328321,
+    "prediction_without_target_count": 50521,
+    "available_target_trajectory_count": 9099,
+    "covered_target_trajectory_count": 2767,
+    "missing_target_trajectory_count": 6332,
+    "mae": 1499.81936441097,
+    "mse": 26357447.453946423,
+    "rmse": 5133.950472486701,
+    "coverage": 0.2783392533717843,
+    "trajectory_coverage": 0.3040993515770964,
+    "unit": "metres"
+   }
+  },
+  "attribute_hybrid": {
+   "tsa": {
+    "available_target_count": 454952,
+    "available_prediction_count": 177152,
+    "intersection_count": 126631,
+    "missing_prediction_count": 328321,
+    "prediction_without_target_count": 50521,
+    "available_target_trajectory_count": 9099,
+    "covered_target_trajectory_count": 2767,
+    "missing_target_trajectory_count": 6332,
+    "mae": 1939.6348262697488,
+    "mse": 125736828.86396217,
+    "rmse": 11213.24345869482,
+    "coverage": 0.2783392533717843,
+    "trajectory_coverage": 0.3040993515770964,
+    "unit": "metres"
+   },
+   "reference056": {
+    "available_target_count": 454952,
+    "available_prediction_count": 177152,
+    "intersection_count": 126631,
+    "missing_prediction_count": 328321,
+    "prediction_without_target_count": 50521,
+    "available_target_trajectory_count": 9099,
+    "covered_target_trajectory_count": 2767,
+    "missing_target_trajectory_count": 6332,
+    "mae": 1205.7553075965666,
+    "mse": 121860345.43077862,
+    "rmse": 11039.037341669726,
+    "coverage": 0.2783392533717843,
+    "trajectory_coverage": 0.3040993515770964,
+    "unit": "metres"
+   }
+  }
+ },
+ "fragment_all_region": {
+  "ols_anchor": {
+   "position": {
+    "intersection_count": 1231110,
+    "available_target_count": 1231110,
+    "coverage": 1.0,
+    "mae": 2162.872998432615,
+    "rmse": 5248.011177365463,
+    "scene_macro_mae": 2311.7915216172323,
+    "unit": "metres"
+   },
+   "speed": {
+    "intersection_count": 1231669,
+    "available_target_count": 1231669,
+    "coverage": 1.0,
+    "mae": 48.78051742800957,
+    "rmse": 201.6002878884632,
+    "scene_macro_mae": 54.63257997370044,
+    "unit": "native_speed"
+   },
+   "heading": {
+    "intersection_count": 1230396,
+    "available_target_count": 1230396,
+    "coverage": 1.0,
+    "mae": 78.1634901663544,
+    "rmse": 93.73443562330424,
+    "scene_macro_mae": 75.23062019524765,
+    "unit": "degrees"
+   }
+  },
+  "ols_mean_supported": {
+   "position": {
+    "intersection_count": 1231110,
+    "available_target_count": 1231110,
+    "coverage": 1.0,
+    "mae": 2460.821516670728,
+    "rmse": 5314.880797849358,
+    "scene_macro_mae": 2214.4273271851166,
+    "unit": "metres"
+   },
+   "speed": {
+    "intersection_count": 1231669,
+    "available_target_count": 1231669,
+    "coverage": 1.0,
+    "mae": 49.1857502187334,
+    "rmse": 199.09549340146205,
+    "scene_macro_mae": 55.182931120071736,
+    "unit": "native_speed"
+   },
+   "heading": {
+    "intersection_count": 1230396,
+    "available_target_count": 1230396,
+    "coverage": 1.0,
+    "mae": 70.77773199438008,
+    "rmse": 87.16409220794247,
+    "scene_macro_mae": 71.16444648251425,
+    "unit": "degrees"
+   }
+  },
+  "ols_attribute_hybrid": {
+   "position": {
+    "intersection_count": 1231110,
+    "available_target_count": 1231110,
+    "coverage": 1.0,
+    "mae": 2162.872998432615,
+    "rmse": 5248.011177365463,
+    "scene_macro_mae": 2311.7915216172323,
+    "unit": "metres"
+   },
+   "speed": {
+    "intersection_count": 1231669,
+    "available_target_count": 1231669,
+    "coverage": 1.0,
+    "mae": 49.1857502187334,
+    "rmse": 199.09549340146205,
+    "scene_macro_mae": 55.182931120071736,
+    "unit": "native_speed"
+   },
+   "heading": {
+    "intersection_count": 1230396,
+    "available_target_count": 1230396,
+    "coverage": 1.0,
+    "mae": 70.77773199438008,
+    "rmse": 87.16409220794247,
+    "scene_macro_mae": 71.16444648251425,
+    "unit": "degrees"
+   }
+  },
+  "tsa_anchor": {
+   "position": {
+    "intersection_count": 1231110,
+    "available_target_count": 1231110,
+    "coverage": 1.0,
+    "mae": 2162.872998432615,
+    "rmse": 5248.011177365463,
+    "scene_macro_mae": 2311.7915216172323,
+    "unit": "metres"
+   },
+   "speed": {
+    "intersection_count": 1231669,
+    "available_target_count": 1231669,
+    "coverage": 1.0,
+    "mae": 48.78051742800957,
+    "rmse": 201.6002878884632,
+    "scene_macro_mae": 54.63257997370044,
+    "unit": "native_speed"
+   },
+   "heading": {
+    "intersection_count": 1230396,
+    "available_target_count": 1230396,
+    "coverage": 1.0,
+    "mae": 78.1634901663544,
+    "rmse": 93.73443562330424,
+    "scene_macro_mae": 75.23062019524765,
+    "unit": "degrees"
+   }
+  },
+  "tsa_mean_supported": {
+   "position": {
+    "intersection_count": 1231110,
+    "available_target_count": 1231110,
+    "coverage": 1.0,
+    "mae": 13644.659375456238,
+    "rmse": 23048.521059709692,
+    "scene_macro_mae": 11945.6508383517,
+    "unit": "metres"
+   },
+   "speed": {
+    "intersection_count": 1231669,
+    "available_target_count": 1231669,
+    "coverage": 1.0,
+    "mae": 48.65833242090448,
+    "rmse": 134.31233143689477,
+    "scene_macro_mae": 55.68964657577881,
+    "unit": "native_speed"
+   },
+   "heading": {
+    "intersection_count": 1230396,
+    "available_target_count": 1230396,
+    "coverage": 1.0,
+    "mae": 76.82961586269845,
+    "rmse": 93.23030051898658,
+    "scene_macro_mae": 74.86779954406927,
+    "unit": "degrees"
+   }
+  },
+  "tsa_attribute_hybrid": {
+   "position": {
+    "intersection_count": 1231110,
+    "available_target_count": 1231110,
+    "coverage": 1.0,
+    "mae": 2162.872998432615,
+    "rmse": 5248.011177365463,
+    "scene_macro_mae": 2311.7915216172323,
+    "unit": "metres"
+   },
+   "speed": {
+    "intersection_count": 1231669,
+    "available_target_count": 1231669,
+    "coverage": 1.0,
+    "mae": 48.65833242090448,
+    "rmse": 134.31233143689477,
+    "scene_macro_mae": 55.68964657577881,
+    "unit": "native_speed"
+   },
+   "heading": {
+    "intersection_count": 1230396,
+    "available_target_count": 1230396,
+    "coverage": 1.0,
+    "mae": 76.82961586269845,
+    "rmse": 93.23030051898658,
+    "scene_macro_mae": 74.86779954406927,
+    "unit": "degrees"
+   }
+  }
+ },
+ "threshold": 0.7775184512138367,
+ "method_names": [
+  "ols_anchor",
+  "ols_mean_supported",
+  "ols_attribute_hybrid",
+  "tsa_anchor",
+  "tsa_mean_supported",
+  "tsa_attribute_hybrid"
+ ],
+ "limitations": [
+  "Offline native128 TSA adaptation; not author online assignment or convergence.",
+  "Full V threshold selection uses the same Macro-F1 rule as056; paper subsets retain that working point.",
+  "Different grouping can change coverage and first representative; conditional MAE is not a complete ranking.",
+  "Frozen056 physical inputs and reference population; references never enter scoring/grouping.",
+  "V is reused development data, not sealed test or unseen-identity evidence."
+ ]
+}

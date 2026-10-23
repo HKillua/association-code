@@ -1,0 +1,6 @@
+074D phase: bind056
+074D phase: stream_native_T2100_V300
+074D phase: fit_fixed1000
+074D phase: score_actual_final_on_cpu
+074D phase: ols_tsa_full_system
+COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1

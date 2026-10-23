@@ -1,0 +1,37 @@
+# LEVEL1-TSA-NATIVE-20261023-074D 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1  总计 737M
+  data_audit.json  1368096 字节  mtime=2026-10-24 00:47:47
+  execution.json  1517 字节  mtime=2026-10-24 00:59:53
+  final-endpoint.json  480333 字节  mtime=2026-10-24 00:52:56
+  run.json  1149 字节  mtime=2026-10-24 00:59:53
+  summary.json  412938 字节  mtime=2026-10-24 00:59:53
+  final-scores/  301 个文件 25M
+  fit/final.pt  5822318 字节  mtime=2026-10-24 00:51:04
+  fit/pool-audit.json  336 字节  mtime=2026-10-24 00:47:49
+  fit/run.json  4239485 字节  mtime=2026-10-24 00:51:04
+  fit/step-0.pt  1985066 字节  mtime=2026-10-24 00:47:58
+  fit/training-windows.json  1959 字节  mtime=2026-10-24 00:51:04
+  fit/training.jsonl  134173045 字节  mtime=2026-10-24 00:51:03
+  system/run.json  544 字节  mtime=2026-10-24 00:59:53
+  system/scene-summary.json.gz  13491306 字节  mtime=2026-10-24 00:59:53
+  system/summary.json  14946610 字节  mtime=2026-10-24 00:59:13
+  system/predictions/  300 个文件 233M
+  system/system-predictions/  300 个文件 311M
+
+launcher: /home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1-launch
+  exit_code.txt  2 字节
+  launch.json  1306 字节
+  launch.stderr.log  43 字节
+  launch.stdout.log  0 字节
+  request.json  1440 字节
+  status.json  528 字节
+  stderr.log  0 字节
+  stdout.log  251 字节
+  worker.pid  8 字节
+  worker.stderr.log  0 字节
+  worker.stdout.log  0 字节
+
+执行checkout: /home/wangguangjie/djs/association-code-run074D HEAD=ecac88e09cedb969b1e746dbab6ee2e6510b0ee5（detach 于交接冻结代码 ecac88e，只读）
+未回传：fit/training.jsonl 逐行曝光日志（134,173,045 字节）、step-0.pt／final.pt、final-scores 的 300 个逐场 NPZ、system/predictions 与 system-predictions 数组、4.2 MB 的 fit/run.json 原件（已给标注来源的紧凑摘录）。
+本目录 Git 回传（不含本清单自身）: 26 个文件 / 1563261 字节
