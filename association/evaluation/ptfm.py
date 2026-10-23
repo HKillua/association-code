@@ -21,11 +21,12 @@ REGIONS=('all','anchor_inside_support','anchor_outside_helper_supported','predic
 
 
 def _predict(model,motion,groups,base,check):
-    output=base.copy();weights=[];presence=[];local=[];origins=[]
+    output=base.copy();weights=[];presence=[];local=[];origins=[];bases=[];residuals=[]
+    residual_mode=getattr(model,'position_mode','direct')=='prior095_residual'
     with torch.inference_mode():
         for group in groups:
             if check:check()
-            args=ptfm_inputs(motion,group,device='cpu');result=model(*args);states=result['states']
+            args=ptfm_inputs(motion,group,device='cpu',**({'include_prior':True} if residual_mode else {}));result=model(*args);states=result['states']
             if (states.shape!=args[0].shape or states.dtype!=torch.float64 or states.device.type!='cpu'
                     or not torch.isfinite(states).all()):raise ValueError('PTFM all states must be finite CPU physical4')
             w=result['task_weights']
@@ -33,10 +34,18 @@ def _predict(model,motion,groups,base,check):
                     or not torch.allclose(w.sum(-1),torch.ones(len(states),dtype=w.dtype),atol=1e-6,rtol=0)):
                 raise ValueError('PTFM task weights must be finite probabilities, not helper weights')
             _same(result['helper_present'].numpy(),args[2][:,0].bool().numpy(),'PTFM visible helper mask')
-            _same(states.numpy(),native_states(result['local_states'],args[3]).numpy(),'PTFM physical inverse')
+            extra={}
+            if residual_mode:
+                extra=dict(position_base=result['base_states'],position_residual_deg=result['position_residual_deg'])
+                _same(result['base_states'].numpy(),args[4].numpy(),'PTFM physical prior input')
+                if result['position_residual_deg'].shape!=(len(states),2) or not torch.isfinite(result['position_residual_deg']).all():
+                    raise ValueError('PTFM position residual must be finite Qx2 native degree')
+                bases.append(result['base_states'].numpy());residuals.append(result['position_residual_deg'].numpy())
+            _same(states.numpy(),native_states(result['local_states'],args[3],**extra).numpy(),'PTFM physical inverse')
             output[group[0]]=states.numpy();weights.append(w.numpy());presence.append(result['helper_present'].numpy())
             local.append(result['local_states'].numpy());origins.append(args[3].numpy())
-    return output,np.asarray(weights),np.asarray(presence),np.asarray(local),np.asarray(origins)
+    extra=dict(group_base_states=np.asarray(bases),group_position_residual_deg=np.asarray(residuals)) if residual_mode else {}
+    return output,np.asarray(weights),np.asarray(presence),np.asarray(local),np.asarray(origins),extra
 
 
 def _weighted(arrays,methods=METHODS):
@@ -89,8 +98,9 @@ def evaluate_ptfm(model,validation_raw,source056,metadata,output,check=None,*,in
     ids=[str(s['scene_id']) for s in validation_raw]
     if not ids or ids!=metadata['scene_ids'] or len(set(ids))!=len(ids) or set(metadata['component_ids'])!=set(ids):
         raise ValueError('PTFM complete V population/order/components required')
+    residual_mode=getattr(model,'position_mode','direct')=='prior095_residual'
     output.mkdir(parents=True,exist_ok=False);started=time.monotonic()
-    state=dict(status='RUNNING',scope='074C-ptfm-evaluation',device='cpu',initial=initial,
+    state=dict(status='RUNNING',scope='076B-ptfm-residual-evaluation' if residual_mode else '074C-ptfm-evaluation',device='cpu',initial=initial,
         source_system=str(source056),scene_ids=ids,total_scenes=len(ids),completed_scenes=0,test_opened=False,
         groups_recomputed=False,scores_recomputed=False,threshold_reselected=False,model_forwards=0,optimizer_updates=0)
     write_json(output/'run.json',state)
@@ -106,7 +116,13 @@ def evaluate_ptfm(model,validation_raw,source056,metadata,output,check=None,*,in
             predictions={arm:fragment['learned_assoc_'+arm] for arm in ARMS}
             predictions['support_switch'],switch=support_switch_prediction(predictions['anchor'],predictions['mean_supported'],fragment['support'],groups)
             predictions['fixed_prior095']=_prior(predictions['anchor'],predictions['mean_supported'],switch)
-            predictions['ptfm_adapted'],weights,present,local,origins=_predict(model,scene['motion'],groups,predictions['anchor'],check)
+            predictions['ptfm_adapted'],weights,present,local,origins,extra=_predict(model,scene['motion'],groups,predictions['anchor'],check)
+            if residual_mode:
+                anchors=np.asarray([g[0] for g in groups],np.int64)
+                _same(extra['group_base_states'][...,:2],predictions['fixed_prior095'][anchors,...,:2],'PTFM fixed prior095 position')
+                if initial:
+                    _same(extra['group_position_residual_deg'],np.zeros_like(extra['group_position_residual_deg']),'PTFM initial zero residual')
+                    _same(predictions['ptfm_adapted'][anchors,...,:2],predictions['fixed_prior095'][anchors,...,:2],'PTFM initial exact physical position')
             reports,artifacts=evaluate_unique_population(scene,{'learned_assoc':groups},{'learned_assoc':predictions})
             artifacts={k.removeprefix('learned_assoc_'):v for k,v in artifacts.items()};base=artifacts['anchor']
             for method,artifact in artifacts.items():
@@ -142,7 +158,7 @@ def evaluate_ptfm(model,validation_raw,source056,metadata,output,check=None,*,in
             payload={k:fragment[k] for k in ('node_ids','identities','target_identity_ids','native_states','support','nearest_seconds',
                 'exact_observation','query_seconds','learned_assoc_group_offsets','learned_assoc_group_node_indices')}
             payload.update(group_anchor_node_indices=anchors,group_helper_present=present,group_task_weights=weights,group_local_states=local,group_origins=origins,
-                **{m+'_group_states':a['group_states'] for m,a in artifacts.items()},**data)
+                **{m+'_group_states':a['group_states'] for m,a in artifacts.items()},**data,**extra)
             np.savez_compressed(output/'predictions'/f'states-{sid}.npz',**payload)
             np.savez_compressed(output/'system-predictions'/f'states-{sid}.npz',**{m+'_'+k:v for m,a in artifacts.items() for k,v in a.items()})
             rows.append(row);arrays.append(data);state.update(completed_scenes=len(rows),model_forwards=state['model_forwards']+len(groups),elapsed_seconds=time.monotonic()-started)
@@ -155,13 +171,15 @@ def evaluate_ptfm(model,validation_raw,source056,metadata,output,check=None,*,in
             idx=[i for i,r in enumerate(rows) if r['component_id']==c];components[c]=_pool([rows[i] for i in idx],[arrays[i] for i in idx])
         largest=min(components,key=lambda c:(-components[c]['position_weightings']['all']['anchor']['point_equal']['unit_count'],c))
         rest=[i for i,r in enumerate(rows) if r['component_id']!=largest]
-        result.update(status='COMPLETED',device='cpu',source_system=str(source056),method_names=list(METHODS),initial=initial,
+        result.update(scope=state['scope'],status='COMPLETED',device='cpu',source_system=str(source056),method_names=list(METHODS),initial=initial,
             components=components,component_count=len(components),largest_component_id=largest,
             remaining_components=_pool([rows[i] for i in rest],[arrays[i] for i in rest]) if rest else None,
             test_opened=False,optimizer_updates=0,groups_recomputed=False,scores_recomputed=False,threshold_reselected=False,
             model_forwards=state['model_forwards'],fragment_count=metadata['fragment_count'],ordinary_source_replay_exact=True,
-            interpretation='PTFM task-adapted full-state output, not published-result reproduction; all outputs including missing helper precede truth alignment',
+            interpretation=('PTFM physical-prior position residual with original full-state heads/loss; no champion-attribute composition; not author reproduction' if residual_mode else 'PTFM task-adapted full-state output, not published-result reproduction; all outputs including missing helper precede truth alignment'),
             normalization='T-only local native-unit zscore; full-state inverse; course circular',
+            position_mode='prior095_residual' if residual_mode else 'direct',
+            initial_position_prior_exact=bool(initial and residual_mode),
             limitations=['Reused V and shared identities; one seed/fixed budget is not convergence or independent generalization.',
                 'Anchor/helper pooled roles and Q64 native completion differ from original aligned dual-radar windows.',
                 '208->128 projection, Eq21 mean(-log task weight), native speed absolute value and latitude reflection are explicit reconstruction choices.'])
@@ -191,7 +209,7 @@ def compare_endpoints(initial,final):
                 final_minus_initial={a:_changes(np.concatenate(v)) for a,v in values.items()})
 
 
-def compare_sequence_control(current,control):
+def _compare_control(current,control,*,control_method='learned_sequence',initial=False):
     """Actual full-state cache comparison against the paired072C Transformer.
 
     The caller binds the completed training/checkpoints. This step checks every
@@ -203,13 +221,14 @@ def compare_sequence_control(current,control):
     current,control=Path(current),Path(control)
     left,right=[read_json(path/'summary.json') for path in (current,control)]
     if (any(v.get('status')!='COMPLETED' or v.get('device')!='cpu' or v.get('test_opened') is not False
-            or v.get('initial') is not False for v in (left,right))
+            or v.get('initial') is not initial for v in (left,right))
             or left['scene_ids']!=right['scene_ids'] or left['source_system']!=right['source_system']):
         raise ValueError('PTFM/Transformer comparison requires completed CPU endpoints with one source/population')
     components={sid:str(c) for c,group in left['components'].items() for sid in group['scene_ids']}
     other={sid:str(c) for c,group in right['components'].items() for sid in group['scene_ids']}
     if components!=other:raise ValueError('PTFM/Transformer component registry differs')
-    methods=('ptfm_adapted','learned_sequence');rows=[];arrays=[]
+    control_alias='learned_sequence' if control_method=='learned_sequence' else 'ptfm_control'
+    methods=('ptfm_adapted',control_alias);rows=[];arrays=[]
     def pooled(selected):
         stats={};differences={}
         for region in REGIONS:
@@ -218,8 +237,12 @@ def compare_sequence_control(current,control):
                 values={method:np.concatenate([d[method+'_'+attr+'_error'][d['region_'+region]&np.isfinite(d[method+'_'+attr+'_error'])]
                     for d in selected]) for method in methods}
                 stats[region][attr]={method:dict(_metric(np.stack((v,v*v),-1)),**_quantiles(v)) for method,v in values.items()}
-                differences[region][attr]=_changes(values[methods[0]]-values[methods[1]])
-        return dict(metrics=stats,ptfm_minus_transformer=differences,position_weightings=_weighted(selected,methods))
+                delta=values[methods[0]]-values[methods[1]]
+                differences[region][attr]=dict(_changes(delta),improvement_tail=_quantiles(-delta[delta<0]),
+                    absolute_change_tail=_quantiles(np.abs(delta)),
+                    harm_above_native_threshold={str(k):int((delta>k).sum()) for k in (10,100,1000,10000)})
+        difference_key='ptfm_minus_transformer' if control_method=='learned_sequence' else 'residual_minus_ptfm'
+        return dict(metrics=stats,**{difference_key:differences},position_weightings=_weighted(selected,methods))
     for sid in left['scene_ids']:
         fragments=[_read(path/'predictions'/f'states-{sid}.npz') for path in (current,control)]
         systems=[_read(path/'system-predictions'/f'states-{sid}.npz') for path in (current,control)]
@@ -228,17 +251,17 @@ def compare_sequence_control(current,control):
             a,b=[_artifact(s,name) for s in systems]
             if set(a)!=set(b) or not a:raise ValueError('PTFM paired ordinary artifact schema differs')
             for key in a:_same(a[key],b[key],'PTFM paired ordinary full output/'+name+'/'+key)
-        artifacts=[_artifact(system,method) for system,method in zip(systems,methods)]
+        artifacts=[_artifact(system,method) for system,method in zip(systems,('ptfm_adapted',control_method))]
         base=_artifact(systems[0],'anchor');n=len(base['target_ids'])
         data={key:fragments[0][key] for key in fragments[0] if key.startswith('region_')}
-        for name in REGIONS[:5]:_same(data['region_'+name],fragments[1]['region_'+name],'PTFM paired support stratum/'+name)
-        for artifact,fragment,method in zip(artifacts,fragments,methods):
+        for name in (REGIONS if control_method=='ptfm_adapted' else REGIONS[:5]):_same(data['region_'+name],fragments[1]['region_'+name],'PTFM paired support stratum/'+name)
+        for artifact,fragment,method,stored_method in zip(artifacts,fragments,methods,('ptfm_adapted',control_method)):
             if set(artifact)!=set(base):raise ValueError('PTFM paired model full artifact schema differs')
             for key in base:
                 if key not in ('aligned_prediction','group_states'):_same(artifact[key],base[key],'PTFM paired fixed population/'+key)
             states=artifact['group_states']
             _check_valid_states(states,np.ones(states.shape,bool),'PTFM paired all output groups')
-            _same(states,fragment[method+'_group_states'],'PTFM paired cached group output')
+            _same(states,fragment[stored_method+'_group_states'],'PTFM paired cached group output')
             selected=base['aligned_group_indices'];chosen=selected>=0
             _same(artifact['aligned_prediction'][chosen],states[selected[chosen]],'PTFM paired group-to-target mapping')
             errors=attribute_errors(artifact['aligned_prediction'][:n],base['aligned_truth'][:n])
@@ -247,14 +270,14 @@ def compare_sequence_control(current,control):
                 mask=valid[...,list(columns)].all(-1)
                 if not np.isfinite(errors[attr][mask]).all():raise ValueError('PTFM comparison nonfinite valid error')
                 data[method+'_'+attr+'_error']=np.where(mask,errors[attr],np.nan)
-                if method=='ptfm_adapted' or attr=='position':
-                    _same(data[method+'_'+attr+'_error'],fragment[method+'_'+attr+'_error'],'PTFM cached/recomputed error')
-        for attr in ATTRIBUTES:_same(np.isfinite(data['ptfm_adapted_'+attr+'_error']),np.isfinite(data['learned_sequence_'+attr+'_error']),'PTFM paired physical mask')
+                if stored_method=='ptfm_adapted' or attr=='position':
+                    _same(data[method+'_'+attr+'_error'],fragment[stored_method+'_'+attr+'_error'],'PTFM cached/recomputed error')
+        for attr in ATTRIBUTES:_same(np.isfinite(data['ptfm_adapted_'+attr+'_error']),np.isfinite(data[control_alias+'_'+attr+'_error']),'PTFM paired physical mask')
         rows.append(dict(scene_id=sid,component_id=components[sid],population=_population(base),**pooled([data])));arrays.append(data)
     result=pooled(arrays)
-    for method,summary in zip(methods,(left,right)):
+    for method,summary,stored_method in zip(methods,(left,right),('ptfm_adapted',control_method)):
         for attr in ATTRIBUTES:
-            actual=result['metrics']['all'][attr][method];expected=summary['methods'][method]['full_target_metrics']['all'][attr]
+            actual=result['metrics']['all'][attr][method];expected=summary['methods'][stored_method]['full_target_metrics']['all'][attr]
             if actual['unit_count']!=expected['intersection_count'] or any(not np.isclose(actual[k],expected[k],rtol=1e-10,atol=1e-9) for k in ('mae','rmse')):
                 raise ValueError('PTFM paired actual arrays disagree with endpoint summary/'+method+'/'+attr)
     groups={c:pooled([a for r,a in zip(rows,arrays) if r['component_id']==c]) for c in sorted(set(components.values()))}
@@ -263,5 +286,27 @@ def compare_sequence_control(current,control):
         scenes=rows,components=groups,largest_component_id=largest,remaining_components=pooled(rest) if rest else None,
         population={key:sum(r['population'][key] for r in rows) for key in rows[0]['population']},
         full_group_population_controls_and_masks_exact=True,model_forwards=0,optimizer_updates=0,test_opened=False,
-        interpretation='Matched actual training samples; full-state multi-task PTFM adaptation versus position-only Transformer with ordinary Mean speed/course. Not a backbone-only or author-reproduction comparison.')
+        interpretation=('Matched actual training samples; full-state multi-task PTFM adaptation versus position-only Transformer with ordinary Mean speed/course. Not a backbone-only or author-reproduction comparison.' if control_method=='learned_sequence' else 'Same full-state architecture/objectives and actual T exposure; physical position initialization and residual parameterization changed. Other final attributes may change through shared training; no champion-attribute composition.'))
+    return result
+
+
+def compare_sequence_control(current,control):
+    return _compare_control(current,control)
+
+def compare_ptfm_control(current,control,*,initial=False):
+    result=_compare_control(current,control,control_method='ptfm_adapted',initial=initial)
+    if initial:
+        # Same CPU architecture/parameters for non-position outputs. Preserve the
+        # predeclared physical replay contract; do not relax based on outcomes.
+        from association.evaluation.evidence_fusion_combo import REPLAY_TOLERANCE
+        tolerance={attr:REPLAY_TOLERANCE[key] for attr,key in (('speed','speed'),('heading','heading_deg'))}
+        maxima={'speed':0.,'heading':0.}
+        for sid in result['scene_ids']:
+            with np.load(Path(current)/'system-predictions'/f'states-{sid}.npz') as new,np.load(Path(control)/'system-predictions'/f'states-{sid}.npz') as old:
+                a,b=new['ptfm_adapted_group_states'],old['ptfm_adapted_group_states']
+                errors=attribute_errors(a,b)
+                for attr in maxima:
+                    maxima[attr]=max(maxima[attr],float(errors[attr].max(initial=0)))
+                    if (errors[attr]>tolerance[attr]).any():raise ValueError('PTFM non-position CPU initial outputs changed/'+attr)
+        result['nonposition_initial_replay']={'maximum_native_difference':maxima,'absolute_tolerance':tolerance,'all_output_groups_verified':True}
     return result

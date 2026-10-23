@@ -4,17 +4,22 @@ import copy,json,math,time
 from pathlib import Path
 import numpy as np
 import torch
-from association.models.ptfm import PTFM,SCOPE,ROUTING_SEMANTICS,LOSS_SEMANTICS,ptfm_inputs,objectives
+from association.models.ptfm import (PTFM,SCOPE,ROUTING_SEMANTICS,LOSS_SEMANTICS,ptfm_inputs,objectives,
+    RESIDUAL_SCOPE,RESIDUAL_ROUTING_SEMANTICS,RESIDUAL_LOSS_SEMANTICS)
 from association.training.evidence_fusion import TRAIN_MODES,prepare_evidence_scenes,training_members
-from association.utils.runtime import write_json
+from association.utils.runtime import read_json,write_json
 
 
 def configuration(value):
+    residual=value.get('model',{}).get('position_output')=='prior095_residual'
+    scope,route,_=semantics(value)
+    model=dict(l2=1e-4,normalization='T_exposure_visible_local_zscore',helper_missing='masked_neutral_carrier')
+    if residual:model['position_output']='prior095_residual'
     if (set(value)!={'scope','routing_semantics','data','motion_observation_policy','train_splits','training','model'}
-            or value['scope']!=SCOPE or value['routing_semantics']!=ROUTING_SEMANTICS
+            or value['scope']!=scope or value['routing_semantics']!=route
             or value['data']!=dict(length=64,max_observations=128,time_unit_seconds=20.,reference_longitude_policy='shortest_arc')
             or value['motion_observation_policy']!='canonical_all' or value['train_splits']!=['T_core']
-            or value['model']!=dict(l2=1e-4,normalization='T_exposure_visible_local_zscore',helper_missing='masked_neutral_carrier')):
+            or value['model']!=model):
         raise ValueError('PTFM frozen architecture/data/normalization contract differs')
     t=value['training']
     if set(t)!={'seed','updates','batch_size','learning_rate','gradient_clip','advisory_seconds'}:
@@ -25,6 +30,16 @@ def configuration(value):
         if isinstance(t[k],bool) or not isinstance(t[k],(int,float)) or not math.isfinite(t[k]) or t[k]<=0:
             raise ValueError('PTFM positive finite '+k+' required')
     return value
+
+
+def semantics(config):
+    if config.get('model',{}).get('position_output')=='prior095_residual':
+        return RESIDUAL_SCOPE,RESIDUAL_ROUTING_SEMANTICS,RESIDUAL_LOSS_SEMANTICS
+    return SCOPE,ROUTING_SEMANTICS,LOSS_SEMANTICS
+
+
+def position_mode(config):
+    return config.get('model',{}).get('position_output','direct')
 
 
 def fit_normalizer(train,config,check=None):
@@ -71,8 +86,75 @@ def _paired_reference(path,config,scene_ids):
     return dict(path=str(path),rows=rows,exposure=exposure)
 
 
+def _paired_ptfm_reference(path,config,scene_ids,check=None):
+    """Bind the completed direct run before any residual-model optimization.
+
+    This reads both endpoints and every successful source batch. Neither a
+    selected checkpoint nor an excerpted exposure log is an admissible source.
+    """
+    if position_mode(config)!='prior095_residual':
+        raise ValueError('direct PTFM pairing is only defined for residual PTFM')
+    path=Path(path).resolve();run=read_json(path/'run.json')
+    direct=copy.deepcopy(config);direct.update(scope=SCOPE,routing_semantics=ROUTING_SEMANTICS)
+    direct['model'].pop('position_output')
+    if (run.get('status')!='COMPLETED' or run.get('configuration')!=direct
+            or run.get('scope')!=SCOPE or run.get('loss_semantics')!=LOSS_SEMANTICS
+            or run.get('optimizer_updates')!=config['training']['updates']
+            or run.get('training_scene_ids')!=scene_ids or run.get('test_opened') is not False
+            or run.get('final_checkpoint')!='final.pt' or run.get('normalizer_sampler_replay_exact') is not True):
+        raise ValueError('PTFM paired direct run/configuration/endpoint is not completed and equivalent')
+    normalizer=read_json(path/'normalizer.json')
+    if run.get('normalizer')!=normalizer:raise ValueError('PTFM paired direct normalizer/run differs')
+    endpoints={}
+    with torch.random.fork_rng(devices=[]):
+        for filename,step in (('step-0.pt',0),('final.pt',config['training']['updates'])):
+            if check:check()
+            model,saved=load_checkpoint(path/filename);del model
+            if (saved['configuration']!=direct or saved['actual_updates']!=step
+                    or saved['normalizer']!=normalizer):
+                raise ValueError('PTFM paired direct checkpoint/configuration/normalizer differs')
+            endpoints[step]=saved
+    audit=dict(successful_updates=0,sampled_anchors=0,valid_position_points=0,task_valid_counts=[0,0,0],
+               scenes={},anchors={})
+    rows=[];batch_size=config['training']['batch_size']
+    with (path/'training.jsonl').open() as handle:
+        for step,line in enumerate(handle,1):
+            if check:check()
+            row=json.loads(line);batch=row.get('batch',[])
+            if (row.get('step')!=step or row.get('mode')!=TRAIN_MODES[(step-1)%len(TRAIN_MODES)]
+                    or len(batch)!=batch_size):raise ValueError('PTFM paired direct successful-batch sequence differs')
+            for sample in batch:
+                counts=sample.get('task_valid_counts')
+                if (sample.get('scene_id') not in scene_ids or not isinstance(counts,list) or len(counts)!=3
+                        or any(type(n) is not int or n<0 or n>config['data']['length'] for n in counts)
+                        or sample.get('valid_position_points')!=counts[0]):
+                    raise ValueError('PTFM paired direct task mask/exposure is malformed')
+                for i,count in enumerate(counts):audit['task_valid_counts'][i]+=count
+                for key,field in (('scenes','scene_id'),('anchors','node_id')):
+                    name=sample[field];audit[key][name]=audit[key].get(name,0)+1
+            audit['successful_updates']+=1;audit['sampled_anchors']+=len(batch);rows.append(row)
+    audit['valid_position_points']=audit['task_valid_counts'][0]
+    if (len(rows)!=config['training']['updates'] or
+            any(run.get('exposure',{}).get(key)!=value for key,value in audit.items())
+            or run.get('trained_scene_count')!=len(audit['scenes'])):
+        raise ValueError('PTFM paired direct actual exposure counters differ')
+    return dict(path=str(path),rows=rows,normalizer=normalizer,initial=endpoints[0],exposure=run['exposure'])
+
+
+def _check_initial_pair(model,saved):
+    current=model.state_dict();reference=saved['model']
+    if set(current)!=set(reference):raise ValueError('PTFM paired initial parameter names differ')
+    for name,value in current.items():
+        expected=reference[name]
+        if name in ('output.weight','output.bias'):
+            expected=expected.clone();expected[:2].zero_()
+        if not torch.equal(value.cpu(),expected):
+            raise ValueError('PTFM paired initial parameters differ/'+name)
+
+
 def _save(path,model,optimizer,step,config,rng,normalizer):
-    torch.save(dict(scope=SCOPE,routing_semantics=ROUTING_SEMANTICS,loss_semantics=LOSS_SEMANTICS,
+    scope,route,loss=semantics(config)
+    torch.save(dict(scope=scope,routing_semantics=route,loss_semantics=loss,
         configuration=config,normalizer=normalizer,step=step,actual_updates=step,model=model.state_dict(),
         optimizer=optimizer.state_dict(),numpy_rng=rng.bit_generator.state,torch_rng=torch.get_rng_state(),
         cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None),path)
@@ -80,9 +162,10 @@ def _save(path,model,optimizer,step,config,rng,normalizer):
 
 def load_checkpoint(path,*,device='cpu'):
     saved=torch.load(path,map_location='cpu',weights_only=False)
-    if (saved.get('scope')!=SCOPE or saved.get('routing_semantics')!=ROUTING_SEMANTICS
-            or saved.get('loss_semantics')!=LOSS_SEMANTICS): raise ValueError('PTFM checkpoint semantics differ')
-    config=configuration(saved['configuration']); step=saved.get('step')
+    config=configuration(saved['configuration']);scope,route,loss=semantics(config)
+    if (saved.get('scope')!=scope or saved.get('routing_semantics')!=route
+            or saved.get('loss_semantics')!=loss): raise ValueError('PTFM checkpoint semantics differ')
+    step=saved.get('step')
     if (type(step) is not int or not 0<=step<=config['training']['updates'] or type(saved.get('actual_updates')) is not int
             or saved['actual_updates']!=step or any(k not in saved for k in ('optimizer','numpy_rng','torch_rng','cuda_rng'))):
         raise ValueError('PTFM checkpoint actual updates/RNG differ')
@@ -93,7 +176,7 @@ def load_checkpoint(path,*,device='cpu'):
         raise ValueError('PTFM normalization exposure/configuration differs')
     if step==config['training']['updates'] and saved['numpy_rng']!=norm['planned_sampler_final_rng']:
         raise ValueError('PTFM final checkpoint sampling/normalization exposure differs')
-    model=PTFM(norm).to(device);model.load_state_dict(saved['model'],strict=True)
+    model=PTFM(norm,position_mode=position_mode(config)).to(device);model.load_state_dict(saved['model'],strict=True)
     if (not torch.equal(model.mean.cpu(),torch.tensor(norm['mean'],dtype=torch.float64))
             or not torch.equal(model.scale.cpu(),torch.tensor(norm['scale'],dtype=torch.float64))
             or not all(torch.isfinite(p).all() for p in model.parameters())):
@@ -108,7 +191,7 @@ def load_checkpoint(path,*,device='cpu'):
     return model,saved
 
 
-def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_reference_fit=None):
+def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_reference_fit=None,paired_ptfm_fit=None):
     config=copy.deepcopy(configuration(config));train_raw=list(train_raw)
     ids=[str(s['scene_id']) for s in train_raw]
     if not ids or len(set(ids))!=len(ids) or any(s.get('split')!='T_core' for s in train_raw):
@@ -117,20 +200,37 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
     t=config['training'];rng=np.random.default_rng(t['seed']);torch.manual_seed(t['seed'])
     audit=dict(successful_updates=0,sampled_anchors=0,valid_position_points=0,task_valid_counts=[0,0,0],
                helper_absent_queries=0,scenes={},anchors={})
-    state=dict(scope=SCOPE,status='RUNNING',configuration=config,optimizer_updates=0,test_opened=False,
-        training_scene_ids=ids,exposure=audit,device=str(device),loss_semantics=LOSS_SEMANTICS,
+    scope,route,loss_semantics=semantics(config)
+    state=dict(scope=scope,status='RUNNING',configuration=config,optimizer_updates=0,test_opened=False,
+        training_scene_ids=ids,exposure=audit,device=str(device),loss_semantics=loss_semantics,
         gradient_clipping=dict(clipped_updates=0),selection_policy='fixed final; no V selection',
         interpretation='PTFM task adaptation with full-state/adaptive-task objective; not author reproduction')
     state['paired_control']=dict(fit=str(Path(paired_reference_fit).resolve()) if paired_reference_fit else None,
         status='PENDING' if paired_reference_fit else 'NOT_REQUESTED',matched_updates=0,matched_anchors=0,
         interpretation='Actual scene/anchor/member exposure only; model, state objectives and initialization differ.')
+    state['paired_ptfm_control']=dict(fit=str(Path(paired_ptfm_fit).resolve()) if paired_ptfm_fit else None,
+        status='PENDING' if paired_ptfm_fit else 'NOT_REQUESTED',matched_updates=0,matched_anchors=0,
+        interpretation='Only position output parameterization and its first two zero-initialized output rows differ.')
     write_json(output/'run.json',state);model=optimizer=norm=None;windows=[];window=[]
     try:
         reference=_paired_reference(paired_reference_fit,config,ids) if paired_reference_fit else None
+        if position_mode(config)=='prior095_residual' and paired_ptfm_fit is None:
+            raise ValueError('PTFM residual training requires the completed direct PTFM paired control')
+        ptfm_reference=_paired_ptfm_reference(paired_ptfm_fit,config,ids,check) if paired_ptfm_fit else None
         train=prepare_evidence_scenes(train_raw,check=check,motion_observation_policy='canonical_all')
         if any(not len(s['identities']) for s in train):raise ValueError('PTFM cannot drop empty train scenes')
         norm=fit_normalizer(train,config,check);write_json(output/'normalizer.json',norm)
-        model=PTFM(norm).to(device);optimizer=torch.optim.Adam(model.parameters(),lr=t['learning_rate'])
+        model=PTFM(norm,position_mode=position_mode(config)).to(device)
+        optimizer=torch.optim.Adam(model.parameters(),lr=t['learning_rate'])
+        if ptfm_reference is not None:
+            if norm!=ptfm_reference['normalizer']:raise ValueError('PTFM paired normalizer differs')
+            _check_initial_pair(model,ptfm_reference['initial'])
+            if rng.bit_generator.state!=ptfm_reference['initial']['numpy_rng']:
+                raise ValueError('PTFM paired initial sampler RNG differs')
+            if not torch.equal(torch.get_rng_state(),ptfm_reference['initial']['torch_rng']):
+                raise ValueError('PTFM paired initial torch RNG differs')
+            state['paired_ptfm_control'].update(initial_parameters_exact_except_position_rows=True,
+                position_rows_zero=True,normalizer_exact=True,initial_sampler_rng_exact=True,initial_torch_rng_exact=True)
         state['parameter_count']=sum(p.numel() for p in model.parameters());state['normalizer']=norm
         _save(output/'step-0.pt',model,optimizer,0,config,rng,norm)
         fit_started=time.monotonic();cuda=torch.device(device).type=='cuda'
@@ -141,7 +241,8 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
             batch=[];losses=[];diags=[];absent=0
             for _ in range(t['batch_size']):
                 scene=train[int(rng.integers(len(train)))];anchor=int(rng.integers(len(scene['identities'])))
-                members=training_members(scene,anchor,mode);result=model(*ptfm_inputs(scene['motion'],members,device=device))
+                members=training_members(scene,anchor,mode);result=model(*ptfm_inputs(scene['motion'],members,device=device,
+                    include_prior=position_mode(config)=='prior095_residual'))
                 target=torch.as_tensor(scene['target'][anchor],dtype=torch.float64,device=device)
                 valid=torch.as_tensor(scene['valid'][anchor],dtype=torch.bool,device=device)
                 loss,diag=objectives(model,result,target,valid);(loss/t['batch_size']).backward()
@@ -157,12 +258,18 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                 common=[{key:value for key,value in sample.items() if key!='task_valid_counts'} for sample in batch]
                 if old['step']!=step or old['mode']!=mode or old['batch']!=common:
                     raise ValueError('PTFM actual batch differs from completed paired control before optimizer update')
+            if ptfm_reference is not None:
+                old=ptfm_reference['rows'][step-1]
+                if old['step']!=step or old['mode']!=mode or old['batch']!=batch:
+                    raise ValueError('PTFM actual batch/task masks differ from direct PTFM before optimizer update')
             penalty=config['model']['l2']*model.l2();penalty.backward()
             grad=torch.nn.utils.clip_grad_norm_(model.parameters(),t['gradient_clip'],error_if_nonfinite=True)
             optimizer.step();state['optimizer_updates']=step
             audit['successful_updates']+=1;audit['sampled_anchors']+=len(batch);audit['helper_absent_queries']+=absent
             if reference is not None:
                 state['paired_control'].update(matched_updates=step,matched_anchors=audit['sampled_anchors'])
+            if ptfm_reference is not None:
+                state['paired_ptfm_control'].update(matched_updates=step,matched_anchors=audit['sampled_anchors'])
             for i in range(3):audit['task_valid_counts'][i]+=sum(d['task_valid_counts'][i] for d in diags)
             audit['valid_position_points']=audit['task_valid_counts'][0]
             for sample in batch:
@@ -192,6 +299,10 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
             for key in ('successful_updates','sampled_anchors','valid_position_points','scenes','anchors'):
                 if audit[key]!=reference['exposure'][key]:raise ValueError('PTFM paired exposure counter differs/'+key)
             state['paired_control'].update(status='PAIR_VERIFIED',actual_successful_batches_exact=True)
+        if ptfm_reference is not None:
+            if audit!=ptfm_reference['exposure']:raise ValueError('PTFM paired final task/exposure audit differs')
+            state['paired_ptfm_control'].update(status='PAIR_VERIFIED',actual_successful_batches_exact=True,
+                all_task_counts_exact=True,full_exposure_exact=True)
         _save(output/'final.pt',model,optimizer,t['updates'],config,rng,norm)
         state.update(status='COMPLETED',final_checkpoint='final.pt',trained_scene_count=len(audit['scenes']))
         write_json(output/'run.json',state);return state

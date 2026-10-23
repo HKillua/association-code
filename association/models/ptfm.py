@@ -13,6 +13,10 @@ from torch import nn
 SCOPE='ptfm-task-adapted-v1'
 ROUTING_SEMANTICS='anchor-supported-helper-fullstate-maskcontext-v1'
 LOSS_SEMANTICS='ptfm-normalized-position-speed-mse-native-circular-heading-adaptive-v1'
+RESIDUAL_SCOPE='ptfm-prior095-residual-v1'
+RESIDUAL_ROUTING_SEMANTICS='anchor-supported-helper-fullstate-maskcontext-prior095-residual-v1'
+RESIDUAL_LOSS_SEMANTICS='ptfm-prior095-residual-normalized-position-speed-mse-native-circular-heading-adaptive-v1'
+POSITION_MODES=('direct','prior095_residual')
 
 
 def _short(x):
@@ -27,7 +31,7 @@ def local_states(states, origin):
     return out
 
 
-def native_states(local, origin):
+def native_states(local, origin, *, position_base=None, position_residual_deg=None):
     """Invert local units; reflect latitude at poles and wrap longitude/course.
 
     Reflection is only a finite geographic output parameterization, not data
@@ -39,10 +43,30 @@ def native_states(local, origin):
     latitude=torch.where(lat>90.,180.-lat,torch.where(lat< -90.,-180.-lat,lat))
     longitude=torch.remainder(local[:,1]+origin[1]+crossed*180.+180.,360.)-180.
     heading=torch.remainder(local[:,3]+origin[3],360.)
-    return torch.stack((latitude,longitude,local[:,2].abs(),heading),-1)
+    position=torch.stack((latitude,longitude),-1)
+    if (position_base is None)!=(position_residual_deg is None):
+        raise ValueError('PTFM residual inverse requires both base and residual')
+    if position_base is not None:
+        if (position_base.shape!=local.shape or position_base.dtype!=torch.float64
+                or position_residual_deg.shape!=(len(local),2)
+                or position_residual_deg.dtype!=torch.float64 or position_base.device!=local.device
+                or position_residual_deg.device!=local.device
+                or not torch.isfinite(position_base).all() or not torch.isfinite(position_residual_deg).all()
+                or (position_base[:,0].abs()>90.).any()):
+            raise ValueError('PTFM residual inverse requires finite geographic base and degree residual')
+        expected_local=torch.stack((position_base[:,0]-origin[0],
+            torch.remainder(position_base[:,1]-origin[1]+180.,360.)-180.),-1)+position_residual_deg
+        if not torch.equal(local[:,:2],expected_local):
+            raise ValueError('PTFM local position does not equal base plus degree residual')
+        # Modulo arithmetic can lose a few bits even at zero. Correct only its
+        # value, keeping precisely the same native-coordinate gradient/map.
+        zero=(position_residual_deg==0).all(-1)
+        exact=position_base[:,:2]+(position-position.detach())
+        position=torch.where(zero[:,None],exact,position)
+    return torch.cat((position,local[:,2:3].abs(),heading[:,None]),-1)
 
 
-def ptfm_inputs(motion,members,*,device='cpu'):
+def ptfm_inputs(motion,members,*,device='cpu',include_prior=False):
     """Only observed/native evidence enters these two streams and context."""
     members=np.asarray(members,np.int64)
     states=np.asarray(motion['states'],np.float64); support=np.asarray(motion['support'])
@@ -69,15 +93,33 @@ def ptfm_inputs(motion,members,*,device='cpu'):
             value=np.rad2deg(np.arctan2(sine,cosine))
             helper[usable,col]=_short(value[usable]) if col==1 else value[usable]%360.
     origin=anchor[0].copy()
-    return (torch.as_tensor(local_states(anchor,origin),dtype=torch.float64,device=device),
+    result=(torch.as_tensor(local_states(anchor,origin),dtype=torch.float64,device=device),
             torch.as_tensor(local_states(helper,origin),dtype=torch.float64,device=device),
             torch.as_tensor(np.column_stack((present,support[members[0]])),dtype=torch.float32,device=device),
             torch.as_tensor(origin,dtype=torch.float64,device=device))
+    if include_prior:
+        # The prior is an output bypass, never an additional encoder feature.
+        # Reproduce the ordinary supported mean and float32 sigmoid arithmetic
+        # of the frozen .95 control, without constructing gate-model features.
+        from association.evaluation.fusion_controls import ordinary_fusion
+        from association.models.support_gate import mix_gate_states
+        ordered=np.r_[members[:1],helpers]
+        nearest=np.asarray(motion['nearest_seconds'],np.float64)
+        if nearest.shape!=support.shape:raise ValueError('PTFM prior requires nearest-query seconds')
+        ordinary=ordinary_fusion(states[ordered],nearest[ordered],support[ordered],[list(range(len(ordered)))])
+        mean=torch.as_tensor(ordinary['predictions']['mean_supported'][0],dtype=torch.float64)
+        initial=torch.sigmoid(torch.full((q,),math.log(19.),dtype=torch.float32))
+        base=mix_gate_states(torch.as_tensor(anchor,dtype=torch.float64),mean,initial,
+            torch.as_tensor(~support[members[0]]&present,dtype=torch.bool))
+        result=(*result,base.to(device))
+    return result
 
 
 class PTFM(nn.Module):
-    def __init__(self,normalizer):
+    def __init__(self,normalizer,*,position_mode='direct'):
         super().__init__()
+        if position_mode not in POSITION_MODES:raise ValueError('unknown PTFM position output mode')
+        self.position_mode=position_mode
         mean=np.asarray(normalizer['mean'],np.float64); scale=np.asarray(normalizer['scale'],np.float64)
         if (mean.shape!=(4,) or scale.shape!=(4,) or not np.isfinite(mean).all()
                 or not np.isfinite(scale).all() or (scale<=0).any() or normalizer.get('split')!='T_core'
@@ -102,15 +144,27 @@ class PTFM(nn.Module):
         for name,value in self.temporal.named_parameters():
             if 'weight' in name: nn.init.orthogonal_(value)
             else: nn.init.zeros_(value)
-        self.motion_observation_policy='canonical_all'; self.routing_semantics=ROUTING_SEMANTICS
+        # Do not add a module or consume RNG: all other initial tensors remain
+        # bit-identical to the direct-output model at the same seed.
+        if position_mode=='prior095_residual':
+            with torch.no_grad():self.output.weight[:2].zero_();self.output.bias[:2].zero_()
+        self.motion_observation_policy='canonical_all'
+        self.routing_semantics=RESIDUAL_ROUTING_SEMANTICS if position_mode=='prior095_residual' else ROUTING_SEMANTICS
 
-    def forward(self,anchor,helper,context,origin):
+    def forward(self,anchor,helper,context,origin,base_states=None):
         q=len(anchor)
         if (anchor.shape!=(q,4) or helper.shape!=anchor.shape or context.shape!=(q,2) or origin.shape!=(4,)
                 or anchor.dtype!=torch.float64 or helper.dtype!=torch.float64
                 or not all(torch.isfinite(x).all() for x in (anchor,helper,context,origin))
                 or not ((context==0)|(context==1)).all()):
             raise ValueError('invalid PTFM local streams or explicit availability context')
+        residual_mode=self.position_mode=='prior095_residual'
+        if residual_mode!=(base_states is not None):
+            raise ValueError('PTFM physical prior must be supplied only for residual position mode')
+        if base_states is not None and (base_states.shape!=anchor.shape or base_states.dtype!=torch.float64
+                or base_states.device!=anchor.device or not torch.isfinite(base_states).all()
+                or (base_states[:,0].abs()>90.).any()):
+            raise ValueError('PTFM physical prior must be finite geographic float64 [Q,4]')
         a=self.anchor(((anchor-self.mean)/self.scale).float())
         b=self.helper(((helper-self.mean)/self.scale).float())*context[:,:1]
         time=torch.arange(q,dtype=torch.float32,device=anchor.device)[:,None]
@@ -124,11 +178,19 @@ class PTFM(nn.Module):
         latent=self.projection(fused)
         normalized=self.output(latent).double()
         local=normalized*self.scale+self.mean
-        states=native_states(local,origin)
+        residual=None
+        if residual_mode:
+            residual=normalized[:,:2]*self.scale[:2]
+            prior_local=torch.stack((base_states[:,0]-origin[0],
+                torch.remainder(base_states[:,1]-origin[1]+180.,360.)-180.),-1)
+            local=torch.cat((prior_local+residual,local[:,2:]),-1)
+        states=native_states(local,origin,position_base=base_states,position_residual_deg=residual)
         weights=torch.softmax(self.task_weights(latent),-1).double()
         if not torch.isfinite(states).all(): raise FloatingPointError('nonfinite PTFM states')
-        return dict(states=states,normalized_states=normalized,local_states=local,origin=origin,
+        result=dict(states=states,normalized_states=normalized,local_states=local,origin=origin,
                     task_weights=weights,helper_present=context[:,0].bool(),anchor_supported=context[:,1].bool())
+        if residual_mode:result.update(base_states=base_states,position_residual_deg=residual)
+        return result
 
     def l2(self):
         return sum(value.square().sum() for name,value in self.temporal.named_parameters() if 'weight' in name)

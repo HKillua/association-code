@@ -34,6 +34,8 @@ python tools/experiments/support_gate_linear_fit.py --help
 python tools/experiments/support_gate_replication.py --help
 python tools/experiments/sequence_position_fit.py --help
 python tools/experiments/ptfm_fit.py --help
+python tools/experiments/ptfm_residual_fit.py --help
+python tools/analysis/ptfm_speed_diagnostics.py --help
 python tools/experiments/tsactfer_level1_fit.py --help
 python tools/experiments/constant_gate_fit.py --help
 python tools/analysis/compare_position_benchmarks.py --help
