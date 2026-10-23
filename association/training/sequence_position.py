@@ -13,6 +13,9 @@ import torch
 from association.models.sequence_position import (BACKBONES, ROUTING_SEMANTICS, SCOPE,
     RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS,
     SequencePosition, sequence_inputs, sequence_objectives)
+from association.models.helper_sequence import (SCOPE as HELPER_SCOPE,
+    ROUTING_SEMANTICS as HELPER_ROUTING, AGGREGATIONS, HelperSequencePosition,
+    helper_sequence_inputs, initialize_from_reference)
 from association.training.evidence_fusion import TRAIN_MODES, prepare_evidence_scenes, training_members
 from association.utils.runtime import write_json
 
@@ -24,19 +27,30 @@ def loss_semantics(config):
     return RELATIVE_HARM_SEMANTICS if config['position_loss'] == RELATIVE_HARM_LOSS else LOSS_SEMANTICS
 
 
+def routing_semantics(config):
+    return HELPER_ROUTING if config['scope'] == HELPER_SCOPE else ROUTING_SEMANTICS
+
+
+def _make_model(config):
+    return (HelperSequencePosition if config['scope'] == HELPER_SCOPE else SequencePosition)(**config['model'])
+
+
 def configuration(value):
     expected = {'scope', 'routing_semantics', 'position_loss', 'data', 'motion_observation_policy',
                 'train_splits', 'model', 'training'}
     if (not isinstance(value, dict) or set(value) != expected
-            or (value['scope'], value['position_loss']) not in ((SCOPE, 'linear'), (RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS))
-            or value['routing_semantics'] != ROUTING_SEMANTICS
+            or (value['scope'], value['position_loss']) not in ((SCOPE, 'linear'), (RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS), (HELPER_SCOPE, 'linear'))
+            or value['routing_semantics'] != routing_semantics(value)
             or value['motion_observation_policy'] != 'canonical_all' or value['train_splits'] != ['T_core']
             or value['data'] != dict(length=64, max_observations=128, time_unit_seconds=20.,
                                      reference_longitude_policy='shortest_arc')):
         raise ValueError('explicit sequence position scope/loss and Level1 data contract required')
     model = value['model']
-    if (not isinstance(model, dict) or set(model) != {'backbone', 'hidden_size', 'num_layers', 'initial_gate'}
-            or model['backbone'] not in BACKBONES or type(model['hidden_size']) is not int
+    helper = value['scope'] == HELPER_SCOPE
+    fields = {'hidden_size', 'num_layers', 'initial_gate', 'aggregation'} if helper else {'backbone', 'hidden_size', 'num_layers', 'initial_gate'}
+    if (not isinstance(model, dict) or set(model) != fields
+            or (model['aggregation'] not in AGGREGATIONS if helper else model['backbone'] not in BACKBONES)
+            or type(model['hidden_size']) is not int
             or model['hidden_size'] != 64 or type(model['num_layers']) is not int or model['num_layers'] != 2
             or isinstance(model['initial_gate'], bool) or model['initial_gate'] != .95):
         raise ValueError('sequence baseline architecture is fixed apart from the declared backbone')
@@ -58,7 +72,7 @@ def configuration(value):
 
 
 def _save(path, model, optimizer, step, config, rng):
-    torch.save(dict(scope=config['scope'], routing_semantics=ROUTING_SEMANTICS,
+    torch.save(dict(scope=config['scope'], routing_semantics=routing_semantics(config),
         loss_semantics=loss_semantics(config), configuration=config, step=step, actual_updates=step,
         motion_observation_policy='canonical_all', model=model.state_dict(),
         optimizer=optimizer.state_dict(), numpy_rng=rng.bit_generator.state,
@@ -72,7 +86,7 @@ def load_checkpoint(path, *, device='cpu'):
         raise ValueError('sequence checkpoint configuration required')
     config = configuration(saved['configuration'])
     if (saved.get('scope') != config['scope']
-            or saved.get('routing_semantics') != ROUTING_SEMANTICS
+            or saved.get('routing_semantics') != routing_semantics(config)
             or saved.get('loss_semantics') != loss_semantics(config)
             or saved.get('motion_observation_policy') != 'canonical_all'):
         raise ValueError('sequence checkpoint scope, routing or loss contract mismatch')
@@ -80,7 +94,7 @@ def load_checkpoint(path, *, device='cpu'):
             or type(saved.get('actual_updates')) is not int or saved['actual_updates'] != saved['step']
             or any(key not in saved for key in ('optimizer', 'numpy_rng', 'torch_rng', 'cuda_rng'))):
         raise ValueError('sequence checkpoint update or optimizer/RNG contract mismatch')
-    model = SequencePosition(**config['model']).to(device)
+    model = _make_model(config).to(device)
     model.load_state_dict(saved['model'], strict=True)
     if not all(torch.isfinite(parameter).all() for parameter in model.parameters()):
         raise ValueError('sequence checkpoint parameters must be finite')
@@ -104,7 +118,10 @@ def _reference_pair(path, config, scene_ids):
     path = Path(path).resolve()
     record = json.loads((path/'run.json').read_text())
     expected = copy.deepcopy(config)
-    expected.update(scope=SCOPE, position_loss='linear')
+    expected.update(scope=SCOPE, position_loss='linear', routing_semantics=ROUTING_SEMANTICS)
+    if config['scope'] == HELPER_SCOPE:
+        expected['model'].pop('aggregation')
+        expected['model']['backbone'] = 'transformer'
     if (record.get('status') != 'COMPLETED' or record.get('configuration') != expected
             or record.get('optimizer_updates') != config['training']['updates']
             or record.get('training_scene_ids') != scene_ids):
@@ -164,16 +181,20 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             or len(set(scene_ids)) != len(scene_ids)):
         raise ValueError('sequence fit requires distinct nonempty T_core scenes only')
     harm_objective = config['position_loss'] == RELATIVE_HARM_LOSS
-    if harm_objective != (paired_reference_fit is not None):
-        raise ValueError('only relative-harm training requires a frozen same-seed linear control')
-    reference = _reference_pair(paired_reference_fit, config, scene_ids) if harm_objective else None
+    helper = config['scope'] == HELPER_SCOPE
+    if (harm_objective or helper) != (paired_reference_fit is not None):
+        raise ValueError('relative-harm/helper training requires a frozen same-seed linear control')
+    reference = _reference_pair(paired_reference_fit, config, scene_ids) if paired_reference_fit is not None else None
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     training = config['training']
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
-    model = SequencePosition(**config['model']).to(device)
+    model = _make_model(config)
+    if helper:
+        initialize_from_reference(model, reference['initial']['model'], branch_seed=training['seed'] + 78000)
+    model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=training['learning_rate'])
     cuda = torch.device(device).type == 'cuda'
     if cuda:
@@ -181,7 +202,7 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
     audit = dict(successful_updates=0, sampled_anchors=0, valid_position_points=0,
                  nonzero_gradient_updates=0, scenes={}, anchors={},
                  modes={mode: dict(updates=0, anchors=0, valid_position_points=0) for mode in TRAIN_MODES})
-    state = dict(scope=config['scope'], routing_semantics=ROUTING_SEMANTICS, loss_semantics=loss_semantics(config),
+    state = dict(scope=config['scope'], routing_semantics=routing_semantics(config), loss_semantics=loss_semantics(config),
         status='RUNNING', configuration=config, optimizer_updates=0, test_opened=False,
         motion_observation_policy='canonical_all', device=str(device), training_scene_ids=scene_ids,
         selection_policy='fixed final step; no validation or intermediate selection in training',
@@ -192,6 +213,12 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
         feature_scaling='fixed visible physical/log scales; no data-fitted or validation statistics',
         prediction_scope='position only; all queries may change; speed/course remain ordinary Mean',
         scientific_status='generic task-adapted equal-exposure pilot, not PTFM/TMTAFF or converged benchmark')
+    if helper:
+        state.update(feature_width=92, helper_aggregation=config['model']['aggregation'],
+            helper_support_exposure={population: {name: 0 for name in ('zero', 'one', 'multiple')}
+                                     for population in ('all_queries', 'valid_position_queries')},
+            helper_gradients=dict(phi_nonzero_updates=0, scorer_nonzero_updates=0),
+            scientific_status='single-seed helper representation screen; weights are latent, not physical reliability')
     if reference is not None:
         state['paired_control'] = dict(fit=reference['path'], status='PENDING', initial_parameters_exact=False,
             initial_sampler_rng_exact=False, actual_successful_batches_matched=0,
@@ -203,12 +230,21 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
         if reference is not None:
             old = reference['initial']
             current = model.state_dict()
-            if (set(current) != set(old['model'])
-                    or any(not torch.equal(value.detach().cpu(), old['model'][key]) for key, value in current.items())
-                    or rng.bit_generator.state != old['numpy_rng']
-                    or not torch.equal(torch.get_rng_state(), old['torch_rng'])):
+            if helper:
+                common_exact = all(torch.equal(
+                    (current[key][:, :76] if key == 'input_projection.0.weight' else current[key]).detach().cpu(), value)
+                    for key, value in old['model'].items())
+            else:
+                common_exact = set(current) == set(old['model']) and all(
+                    torch.equal(value.detach().cpu(), old['model'][key]) for key, value in current.items())
+            if (not common_exact or rng.bit_generator.state != old['numpy_rng']
+                    or (not helper and not torch.equal(torch.get_rng_state(), old['torch_rng']))):
                 raise ValueError('relative-harm fresh initial parameters or sampler RNG differ from linear control')
             state['paired_control'].update(initial_parameters_exact=True, initial_sampler_rng_exact=True)
+            if helper:
+                state['paired_control'].update(initial_parameters_scope='all original common tensors; first76 projection columns',
+                    added_projection_zero=True, branch_seed=training['seed'] + 78000,
+                    initialization='original step0 common tensors; independent new branch; fresh Adam')
         train = prepare_evidence_scenes(train_raw, check=check, motion_observation_policy='canonical_all')
         if any(not len(scene['identities']) for scene in train):
             raise ValueError('uniform scene sampling cannot silently discard empty scenes')
@@ -221,11 +257,12 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             optimizer.zero_grad(set_to_none=True)
             mode = TRAIN_MODES[(step - 1) % len(TRAIN_MODES)]
             batch, samples, linear, logarithmic, optimized = [], [], [], [], []
+            helper_batch = []
             for _ in range(training['batch_size']):
                 scene = train[int(rng.integers(len(train)))]
                 anchor = int(rng.integers(len(scene['identities'])))
                 members = training_members(scene, anchor, mode)
-                result = model(*sequence_inputs(scene['motion'], members, device=device))
+                result = model(*(helper_sequence_inputs if helper else sequence_inputs)(scene['motion'], members, device=device))
                 target = torch.as_tensor(scene['target'][anchor], dtype=torch.float64, device=device)
                 valid = torch.as_tensor(scene['valid'][anchor], dtype=torch.bool, device=device)
                 losses, diagnostics = sequence_objectives(result, target, valid, position_loss=config['position_loss'])
@@ -239,6 +276,13 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                 support = scene['motion']['support']
                 eligible = ~support[anchor] & support[members[1:]].any(0)
                 samples.append(diagnostics)
+                if helper:
+                    counts = support[members[1:]].sum(0)
+                    valid_positions = valid[:, :2].all(-1).cpu().numpy()
+                    helper_batch.append({population: {name: int((selection & mask).sum())
+                        for name, selection in (('zero', counts == 0), ('one', counts == 1), ('multiple', counts >= 2))}
+                        for population, mask in (('all_queries', np.ones_like(counts, bool)),
+                                                  ('valid_position_queries', valid_positions))})
                 batch.append(dict(scene_id=str(scene['scene_id']), anchor_index=anchor,
                     node_id=str(scene['node_ids'][anchor]), members=[int(x) for x in members],
                     valid_position_points=diagnostics['valid_position_points'],
@@ -250,6 +294,11 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                     raise ValueError(f'relative-harm actual sampling differs from linear control before update {step}')
             norm = torch.nn.utils.clip_grad_norm_(model.parameters(), training['gradient_clip'],
                                                  error_if_nonfinite=True)
+            branch_grad = {}
+            if helper:
+                branch_grad = {label: any(p.grad is not None and bool(torch.count_nonzero(p.grad))
+                    for name, p in model.named_parameters() if name.startswith(prefix))
+                    for label, prefix in (('phi_nonzero_updates', 'phi.'), ('scorer_nonzero_updates', 'scorer.'))}
             optimizer.step()
             # Commit actual optimizer exposure before later serialization checks.
             state['optimizer_updates'] = step
@@ -258,6 +307,13 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             audit['sampled_anchors'] += len(batch)
             audit['valid_position_points'] += count
             audit['nonzero_gradient_updates'] += int(norm > 0)
+            if helper:
+                for sample_counts in helper_batch:
+                    for population, counts in sample_counts.items():
+                        for category, value in counts.items():
+                            state['helper_support_exposure'][population][category] += value
+                for label, nonzero in branch_grad.items():
+                    state['helper_gradients'][label] += int(nonzero)
             audit['modes'][mode]['updates'] += 1
             audit['modes'][mode]['anchors'] += len(batch)
             audit['modes'][mode]['valid_position_points'] += count
@@ -292,6 +348,8 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             row = dict(step=step, mode=mode, batch=batch, loss=float(np.mean(optimized)),
                 objectives=objectives, gradient_norm=float(norm), gradient_clipped=bool(norm > training['gradient_clip']),
                 gradient_clip_scale=min(1., training['gradient_clip'] / (float(norm) + 1e-6)))
+            if helper:
+                row.update(helper_support_batch=helper_batch, helper_gradients=branch_grad)
             rows.append(row)
             with (output / 'training.jsonl').open('a') as handle:
                 handle.write(json.dumps(row, allow_nan=False) + '\n')

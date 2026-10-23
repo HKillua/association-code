@@ -1,0 +1,8 @@
+{
+  "scope": "079-tsa-frozen-training-input-probe-v1",
+  "seed": 20261024,
+  "scene_count": 32,
+  "pairs_per_head_scene": 32,
+  "inference_batch_tracks": 128,
+  "advisory_seconds": 3600
+}

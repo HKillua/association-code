@@ -10,6 +10,9 @@
 | `support_gate_linear_fit.py` | 已完成070：只改线性位置损失，逐批配对068，复用原CPU初始化；保留复现入口，不重领 |
 | `support_gate_replication.py` | 071A/B：独立启动新seed Log／线性1000更新及CPU两端点评价；compare仅在两臂完成后核实际配对 |
 | `sequence_position_fit.py` | LSTM／Transformer二维位置恢复；extended4000为072，harm4000／harm-replica4000为074A/B，必须绑定同seed完整旧控制；CPU两端点 |
+| `helper_sequence_fit.py` | 078A/B/C：三种helper集合表示，同seed／原072C公共初值和4000实际批次配对，CPU两端点全人口评价 |
+| `../analysis/compare_helper_sequence.py` | 078单臂或三臂缓存比较，严格配对、H/I/尾部/组件和helper数量分层，无前向 |
+| `../analysis/tsactfer_input_probe.py` | 079冻结074D，在固定32个T场比较裁窗/完整×同/跨场负例；零训练，非全候选成绩 |
 | `ptfm_fit.py` | 074C：双流PTFM四状态任务适配，T-only归一化、与072C实际批次配对；CPU两端点及真实缓存对照 |
 | `ptfm_residual_fit.py` | 076B：只改PTFM位置为固定.95物理初值＋零初始化残差；配对074C全部初参例外与实际批次，并保留072C曝光比较 |
 | `../analysis/ptfm_speed_diagnostics.py` | 076A：只读074C及056缓存；固定零速控制、原生分布、逐目标动态与相邻有效查询变化，不加载权重或前向 |

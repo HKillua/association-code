@@ -50,7 +50,8 @@ def _prior(anchor, mean, switch):
     return result
 
 
-def _predict(model, motion, groups, predictions, check, *, initial=False):
+def _predict(model, motion, groups, predictions, check, *, initial=False,
+             input_builder=sequence_inputs, observer=None):
     q = motion['states'].shape[1]
     output = predictions['fixed_prior095'].copy()
     residuals = []
@@ -58,7 +59,7 @@ def _predict(model, motion, groups, predictions, check, *, initial=False):
         for group in groups:
             if check:
                 check()
-            args = sequence_inputs(motion, group, device='cpu')
+            args = input_builder(motion, group, device='cpu')
             result = model(*args)
             states = _tensor(result['states'], (q, 4), 'states', physical=True)
             base = _tensor(result['base_states'], (q, 4), 'baseline_states', physical=True)
@@ -74,6 +75,8 @@ def _predict(model, motion, groups, predictions, check, *, initial=False):
                 _same(states, base, '071 initial output exactly fixed .95')
             output[group[0]] = states
             residuals.append(residual)
+            if observer is not None:
+                observer(group, args, result)
     return output, np.asarray(residuals)
 
 
@@ -175,7 +178,8 @@ def _pool(rows, arrays):
     return result
 
 
-def evaluate_sequence_position(model, validation_raw, source056, metadata, output, check=None, *, initial=False):
+def evaluate_sequence_position(model, validation_raw, source056, metadata, output, check=None, *, initial=False,
+                               predictor=None, evaluation_scope='071-sequence-position-evaluation'):
     source056, output = Path(source056).resolve(), Path(output).resolve()
     protected = source056.parent
     if output == protected or output in protected.parents or protected in output.parents:
@@ -189,7 +193,7 @@ def evaluate_sequence_position(model, validation_raw, source056, metadata, outpu
         raise ValueError('071 requires exact component registry')
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    state = dict(status='RUNNING', scope='071-sequence-position-evaluation', device='cpu',
+    state = dict(status='RUNNING', scope=evaluation_scope, device='cpu',
         source_system=str(source056), scene_ids=ids, total_scenes=len(ids), completed_scenes=0,
         initial=initial, test_opened=False, groups_recomputed=False, threshold_reselected=False,
         model_forwards=0, optimizer_updates=0,
@@ -214,8 +218,10 @@ def evaluate_sequence_position(model, validation_raw, source056, metadata, outpu
             predictions['support_switch'], switch = support_switch_prediction(predictions['anchor'],
                 predictions['mean_supported'], fragment['support'], groups)
             predictions['fixed_prior095'] = _prior(predictions['anchor'], predictions['mean_supported'], switch)
-            predictions['learned_sequence'], residual = _predict(model, scene['motion'], groups,
+            predicted = (_predict if predictor is None else predictor)(model, scene['motion'], groups,
                 predictions, check, initial=initial)
+            predictions['learned_sequence'], residual = predicted[:2]
+            extra_payload = {} if len(predicted) == 2 else predicted[2]
             reports, artifact = evaluate_unique_population(scene, {'learned_assoc': groups}, {'learned_assoc': predictions})
             artifact = {key.removeprefix('learned_assoc_'): value for key, value in artifact.items()}
             for arm in ARMS:
@@ -235,6 +241,9 @@ def evaluate_sequence_position(model, validation_raw, source056, metadata, outpu
                     'native_states', 'support', 'nearest_seconds', 'exact_observation', 'query_seconds',
                     'learned_assoc_group_offsets', 'learned_assoc_group_node_indices')},
                 **{method+'_group_states': artifact[method]['group_states'] for method in METHODS}, **data)
+            if set(extra_payload) & set(payload):
+                raise ValueError('sequence diagnostic payload cannot replace physical inputs or outputs')
+            payload.update(extra_payload)
             np.savez_compressed(output/'predictions'/f'states-{sid}.npz', **payload)
             np.savez_compressed(output/'system-predictions'/f'states-{sid}.npz',
                 **{method+'_'+key: value for method, values in artifact.items() for key, value in values.items()})

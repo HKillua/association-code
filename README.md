@@ -33,6 +33,9 @@ python tools/experiments/support_gate_fit.py --help
 python tools/experiments/support_gate_linear_fit.py --help
 python tools/experiments/support_gate_replication.py --help
 python tools/experiments/sequence_position_fit.py --help
+python tools/experiments/helper_sequence_fit.py --help
+python tools/analysis/compare_helper_sequence.py --help
+python tools/analysis/tsactfer_input_probe.py --help
 python tools/experiments/ptfm_fit.py --help
 python tools/experiments/ptfm_residual_fit.py --help
 python tools/analysis/ptfm_speed_diagnostics.py --help
@@ -52,4 +55,6 @@ python -m unittest discover -s tests
 
 [075只读诊断](HandOver/S2L-20261024-075.md)已完成，待深入科研复核。[076A/B](HandOver/L2S-20261024-076.md)均已完成并审查。A速度平均水平误差改善而目标内动态较差；B位置残差适配为有效负实验：MAE1609.060m虽优于074C的1845.384m，却在全部300场、38组件劣于自身固定.95初值721.174m。关闭该配方，不加步追榜；不据此否定原作者PTFM，见[076B审查](docs/research_status.md#076b结果审查2026-10-24)。
 
-[074双seed深挖](docs/research_status.md#074ab两seed深挖与去留2026-10-24)确认累计伤害与有效改善同时减少，净收益方向跨seed翻转；A的RMSE净改善对3035敏感。[077缓存诊断](HandOver/S2L-20261024-077.md)已完成并审查：固定减半MAE640.247／624.993m，两seed均未超过原linear；A与harm互有取舍、B仅全局H/I由harm占优，不据此证明惩罚必要，见[综合审查](docs/research_status.md#076a077结果审查2026-10-24)。076A／076B／077均已结案，当前无新READY。
+[074双seed深挖](docs/research_status.md#074ab两seed深挖与去留2026-10-24)确认累计伤害与有效改善同时减少，净收益方向跨seed翻转；A的RMSE净改善对3035敏感。[077缓存诊断](HandOver/S2L-20261024-077.md)已完成并审查：固定减半MAE640.247／624.993m，两seed均未超过原linear；A与harm互有取舍、B仅全局H/I由harm占优，不据此证明惩罚必要，见[综合审查](docs/research_status.md#076a077结果审查2026-10-24)。076A／076B／077均已结案，不重领。
+
+078A/B/C已完成同seed容量／联合编码／选择性聚合的实现，079完成冻结TSA资格诊断；最新执行状态以[交接索引](HandOver/Handover.md)为准。先筛选机制、入围后再配对seed复验，不给所有候选重复预算。方法边界及外部审查纠正见[078/079审查](docs/research_status.md#078079对抗性审查与实施2026-10-24)。
