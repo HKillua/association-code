@@ -1,6 +1,16 @@
 # 当前交接
 
-2026-10-23。本地已审服务器`9761a84`：**073A/B/C及CPU整表均COMPLETED／退出0，科研验收通过、结案。按实验前的MAE判据，接受Transformer4000为后续位置恢复底座，保留门控为小容量／尾部对照。** 两seed的点MAE、四种MAE加权及最大组件外方向全一致；点RMSE两seed均略差，P99方向翻转，不能称全面更可靠。依据与回执勘误见[研究状态073节](../docs/research_status.md#073审查与后续方向2026-10-23)／[本地复算](results/LEVEL1-POSITION-REPLICATION-20261023-073-summary/local-audit.json)。**当前无新READY或已知在途任务，旧READY不得重领。** 下一批[074四卡设计](../docs/research_status.md#074四卡实验设计2026-10-23设计v1未发布执行)为两seed方法干预＋PTFM适配＋TSA适配，当前仅设计与开发规划，未发布执行交接。
+2026-10-23。本地已审服务器`9761a84`：**073A/B/C及CPU整表均COMPLETED／退出0，科研验收通过、结案。按实验前的MAE判据，接受Transformer4000为后续位置恢复底座，保留门控为小容量／尾部对照。** 两seed的点MAE、四种MAE加权及最大组件外方向全一致；点RMSE两seed均略差，P99方向翻转，不能称全面更可靠。依据与回执勘误见[研究状态073节](../docs/research_status.md#073审查与后续方向2026-10-23)／[本地复算](results/LEVEL1-POSITION-REPLICATION-20261023-073-summary/local-audit.json)。**074A/B已完成代码与检查，现分别LOCAL_TO_SERVER / READY；C/D独立开发中，暂不可领取。旧READY不得重领。**
+
+| 当前074任务 | 状态 | 执行范围 |
+|---|---|---|
+| [074A/B](L2S-20261023-074AB.md) | **LOCAL_TO_SERVER / READY**，冻结417c90d，分别独立领取 | 两seed Transformer相对初值退化惩罚，各fresh4000、单GPU/CPU4；CPU两端点及各自同seed缓存对照 |
+| 074C PTFM / 074D TSA | **DEVELOPING，不可领取** | 完成各自适配、贯通和审查后独立发布，不等待A/B结果 |
+
+全局最多四个已发布单卡任务；074A/B不占用另外两槽的授权范围，C/D未READY不得提前运行。A/B一次尝试、不自动重试、4小时仅提醒；完成后各一次CPU缓存表预算已含。push不唤醒服务器，READY不等于RUNNING。详细研究边界见[074契约](../docs/specs/evidence-association-fusion.md#074相对初值退化惩罚与领域对照)。
+
+## 073历史结案记录
+
 
 **073三项及一次CPU缓存表全部COMPLETED／退出0（冻结代码`e08b974`）：A 3,406.8s、B 3,496.5s、C 4,076.4s、CPU表165.4s，零重试、未触达4小时建议线。** 两seed×两方法4000的表已补齐：Transformer点MAE在两个seed与四种MAE加权、最大组件及组件外全部优于同seed门控（072C 590.744／073C 606.624 vs 073A 646.750／073B 635.776），但点RMSE两seed均略差（+1.304／+44.382m），P99方向跨seed翻转（−637.0／+494.5m）；门控自身加训方向也翻转（073A比071B差+13.16m，073B比070好−25.88m）。`gate_prefixes`对两门控臂的初参数／采样器RNG／前1000实际批全`exact=true`，Transformer两臂因换seed无此前缀声明。预定MAE晋级已满足；本地决定与尾部代价一并记录，原件见[073整表回执](S2L-20261023-073-summary.md)。
 
@@ -28,7 +38,7 @@
 
 ## 执行／回传规则
 
-只领取当前表READY或已满足依赖步骤；073每项独立写S2L并完成即回传，不等全部。提交实际command/exit/run/config、必要端点/逐场/曝光/窗口loss/clip与耗时和原件路径；完整权重、训练JSONL、预测留服务器，不用同名摘要替换输入。成功必须由内容、命令、退出码和实际数组支持，Git版本只定位冻结代码，无SHA/hash准入。
+只领取当前074表READY或其已满足依赖步骤；旧073为已结案记录，不重领。各项独立写S2L并完成即回传，不等全部。提交实际command/exit/run/config、必要端点/逐场/曝光/窗口loss/clip与耗时和原件路径；完整权重、训练JSONL、预测留服务器，不用同名摘要替换输入。成功必须由内容、命令、退出码和实际数组支持，Git版本只定位冻结代码，无SHA/hash准入。
 
 非有限、来源/配置/人口不符即保全失败，不删点/放宽标准/自动重试。超建议时间记录实耗和进度，继续当前固定工作，不自动杀或加步。全局兼容GPU可共卡，不触碰他人进程，服务托管沿用[服务器规则](../docs/server_autonomy.md)。本地不SSH值守、不跨聊天发指令；**push不会唤醒服务器，READY不代表已启动**。
 
