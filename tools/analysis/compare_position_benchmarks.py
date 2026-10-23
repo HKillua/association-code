@@ -45,6 +45,10 @@ REPLICATION_CONFIGS = {
     '073B_gate4000_seed21': 'support-gate-linear-extended-replica-level1.json',
     '073C_transformer4000_seed21': 'sequence-position-transformer-extended-replica-level1.json',
 }
+HARM_CONFIGS = {
+    '074A_harm4000_seed23': 'sequence-position-transformer-relative-harm-level1.json',
+    '074B_harm4000_seed21': 'sequence-position-transformer-relative-harm-replica-level1.json',
+}
 CONSTANT_METHOD = '072A_constant'
 OPTIONAL_INPUTS = ('constant_run072A', 'lstm_run072B', 'transformer_run072C')
 INPUT_KEYS = ('node_ids', 'identities', 'target_identity_ids', 'native_states', 'support',
@@ -168,8 +172,8 @@ def verify_extended_sampling(lstm_fit, transformer_fit, previous_lstm, previous_
 def _metadata(path, arm):
     path = Path(path).resolve()
     run, summary, fit = [read_json(path/name) for name in ('run.json', 'summary.json', 'fit/run.json')]
-    extended = arm in EXTENDED_CONFIGS or arm in REPLICATION_CONFIGS
-    config = read_json(ROOT/'configs'/({**ARM_CONFIGS, **EXTENDED_CONFIGS, **REPLICATION_CONFIGS}[arm]))
+    extended = arm in EXTENDED_CONFIGS or arm in REPLICATION_CONFIGS or arm in HARM_CONFIGS
+    config = read_json(ROOT/'configs'/({**ARM_CONFIGS, **EXTENDED_CONFIGS, **REPLICATION_CONFIGS, **HARM_CONFIGS}[arm]))
     steps = 4000 if extended else 1000
     if config['training']['updates'] != steps:
         raise ValueError(f'comparison requires declared{steps}-update budgets')

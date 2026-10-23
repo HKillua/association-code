@@ -16,6 +16,8 @@ from association.models.evidence_fusion import physical_errors
 from association.models.support_gate import gate_inputs, mix_gate_states
 
 SCOPE = 'sequence-position-v1'
+RELATIVE_HARM_SCOPE = 'sequence-position-relative-harm-v1'
+RELATIVE_HARM_LOSS = 'linear_relative_harm'
 ROUTING_SEMANTICS = 'warm095-allquery-tangent-residual-position-v1'
 FEATURE_WIDTH = 76
 EARTH_RADIUS_M = 6371000.
@@ -169,8 +171,10 @@ class SequencePosition(nn.Module):
                     residual_m=residual_m)
 
 
-def sequence_objectives(result, target, valid):
+def sequence_objectives(result, target, valid, *, position_loss='linear'):
     """Position-only losses, per-anchor mean over every valid query, not just R."""
+    if position_loss not in ('linear', RELATIVE_HARM_LOSS):
+        raise ValueError('unknown sequence position objective')
     if target.shape != result['states'].shape or valid.shape != target.shape or valid.dtype != torch.bool:
         raise ValueError('one anchor target with per-attribute validity required')
     mask = valid[:, :2].all(-1)
@@ -186,4 +190,22 @@ def sequence_objectives(result, target, valid):
               for name, value in (('linear', error), ('log1p', torch.log1p(error)))}
     diagnostics = dict(valid_position_points=int(mask.sum()),
         linear_sum=float(error[mask].detach().sum()), log1p_sum=float(torch.log1p(error[mask]).detach().sum()))
+    if position_loss == RELATIVE_HARM_LOSS:
+        # The inference input is still the visible fixed-.95 physical prior.
+        # Only this T-only objective sees its reference error; neither the prior
+        # nor reference can receive a gradient through the extra baseline term.
+        base = result['base_states']
+        if base.shape != target.shape or not torch.isfinite(base[:, :2][mask]).all():
+            raise ValueError('relative harm requires matching finite fixed-prior positions')
+        baseline = (physical_errors(base.detach(), safe.detach())[:, 0] / 1000.).detach()
+        if not torch.isfinite(baseline[mask]).all():
+            raise FloatingPointError('nonfinite valid fixed-prior position error')
+        harm = torch.relu(error - baseline)
+        gain = torch.relu(baseline - error)
+        combined = error + harm  # Frozen coefficient 1; no tunable weighting.
+        losses[RELATIVE_HARM_LOSS] = combined[mask].mean() + zero if mask.any() else zero
+        diagnostics.update(baseline_sum=float(baseline[mask].sum()),
+            relative_harm_sum=float(harm[mask].detach().sum()),
+            relative_gain_sum=float(gain[mask].detach().sum()),
+            objective_sum=float(combined[mask].detach().sum()))
     return losses, diagnostics

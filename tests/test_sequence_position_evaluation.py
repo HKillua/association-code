@@ -207,6 +207,14 @@ class SequencePositionEvaluationTests(unittest.TestCase):
         lstm = read_json(entry.ROOT/'configs/sequence-position-lstm-extended-level1.json')
         with self.assertRaisesRegex(ValueError, 'Transformer'):
             entry.production_contract(lstm, manifest, alignment, profile='replica4000')
+        for profile, suffix, original in (
+                ('harm4000', 'relative-harm-level1', 'extended-level1'),
+                ('harm-replica4000', 'relative-harm-replica-level1', 'extended-replica-level1')):
+            config = read_json(entry.ROOT/f'configs/sequence-position-transformer-{suffix}.json')
+            expected = read_json(entry.ROOT/f'configs/sequence-position-transformer-{original}.json')
+            expected.update(scope='sequence-position-relative-harm-v1', position_loss='linear_relative_harm')
+            self.assertEqual(config, expected)
+            entry.production_contract(config, manifest, alignment, profile=profile)
 
     def test_real_small_cli_run_preserves_fixed_endpoints_without_validation_selection(self):
         from tests.training.test_support_gate import tiny_train
@@ -241,6 +249,55 @@ class SequencePositionEvaluationTests(unittest.TestCase):
             self.assertEqual(read_json(root/'out/run.json')['completed_endpoints'], ['initial', 'final'])
             self.assertFalse(read_json(root/'out/run.json')['validation_selection'])
             self.assertTrue(read_json(root/'out/endpoint-comparison.json')['population_and_masks_exact'])
+
+    def test_relative_harm_full_chain_binds_same_seed_actual_control_and_all_cpu_outputs(self):
+        from tests.training.test_support_gate import tiny_train
+        from tools.experiments import sequence_position_fit as entry
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, metadata, validation = support_gate_cache_fixture(root)
+            training = tiny_train()
+            config = read_json(entry.ROOT/'configs/sequence-position-transformer-extended-level1.json')
+            config['training'].update(updates=2, batch_size=2)
+            manifest = dict(splits={'T_core': [str(scene['scene_id']) for scene in training],
+                                    'V_select': ['3035']}, components={'3035': 'shared'})
+            harm = deepcopy(config)
+            harm.update(scope='sequence-position-relative-harm-v1', position_loss='linear_relative_harm')
+            for name, value in (('control', config), ('harm', harm), ('manifest', manifest), ('alignment', {})):
+                write_json(root/(name+'.json'), value)
+            args = Namespace(source_system=str(source), output=str(root/'control'), archive=['not-opened.zip'],
+                manifest=str(root/'manifest.json'), alignment=str(root/'alignment.json'),
+                config=str(root/'control.json'), device='cpu', cpu_threads=4, time_policy='advisory',
+                profile='extended4000', paired_control=None)
+            with patch.object(entry, 'production_contract'), patch.object(entry, '_bind_source'), \
+                    patch.object(entry, '_load_metadata', return_value=metadata), \
+                    patch.object(entry, 'load_timed_dataset', side_effect=lambda *a, **k: dict(train=training,
+                        validation=validation, report={'fixture': True})), \
+                    patch('association.evaluation.sequence_position.frozen_motion', side_effect=lambda raw, *_: raw):
+                entry.run(args)
+                args = Namespace(**vars(args))
+                args.config, args.output = str(root/'harm.json'), str(root/'harm')
+                args.profile, args.paired_control = 'harm4000', str(root/'control')
+                result = entry.run(args)
+            self.assertEqual(result['status'], 'COMPLETED')
+            self.assertEqual(result['training_pairing']['actual_successful_batches_matched'], 2)
+            self.assertTrue(result['training_pairing']['initial_parameters_exact'])
+            self.assertTrue(result['training_pairing']['sampling_exposure_exact'])
+            self.assertEqual(read_json(root/'harm/run.json')['completed_endpoints'], ['initial', 'final'])
+            self.assertEqual(read_json(root/'harm/final/summary.json')['checkpoint']['position_loss'], 'linear_relative_harm')
+            self.assertTrue(read_json(root/'harm/endpoint-comparison.json')['population_and_masks_exact'])
+            for label in ('initial', 'final'):
+                with np.load(root/'harm'/label/'system-predictions/states-3035.npz', allow_pickle=False) as data:
+                    np.testing.assert_array_equal(data['learned_sequence_group_states'][..., 2:],
+                                                  data['mean_supported_group_states'][..., 2:])
+                    if label == 'initial':
+                        np.testing.assert_array_equal(data['learned_sequence_group_states'],
+                                                      data['fixed_prior095_group_states'])
+            record = read_json(root/'control/final/run.json')
+            record['checkpoint']['step'] = 1
+            write_json(root/'control/final/run.json', record)
+            with self.assertRaisesRegex(ValueError, 'frozen endpoint'):
+                entry.bind_linear_control(root/'control', harm, source, manifest)
 
 
 if __name__ == '__main__':
