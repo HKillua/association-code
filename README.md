@@ -45,6 +45,6 @@ python -m unittest discover -s tests
 
 本地AI负责代码和决策，服务器AI按交接执行；push不会唤醒服务器。权限、维护和回传规则见[AGENTS](AGENTS.md)及[现场执行规则](docs/server_autonomy.md)。
 
-073已完成并复核：同4000更新、两个seed下Transformer的MAE均优于门控（590.744／606.624m对646.750／635.776m），满足预定晋级条件，采用其为后续位置恢复底座；RMSE和部分尾部仍有代价，门控保留为对照。固定056分组、97.21%覆盖与610重复；速度／航向统一Mean。领域PTFM／TSA及有效完整TMTAFF仍缺，T_test封存。074D TSA适配已完成，当前结果严重失效，尚未补齐可信强关联基线；两seed退化惩罚A/B与PTFM四状态适配C按最近回执仍RUNNING。详见[074D结果审查](docs/research_status.md#074d结果审查2026-10-24)，不将适配pilot失败宣称为击败原论文。详见[研究决策](docs/research_status.md#073审查与后续方向2026-10-23)与[交接](HandOver/Handover.md)。
+073已完成并复核：同4000更新、两个seed下Transformer的MAE均优于门控（590.744／606.624m对646.750／635.776m），满足预定晋级条件，采用其为后续位置恢复底座；RMSE和部分尾部仍有代价，门控保留为对照。固定056分组、97.21%覆盖与610重复；速度／航向统一Mean。领域PTFM／TSA及有效完整TMTAFF仍缺，T_test封存。074D TSA适配已完成，当前结果严重失效，尚未补齐可信强关联基线；074C已完成：位置1845.38m未达竞争水平，速度／航向有待进一步归因的改善，见[074C审查](docs/research_status.md#074c结果审查2026-10-24)；两seed退化惩罚A/B待完整回传。详见[074D结果审查](docs/research_status.md#074d结果审查2026-10-24)，不将适配pilot失败宣称为击败原论文。详见[研究决策](docs/research_status.md#073审查与后续方向2026-10-23)与[交接](HandOver/Handover.md)。
 
-[075只读诊断](HandOver/L2S-20261024-075.md)已READY：冻结074D评分与日志，区分排序能力、原阈值错误与训练曝光，CPU4／零训练。全仓514项测试通过；尚无服务器分析结果。
+[075只读诊断](HandOver/L2S-20261024-075.md)已由服务器领取RUNNING：冻结074D评分与日志，区分排序能力、原阈值错误与训练曝光，CPU4／零训练。全仓514项测试通过；尚无服务器分析结果。

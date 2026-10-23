@@ -1,0 +1,414 @@
+{
+  "audit_kind": "LOCAL_AGGREGATE_RECOMPUTATION",
+  "review_date": "2026-10-24",
+  "repository_head": "1e268486adfd7c2d64f0008cac190ecebaa71523",
+  "inputs": [
+    "final/summary.json.gz",
+    "transformer-comparison.json.gz",
+    "endpoint-comparison.json.gz"
+  ],
+  "gzip_layers": {
+    "final/summary.json.gz": 1,
+    "transformer-comparison.json.gz": 2,
+    "endpoint-comparison.json.gz": 1
+  },
+  "raw_prediction_npz_available": false,
+  "scope": "Recomputed point-weighted MAE/MSE/RMSE and scene/component signs from returned aggregate records; no original prediction, mask, source data or checkpoint replay. P95/P99 are retained source aggregate quantiles, not reconstructed from scene quantiles.",
+  "source_flags": {
+    "status": "COMPLETED",
+    "scene_count": 300,
+    "population": {
+      "target_identity_count": 9100,
+      "predicted_group_count": 9353,
+      "duplicate_prediction_group_count": 610,
+      "anchor_matched_target_count": 8743,
+      "reference_unavailable_target_count": 1
+    },
+    "full_group_population_controls_and_masks_exact": true,
+    "model_forwards": 0,
+    "optimizer_updates": 0,
+    "test_opened": false
+  },
+  "attributes": {
+    "position": {
+      "models": {
+        "ptfm_adapted": {
+          "point_count": 442263,
+          "mae_from_scenes": 1845.3842969292293,
+          "rmse_from_scenes": 6559.955864203172,
+          "scene_macro_mae": 2116.1883418582793,
+          "source_mae": 1845.3842969291773,
+          "source_rmse": 6559.955864203137,
+          "absolute_mae_reaggregation_difference": 5.206857167650014e-11,
+          "absolute_mse_reaggregation_difference": 4.544854164123535e-07,
+          "source_p95": 4314.238247555654,
+          "source_p99": 10674.032433617764
+        },
+        "learned_sequence": {
+          "point_count": 442263,
+          "mae_from_scenes": 590.7435832803392,
+          "rmse_from_scenes": 3289.2144439100957,
+          "scene_macro_mae": 660.0388023984616,
+          "source_mae": 590.7435832803362,
+          "source_rmse": 3289.214443910104,
+          "absolute_mae_reaggregation_difference": 2.9558577807620168e-12,
+          "absolute_mse_reaggregation_difference": 5.21540641784668e-08,
+          "source_p95": 1966.401024643514,
+          "source_p99": 7825.684916974176
+        }
+      },
+      "scenes": {
+        "mae": {
+          "ptfm_better": 3,
+          "ptfm_worse": 297,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        },
+        "rmse": {
+          "ptfm_better": 26,
+          "ptfm_worse": 274,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        }
+      },
+      "components": {
+        "mae": {
+          "ptfm_better": 0,
+          "ptfm_worse": 38,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        },
+        "rmse": {
+          "ptfm_better": 5,
+          "ptfm_worse": 33,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        }
+      },
+      "actual_attribute_population": {
+        "available_target_count": 454952,
+        "available_prediction_count": 598592,
+        "intersection_count": 442263,
+        "missing_prediction_count": 12689,
+        "prediction_without_target_count": 156329,
+        "available_target_trajectory_count": 9099,
+        "covered_target_trajectory_count": 8742,
+        "missing_target_trajectory_count": 357,
+        "mae": 1845.3842969292298,
+        "mse": 43033020.94029361,
+        "rmse": 6559.955864203174,
+        "coverage": 0.9721091455801931,
+        "trajectory_coverage": 0.9607649192218926,
+        "scene_macro_mae": 2116.188341858278,
+        "scene_macro_mae_scene_count": 300,
+        "scene_macro_coverage": 0.9909941765696808,
+        "scene_macro_coverage_scene_count": 300,
+        "scene_macro_trajectory_coverage": 0.9855202647918488,
+        "scene_macro_trajectory_coverage_scene_count": 300,
+        "scene_count": 300,
+        "unit": "metres"
+      },
+      "paired_point_counts_and_net_change": {
+        "common_point_count": 442263,
+        "better_point_count": 30004,
+        "worse_point_count": 412259,
+        "tied_point_count": 0,
+        "improvement_sum": 31140752.081585735,
+        "harm_sum": 586021918.0220848,
+        "signed_error_change_sum": 554881165.9404991,
+        "mean_error_change": 1254.6407136488901,
+        "positive_delta_tail": {
+          "point_count": 412259,
+          "p95": 3199.2122905034844,
+          "p99": 6866.502416261817
+        }
+      },
+      "final_minus_step0": {
+        "common_point_count": 442263,
+        "better_point_count": 436132,
+        "worse_point_count": 6131,
+        "tied_point_count": 0,
+        "improvement_sum": 6631836850.706061,
+        "harm_sum": 14394338.992405768,
+        "signed_error_change_sum": -6617442511.7136545,
+        "mean_error_change": -14962.686256172581,
+        "positive_delta_tail": {
+          "point_count": 6131,
+          "p95": 7414.837584557196,
+          "p99": 20354.271805964767
+        }
+      }
+    },
+    "speed": {
+      "models": {
+        "ptfm_adapted": {
+          "point_count": 442476,
+          "mae_from_scenes": 1.4609045948941954,
+          "rmse_from_scenes": 2.0488039456534466,
+          "scene_macro_mae": 1.6624761718740326,
+          "source_mae": 1.4609045948941977,
+          "source_rmse": 2.0488039456534652,
+          "absolute_mae_reaggregation_difference": 2.220446049250313e-15,
+          "absolute_mse_reaggregation_difference": 7.638334409421077e-14,
+          "source_p95": 3.777299221155113,
+          "source_p99": 5.6862486585172425
+        },
+        "learned_sequence": {
+          "point_count": 442476,
+          "mae_from_scenes": 53.85100816606373,
+          "rmse_from_scenes": 195.08047366622154,
+          "scene_macro_mae": 59.59889188852309,
+          "source_mae": 53.85100816606454,
+          "source_rmse": 195.08047366622097,
+          "absolute_mae_reaggregation_difference": 8.100187187665142e-13,
+          "absolute_mse_reaggregation_difference": 2.255546860396862e-10,
+          "source_p95": 98.11107458128801,
+          "source_p99": 133.87501537707408
+        }
+      },
+      "scenes": {
+        "mae": {
+          "ptfm_better": 300,
+          "ptfm_worse": 0,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        },
+        "rmse": {
+          "ptfm_better": 300,
+          "ptfm_worse": 0,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        }
+      },
+      "components": {
+        "mae": {
+          "ptfm_better": 38,
+          "ptfm_worse": 0,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        },
+        "rmse": {
+          "ptfm_better": 38,
+          "ptfm_worse": 0,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        }
+      },
+      "actual_attribute_population": {
+        "available_target_count": 455162,
+        "available_prediction_count": 598592,
+        "intersection_count": 442476,
+        "missing_prediction_count": 12686,
+        "prediction_without_target_count": 156116,
+        "available_target_trajectory_count": 9096,
+        "covered_target_trajectory_count": 8739,
+        "missing_target_trajectory_count": 357,
+        "mae": 1.4609045948941952,
+        "mse": 4.197597607725132,
+        "rmse": 2.0488039456534466,
+        "coverage": 0.9721286047605029,
+        "trajectory_coverage": 0.9607519788918206,
+        "scene_macro_mae": 1.6624761718740326,
+        "scene_macro_mae_scene_count": 300,
+        "scene_macro_coverage": 0.9909966465601849,
+        "scene_macro_coverage_scene_count": 300,
+        "scene_macro_trajectory_coverage": 0.9855202647918488,
+        "scene_macro_trajectory_coverage_scene_count": 300,
+        "scene_count": 300,
+        "unit": "native_speed"
+      },
+      "paired_point_counts_and_net_change": {
+        "common_point_count": 442476,
+        "better_point_count": 441974,
+        "worse_point_count": 502,
+        "tied_point_count": 0,
+        "improvement_sum": 23183842.126603946,
+        "harm_sum": 2478.6588471463256,
+        "signed_error_change_sum": -23181363.467756804,
+        "mean_error_change": -52.39010357116952,
+        "positive_delta_tail": {
+          "point_count": 502,
+          "p95": 29.810054311650237,
+          "p99": 43.055540665101915
+        }
+      },
+      "final_minus_step0": {
+        "common_point_count": 442476,
+        "better_point_count": 442467,
+        "worse_point_count": 9,
+        "tied_point_count": 0,
+        "improvement_sum": 43122207.610526405,
+        "harm_sum": 147.3679113614011,
+        "signed_error_change_sum": -43122060.242615044,
+        "mean_error_change": -97.4562693628921,
+        "positive_delta_tail": {
+          "point_count": 9,
+          "p95": 60.81959049355204,
+          "p99": 75.95207424157337
+        }
+      }
+    },
+    "heading": {
+      "models": {
+        "ptfm_adapted": {
+          "point_count": 442000,
+          "mae_from_scenes": 61.505026965913586,
+          "rmse_from_scenes": 78.57747277800253,
+          "scene_macro_mae": 56.072250654985716,
+          "source_mae": 61.50502696591376,
+          "source_rmse": 78.57747277800298,
+          "absolute_mae_reaggregation_difference": 1.7053025658242404e-13,
+          "absolute_mse_reaggregation_difference": 7.09405867382884e-11,
+          "source_p95": 160.24806749192476,
+          "source_p99": 175.95619806991235
+        },
+        "learned_sequence": {
+          "point_count": 442000,
+          "mae_from_scenes": 75.93638207929335,
+          "rmse_from_scenes": 91.71769192083666,
+          "scene_macro_mae": 72.65973513117564,
+          "source_mae": 75.93638207929187,
+          "source_rmse": 91.71769192083656,
+          "absolute_mae_reaggregation_difference": 1.4779288903810084e-12,
+          "absolute_mse_reaggregation_difference": 2.000888343900442e-11,
+          "source_p95": 167.03929358884454,
+          "source_p99": 177.41038116405363
+        }
+      },
+      "scenes": {
+        "mae": {
+          "ptfm_better": 282,
+          "ptfm_worse": 18,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        },
+        "rmse": {
+          "ptfm_better": 280,
+          "ptfm_worse": 20,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        }
+      },
+      "components": {
+        "mae": {
+          "ptfm_better": 31,
+          "ptfm_worse": 7,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        },
+        "rmse": {
+          "ptfm_better": 31,
+          "ptfm_worse": 7,
+          "tied": 0,
+          "numerical_sign_tolerance": 1e-09
+        }
+      },
+      "actual_attribute_population": {
+        "available_target_count": 454689,
+        "available_prediction_count": 598592,
+        "intersection_count": 442000,
+        "missing_prediction_count": 12689,
+        "prediction_without_target_count": 156592,
+        "available_target_trajectory_count": 9099,
+        "covered_target_trajectory_count": 8742,
+        "missing_target_trajectory_count": 357,
+        "mae": 61.50502696591359,
+        "mse": 6174.419228177725,
+        "rmse": 78.5774727780025,
+        "coverage": 0.9720930130264862,
+        "trajectory_coverage": 0.9607649192218926,
+        "scene_macro_mae": 56.072250654985716,
+        "scene_macro_mae_scene_count": 300,
+        "scene_macro_coverage": 0.9909885667345301,
+        "scene_macro_coverage_scene_count": 300,
+        "scene_macro_trajectory_coverage": 0.9855202647918488,
+        "scene_macro_trajectory_coverage_scene_count": 300,
+        "scene_count": 300,
+        "unit": "degrees"
+      },
+      "paired_point_counts_and_net_change": {
+        "common_point_count": 442000,
+        "better_point_count": 263116,
+        "worse_point_count": 178884,
+        "tied_point_count": 0,
+        "improvement_sum": 13817124.383341528,
+        "harm_sum": 7438465.423227676,
+        "signed_error_change_sum": -6378658.960113853,
+        "mean_error_change": -14.431355113379759,
+        "positive_delta_tail": {
+          "point_count": 178884,
+          "p95": 119.72289654880235,
+          "p99": 152.4097474238262
+        }
+      },
+      "final_minus_step0": {
+        "common_point_count": 442000,
+        "better_point_count": 282149,
+        "worse_point_count": 159851,
+        "tied_point_count": 0,
+        "improvement_sum": 16261160.794504648,
+        "harm_sum": 6326169.653775344,
+        "signed_error_change_sum": -9934991.140729304,
+        "mean_error_change": -22.477355522012,
+        "positive_delta_tail": {
+          "point_count": 159851,
+          "p95": 97.99606892849911,
+          "p99": 132.40851770069105
+        }
+      }
+    }
+  },
+  "all_methods_same_reported_population": true,
+  "helper_query_population": {
+    "all_output_groups": {
+      "query_count": 598592,
+      "supported_helper_present": 266212,
+      "supported_helper_absent": 332380,
+      "negative_raw_speed": 24818,
+      "raw_latitude_outside_domain": 0
+    },
+    "unique_selected_groups": {
+      "query_count": 559552,
+      "supported_helper_present": 263028,
+      "supported_helper_absent": 296524,
+      "negative_raw_speed": 23465,
+      "raw_latitude_outside_domain": 0
+    }
+  },
+  "tail_counterexamples": {
+    "ptfm_vs_anchor_position_p99": {
+      "ptfm": 10674.032433617764,
+      "anchor": 11661.258578506106,
+      "interpretation": "PTFM P99 is better than Anchor, despite worse overall position MAE/RMSE/P95."
+    },
+    "outside_largest_component_position": {
+      "ptfm_adapted": {
+        "unit_count": 109365,
+        "mae": 2330.2436312939417,
+        "mse": 21165634.822695963,
+        "rmse": 4600.612439957963,
+        "point_count": 109365,
+        "p95": 6816.384868357667,
+        "p99": 18120.311799229294
+      },
+      "learned_sequence": {
+        "unit_count": 109365,
+        "mae": 866.4773967119845,
+        "mse": 23239495.525912896,
+        "rmse": 4820.735994214255,
+        "point_count": 109365,
+        "p95": 2704.8732949436826,
+        "p99": 15354.397850019208
+      }
+    }
+  },
+  "interpretation_limits": [
+    "072C learned_sequence trains position only; its speed/course equal ordinary Mean. These are not trained Transformer speed/course predictions, so PTFM speed/course superiority does not establish superiority over a comparable learned three-state competitor.",
+    "Speed improvement appears in all 300 scenes and all 38 components; heading MAE improves in 282 scenes and 31 components. This is broad development-set evidence, not independent identities or multiple-seed evidence.",
+    "Near-equal speed MAE with and without a supported helper does not prove helpers have no value; populations differ. Conversely, large overall speed improvement alone does not establish a multisource-fusion contribution. Training-only constant/prior and anchor-only supervised controls remain necessary.",
+    "Position, speed and heading use 442263, 442476 and 442000 valid points respectively. The receipt stratification table displays position counts; those cannot be reused as speed/course denominators. Helper-availability query counts include rows without valid attribute truth.",
+    "Position MAE is worse in 297/300 scenes and 38/38 components, but not every tail metric or subset is worse: P99 beats Anchor and aggregate RMSE outside the largest component beats 072C.",
+    "Reported exposure matches 072C, but architecture, initialization, output attributes and objectives differ. This is a task adaptation comparison, not a backbone-only ablation or author reproduction. 4000 updates do not establish adequate convergence.",
+    "Training source speed normalizer mean 55.47 and standard deviation 196.83 are input statistics, not truth statistics; native speed unit and possible prior/shrinkage mechanisms require direct truth/prediction analysis before physical or causal interpretation."
+  ]
+}
