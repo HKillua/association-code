@@ -1,0 +1,108 @@
+{
+  "status": "COMPLETED",
+  "scope": "076B-ptfm-prior095-residual",
+  "configuration": {
+    "scope": "ptfm-prior095-residual-v1",
+    "routing_semantics": "anchor-supported-helper-fullstate-maskcontext-prior095-residual-v1",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "l2": 0.0001,
+      "normalization": "T_exposure_visible_local_zscore",
+      "helper_missing": "masked_neutral_carrier",
+      "position_output": "prior095_residual"
+    },
+    "training": {
+      "seed": 20261023,
+      "updates": 4000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 14400.0
+    }
+  },
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "optimizer_updates": 4000,
+  "test_opened": false,
+  "endpoints": {
+    "initial": {
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/step-0.pt",
+      "step": 0,
+      "actual_updates": 0,
+      "configured_final_updates": 4000,
+      "routing_semantics": "anchor-supported-helper-fullstate-maskcontext-prior095-residual-v1"
+    },
+    "final": {
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/final.pt",
+      "step": 4000,
+      "actual_updates": 4000,
+      "configured_final_updates": 4000,
+      "routing_semantics": "anchor-supported-helper-fullstate-maskcontext-prior095-residual-v1"
+    }
+  },
+  "interpretation": "PTFM task adaptation with physical position prior and zero initialized residual; other outputs may change through shared training, no attribute composition; not author reproduction",
+  "normalizer": {
+    "mean": [
+      2.9645272710863286e-05,
+      -0.0010922379994508754,
+      55.471693199754625,
+      -0.03159675142077479
+    ],
+    "scale": [
+      0.15065902516342408,
+      0.22588370896977306,
+      196.8294699481901,
+      92.60232428299612
+    ],
+    "count": 3430927,
+    "split": "T_core",
+    "truth_used": false,
+    "missing_helper_rows_counted": false,
+    "scope": "planned identical scene/anchor/member exposure; visible local native units only",
+    "training_updates": 4000,
+    "sampled_anchors": 32000,
+    "planned_sampler_final_rng": {
+      "bit_generator": "PCG64",
+      "state": {
+        "state": 111420086538680815649617955798153411077,
+        "inc": 162461770569406593203092421552682192259
+      },
+      "has_uint32": 0,
+      "uinteger": 1849323132
+    }
+  },
+  "paired_control": {
+    "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit",
+    "status": "PAIR_VERIFIED",
+    "matched_updates": 4000,
+    "matched_anchors": 32000,
+    "interpretation": "Actual scene/anchor/member exposure only; model, state objectives and initialization differ.",
+    "actual_successful_batches_exact": true
+  },
+  "paired_ptfm": {
+    "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-20261023-074C-attempt-1/fit",
+    "status": "PAIR_VERIFIED",
+    "matched_updates": 4000,
+    "matched_anchors": 32000,
+    "interpretation": "Only position output parameterization and its first two zero-initialized output rows differ.",
+    "initial_parameters_exact_except_position_rows": true,
+    "position_rows_zero": true,
+    "normalizer_exact": true,
+    "initial_sampler_rng_exact": true,
+    "initial_torch_rng_exact": true,
+    "actual_successful_batches_exact": true,
+    "all_task_counts_exact": true,
+    "full_exposure_exact": true
+  },
+  "initial_comparison": "initial-ptfm-comparison.json.gz",
+  "ptfm_comparison": "ptfm-comparison.json.gz",
+  "transformer_comparison": "transformer-comparison.json.gz"
+}

@@ -1,0 +1,234 @@
+{
+ "registered_at_utc": "2026-10-23T20:14:28.922525Z",
+ "note": "076B原件保留服务器：完整checkpoint、training.jsonl、逐场预测NPZ与preparation.json未入Git。initial/final的summary.json原件为未压缩JSON，Git内以gzip副本回传（roundtrip逐值相同，SHA见下）。",
+ "endpoint_summary_originals": {
+  "initial": {
+   "server_path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/initial/summary.json",
+   "sha256_of_server_original": "21f945097d6b3c25d6f76828fceb3ffe96238afc504e3a2f4fd1c52e3d42503b",
+   "git_gzip_copy": "initial-summary.json.gz",
+   "gunzip_equals_original": true
+  },
+  "final": {
+   "server_path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/final/summary.json",
+   "sha256_of_server_original": "4fa777aa7f2302ae8bb9c3a1465a1bda1df1e05ef74044baab294081d60d7397",
+   "git_gzip_copy": "final-summary.json.gz",
+   "gunzip_equals_original": true
+  }
+ },
+ "server_originals": [
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/endpoint-comparison.json",
+   "bytes": 1569,
+   "mtime_utc": "2026-10-23T20:07:08.332922Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/execution.json",
+   "bytes": 1951,
+   "mtime_utc": "2026-10-23T20:10:47.360537Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/initial-ptfm-comparison.json.gz",
+   "bytes": 1036994,
+   "mtime_utc": "2026-10-23T19:56:26.238739Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/preparation.json",
+   "bytes": 622925338,
+   "mtime_utc": "2026-10-23T19:09:48.595291Z",
+   "note": "622,925,338B逐场景准备统计，留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/ptfm-comparison.json.gz",
+   "bytes": 1828332,
+   "mtime_utc": "2026-10-23T20:09:00.104614Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/run.json",
+   "bytes": 1552,
+   "mtime_utc": "2026-10-23T20:10:47.360537Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/source-binding.json",
+   "bytes": 4683,
+   "mtime_utc": "2026-10-23T18:33:04.317753Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/summary.json",
+   "bytes": 3928,
+   "mtime_utc": "2026-10-23T20:10:47.356537Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/transformer-comparison.json.gz",
+   "bytes": 1714713,
+   "mtime_utc": "2026-10-23T20:10:47.304537Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/initial/run.json",
+   "bytes": 5140,
+   "mtime_utc": "2026-10-23T19:54:33.387073Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/initial/scene-summary.json.gz",
+   "bytes": 1019599,
+   "mtime_utc": "2026-10-23T19:54:31.519078Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/initial/summary.json",
+   "bytes": 7367390,
+   "mtime_utc": "2026-10-23T19:54:33.339073Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/final.pt",
+   "bytes": 2396678,
+   "mtime_utc": "2026-10-23T19:44:34.317023Z",
+   "kept_on_server_only": true
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/normalizer.json",
+   "bytes": 739,
+   "mtime_utc": "2026-10-23T19:17:09.011709Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/run.json",
+   "bytes": 661884,
+   "mtime_utc": "2026-10-23T19:44:34.417023Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/step-0.pt",
+   "bytes": 802982,
+   "mtime_utc": "2026-10-23T19:17:23.731622Z",
+   "kept_on_server_only": true
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/training-windows.json",
+   "bytes": 12190,
+   "mtime_utc": "2026-10-23T19:44:34.137024Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit/training.jsonl",
+   "bytes": 8513803,
+   "mtime_utc": "2026-10-23T19:44:34.133024Z",
+   "kept_on_server_only": true
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/final/run.json",
+   "bytes": 5146,
+   "mtime_utc": "2026-10-23T20:06:25.589040Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/final/scene-summary.json.gz",
+   "bytes": 1221074,
+   "mtime_utc": "2026-10-23T20:06:23.517046Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/final/summary.json",
+   "bytes": 7393863,
+   "mtime_utc": "2026-10-23T20:06:25.513041Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1-launch/status.json",
+   "bytes": 527,
+   "mtime_utc": "2026-10-23T20:10:53.880533Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-23T20:10:53.880533Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1-launch/request.json",
+   "bytes": 1797,
+   "mtime_utc": "2026-10-23T18:32:56.937507Z"
+  },
+  {
+   "path": "runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1-launch/launch.json",
+   "bytes": 1315,
+   "mtime_utc": "2026-10-23T18:32:57.013510Z"
+  }
+ ],
+ "server_originals_total_bytes": 656923189,
+ "git_returned": [
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/076B-key-metrics.json",
+   "bytes": 27834,
+   "mtime_utc": "2026-10-23T20:14:28.920326Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/endpoint-comparison.json",
+   "bytes": 1569,
+   "mtime_utc": "2026-10-23T20:13:16.776408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/execution.json",
+   "bytes": 1951,
+   "mtime_utc": "2026-10-23T20:13:16.776408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/final-summary.json.gz",
+   "bytes": 439856,
+   "mtime_utc": "2026-10-23T20:13:46.712376Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/initial-ptfm-comparison.json.gz",
+   "bytes": 1036994,
+   "mtime_utc": "2026-10-23T20:13:16.792408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/initial-summary.json.gz",
+   "bytes": 385442,
+   "mtime_utc": "2026-10-23T20:13:46.252376Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/ptfm-comparison.json.gz",
+   "bytes": 1828332,
+   "mtime_utc": "2026-10-23T20:13:16.796408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/run.json",
+   "bytes": 1552,
+   "mtime_utc": "2026-10-23T20:13:16.776408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/source-binding.json",
+   "bytes": 4683,
+   "mtime_utc": "2026-10-23T20:13:16.788409Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/summary.json",
+   "bytes": 3928,
+   "mtime_utc": "2026-10-23T20:13:16.776408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/transformer-comparison.json.gz",
+   "bytes": 1714713,
+   "mtime_utc": "2026-10-23T20:13:16.800408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/initial/run.json",
+   "bytes": 5140,
+   "mtime_utc": "2026-10-23T20:13:16.816408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/fit/normalizer.json",
+   "bytes": 739,
+   "mtime_utc": "2026-10-23T20:13:16.812408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/fit/run.json",
+   "bytes": 661884,
+   "mtime_utc": "2026-10-23T20:13:16.800408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/fit/training-windows.json",
+   "bytes": 12190,
+   "mtime_utc": "2026-10-23T20:13:16.800408Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-PTFM-RESIDUAL-20261024-076B/final/run.json",
+   "bytes": 5146,
+   "mtime_utc": "2026-10-23T20:13:16.816408Z"
+  }
+ ],
+ "git_returned_total_bytes": 6131953,
+ "git_returned_file_count": 16
+}
