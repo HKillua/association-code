@@ -17,6 +17,7 @@
 | `ptfm_residual_fit.py` | 076B：只改PTFM位置为固定.95物理初值＋零初始化残差；配对074C全部初参例外与实际批次，并保留072C曝光比较 |
 | `../analysis/ptfm_speed_diagnostics.py` | 076A：只读074C及056缓存；固定零速控制、原生分布、逐目标动态与相邻有效查询变化，不加载权重或前向 |
 | `tsactfer_level1_fit.py` | 074D：TSA原生时间128点Level1适配，双头固定final评分、全候选及论文资格子集、六臂系统与056共同点 |
+| `../analysis/tsactfer_population_probe.py` | 080：只读074D/079缓存，同规则T/V平衡及V完整候选对照、固定先验AP、margin均值分解；零GPU/前向/权重加载 |
 | `constant_gate_fit.py` | 072A：原071B实际T样本上的1001点全局标量搜索，固定后一次完整CPU V评价 |
 | `../analysis/compare_position_benchmarks.py` | 071整表；显式三项072输入后核常数与4000更新终点、真实采样前缀及同人口；不做模型前向 |
 | `../analysis/tsactfer_score_diagnostics.py` | 075：只读074D固定final评分及成功训练日志；两头排序／原阈值错误／时间资格与同场负例曝光，不加载权重或重新选阈值 |
