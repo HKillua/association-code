@@ -162,7 +162,8 @@ def _batch_diagnostics(samples, losses):
     return result
 
 
-def train_support_gate(train_raw, config, output, *, device='cpu', check=None, paired_reference_fit=None):
+def train_support_gate(train_raw, config, output, *, device='cpu', check=None, paired_reference_fit=None,
+                       record_objectives=False):
     """Uniform scene/anchor batches; evaluation belongs to the CPU entry point.
 
     T-only samples are staged per batch and committed to the exposure audit only
@@ -170,6 +171,8 @@ def train_support_gate(train_raw, config, output, *, device='cpu', check=None, p
     predeclared optimizer update, and are separately reported (Adam may retain
     momentum). This API never accepts V_select or T_test scenes.
     """
+    if not isinstance(record_objectives, bool):
+        raise ValueError('record_objectives must be an explicit boolean')
     config = copy.deepcopy(configuration(config))
     output = Path(output)
     if paired_reference_fit is not None:
@@ -180,7 +183,8 @@ def train_support_gate(train_raw, config, output, *, device='cpu', check=None, p
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
     training = config['training']
-    detailed_audit = config.get('position_loss', 'log1p') == 'linear' or paired_reference_fit is not None
+    detailed_audit = (config.get('position_loss', 'log1p') == 'linear'
+                      or paired_reference_fit is not None or record_objectives)
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
     model = SupportGate(**config['model']).to(device)

@@ -7,14 +7,17 @@
 | `evidence_association_fit.py` | OLS证据关联训练；固定终点、普通/配对困难采样和实际曝光审计 |
 | `evidence_fusion_fit.py` | 属性utility融合训练；`check`为合成检查，Level1真实fit绑定当前OLS工作点 |
 | `support_gate_fit.py` | 068：3035／2535输入预核→T_core受限位置门控1000更新→固定056分组CPU初始化及终点评价；一条失败即停的链 |
-| `support_gate_linear_fit.py` | 070：只改线性位置损失，逐批配对068，复用原CPU初始化，只做新final1000完整V300评价；按当前READY交接执行 |
+| `support_gate_linear_fit.py` | 已完成070：只改线性位置损失，逐批配对068，复用原CPU初始化；保留复现入口，不重领 |
+| `support_gate_replication.py` | 071A/B：独立启动新seed Log／线性1000更新及CPU两端点评价；compare仅在两臂完成后核实际配对 |
+| `sequence_position_fit.py` | 071C/D：LSTM／Transformer通用二维位置恢复，各1000更新及CPU两端点，不是领域原版复现 |
+| `../analysis/compare_position_benchmarks.py` | 071四臂全部完成后，CPU核实际采样与缓存人口，比较070／四终点／普通控制；不做模型前向 |
 | `level1_system_evaluate.py` | 普通/学习关联与普通/学习融合的完整系统评价；保存全部目标、分组、mask和路由 |
 | `level1_ols_working_point.py` | Level1纯OLS开发工作点，不加载学习权重 |
 | `tmtaff_complete_fit.py` / `tmtaff_complete_evaluate.py` | TMTAFF参考各阶段训练和冻结评价，保留完整baseline实现 |
 | `tsactfer_fit.py` | TSA-cTFER独立关联对照的离线适配 |
 | `make_scene_manifest.py` / `prepare_scene_data.py` | 数据名单生成和时间/人口准备；当前名单已冻结，不重复生成 |
 | `launch_detached.py` | 服务器服务管理器托管单次作业，保存真实退出状态 |
-| `../analysis/frozen_fusion_transfer.py` | 当前062：056固定组与三个057冻结融合的七臂比较 |
+| `../analysis/frozen_fusion_transfer.py` | 062—066：056固定组与三个057冻结融合的七臂比较；旧验收失败，不恢复额度 |
 | `../analysis/compare_association_duration.py` | 保留共同人口、代表变化、增/失覆盖的跨轮缓存比较；亦提供062源重放函数 |
 | `../analysis/learned_group_oracle.py` | 有限候选Oracle诊断及062来源检查；061已结案，不恢复执行额度 |
 | `../analysis/compare_physical_predictions.py` | 通用物理预测比较 |
