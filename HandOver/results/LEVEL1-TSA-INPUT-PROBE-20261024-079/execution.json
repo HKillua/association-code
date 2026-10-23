@@ -1,0 +1,62 @@
+{
+  "arguments": {
+    "source_074d": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1",
+    "manifest": "/home/wangguangjie/djs/association-code-run079/configs/data/mtad-level1-scene3000.json",
+    "config": "/home/wangguangjie/djs/association-code-run079/configs/tsactfer-input-probe-level1.json",
+    "output": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1",
+    "archive": [
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip"
+    ],
+    "device": "cuda:0",
+    "cpu_threads": 4
+  },
+  "configuration": {
+    "scope": "079-tsa-frozen-training-input-probe-v1",
+    "seed": 20261024,
+    "scene_count": 32,
+    "pairs_per_head_scene": 32,
+    "inference_batch_tracks": 128,
+    "advisory_seconds": 3600
+  },
+  "selected_training_scene_ids": [
+    "101",
+    "206",
+    "255",
+    "354",
+    "377",
+    "664",
+    "1101",
+    "1167",
+    "1484",
+    "1598",
+    "1869",
+    "1903",
+    "2363",
+    "2377",
+    "2389",
+    "2656",
+    "2678",
+    "2743",
+    "2781",
+    "3140",
+    "3345",
+    "3588",
+    "3628",
+    "3657",
+    "3761",
+    "3828",
+    "3987",
+    "4296",
+    "4457",
+    "4582",
+    "4912",
+    "4977"
+  ],
+  "normalizer_refit": false,
+  "reference_read": false,
+  "validation_observations_read": false,
+  "test_opened": false,
+  "training": false
+}

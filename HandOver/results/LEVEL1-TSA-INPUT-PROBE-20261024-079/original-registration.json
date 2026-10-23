@@ -1,0 +1,102 @@
+{
+ "registered_at_utc": "2026-10-23T21:30:25.942649Z",
+ "note": "079原件保留服务器；scores明细不入Git。Git回传件不含本清单自身，均为逐字节复制（未再压缩）。",
+ "server_originals": [
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/data-audit.json",
+   "bytes": 27720,
+   "mtime_utc": "2026-10-23T21:26:16.234625Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/execution.json",
+   "bytes": 1512,
+   "mtime_utc": "2026-10-23T21:26:21.926569Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/report.md",
+   "bytes": 1634,
+   "mtime_utc": "2026-10-23T21:26:21.926569Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/run.json",
+   "bytes": 1179,
+   "mtime_utc": "2026-10-23T21:26:21.926569Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/source-verification.json",
+   "bytes": 413,
+   "mtime_utc": "2026-10-23T21:25:59.266794Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/summary.json",
+   "bytes": 350148,
+   "mtime_utc": "2026-10-23T21:26:21.922570Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1/scores",
+   "bytes": 137712,
+   "note": "逐 view 分数明细，留服务器不回传",
+   "files": 4
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1-launch/status.json",
+   "bytes": 527,
+   "mtime_utc": "2026-10-23T21:26:22.722562Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-23T21:26:22.722562Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1-launch/request.json",
+   "bytes": 1403,
+   "mtime_utc": "2026-10-23T21:25:35.619038Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1-launch/launch.json",
+   "bytes": 1316,
+   "mtime_utc": "2026-10-23T21:25:35.755037Z"
+  }
+ ],
+ "server_originals_total_bytes": 523566,
+ "git_returned": [
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/079-key-metrics.json",
+   "bytes": 12862,
+   "mtime_utc": "2026-10-23T21:30:25.920637Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/data-audit.json",
+   "bytes": 27720,
+   "mtime_utc": "2026-10-23T21:30:25.896637Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/execution.json",
+   "bytes": 1512,
+   "mtime_utc": "2026-10-23T21:30:25.900637Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/report.md",
+   "bytes": 1634,
+   "mtime_utc": "2026-10-23T21:30:25.896637Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/run.json",
+   "bytes": 1179,
+   "mtime_utc": "2026-10-23T21:30:25.896637Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/source-verification.json",
+   "bytes": 413,
+   "mtime_utc": "2026-10-23T21:30:25.896637Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-INPUT-PROBE-20261024-079/summary.json",
+   "bytes": 350148,
+   "mtime_utc": "2026-10-23T21:30:25.896637Z"
+  }
+ ],
+ "git_returned_total_bytes": 395468,
+ "git_returned_file_count": 7
+}

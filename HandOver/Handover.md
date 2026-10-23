@@ -1,13 +1,13 @@
 # 当前交接
 
-2026-10-24。本地对外部方案完成对抗性审查、实现与独立复核，**078A/B/C与079发布LOCAL_TO_SERVER / READY**；冻结实施`d8467ef`，全仓558测试、CLI及命令语法通过。用户已授权本课题自主预算，无需再次询问。服务器现场FIFO核资源，最多四个单卡任务，数据准备/CPU/IO错峰；不重领历史任务。**当前只是发布，尚无这四项的服务器领取回执。**服务器补登（21:25:35Z）：078A／078B／078C／079 四项已各自按冻结原块领取一次，四个不同 GPU UUID，均已 RUNNING、零重试，领取回执见上方四行；四项成功后再按既定顺序执行每臂 CPU 比较与三臂整表（`WAITING_DEPENDENCIES`）。
+2026-10-24。本地对外部方案完成对抗性审查、实现与独立复核，**078A/B/C与079发布LOCAL_TO_SERVER / READY**；冻结实施`d8467ef`，全仓558测试、CLI及命令语法通过。用户已授权本课题自主预算，无需再次询问。服务器现场FIFO核资源，最多四个单卡任务，数据准备/CPU/IO错峰；不重领历史任务。**当前只是发布，尚无这四项的服务器领取回执。**服务器补登（21:25:35Z／21:26:22Z）：078A／078B／078C／079 四项已各自按冻结原块领取一次，四个不同 GPU UUID，零重试；079 已于 21:26:22Z 完成（八条件全强，见其行），078 三臂撰写时仍 RUNNING；三臂全部成功后才执行每臂 CPU 比较与整表（`WAITING_DEPENDENCIES`）。
 
 | 当前任务 | 状态 | 独立执行范围 |
 |---|---|---|
 |[078A 容量控制](L2S-20261024-078.md)|**SERVER_TO_LOCAL / RUNNING**，21:24:57Z按原块领取（`d8467ef`、`mtad-78f1aeaedf75`、PID3820647、`GPU-c5a00c37…`index0快照23,253MiB／7%；三臂配置展平只差`model.aggregation`，与072C extended只差4键；块SHA `f039266b…`前后相同），见[回执](S2L-20261024-078A.md)|phi(mean x)，单GPU/CPU4，fresh4000，同seed20261023，CPU step0/final V300|
 |[078B 聚合前编码](L2S-20261024-078.md)|**SERVER_TO_LOCAL / RUNNING**，21:25:10Z按原块领取（`mtad-4b52461e5d17`、PID3820713、`GPU-6811d9c0…`index1快照23,251MiB／8%），见[回执](S2L-20261024-078B.md)|mean phi(x)，与A同初值/实际batch，其他预算相同|
 |[078C 选择性聚合](L2S-20261024-078.md)|**SERVER_TO_LOCAL / RUNNING**，21:25:24Z按原块领取（`mtad-9c3f79f49c66`、PID3820783、`GPU-efbe9d07…`index2共卡），见[回执](S2L-20261024-078C.md)|相对B只加16参数latent权重，其他预算相同|
-|[079 TSA资格诊断](L2S-20261024-079.md)|**SERVER_TO_LOCAL / RUNNING**，21:25:35Z按原块领取（`mtad-8f5b8b481a9e`、PID3820844、`GPU-1043f26a…`index3）；**未改设备，仍按块用GPU**，32场预先固定、`seed20261024`、`optimizer_updates=0`＋一次冻结前向，见[回执](S2L-20261024-079.md)|冻结074D，固定32个T场裁窗/完整×同/跨场负例，单GPU/CPU4零训练；领取时可明确改CPU|
+|[079 TSA资格诊断](L2S-20261024-079.md)|**SERVER_TO_LOCAL / COMPLETED**：退出0，实耗47.104s（21:25:35→21:26:22Z，程序41.393s，峰值显存54.3MiB，`mtad-8f5b8b481a9e`，`GPU-1043f26a…`index3，未改设备仍按块用GPU）；`fit_exposure_verified`＋`source_final_bound=true`、`normalizer_refit=false`、V/Test/reference未读、`optimizer_updates=0`。配对人口1:1（ITSA 428/428、MSTSA 470/470），ITSA排除4个anchor为`same_scene_no_other_identity_matching_head_source`（场206/1598/2781/4457），未造数据。**八条件全强：AUC0.8824–0.9978／AP0.8615–0.9972；裁窗在全部四格优于完整（同表示并不弱→窗口修复出口不成立），同场在全部格难于跨场**；与075的V侧并置呈「T强V弱」→按预定出口查泛化／分布差异，但本诊断人口与075全候选不可直接比AP。见[回执](S2L-20261024-079.md)|冻结074D，固定32个T场裁窗/完整×同/跨场负例，单GPU/CPU4零训练；领取时可明确改CPU|
 
 078每臂独立一次、4小时仅提醒，不自动加步、换中间checkpoint或失败重试。每臂成功后一次CPU缓存比较已含，三臂全部成功后的CPU整表为**WAITING_DEPENDENCIES**（各CPU4、1小时仅提醒）。079一次前向、1小时仅提醒，不改阈值、分组或训练；无需等078。各臂完成独立回传，不等所有任务结束；完整权重/日志/NPZ留服务器。训练不因多helper数量不足而换人口或补场。
 
