@@ -14,6 +14,7 @@
 | `tsactfer_level1_fit.py` | 074D：TSA原生时间128点Level1适配，双头固定final评分、全候选及论文资格子集、六臂系统与056共同点 |
 | `constant_gate_fit.py` | 072A：原071B实际T样本上的1001点全局标量搜索，固定后一次完整CPU V评价 |
 | `../analysis/compare_position_benchmarks.py` | 071整表；显式三项072输入后核常数与4000更新终点、真实采样前缀及同人口；不做模型前向 |
+| `../analysis/tsactfer_score_diagnostics.py` | 075：只读074D固定final评分及成功训练日志；两头排序／原阈值错误／时间资格与同场负例曝光，不加载权重或重新选阈值 |
 | `../analysis/compare_position_harm.py` | 074A/B分别核同seed旧Transformer缓存、实际训练配对、累计改善／伤害与尾部，不做模型前向 |
 | `level1_system_evaluate.py` | 普通/学习关联与普通/学习融合的完整系统评价；保存全部目标、分组、mask和路由 |
 | `level1_ols_working_point.py` | Level1纯OLS开发工作点，不加载学习权重 |
