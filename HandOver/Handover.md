@@ -2,13 +2,13 @@
 
 2026-10-23。本地已审服务器`dca8af9`：**072A/B/C及CPU整表均COMPLETED／退出0**。Transformer4000的位置MAE590.744m反超门控1000的633.590m，门控总体RMSE/P99略好；训练侧常量g=.028的873.083m只否定该控制，未排除所有常量。原始解释勘误和独立复算见[研究状态072节](../docs/research_status.md#072审查与073决定2026-10-23)。现无已知在途任务；旧READY均不得重领。
 
-**073已READY，冻结代码`e08b974`，本地实现、必要测试及独审完成。** 用户已授权自主安排，无需再次申请批准。三个新任务补齐两seed×两方法4000更新，复用完成的072C；无第四项凑卡、不换新网络、不重跑072、T_test封存。只按[073完整命令与预算](L2S-20261023-073.md)领取。
+**073三项已于UTC 10:29全部领取并提交，冻结代码`e08b974`，三项RUNNING／零重试，各绑不同UUID（A→index0、B→index1、C→index2），均4小时仅提醒。** 领取前实测available 105 GB、PSI io／memory `avg10=0.00`、`/home` 余780 GB；index2／3被他人占至各剩9.2 GB／util 88–96%，故把GPU段最短的Transformer放index2，两个门控（训练段更长）取两张近乎空闲卡，未触碰他人进程。服务器按交接第15／19行做了config扁平化逐项核对（见各回执）。073 CPU表仍WAITING_DEPENDENCIES。
 
 | 当前任务 | 方向／状态 | 固定工作与下一执行方 |
 | --- | --- | --- |
-| 073A | **LOCAL_TO_SERVER / READY** | 门控线性loss，seed20261023，fresh4000＋CPU step0/final V300；服务器可领取 |
-| 073B | **LOCAL_TO_SERVER / READY** | 相同门控，seed20261021，fresh4000＋CPU两端点；独立领取 |
-| 073C | **LOCAL_TO_SERVER / READY** | Transformer，seed20261021，fresh4000＋CPU两端点；独立领取 |
+| 073A | **SERVER_TO_LOCAL / RUNNING**：`258bb26`之后的`e08b974`，UTC 10:29:02提交，单元`mtad-78213406112d`，`GPU-c5a00c37…`(index0)，CPU4，4h仅提醒；`profile=extended4000`，config扁平化相对071B仅`updates 1000→4000`（seed同为20261023） | 服务器监督至终态，写 [073A回执](S2L-20261023-073A.md)，不重领 |
+| 073B | **SERVER_TO_LOCAL / RUNNING**：UTC 10:29:15提交，单元`mtad-433981ca17ec`，`GPU-6811d9c0…`(index1)，CPU4，4h仅提醒；`profile=replica4000`，相对070（seed20261021/1000）仅`updates`变化 | 服务器监督至终态，写 [073B回执](S2L-20261023-073B.md)，不等A |
+| 073C | **SERVER_TO_LOCAL / RUNNING**：UTC 10:29:27提交，单元`mtad-56e85b7ba16f`，`GPU-efbe9d07…`(index2，与他人共卡)，CPU4；`profile=replica4000`，相对072C仅`seed 20261023→20261021`（updates同为4000） | 服务器监督至终态，写 [073C回执](S2L-20261023-073C.md)，不等B |
 | 073 CPU表 | **LOCAL_TO_SERVER / WAITING_DEPENDENCIES** | 三新臂退出0且完整COMPLETED后一次CPU4，只读073三终点＋原072C，核实际同人口、同seed4000采样、旧gate初参/1000前缀；预算已含 |
 
 本批共12000新更新、每项单GPU/CPU4/一次无重试、4小时仅提醒；CPU表1小时仅提醒。门控整链粗估约1.3h/项、Transformer约1h，准备/IO与共卡影响实速，不是完成承诺或硬时限。最多三项本批作业，全局上限四单卡，现场FIFO/CPU/内存决定错峰。活动checkout、配置、runs不改；存在输出或领取先核实际状态，不覆盖或重开。
