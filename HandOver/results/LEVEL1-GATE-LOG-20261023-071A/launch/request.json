@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run071A/tools/experiments/support_gate_replication.py",
+    "fit",
+    "--source-system",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run071A/configs/data/mtad-level1-scene3000.json",
+    "--alignment",
+    "/home/wangguangjie/djs/association-code-run071A/configs/data/mtad-level1-alignment.json",
+    "--config",
+    "/home/wangguangjie/djs/association-code-run071A/configs/support-gate-replica-log-level1.json",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-GATE-LOG-20261023-071A-attempt-1",
+    "--device",
+    "cuda:0",
+    "--cpu-threads",
+    "4",
+    "--time-policy",
+    "advisory"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run071A",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-1043f26a-d4bd-7cd8-1089-ee9066f1ffcc",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-23T06:02:16.572244+00:00",
+  "started_monotonic": 2665747.665621499,
+  "max_seconds": 14400.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}
