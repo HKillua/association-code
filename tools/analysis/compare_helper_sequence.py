@@ -1,7 +1,7 @@
-"""078 cached same-population screening against072C and matched helper arms.
+"""Cached same-population helper comparisons under explicit078/081 profiles.
 
-Accept one completed helper arm for immediate comparison, or all three for the
-primary A/B/C closeout. Never rerun inference or promote a single-seed winner.
+Accept one completed helper arm or the profile's complete set (078ABC/081BC).
+Never mix seeds, rerun inference, or automatically promote a method.
 """
 from __future__ import annotations
 
@@ -23,16 +23,20 @@ from association.training.helper_sequence import load_checkpoint
 from association.utils.runtime import read_json, write_json, write_json_gzip
 from tools.analysis.compare_position_benchmarks import _metadata, _pool, _sequence_sampling, CONTROLS
 from tools.analysis.compare_position_harm import scene_pair, harm_statistics
-from tools.experiments.helper_sequence_fit import CONFIGS, ROOT, bind_reference
+from tools.experiments.helper_sequence_fit import (CONFIGS, ROOT, PROFILE_CONFIGS,
+    PROFILE_REFERENCES, bind_reference, frozen_configuration)
 
 
-def helper_metadata(path):
+def helper_metadata(path, profile='screen078'):
     path = Path(path).resolve()
     run, summary, fit = [read_json(path/name) for name in ('run.json', 'summary.json', 'fit/run.json')]
     config = run['configuration']
     mode = config['model']['aggregation']
-    if config != read_json(ROOT/'configs'/CONFIGS[mode]):
-        raise ValueError('078 comparison requires the frozen aggregation configuration')
+    frozen_configuration(config, profile)
+    # Old078 records predate the explicit profile field; the exact old config
+    # still binds their seed. Replica records must declare081 in both places.
+    if any(record.get('profile', 'screen078') != profile for record in (run, summary)):
+        raise ValueError('helper run/profile differs; mixed-seed tables are forbidden')
     steps = config['training']['updates']
     for record in (run, summary, fit):
         if (record.get('status') != 'COMPLETED' or record.get('configuration') != config
@@ -154,6 +158,9 @@ def summarize(rows, arrays, methods):
 
 
 def run(args):
+    profile = getattr(args, 'profile', 'screen078')
+    if profile not in PROFILE_CONFIGS:
+        raise ValueError('unknown helper comparison profile')
     if args.cpu_threads != 4:
         raise ValueError('078 comparison fixes CPU4')
     torch.set_num_threads(4)
@@ -168,12 +175,13 @@ def run(args):
             if output == protected or output in protected.parents or protected in output.parents:
                 raise ValueError('078 comparison output overlaps an immutable input')
     output.mkdir(parents=True)
-    state = dict(status='RUNNING', completed_scenes=0, model_forwards=0, optimizer_updates=0, test_opened=False)
+    state = dict(status='RUNNING', profile=profile, completed_scenes=0,
+        model_forwards=0, optimizer_updates=0, test_opened=False)
     write_json(output/'run.json', state)
     try:
-        arms = {'linear': _metadata(linear_path, '072C_transformer4000')}
+        arms = {'linear': _metadata(linear_path, PROFILE_REFERENCES[profile][2])}
         for path in paths:
-            name, arm = helper_metadata(path)
+            name, arm = helper_metadata(path, profile=profile)
             if name in arms:
                 raise ValueError('078 duplicate aggregation arm')
             arms[name] = arm
@@ -222,22 +230,24 @@ def run(args):
         population = {name: dict(total=sum(row[name]['total'] for row in helper_populations), counts={
             bucket: sum(row[name]['counts'][bucket] for row in helper_populations) for bucket in BUCKETS})
             for name in POPULATIONS}
-        summary.update(status='COMPLETED', pairing=pairing, methods=list(methods), components=components,
+        summary.update(status='COMPLETED', profile=profile, pairing=pairing, methods=list(methods), components=components,
             largest_component_id=largest, remaining_components=summarize([rows[i] for i in rest],
             [arrays[i] for i in rest], methods) if rest else None, helper_population=population,
-            inputs={name: str(arm['path']) for name, arm in arms.items()}, single_seed_screen=True,
-            complete_abc=set(arms) == {'linear', *CONFIGS}, model_forwards=0, optimizer_updates=0,
+            inputs={name: str(arm['path']) for name, arm in arms.items()}, single_seed_screen=(profile == 'screen078'),
+            single_seed_comparison=True, complete_profile=set(arms) == {'linear', *PROFILE_CONFIGS[profile]},
+            complete_abc=(profile == 'screen078' and set(arms) == {'linear', *CONFIGS}),
+            model_forwards=0, optimizer_updates=0,
             test_opened=False, old066_acceptance='REJECTED',
-            interpretation='Single-seed fixed-endpoint screening. Reused V/shared identities; improvement is not independent generalization. Feature-pooling weights are not reliability attribution.')
+            interpretation='One-seed fixed-endpoint comparison;081 is a matched second seed, not automatic promotion. Reused V/shared identities; improvement is not independent generalization. Feature-pooling weights are not reliability attribution.')
         write_json_gzip(output/'summary.json.gz', summary)
         write_json_gzip(output/'scene-summary.json.gz', scene_rows)
-        lines = ['# 078 helper representation screening', '', '| Method | MAE m | RMSE m | P95 m | P99 m |',
+        lines = ['# Helper representation comparison: '+profile, '', '| Method | MAE m | RMSE m | P95 m | P99 m |',
                  '|---|---:|---:|---:|---:|']
         for name in methods:
             value = summary['position_weightings']['all'][name]['point_equal']
             lines.append('| '+name+' | '+' | '.join(f'{value[k]:.4f}' for k in ('mae', 'rmse', 'p95', 'p99'))+' |')
         lines += ['', 'All outputs, duplicate groups and valid target masks retained. H/I and fixed100/1000/10000m harm counts, four weightings, support/helper strata and components are in JSON.',
-                  'A/B/C are exploratory single-seed results. No automatic promotion or retry.']
+                  'This table contains one declared seed/profile only. No automatic promotion or retry.']
         (output/'report.md').write_text('\n'.join(lines)+'\n')
         state.update(status='COMPLETED', population=summary['population'])
         write_json(output/'run.json', state)
@@ -254,6 +264,7 @@ def main(argv=None):
     parser.add_argument('--linear-run', required=True)
     parser.add_argument('--output', required=True)
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--profile', choices=tuple(PROFILE_CONFIGS), default='screen078')
     result = run(parser.parse_args(argv))
     print(result['status'], flush=True)
     return 0

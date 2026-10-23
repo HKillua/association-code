@@ -17,10 +17,10 @@ from association.evaluation.association import evaluate_scenes
 from association.evaluation.evidence_fusion_combo import read_scores
 from association.evaluation.fusion_controls import ordinary_fusion, attribute_errors
 from association.evaluation.grouping import group_predicted_tracks
-from association.evaluation.system_attribution import ATTRIBUTES, _same
+from association.evaluation.system_attribution import ATTRIBUTES, _same, assert_metrics
 from association.evaluation.oracle_diagnostics import POPULATION_KEYS
 from association.evaluation.tmtaff import aggregate_fusion_reports
-from association.utils.runtime import read_json, write_json, write_json_gzip
+from association.utils.runtime import read_json, write_json, write_json_gzip, load_records, read_json_or_gzip
 from tools.analysis.compare_association_duration import ARMS, _load_arrays, _replay
 from tools.analysis.frozen_fusion_transfer import groups_from_cache
 from tools.experiments.level1_system_evaluate import (
@@ -116,9 +116,14 @@ def _scene(fragment, truth, valid, sid, component):
 
 
 def evaluate_system(records, threshold, source056, metadata, output, *, check=None,
-                    ols_records=None, reference_records=None):
+                    ols_records=None, reference_records=None, execution_scope='074D-tsa-full-system',
+                    comparison_system=None):
     """OLS/TSA×3 plus paired056 comparisons, without any neural forward."""
     source056, output = Path(source056).resolve(), Path(output).resolve()
+    if execution_scope not in ('074D-tsa-full-system', '082-tsa-full-system'):
+        raise ValueError('unknown TSA system execution scope')
+    if (execution_scope == '082-tsa-full-system') != (comparison_system is not None):
+        raise ValueError('082 must bind074D system;074D cannot claim082 comparison')
     if output == source056.parent or source056.parent in output.parents or output in source056.parent.parents:
         raise ValueError('074D output cannot overlap immutable056')
     ids = [str(row['scene_id']) for row in records]
@@ -146,11 +151,44 @@ def evaluate_system(records, threshold, source056, metadata, output, *, check=No
                                baseline['selected_threshold']['metrics'])
     _verify_association_metrics(evaluate_scenes(reference_records, metadata['association_threshold']),
                                metadata['association'])
+    old_system, old_summary, old_records, old_scene_reports = None, None, None, None
+    if comparison_system is not None:
+        old_system = Path(comparison_system).resolve()
+        if output == old_system.parent or old_system.parent in output.parents or output in old_system.parent.parents:
+            raise ValueError('082 output cannot overlap074D system')
+        old_run, old_summary = read_json(old_system/'run.json'), read_json(old_system/'summary.json')
+        endpoint = read_json(old_system.parent/'final-endpoint.json')
+        if (old_run.get('status') != 'COMPLETED' or old_run.get('scope') != '074D-tsa-full-system'
+                or old_run.get('completed_scenes') != len(ids) or old_summary.get('status') != 'COMPLETED'
+                or old_summary.get('scene_ids') != ids or old_summary.get('endpoint') != 'final'
+                or old_summary.get('test_opened') is not False or endpoint.get('status') != 'COMPLETED'
+                or endpoint.get('scene_ids') != ids or endpoint.get('test_opened') is not False
+                or endpoint.get('scores_from_actual_final_checkpoint') is not True
+                or old_summary.get('threshold') != endpoint['selection']['threshold']
+                or endpoint['score_binding'].get('scope') != 'tsactfer-native-level1-final-v1'
+                or endpoint['configuration'].get('scope') != 'tsactfer-native-level1-final-v1'):
+            raise ValueError('082 requires completed074D final system with identical population')
+        from baselines.tsactfer_level1 import final_model
+        checked_model, snapshot = final_model(old_system.parent/'fit', endpoint['configuration'], endpoint['normalizer'])
+        del checked_model
+        if (endpoint.get('actual_updates') != snapshot['actual_updates'] or endpoint.get('step') != snapshot['step']
+                or endpoint['score_binding'].get('step') != snapshot['step']
+                or endpoint['score_binding'].get('configuration') != snapshot['configuration']
+                or endpoint['score_binding'].get('normalizer') != snapshot['normalizer']):
+            raise ValueError('082074D endpoint and actual final checkpoint differ')
+        old_scene_reports = read_json_or_gzip(old_system/'scene-summary.json')
+        if [r['scene_id'] for r in old_scene_reports] != ids:
+            raise ValueError('082074D scene report order differs')
+        old_records = _source_records(load_records(old_system.parent/'final-scores', endpoint['score_binding']), records)
+        _verify_association_metrics(evaluate_scenes(old_records, old_summary['threshold']),
+            old_summary['association']['tsa']['metrics'])
+        if Path(old_run['source_system']).resolve() != source056:
+            raise ValueError('082074D comparison source056 differs')
     output.mkdir(parents=True, exist_ok=False)
     for name in ('predictions', 'system-predictions'):
         (output/name).mkdir()
     started = time.monotonic()
-    state = dict(status='RUNNING', scope='074D-tsa-full-system', source_system=str(source056),
+    state = dict(status='RUNNING', scope=execution_scope, source_system=str(source056),
         model_forwards=0, optimizer_updates=0, test_opened=False, threshold_reselected=False,
         completed_scenes=0, total_scenes=len(ids), method_names=list(METHODS))
     write_json(output/'run.json', state)
@@ -193,6 +231,35 @@ def evaluate_system(records, threshold, source056, metadata, output, *, check=No
                 pair, mask = common_target_metrics({
                     'tsa': artifacts['tsa_'+arm], 'reference056': replay[1]['learned_assoc_'+arm]})
                 paired[arm] = pair; pair_masks[arm] = mask
+            old_artifacts, old_pairs, old_pair_masks = {}, {}, {}
+            if old_system is not None:
+                with np.load(old_system/'predictions'/f'states-{sid}.npz', allow_pickle=False) as saved_old:
+                    old_row = old_records[len(rows)]
+                    for key in ('node_ids', 'pairs', 'sources', 'identities'):
+                        _same(saved_old[key], row[key], '082074D cached population '+key)
+                    _same(saved_old['tsa_scores'], old_row['scores'], '082074D cached final scores')
+                    old_groups = groups_from_cache(saved_old, 'tsa')
+                    _replay_score_groups(old_row, old_summary['threshold'], old_groups, n, '074D')
+                    old_controls = ordinary_fusion(motion['states'], motion['nearest_seconds'], motion['support'], old_groups)
+                    old_predictions = ordinary_predictions(old_controls, ARMS)
+                    for arm in ARMS:
+                        _same(saved_old['tsa_'+arm], old_predictions[arm], '082074D ordinary output '+arm)
+                old_reports, rebuilt = evaluate_unique_population(scene, {'tsa': old_groups}, {'tsa': old_predictions})
+                for arm in ARMS:
+                    expected_old = old_scene_reports[len(rows)]['unique_target']['tsa_'+arm]
+                    assert_metrics(old_reports['tsa_'+arm]['full_target_metrics'], expected_old['full_target_metrics'], '082074D '+arm)
+                    for key in POPULATION_KEYS:
+                        _same(old_reports['tsa_'+arm][key], expected_old[key], '082074D population '+key)
+                with np.load(old_system/'system-predictions'/f'states-{sid}.npz', allow_pickle=False) as saved_old:
+                    for arm in ARMS:
+                        prefix = 'tsa_'+arm+'_'
+                        old_artifacts[arm] = {key[len(prefix):]: saved_old[key] for key in saved_old.files if key.startswith(prefix)}
+                        if set(old_artifacts[arm]) != set(rebuilt['tsa_'+arm]):
+                            raise ValueError('082074D aligned artifact fields differ')
+                        for key, value in rebuilt['tsa_'+arm].items():
+                            _same(old_artifacts[arm][key], value, '082074D aligned '+arm+'/'+key)
+                        pair, mask = common_target_metrics({'tsa': artifacts['tsa_'+arm], 'reference074d': old_artifacts[arm]})
+                        old_pairs[arm], old_pair_masks[arm] = pair, mask
             for name, groups in dict(partitions, reference056=groups_from_cache(fragment, 'learned_assoc')).items():
                 membership = np.empty(n, np.int64)
                 for group_index, nodes in enumerate(groups):
@@ -204,6 +271,8 @@ def evaluate_system(records, threshold, source056, metadata, output, *, check=No
                                       for region, mask in regions.items()} for name, values in flat.items()}
             per_scene = dict(scene_id=sid, component_id=str(row['component_id']), unique_target=reports,
                 common_valid_target_points=common, comparisons_to_056=paired, fragment=fragment_metrics)
+            if old_system is not None:
+                per_scene['comparisons_to_074d'] = old_pairs
             rows.append(per_scene)
             target_count = len(fragment['target_identity_ids'])
             for name, artifact in artifacts.items():
@@ -225,19 +294,27 @@ def evaluate_system(records, threshold, source056, metadata, output, *, check=No
             for arm in ARMS:
                 saved['comparison056_'+arm+'_common_prediction_valid'] = pair_masks[arm]
                 saved.update({'reference056_'+arm+'_'+key: value for key, value in replay[1]['learned_assoc_'+arm].items()})
+            if old_system is not None:
+                for arm in ARMS:
+                    saved['comparison074d_'+arm+'_common_prediction_valid'] = old_pair_masks[arm]
             np.savez_compressed(output/'system-predictions'/f'states-{sid}.npz', **saved)
             state['completed_scenes'] = len(rows)
             write_json(output/'run.json', state)
         def pool(items):
-            return dict(scene_count=len(items), methods={name: dict(
+            result = dict(scene_count=len(items), methods={name: dict(
                 population={key: sum(r['unique_target'][name][key] for r in items) for key in POPULATION_KEYS},
                 full_target_metrics=aggregate_fusion_reports([r['unique_target'][name] for r in items]),
                 common_valid_target_points=aggregate_fusion_reports([r['common_valid_target_points'][name] for r in items]))
                 for name in METHODS}, comparisons_to_056={arm: {
                     side: aggregate_fusion_reports([r['comparisons_to_056'][arm][side] for r in items])
                     for side in ('tsa', 'reference056')} for arm in ARMS})
+            if old_system is not None:
+                result['comparisons_to_074d'] = {arm: {side: aggregate_fusion_reports(
+                    [r['comparisons_to_074d'][arm][side] for r in items])
+                    for side in ('tsa', 'reference074d')} for arm in ARMS}
+            return result
         summary = pool(rows)
-        summary.update(status='COMPLETED', scene_ids=ids, source_system=str(source056),
+        summary.update(status='COMPLETED', scope=execution_scope, scene_ids=ids, source_system=str(source056),
             method_names=list(METHODS), endpoint='final', threshold=threshold,
             model_forwards=0, optimizer_updates=0, test_opened=False,
             association={name: dict(metrics=evaluate_scenes(value, point),
@@ -253,6 +330,18 @@ def evaluate_system(records, threshold, source056, metadata, output, *, check=No
                 'Different grouping can change coverage and first representative; conditional MAE is not a complete ranking.',
                 'Frozen056 physical inputs and reference population; references never enter scoring/grouping.',
                 'V is reused development data, not sealed test or unseen-identity evidence.'])
+        if old_system is not None:
+            from association.evaluation.tsactfer_score_diagnostics import analyze_scores
+            ranking = dict(scope='082-fixed-final-score-diagnostics', threshold_reselected=False,
+                tsa=analyze_scores(records, threshold, check=check),
+                reference074d=analyze_scores(old_records, old_summary['threshold'], check=check))
+            write_json_gzip(output/'score-diagnostics.json.gz', ranking)
+            summary['ranking'] = {name: dict(threshold=report['protocol']['threshold'], pooled=report['pooled'])
+                                  for name, report in ranking.items() if name in ('tsa', 'reference074d')}
+            summary['score_diagnostics_path'] = str(output/'score-diagnostics.json.gz')
+            summary['reference074d'] = dict(source_system=str(old_system), threshold=old_summary['threshold'],
+                association=old_summary['association']['tsa'], group_comembership=old_summary['group_comembership']['tsa'],
+                methods={name: old_summary['methods'][name] for name in METHODS if name.startswith('tsa_')})
         for name in METHODS:
             summary['methods'][name]['attribute_quantiles'] = {}
             for attr, chunks in errors[name].items():

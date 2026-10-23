@@ -107,7 +107,48 @@ class HelperSequenceEvaluationTests(unittest.TestCase):
                 archive.assert_not_called(); train.assert_not_called()
             self.assertEqual(read_json(root/'out/run.json')['status'], 'FAILED')
 
+    def test_replica_contract_fixed_seed_only_bc_and_no_mixed_profile(self):
+        from tools.analysis import compare_helper_sequence as compare
+        manifest = read_json(entry.ROOT/'configs/data/mtad-level1-scene3000.json')
+        alignment = read_json(entry.ROOT/'configs/data/mtad-level1-alignment.json')
+        for mode, filename in entry.REPLICA_CONFIGS.items():
+            replica = read_json(entry.ROOT/'configs'/filename)
+            original = read_json(entry.ROOT/'configs'/entry.CONFIGS[mode])
+            expected = deepcopy(original)
+            expected['training']['seed'] = 20261021
+            self.assertEqual(replica, expected)
+            entry.production_contract(replica, manifest, alignment, profile='replica081')
+            for config, profile in ((replica, 'screen078'), (original, 'replica081')):
+                with self.assertRaisesRegex(ValueError, 'frozen'):
+                    entry.production_contract(config, manifest, alignment, profile=profile)
+                # This is a real metadata rejection, before weights or arrays
+                # can be read. A config from another seed must not enter a table.
+                with TemporaryDirectory() as directory:
+                    path = Path(directory)
+                    (path/'fit').mkdir()
+                    for name in ('run.json', 'summary.json', 'fit/run.json'):
+                        write_json(path/name, dict(configuration=config, profile=profile))
+                    with self.assertRaisesRegex(ValueError, 'frozen'):
+                        compare.helper_metadata(path, profile=profile)
+            with TemporaryDirectory() as directory:
+                path = Path(directory)
+                (path/'fit').mkdir()
+                for name in ('run.json', 'summary.json', 'fit/run.json'):
+                    write_json(path/name, dict(configuration=replica, profile='screen078'))
+                with self.assertRaisesRegex(ValueError, 'profile differs'):
+                    compare.helper_metadata(path, profile='replica081')
+        post = read_json(entry.ROOT/'configs'/entry.CONFIGS['post_pool'])
+        post['training']['seed'] = 20261021
+        with self.assertRaisesRegex(ValueError, 'frozen'):
+            entry.production_contract(post, manifest, alignment, profile='replica081')
+
     def test_actual_control_three_helper_fits_endpoints_and_comparison(self):
+        self._actual_control_fits_endpoints_and_comparison('screen078')
+
+    def test_actual_replica_control_two_helper_fits_endpoints_and_comparison(self):
+        self._actual_control_fits_endpoints_and_comparison('replica081')
+
+    def _actual_control_fits_endpoints_and_comparison(self, profile):
         from tools.experiments import sequence_position_fit as original
         from tools.analysis import compare_helper_sequence as compare
         with TemporaryDirectory() as directory:
@@ -116,13 +157,15 @@ class HelperSequenceEvaluationTests(unittest.TestCase):
             train = tiny_train()
             manifest = dict(splits={'T_core': [str(s['scene_id']) for s in train], 'V_select': ['3035']},
                             components={'3035': 'shared'})
-            linear = read_json(entry.ROOT/'configs/sequence-position-transformer-extended-level1.json')
+            linear_profile, linear_filename, reference_arm = entry.PROFILE_REFERENCES[profile]
+            modes = entry.PROFILE_CONFIGS[profile]
+            linear = read_json(entry.ROOT/'configs'/linear_filename)
             linear['training'].update(updates=3, batch_size=2)
             for name, value in (('linear', linear), ('manifest', manifest), ('alignment', {})):
                 write_json(root/(name+'.json'), value)
             args = Namespace(source_system=str(source), output=str(root/'linear'), paired_control=None,
                 archive=['unread.zip'], manifest=str(root/'manifest.json'), alignment=str(root/'alignment.json'),
-                config=str(root/'linear.json'), device='cpu', cpu_threads=4, time_policy='advisory', profile='extended4000')
+                config=str(root/'linear.json'), device='cpu', cpu_threads=4, time_policy='advisory', profile=linear_profile)
             dataset = lambda *a, **k: dict(train=train, validation=validation, report={'fixture': True})
             with patch.object(original, 'production_contract'), patch.object(original, '_bind_source'), \
                     patch.object(original, '_load_metadata', return_value=metadata), \
@@ -130,7 +173,8 @@ class HelperSequenceEvaluationTests(unittest.TestCase):
                     patch('association.evaluation.sequence_position.frozen_motion', side_effect=lambda raw, *_: raw):
                 original.run(args)
             configs = {}
-            for mode, filename in entry.CONFIGS.items():
+            args.profile = profile
+            for mode, filename in modes.items():
                 config = read_json(entry.ROOT/'configs'/filename)
                 config['training'].update(updates=3, batch_size=2)
                 configs[mode] = config
@@ -142,6 +186,7 @@ class HelperSequenceEvaluationTests(unittest.TestCase):
                         patch('association.evaluation.sequence_position.frozen_motion', side_effect=lambda raw, *_: raw):
                     result = entry.run(args)
                 self.assertEqual(result['status'], 'COMPLETED')
+                self.assertEqual(result['profile'], profile)
                 self.assertEqual(result['training_pairing']['actual_successful_batches_matched'], 3)
                 self.assertTrue(read_json(root/mode/'endpoint-comparison.json')['population_and_masks_exact'])
                 self.assertEqual(read_json(root/mode/'run.json')['completed_endpoints'], ['initial', 'final'])
@@ -153,16 +198,26 @@ class HelperSequenceEvaluationTests(unittest.TestCase):
             # Only production-scale manifest/config registry binding is replaced.
             # Real log replay, initial tensor checks, cache correspondence, H/I,
             # helper cohorts and complete-target metric reconstruction all run.
-            with patch.object(compare, '_metadata', side_effect=lambda path, name: meta(path)), \
-                    patch.object(compare, 'helper_metadata', side_effect=lambda path: (Path(path).name, meta(path))):
-                result = compare.run(Namespace(helper_run=[str(root/mode) for mode in entry.CONFIGS],
-                    linear_run=str(root/'linear'), output=str(root/'comparison'), cpu_threads=4))
-            self.assertTrue(result['complete_abc'])
+            with patch.object(compare, '_metadata', side_effect=lambda path, name: meta(path)) as base_binding, \
+                    patch.object(compare, 'helper_metadata', side_effect=lambda path, profile: (Path(path).name, meta(path))):
+                result = compare.run(Namespace(helper_run=[str(root/mode) for mode in modes],
+                    linear_run=str(root/'linear'), output=str(root/'comparison'), cpu_threads=4, profile=profile))
+                if profile == 'replica081':
+                    single = compare.run(Namespace(helper_run=[str(root/'pre_pool')],
+                        linear_run=str(root/'linear'), output=str(root/'single-comparison'),
+                        cpu_threads=4, profile=profile))
+                    self.assertFalse(single['complete_profile'])
+                    self.assertNotIn('weighted_pool__minus__pre_pool', single['relative_harm']['all'])
+            self.assertEqual(base_binding.call_args.args[1], reference_arm)
+            self.assertEqual(result['profile'], profile)
+            self.assertTrue(result['complete_profile'])
+            self.assertEqual(result['complete_abc'], profile == 'screen078')
+            self.assertEqual(result['single_seed_screen'], profile == 'screen078')
             self.assertEqual(result['pairing']['matched_updates'], 3)
             self.assertEqual(result['position_population']['covered_target_points'], 127)
             self.assertEqual(sum(result['helper_cohorts'][bucket]['linear']['point_equal']['unit_count']
                                  for bucket in BUCKETS), 127)
-            self.assertIn('pre_pool__minus__post_pool', result['relative_harm']['all'])
+            self.assertEqual('pre_pool__minus__post_pool' in result['relative_harm']['all'], profile == 'screen078')
             self.assertIn('weighted_pool__minus__pre_pool', result['relative_harm']['all'])
             self.assertEqual(result['helper_population']['all_output_group_queries']['total'], 256)
             # Tampering an actually used sample must fail even when metrics exist.

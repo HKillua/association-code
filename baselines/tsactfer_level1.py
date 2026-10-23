@@ -23,6 +23,7 @@ from baselines.tsactfer_data import fit_normalizer, pack_scene, build_positive_p
 from tools.experiments.tsactfer_fit import learning_rate, score_scenes
 
 SCOPE = 'tsactfer-native-level1-final-v1'
+FULL_SCOPE = 'tsactfer-native-level1-full-view-final-v1'
 META = ('scene_id', 'component_id', 'split', 'node_ids', 'identities', 'sources',
         'intervals', 'pairs', 'labels')
 PACKED = (*META, 'positions', 'time_ids', 'observed', 'times', 'packing_audit')
@@ -30,11 +31,16 @@ PACKED = (*META, 'positions', 'time_ids', 'observed', 'times', 'packing_audit')
 
 def configuration(config):
     if (set(config) != {'scope', 'seed', 'model', 'data', 'training'}
-            or config['scope'] != SCOPE or type(config['seed']) is not int or config['seed'] < 0):
+            or config['scope'] not in (SCOPE, FULL_SCOPE) or type(config['seed']) is not int or config['seed'] < 0):
         raise ValueError('explicit native TSA scope and seed required')
     model = TSAConfig(**config['model'])
     data, training = config['data'], config['training']
-    if set(data) != {'max_points', 'time_bin_seconds', 'min_crop_fraction'}:
+    expected_data = {'max_points', 'time_bin_seconds', 'min_crop_fraction'}
+    if config['scope'] == FULL_SCOPE:
+        expected_data.add('training_view')
+        if data.get('training_view') != 'full_native':
+            raise ValueError('082 requires explicit full_native training view')
+    if set(data) != expected_data:
         raise ValueError('unexpected native TSA data configuration')
     if type(data['max_points']) is not int or not 2 <= data['max_points'] <= model.length:
         raise ValueError('native cap must fit the declared encoder slots')
@@ -124,7 +130,7 @@ def prepare_native_dataset(archives, manifest, config, *, verify_validation=None
 
 
 def _save(path, model, optimizer, config, normalizer, rng, step):
-    torch.save(dict(scope=SCOPE, configuration=config, normalizer=normalizer,
+    torch.save(dict(scope=config['scope'], configuration=config, normalizer=normalizer,
         step=step, actual_updates=step, model=model.state_dict(), optimizer=optimizer.state_dict(),
         numpy_rng=rng.bit_generator.state, torch_rng=torch.get_rng_state(),
         cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None), path)
@@ -134,7 +140,7 @@ def load_checkpoint(path, *, device='cpu'):
     saved = torch.load(path, map_location='cpu', weights_only=False)
     config = configuration(saved['configuration'])
     steps = saved.get('step')
-    if (saved.get('scope') != SCOPE or type(steps) is not int
+    if (saved.get('scope') != config['scope'] or type(steps) is not int
             or not 0 <= steps <= config['training']['updates'] or steps % 2
             or saved.get('actual_updates') != steps
             or any(key not in saved for key in ('normalizer', 'optimizer', 'numpy_rng', 'torch_rng', 'cuda_rng'))):
@@ -166,10 +172,18 @@ def load_checkpoint(path, *, device='cpu'):
     return model, saved
 
 
-def train_native(train, normalizer, config, output, *, device='cpu', check=None):
+def train_native(train, normalizer, config, output, *, device='cpu', check=None, reference_fit=None):
     """One fixed fit; actual exposure commits only after a successful Adam call."""
     config = configuration(config)
+    full_view = config['scope'] == FULL_SCOPE
+    if full_view != (reference_fit is not None):
+        raise ValueError('082 requires074D reference fit;074D cannot use082 reference binding')
+    if full_view:
+        verify_reference_fit(reference_fit, config, normalizer)
     output = Path(output)
+    if full_view and (Path(reference_fit).resolve().parent in output.resolve().parents
+                      or output.resolve() in Path(reference_fit).resolve().parents):
+        raise ValueError('082 output cannot overlap immutable074D')
     output.mkdir(parents=True, exist_ok=False)
     started, settings = time.monotonic(), config['training']
     ids = [str(s['scene_id']) for s in train]
@@ -189,13 +203,27 @@ def train_native(train, normalizer, config, output, *, device='cpu', check=None)
     exposure = dict(successful_optimizer_calls=0, nonzero_lr_updates=0, positive_pair_exposures=0,
         track_exposures=0, token_exposures=0, task_calls={'ITSA': 0, 'MSTSA': 0},
         scenes={}, identities={}, pairs={}, cropped_pairs=0, fallback_pairs=0)
-    run = dict(scope=SCOPE, status='RUNNING', configuration=config, normalizer=normalizer,
+    if full_view:
+        exposure.update(planned_token_exposures=0, planned_cropped_pairs=0, planned_fallback_pairs=0,
+                        token_exposures_by_task={'ITSA': 0, 'MSTSA': 0})
+    run = dict(scope=config['scope'], status='RUNNING', configuration=config, normalizer=normalizer,
         optimizer_updates=0, training_scene_ids=ids, test_opened=False, reference_read=False,
         exposure=exposure, device=str(device), parameter_count=sum(p.numel() for p in model.parameters()),
         gradient_clipping=dict(clipped_updates=0), selection_policy='fixed final; V never supplied to fit')
+    if full_view:
+        # Already validated before torch.manual_seed; do not instantiate another
+        # model here, which would advance the paired dropout RNG stream.
+        initial = torch.load(Path(reference_fit)/'step-0.pt', map_location='cpu', weights_only=False)
+        if initial['step'] != 0 or set(initial['model']) != set(model.state_dict()) or any(
+                not torch.equal(value.cpu(), initial['model'][name]) for name, value in model.state_dict().items()):
+            raise ValueError('082 initial tensors differ from074D step0')
+        run['pairing'] = dict(reference_fit=str(Path(reference_fit).resolve()), reference_scope=SCOPE,
+            initial_parameters_equal=True, normalizer_equal=True, configuration_except_view_equal=True,
+            successful_paired_updates=0, completed=False, crop_log_semantics='planned but not applied')
     write_json(output/'run.json', run)
     _save(output/'step-0.pt', model, optimizer, config, normalizer, rng, 0)
     rows = []
+    reference_log = (Path(reference_fit)/'training.jsonl').open() if full_view else None
     try:
         with (output/'training.jsonl').open('x') as log:
             for step in range(1, settings['updates']+1):
@@ -205,6 +233,12 @@ def train_native(train, normalizer, config, output, *, device='cpu', check=None)
                 task = 'ITSA' if step % 2 else 'MSTSA'
                 batch = sample_batch(train, pools, task, settings['pair_batch_size'], rng,
                                      min_crop_fraction=config['data']['min_crop_fraction'])
+                samples = batch_samples(train, batch)
+                planned = deepcopy(batch['augmentation'])
+                if full_view:
+                    source_row = json.loads(reference_log.readline())
+                    verify_planned_batch(source_row, step, task, samples, planned, settings)
+                    batch = full_native_batch(train, batch)
                 lr = learning_rate(step, settings)
                 for group in optimizer.param_groups:
                     group['lr'] = lr
@@ -219,15 +253,9 @@ def train_native(train, normalizer, config, output, *, device='cpu', check=None)
                 run['optimizer_updates'] = step
                 if not all(torch.isfinite(p).all() for p in model.parameters()):
                     raise FloatingPointError('nonfinite weights after TSA Adam call')
-                samples = []
-                for identity, (si, left, right), window in zip(batch['identities'], batch['pairs'], batch['crop_windows']):
-                    scene = train[int(si)]
-                    sample = dict(scene_id=str(scene['scene_id']), identity=str(identity),
-                        left_node=str(scene['node_ids'][int(left)]), right_node=str(scene['node_ids'][int(right)]),
-                        left_index=int(left), right_index=int(right), crop=window)
-                    samples.append(sample)
-                    for field, key in (('scenes', sample['scene_id']), ('identities', str(identity)),
-                                       ('pairs', json.dumps([sample['scene_id'], int(left), int(right)], separators=(',', ':')))):
+                for sample in samples:
+                    for field, key in (('scenes', sample['scene_id']), ('identities', sample['identity']),
+                            ('pairs', json.dumps([sample['scene_id'], sample['left_index'], sample['right_index']], separators=(',', ':')))):
                         exposure[field][key] = exposure[field].get(key, 0)+1
                 exposure['successful_optimizer_calls'] += 1
                 exposure['nonzero_lr_updates'] += int(lr > 0)
@@ -242,10 +270,21 @@ def train_native(train, normalizer, config, output, *, device='cpu', check=None)
                     gradient_norm=float(norm), gradient_clip_scale=min(1., settings['gradient_clip']/(float(norm)+1e-6)),
                     seconds=time.monotonic()-tick, token_count=int(batch['observed'].sum()),
                     augmentation=batch['augmentation'], batch=samples)
+                if full_view:
+                    row.update(input_view='full_native', planned_augmentation=planned)
+                    exposure['planned_token_exposures'] += planned['output_points']
+                    exposure['planned_cropped_pairs'] += planned['cropped_pairs']
+                    exposure['planned_fallback_pairs'] += planned['fallback_pairs']
+                    exposure['token_exposures_by_task'][task] += row['token_count']
+                    run['pairing']['successful_paired_updates'] += 1
                 log.write(json.dumps(row)+'\n'); log.flush()
                 rows.append({key: row[key] for key in ('step', 'task', 'loss', 'learning_rate', 'gradient_norm', 'seconds')})
                 if step % 100 == 0:
                     write_json(output/'run.json', run)
+        if full_view:
+            if reference_log.readline() or run['pairing']['successful_paired_updates'] != settings['updates']:
+                raise ValueError('082 paired source update count differs')
+            run['pairing']['completed'] = True
         _save(output/'final.pt', model, optimizer, config, normalizer, rng, settings['updates'])
         windows = [dict(first_step=part[0]['step'], last_step=part[-1]['step'],
             mean_loss=float(np.mean([r['loss'] for r in part])),
@@ -265,6 +304,9 @@ def train_native(train, normalizer, config, output, *, device='cpu', check=None)
                    error=f'{type(error).__name__}: {error}', elapsed_seconds=time.monotonic()-started)
         write_json(output/'run.json', run)
         raise
+    finally:
+        if reference_log is not None:
+            reference_log.close()
 
 
 def final_model(fit_dir, config, normalizer):
@@ -273,7 +315,7 @@ def final_model(fit_dir, config, normalizer):
     run = json.loads((fit_dir/'run.json').read_text())
     model, saved = load_checkpoint(fit_dir/'final.pt', device='cpu')
     steps = config['training']['updates']
-    if (run.get('status') != 'COMPLETED' or run.get('configuration') != config
+    if (run.get('scope') != config['scope'] or run.get('status') != 'COMPLETED' or run.get('configuration') != config
             or run.get('normalizer') != normalizer or saved['configuration'] != config
             or saved['normalizer'] != normalizer or saved['step'] != steps
             or run.get('optimizer_updates') != steps or run.get('final_checkpoint') != 'final.pt'
@@ -290,9 +332,13 @@ def verify_exposure(fit_dir, run):
     """Rebuild actual successful-call exposure from every logged sampled pair."""
     config, original = run['configuration'], run['exposure']
     steps, batch_size = config['training']['updates'], config['training']['pair_batch_size']
+    full_view = config['scope'] == FULL_SCOPE
     counts = dict(successful_optimizer_calls=0, nonzero_lr_updates=0, positive_pair_exposures=0,
         track_exposures=0, token_exposures=0, task_calls={'ITSA': 0, 'MSTSA': 0},
         scenes={}, identities={}, pairs={}, cropped_pairs=0, fallback_pairs=0)
+    if full_view:
+        counts.update(planned_token_exposures=0, planned_cropped_pairs=0, planned_fallback_pairs=0,
+                      token_exposures_by_task={'ITSA': 0, 'MSTSA': 0})
     with (Path(fit_dir)/'training.jsonl').open() as handle:
         for step, line in enumerate(handle, 1):
             row = json.loads(line)
@@ -303,6 +349,16 @@ def verify_exposure(fit_dir, run):
                     or len(samples) != batch_size or len({s['identity'] for s in samples}) != batch_size
                     or not np.isfinite(row['loss']) or not np.isfinite(row['gradient_norm'])):
                 raise ValueError('TSA actual successful-call sample log differs')
+            if full_view:
+                planned, actual = row['planned_augmentation'], row['augmentation']
+                if (row.get('input_view') != 'full_native' or row['token_count'] != planned['input_points']
+                        or actual != dict(pair_count=batch_size, cropped_pairs=0, fallback_pairs=0,
+                            input_points=row['token_count'], output_points=row['token_count'])):
+                    raise ValueError('082 planned and actual full input exposure differ')
+                counts['planned_token_exposures'] += planned['output_points']
+                counts['planned_cropped_pairs'] += planned['cropped_pairs']
+                counts['planned_fallback_pairs'] += planned['fallback_pairs']
+                counts['token_exposures_by_task'][task] += row['token_count']
             for sample in samples:
                 if (sample['scene_id'] not in run['training_scene_ids']
                         or sample['left_node'] == sample['right_node']
@@ -323,4 +379,91 @@ def verify_exposure(fit_dir, run):
                   unique_pairs=len(counts['pairs']), repeated_pair_exposures=counts['positive_pair_exposures']-len(counts['pairs']))
     if counts['successful_optimizer_calls'] != steps or counts != original:
         raise ValueError('TSA actual exposure does not reproduce completed fit audit')
+    if full_view:
+        verify_completed_pairing(fit_dir, run)
     return counts
+
+
+def crop_reference_configuration(config):
+    result = configuration(config)
+    if result['scope'] != FULL_SCOPE:
+        raise ValueError('082 full-view profile required')
+    result['scope'] = SCOPE
+    result['data'].pop('training_view')
+    return result
+
+
+def batch_samples(train, batch):
+    return [dict(scene_id=str(train[int(si)]['scene_id']), identity=str(identity),
+        left_node=str(train[int(si)]['node_ids'][int(left)]),
+        right_node=str(train[int(si)]['node_ids'][int(right)]),
+        left_index=int(left), right_index=int(right), crop=window)
+        for identity, (si, left, right), window in zip(batch['identities'], batch['pairs'], batch['crop_windows'])]
+
+
+def full_native_batch(train, planned):
+    """Restore full already-packed inputs after the original sampler consumes RNG.
+
+    Positive refs/identities, planned crop metadata and their order are unchanged.
+    No new draws, selection, interpolation, normalization or reference data occur.
+    """
+    batch = dict(planned)
+    refs = planned['pairs']
+    for key in ('positions', 'time_ids', 'times', 'observed'):
+        batch[key] = np.stack([train[int(si)][key][int(node)]
+            for side in (1, 2) for ref in refs
+            for si, node in [(ref[0], ref[side])]])
+    count = int(batch['observed'].sum())
+    if count != planned['augmentation']['input_points']:
+        raise ValueError('082 full input tokens differ from planned pre-crop population')
+    batch['augmentation'] = dict(pair_count=len(refs), cropped_pairs=0, fallback_pairs=0,
+                                input_points=count, output_points=count)
+    return batch
+
+
+def verify_planned_batch(source, step, task, samples, planned, settings):
+    if (source['step'] != step or source['task'] != task or source['batch'] != samples
+            or source['augmentation'] != planned or source['token_count'] != planned['output_points']
+            or source['learning_rate'] != learning_rate(step, settings)):
+        raise ValueError('082 actual batch/positive/crop plan differs from074D')
+
+
+def verify_reference_fit(reference_fit, config, normalizer):
+    path = Path(reference_fit)
+    run = json.loads((path/'run.json').read_text())
+    expected = crop_reference_configuration(config)
+    if (run.get('scope') != SCOPE or run.get('status') != 'COMPLETED'
+            or run.get('configuration') != expected or run.get('normalizer') != normalizer
+            or run.get('training_scene_ids') != normalizer['training_scene_ids']
+            or run.get('optimizer_updates') != config['training']['updates']
+            or run.get('final_checkpoint') != 'final.pt' or run.get('test_opened') is not False
+            or run.get('reference_read') is not False):
+        raise ValueError('082 requires completed074D with identical configuration and T normalizer')
+    verify_exposure(path, run)
+    _, initial = load_checkpoint(path/'step-0.pt')
+    if initial['step'] != 0 or initial['configuration'] != expected or initial['normalizer'] != normalizer:
+        raise ValueError('082 reference step0 configuration/normalizer differ')
+    return run
+
+
+def verify_completed_pairing(fit_dir, run):
+    pairing = run.get('pairing', {})
+    steps = run['configuration']['training']['updates']
+    if (pairing.get('completed') is not True or pairing.get('successful_paired_updates') != steps
+            or pairing.get('initial_parameters_equal') is not True or pairing.get('normalizer_equal') is not True
+            or pairing.get('configuration_except_view_equal') is not True or pairing.get('reference_scope') != SCOPE):
+        raise ValueError('082 completed pairing is not bound')
+    reference = Path(pairing['reference_fit'])
+    verify_reference_fit(reference, run['configuration'], run['normalizer'])
+    with (reference/'training.jsonl').open() as source, (Path(fit_dir)/'training.jsonl').open() as actual:
+        for step, line in enumerate(actual, 1):
+            row = json.loads(line)
+            verify_planned_batch(json.loads(source.readline()), step, row['task'], row['batch'],
+                row['planned_augmentation'], run['configuration']['training'])
+        if source.readline() or step != steps:
+            raise ValueError('082 completed pairing count differs')
+    _, original = load_checkpoint(reference/'step-0.pt')
+    _, initial = load_checkpoint(Path(fit_dir)/'step-0.pt')
+    if any(not torch.equal(initial['model'][name], value) for name, value in original['model'].items()):
+        raise ValueError('082 completed initial parameter pairing differs')
+    return pairing

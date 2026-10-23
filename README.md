@@ -40,6 +40,7 @@ python tools/experiments/ptfm_fit.py --help
 python tools/experiments/ptfm_residual_fit.py --help
 python tools/analysis/ptfm_speed_diagnostics.py --help
 python tools/experiments/tsactfer_level1_fit.py --help
+python tools/experiments/tsactfer_full_view_fit.py --help
 python tools/experiments/constant_gate_fit.py --help
 python tools/analysis/compare_position_benchmarks.py --help
 python tools/analysis/compare_residual_shrink.py --help
@@ -57,6 +58,4 @@ python -m unittest discover -s tests
 
 [074双seed深挖](docs/research_status.md#074ab两seed深挖与去留2026-10-24)确认累计伤害与有效改善同时减少，净收益方向跨seed翻转；A的RMSE净改善对3035敏感。[077缓存诊断](HandOver/S2L-20261024-077.md)已完成并审查：固定减半MAE640.247／624.993m，两seed均未超过原linear；A与harm互有取舍、B仅全局H/I由harm占优，不据此证明惩罚必要，见[综合审查](docs/research_status.md#076a077结果审查2026-10-24)。076A／076B／077均已结案，不重领。
 
-078A/B/C已领取运行；079冻结TSA诊断完成并复核，科研解释有三项纠正；080只读缓存人口对照已发布READY（实施`a6c4305`、566测试通过，尚无080结果）；最新执行状态以[交接索引](HandOver/Handover.md)为准。先筛选机制、入围后再配对seed复验，不给所有候选重复预算。方法边界及外部审查纠正见[078/079审查](docs/research_status.md#078079对抗性审查与实施2026-10-24)。
-
-079执行与推断边界、080的具体判别作用见[最新审查](docs/research_status.md#079结果审查与080决策2026-10-24)。080不占GPU、不重跑模型，078三臂不受其等待影响。
+078A/B/C和080全部完成并复核：[078/080审查与下一步](docs/research_status.md#078080完成复核与081082决定2026-10-24)。078C仅比原linear低1.60m，场景等权和部分尾部反向，未晋级；相对初值累计伤害下降有复验线索。080不支持“T强V弱”，类先验与候选组成需分别解释。下一轮081只补pre/weighted两臂匹配seed，082只改TSA训练视图crop→full；不为第四空卡追加任务。实现及实际领取状态见[交接索引](HandOver/Handover.md)，push不代表已启动。

@@ -1,0 +1,132 @@
+{
+  "source_commit": "2f4f885",
+  "evidence_scope": "JSON count/margin reaggregation plus code review, not raw score-array replay",
+  "heads": {
+    "ITSA": {
+      "train_balanced_full": {
+        "pair_count": 856,
+        "positive_count": 428,
+        "negative_count": 428,
+        "prevalence": 0.5,
+        "roc_auc": 0.8824242291903223,
+        "average_precision": 0.861533224554736,
+        "average_precision_prior05": 0.861533224554736,
+        "false_positive_rate": 0.19626168224299065,
+        "false_discovery_rate": 0.20437956204379562
+      },
+      "validation_balanced_full": {
+        "pair_count": 802,
+        "positive_count": 401,
+        "negative_count": 401,
+        "prevalence": 0.5,
+        "roc_auc": 0.8928364873352778,
+        "average_precision": 0.8596968202126276,
+        "average_precision_prior05": 0.8596968202126277,
+        "false_positive_rate": 0.14713216957605985,
+        "false_discovery_rate": 0.15945945945945947
+      },
+      "full_same_V32": {
+        "itsa_all": {
+          "pair_count": 296406,
+          "positive_count": 877,
+          "negative_count": 295529,
+          "prevalence": 0.0029587795118857243,
+          "roc_auc": 0.8723172014138973,
+          "average_precision": 0.015014206051081525,
+          "average_precision_prior05": 0.8256656721636981,
+          "false_positive_rate": 0.18821164758788478,
+          "false_discovery_rate": 0.9876416065911432
+        },
+        "itsa_eligible": {
+          "pair_count": 28534,
+          "positive_count": 875,
+          "negative_count": 27659,
+          "prevalence": 0.030665171374500595,
+          "roc_auc": 0.8899587940892398,
+          "average_precision": 0.21269529413858998,
+          "average_precision_prior05": 0.8658513764165179,
+          "false_positive_rate": 0.1766513612205792,
+          "false_discovery_rate": 0.8756272401433691
+        },
+        "itsa_ineligible": {
+          "pair_count": 267872,
+          "positive_count": 2,
+          "negative_count": 267870,
+          "prevalence": 7.466252538525863e-06,
+          "roc_auc": 0.9140945234628738,
+          "average_precision": 6.399899000841022e-05,
+          "average_precision_prior05": 0.8889682010374593,
+          "false_positive_rate": 0.18940530854518983,
+          "false_discovery_rate": 0.9999605818124483
+        }
+      }
+    },
+    "MSTSA": {
+      "train_balanced_full": {
+        "pair_count": 940,
+        "positive_count": 470,
+        "negative_count": 470,
+        "prevalence": 0.5,
+        "roc_auc": 0.9140153915799004,
+        "average_precision": 0.8889493257187335,
+        "average_precision_prior05": 0.8889493257187334,
+        "false_positive_rate": 0.16595744680851063,
+        "false_discovery_rate": 0.16666666666666666
+      },
+      "validation_balanced_full": {
+        "pair_count": 870,
+        "positive_count": 435,
+        "negative_count": 435,
+        "prevalence": 0.5,
+        "roc_auc": 0.9345171092614613,
+        "average_precision": 0.9195671346651746,
+        "average_precision_prior05": 0.9195671346651746,
+        "false_positive_rate": 0.12413793103448276,
+        "false_discovery_rate": 0.12857142857142856
+      },
+      "full_same_V32": {
+        "mstsa_all": {
+          "pair_count": 289449,
+          "positive_count": 1747,
+          "negative_count": 287702,
+          "prevalence": 0.006035605581639598,
+          "roc_auc": 0.9168627692290698,
+          "average_precision": 0.09600942017266592,
+          "average_precision_prior05": 0.9026808450998953,
+          "false_positive_rate": 0.10434060242890213,
+          "false_discovery_rate": 0.9592880196849135
+        },
+        "mstsa_eligible": {
+          "pair_count": 218095,
+          "positive_count": 1432,
+          "negative_count": 216663,
+          "prevalence": 0.006565946032692176,
+          "roc_auc": 0.931279669657667,
+          "average_precision": 0.10654552657151094,
+          "average_precision_prior05": 0.9135963509961671,
+          "false_positive_rate": 0.12412363901542948,
+          "false_discovery_rate": 0.9583763942838815
+        },
+        "mstsa_ineligible": {
+          "pair_count": 71354,
+          "positive_count": 315,
+          "negative_count": 71039,
+          "prevalence": 0.004414608851641113,
+          "roc_auc": 0.8673615677683866,
+          "average_precision": 0.05922196785070869,
+          "average_precision_prior05": 0.8488728365826268,
+          "false_positive_rate": 0.04400399780402314,
+          "false_discovery_rate": 0.9672029702970297
+        }
+      }
+    }
+  },
+  "count_checks": 28,
+  "margin_checks": 12,
+  "interpretation": [
+    "Same-rule sampled T/V provide no evidence for T-strong V-weak; this is not an equivalence proof.",
+    "Compare matched heads; all-pooled V cannot be compared to ITSA-balanced as a pure prior intervention.",
+    "AP at prior 0.5 holds each population class-conditional score distribution fixed; residual AP differences include composition.",
+    "082 train-view alignment hypothesis comes from 079 paired crop/full evidence plus audited input mismatch, not from low AP alone."
+  ]
+}

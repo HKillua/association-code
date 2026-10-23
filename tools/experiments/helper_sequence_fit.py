@@ -1,7 +1,8 @@
-"""078 one fixed helper-aggregation run, paired to original072C sampling.
+"""Frozen helper-aggregation run, paired to a same-seed linear reference.
 
 No checkpoint selection, threshold changes, association reruns or automatic retry.
-All three arms use seed20261023,4000 updates and unchanged full T2100/V300.
+078 screens three arms at seed20261023;081 repeats only B/C at seed20261021.
+Both profiles retain4000 updates and unchanged full T2100/V300.
 """
 from __future__ import annotations
 
@@ -28,15 +29,30 @@ from tools.experiments.sequence_position_fit import (ROOT, bind_linear_control, 
 
 CONFIGS = {mode: f'helper-sequence-{mode.replace("_", "-")}-level1.json'
            for mode in ('post_pool', 'pre_pool', 'weighted_pool')}
+REPLICA_CONFIGS = {mode: f'helper-sequence-{mode.replace("_", "-")}-replica-level1.json'
+                   for mode in ('pre_pool', 'weighted_pool')}
+PROFILE_CONFIGS = {'screen078': CONFIGS, 'replica081': REPLICA_CONFIGS}
+PROFILE_REFERENCES = {
+    'screen078': ('extended4000', 'sequence-position-transformer-extended-level1.json', '072C_transformer4000'),
+    'replica081': ('replica4000', 'sequence-position-transformer-extended-replica-level1.json', '073C_transformer4000_seed21'),
+}
 
 
-def production_contract(config, manifest, alignment):
+def frozen_configuration(config, profile='screen078'):
+    """Explicit profiles reject other seeds, post-pool replicas and mixed tables."""
     configuration(config)
-    aggregation = config['model']['aggregation']
-    if config != read_json(ROOT/'configs'/CONFIGS[aggregation]):
-        raise ValueError('078 requires the frozen aggregation-specific4000-update configuration')
-    linear = read_json(ROOT/'configs/sequence-position-transformer-extended-level1.json')
-    linear_production_contract(linear, manifest, alignment, profile='extended4000')
+    modes = PROFILE_CONFIGS.get(profile, {})
+    filename = modes.get(config['model']['aggregation'])
+    if filename is None or config != read_json(ROOT/'configs'/filename):
+        raise ValueError('helper run requires the frozen aggregation/profile configuration')
+    return config
+
+
+def production_contract(config, manifest, alignment, profile='screen078'):
+    frozen_configuration(config, profile)
+    linear_profile, filename, _ = PROFILE_REFERENCES[profile]
+    linear = read_json(ROOT/'configs'/filename)
+    linear_production_contract(linear, manifest, alignment, profile=linear_profile)
 
 
 def bind_reference(path, config, source, manifest):
@@ -52,6 +68,7 @@ def bind_reference(path, config, source, manifest):
 
 
 def run(args):
+    profile = getattr(args, 'profile', 'screen078')
     source, reference, output = [Path(p).resolve() for p in (args.source_system, args.paired_control, args.output)]
     for protected in (source.parent, reference):
         if output == protected or output in protected.parents or protected in output.parents:
@@ -64,10 +81,12 @@ def run(args):
     if args.device == 'cuda:0' and not torch.cuda.is_available():
         raise ValueError('requested CUDA unavailable; no fallback')
     config, manifest, alignment = [read_json(p) for p in (args.config, args.manifest, args.alignment)]
-    production_contract(config, manifest, alignment)
+    production_contract(config, manifest, alignment, profile=profile)
     output.mkdir(parents=True)
     started = time.monotonic()
-    state = dict(scope='078-helper-representation-screen', status='RUNNING', phase='source_binding',
+    experiment = '081' if profile == 'replica081' else '078'
+    state = dict(scope=experiment+'-helper-representation-'+('replication' if profile == 'replica081' else 'screen'),
+        profile=profile, status='RUNNING', phase='source_binding',
         configuration=config, aggregation=config['model']['aggregation'], source_system=str(source),
         paired_control=str(reference), train_device=args.device, inference_device='cpu', cpu_threads=4,
         optimizer_updates=0, completed_endpoints=[], validation_selection=False, association_recomputed=False,
@@ -86,7 +105,7 @@ def run(args):
     def phase(name):
         state.update(phase=name, elapsed_seconds=time.monotonic()-started)
         write_json(output/'run.json', state)
-        print('078 phase: '+name, flush=True)
+        print(experiment+' phase: '+name, flush=True)
         check()
 
     try:
@@ -128,13 +147,14 @@ def run(args):
             del model
         phase('paired_endpoint_comparison')
         write_json(output/'endpoint-comparison.json', compare_endpoints(output/'initial', output/'final'))
-        summary = dict(scope=state['scope'], status='COMPLETED', configuration=config,
+        summary = dict(scope=state['scope'], profile=profile, status='COMPLETED', configuration=config,
             optimizer_updates=training['optimizer_updates'], endpoints=endpoints,
             endpoint_comparison='endpoint-comparison.json', source_system=str(source), paired_control=str(reference),
             training_pairing=training['paired_control'], inference_device='cpu', test_opened=False,
-            scientific_status='single-seed helper-representation screening; no automatic method promotion',
+            scientific_status=('matched second-seed B/C tail-signal check; no automatic method promotion'
+                if profile == 'replica081' else 'single-seed helper-representation screening; no automatic method promotion'),
             limitations=['Same reused V300 and shared identities; not independent generalization.',
-                'A/B equal parameter count is not equal FLOPs; C adds16 scoring parameters.',
+                'post_pool/pre_pool have107602 parameters; weighted_pool has107618; this does not imply equal FLOPs.',
                 'Learned feature-pooling weights are not physical confidence or causal attribution.',
                 'All four physical outputs retained; speed/heading are frozen Mean, not learned here.',
                 'Training synthetic groups differ from frozen056 deployment groups.'])
@@ -163,6 +183,8 @@ def main(argv=None):
     parser.add_argument('--device', choices=('cpu', 'cuda:0'), default='cuda:0')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--time-policy', choices=('advisory',), default='advisory')
+    parser.add_argument('--profile', choices=tuple(PROFILE_CONFIGS), default='screen078',
+                        help='explicit frozen seed/control; replica081 permits only pre_pool and weighted_pool')
     args = parser.parse_args(argv)
     def cancel(signum, frame):
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
