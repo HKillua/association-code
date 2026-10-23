@@ -1,0 +1,20 @@
+{
+  "scope": "076A-ptfm-speed-cache-diagnostics",
+  "status": "COMPLETED",
+  "source_074c": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-20261023-074C-attempt-1",
+  "cpu_threads": 4,
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "checkpoints_opened": false,
+  "raw_archives_opened": false,
+  "test_opened": false,
+  "groups_recomputed": false,
+  "threshold_reselected": false,
+  "validation_fitted": false,
+  "old066_acceptance": "REJECTED",
+  "advisory_reached": false,
+  "scene_count": 300,
+  "phase": "completed",
+  "completed_scenes": 300,
+  "elapsed_seconds": 260.4544209409505
+}
