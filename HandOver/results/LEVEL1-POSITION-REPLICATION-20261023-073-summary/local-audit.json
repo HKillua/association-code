@@ -1,0 +1,244 @@
+{
+  "evidence": "Returned scene sufficient statistics, not raw NPZ or checkpoint replay",
+  "checked_weighted_cells": 180,
+  "max_reaggregation_absolute_error": {
+    "mae": 2.1827872842550278e-11,
+    "mse": 6.016343832015991e-07,
+    "rmse": 9.049472282640636e-11
+  },
+  "population": {
+    "target_identity_count": 9100,
+    "predicted_group_count": 9353,
+    "duplicate_prediction_group_count": 610,
+    "anchor_matched_target_count": 8743,
+    "reference_unavailable_target_count": 1
+  },
+  "position_population": {
+    "available_target_points": 454952,
+    "covered_target_points": 442263,
+    "missing_prediction_points": 12689,
+    "available_target_trajectories": 9099,
+    "covered_target_trajectories": 8742,
+    "point_coverage": 0.9721091455801931
+  },
+  "component_count": 38,
+  "pairs": {
+    "20261023": {
+      "point_delta": {
+        "mae": -56.00623753832531,
+        "rmse": 1.3040236980241389,
+        "p95": -350.46577664014717,
+        "p99": -637.0424656808245
+      },
+      "weighted_mae_delta": {
+        "point_equal": -56.00623753832531,
+        "scene_target_equal": -40.30814810081165,
+        "scene_equal_point_mean": -109.74816688778742,
+        "scene_equal_target_mean": -91.0582706722704
+      },
+      "weighted_rmse_delta": {
+        "point_equal": 1.3040236980241389,
+        "scene_target_equal": 2.215489328314561,
+        "scene_equal_point_mean": -19.187119417380927,
+        "scene_equal_target_mean": -27.123931276172243
+      },
+      "remaining_components_mae_delta": {
+        "point_equal": -101.47683920587394,
+        "scene_target_equal": -88.3613481677902,
+        "scene_equal_point_mean": -129.60791738779596,
+        "scene_equal_target_mean": -110.92271936810221
+      },
+      "scene_win_loss": {
+        "mae": {
+          "better": 251,
+          "worse": 49,
+          "tie": 0
+        },
+        "rmse": {
+          "better": 239,
+          "worse": 61,
+          "tie": 0
+        }
+      },
+      "component_win_loss": {
+        "mae": {
+          "better": 32,
+          "worse": 6,
+          "tie": 0
+        },
+        "rmse": {
+          "better": 32,
+          "worse": 6,
+          "tie": 0
+        }
+      },
+      "sse_attribution": {
+        "net_m2": 3793168874.8966284,
+        "positive_m2": 203409364461.84058,
+        "negative_m2": -199616195586.94394,
+        "top5": [
+          {
+            "scene_id": "3035",
+            "point_count": 3614,
+            "sse_delta_m2": 70211658159.37025,
+            "rmse_delta_m": 587.6570221368129,
+            "share_of_positive_sse": 0.34517416808773277
+          },
+          {
+            "scene_id": "4335",
+            "point_count": 1736,
+            "sse_delta_m2": 33188483884.806015,
+            "rmse_delta_m": 880.5473741729093,
+            "share_of_positive_sse": 0.1631610421310379
+          },
+          {
+            "scene_id": "282",
+            "point_count": 12907,
+            "sse_delta_m2": 23343200951.033234,
+            "rmse_delta_m": 553.6197503232695,
+            "share_of_positive_sse": 0.11475971626376326
+          },
+          {
+            "scene_id": "1653",
+            "point_count": 10379,
+            "sse_delta_m2": 16450484243.7784,
+            "rmse_delta_m": 233.16527956196433,
+            "share_of_positive_sse": 0.08087378025737108
+          },
+          {
+            "scene_id": "3302",
+            "point_count": 634,
+            "sse_delta_m2": 11331804502.916975,
+            "rmse_delta_m": 1752.5527040979778,
+            "share_of_positive_sse": 0.055709355038286903
+          }
+        ],
+        "top3_share_of_positive": 0.623094926482534,
+        "scope": "Per-scene cumulative squared-error differences; no pointwise or causal inference"
+      }
+    },
+    "20261021": {
+      "point_delta": {
+        "mae": -29.151572974169653,
+        "rmse": 44.38151989392372,
+        "p95": -137.52758448249028,
+        "p99": 494.49841017788094
+      },
+      "weighted_mae_delta": {
+        "point_equal": -29.151572974169653,
+        "scene_target_equal": -22.21340778118656,
+        "scene_equal_point_mean": -65.22992844988607,
+        "scene_equal_target_mean": -57.123940057942946
+      },
+      "weighted_rmse_delta": {
+        "point_equal": 44.38151989392372,
+        "scene_target_equal": 24.887105858873838,
+        "scene_equal_point_mean": 37.68106396681105,
+        "scene_equal_target_mean": 15.81431381356424
+      },
+      "remaining_components_mae_delta": {
+        "point_equal": -35.399910480401786,
+        "scene_target_equal": -33.08833986582886,
+        "scene_equal_point_mean": -66.5371512081449,
+        "scene_equal_target_mean": -59.16301077357048
+      },
+      "scene_win_loss": {
+        "mae": {
+          "better": 236,
+          "worse": 64,
+          "tie": 0
+        },
+        "rmse": {
+          "better": 219,
+          "worse": 81,
+          "tie": 0
+        }
+      },
+      "component_win_loss": {
+        "mae": {
+          "better": 31,
+          "worse": 7,
+          "tie": 0
+        },
+        "rmse": {
+          "better": 24,
+          "worse": 14,
+          "tie": 0
+        }
+      },
+      "sse_attribution": {
+        "net_m2": 129217525465.02939,
+        "positive_m2": 215775815533.62012,
+        "negative_m2": -86558290068.59071,
+        "top5": [
+          {
+            "scene_id": "3035",
+            "point_count": 3614,
+            "sse_delta_m2": 25737809329.85481,
+            "rmse_delta_m": 215.64056745690687,
+            "share_of_positive_sse": 0.11928032465642374
+          },
+          {
+            "scene_id": "282",
+            "point_count": 12907,
+            "sse_delta_m2": 16495472287.992449,
+            "rmse_delta_m": 380.0098329420939,
+            "share_of_positive_sse": 0.07644727119764858
+          },
+          {
+            "scene_id": "256",
+            "point_count": 1618,
+            "sse_delta_m2": 15758630523.020376,
+            "rmse_delta_m": 1271.2893108778899,
+            "share_of_positive_sse": 0.0730324224892804
+          },
+          {
+            "scene_id": "3470",
+            "point_count": 7938,
+            "sse_delta_m2": 14746712684.770428,
+            "rmse_delta_m": 965.6894376781495,
+            "share_of_positive_sse": 0.06834275031379843
+          },
+          {
+            "scene_id": "1653",
+            "point_count": 10379,
+            "sse_delta_m2": 12991586401.68005,
+            "rmse_delta_m": 184.95393837664187,
+            "share_of_positive_sse": 0.060208723436180576
+          }
+        ],
+        "top3_share_of_positive": 0.26876001834335267,
+        "scope": "Per-scene cumulative squared-error differences; no pointwise or causal inference"
+      }
+    }
+  },
+  "status": "COMPLETED_LOCAL_AGGREGATE_AUDIT",
+  "source_commit": "9761a84",
+  "source_files": [
+    "summary.json.gz",
+    "scene-summary.json.gz"
+  ],
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "archive_reads": 0,
+  "test_opened": false,
+  "calculation": {
+    "weighted_mae": "sum(unit_count * scene_mae) / sum(unit_count)",
+    "weighted_mse": "sum(unit_count * scene_mse) / sum(unit_count)",
+    "weighted_rmse": "sqrt(weighted_mse)",
+    "scene_sse_difference": "scene_point_count * (transformer_mse - same_seed_gate_mse)",
+    "component_scope": "All-region MAE/MSE, all nine methods and four weightings, all 38 components"
+  },
+  "limits": [
+    "Original checkpoint, actual batch JSONL and prediction NPZ remain on server; their exact equality is server evidence.",
+    "P95/P99 are server array-level statistics, not derived from per-scene quantiles.",
+    "Two seeds on reused V300 are development evidence, not independent generalization or significance.",
+    "Scene SSE differences do not identify a particular target, query or causal mechanism."
+  ],
+  "preregistered_decision": {
+    "criterion": "L2S-20261023-073.md fixed interpretation item 1",
+    "met": true,
+    "decision": "Use Transformer4000 as the next position-recovery backbone; retain Gate as lightweight/tail control.",
+    "caveat": "Point RMSE is worse at both seeds; P99 direction flips. Do not claim Pareto dominance or select the winning seed."
+  }
+}
