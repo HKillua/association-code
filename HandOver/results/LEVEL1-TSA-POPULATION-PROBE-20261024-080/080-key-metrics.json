@@ -1,0 +1,549 @@
+{
+ "derived_by": "server agent 从 summary.json 抽取的小型键表，仅便览，不作为后续运行输入；原件为同目录 summary.json",
+ "flags": {
+  "checkpoints_opened": false,
+  "groups_recomputed": false,
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "raw_archives_read": false,
+  "scope": "080-tsa-population-probe-v1",
+  "status": "COMPLETED",
+  "test_opened": false,
+  "threshold": 0.7775184512138367,
+  "threshold_reselected": false
+ },
+ "frozen_code": "a6c4305",
+ "margin_decomposition": {
+  "ITSA": {
+   "cross_scene": {
+    "count": 428,
+    "deterioration_count": 92,
+    "improvement_count": 336,
+    "mean_decomposition_residual": 0.0,
+    "mean_margin_change": 0.09018892656889892,
+    "mean_negative_change": -0.028597173128694853,
+    "mean_positive_change": 0.06159175344020407,
+    "tie_count": 0
+   },
+   "same_scene": {
+    "count": 428,
+    "deterioration_count": 112,
+    "improvement_count": 316,
+    "mean_decomposition_residual": 0.0,
+    "mean_margin_change": 0.06972384274824062,
+    "mean_negative_change": -0.008132089308036543,
+    "mean_positive_change": 0.06159175344020407,
+    "tie_count": 0
+   }
+  },
+  "MSTSA": {
+   "cross_scene": {
+    "count": 470,
+    "deterioration_count": 146,
+    "improvement_count": 324,
+    "mean_decomposition_residual": 1.3877787807814457e-17,
+    "mean_margin_change": 0.12305920245324044,
+    "mean_negative_change": -0.06741693959115667,
+    "mean_positive_change": 0.055642262862083756,
+    "tie_count": 0
+   },
+   "same_scene": {
+    "count": 470,
+    "deterioration_count": 106,
+    "improvement_count": 364,
+    "mean_decomposition_residual": 0.0,
+    "mean_margin_change": 0.1569157858418816,
+    "mean_negative_change": -0.10127352297979783,
+    "mean_positive_change": 0.055642262862083756,
+    "tie_count": 0
+   }
+  }
+ },
+ "protocol": {
+  "eligibility_population": "Anchors require same_scene and cross_scene negative availability; onlysame_scene scores are used forV.",
+  "limitations": [
+   "T/V share sampling rules, not individual examples, random draw order or equal geography/scene density.",
+   "T is in-sample; scenes and identities are correlated. This is descriptive development evidence, not causal generalization.",
+   "079T and074DV frozen scores may use different devices; tiny threshold-adjacent changes are not evidence of generalization.",
+   "Balanced AP differs from full-candidate AP through prevalence and candidate composition.",
+   "Standardized AP holds empirical class-conditional distributions fixed; it does not remove population confounding.",
+   "AUC/mean margin improvement does not guarantee useful precision under rare positives or system recovery."
+  ],
+  "negative_pool": "Other globally distinct identity right views among selected eligible positives, matching head source relation.",
+  "selection": "Fixed scene roster and identity cap; missing eligibility does not trigger replacement.",
+  "standardized_ap_definition": "Tie-group integral of precision at prior0.5 over empirical positive recall; both classes required.",
+  "standardized_ap_is_observed_AP": false,
+  "standardized_prior": 0.5,
+  "temporal_scope": "Original full-input task eligibility; no croppedV or fabricated cross-scene scores."
+ },
+ "run_json": {
+  "advisory_reached": false,
+  "checkpoints_opened": false,
+  "configuration": {
+   "advisory_seconds": 3600,
+   "pairs_per_head_scene": 32,
+   "scene_count": 32,
+   "scope": "080-tsa-population-probe-v1",
+   "seed": 20261024
+  },
+  "elapsed_seconds": 18.63777245208621,
+  "frozen_threshold": 0.7775184512138367,
+  "groups_recomputed": false,
+  "model_forwards": 0,
+  "old066_acceptance": "REJECTED",
+  "optimizer_updates": 0,
+  "phase": "completed",
+  "raw_archives_read": false,
+  "reference_read": false,
+  "retries": 0,
+  "scope": "080-tsa-population-probe-v1",
+  "source_074d": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1",
+  "source_079": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1",
+  "status": "COMPLETED",
+  "test_opened": false,
+  "threshold_reselected": false
+ },
+ "scene_rosters": {
+  "overlap": [],
+  "train32": [
+   "101",
+   "206",
+   "255",
+   "354",
+   "377",
+   "664",
+   "1101",
+   "1167",
+   "1484",
+   "1598",
+   "1869",
+   "1903",
+   "2363",
+   "2377",
+   "2389",
+   "2656",
+   "2678",
+   "2743",
+   "2781",
+   "3140",
+   "3345",
+   "3588",
+   "3628",
+   "3657",
+   "3761",
+   "3828",
+   "3987",
+   "4296",
+   "4457",
+   "4582",
+   "4912",
+   "4977"
+  ],
+  "validation32": [
+   "25",
+   "108",
+   "152",
+   "297",
+   "303",
+   "629",
+   "1162",
+   "1272",
+   "1560",
+   "1582",
+   "1981",
+   "2067",
+   "2416",
+   "2489",
+   "2502",
+   "2722",
+   "2874",
+   "2941",
+   "2972",
+   "3175",
+   "3317",
+   "3649",
+   "3662",
+   "3755",
+   "3772",
+   "4208",
+   "4229",
+   "4272",
+   "4393",
+   "4513",
+   "4583",
+   "4645"
+  ]
+ },
+ "source074d_verification": {
+  "checkpoints_opened": false,
+  "component_count": 38,
+  "fixed_scope_metrics": {
+   "all": {
+    "fn": 6530,
+    "fp": 726469,
+    "macro_f1": 0.3619851975939634,
+    "pair_count": 4439092,
+    "tn": 3687948,
+    "tp": 18145
+   },
+   "itsa_all": {
+    "fn": 1727,
+    "fp": 462098,
+    "macro_f1": 0.27822385442474096,
+    "pair_count": 2243583,
+    "tn": 1773283,
+    "tp": 6475
+   },
+   "itsa_eligible": {
+    "fn": 1708,
+    "fp": 42782,
+    "macro_f1": 0.6215810127362544,
+    "pair_count": 227135,
+    "tn": 176202,
+    "tp": 6443
+   },
+   "mstsa_all": {
+    "fn": 4803,
+    "fp": 264371,
+    "macro_f1": 0.4443150194417285,
+    "pair_count": 2195509,
+    "tn": 1914665,
+    "tp": 11670
+   },
+   "mstsa_eligible": {
+    "fn": 2755,
+    "fp": 235514,
+    "macro_f1": 0.4776053511350367,
+    "pair_count": 1657999,
+    "tn": 1408992,
+    "tp": 10738
+   }
+  },
+  "limitation": "JSON/NPZ/log consistency only; checkpoint bytes deliberately not reloaded",
+  "node_count": 24599,
+  "normalizer_T_only": true,
+  "pair_count": 4439092,
+  "scene_count": 300,
+  "source_fixed_final_steps": 1000,
+  "source_metrics_reproduced": true,
+  "source_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1",
+  "source_status": "COMPLETED",
+  "source_time_eligibility_reproduced": true,
+  "threshold": 0.7775184512138367
+ },
+ "source079_verification": {
+  "ITSA": {
+   "all_saved_metrics_reproduced": true,
+   "cross_scene_availability_exclusions": 0,
+   "excluded_anchors": [
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "206",
+     "view_index": 8
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "1598",
+     "view_index": 112
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "2781",
+     "view_index": 256
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "4457",
+     "view_index": 384
+    }
+   ],
+   "paired_anchors": 428,
+   "source_rows": 432
+  },
+  "MSTSA": {
+   "all_saved_metrics_reproduced": true,
+   "cross_scene_availability_exclusions": 0,
+   "excluded_anchors": [],
+   "paired_anchors": 470,
+   "source_rows": 470
+  }
+ },
+ "source_run": "runs/LEVEL1-TSA-POPULATION-PROBE-20261024-080-attempt-1",
+ "train_balanced_full": {
+  "ITSA": {
+   "average_precision": 0.861533224554736,
+   "average_precision_prior05": 0.861533224554736,
+   "f1": 0.7794994040524433,
+   "false_discovery_rate": 0.20437956204379562,
+   "false_positive_rate": 0.19626168224299065,
+   "fn": 101,
+   "fp": 84,
+   "negative_count": 428,
+   "pair_count": 856,
+   "positive_count": 428,
+   "precision": 0.7956204379562044,
+   "prevalence": 0.5,
+   "recall": 0.764018691588785,
+   "roc_auc": 0.8824242291903223,
+   "tn": 344,
+   "tp": 327
+  },
+  "MSTSA": {
+   "average_precision": 0.8889493257187335,
+   "average_precision_prior05": 0.8889493257187334,
+   "f1": 0.8315565031982942,
+   "false_discovery_rate": 0.16666666666666666,
+   "false_positive_rate": 0.16595744680851063,
+   "fn": 80,
+   "fp": 78,
+   "negative_count": 470,
+   "pair_count": 940,
+   "positive_count": 470,
+   "precision": 0.8333333333333334,
+   "prevalence": 0.5,
+   "recall": 0.8297872340425532,
+   "roc_auc": 0.9140153915799004,
+   "tn": 392,
+   "tp": 390
+  }
+ },
+ "validation_balanced_full": {
+  "ITSA": {
+   "average_precision": 0.8596968202126276,
+   "average_precision_prior05": 0.8596968202126277,
+   "component_count": 9,
+   "excluded_anchors": [
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "108",
+     "view_index": 27
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "297",
+     "view_index": 38
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "2416",
+     "view_index": 162
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "3662",
+     "view_index": 267
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "3755",
+     "view_index": 270
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "4272",
+     "view_index": 353
+    },
+    {
+     "reason": [
+      "same_scene_no_other_identity_matching_head_source"
+     ],
+     "scene_id": "4645",
+     "view_index": 403
+    }
+   ],
+   "f1": 0.8067444876783398,
+   "false_discovery_rate": 0.15945945945945947,
+   "false_positive_rate": 0.14713216957605985,
+   "fn": 90,
+   "fp": 59,
+   "negative_count": 401,
+   "pair_count": 802,
+   "paired_anchors": 401,
+   "positive_count": 401,
+   "precision": 0.8405405405405405,
+   "prevalence": 0.5,
+   "recall": 0.7755610972568578,
+   "roc_auc": 0.8928364873352778,
+   "scene_count": 32,
+   "selected_positive_views": 408,
+   "tn": 342,
+   "tp": 311
+  },
+  "MSTSA": {
+   "average_precision": 0.9195671346651746,
+   "average_precision_prior05": 0.9195671346651746,
+   "component_count": 9,
+   "excluded_anchors": [],
+   "f1": 0.856140350877193,
+   "false_discovery_rate": 0.12857142857142856,
+   "false_positive_rate": 0.12413793103448276,
+   "fn": 69,
+   "fp": 54,
+   "negative_count": 435,
+   "pair_count": 870,
+   "paired_anchors": 435,
+   "positive_count": 435,
+   "precision": 0.8714285714285714,
+   "prevalence": 0.5,
+   "recall": 0.8413793103448276,
+   "roc_auc": 0.9345171092614613,
+   "scene_count": 32,
+   "selected_positive_views": 435,
+   "tn": 381,
+   "tp": 366
+  }
+ },
+ "validation_full_candidates_counts": {
+  "component_count": 9,
+  "node_count": 2643,
+  "scene_count": 32
+ },
+ "validation_full_candidates_pooled": {
+  "all": {
+   "average_precision": 0.03822864630983489,
+   "average_precision_prior05": 0.8628641317409437,
+   "f1": 0.043663766831052254,
+   "false_discovery_rate": 0.9775142390795676,
+   "false_positive_rate": 0.14683890259605542,
+   "fn": 654,
+   "fp": 85641,
+   "negative_count": 583231,
+   "pair_count": 585855,
+   "positive_count": 2624,
+   "precision": 0.022485760920432366,
+   "prevalence": 0.004478923965827722,
+   "recall": 0.7507621951219512,
+   "roc_auc": 0.8910599805980947,
+   "tn": 497590,
+   "tp": 1970
+  },
+  "itsa_all": {
+   "average_precision": 0.015014206051081525,
+   "average_precision_prior05": 0.8256656721636981,
+   "f1": 0.024337791765014424,
+   "false_discovery_rate": 0.9876416065911432,
+   "false_positive_rate": 0.18821164758788478,
+   "fn": 181,
+   "fp": 55622,
+   "negative_count": 295529,
+   "pair_count": 296406,
+   "positive_count": 877,
+   "precision": 0.012358393408856848,
+   "prevalence": 0.0029587795118857243,
+   "recall": 0.7936145952109465,
+   "roc_auc": 0.8723172014138973,
+   "tn": 239907,
+   "tp": 696
+  },
+  "itsa_eligible": {
+   "average_precision": 0.21269529413858998,
+   "average_precision_prior05": 0.8658513764165179,
+   "f1": 0.2150271107668474,
+   "false_discovery_rate": 0.8756272401433691,
+   "false_positive_rate": 0.1766513612205792,
+   "fn": 181,
+   "fp": 4886,
+   "negative_count": 27659,
+   "pair_count": 28534,
+   "positive_count": 875,
+   "precision": 0.12437275985663082,
+   "prevalence": 0.030665171374500595,
+   "recall": 0.7931428571428571,
+   "roc_auc": 0.8899587940892398,
+   "tn": 22773,
+   "tp": 694
+  },
+  "itsa_ineligible": {
+   "average_precision": 6.399899000841022e-05,
+   "average_precision_prior05": 0.8889682010374593,
+   "f1": 7.883326763894364e-05,
+   "false_discovery_rate": 0.9999605818124483,
+   "false_positive_rate": 0.18940530854518983,
+   "fn": 0,
+   "fp": 50736,
+   "negative_count": 267870,
+   "pair_count": 267872,
+   "positive_count": 2,
+   "precision": 3.941818755173637e-05,
+   "prevalence": 7.466252538525863e-06,
+   "recall": 1.0,
+   "roc_auc": 0.9140945234628738,
+   "tn": 217134,
+   "tp": 2
+  },
+  "mstsa_all": {
+   "average_precision": 0.09600942017266592,
+   "average_precision_prior05": 0.9026808450998953,
+   "f1": 0.07711864406779662,
+   "false_discovery_rate": 0.9592880196849135,
+   "false_positive_rate": 0.10434060242890213,
+   "fn": 473,
+   "fp": 30019,
+   "negative_count": 287702,
+   "pair_count": 289449,
+   "positive_count": 1747,
+   "precision": 0.04071198031508644,
+   "prevalence": 0.006035605581639598,
+   "recall": 0.7292501431024614,
+   "roc_auc": 0.9168627692290698,
+   "tn": 257683,
+   "tp": 1274
+  },
+  "mstsa_eligible": {
+   "average_precision": 0.10654552657151094,
+   "average_precision_prior05": 0.9135963509961671,
+   "f1": 0.07920523514054183,
+   "false_discovery_rate": 0.9583763942838815,
+   "false_positive_rate": 0.12412363901542948,
+   "fn": 264,
+   "fp": 26893,
+   "negative_count": 216663,
+   "pair_count": 218095,
+   "positive_count": 1432,
+   "precision": 0.04162360571611846,
+   "prevalence": 0.006565946032692176,
+   "recall": 0.8156424581005587,
+   "roc_auc": 0.931279669657667,
+   "tn": 189770,
+   "tp": 1168
+  },
+  "mstsa_ineligible": {
+   "average_precision": 0.05922196785070869,
+   "average_precision_prior05": 0.8488728365826268,
+   "f1": 0.05976881872004511,
+   "false_discovery_rate": 0.9672029702970297,
+   "false_positive_rate": 0.04400399780402314,
+   "fn": 209,
+   "fp": 3126,
+   "negative_count": 71039,
+   "pair_count": 71354,
+   "positive_count": 315,
+   "precision": 0.0327970297029703,
+   "prevalence": 0.004414608851641113,
+   "recall": 0.33650793650793653,
+   "roc_auc": 0.8673615677683866,
+   "tn": 67913,
+   "tp": 106
+  }
+ }
+}

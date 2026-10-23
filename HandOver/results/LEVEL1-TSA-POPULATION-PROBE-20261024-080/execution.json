@@ -1,0 +1,21 @@
+{
+  "arguments": {
+    "source_074d": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1",
+    "source_079": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-INPUT-PROBE-20261024-079-attempt-1",
+    "manifest": "/home/wangguangjie/djs/association-code-run080/configs/data/mtad-level1-scene3000.json",
+    "config": "/home/wangguangjie/djs/association-code-run080/configs/tsactfer-population-probe-level1.json",
+    "output": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-POPULATION-PROBE-20261024-080-attempt-1",
+    "cpu_threads": 4
+  },
+  "configuration": {
+    "scope": "080-tsa-population-probe-v1",
+    "seed": 20261024,
+    "scene_count": 32,
+    "pairs_per_head_scene": 32,
+    "advisory_seconds": 3600
+  },
+  "model_forwards": 0,
+  "checkpoints_opened": false,
+  "raw_archives_read": false,
+  "test_opened": false
+}
