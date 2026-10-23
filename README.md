@@ -57,4 +57,4 @@ python -m unittest discover -s tests
 
 [074双seed深挖](docs/research_status.md#074ab两seed深挖与去留2026-10-24)确认累计伤害与有效改善同时减少，净收益方向跨seed翻转；A的RMSE净改善对3035敏感。[077缓存诊断](HandOver/S2L-20261024-077.md)已完成并审查：固定减半MAE640.247／624.993m，两seed均未超过原linear；A与harm互有取舍、B仅全局H/I由harm占优，不据此证明惩罚必要，见[综合审查](docs/research_status.md#076a077结果审查2026-10-24)。076A／076B／077均已结案，不重领。
 
-078A/B/C已完成同seed容量／联合编码／选择性聚合的实现，079完成冻结TSA资格诊断；最新执行状态以[交接索引](HandOver/Handover.md)为准。先筛选机制、入围后再配对seed复验，不给所有候选重复预算。方法边界及外部审查纠正见[078/079审查](docs/research_status.md#078079对抗性审查与实施2026-10-24)。
+078A/B/C同seed容量／联合编码／选择性聚合与079冻结TSA资格诊断已完成开发，558测试通过、四项已发布READY（实施`d8467ef`，尚非执行结果）；最新执行状态以[交接索引](HandOver/Handover.md)为准。先筛选机制、入围后再配对seed复验，不给所有候选重复预算。方法边界及外部审查纠正见[078/079审查](docs/research_status.md#078079对抗性审查与实施2026-10-24)。
