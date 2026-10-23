@@ -1,0 +1,19 @@
+{
+  "scope": "075-tsa-frozen-score-diagnostics-v1",
+  "status": "COMPLETED",
+  "source_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TSA-NATIVE-20261023-074D-attempt-1",
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "checkpoints_opened": false,
+  "raw_archives_read": false,
+  "threshold_reselected": false,
+  "groups_recomputed": false,
+  "test_opened": false,
+  "retries": 0,
+  "advisory_reached": false,
+  "old066_acceptance": "REJECTED",
+  "phase": "completed",
+  "elapsed_seconds": 75.94298133719712,
+  "completed_scenes": 300,
+  "pair_count": 4439092
+}

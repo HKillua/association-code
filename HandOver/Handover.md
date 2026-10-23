@@ -17,7 +17,7 @@
 
 | 任务 | 方向／状态 | 执行范围 |
 |---|---|---|
-| [075：074D评分与训练曝光诊断](L2S-20261024-075.md) | **SERVER_TO_LOCAL / RUNNING**：冻结`72caeac`，UTC 17:55:05提交，单元`mtad-b5c6f2ce73c9`，`CUDA_VISIBLE_DEVICES=`（空）＋CPU4，1小时仅提醒；执行块19行／921字节／SHA `43602962a8e6c353e60fcebcd8fbb7b72d4a6e0234ae157da130347932c66ae5` 提交前后相同；只读074D原件，不加载权重、不前向、不重选阈值 | 服务器监督至终态，写 [075回执](S2L-20261024-075.md)，不重领 |
+| [075：074D评分与训练曝光诊断](L2S-20261024-075.md) | **SERVER_TO_LOCAL / COMPLETED**：退出0，实耗91.402s（17:55:05→17:56:37UTC，程序75.943s），`mtad-b5c6f2ce73c9`，零GPU（`CUDA_VISIBLE_DEVICES=`空）；`checkpoints_opened=false`、`raw_archives_read=false`、`threshold_reselected=false`、`groups_recomputed=false`、`test_opened=false`；来源闭合`source_metrics_reproduced=true`＋`time_eligibility=true`＋`normalizer_T_only=true`（300场/24,599节点/4,439,092对/38组件/阈值0.7775185不变）。**结论：头内排序尚可（all pooled AUC 0.877793、MSTSA资格内0.917303）但原阈值FDR 0.975632、FP 726,469；itsa资格外2,016,448对仅51正例却贡献419,316 FP（FDR 0.999924）；同场负比较仅0.31%、MSTSA裁窗token保留0.573** | 本地审 [075回执](S2L-20261024-075.md) 与 `results/LEVEL1-TSA-SCORE-DIAGNOSTICS-20261024-075/`，不重领 |
 
 075不依赖A/B/C终态，按现场CPU／内存／I/O错峰；不改变074D原阈值、分组或成绩，不加载权重，也不追加训练。使用原件而非Git摘要，具体路径／命令／回传见交接。075已由服务器领取RUNNING，尚无完成结果。
 
