@@ -52,4 +52,4 @@ python -m unittest discover -s tests
 
 [075只读诊断](HandOver/S2L-20261024-075.md)已完成，待深入科研复核。[076A/B](HandOver/L2S-20261024-076.md)服务器最新回执：A已完成、B已领取运行中（Git回执非实时监控）。A速度MAE优于零速，但目标内动态指标较差，待进一步科研复核；B为配对074C的单GPU4000更新位置残差适配，冻结代码`a642a2d`。
 
-[074双seed深挖](docs/research_status.md#074ab两seed深挖与去留2026-10-24)确认累计伤害与有效改善同时减少，净收益方向跨seed翻转；A的RMSE净改善对3035敏感。新增[077缓存诊断](HandOver/L2S-20261024-077.md)为READY，固定残差减半、零训练／前向／权重加载，与076独立推进。冻结`dc483d1`，全仓536项测试通过；暂无077服务器结果。
+[074双seed深挖](docs/research_status.md#074ab两seed深挖与去留2026-10-24)确认累计伤害与有效改善同时减少，净收益方向跨seed翻转；A的RMSE净改善对3035敏感。[077缓存诊断](HandOver/S2L-20261024-077.md)已完成并审查：固定减半MAE640.247／624.993m，两seed均未超过原linear；A与harm互有取舍、B仅全局H/I由harm占优，不据此证明惩罚必要。076A也已审，速度平均水平误差改善而目标内动态较差，见[综合审查](docs/research_status.md#076a077结果审查2026-10-24)。076B最新回执仍RUNNING，当前无新READY。

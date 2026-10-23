@@ -1,0 +1,633 @@
+{
+  "scope": "076A local aggregate and code adversarial review",
+  "sources": {
+    "summary": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/summary.json.gz",
+    "scenes": "HandOver/results/LEVEL1-PTFM-SPEED-20261024-076A/scene-summary.json.gz",
+    "receipt": "HandOver/S2L-20261024-076A.md",
+    "implementation": [
+      "association/evaluation/ptfm_speed_diagnostics.py",
+      "tools/analysis/ptfm_speed_diagnostics.py"
+    ]
+  },
+  "evidence_boundary": "Reaggregated server-returned per-scene JSON and audited code; did not reopen 300 server NPZ or raw observations. No new model execution or training. Tests use synthetic fixture only.",
+  "point_count": 442476,
+  "same_population_truth_distribution": {
+    "count": 442476,
+    "mean": 3.5227059402686014,
+    "std": 2.378448673970925,
+    "min": 0.0,
+    "p01": 0.0,
+    "p05": 0.0,
+    "median": 3.467419856978863,
+    "p95": 7.202222000000001,
+    "p99": 9.699761570902073,
+    "max": 52.44948695978836
+  },
+  "metrics": {
+    "anchor": {
+      "mae": 62.473264676220744,
+      "mse": 46007.110676326665,
+      "rmse": 214.4926821043708,
+      "pearson": 0.023054751556326233,
+      "prediction_distribution": {
+        "count": 442476,
+        "mean": 65.98966153714207,
+        "std": 205.23606205572162,
+        "min": 0.24416829271907892,
+        "p01": 10.604947,
+        "p05": 20.20384750581374,
+        "median": 57.735119,
+        "p95": 114.950944,
+        "p99": 148.748727,
+        "max": 76384.74001326122
+      },
+      "dynamics": {
+        "targets_with_valid_points": 8739,
+        "targets_with_at_least_two_points": 8732,
+        "target_pearson": {
+          "defined_target_count": 8519,
+          "undefined_target_count": 213,
+          "macro_mean": 0.004306318232177302,
+          "values": {
+            "count": 8519,
+            "mean": 0.004306318232177302,
+            "std": 0.2613424964223371,
+            "min": -1.0,
+            "p01": -0.6852423975869506,
+            "p05": -0.4530590098751789,
+            "median": 0.004635232335856131,
+            "p95": 0.4433229422121371,
+            "p99": 0.684626750253279,
+            "max": 1.0
+          }
+        },
+        "prediction_within_target_std": {
+          "count": 8732,
+          "mean": 38.25186155485983,
+          "std": 176.843774783976,
+          "min": 0.0,
+          "p01": 10.637920249239688,
+          "p05": 14.997377180730354,
+          "median": 25.43655489711552,
+          "p95": 38.9364562705707,
+          "p99": 301.45061120413243,
+          "max": 9889.430591076005
+        },
+        "truth_within_target_std": {
+          "count": 8732,
+          "mean": 0.4942175529722589,
+          "std": 0.8361937615979884,
+          "min": 0.0,
+          "p01": 0.0,
+          "p05": 0.020321364352734166,
+          "median": 0.1844399406356209,
+          "p95": 1.896530037234881,
+          "p99": 3.78458806974451,
+          "max": 17.87390502194352
+        },
+        "centered_error": {
+          "point_count": 442469,
+          "mae": 25.842891413696584,
+          "mse": 35791.70176591915,
+          "rmse": 189.18694924840653,
+          "absolute_error": {
+            "count": 442469,
+            "mean": 25.842891413696584,
+            "std": 187.41357135837052,
+            "min": 1.9522208606126412e-05,
+            "p01": 0.26924933918276234,
+            "p05": 1.3910371801224288,
+            "median": 15.866639115992484,
+            "p95": 55.69728020710784,
+            "p99": 109.10070522900142,
+            "max": 73623.81946842332
+          }
+        },
+        "adjacent_increment_error": {
+          "point_count": 433406,
+          "mae": 26.682143914253743,
+          "mse": 42683.11795911308,
+          "rmse": 206.59893019837511,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 26.682143914253743,
+            "std": 204.86869247215915,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 6.938893903907228e-18,
+            "median": 15.607409517009991,
+            "p95": 72.82715067736177,
+            "p99": 105.88748249666607,
+            "max": 70276.02263296992
+          }
+        },
+        "adjacent_rate_error_per_second": {
+          "point_count": 433406,
+          "mae": 0.243092268057513,
+          "mse": 3.3022687786558773,
+          "rmse": 1.8172145659376269,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 0.243092268057513,
+            "std": 1.800881708460201,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 6.076595995915423e-20,
+            "median": 0.13892891747553926,
+            "p95": 0.6662455600976549,
+            "p99": 1.0919732710843832,
+            "max": 617.0577597041272
+          }
+        }
+      },
+      "mse_decomposition": {
+        "total_mse": 46007.110676326665,
+        "within_target_component": 35791.13553879641,
+        "mean_error_component": 10215.975137530259,
+        "common_denominator": 442476,
+        "centered_point_count": 442469
+      }
+    },
+    "mean_supported": {
+      "mae": 53.8510081660637,
+      "mse": 38056.391205837346,
+      "rmse": 195.0804736662215,
+      "pearson": 0.018297844446947285,
+      "prediction_distribution": {
+        "count": 442476,
+        "mean": 57.370923001290976,
+        "std": 187.5298015849707,
+        "min": 0.24416829271907892,
+        "p01": 13.227795479472391,
+        "p05": 21.978718489664274,
+        "median": 48.56621284461574,
+        "p95": 101.299351,
+        "p99": 137.1308141312807,
+        "max": 68728.11766965404
+      },
+      "dynamics": {
+        "targets_with_valid_points": 8739,
+        "targets_with_at_least_two_points": 8732,
+        "target_pearson": {
+          "defined_target_count": 8520,
+          "undefined_target_count": 212,
+          "macro_mean": 0.0024267790915181715,
+          "values": {
+            "count": 8520,
+            "mean": 0.0024267790915181715,
+            "std": 0.21371295645667499,
+            "min": -1.0,
+            "p01": -0.5787860042290189,
+            "p05": -0.3391849553799343,
+            "median": 0.0036898159523910535,
+            "p95": 0.33431451949262647,
+            "p99": 0.5728911173611588,
+            "max": 1.0
+          }
+        },
+        "prediction_within_target_std": {
+          "count": 8732,
+          "mean": 35.345400428766716,
+          "std": 168.46752122039103,
+          "min": 0.015102875360968326,
+          "p01": 7.000984440165887,
+          "p05": 10.782207050527148,
+          "median": 20.936867831834135,
+          "p95": 36.00241770124284,
+          "p99": 367.2995300671837,
+          "max": 8973.514127840463
+        },
+        "truth_within_target_std": {
+          "count": 8732,
+          "mean": 0.4942175529722589,
+          "std": 0.8361937615979884,
+          "min": 0.0,
+          "p01": 0.0,
+          "p05": 0.020321364352734166,
+          "median": 0.1844399406356209,
+          "p95": 1.896530037234881,
+          "p99": 3.78458806974451,
+          "max": 17.87390502194352
+        },
+        "centered_error": {
+          "point_count": 442469,
+          "mae": 22.930079697346567,
+          "mse": 32080.865543807206,
+          "rmse": 179.11132165166782,
+          "absolute_error": {
+            "count": 442469,
+            "mean": 22.930079697346567,
+            "std": 177.63748756633706,
+            "min": 9.188521102054814e-05,
+            "p01": 0.2459545649086785,
+            "p05": 1.1849078396003316,
+            "median": 13.233973470549778,
+            "p95": 48.928104586450225,
+            "p99": 116.63059766622449,
+            "max": 66167.1855540825
+          }
+        },
+        "adjacent_increment_error": {
+          "point_count": 433406,
+          "mae": 26.181314535910932,
+          "mse": 36763.51305075617,
+          "rmse": 191.7381366623661,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 26.181314535910932,
+            "std": 189.9422328496953,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 0.12205027021686676,
+            "median": 16.223282030783558,
+            "p95": 64.45438077426809,
+            "p99": 101.4635708774307,
+            "max": 63309.06757052824
+          }
+        },
+        "adjacent_rate_error_per_second": {
+          "point_count": 433406,
+          "mae": 0.23836076911083065,
+          "mse": 2.848981936480769,
+          "rmse": 1.6878927502897716,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 0.23836076911083065,
+            "std": 1.6709775822044002,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 0.0010911924680071323,
+            "median": 0.14433924025557898,
+            "p95": 0.5941902677073505,
+            "p99": 1.0653621606108565,
+            "max": 555.8844957412246
+          }
+        }
+      },
+      "mse_decomposition": {
+        "total_mse": 38056.391205837346,
+        "within_target_component": 32080.35802236241,
+        "mean_error_component": 5976.033183474938,
+        "common_denominator": 442476,
+        "centered_point_count": 442469
+      }
+    },
+    "ptfm_adapted": {
+      "mae": 1.4609045948941948,
+      "mse": 4.197597607725128,
+      "rmse": 2.0488039456534457,
+      "pearson": 0.5671284905657379,
+      "prediction_distribution": {
+        "count": 442476,
+        "mean": 3.46832091213064,
+        "std": 1.9464772043109888,
+        "min": 3.893781511976613e-05,
+        "p01": 0.1154933170701522,
+        "p05": 0.5879253663136694,
+        "median": 3.4172687257545533,
+        "p95": 6.557672872943234,
+        "p99": 9.769353019736768,
+        "max": 112.98691247935471
+      },
+      "dynamics": {
+        "targets_with_valid_points": 8739,
+        "targets_with_at_least_two_points": 8732,
+        "target_pearson": {
+          "defined_target_count": 8520,
+          "undefined_target_count": 212,
+          "macro_mean": 0.026604864818966976,
+          "values": {
+            "count": 8520,
+            "mean": 0.026604864818966976,
+            "std": 0.43033637349237513,
+            "min": -1.0,
+            "p01": -0.8410059178232147,
+            "p05": -0.6852701751784885,
+            "median": 0.020258402485268907,
+            "p95": 0.7396116282643761,
+            "p99": 0.867666555003647,
+            "max": 1.0
+          }
+        },
+        "prediction_within_target_std": {
+          "count": 8732,
+          "mean": 0.9103619105611424,
+          "std": 0.5169329219193497,
+          "min": 0.018052539043591054,
+          "p01": 0.28391542018069704,
+          "p05": 0.4235088435451197,
+          "median": 0.8284778929369212,
+          "p95": 1.5520482940250744,
+          "p99": 2.489450978629749,
+          "max": 26.35576014005869
+        },
+        "truth_within_target_std": {
+          "count": 8732,
+          "mean": 0.4942175529722589,
+          "std": 0.8361937615979884,
+          "min": 0.0,
+          "p01": 0.0,
+          "p05": 0.020321364352734166,
+          "median": 0.1844399406356209,
+          "p95": 1.896530037234881,
+          "p99": 3.78458806974451,
+          "max": 17.87390502194352
+        },
+        "centered_error": {
+          "point_count": 442469,
+          "mae": 0.9612932769081649,
+          "mse": 2.128793925791791,
+          "rmse": 1.4590386992097883,
+          "absolute_error": {
+            "count": 442469,
+            "mean": 0.9612932769081649,
+            "std": 1.097592438732589,
+            "min": 1.6048102287058441e-06,
+            "p01": 0.012230821869027242,
+            "p05": 0.06047330722198488,
+            "median": 0.6859170311127523,
+            "p95": 2.7325239215926205,
+            "p99": 4.7617943917162044,
+            "max": 76.09881645398583
+          }
+        },
+        "adjacent_increment_error": {
+          "point_count": 433406,
+          "mae": 0.5468463698058971,
+          "mse": 0.7646243635687583,
+          "rmse": 0.8744280208048907,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 0.5468463698058971,
+            "std": 0.6823367287482554,
+            "min": 4.284687861400016e-06,
+            "p01": 0.006040347368089449,
+            "p05": 0.030567094590892685,
+            "median": 0.3851636322084667,
+            "p95": 1.5121463120072542,
+            "p99": 2.560282957961879,
+            "max": 63.11189350956169
+          }
+        },
+        "adjacent_rate_error_per_second": {
+          "point_count": 433406,
+          "mae": 0.004951858658813651,
+          "mse": 6.3058056337253e-05,
+          "rmse": 0.00794091029651217,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 0.004951858658813651,
+            "std": 0.006207829907494666,
+            "min": 3.750664655664869e-08,
+            "p01": 5.372486344049906e-05,
+            "p05": 0.00027358149173254374,
+            "median": 0.0034475782963889357,
+            "p95": 0.013811029501064692,
+            "p99": 0.02446604516804773,
+            "max": 0.5524592595668167
+          }
+        }
+      },
+      "mse_decomposition": {
+        "total_mse": 4.197597607725128,
+        "within_target_component": 2.1287602481290917,
+        "mean_error_component": 2.0688373595960363,
+        "common_denominator": 442476,
+        "centered_point_count": 442469
+      }
+    },
+    "zero_speed": {
+      "mae": 3.5227059402686014,
+      "mse": 18.066475236317736,
+      "rmse": 4.250467649132003,
+      "pearson": null,
+      "prediction_distribution": {
+        "count": 442476,
+        "mean": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "p01": 0.0,
+        "p05": 0.0,
+        "median": 0.0,
+        "p95": 0.0,
+        "p99": 0.0,
+        "max": 0.0
+      },
+      "dynamics": {
+        "targets_with_valid_points": 8739,
+        "targets_with_at_least_two_points": 8732,
+        "target_pearson": {
+          "defined_target_count": 0,
+          "undefined_target_count": 8732,
+          "macro_mean": null,
+          "values": {
+            "count": 0,
+            "mean": null,
+            "std": null,
+            "min": null,
+            "p01": null,
+            "p05": null,
+            "median": null,
+            "p95": null,
+            "p99": null,
+            "max": null
+          }
+        },
+        "prediction_within_target_std": {
+          "count": 8732,
+          "mean": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "p01": 0.0,
+          "p05": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "truth_within_target_std": {
+          "count": 8732,
+          "mean": 0.4942175529722589,
+          "std": 0.8361937615979884,
+          "min": 0.0,
+          "p01": 0.0,
+          "p05": 0.020321364352734166,
+          "median": 0.1844399406356209,
+          "p95": 1.896530037234881,
+          "p99": 3.78458806974451,
+          "max": 17.87390502194352
+        },
+        "centered_error": {
+          "point_count": 442469,
+          "mae": 0.4218943093012499,
+          "mse": 0.9896319720391186,
+          "rmse": 0.9948024789068022,
+          "absolute_error": {
+            "count": 442469,
+            "mean": 0.4218943093012499,
+            "std": 0.9009090763325343,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 0.003985263894474054,
+            "median": 0.1299935176009912,
+            "p95": 1.9281446325371427,
+            "p99": 3.8293787673824524,
+            "max": 46.03501207757607
+          }
+        },
+        "adjacent_increment_error": {
+          "point_count": 433406,
+          "mae": 0.11762136826819586,
+          "mse": 0.23665309069203225,
+          "rmse": 0.48647003062062544,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 0.11762136826819586,
+            "std": 0.47203633802785744,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 0.0,
+            "median": 0.036195633032728214,
+            "p95": 0.42168256771713114,
+            "p99": 1.5090365178285252,
+            "max": 50.83338741481482
+          }
+        },
+        "adjacent_rate_error_per_second": {
+          "point_count": 433406,
+          "mae": 0.0010454542381119465,
+          "mse": 1.836496274646323e-05,
+          "rmse": 0.0042854361209173596,
+          "absolute_error": {
+            "count": 433406,
+            "mean": 0.0010454542381119465,
+            "std": 0.004155958154562796,
+            "min": 0.0,
+            "p01": 0.0,
+            "p05": 0.0,
+            "median": 0.0003234481549578054,
+            "p95": 0.003752868242232598,
+            "p99": 0.013298968948445648,
+            "max": 0.444915727581736
+          }
+        }
+      },
+      "mse_decomposition": {
+        "total_mse": 18.066475236317736,
+        "within_target_component": 0.9896163159949393,
+        "mean_error_component": 17.076858920322795,
+        "common_denominator": 442476,
+        "centered_point_count": 442469
+      }
+    }
+  },
+  "heterogeneity_counts": {
+    "scene": {
+      "mae": {
+        "ptfm_better": 286,
+        "equal": 0,
+        "ptfm_worse": 14
+      },
+      "rmse": {
+        "ptfm_better": 291,
+        "equal": 0,
+        "ptfm_worse": 9
+      },
+      "centered_rmse": {
+        "ptfm_better": 9,
+        "equal": 0,
+        "ptfm_worse": 291
+      },
+      "increment_mae": {
+        "ptfm_better": 0,
+        "equal": 0,
+        "ptfm_worse": 300
+      },
+      "rate_mae": {
+        "ptfm_better": 0,
+        "equal": 0,
+        "ptfm_worse": 300
+      }
+    },
+    "component": {
+      "mae": {
+        "ptfm_better": 35,
+        "equal": 0,
+        "ptfm_worse": 3
+      },
+      "rmse": {
+        "ptfm_better": 37,
+        "equal": 0,
+        "ptfm_worse": 1
+      },
+      "centered_rmse": {
+        "ptfm_better": 2,
+        "equal": 0,
+        "ptfm_worse": 36
+      },
+      "increment_mae": {
+        "ptfm_better": 0,
+        "equal": 0,
+        "ptfm_worse": 38
+      },
+      "rate_mae": {
+        "ptfm_better": 0,
+        "equal": 0,
+        "ptfm_worse": 38
+      }
+    }
+  },
+  "mse_decomposition_identity": "sum(error^2)=sum((error-target_mean_error)^2)+sum(target_n*target_mean_error^2), scene-target units; singleton centered component zero; common denominator442476.",
+  "ptfm_minus_zero_decomposition": {
+    "total_mse": -13.868877628592607,
+    "within_target_component": 1.1391439321341523,
+    "mean_error_component": -15.008021560726759
+  },
+  "fixed_native_truth_speed_bins": {
+    "exactly_zero": {
+      "count": 37472,
+      "ptfm_mae": 1.9807440622321268,
+      "zero_mae": 0.0
+    },
+    "gt0_le1": {
+      "count": 40088,
+      "ptfm_mae": 1.9014809688337568,
+      "zero_mae": 0.2240646464280344
+    },
+    "gt1_le5": {
+      "count": 246046,
+      "ptfm_mae": 1.0570917853820856,
+      "zero_mae": 3.2099566530176653
+    },
+    "gt5_le20": {
+      "count": 118787,
+      "ptfm_mae": 1.9618208382233908,
+      "zero_mae": 6.371946725290571
+    },
+    "gt20": {
+      "count": 83,
+      "ptfm_mae": 34.14691103218281,
+      "zero_mae": 36.495178009713705
+    }
+  },
+  "receipt_corrections": [
+    {
+      "claim": "pooled Pearson0.567 is almost all between-target levels because target macro0.0266",
+      "correction": "These correlations have different weights/variances and cannot quantify covariance decomposition; instead MSE decomposition rigorously shows all total MSE gain versus zero derives from lower target mean-error component, with worse within-target centered error. This does not identify causal model inputs or mechanism."
+    },
+    {
+      "claim": "all output group PTFM mean3.580/std6.356 versus unique-valid truth mean3.523",
+      "correction": "Populations differ. Aligned common valid PTFM mean3.468320912/std1.946477204 versus truthmean3.522705940/std2.378448674;598592 is group-query point count, not group count9353."
+    },
+    {
+      "claim": "PTFM has not recovered target dynamics",
+      "correction": "At aggregate and mostly per-scene/component, centered/difference errors worse than zero; no evidence of overall beneficial dynamic recovery, not proof no individual track is recovered or model has zero dynamical information."
+    },
+    {
+      "claim": "truth exactlyzero or <=1 is stopped/slow",
+      "correction": "Use native numeric strata only; units unverified and support not simultaneous actualmeasurement."
+    }
+  ],
+  "next_step": "Keep PTFM speed result as useful level estimation/calibration evidence, not multi-source dynamic gain. Do not automatically add architecture or fit V constants. Integrate076B before any new execution; if speed causal claim needed, same-population frozen helper intervention plus T-only baseline and physical-unit provenance are the minimal distinctions.",
+  "reaggregation_passed": true
+}
