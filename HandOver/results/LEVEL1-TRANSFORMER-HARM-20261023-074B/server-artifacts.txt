@@ -1,0 +1,49 @@
+# LEVEL1-TRANSFORMER-HARM-20261023-074B 留服务器原件（实测）
+
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-TRANSFORMER-HARM-20261023-074B-attempt-1  总计 1.5G
+  endpoint-comparison.json  4162852 字节  mtime=2026-10-24 01:53:07
+  execution.json  2110 字节  mtime=2026-10-24 01:53:07
+  preparation.json  622925339 字节  mtime=2026-10-24 00:57:19
+  run.json  1637 字节  mtime=2026-10-24 01:53:07
+  summary.json  3440 字节  mtime=2026-10-24 01:53:07
+  final/run.json  5243 字节  mtime=2026-10-24 01:52:06
+  final/scene-summary.json.gz  902631 字节  mtime=2026-10-24 01:52:05
+  final/summary.json  4888235 字节  mtime=2026-10-24 01:52:06
+  final/predictions/  300 个文件 193M
+  final/scenes/  300 个文件 1.2M
+  final/system-predictions/  300 个文件 267M
+  fit/final.pt  1299074 字节  mtime=2026-10-24 01:37:05
+  fit/run.json  664913 字节  mtime=2026-10-24 01:37:06
+  fit/step-0.pt  437010 字节  mtime=2026-10-24 00:57:23
+  fit/training-windows.json  18562 字节  mtime=2026-10-24 01:37:06
+  fit/training.jsonl  8657784 字节  mtime=2026-10-24 01:37:05
+  initial/run.json  5238 字节  mtime=2026-10-24 01:44:44
+  initial/scene-summary.json.gz  756899 字节  mtime=2026-10-24 01:44:43
+  initial/summary.json  4850988 字节  mtime=2026-10-24 01:44:44
+  initial/predictions/  300 个文件 187M
+  initial/scenes/  300 个文件 1.2M
+  initial/system-predictions/  300 个文件 267M
+
+配对表run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-HARM-PAIRED-20261023-074B-attempt-1  总计 1.3M
+  report.md  1110 字节  mtime=2026-10-24 02:00:09
+  run.json  351 字节  mtime=2026-10-24 02:00:09
+  scene-summary.json.gz  1051867 字节  mtime=2026-10-24 02:00:09
+  summary.json.gz  284440 字节  mtime=2026-10-24 02:00:07
+  launcher/  11 个文件 32K
+
+launcher: /home/wangguangjie/djs/association-code/runs/LEVEL1-TRANSFORMER-HARM-20261023-074B-attempt-1-launch
+  exit_code.txt  2 字节
+  launch.json  1324 字节
+  launch.stderr.log  43 字节
+  launch.stdout.log  0 字节
+  request.json  1774 字节
+  status.json  527 字节
+  stderr.log  0 字节
+  stdout.log  318 字节
+  worker.pid  8 字节
+  worker.stderr.log  0 字节
+  worker.stdout.log  0 字节
+
+执行checkout: /home/wangguangjie/djs/association-code-run074B HEAD=417c90d2f687b33e090fb99de968857fb523fc10（detach 于交接冻结代码 417c90d，只读）
+未回传：fit/training.jsonl 逐行日志、step-0.pt／final.pt、preparation.json、两端点 predictions／system-predictions／scenes NPZ；程序原件以 .gz 原样回传，未改名或替换。
+本目录 Git 回传（不含本清单自身）: 40 个文件 / 3006823 字节
