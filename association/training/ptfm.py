@@ -1,0 +1,203 @@
+"""074C bounded training-only PTFM reference adaptation."""
+from __future__ import annotations
+import copy,json,math,time
+from pathlib import Path
+import numpy as np
+import torch
+from association.models.ptfm import PTFM,SCOPE,ROUTING_SEMANTICS,LOSS_SEMANTICS,ptfm_inputs,objectives
+from association.training.evidence_fusion import TRAIN_MODES,prepare_evidence_scenes,training_members
+from association.utils.runtime import write_json
+
+
+def configuration(value):
+    if (set(value)!={'scope','routing_semantics','data','motion_observation_policy','train_splits','training','model'}
+            or value['scope']!=SCOPE or value['routing_semantics']!=ROUTING_SEMANTICS
+            or value['data']!=dict(length=64,max_observations=128,time_unit_seconds=20.,reference_longitude_policy='shortest_arc')
+            or value['motion_observation_policy']!='canonical_all' or value['train_splits']!=['T_core']
+            or value['model']!=dict(l2=1e-4,normalization='T_exposure_visible_local_zscore',helper_missing='masked_neutral_carrier')):
+        raise ValueError('PTFM frozen architecture/data/normalization contract differs')
+    t=value['training']
+    if set(t)!={'seed','updates','batch_size','learning_rate','gradient_clip','advisory_seconds'}:
+        raise ValueError('PTFM unexpected training settings')
+    for k in ('seed','updates','batch_size'):
+        if type(t[k]) is not int or t[k]<1: raise ValueError('PTFM positive integer '+k+' required')
+    for k in ('learning_rate','gradient_clip','advisory_seconds'):
+        if isinstance(t[k],bool) or not isinstance(t[k],(int,float)) or not math.isfinite(t[k]) or t[k]<=0:
+            raise ValueError('PTFM positive finite '+k+' required')
+    return value
+
+
+def fit_normalizer(train,config,check=None):
+    """Replay planned T samples with an independent RNG, before any optimization.
+
+    Inputs only; neither targets/masks nor V affect statistics. Missing helpers
+    are excluded rather than counted as duplicate measurements. Actual training
+    restarts the same sampler seed, verifies its terminal RNG, and (when paired)
+    checks every actual successful sample against the completed072C control.
+    """
+    rng=np.random.default_rng(config['training']['seed']); count=0; mean=np.zeros(4); m2=np.zeros(4)
+    for step in range(config['training']['updates']):
+        if check: check()
+        mode=TRAIN_MODES[step%len(TRAIN_MODES)]
+        for _ in range(config['training']['batch_size']):
+            scene=train[int(rng.integers(len(train)))]; anchor=int(rng.integers(len(scene['identities'])))
+            members=training_members(scene,anchor,mode)
+            a,b,c,_=ptfm_inputs(scene['motion'],members)
+            values=np.concatenate((a.numpy(),b.numpy()[c[:,0].numpy().astype(bool)]))
+            n=len(values); average=values.mean(0); within=((values-average)**2).sum(0)
+            delta=average-mean; total=count+n
+            m2+=within+delta**2*count*n/total;mean+=delta*n/total;count=total
+    return dict(mean=mean.tolist(),scale=np.maximum(np.sqrt(m2/count),1e-6).tolist(),count=count,
+        split='T_core',truth_used=False,missing_helper_rows_counted=False,
+        scope='planned identical scene/anchor/member exposure; visible local native units only',
+        training_updates=config['training']['updates'],sampled_anchors=config['training']['updates']*config['training']['batch_size'],
+        planned_sampler_final_rng=rng.bit_generator.state)
+
+
+def _paired_reference(path,config,scene_ids):
+    from tools.analysis.compare_position_benchmarks import _sequence_sampling
+    from association.training.sequence_position import load_checkpoint as sequence_checkpoint
+    path=Path(path).resolve();run,rows,exposure=_sequence_sampling(path)
+    expected=run['configuration']
+    if (any(expected[k]!=config[k] for k in ('data','training','train_splits','motion_observation_policy'))
+            or expected.get('position_loss')!='linear' or expected['model']['backbone']!='transformer'
+            or run['training_scene_ids']!=scene_ids):
+        raise ValueError('PTFM paired control must have the same actual training protocol and ordered scenes')
+    with torch.random.fork_rng(devices=[]):
+        for filename,step in (('step-0.pt',0),('final.pt',config['training']['updates'])):
+            model,saved=sequence_checkpoint(path/filename);del model
+            if saved['configuration']!=expected or saved['actual_updates']!=step:
+                raise ValueError('PTFM paired control endpoint binding differs')
+    return dict(path=str(path),rows=rows,exposure=exposure)
+
+
+def _save(path,model,optimizer,step,config,rng,normalizer):
+    torch.save(dict(scope=SCOPE,routing_semantics=ROUTING_SEMANTICS,loss_semantics=LOSS_SEMANTICS,
+        configuration=config,normalizer=normalizer,step=step,actual_updates=step,model=model.state_dict(),
+        optimizer=optimizer.state_dict(),numpy_rng=rng.bit_generator.state,torch_rng=torch.get_rng_state(),
+        cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None),path)
+
+
+def load_checkpoint(path,*,device='cpu'):
+    saved=torch.load(path,map_location='cpu',weights_only=False)
+    if (saved.get('scope')!=SCOPE or saved.get('routing_semantics')!=ROUTING_SEMANTICS
+            or saved.get('loss_semantics')!=LOSS_SEMANTICS): raise ValueError('PTFM checkpoint semantics differ')
+    config=configuration(saved['configuration']); step=saved.get('step')
+    if (type(step) is not int or not 0<=step<=config['training']['updates'] or type(saved.get('actual_updates')) is not int
+            or saved['actual_updates']!=step or any(k not in saved for k in ('optimizer','numpy_rng','torch_rng','cuda_rng'))):
+        raise ValueError('PTFM checkpoint actual updates/RNG differ')
+    norm=saved['normalizer']
+    if (norm.get('training_updates')!=config['training']['updates'] or norm.get('sampled_anchors')!=config['training']['updates']*config['training']['batch_size']
+            or type(norm.get('count')) is not int or norm['count']<1 or norm.get('missing_helper_rows_counted') is not False
+            or not isinstance(norm.get('planned_sampler_final_rng'),dict)):
+        raise ValueError('PTFM normalization exposure/configuration differs')
+    if step==config['training']['updates'] and saved['numpy_rng']!=norm['planned_sampler_final_rng']:
+        raise ValueError('PTFM final checkpoint sampling/normalization exposure differs')
+    model=PTFM(norm).to(device);model.load_state_dict(saved['model'],strict=True)
+    if (not torch.equal(model.mean.cpu(),torch.tensor(norm['mean'],dtype=torch.float64))
+            or not torch.equal(model.scale.cpu(),torch.tensor(norm['scale'],dtype=torch.float64))
+            or not all(torch.isfinite(p).all() for p in model.parameters())):
+        raise ValueError('PTFM normalizer buffers or model parameters differ')
+    groups=saved['optimizer'].get('param_groups',[]);entries=saved['optimizer'].get('state',{})
+    if (len(groups)!=1 or groups[0].get('lr')!=config['training']['learning_rate']
+            or len(groups[0].get('params',[]))!=len(list(model.parameters()))):
+        raise ValueError('PTFM optimizer/configuration differs')
+    if (step==0 and entries) or (step>0 and (set(entries)!=set(groups[0]['params']) or
+            any(float(entry.get('step',-1))!=step for entry in entries.values()))):
+        raise ValueError('PTFM actual optimizer step differs')
+    return model,saved
+
+
+def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_reference_fit=None):
+    config=copy.deepcopy(configuration(config));train_raw=list(train_raw)
+    ids=[str(s['scene_id']) for s in train_raw]
+    if not ids or len(set(ids))!=len(ids) or any(s.get('split')!='T_core' for s in train_raw):
+        raise ValueError('PTFM fitting accepts distinct T_core scenes only')
+    output=Path(output);output.mkdir(parents=True,exist_ok=False);started=time.monotonic()
+    t=config['training'];rng=np.random.default_rng(t['seed']);torch.manual_seed(t['seed'])
+    audit=dict(successful_updates=0,sampled_anchors=0,valid_position_points=0,task_valid_counts=[0,0,0],
+               helper_absent_queries=0,scenes={},anchors={})
+    state=dict(scope=SCOPE,status='RUNNING',configuration=config,optimizer_updates=0,test_opened=False,
+        training_scene_ids=ids,exposure=audit,device=str(device),loss_semantics=LOSS_SEMANTICS,
+        gradient_clipping=dict(clipped_updates=0),selection_policy='fixed final; no V selection',
+        interpretation='PTFM task adaptation with full-state/adaptive-task objective; not author reproduction')
+    state['paired_control']=dict(fit=str(Path(paired_reference_fit).resolve()) if paired_reference_fit else None,
+        status='PENDING' if paired_reference_fit else 'NOT_REQUESTED',matched_updates=0,matched_anchors=0,
+        interpretation='Actual scene/anchor/member exposure only; model, state objectives and initialization differ.')
+    write_json(output/'run.json',state);model=optimizer=norm=None;windows=[];window=[]
+    try:
+        reference=_paired_reference(paired_reference_fit,config,ids) if paired_reference_fit else None
+        train=prepare_evidence_scenes(train_raw,check=check,motion_observation_policy='canonical_all')
+        if any(not len(s['identities']) for s in train):raise ValueError('PTFM cannot drop empty train scenes')
+        norm=fit_normalizer(train,config,check);write_json(output/'normalizer.json',norm)
+        model=PTFM(norm).to(device);optimizer=torch.optim.Adam(model.parameters(),lr=t['learning_rate'])
+        state['parameter_count']=sum(p.numel() for p in model.parameters());state['normalizer']=norm
+        _save(output/'step-0.pt',model,optimizer,0,config,rng,norm)
+        fit_started=time.monotonic();cuda=torch.device(device).type=='cuda'
+        if cuda:torch.cuda.reset_peak_memory_stats(device)
+        for step in range(1,t['updates']+1):
+            if check:check()
+            model.train();optimizer.zero_grad(set_to_none=True);mode=TRAIN_MODES[(step-1)%len(TRAIN_MODES)]
+            batch=[];losses=[];diags=[];absent=0
+            for _ in range(t['batch_size']):
+                scene=train[int(rng.integers(len(train)))];anchor=int(rng.integers(len(scene['identities'])))
+                members=training_members(scene,anchor,mode);result=model(*ptfm_inputs(scene['motion'],members,device=device))
+                target=torch.as_tensor(scene['target'][anchor],dtype=torch.float64,device=device)
+                valid=torch.as_tensor(scene['valid'][anchor],dtype=torch.bool,device=device)
+                loss,diag=objectives(model,result,target,valid);(loss/t['batch_size']).backward()
+                losses.append(float(loss.detach()));diags.append(diag)
+                absent+=int((~result['helper_present']).sum())
+                eligible=~scene['motion']['support'][anchor]&scene['motion']['support'][members[1:]].any(0)
+                batch.append(dict(scene_id=str(scene['scene_id']),anchor_index=anchor,node_id=str(scene['node_ids'][anchor]),
+                    members=[int(x) for x in members],valid_position_points=diag['task_valid_counts'][0],
+                    eligible_query_points=int(eligible.sum()),eligible_valid_position_points=int((eligible&valid[:,:2].all(-1).cpu().numpy()).sum()),
+                    task_valid_counts=diag['task_valid_counts']))
+            if reference is not None:
+                old=reference['rows'][step-1]
+                common=[{key:value for key,value in sample.items() if key!='task_valid_counts'} for sample in batch]
+                if old['step']!=step or old['mode']!=mode or old['batch']!=common:
+                    raise ValueError('PTFM actual batch differs from completed paired control before optimizer update')
+            penalty=config['model']['l2']*model.l2();penalty.backward()
+            grad=torch.nn.utils.clip_grad_norm_(model.parameters(),t['gradient_clip'],error_if_nonfinite=True)
+            optimizer.step();state['optimizer_updates']=step
+            audit['successful_updates']+=1;audit['sampled_anchors']+=len(batch);audit['helper_absent_queries']+=absent
+            if reference is not None:
+                state['paired_control'].update(matched_updates=step,matched_anchors=audit['sampled_anchors'])
+            for i in range(3):audit['task_valid_counts'][i]+=sum(d['task_valid_counts'][i] for d in diags)
+            audit['valid_position_points']=audit['task_valid_counts'][0]
+            for sample in batch:
+                for key,field in (('scenes','scene_id'),('anchors','node_id')):
+                    name=sample[field];audit[key][name]=audit[key].get(name,0)+1
+            state['gradient_clipping']['clipped_updates']+=int(grad>t['gradient_clip'])
+            if not all(torch.isfinite(p).all() for p in model.parameters()):raise FloatingPointError('PTFM nonfinite updated parameter')
+            row=dict(step=step,mode=mode,batch=batch,loss=float(np.mean(losses)),l2=float(penalty.detach()),
+                task_losses=np.mean([d['task_losses'] for d in diags],axis=0).tolist(),
+                task_sigmas=np.mean([d['task_sigmas'] for d in diags],axis=0).tolist(),gradient_norm=float(grad),
+                gradient_clipped=bool(grad>t['gradient_clip']),gradient_clip_scale=min(1.,t['gradient_clip']/(float(grad)+1e-6)))
+            with (output/'training.jsonl').open('a') as handle:handle.write(json.dumps(row,allow_nan=False)+'\n')
+            window.append(row)
+            if step%100==0 or step==t['updates']:
+                windows.append(dict(first_step=window[0]['step'],last_step=step,loss_mean=float(np.mean([r['loss'] for r in window])),
+                    task_losses_mean=np.mean([r['task_losses'] for r in window],0).tolist(),
+                    gradient_norm_median=float(np.median([r['gradient_norm'] for r in window])),
+                    clipped_updates=sum(r['gradient_clipped'] for r in window)))
+                window=[];write_json(output/'training-windows.json',dict(windows=windows,selection=False))
+            state.update(elapsed_seconds=time.monotonic()-started,training_seconds=time.monotonic()-fit_started,
+                         peak_cuda_memory_allocated_bytes=torch.cuda.max_memory_allocated(device) if cuda else 0)
+            write_json(output/'run.json',state)
+        if rng.bit_generator.state!=norm['planned_sampler_final_rng']:
+            raise ValueError('PTFM actual sampling differs from planned normalization exposure')
+        state['normalizer_sampler_replay_exact']=True
+        if reference is not None:
+            for key in ('successful_updates','sampled_anchors','valid_position_points','scenes','anchors'):
+                if audit[key]!=reference['exposure'][key]:raise ValueError('PTFM paired exposure counter differs/'+key)
+            state['paired_control'].update(status='PAIR_VERIFIED',actual_successful_batches_exact=True)
+        _save(output/'final.pt',model,optimizer,t['updates'],config,rng,norm)
+        state.update(status='COMPLETED',final_checkpoint='final.pt',trained_scene_count=len(audit['scenes']))
+        write_json(output/'run.json',state);return state
+    except BaseException as error:
+        state.update(status='INTERRUPTED' if isinstance(error,(KeyboardInterrupt,InterruptedError)) else 'FAILED',
+                     error=f'{type(error).__name__}: {error}',elapsed_seconds=time.monotonic()-started)
+        write_json(output/'run.json',state)
+        if model is not None:_save(output/'interrupted.pt',model,optimizer,state['optimizer_updates'],config,rng,norm)
+        raise

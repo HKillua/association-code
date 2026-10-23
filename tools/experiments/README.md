@@ -9,13 +9,16 @@
 | `support_gate_fit.py` | 068：3035／2535输入预核→T_core受限位置门控1000更新→固定056分组CPU初始化及终点评价；一条失败即停的链 |
 | `support_gate_linear_fit.py` | 已完成070：只改线性位置损失，逐批配对068，复用原CPU初始化；保留复现入口，不重领 |
 | `support_gate_replication.py` | 071A/B：独立启动新seed Log／线性1000更新及CPU两端点评价；compare仅在两臂完成后核实际配对 |
-| `sequence_position_fit.py` | LSTM／Transformer通用二维位置恢复；默认071的1000更新，显式extended4000为072B/C从头4000更新，CPU两端点；不是领域原版复现 |
+| `sequence_position_fit.py` | LSTM／Transformer二维位置恢复；extended4000为072，harm4000／harm-replica4000为074A/B，必须绑定同seed完整旧控制；CPU两端点 |
+| `ptfm_fit.py` | 074C：双流PTFM四状态任务适配，T-only归一化、与072C实际批次配对；CPU两端点及真实缓存对照 |
+| `tsactfer_level1_fit.py` | 074D：TSA原生时间128点Level1适配，双头固定final评分、全候选及论文资格子集、六臂系统与056共同点 |
 | `constant_gate_fit.py` | 072A：原071B实际T样本上的1001点全局标量搜索，固定后一次完整CPU V评价 |
 | `../analysis/compare_position_benchmarks.py` | 071整表；显式三项072输入后核常数与4000更新终点、真实采样前缀及同人口；不做模型前向 |
+| `../analysis/compare_position_harm.py` | 074A/B分别核同seed旧Transformer缓存、实际训练配对、累计改善／伤害与尾部，不做模型前向 |
 | `level1_system_evaluate.py` | 普通/学习关联与普通/学习融合的完整系统评价；保存全部目标、分组、mask和路由 |
 | `level1_ols_working_point.py` | Level1纯OLS开发工作点，不加载学习权重 |
 | `tmtaff_complete_fit.py` / `tmtaff_complete_evaluate.py` | TMTAFF参考各阶段训练和冻结评价，保留完整baseline实现 |
-| `tsactfer_fit.py` | TSA-cTFER独立关联对照的离线适配 |
+| `tsactfer_fit.py` | 历史TSA离线入口，不作为074D的Level1固定终点入口 |
 | `make_scene_manifest.py` / `prepare_scene_data.py` | 数据名单生成和时间/人口准备；当前名单已冻结，不重复生成 |
 | `launch_detached.py` | 服务器服务管理器托管单次作业，保存真实退出状态 |
 | `../analysis/frozen_fusion_transfer.py` | 062—066：056固定组与三个057冻结融合的七臂比较；旧验收失败，不恢复额度 |
