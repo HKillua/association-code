@@ -1,0 +1,14 @@
+{
+  "status": "COMPLETED",
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "test_opened": false,
+  "completed_scenes": 300,
+  "population": {
+    "target_identity_count": 9100,
+    "predicted_group_count": 9353,
+    "duplicate_prediction_group_count": 610,
+    "anchor_matched_target_count": 8743,
+    "reference_unavailable_target_count": 1
+  }
+}
