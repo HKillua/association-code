@@ -1,0 +1,869 @@
+{
+  "scope": "074D local summary audit; no checkpoint, raw archive, or prediction arrays read",
+  "source_commit": "038838a",
+  "date": "2026-10-24",
+  "source": "system/summary.json.gz",
+  "edge": {
+    "ols": {
+      "pair_count": 4439092,
+      "macro_f1": 0.6846857238999655,
+      "micro_f1": 0.24318670429456385,
+      "micro_precision": 0.14188056149081762,
+      "micro_recall": 0.8503748733535967,
+      "tp": 20983,
+      "fp": 126909,
+      "fn": 3692,
+      "tn": 4287508
+    },
+    "reference056": {
+      "pair_count": 4439092,
+      "macro_f1": 0.8067376841059276,
+      "micro_f1": 0.44014641771770896,
+      "micro_precision": 0.28940984192650476,
+      "micro_recall": 0.918581560283688,
+      "tp": 22666,
+      "fp": 55652,
+      "fn": 2009,
+      "tn": 4358765
+    },
+    "tsa": {
+      "pair_count": 4439092,
+      "macro_f1": 0.3619851975939634,
+      "micro_f1": 0.047173428971426866,
+      "micro_precision": 0.024368330436978086,
+      "micro_recall": 0.7353596757852077,
+      "tp": 18145,
+      "fp": 726469,
+      "fn": 6530,
+      "tn": 3687948
+    }
+  },
+  "group": {
+    "ols": {
+      "scene_count": 300,
+      "pair_count": 4439092,
+      "macro_f1": 0.6701414363318533,
+      "positive_scene_macro_f1": 0.6701414363318533,
+      "positive_scene_count": 300,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "micro_f1": 0.24269912838412736,
+      "micro_precision": 0.14538318297107267,
+      "micro_recall": 0.7340628166160081,
+      "p_ca": 0.7340628166160081,
+      "p_fa": 0.8546168170289273,
+      "tp": 18113,
+      "fp": 106475,
+      "fn": 6562,
+      "tn": 4307942,
+      "threshold": 0.5,
+      "empty_f1_convention": "truth and prediction empty: 1; no eligible pairs: excluded from shared denominator"
+    },
+    "reference056": {
+      "scene_count": 300,
+      "pair_count": 4439092,
+      "macro_f1": 0.7656567785944534,
+      "positive_scene_macro_f1": 0.7656567785944534,
+      "positive_scene_count": 300,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "micro_f1": 0.4187760986955753,
+      "micro_precision": 0.31516665301777086,
+      "micro_recall": 0.62387031408308,
+      "p_ca": 0.62387031408308,
+      "p_fa": 0.6848333469822292,
+      "tp": 15394,
+      "fp": 33450,
+      "fn": 9281,
+      "tn": 4380967,
+      "threshold": 0.5,
+      "empty_f1_convention": "truth and prediction empty: 1; no eligible pairs: excluded from shared denominator"
+    },
+    "tsa": {
+      "scene_count": 300,
+      "pair_count": 4439092,
+      "macro_f1": 0.3208924974268361,
+      "positive_scene_macro_f1": 0.3208924974268361,
+      "positive_scene_count": 300,
+      "negative_scene_count": 0,
+      "negative_scene_false_acceptance_rate": null,
+      "micro_f1": 0.04236660541439683,
+      "micro_precision": 0.022069646139550026,
+      "micro_recall": 0.5274569402228977,
+      "p_ca": 0.5274569402228977,
+      "p_fa": 0.97793035386045,
+      "tp": 13015,
+      "fp": 576709,
+      "fn": 11660,
+      "tn": 3837708,
+      "threshold": 0.5,
+      "empty_f1_convention": "truth and prediction empty: 1; no eligible pairs: excluded from shared denominator"
+    }
+  },
+  "paper_scope": {
+    "ols": {
+      "itsa": {
+        "candidate_count": 227135,
+        "positive_count": 8151,
+        "macro_f1": 0.7726919187991034,
+        "micro_f1": 0.6104514161622696,
+        "tp": 6606,
+        "fp": 6886,
+        "fn": 1545,
+        "threshold_reselected": false
+      },
+      "mstsa": {
+        "candidate_count": 1657999,
+        "positive_count": 13493,
+        "macro_f1": 0.7563930356193379,
+        "micro_f1": 0.335330991251636,
+        "tp": 12170,
+        "fp": 46922,
+        "fn": 1323,
+        "threshold_reselected": false
+      }
+    },
+    "reference056": {
+      "itsa": {
+        "candidate_count": 227135,
+        "positive_count": 8151,
+        "macro_f1": 0.8912425082909758,
+        "micro_f1": 0.717545092527524,
+        "tp": 7658,
+        "fp": 5536,
+        "fn": 493,
+        "threshold_reselected": false
+      },
+      "mstsa": {
+        "candidate_count": 1657999,
+        "positive_count": 13493,
+        "macro_f1": 0.8120225694756842,
+        "micro_f1": 0.43212435233160623,
+        "tp": 12510,
+        "fp": 31897,
+        "fn": 983,
+        "threshold_reselected": false
+      }
+    },
+    "tsa": {
+      "itsa": {
+        "candidate_count": 227135,
+        "positive_count": 8151,
+        "macro_f1": 0.6215810127362544,
+        "micro_f1": 0.22458867819297268,
+        "tp": 6443,
+        "fp": 42782,
+        "fn": 1708,
+        "threshold_reselected": false
+      },
+      "mstsa": {
+        "candidate_count": 1657999,
+        "positive_count": 13493,
+        "macro_f1": 0.4776053511350367,
+        "micro_f1": 0.08268109107008798,
+        "tp": 10738,
+        "fp": 235514,
+        "fn": 2755,
+        "threshold_reselected": false
+      }
+    }
+  },
+  "systems": {
+    "ols_anchor": {
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 6900,
+        "duplicate_prediction_group_count": 1102,
+        "anchor_matched_target_count": 5798,
+        "reference_unavailable_target_count": 1
+      },
+      "metrics_all": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 441600,
+          "intersection_count": 285721,
+          "missing_prediction_count": 169231,
+          "prediction_without_target_count": 155879,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 5797,
+          "missing_target_trajectory_count": 3302,
+          "mae": 1295.5763183558963,
+          "mse": 61863693.31781594,
+          "rmse": 7865.347628542298,
+          "coverage": 0.6280244948917688,
+          "trajectory_coverage": 0.6371029783492691,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 441600,
+          "intersection_count": 285961,
+          "missing_prediction_count": 169201,
+          "prediction_without_target_count": 155639,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 5795,
+          "missing_target_trajectory_count": 3301,
+          "mae": 63.47694504693943,
+          "mse": 68526.38464009197,
+          "rmse": 261.77544697716013,
+          "coverage": 0.6282620253887626,
+          "trajectory_coverage": 0.6370932277924363,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 441600,
+          "intersection_count": 285528,
+          "missing_prediction_count": 169161,
+          "prediction_without_target_count": 156072,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 5797,
+          "missing_target_trajectory_count": 3302,
+          "mae": 79.33268337764629,
+          "mse": 9001.561125994342,
+          "rmse": 94.87655730471222,
+          "coverage": 0.6279632891932727,
+          "trajectory_coverage": 0.6371029783492691,
+          "unit": "degrees"
+        }
+      }
+    },
+    "ols_mean_supported": {
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 6900,
+        "duplicate_prediction_group_count": 1102,
+        "anchor_matched_target_count": 5798,
+        "reference_unavailable_target_count": 1
+      },
+      "metrics_all": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 441600,
+          "intersection_count": 285721,
+          "missing_prediction_count": 169231,
+          "prediction_without_target_count": 155879,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 5797,
+          "missing_target_trajectory_count": 3302,
+          "mae": 1994.2023724438704,
+          "mse": 62816351.305161,
+          "rmse": 7925.676709604108,
+          "coverage": 0.6280244948917688,
+          "trajectory_coverage": 0.6371029783492691,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 441600,
+          "intersection_count": 285961,
+          "missing_prediction_count": 169201,
+          "prediction_without_target_count": 155639,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 5795,
+          "missing_target_trajectory_count": 3301,
+          "mae": 53.88762402653612,
+          "mse": 59852.66247099731,
+          "rmse": 244.64803794634713,
+          "coverage": 0.6282620253887626,
+          "trajectory_coverage": 0.6370932277924363,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 441600,
+          "intersection_count": 285528,
+          "missing_prediction_count": 169161,
+          "prediction_without_target_count": 156072,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 5797,
+          "missing_target_trajectory_count": 3302,
+          "mae": 72.26997436215859,
+          "mse": 7822.378588715093,
+          "rmse": 88.44421173098381,
+          "coverage": 0.6279632891932727,
+          "trajectory_coverage": 0.6371029783492691,
+          "unit": "degrees"
+        }
+      }
+    },
+    "ols_attribute_hybrid": {
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 6900,
+        "duplicate_prediction_group_count": 1102,
+        "anchor_matched_target_count": 5798,
+        "reference_unavailable_target_count": 1
+      },
+      "metrics_all": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 441600,
+          "intersection_count": 285721,
+          "missing_prediction_count": 169231,
+          "prediction_without_target_count": 155879,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 5797,
+          "missing_target_trajectory_count": 3302,
+          "mae": 1295.5763183558963,
+          "mse": 61863693.31781594,
+          "rmse": 7865.347628542298,
+          "coverage": 0.6280244948917688,
+          "trajectory_coverage": 0.6371029783492691,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 441600,
+          "intersection_count": 285961,
+          "missing_prediction_count": 169201,
+          "prediction_without_target_count": 155639,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 5795,
+          "missing_target_trajectory_count": 3301,
+          "mae": 53.88762402653612,
+          "mse": 59852.66247099731,
+          "rmse": 244.64803794634713,
+          "coverage": 0.6282620253887626,
+          "trajectory_coverage": 0.6370932277924363,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 441600,
+          "intersection_count": 285528,
+          "missing_prediction_count": 169161,
+          "prediction_without_target_count": 156072,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 5797,
+          "missing_target_trajectory_count": 3302,
+          "mae": 72.26997436215859,
+          "mse": 7822.378588715093,
+          "rmse": 88.44421173098381,
+          "coverage": 0.6279632891932727,
+          "trajectory_coverage": 0.6371029783492691,
+          "unit": "degrees"
+        }
+      }
+    },
+    "tsa_anchor": {
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 3421,
+        "duplicate_prediction_group_count": 605,
+        "anchor_matched_target_count": 2816,
+        "reference_unavailable_target_count": 1
+      },
+      "metrics_all": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 218944,
+          "intersection_count": 127899,
+          "missing_prediction_count": 327053,
+          "prediction_without_target_count": 91045,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2815,
+          "missing_target_trajectory_count": 6284,
+          "mae": 1949.905834942013,
+          "mse": 124672905.63947147,
+          "rmse": 11165.702200912912,
+          "coverage": 0.2811263605830945,
+          "trajectory_coverage": 0.3093746565556655,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 218944,
+          "intersection_count": 128021,
+          "missing_prediction_count": 327141,
+          "prediction_without_target_count": 90923,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2814,
+          "missing_target_trajectory_count": 6282,
+          "mae": 61.611556083176666,
+          "mse": 73974.96604147725,
+          "rmse": 271.9833929516235,
+          "coverage": 0.2812646925709967,
+          "trajectory_coverage": 0.30936675461741425,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 218944,
+          "intersection_count": 127835,
+          "missing_prediction_count": 326854,
+          "prediction_without_target_count": 91109,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2815,
+          "missing_target_trajectory_count": 6284,
+          "mae": 78.66503202298253,
+          "mse": 8890.643356620716,
+          "rmse": 94.2902081693572,
+          "coverage": 0.2811482133942101,
+          "trajectory_coverage": 0.3093746565556655,
+          "unit": "degrees"
+        }
+      }
+    },
+    "tsa_mean_supported": {
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 3421,
+        "duplicate_prediction_group_count": 605,
+        "anchor_matched_target_count": 2816,
+        "reference_unavailable_target_count": 1
+      },
+      "metrics_all": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 218944,
+          "intersection_count": 127899,
+          "missing_prediction_count": 327053,
+          "prediction_without_target_count": 91045,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2815,
+          "missing_target_trajectory_count": 6284,
+          "mae": 8148.388031782811,
+          "mse": 291115297.06853986,
+          "rmse": 17062.101191486934,
+          "coverage": 0.2811263605830945,
+          "trajectory_coverage": 0.3093746565556655,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 218944,
+          "intersection_count": 128021,
+          "missing_prediction_count": 327141,
+          "prediction_without_target_count": 90923,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2814,
+          "missing_target_trajectory_count": 6282,
+          "mae": 53.18378267253904,
+          "mse": 60881.820626324006,
+          "rmse": 246.74241756601967,
+          "coverage": 0.2812646925709967,
+          "trajectory_coverage": 0.30936675461741425,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 218944,
+          "intersection_count": 127835,
+          "missing_prediction_count": 326854,
+          "prediction_without_target_count": 91109,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2815,
+          "missing_target_trajectory_count": 6284,
+          "mae": 76.30572975324927,
+          "mse": 8518.936995462318,
+          "rmse": 92.29808771292241,
+          "coverage": 0.2811482133942101,
+          "trajectory_coverage": 0.3093746565556655,
+          "unit": "degrees"
+        }
+      }
+    },
+    "tsa_attribute_hybrid": {
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 3421,
+        "duplicate_prediction_group_count": 605,
+        "anchor_matched_target_count": 2816,
+        "reference_unavailable_target_count": 1
+      },
+      "metrics_all": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 218944,
+          "intersection_count": 127899,
+          "missing_prediction_count": 327053,
+          "prediction_without_target_count": 91045,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2815,
+          "missing_target_trajectory_count": 6284,
+          "mae": 1949.905834942013,
+          "mse": 124672905.63947147,
+          "rmse": 11165.702200912912,
+          "coverage": 0.2811263605830945,
+          "trajectory_coverage": 0.3093746565556655,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 218944,
+          "intersection_count": 128021,
+          "missing_prediction_count": 327141,
+          "prediction_without_target_count": 90923,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2814,
+          "missing_target_trajectory_count": 6282,
+          "mae": 53.18378267253904,
+          "mse": 60881.820626324006,
+          "rmse": 246.74241756601967,
+          "coverage": 0.2812646925709967,
+          "trajectory_coverage": 0.30936675461741425,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 218944,
+          "intersection_count": 127835,
+          "missing_prediction_count": 326854,
+          "prediction_without_target_count": 91109,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2815,
+          "missing_target_trajectory_count": 6284,
+          "mae": 76.30572975324927,
+          "mse": 8518.936995462318,
+          "rmse": 92.29808771292241,
+          "coverage": 0.2811482133942101,
+          "trajectory_coverage": 0.3093746565556655,
+          "unit": "degrees"
+        }
+      }
+    }
+  },
+  "common_to_056": {
+    "anchor": {
+      "tsa": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 177152,
+          "intersection_count": 126631,
+          "missing_prediction_count": 328321,
+          "prediction_without_target_count": 50521,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 1939.6348262697488,
+          "mse": 125736828.86396217,
+          "rmse": 11213.24345869482,
+          "coverage": 0.2783392533717843,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 177152,
+          "intersection_count": 126753,
+          "missing_prediction_count": 328409,
+          "prediction_without_target_count": 50399,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2766,
+          "missing_target_trajectory_count": 6330,
+          "mae": 61.83987190254654,
+          "mse": 74693.84600491724,
+          "rmse": 273.3017489971794,
+          "coverage": 0.27847887125902426,
+          "trajectory_coverage": 0.30408970976253297,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 177152,
+          "intersection_count": 126567,
+          "missing_prediction_count": 328122,
+          "prediction_without_target_count": 50585,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 78.64556377218577,
+          "mse": 8888.010554099817,
+          "rmse": 94.2762459694902,
+          "coverage": 0.27835949407177213,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "degrees"
+        }
+      },
+      "reference056": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 177152,
+          "intersection_count": 126631,
+          "missing_prediction_count": 328321,
+          "prediction_without_target_count": 50521,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 1205.7553075965666,
+          "mse": 121860345.43077862,
+          "rmse": 11039.037341669726,
+          "coverage": 0.2783392533717843,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 177152,
+          "intersection_count": 126753,
+          "missing_prediction_count": 328409,
+          "prediction_without_target_count": 50399,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2766,
+          "missing_target_trajectory_count": 6330,
+          "mae": 68.47521961361707,
+          "mse": 74336.78029164059,
+          "rmse": 272.64772196304995,
+          "coverage": 0.27847887125902426,
+          "trajectory_coverage": 0.30408970976253297,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 177152,
+          "intersection_count": 126567,
+          "missing_prediction_count": 328122,
+          "prediction_without_target_count": 50585,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 79.8894717756721,
+          "mse": 9100.559182427869,
+          "rmse": 95.3968510089713,
+          "coverage": 0.27835949407177213,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "degrees"
+        }
+      }
+    },
+    "mean_supported": {
+      "tsa": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 177152,
+          "intersection_count": 126631,
+          "missing_prediction_count": 328321,
+          "prediction_without_target_count": 50521,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 8178.881995418046,
+          "mse": 293565109.25720835,
+          "rmse": 17133.741834672554,
+          "coverage": 0.2783392533717843,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 177152,
+          "intersection_count": 126753,
+          "missing_prediction_count": 328409,
+          "prediction_without_target_count": 50399,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2766,
+          "missing_target_trajectory_count": 6330,
+          "mae": 53.386007870172726,
+          "mse": 61476.73164302568,
+          "rmse": 247.94501737890536,
+          "coverage": 0.27847887125902426,
+          "trajectory_coverage": 0.30408970976253297,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 177152,
+          "intersection_count": 126567,
+          "missing_prediction_count": 328122,
+          "prediction_without_target_count": 50585,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 76.22701081421489,
+          "mse": 8505.419825465484,
+          "rmse": 92.22483301945026,
+          "coverage": 0.27835949407177213,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "degrees"
+        }
+      },
+      "reference056": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 177152,
+          "intersection_count": 126631,
+          "missing_prediction_count": 328321,
+          "prediction_without_target_count": 50521,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 1499.81936441097,
+          "mse": 26357447.453946423,
+          "rmse": 5133.950472486701,
+          "coverage": 0.2783392533717843,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 177152,
+          "intersection_count": 126753,
+          "missing_prediction_count": 328409,
+          "prediction_without_target_count": 50399,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2766,
+          "missing_target_trajectory_count": 6330,
+          "mae": 55.654166975795775,
+          "mse": 54739.343663558386,
+          "rmse": 233.9644068305228,
+          "coverage": 0.27847887125902426,
+          "trajectory_coverage": 0.30408970976253297,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 177152,
+          "intersection_count": 126567,
+          "missing_prediction_count": 328122,
+          "prediction_without_target_count": 50585,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 72.71805010795666,
+          "mse": 7907.630096205222,
+          "rmse": 88.92485645872712,
+          "coverage": 0.27835949407177213,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "degrees"
+        }
+      }
+    },
+    "attribute_hybrid": {
+      "tsa": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 177152,
+          "intersection_count": 126631,
+          "missing_prediction_count": 328321,
+          "prediction_without_target_count": 50521,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 1939.6348262697488,
+          "mse": 125736828.86396217,
+          "rmse": 11213.24345869482,
+          "coverage": 0.2783392533717843,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 177152,
+          "intersection_count": 126753,
+          "missing_prediction_count": 328409,
+          "prediction_without_target_count": 50399,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2766,
+          "missing_target_trajectory_count": 6330,
+          "mae": 53.386007870172726,
+          "mse": 61476.73164302568,
+          "rmse": 247.94501737890536,
+          "coverage": 0.27847887125902426,
+          "trajectory_coverage": 0.30408970976253297,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 177152,
+          "intersection_count": 126567,
+          "missing_prediction_count": 328122,
+          "prediction_without_target_count": 50585,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 76.22701081421489,
+          "mse": 8505.419825465484,
+          "rmse": 92.22483301945026,
+          "coverage": 0.27835949407177213,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "degrees"
+        }
+      },
+      "reference056": {
+        "position": {
+          "available_target_count": 454952,
+          "available_prediction_count": 177152,
+          "intersection_count": 126631,
+          "missing_prediction_count": 328321,
+          "prediction_without_target_count": 50521,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 1205.7553075965666,
+          "mse": 121860345.43077862,
+          "rmse": 11039.037341669726,
+          "coverage": 0.2783392533717843,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "metres"
+        },
+        "speed": {
+          "available_target_count": 455162,
+          "available_prediction_count": 177152,
+          "intersection_count": 126753,
+          "missing_prediction_count": 328409,
+          "prediction_without_target_count": 50399,
+          "available_target_trajectory_count": 9096,
+          "covered_target_trajectory_count": 2766,
+          "missing_target_trajectory_count": 6330,
+          "mae": 55.654166975795775,
+          "mse": 54739.343663558386,
+          "rmse": 233.9644068305228,
+          "coverage": 0.27847887125902426,
+          "trajectory_coverage": 0.30408970976253297,
+          "unit": "native_speed"
+        },
+        "heading": {
+          "available_target_count": 454689,
+          "available_prediction_count": 177152,
+          "intersection_count": 126567,
+          "missing_prediction_count": 328122,
+          "prediction_without_target_count": 50585,
+          "available_target_trajectory_count": 9099,
+          "covered_target_trajectory_count": 2767,
+          "missing_target_trajectory_count": 6332,
+          "mae": 72.71805010795666,
+          "mse": 7907.630096205222,
+          "rmse": 88.92485645872712,
+          "coverage": 0.27835949407177213,
+          "trajectory_coverage": 0.3040993515770964,
+          "unit": "degrees"
+        }
+      }
+    }
+  },
+  "scene_comparisons": {
+    "ols": {
+      "better": 14,
+      "worse": 285,
+      "tie": 1
+    },
+    "reference056": {
+      "better": 1,
+      "worse": 298,
+      "tie": 1
+    }
+  },
+  "by_scene_size": {
+    "lt32": {
+      "scenes": 159,
+      "macro_f1": 0.5051851756499106,
+      "fp": 4427
+    },
+    "32to128": {
+      "scenes": 104,
+      "macro_f1": 0.2477512287568827,
+      "fp": 50929
+    },
+    "ge129": {
+      "scenes": 37,
+      "macro_f1": 0.06770239349020109,
+      "fp": 671113
+    }
+  },
+  "outside_time_eligibility": {
+    "fp": 448173,
+    "fp_share": 0.6169196483263567,
+    "tp": 964
+  }
+}
