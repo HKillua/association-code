@@ -1,6 +1,7 @@
-"""071C/D: bounded generic LSTM/Transformer position recovery pilots.
+"""Fixed-budget generic LSTM/Transformer position recovery runs.
 
 One fixed from-scratch run, then independent CPU step0/final full V evaluation.
+The default 071 pilot uses 1000 updates; extended4000 uses a fresh 4000.
 No V-based training selection, association inference, regrouping, test access,
 old fusion checkpoint, source modification or automatic retry.
 """
@@ -28,47 +29,54 @@ from tools.analysis.learned_group_oracle import _bind_source
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def production_contract(config, manifest, alignment):
+def production_contract(config, manifest, alignment, profile='pilot1000'):
     configuration(config)
     backbone = config['model']['backbone']
-    if config != read_json(ROOT/f'configs/sequence-position-{backbone}-level1.json'):
-        raise ValueError('071 requires the frozen backbone-specific1000-update configuration')
+    suffixes = {'pilot1000': 'level1', 'extended4000': 'extended-level1'}
+    if profile not in suffixes:
+        raise ValueError('unknown sequence training profile')
+    if config != read_json(ROOT/f'configs/sequence-position-{backbone}-{suffixes[profile]}.json'):
+        updates = 1000 if profile == 'pilot1000' else 4000
+        raise ValueError(f'{profile} requires the frozen backbone-specific {updates}-update configuration')
     validate_manifest(manifest)
     if manifest != read_json(ROOT/'configs/data/mtad-level1-scene3000.json'):
-        raise ValueError('071 requires unchanged full Level1 manifest')
+        raise ValueError('sequence training requires unchanged full Level1 manifest')
     if alignment != read_json(ROOT/'configs/data/mtad-level1-alignment.json'):
-        raise ValueError('071 requires unchanged Level1 alignment')
+        raise ValueError('sequence training requires unchanged Level1 alignment')
 
 
 def endpoint_model(path, expected_step, config, training):
     if (training.get('status') != 'COMPLETED' or training.get('configuration') != config
             or training.get('optimizer_updates') != config['training']['updates']
             or expected_step not in (0, config['training']['updates'])):
-        raise ValueError('071 endpoints require completed fixed-budget training')
+        raise ValueError('sequence endpoints require completed fixed-budget training')
     model, checkpoint = load_checkpoint(path, device='cpu')
     if (checkpoint.get('configuration') != config or checkpoint.get('step') != expected_step
             or checkpoint.get('actual_updates') != expected_step):
-        raise ValueError('071 checkpoint step/configuration/actual_updates mismatch')
+        raise ValueError('sequence checkpoint step/configuration/actual_updates mismatch')
     return model
 
 
 def run(args):
+    profile = getattr(args, 'profile', 'pilot1000')
     source, output = Path(args.source_system).resolve(), Path(args.output).resolve()
     protected = source.parent
     if output == protected or output in protected.parents or protected in output.parents:
-        raise ValueError('071 output must be separate from immutable056 source')
+        raise ValueError('sequence output must be separate from immutable056 source')
     if output.exists():
         raise FileExistsError('output already exists; no reuse/retry')
     if args.cpu_threads != 4 or args.time_policy != 'advisory':
-        raise ValueError('071 fixes CPU4 and advisory wall time')
+        raise ValueError('sequence training fixes CPU4 and advisory wall time')
     torch.set_num_threads(4)
     if args.device == 'cuda:0' and not torch.cuda.is_available():
         raise ValueError('requested CUDA unavailable; no fallback')
     config, manifest, alignment = [read_json(path) for path in (args.config, args.manifest, args.alignment)]
-    production_contract(config, manifest, alignment)
+    production_contract(config, manifest, alignment, profile=profile)
     output.mkdir(parents=True, exist_ok=False)
     started = time.monotonic()
-    state = dict(scope='071-generic-sequence-position-pilot', status='RUNNING', phase='source_binding',
+    scope = ('071-generic-sequence-position-pilot' if profile == 'pilot1000'
+             else '072-generic-sequence-position-extended4000')
+    state = dict(scope=scope, profile=profile, status='RUNNING', phase='source_binding',
         configuration=config, backbone=config['model']['backbone'], source_system=str(source),
         train_device=args.device, inference_device='cpu', cpu_threads=4, optimizer_updates=0,
         test_opened=False, retries=0, old066_acceptance='REJECTED', completed_endpoints=[],
@@ -87,7 +95,7 @@ def run(args):
     def phase(name):
         state.update(phase=name, elapsed_seconds=time.monotonic()-started)
         write_json(output/'run.json', state)
-        print('071 phase: '+name, flush=True)
+        print(f'{profile} phase: '+name, flush=True)
         check()
 
     try:
@@ -100,10 +108,10 @@ def run(args):
             motion_observation_policy='canonical_all')
         for key, split in (('train', 'T_core'), ('validation', 'V_select')):
             if [str(scene['scene_id']) for scene in dataset[key]] != manifest['splits'][split]:
-                raise ValueError('071 prepared full '+split+' population/order differs')
+                raise ValueError('sequence prepared full '+split+' population/order differs')
         preparation = dataset['report']
         write_json(output/'preparation.json', preparation)
-        phase('fit1000')
+        phase(f'fit{config["training"]["updates"]}')
         training = train_sequence_position(dataset.pop('train'), config, output/'fit', device=args.device, check=check)
         state['optimizer_updates'] = training['optimizer_updates']
         write_json(output/'run.json', state)
@@ -131,11 +139,11 @@ def run(args):
         phase('paired_endpoint_comparison')
         comparison = compare_endpoints(output/'initial', output/'final')
         write_json(output/'endpoint-comparison.json', comparison)
-        summary = dict(scope=state['scope'], status='COMPLETED', configuration=config,
+        summary = dict(scope=state['scope'], profile=profile, status='COMPLETED', configuration=config,
             optimizer_updates=training['optimizer_updates'], endpoints=endpoints,
             endpoint_comparison='endpoint-comparison.json', source_system=str(source), inference_device='cpu',
             test_opened=False, scientific_status='bounded generic position-only pilot; no automatic method promotion',
-            limitations=['1000 updates and one seed do not prove competitive baseline convergence.',
+            limitations=[f'{config["training"]["updates"]} updates and one seed do not prove competitive baseline convergence.',
                 'Shared physical warm start; not original LSTM/PTFM/TMTAFF reproduction.',
                 'Full-Q two-dimensional residual is unrestricted by the gate opportunity mask.',
                 'Offline canonical inputs, reused V300, shared identities and synthetic training groups.',
@@ -166,6 +174,8 @@ def main(argv=None):
     parser.add_argument('--device', choices=('cpu', 'cuda:0'), default='cuda:0')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--time-policy', choices=('advisory',), default='advisory')
+    parser.add_argument('--profile', choices=('pilot1000', 'extended4000'), default='pilot1000',
+                        help='explicit fresh training budget; extended4000 is not a resumed pilot')
     args = parser.parse_args(argv)
 
     def cancel(signum, frame):

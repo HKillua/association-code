@@ -181,6 +181,23 @@ class SequencePositionEvaluationTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 entry.run(args)
 
+    def test_extended_profile_changes_only_the_fresh_update_budget(self):
+        from tools.experiments import sequence_position_fit as entry
+        manifest = read_json(entry.ROOT/'configs/data/mtad-level1-scene3000.json')
+        alignment = read_json(entry.ROOT/'configs/data/mtad-level1-alignment.json')
+        for backbone in ('lstm', 'transformer'):
+            with self.subTest(backbone=backbone):
+                pilot = read_json(entry.ROOT/f'configs/sequence-position-{backbone}-level1.json')
+                extended = read_json(entry.ROOT/f'configs/sequence-position-{backbone}-extended-level1.json')
+                expected = deepcopy(pilot)
+                expected['training']['updates'] = 4000
+                self.assertEqual(extended, expected)
+                entry.production_contract(extended, manifest, alignment, profile='extended4000')
+                with self.assertRaisesRegex(ValueError, '1000-update'):
+                    entry.production_contract(extended, manifest, alignment)
+                with self.assertRaisesRegex(ValueError, '4000-update'):
+                    entry.production_contract(pilot, manifest, alignment, profile='extended4000')
+
     def test_real_small_cli_run_preserves_fixed_endpoints_without_validation_selection(self):
         from tests.training.test_support_gate import tiny_train
         from tools.experiments import sequence_position_fit as entry
@@ -208,6 +225,7 @@ class SequencePositionEvaluationTests(unittest.TestCase):
                 result = entry.run(args)
             self.assertEqual(result['status'], 'COMPLETED')
             self.assertEqual(result['optimizer_updates'], 2)
+            self.assertTrue(result['limitations'][0].startswith('2 updates'))
             self.assertEqual(read_json(root/'out/run.json')['completed_endpoints'], ['initial', 'final'])
             self.assertFalse(read_json(root/'out/run.json')['validation_selection'])
             self.assertTrue(read_json(root/'out/endpoint-comparison.json')['population_and_masks_exact'])

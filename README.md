@@ -22,7 +22,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 - `association/`：数据、当前关联/融合、TMTAFF参考、评价和训练。
 - `baselines/`：TSA-cTFER独立关联对照。
 - `tools/experiments/`：保留的[训练与执行入口](tools/experiments/README.md)。
-- `tools/analysis/`：缓存复核、归因诊断和071四臂统一比较。
+- `tools/analysis/`：缓存复核、归因诊断和071/072同人口比较。
 - `configs/`：当前配置和固定数据名单；文件存在不代表可执行授权。
 - `tests/`：数据划分、时间/单位/mask、参数更新/冻结、评价人口及小型贯通验证。
 
@@ -33,6 +33,7 @@ python tools/experiments/support_gate_fit.py --help
 python tools/experiments/support_gate_linear_fit.py --help
 python tools/experiments/support_gate_replication.py --help
 python tools/experiments/sequence_position_fit.py --help
+python tools/experiments/constant_gate_fit.py --help
 python tools/analysis/compare_position_benchmarks.py --help
 python tools/analysis/frozen_fusion_transfer.py --help
 python tools/analysis/support_gate_diagnostics.py --help
@@ -41,4 +42,4 @@ python -m unittest discover -s tests
 
 本地AI负责代码和决策，服务器AI按交接执行；push不会唤醒服务器。权限、维护和回传规则见[AGENTS](AGENTS.md)及[现场执行规则](docs/server_autonomy.md)。
 
-070线性位置门控已取得单seed开发集正面结果，尚缺稳定性及独立深度学习竞争证据。071推进四个独立单卡任务：新seed的Log／线性配对复验，以及可独立修正二维位置的LSTM／Transformer通用对照；固定056分组与完整人口，速度／航向统一Mean。详情见[方法契约](docs/specs/evidence-association-fusion.md)，只按[当前交接](HandOver/Handover.md)领取，不从旧任务额度续跑。
+071四臂已完成：线性位置门控两个seed均胜固定控制，第二个seed MAE633.590m；LSTM/Transformer也有学习收益，但仍是有界开发比较。072增加训练侧全局恒定权重控制，并给两时序基线固定4000更新的独立训练机会。固定056分组与完整人口，速度／航向统一Mean，T_test封存；只按[当前交接](HandOver/Handover.md)领取，不从旧任务续跑。

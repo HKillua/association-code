@@ -117,6 +117,21 @@ class SupportGate(nn.Module):
         return dict(states=states, gate=gate, eligible=eligible, logits=logits, mean_states=mean)
 
 
+class ConstantSupportGate(nn.Module):
+    """Training-fitted global scalar control; no query-dependent parameters."""
+    def __init__(self, logit):
+        super().__init__()
+        if not math.isfinite(float(logit)):
+            raise ValueError('constant gate requires a finite selected logit')
+        self.register_buffer('logit', torch.tensor(float(logit), dtype=torch.float32))
+
+    def forward(self, anchor, mean, features, eligible):
+        logits = self.logit.expand(len(anchor))
+        gate = torch.sigmoid(logits)
+        return dict(states=mix_gate_states(anchor, mean, gate, eligible), gate=gate,
+                    eligible=eligible, logits=logits, mean_states=mean)
+
+
 def support_gate_objectives(result, target, valid):
     """T-only direct position loss on all valid queries, including R-exterior.
 
