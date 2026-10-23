@@ -1,0 +1,43 @@
+# 071C 留服务器原件（实测，未回传完整数组／权重／训练日志／准备报告）
+run目录: /home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-LSTM-20261023-071C-attempt-1  总计 1.5G
+  run.json  1436 字节  mtime=2026-10-23 15:09:24
+  summary.json  2655 字节  mtime=2026-10-23 15:09:24
+  execution.json  1883 字节  mtime=2026-10-23 15:09:24
+  preparation.json  622925339 字节  mtime=2026-10-23 14:44:07
+  endpoint-comparison.json  4163754 字节  mtime=2026-10-23 15:09:24
+  fit/run.json  242286 字节  mtime=2026-10-23 14:53:53
+  fit/training.jsonl  1881068 字节  mtime=2026-10-23 14:53:51
+  fit/step-0.pt  297263 字节  mtime=2026-10-23 14:44:14
+  fit/final.pt  880847 字节  mtime=2026-10-23 14:53:53
+  initial/run.json  5178 字节  mtime=2026-10-23 15:01:23
+  initial/summary.json  4850929 字节  mtime=2026-10-23 15:01:23
+  initial/scene-summary.json.gz  756899 字节  mtime=2026-10-23 15:01:22
+  final/run.json  5185 字节  mtime=2026-10-23 15:08:36
+  final/summary.json  4888678 字节  mtime=2026-10-23 15:08:36
+  final/scene-summary.json.gz  901939 字节  mtime=2026-10-23 15:08:35
+  initial/scenes/ 300 个文件 1.2M
+  initial/predictions/ 300 个文件 187M
+  initial/system-predictions/ 300 个文件 267M
+  final/scenes/ 300 个文件 1.2M
+  final/predictions/ 300 个文件 194M
+  final/system-predictions/ 300 个文件 267M
+launcher: runs/LEVEL1-SEQUENCE-LSTM-20261023-071C-attempt-1-launch
+  status.json 528 字节
+  exit_code.txt 2 字节
+  stdout.log 250 字节
+  stderr.log 0 字节
+  request.json 1573 字节
+  launch.json 1314 字节
+  launch.stdout.log 0 字节
+  launch.stderr.log 43 字节
+  worker.stdout.log 0 字节
+  worker.stderr.log 0 字节
+  worker.pid 8 字节
+只读源与旧现场（大小／mtime 未变，实测）:
+  runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system/summary.json 523770716 字节 mtime=2026-10-22 01:58:30
+  runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1/fit/final.pt 107660 字节 mtime=2026-10-23 01:59:32
+  runs/LEVEL1-LINEAR-GATE-20261023-070-attempt-1/run.json 1590 字节 mtime=2026-10-23 04:58:31
+  runs/LEVEL1-GATE-LOG-20261023-071A-attempt-1/run.json 1481 字节 mtime=2026-10-23 14:51:42
+  runs/LEVEL1-GATE-LINEAR-20261023-071B-attempt-1/run.json 1483 字节 mtime=2026-10-23 14:52:15
+checkout: /home/wangguangjie/djs/association-code-run071C HEAD=b7ad49c2fffa8bcec7aedbfdfa714b30c9d66e97（detached，活动目录未 pull）
+磁盘: /dev/sda        7.3T  6.1T  785G   89% /home

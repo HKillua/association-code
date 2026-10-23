@@ -1,0 +1,54 @@
+{
+  "scope": "071-generic-sequence-position-pilot",
+  "status": "COMPLETED",
+  "phase": "completed",
+  "configuration": {
+    "scope": "sequence-position-v1",
+    "routing_semantics": "warm095-allquery-tangent-residual-position-v1",
+    "position_loss": "linear",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "backbone": "lstm",
+      "hidden_size": 64,
+      "num_layers": 2,
+      "initial_gate": 0.95
+    },
+    "training": {
+      "seed": 20261023,
+      "updates": 1000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 14400.0
+    }
+  },
+  "backbone": "lstm",
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "train_device": "cuda:0",
+  "inference_device": "cpu",
+  "cpu_threads": 4,
+  "optimizer_updates": 1000,
+  "test_opened": false,
+  "retries": 0,
+  "old066_acceptance": "REJECTED",
+  "completed_endpoints": [
+    "initial",
+    "final"
+  ],
+  "validation_selection": false,
+  "association_recomputed": false,
+  "groups_recomputed": false,
+  "threshold_reselected": false,
+  "advisory_reached": false,
+  "time_policy": "advisory",
+  "elapsed_seconds": 3127.175491214264
+}
