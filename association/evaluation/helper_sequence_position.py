@@ -125,13 +125,13 @@ def error_summary(values):
     return result
 
 
-def evaluate_helper_sequence(model, validation_raw, source056, metadata, output, check=None, *, initial=False):
+def evaluate_helper_sequence(model, validation_raw, source056, metadata, output, check=None, *, initial=False, predictor=None, evaluation_scope=SCOPE):
     output = Path(output)
     if output.exists():
         raise FileExistsError('078 output already exists; no reuse or retry')
     try:
         result = evaluate_sequence_position(model, validation_raw, source056, metadata, output, check,
-            initial=initial, predictor=_helper_predict, evaluation_scope=SCOPE)
+            initial=initial, predictor=_helper_predict if predictor is None else predictor, evaluation_scope=evaluation_scope)
         rows, errors = [], []
         for sid in result['scene_ids']:
             if check:
@@ -146,7 +146,7 @@ def evaluate_helper_sequence(model, validation_raw, source056, metadata, output,
         pooled = {name: dict(total=sum(row[name]['total'] for row in rows), counts={
             bucket: sum(row[name]['counts'][bucket] for row in rows) for bucket in BUCKETS})
             for name in POPULATIONS}
-        result.update(scope=SCOPE, aggregation=model.aggregation, helper_population=pooled,
+        result.update(scope=evaluation_scope, aggregation=model.aggregation, helper_population=pooled,
             helper_position_strata={bucket: {method: error_summary(np.concatenate([
                 item[bucket][method] for item in errors])) for method in METHODS} for bucket in BUCKETS},
             interpretation='Helper representation screening; learned feature weights are not physical confidence or attribution.')

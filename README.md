@@ -6,7 +6,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 
 日常开发和服务器回传统一使用 **`main`**；本地工作目录为 `/Users/a1/Projects/association-code`。历史研究分支已合入main并退役，实验按提交保留，不再维护多条长期分支。
 
-083–085已执行并审查结案：整helper丢弃配方未胜原linear，按冻结规则停止；两项CPU核查的解释已勘误。当前没有新READY，保留原强模型，见[交接](HandOver/Handover.md)与[研究状态](docs/research_status.md)。
+083–085已结案，整helper丢弃配方关闭；默认仍为056关联＋原线性Transformer。当前推进086A/B目标策略、087A/B时序对应、088 Level1 TCM与089 T-only审计，五项GPU任务最多四项同时执行。具体冻结版本与领取状态见[交接](HandOver/Handover.md)，审查边界见[并行合同](docs/specs/post083-parallel-design.md)。
 
 ## 现在看哪里
 
@@ -62,4 +62,4 @@ python -m unittest discover -s tests
 
 078A/B/C和080全部完成并复核：[078/080审查与下一步](docs/research_status.md#078080完成复核与081082决定2026-10-24)。078C仅比原linear低1.60m，场景等权和部分尾部反向，未晋级；相对初值累计伤害下降有复验线索。080不支持“T强V弱”，类先验与候选组成需分别解释。下一轮081只补pre/weighted两臂匹配seed，082只改TSA训练视图crop→full；不为第四空卡追加任务。实现及实际领取状态见[交接索引](HandOver/Handover.md)，push不代表已启动。
 
-081A/B与整表已完成并复核：weighted相对pre在第二seed的MAE增加16.381m、RMSE增加30.641m、H增加31.23%，四项预定出口均失败；关闭当前配方、不追加第三seed。082当前TSA适配亦暂停。**当前无RUNNING／新READY，默认仍为056关联＋原线性Transformer。** 见[081收尾](docs/research_status.md#081双seed收尾与阶段决定2026-10-24)；强领域baseline缺口与T_test封存状态保持。
+081A/B与整表已完成并复核：weighted相对pre在第二seed的MAE增加16.381m、RMSE增加30.641m、H增加31.23%，四项预定出口均失败；关闭当前配方、不追加第三seed。082当前TSA适配亦暂停。**该轮已结案，不重领；默认仍为056关联＋原线性Transformer，新批次以顶部为准。** 见[081收尾](docs/research_status.md#081双seed收尾与阶段决定2026-10-24)；强领域baseline缺口与T_test封存状态保持。

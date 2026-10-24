@@ -49,7 +49,7 @@ python tools/experiments/prepare_scene_data.py \
 
 ## 保留的配置
 
-- [TCM一遍覆盖模板](../tmtaff-tcm-level1.json)：2424更新对应训练片段的一遍起点，不代表充分收敛；尚无新的执行授权。
+- [TCM一遍覆盖模板](../tmtaff-tcm-level1.json)：2424更新对应训练片段的一遍起点，不代表充分收敛；新Level1基础任务见[088交接](../../HandOver/L2S-20261024-088.md)，是否可领取只认当前索引。
 - [关联配置](../evidence-association-level1.json)：056的完整canonical观测、1000更新固定终点；普通/困难采样与3000更新配置保留作已完成对照定义。
 - [融合helper质量](../evidence-fusion-level1.json)、[Direct-only](../evidence-fusion-level1-direct-only.json)、[固定混合收益](../evidence-fusion-level1-mixed-action.json)：057三臂，仅改变辅助监督，共享正bias初始化和固定α=0.5；实际训练/评价配置绑定当前OLS工作点。
 

@@ -310,3 +310,16 @@ def compare_ptfm_control(current,control,*,initial=False):
                     if (errors[attr]>tolerance[attr]).any():raise ValueError('PTFM non-position CPU initial outputs changed/'+attr)
         result['nonposition_initial_replay']={'maximum_native_difference':maxima,'absolute_tolerance':tolerance,'all_output_groups_verified':True}
     return result
+
+
+def compare_objective_control(current,control,*,initial=False):
+    """086 same-architecture objective comparison; initial ALL states replay."""
+    result=compare_ptfm_control(current,control,initial=initial)
+    if initial:
+        for sid in result['scene_ids']:
+            with np.load(Path(current)/'system-predictions'/f'states-{sid}.npz') as new, np.load(Path(control)/'system-predictions'/f'states-{sid}.npz') as old:
+                _same(new['ptfm_adapted_group_states'],old['ptfm_adapted_group_states'],'086 all initial CPU group states')
+        result['all_initial_group_states_exact']=True
+    result['objective_control_minus_reference']=result.pop('residual_minus_ptfm')
+    result['interpretation']='Same full-state architecture, all initial parameters and actual samples; only objective strategy changes. Constant-vs-adaptive is a strategy comparison, not sigma-only causality. No champion attribute composition.'
+    return result

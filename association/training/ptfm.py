@@ -10,12 +10,19 @@ from association.training.evidence_fusion import TRAIN_MODES,prepare_evidence_sc
 from association.utils.runtime import read_json,write_json
 
 
+OBJECTIVE_SCOPE='ptfm-prior095-objective-control-v1'
+
+def objective_mode(value):
+    return value.get('objective_mode','adaptive')
+
 def configuration(value):
     residual=value.get('model',{}).get('position_output')=='prior095_residual'
     scope,route,_=semantics(value)
     model=dict(l2=1e-4,normalization='T_exposure_visible_local_zscore',helper_missing='masked_neutral_carrier')
     if residual:model['position_output']='prior095_residual'
-    if (set(value)!={'scope','routing_semantics','data','motion_observation_policy','train_splits','training','model'}
+    keys={'scope','routing_semantics','data','motion_observation_policy','train_splits','training','model'}
+    if objective_mode(value)!='adaptive':keys.add('objective_mode')
+    if (set(value)!=keys
             or value['scope']!=scope or value['routing_semantics']!=route
             or value['data']!=dict(length=64,max_observations=128,time_unit_seconds=20.,reference_longitude_policy='shortest_arc')
             or value['motion_observation_policy']!='canonical_all' or value['train_splits']!=['T_core']
@@ -33,6 +40,11 @@ def configuration(value):
 
 
 def semantics(config):
+    mode=objective_mode(config)
+    if mode!='adaptive':
+        if mode not in ('fixed-equal','position-only') or config.get('model',{}).get('position_output')!='prior095_residual':
+            raise ValueError('086 requires residual PTFM and a fixed objective mode')
+        return OBJECTIVE_SCOPE,RESIDUAL_ROUTING_SEMANTICS,RESIDUAL_LOSS_SEMANTICS.replace('-adaptive-v1','-'+mode+'-v1')
     if config.get('model',{}).get('position_output')=='prior095_residual':
         return RESIDUAL_SCOPE,RESIDUAL_ROUTING_SEMANTICS,RESIDUAL_LOSS_SEMANTICS
     return SCOPE,ROUTING_SEMANTICS,LOSS_SEMANTICS
@@ -95,10 +107,15 @@ def _paired_ptfm_reference(path,config,scene_ids,check=None):
     if position_mode(config)!='prior095_residual':
         raise ValueError('direct PTFM pairing is only defined for residual PTFM')
     path=Path(path).resolve();run=read_json(path/'run.json')
-    direct=copy.deepcopy(config);direct.update(scope=SCOPE,routing_semantics=ROUTING_SEMANTICS)
-    direct['model'].pop('position_output')
+    direct=copy.deepcopy(config)
+    control=objective_mode(config)!='adaptive'
+    if control:
+        direct.pop('objective_mode');direct.update(scope=RESIDUAL_SCOPE,routing_semantics=RESIDUAL_ROUTING_SEMANTICS)
+    else:
+        direct.update(scope=SCOPE,routing_semantics=ROUTING_SEMANTICS);direct['model'].pop('position_output')
+    expected_scope,_,expected_loss=semantics(direct)
     if (run.get('status')!='COMPLETED' or run.get('configuration')!=direct
-            or run.get('scope')!=SCOPE or run.get('loss_semantics')!=LOSS_SEMANTICS
+            or run.get('scope')!=expected_scope or run.get('loss_semantics')!=expected_loss
             or run.get('optimizer_updates')!=config['training']['updates']
             or run.get('training_scene_ids')!=scene_ids or run.get('test_opened') is not False
             or run.get('final_checkpoint')!='final.pt' or run.get('normalizer_sampler_replay_exact') is not True):
@@ -141,12 +158,12 @@ def _paired_ptfm_reference(path,config,scene_ids,check=None):
     return dict(path=str(path),rows=rows,normalizer=normalizer,initial=endpoints[0],exposure=run['exposure'])
 
 
-def _check_initial_pair(model,saved):
+def _check_initial_pair(model,saved,*,exact=False):
     current=model.state_dict();reference=saved['model']
     if set(current)!=set(reference):raise ValueError('PTFM paired initial parameter names differ')
     for name,value in current.items():
         expected=reference[name]
-        if name in ('output.weight','output.bias'):
+        if not exact and name in ('output.weight','output.bias'):
             expected=expected.clone();expected[:2].zero_()
         if not torch.equal(value.cpu(),expected):
             raise ValueError('PTFM paired initial parameters differ/'+name)
@@ -211,6 +228,9 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
     state['paired_ptfm_control']=dict(fit=str(Path(paired_ptfm_fit).resolve()) if paired_ptfm_fit else None,
         status='PENDING' if paired_ptfm_fit else 'NOT_REQUESTED',matched_updates=0,matched_anchors=0,
         interpretation='Only position output parameterization and its first two zero-initialized output rows differ.')
+    if objective_mode(config)!='adaptive':
+        state['interpretation']='PTFM fixed objective strategy control, not author reproduction or sigma-only causality'
+        state['paired_ptfm_control']['interpretation']='All initial parameters, normalizer and actual samples match076B; only objective strategy changes.'
     write_json(output/'run.json',state);model=optimizer=norm=None;windows=[];window=[]
     try:
         reference=_paired_reference(paired_reference_fit,config,ids) if paired_reference_fit else None
@@ -224,12 +244,13 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
         optimizer=torch.optim.Adam(model.parameters(),lr=t['learning_rate'])
         if ptfm_reference is not None:
             if norm!=ptfm_reference['normalizer']:raise ValueError('PTFM paired normalizer differs')
-            _check_initial_pair(model,ptfm_reference['initial'])
+            _check_initial_pair(model,ptfm_reference['initial'],exact=objective_mode(config)!='adaptive')
             if rng.bit_generator.state!=ptfm_reference['initial']['numpy_rng']:
                 raise ValueError('PTFM paired initial sampler RNG differs')
             if not torch.equal(torch.get_rng_state(),ptfm_reference['initial']['torch_rng']):
                 raise ValueError('PTFM paired initial torch RNG differs')
-            state['paired_ptfm_control'].update(initial_parameters_exact_except_position_rows=True,
+            state['paired_ptfm_control'].update(initial_parameters_exact=objective_mode(config)!='adaptive',
+                initial_parameters_exact_except_position_rows=True,
                 position_rows_zero=True,normalizer_exact=True,initial_sampler_rng_exact=True,initial_torch_rng_exact=True)
         state['parameter_count']=sum(p.numel() for p in model.parameters());state['normalizer']=norm
         _save(output/'step-0.pt',model,optimizer,0,config,rng,norm)
@@ -245,7 +266,7 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                     include_prior=position_mode(config)=='prior095_residual'))
                 target=torch.as_tensor(scene['target'][anchor],dtype=torch.float64,device=device)
                 valid=torch.as_tensor(scene['valid'][anchor],dtype=torch.bool,device=device)
-                loss,diag=objectives(model,result,target,valid);(loss/t['batch_size']).backward()
+                loss,diag=objectives(model,result,target,valid,mode=objective_mode(config));(loss/t['batch_size']).backward()
                 losses.append(float(loss.detach()));diags.append(diag)
                 absent+=int((~result['helper_present']).sum())
                 eligible=~scene['motion']['support'][anchor]&scene['motion']['support'][members[1:]].any(0)
@@ -281,6 +302,10 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                 task_losses=np.mean([d['task_losses'] for d in diags],axis=0).tolist(),
                 task_sigmas=np.mean([d['task_sigmas'] for d in diags],axis=0).tolist(),gradient_norm=float(grad),
                 gradient_clipped=bool(grad>t['gradient_clip']),gradient_clip_scale=min(1.,t['gradient_clip']/(float(grad)+1e-6)))
+            if objective_mode(config)!='adaptive':
+                for field in ('actual_task_coefficients','actual_task_regularizers','actual_task_contributions'):
+                    row[field]=np.mean([d[field] for d in diags],axis=0).tolist()
+                row['objective_mode']=objective_mode(config)
             with (output/'training.jsonl').open('a') as handle:handle.write(json.dumps(row,allow_nan=False)+'\n')
             window.append(row)
             if step%100==0 or step==t['updates']:
@@ -288,6 +313,10 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                     task_losses_mean=np.mean([r['task_losses'] for r in window],0).tolist(),
                     gradient_norm_median=float(np.median([r['gradient_norm'] for r in window])),
                     clipped_updates=sum(r['gradient_clipped'] for r in window)))
+                if objective_mode(config)!='adaptive':
+                    for field in ('actual_task_coefficients','actual_task_regularizers','actual_task_contributions','task_sigmas'):
+                        windows[-1][field+'_mean']=np.mean([r[field] for r in window],0).tolist()
+                    windows[-1]['l2_mean']=float(np.mean([r['l2'] for r in window]))
                 window=[];write_json(output/'training-windows.json',dict(windows=windows,selection=False))
             state.update(elapsed_seconds=time.monotonic()-started,training_seconds=time.monotonic()-fit_started,
                          peak_cuda_memory_allocated_bytes=torch.cuda.max_memory_allocated(device) if cuda else 0)

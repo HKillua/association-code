@@ -16,6 +16,9 @@ from association.models.sequence_position import (BACKBONES, ROUTING_SEMANTICS, 
 from association.models.helper_sequence import (SCOPE as HELPER_SCOPE,
     ROUTING_SEMANTICS as HELPER_ROUTING, AGGREGATIONS, HelperSequencePosition,
     helper_sequence_inputs, initialize_from_reference)
+from association.models.helper_temporal import (SCOPE as TEMPORAL_SCOPE, ROUTING_SEMANTICS as TEMPORAL_ROUTING,
+    MODES as TEMPORAL_MODES, HelperTemporalPosition, permutation_plan,
+    initialize_from_reference as initialize_temporal)
 from association.training.evidence_fusion import TRAIN_MODES, prepare_evidence_scenes, training_members
 from association.training.helper_dropout import (SCOPE as HELPER_DROPOUT_SCOPE,
     KIND as HELPER_DROPOUT_KIND, drop_helper_fragments, dropout_audit,
@@ -32,11 +35,11 @@ def loss_semantics(config):
 
 
 def routing_semantics(config):
-    return HELPER_ROUTING if config['scope'] == HELPER_SCOPE else ROUTING_SEMANTICS
+    return TEMPORAL_ROUTING if config['scope'] == TEMPORAL_SCOPE else (HELPER_ROUTING if config['scope'] == HELPER_SCOPE else ROUTING_SEMANTICS)
 
 
 def _make_model(config):
-    return (HelperSequencePosition if config['scope'] == HELPER_SCOPE else SequencePosition)(**config['model'])
+    return (HelperTemporalPosition if config['scope'] == TEMPORAL_SCOPE else (HelperSequencePosition if config['scope'] == HELPER_SCOPE else SequencePosition))(**config['model'])
 
 
 def configuration(value):
@@ -45,17 +48,19 @@ def configuration(value):
     dropout = isinstance(value, dict) and value.get('scope') == HELPER_DROPOUT_SCOPE
     if dropout: expected.add('augmentation')
     if (not isinstance(value, dict) or set(value) != expected
-            or (value['scope'], value['position_loss']) not in ((SCOPE, 'linear'), (RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS), (HELPER_SCOPE, 'linear'), (HELPER_DROPOUT_SCOPE, 'linear'))
+            or (value['scope'], value['position_loss']) not in ((SCOPE, 'linear'), (RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS), (HELPER_SCOPE, 'linear'), (HELPER_DROPOUT_SCOPE, 'linear'), (TEMPORAL_SCOPE, 'linear'))
             or value['routing_semantics'] != routing_semantics(value)
             or value['motion_observation_policy'] != 'canonical_all' or value['train_splits'] != ['T_core']
             or value['data'] != dict(length=64, max_observations=128, time_unit_seconds=20.,
                                      reference_longitude_policy='shortest_arc')):
         raise ValueError('explicit sequence position scope/loss and Level1 data contract required')
     model = value['model']
+    temporal = value['scope'] == TEMPORAL_SCOPE
     helper = value['scope'] == HELPER_SCOPE
     fields = {'hidden_size', 'num_layers', 'initial_gate', 'aggregation'} if helper else {'backbone', 'hidden_size', 'num_layers', 'initial_gate'}
+    if temporal: fields = {'hidden_size', 'num_layers', 'initial_gate', 'correspondence'}
     if (not isinstance(model, dict) or set(model) != fields
-            or (model['aggregation'] not in AGGREGATIONS if helper else model['backbone'] not in BACKBONES)
+            or (model['correspondence'] not in TEMPORAL_MODES if temporal else (model['aggregation'] not in AGGREGATIONS if helper else model['backbone'] not in BACKBONES))
             or type(model['hidden_size']) is not int
             or model['hidden_size'] != 64 or type(model['num_layers']) is not int or model['num_layers'] != 2
             or isinstance(model['initial_gate'], bool) or model['initial_gate'] != .95):
@@ -93,6 +98,9 @@ def _save(path, model, optimizer, step, config, rng, augmentation_rng=None):
         optimizer=optimizer.state_dict(), numpy_rng=rng.bit_generator.state,
         torch_rng=torch.get_rng_state(),
         cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None)
+    if config['scope'] == TEMPORAL_SCOPE:
+        if augmentation_rng is None: raise ValueError('temporal checkpoint requires route RNG')
+        saved['temporal_route_rng'] = copy.deepcopy(augmentation_rng.bit_generator.state)
     if config['scope'] == HELPER_DROPOUT_SCOPE:
         if augmentation_rng is None: raise ValueError('dropout checkpoint requires augmentation RNG')
         saved.update(augmentation=copy.deepcopy(config['augmentation']),
@@ -106,6 +114,10 @@ def load_checkpoint(path, *, device='cpu'):
     if not isinstance(saved, dict) or not isinstance(saved.get('configuration'), dict):
         raise ValueError('sequence checkpoint configuration required')
     config = configuration(saved['configuration'])
+    if config['scope'] == TEMPORAL_SCOPE:
+        validate_augmentation_rng_state(saved.get('temporal_route_rng'))
+    elif 'temporal_route_rng' in saved:
+        raise ValueError('non-temporal checkpoint cannot carry temporal RNG')
     if config['scope'] == HELPER_DROPOUT_SCOPE:
         if (saved.get('augmentation') != config['augmentation']
                 or saved.get('augmentation_applied_only_to_training') is not True):
@@ -148,8 +160,8 @@ def _reference_pair(path, config, scene_ids):
     expected = copy.deepcopy(config)
     expected.update(scope=SCOPE, position_loss='linear', routing_semantics=ROUTING_SEMANTICS)
     expected.pop('augmentation', None)
-    if config['scope'] == HELPER_SCOPE:
-        expected['model'].pop('aggregation')
+    if config['scope'] in (HELPER_SCOPE, TEMPORAL_SCOPE):
+        expected['model'].pop('correspondence' if config['scope'] == TEMPORAL_SCOPE else 'aggregation')
         expected['model']['backbone'] = 'transformer'
     if (record.get('status') != 'COMPLETED' or record.get('configuration') != expected
             or record.get('optimizer_updates') != config['training']['updates']
@@ -210,7 +222,8 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             or len(set(scene_ids)) != len(scene_ids)):
         raise ValueError('sequence fit requires distinct nonempty T_core scenes only')
     harm_objective = config['position_loss'] == RELATIVE_HARM_LOSS
-    helper = config['scope'] == HELPER_SCOPE
+    temporal = config['scope'] == TEMPORAL_SCOPE
+    helper = config['scope'] in (HELPER_SCOPE,TEMPORAL_SCOPE)
     dropout = config['scope'] == HELPER_DROPOUT_SCOPE
     if (harm_objective or helper or dropout) != (paired_reference_fit is not None):
         raise ValueError('relative-harm/helper/dropout training requires a frozen same-seed linear control')
@@ -221,10 +234,12 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
     training = config['training']
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
-    augmentation_rng = np.random.default_rng(config['augmentation']['seed']) if dropout else None
+    augmentation_rng = (np.random.default_rng(training['seed']+87000) if temporal else
+        (np.random.default_rng(config['augmentation']['seed']) if dropout else None))
     model = _make_model(config)
     if helper:
-        initialize_from_reference(model, reference['initial']['model'], branch_seed=training['seed'] + 78000)
+        (initialize_temporal if temporal else initialize_from_reference)(model, reference['initial']['model'],
+            branch_seed=training['seed'] + (87200 if temporal else 78000))
     model = model.to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=training['learning_rate'])
     cuda = torch.device(device).type == 'cuda'
@@ -245,11 +260,16 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
         prediction_scope='position only; all queries may change; speed/course remain ordinary Mean',
         scientific_status='generic task-adapted equal-exposure pilot, not PTFM/TMTAFF or converged benchmark')
     if helper:
-        state.update(feature_width=92, helper_aggregation=config['model']['aggregation'],
+        state.update(feature_width=92, helper_aggregation=(model.aggregation if temporal else config['model']['aggregation']),
             helper_support_exposure={population: {name: 0 for name in ('zero', 'one', 'multiple')}
                                      for population in ('all_queries', 'valid_position_queries')},
             helper_gradients=dict(phi_nonzero_updates=0, scorer_nonzero_updates=0),
             scientific_status='single-seed helper representation screen; weights are latent, not physical reliability')
+    if temporal:
+        state.update(correspondence=model.correspondence,temporal_route_seed=training['seed']+87000,
+            temporal_evaluation_seed=training['seed']+87100,
+            temporal_routing_exposure=dict(sampled_anchors=0,multihelper_anchors=0,helper_query_slots=0,planned_changed_slots=0,applied_changed_slots=0))
+        state['helper_gradients']['temporal_nonzero_updates']=0
     if dropout:
         state.update(augmentation=copy.deepcopy(config['augmentation']),
             augmentation_exposure=empty_dropout_exposure(),
@@ -284,7 +304,7 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                     initialization='same-seed linear step0 tensors verified exact; fresh Adam; no resumed optimizer')
             if helper:
                 state['paired_control'].update(initial_parameters_scope='all original common tensors; first76 projection columns',
-                    added_projection_zero=True, branch_seed=training['seed'] + 78000,
+                    added_projection_zero=True, branch_seed=training['seed'] + (87200 if temporal else 78000),
                     initialization='original step0 common tensors; independent new branch; fresh Adam')
         train = prepare_evidence_scenes(train_raw, check=check, motion_observation_policy='canonical_all')
         if any(not len(scene['identities']) for scene in train):
@@ -300,6 +320,9 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             batch, samples, linear, logarithmic, optimized = [], [], [], [], []
             helper_batch = []
             augmentation_batch = []
+            temporal_batch = []
+            temporal_applied_batch = []
+            temporal_rng_before = copy.deepcopy(augmentation_rng.bit_generator.state) if temporal else None
             augmentation_rng_before = copy.deepcopy(augmentation_rng.bit_generator.state) if dropout else None
             for _ in range(training['batch_size']):
                 scene = train[int(rng.integers(len(train)))]
@@ -307,7 +330,18 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                 members = training_members(scene, anchor, mode)
                 retained, drop_mask = (drop_helper_fragments(members, augmentation_rng, config['augmentation']['probability'])
                                        if dropout else (members, None))
-                result = model(*(helper_sequence_inputs if helper else sequence_inputs)(scene['motion'], retained, device=device))
+                inputs = (helper_sequence_inputs if helper else sequence_inputs)(scene['motion'], retained, device=device)
+                if temporal:
+                    plan=permutation_plan(len(retained)-1,len(inputs[0]),augmentation_rng)
+                    result=model(*inputs,plan=plan)
+                    actual=result['effective_route']
+                    identity=np.broadcast_to(np.arange(len(retained)-1),plan.shape)
+                    expected=plan if model.correspondence=='shuffled' else identity
+                    if not np.array_equal(actual,expected): raise ValueError('087 actual training route differs from declared mode')
+                    temporal_batch.append(plan.tolist())
+                    temporal_applied_batch.append(actual.tolist())
+                else:
+                    result=model(*inputs)
                 target = torch.as_tensor(scene['target'][anchor], dtype=torch.float64, device=device)
                 valid = torch.as_tensor(scene['valid'][anchor], dtype=torch.bool, device=device)
                 losses, diagnostics = sequence_objectives(result, target, valid, position_loss=config['position_loss'])
@@ -347,6 +381,8 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                 branch_grad = {label: any(p.grad is not None and bool(torch.count_nonzero(p.grad))
                     for name, p in model.named_parameters() if name.startswith(prefix))
                     for label, prefix in (('phi_nonzero_updates', 'phi.'), ('scorer_nonzero_updates', 'scorer.'))}
+            if temporal:
+                branch_grad['temporal_nonzero_updates']=any(p.grad is not None and bool(torch.count_nonzero(p.grad)) for p in model.temporal.parameters())
             optimizer.step()
             # Commit actual optimizer exposure before later serialization checks.
             state['optimizer_updates'] = step
@@ -357,6 +393,17 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             audit['nonzero_gradient_updates'] += int(norm > 0)
             if dropout:
                 commit_dropout_exposure(state['augmentation_exposure'], augmentation_batch)
+            if temporal:
+                for planned,applied in zip(temporal_batch,temporal_applied_batch):
+                    plan=np.asarray(planned,dtype=np.int64)
+                    actual=np.asarray(applied,dtype=np.int64)
+                    q,h=plan.shape; identity=np.broadcast_to(np.arange(h),plan.shape)
+                    route_exposure=state['temporal_routing_exposure']
+                    route_exposure['sampled_anchors']+=1
+                    route_exposure['multihelper_anchors']+=int(h>=2)
+                    route_exposure['helper_query_slots']+=h*q
+                    route_exposure['planned_changed_slots']+=int((plan!=identity).sum())
+                    route_exposure['applied_changed_slots']+=int((actual!=identity).sum())
             if helper:
                 for sample_counts in helper_batch:
                     for population, counts in sample_counts.items():
@@ -400,6 +447,9 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                 gradient_clip_scale=min(1., training['gradient_clip'] / (float(norm) + 1e-6)))
             if helper:
                 row.update(helper_support_batch=helper_batch, helper_gradients=branch_grad)
+            if temporal:
+                row.update(temporal_route_batch=temporal_batch,temporal_applied_batch=temporal_applied_batch,temporal_rng_before=temporal_rng_before,
+                    temporal_rng_after=copy.deepcopy(augmentation_rng.bit_generator.state))
             if dropout:
                 row.update(augmentation_batch=augmentation_batch,
                     augmentation_rng_before=augmentation_rng_before,

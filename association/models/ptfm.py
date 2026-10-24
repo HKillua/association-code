@@ -196,7 +196,7 @@ class PTFM(nn.Module):
         return sum(value.square().sum() for name,value in self.temporal.named_parameters() if 'weight' in name)
 
 
-def objectives(model,result,target,valid):
+def objectives(model,result,target,valid,*,mode='adaptive'):
     """Paper adaptive objective with per-task valid masks and native-angle loss.
 
     Position is squared standardized local lat/lon distance; speed standardized
@@ -204,6 +204,7 @@ def objectives(model,result,target,valid):
     by the T-fitted course scale. A task with no labels contributes neither loss
     nor sigma. No labels are used in inference or normalizer fitting.
     """
+    if mode not in ('adaptive','fixed-equal','position-only'):raise ValueError('unknown PTFM objective mode')
     if target.shape!=result['states'].shape or valid.shape!=target.shape or valid.dtype!=torch.bool:
         raise ValueError('PTFM requires per-attribute target masks')
     if not torch.isfinite(target[valid]).all(): raise ValueError('valid PTFM truth must be finite')
@@ -222,7 +223,18 @@ def objectives(model,result,target,valid):
         loss=error[mask].mean()+zero if mask.any() else zero
         sigma=-torch.log(result['task_weights'][mask,index]+1e-8).mean()+zero if mask.any() else zero
         losses.append(loss);sigmas.append(sigma)
-    total=sum(torch.exp(-sigma)*loss+sigma for loss,sigma,count in zip(losses,sigmas,counts) if count)+zero
+    if mode=='adaptive':
+        coefficients=[torch.exp(-sigma) if count else zero for sigma,count in zip(sigmas,counts)]
+        regularizers=[sigma if count else zero for sigma,count in zip(sigmas,counts)]
+    else:
+        enabled=[bool(count and (mode=='fixed-equal' or index==0)) for index,count in enumerate(counts)]
+        coefficients=[zero+1./3 if use else zero for use in enabled]
+        regularizers=[zero+math.log(3.) if use else zero for use in enabled]
+    contributions=[coefficient*loss+regularizer for coefficient,loss,regularizer in zip(coefficients,losses,regularizers)]
+    total=sum(contributions)+zero
     if not torch.isfinite(total): raise FloatingPointError('nonfinite PTFM objective')
     return total,dict(task_valid_counts=counts,task_losses=[float(x.detach()) for x in losses],
-                      task_sigmas=[float(x.detach()) for x in sigmas])
+                      task_sigmas=[float(x.detach()) for x in sigmas],
+                      objective_mode=mode,actual_task_coefficients=[float(x.detach()) for x in coefficients],
+                      actual_task_regularizers=[float(x.detach()) for x in regularizers],
+                      actual_task_contributions=[float(x.detach()) for x in contributions])

@@ -43,7 +43,7 @@
 
 模型、监督、配对采样、输入与指标定义集中在[方法规格](../../docs/specs/evidence-association-fusion.md)；参考模型见[TMTAFF实现](../../docs/specs/tmtaff-reference.md)。旧Cooperative候选、已结案一次性分析及专用测试已退役，历史原件见[摘要](../../docs/history/README.md)。不得按真实身份删难例；normalizer只拟合训练，T_test封存。
 
-### 083–085 当前增量
+### 083–085 已结案入口（不可重领）
 
 - `sequence_position_fit.py --profile helper-dropout4000`：原linear Transformer固定4000更新，仅T整helper片段p=.5丢弃，原采样严格配072C；V完整组。冻结配置`configs/sequence-position-transformer-helper-dropout-level1.json`。
 - `tools/analysis/compare_helper_dropout.py`：原始batch/独立增强RNG重放、首末checkpoint绑定、完整缓存比较和预声明screen，不前向。
@@ -51,3 +51,13 @@
 - `tools/analysis/ptfm_objective_audit.py`：074C/076B既有首末缓存的原任务目标/物理误差及训练趋势核查，不读checkpoint或前向。
 
 均只按HandOver当前READY领取，不能从入口列表自行追加实验。
+
+
+### 086–089 并行批次
+
+- `helper_temporal_fit.py`：087A/B同架构、同初值与原采样，只改变新增BiGRU分支的跨查询helper对应；每臂自带072C/078B比较。`../analysis/compare_helper_temporal.py`生成双臂缓存整表。
+- `ptfm_objective_fit.py`：086A固定三任务系数、086B仅位置监督，与076B初值及实际批次配对；每臂自带初末/076B/072C比较。`../analysis/ptfm_objective_compare.py`汇合两臂。
+- `tmtaff_complete_fit.py --phase tcm`：088 fresh Level1一遍TCM覆盖与完整V特征诊断，不执行TAM/TFM/JOINT。
+- `../analysis/helper_prior_replay.py`：089按原日志重放T-only删除前后物理初值和loss系数；不读权重、不前向、不读V/test payload。
+
+范围、冻结版本、排队及终止条件只认[当前交接](../../HandOver/Handover.md)。五项GPU任务最多四项同时执行，CPU准备与评价错峰。
