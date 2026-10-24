@@ -10,10 +10,10 @@
 
 | 槽位／任务 | 当前状态 | 执行合同与固定终点 |
 |---|---|---|
-|**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `cd750f42a3b53a8e…`（仅填 task_arm/task_gpu_uuid），单元 `mtad-963699caece8`，`GPU-c5a00c37`(index0，快照空闲24,247MiB/util0%)、CPU4、4h仅提醒；13:37:44Z 提交，phase `prepare_T2100_V300`。| READY，未领取 | [090](L2S-20261024-090.md)，冻结072C、全query新读出，追加4000更新，CPU完整初末V。 |
-|**SERVER_TO_LOCAL / RUNNING**：同逐字块，单元 `mtad-1bd422a78e12`，`GPU-6811d9c0`(index1)、CPU4；13:39:05Z 提交，phase `prepare_T2100_V300`。| READY，未领取 | [090](L2S-20261024-090.md)，同初值新读出仅Anchor无支撑query修正，追加4000更新；保留原全部有效点分母。 |
-|**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `ad43030630a7ae02…`；来源前检通过（`READY_DEPENDENCIES`，phase tfm／policy learned，source 088），随后按要求登记并按现场FIFO取 `GPU-efbe9d07`(index2)提交，单元 `mtad-ae7ad5eb25d1`、8h仅提醒；13:40:27Z。| READY，未领取 | [093](L2S-20261024-093.md)，冻结088 learned completion，fresh TFM1000，0/final完整V oracle物理端点。 |
-|**SERVER_TO_LOCAL / RUNNING**：同块（policy state_hold／suffix hold），来源前检通过；`GPU-1043f26a`(index3)，单元 `mtad-2c7a37ed732f`、8h仅提醒；13:42:09Z。| READY，未领取 | [093](L2S-20261024-093.md)，同088投影、state_hold current-tau，fresh TFM1000；同初参/实际采样。 |
+| 槽1：090A |**SERVER_TO_LOCAL / COMPLETED**：逐字块 sha256 `cd750f42a3b53a8eb88ae3507c77947a5d7b3691aac4af335c3bd1b1639edfc8`（仅填 task_arm=090A／task_gpu_uuid），单元 `mtad-963699caece8`，`GPU-c5a00c37`(index0，快照24,247MiB／util0%)，13:37:44Z提交；退出0、launcher 3,140.976 s（程序3,136.696 s）、`retries=0`、4h线未触。109,732总参数／**可训练4,578**，teacher 105,154 `teacher_unchanged=true`；配072C `source_final_parameters_exact`／`initial_sampler_rng_exact`／4000batch／`sampling_exposure_exact` 全true（1,566,596点）；裁剪3,390/4,000（84.75%），峰值17.9MiB，teacher4000＋新增4000=8000（非等预算）。**点等权MAE 590.7436→574.2785：改善2.7872%，差0.21pp未达3%**；RMSE −2.595／P95 −26.272／P99 −15.580、其余三加权与最大组件外非劣、266/300场、34/38组件改善；`original072C_screen_passed=false`、`eligible_for_replication=false`、**`teacher_inside_exact_verified=false`（inside 237.6874→229.9401，保护区被改动）**、`added_budget_control_passed=null`（090C未跑，不能排除追加预算解释）。posthoc_mask_A 579.9358为固定诊断。见[回执](S2L-20261024-090A.md)| [090](L2S-20261024-090.md)，冻结072C、全query新读出，追加4000更新，CPU完整初末V。 |
+| 槽2：090B |**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `cd750f42a3b53a8eb88ae3507c77947a5d7b3691aac4af335c3bd1b1639edfc8`，单元 `mtad-1bd422a78e12`，`GPU-6811d9c0`(index1，快照24,247MiB／util0%)、CPU4、4h仅提醒；13:39:05Z提交，追加4000更新已完成，现 `evaluate_cpu_final`。| [090](L2S-20261024-090.md)，同初值新读出仅Anchor无支撑query修正，追加4000更新；保留原全部有效点分母。 |
+| 槽3：093A |**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `ad43030630a7ae02fda53c85626b0abd769cff28308d3968502663bd5ad8100e`；来源前检返回 `READY_DEPENDENCIES`（phase tfm／policy learned，绑定088）后按现场FIFO取 `GPU-efbe9d07`(index2)提交，单元 `mtad-ae7ad5eb25d1`、8h仅提醒；13:40:27Z，现 phase `tfm`。| [093](L2S-20261024-093.md)，冻结088 learned completion，fresh TFM1000，0/final完整V oracle物理端点。 |
+| 槽4：093B |**SERVER_TO_LOCAL / RUNNING**：同块（policy state_hold／suffix hold，sha256 `ad43030630a7ae02fda53c85626b0abd769cff28308d3968502663bd5ad8100e`），来源前检通过；`GPU-1043f26a`(index3)，单元 `mtad-2c7a37ed732f`、8h仅提醒；13:42:09Z，现 phase `tfm`。| [093](L2S-20261024-093.md)，同088投影、state_hold current-tau，fresh TFM1000；同初参/实际采样。 |
 
 槽号只是队列位置，**不是预先指定物理GPU index**。服务器按现场FIFO和实际空闲情况选UUID，每臂单GPU/CPU4；全局最多四个已领取单卡。预读数据、校准、完整评价和CPU联表按内存/I/O错峰，可间隔启动；训练可并行。不得终止他人进程或把仍占GPU的CPU评价进程当成已释放卡。
 
@@ -21,12 +21,12 @@
 
 | 顺序／任务 | 当前状态 | 固定范围 |
 |---|---|---|
-| 1：091A | READY，未领取 | [091](L2S-20261024-091.md)，PTFM标准化径向线性目标，T-only初始均值校准＋固定T探针，fresh4000。 |
+| 1：091A |**SERVER_TO_LOCAL / RUNNING**：090A 终态并确认 index0 释放（`is-active=inactive`、显存12MiB）后按队列顺序接入；逐字块 sha256 `2acc0d825651973177cdd7eb54d3758d049d3c19adc20bd52bb90574ac771c84`（仅填 task_arm=091A→radial-linear／task_gpu_uuid），`GPU-c5a00c37`(index0，快照空闲24,247MiB／util0%)、CPU4、4h仅提醒；14:31:07Z提交。| [091](L2S-20261024-091.md)，PTFM标准化径向线性目标，T-only初始均值校准＋固定T探针，fresh4000。 |
 | 2：091B | READY，未领取 | [091](L2S-20261024-091.md)，Haversine线性目标，同一校准规则与配对样本，fresh4000。 |
 | 3：090C | READY，未领取，必要预算对照 | [090](L2S-20261024-090.md)，同072C final全原模型fresh Adam微调4000。不能因A/B先回分数取消本控制。 |
 | 4：094A | READY，未领取 | [094](L2S-20261024-094.md)，冻结088 learned，仅TAM4000；T-only校准margin、固定final全V候选和原阈值协议。 |
 | 5：094B | READY，未领取 | [094](L2S-20261024-094.md)，同源state_hold，仅TAM4000；同校准样本/规则、各自margin，不在联表重选阈值。 |
-|**SERVER_TO_LOCAL / COMPLETED**：逐字块 sha256 `1d7251c74744c116…`，单元 `mtad-24222b2f7da0`，退出0、launcher 17.269 s（程序17.020 s）、CPU4零GPU/零模型/零前向/零checkpoint/零原卷、1h线未触。实读088完整`completion-evaluation.json` 216,831,323 B（本次算得 sha256 `ff8c5dd49aa8a001…`），300场／24,599片段／38组件全闭合，`aggregation_verified=true`。一步 model 0.0299894 对 hold 0.0175013（+71.35%）；query all model 0.0203170 对 0.0187430，inside逐值相同(插值)、before model更好、after model差(+82.63%)；组件单位等权均值反而model更好(0.025797/0.039743)，最大组件占正SSE差额81.12%／净差额220.16%，组件外model更好。**region×distance联合表按原件不可得，未拼接。** 见[回执](S2L-20261024-095.md)| READY，未领取 | [095](L2S-20261024-095.md)，一次CPU4读取完整088的24599条per_fragment，零模型/前向/训练/原卷；不作GPU前置。 |
+| CPU独立：095 |**SERVER_TO_LOCAL / COMPLETED**：逐字块 sha256 `1d7251c74744c1160f7785418cb5628080371859f1453013ed56d60f1b56fac4`，单元 `mtad-24222b2f7da0`，退出0、launcher 17.269 s（程序17.020 s）、CPU4零GPU/零模型/零前向/零checkpoint/零原卷、1h线未触。实读088完整`completion-evaluation.json` 216,831,323 B（本次算得 sha256 `ff8c5dd49aa8a001…`），300场／24,599片段／38组件闭合、`aggregation_verified=true`。一步 model 0.0299894 对 hold 0.0175013（+71.35%）；query all 0.0203170 对 0.0187430，inside逐值相同(共享插值)、before model更好(0.023675/0.025644)、after model差(+82.63%)；组件单位等权均值反而model更好(0.025797/0.039743)，最大组件占正SSE差额81.12%／净差额220.16%，组件外model更好(0.028113/0.035822)。region×distance联合表按原件不可得，未从边际拼接。见[回执](S2L-20261024-095.md)| [095](L2S-20261024-095.md)，一次CPU4读取完整088的24599条per_fragment，零模型/前向/训练/原卷；不作GPU前置。 |
 
 ### 来源、验收与回传
 
