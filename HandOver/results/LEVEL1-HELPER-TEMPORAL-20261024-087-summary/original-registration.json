@@ -1,0 +1,65 @@
+{
+  "ended_at_utc": "2026-10-24T10:43:15.268009+00:00",
+  "frozen_code": "a3e92a9",
+  "git_returned": [
+    {
+      "already_gzip": false,
+      "bytes": 351,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T10:43:14.812Z",
+      "path": "HandOver/results/LEVEL1-HELPER-TEMPORAL-20261024-087-summary/run.json",
+      "sha256": "8b1093467dcfe6ddd0cda78d15a73c23a10fc787ba761d88fa865f300f182620"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 927,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T10:43:14.812Z",
+      "path": "HandOver/results/LEVEL1-HELPER-TEMPORAL-20261024-087-summary/report.md",
+      "sha256": "2a65e2658e91bdec34397e568c9578b64d6534749f0463c527ffd37887e64e32"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 613435,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T10:43:09.156Z",
+      "path": "HandOver/results/LEVEL1-HELPER-TEMPORAL-20261024-087-summary/summary.json.gz",
+      "sha256": "7436d0dde168ef03289cb7f99ca3feed31b5e593273cf7b5b6b2068231fb7b77"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 4073310,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T10:43:14.812Z",
+      "path": "HandOver/results/LEVEL1-HELPER-TEMPORAL-20261024-087-summary/scene-summary.json.gz",
+      "sha256": "290dae9acf97634e054b501f9138c066cf52cd8bc3bb419c9cb42a4ff813847e"
+    }
+  ],
+  "git_returned_total_bytes": 4688023,
+  "inputs": [
+    "runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1",
+    "runs/LEVEL1-HELPER-SEQUENCE-20261024-078B-attempt-1",
+    "runs/LEVEL1-HELPER-TEMPORAL-20261024-087A-attempt-1",
+    "runs/LEVEL1-HELPER-TEMPORAL-20261024-087B-attempt-1"
+  ],
+  "launcher_elapsed_seconds": 326.3938401900232,
+  "launcher_returncode": 0,
+  "note": "087双臂整表；两个 .gz 为程序原生 gzip 未再压缩；零前向零训练，只读四套完整 run 原件（权重/JSONL/NPZ）核初值、路由与缓存。整表登记与本臂训练run分开。",
+  "registered_at_utc": "2026-10-24T10:44:58Z",
+  "server_originals_tree_totals": [
+    {
+      "file_content_bytes": 4688023,
+      "file_count": 4,
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087-summary-attempt-1"
+    },
+    {
+      "file_content_bytes": 3206,
+      "file_count": 11,
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087-summary-attempt-1-launch"
+    }
+  ],
+  "server_run_dir": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087-summary-attempt-1",
+  "submitted_at_utc": "2026-10-24T10:37:48.991186+00:00",
+  "task": "087-summary",
+  "unit": "mtad-a7820dae5e9c.service"
+}
