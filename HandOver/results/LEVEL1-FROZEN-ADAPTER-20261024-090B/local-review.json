@@ -1,0 +1,654 @@
+{
+  "source_commit": "c01d366",
+  "execution_accepted": true,
+  "checks": 96880,
+  "max_absolute_reaggregation_difference": 6.103515625e-05,
+  "max_normalized_reaggregation_difference": 1.1039261141849847e-13,
+  "arms": {
+    "090A": {
+      "aggregate_checks": 62040,
+      "metrics": {
+        "point_equal": {
+          "unit_count": 442263,
+          "mae": 574.2784815755844,
+          "mse": 10801869.542309577,
+          "rmse": 3286.6197745266454,
+          "point_count": 442263,
+          "p95": 1940.1289065575845,
+          "p99": 7810.105047206942
+        },
+        "scene_target_equal": {
+          "unit_count": 8742,
+          "mae": 571.00543393349,
+          "mse": 10845712.51875893,
+          "rmse": 3293.282939372038
+        },
+        "scene_equal_point_mean": {
+          "unit_count": 300,
+          "mae": 640.6404184640643,
+          "mse": 18874991.592343383,
+          "rmse": 4344.535831633039
+        },
+        "scene_equal_target_mean": {
+          "unit_count": 300,
+          "mae": 615.4699508608104,
+          "mse": 16286067.52017054,
+          "rmse": 4035.6000198446995
+        }
+      },
+      "baseline": {
+        "point_equal": {
+          "unit_count": 442263,
+          "mae": 590.7435832803362,
+          "mse": 10818931.658026854,
+          "rmse": 3289.214443910104,
+          "point_count": 442263,
+          "p95": 1966.401024643514,
+          "p99": 7825.684916974176
+        },
+        "scene_target_equal": {
+          "unit_count": 8742,
+          "mae": 588.4567184303615,
+          "mse": 10867075.173632199,
+          "rmse": 3296.524711515477
+        },
+        "scene_equal_point_mean": {
+          "unit_count": 300,
+          "mae": 660.0388023984616,
+          "mse": 18905204.96329673,
+          "rmse": 4348.01161029921
+        },
+        "scene_equal_target_mean": {
+          "unit_count": 300,
+          "mae": 636.5662731407627,
+          "mse": 16320329.139284922,
+          "rmse": 4039.8427121962213
+        }
+      },
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 9353,
+        "duplicate_prediction_group_count": 610,
+        "anchor_matched_target_count": 8743,
+        "reference_unavailable_target_count": 1
+      },
+      "position_population": {
+        "available_target_points": 454952,
+        "covered_target_points": 442263,
+        "missing_prediction_points": 12689,
+        "available_target_trajectories": 9099,
+        "covered_target_trajectories": 8742,
+        "point_coverage": 0.9721091455801931
+      },
+      "screen_recomputed": {
+        "original072C_screen_passed": false,
+        "relative_mae_reduction": 0.027871824884365085,
+        "deltas_vs072C": {
+          "mae": -16.465101704751874,
+          "rmse": -2.594669383458495,
+          "p95": -26.272118085929378,
+          "p99": -15.579869767234413
+        },
+        "improved_scenes": 266,
+        "improved_components": 34,
+        "nonpoint_mae_nonworse": true,
+        "outside_largest_component_nonworse": true,
+        "added_budget_control_passed": null
+      },
+      "route_exposure": {
+        "all_queries": 2048000,
+        "anchor_supported_queries": 978887,
+        "valid_queries": 1566596,
+        "valid_anchor_supported_queries": 977036,
+        "increment_allowed_queries": 2048000,
+        "valid_increment_allowed_queries": 1566596
+      },
+      "teacher_unchanged_reported": true,
+      "initial_output_source_final_exact": true,
+      "protected_inside_teacher_exact": false,
+      "exposure": {
+        "successful_updates": 4000,
+        "sampled_anchors": 32000,
+        "valid_position_points": 1566596,
+        "nonzero_gradient_updates": 4000,
+        "modes": {
+          "clean": {
+            "updates": 1334,
+            "anchors": 10672,
+            "valid_position_points": 520861
+          },
+          "clean_plus_wrong": {
+            "updates": 1333,
+            "anchors": 10664,
+            "valid_position_points": 525975
+          },
+          "wrong_only": {
+            "updates": 1333,
+            "anchors": 10664,
+            "valid_position_points": 519760
+          }
+        },
+        "unique_scenes": 2100,
+        "unique_anchors": 24592
+      },
+      "harm_vs_linear": {
+        "common_point_count": 442263,
+        "better_point_count": 255346,
+        "worse_point_count": 186917,
+        "tied_point_count": 0,
+        "improvement_sum": 18472541.14087035,
+        "harm_sum": 11190635.86561966,
+        "signed_error_change_sum": -7281905.275250692,
+        "mean_error_change": -16.465101704756428,
+        "positive_delta_tail": {
+          "point_count": 186917,
+          "p95": 189.2726536649073,
+          "p99": 440.3888512549046
+        },
+        "severe_harm": {
+          "100": {
+            "threshold_m": 100.0,
+            "count": 21896,
+            "cumulative_harm_m": 5168967.85277715
+          },
+          "1000": {
+            "threshold_m": 1000.0,
+            "count": 302,
+            "cumulative_harm_m": 508593.9729032945
+          },
+          "10000": {
+            "threshold_m": 10000.0,
+            "count": 0,
+            "cumulative_harm_m": 0.0
+          }
+        },
+        "squared_error_change_sum_m2": -7545942483.588477,
+        "net_identity_residual_m": 0.0
+      },
+      "regional_deltas_vs_linear": {
+        "anchor_inside_support": {
+          "common_point_count": 322953,
+          "better_point_count": 184043,
+          "worse_point_count": 138910,
+          "tied_point_count": 0,
+          "improvement_sum": 7739625.462743221,
+          "harm_sum": 5237605.759848268,
+          "signed_error_change_sum": -2502019.7028949517,
+          "mean_error_change": -7.747318349403634,
+          "positive_delta_tail": {
+            "point_count": 138910,
+            "p95": 87.06078660021527,
+            "p99": 127.19352822570163
+          },
+          "severe_harm": {
+            "100": {
+              "threshold_m": 100.0,
+              "count": 3867,
+              "cumulative_harm_m": 517301.9793437912
+            },
+            "1000": {
+              "threshold_m": 1000.0,
+              "count": 3,
+              "cumulative_harm_m": 3452.1661076630307
+            },
+            "10000": {
+              "threshold_m": 10000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            }
+          },
+          "squared_error_change_sum_m2": -4310709199.765893,
+          "net_identity_residual_m": 1.3969838619232178e-09
+        },
+        "anchor_outside_helper_supported": {
+          "common_point_count": 90769,
+          "better_point_count": 55262,
+          "worse_point_count": 35507,
+          "tied_point_count": 0,
+          "improvement_sum": 9937514.89173675,
+          "harm_sum": 5395535.455544681,
+          "signed_error_change_sum": -4541979.436192066,
+          "mean_error_change": -50.03888371792205,
+          "positive_delta_tail": {
+            "point_count": 35507,
+            "p95": 448.02188199926604,
+            "p99": 936.270960294939
+          },
+          "severe_harm": {
+            "100": {
+              "threshold_m": 100.0,
+              "count": 17465,
+              "cumulative_harm_m": 4583199.808438171
+            },
+            "1000": {
+              "threshold_m": 1000.0,
+              "count": 299,
+              "cumulative_harm_m": 505141.8067956315
+            },
+            "10000": {
+              "threshold_m": 10000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            }
+          },
+          "squared_error_change_sum_m2": -2968821319.56746,
+          "net_identity_residual_m": 1.862645149230957e-09
+        },
+        "predicted_group_no_support": {
+          "common_point_count": 28541,
+          "better_point_count": 16041,
+          "worse_point_count": 12500,
+          "tied_point_count": 0,
+          "improvement_sum": 795400.7863903857,
+          "harm_sum": 557494.6502267121,
+          "signed_error_change_sum": -237906.13616367357,
+          "mean_error_change": -8.335592171391106,
+          "positive_delta_tail": {
+            "point_count": 12500,
+            "p95": 97.82778941106044,
+            "p99": 130.61186074179676
+          },
+          "severe_harm": {
+            "100": {
+              "threshold_m": 100.0,
+              "count": 564,
+              "cumulative_harm_m": 68466.06499518885
+            },
+            "1000": {
+              "threshold_m": 1000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            },
+            "10000": {
+              "threshold_m": 10000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            }
+          },
+          "squared_error_change_sum_m2": -266411964.25512645,
+          "net_identity_residual_m": 2.9103830456733704e-11
+        }
+      },
+      "remaining_component_metrics": {
+        "point_equal": {
+          "unit_count": 109365,
+          "mae": 848.1349922925997,
+          "mse": 23209701.359778155,
+          "rmse": 4817.644793857073,
+          "point_count": 109365,
+          "p95": 2712.0297704766435,
+          "p99": 15312.153319491568
+        },
+        "scene_target_equal": {
+          "unit_count": 2256,
+          "mae": 808.4494387421298,
+          "mse": 20506261.65752978,
+          "rmse": 4528.384000670634
+        },
+        "scene_equal_point_mean": {
+          "unit_count": 170,
+          "mae": 826.5753242924368,
+          "mse": 29395526.113368016,
+          "rmse": 5421.76411450812
+        },
+        "scene_equal_target_mean": {
+          "unit_count": 170,
+          "mae": 783.6575378096563,
+          "mse": 24824185.411368325,
+          "rmse": 4982.38752119587
+        }
+      }
+    },
+    "090B": {
+      "aggregate_checks": 34840,
+      "metrics": {
+        "point_equal": {
+          "unit_count": 442263,
+          "mae": 580.8091031822686,
+          "mse": 10799736.104501683,
+          "rmse": 3286.2951943642684,
+          "point_count": 442263,
+          "p95": 1923.38972794601,
+          "p99": 7817.4069083368695
+        },
+        "scene_target_equal": {
+          "unit_count": 8742,
+          "mae": 576.7478693135733,
+          "mse": 10833565.058992451,
+          "rmse": 3291.4381444882797
+        },
+        "scene_equal_point_mean": {
+          "unit_count": 300,
+          "mae": 648.4113830385129,
+          "mse": 18887741.978698302,
+          "rmse": 4346.002988804576
+        },
+        "scene_equal_target_mean": {
+          "unit_count": 300,
+          "mae": 622.8806296292696,
+          "mse": 16292072.746108707,
+          "rmse": 4036.3439826294175
+        }
+      },
+      "baseline": {
+        "point_equal": {
+          "unit_count": 442263,
+          "mae": 590.7435832803362,
+          "mse": 10818931.658026854,
+          "rmse": 3289.214443910104,
+          "point_count": 442263,
+          "p95": 1966.401024643514,
+          "p99": 7825.684916974176
+        },
+        "scene_target_equal": {
+          "unit_count": 8742,
+          "mae": 588.4567184303615,
+          "mse": 10867075.173632199,
+          "rmse": 3296.524711515477
+        },
+        "scene_equal_point_mean": {
+          "unit_count": 300,
+          "mae": 660.0388023984616,
+          "mse": 18905204.96329673,
+          "rmse": 4348.01161029921
+        },
+        "scene_equal_target_mean": {
+          "unit_count": 300,
+          "mae": 636.5662731407627,
+          "mse": 16320329.139284922,
+          "rmse": 4039.8427121962213
+        }
+      },
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 9353,
+        "duplicate_prediction_group_count": 610,
+        "anchor_matched_target_count": 8743,
+        "reference_unavailable_target_count": 1
+      },
+      "position_population": {
+        "available_target_points": 454952,
+        "covered_target_points": 442263,
+        "missing_prediction_points": 12689,
+        "available_target_trajectories": 9099,
+        "covered_target_trajectories": 8742,
+        "point_coverage": 0.9721091455801931
+      },
+      "screen_recomputed": {
+        "original072C_screen_passed": false,
+        "relative_mae_reduction": 0.016816907333808907,
+        "deltas_vs072C": {
+          "mae": -9.934480098067638,
+          "rmse": -2.919249545835555,
+          "p95": -43.011296697503894,
+          "p99": -8.278008637306812
+        },
+        "improved_scenes": 229,
+        "improved_components": 30,
+        "nonpoint_mae_nonworse": true,
+        "outside_largest_component_nonworse": true,
+        "added_budget_control_passed": null
+      },
+      "route_exposure": {
+        "all_queries": 2048000,
+        "anchor_supported_queries": 978887,
+        "valid_queries": 1566596,
+        "valid_anchor_supported_queries": 977036,
+        "increment_allowed_queries": 1069113,
+        "valid_increment_allowed_queries": 589560
+      },
+      "teacher_unchanged_reported": true,
+      "initial_output_source_final_exact": true,
+      "protected_inside_teacher_exact": true,
+      "exposure": {
+        "successful_updates": 4000,
+        "sampled_anchors": 32000,
+        "valid_position_points": 1566596,
+        "nonzero_gradient_updates": 4000,
+        "modes": {
+          "clean": {
+            "updates": 1334,
+            "anchors": 10672,
+            "valid_position_points": 520861
+          },
+          "clean_plus_wrong": {
+            "updates": 1333,
+            "anchors": 10664,
+            "valid_position_points": 525975
+          },
+          "wrong_only": {
+            "updates": 1333,
+            "anchors": 10664,
+            "valid_position_points": 519760
+          }
+        },
+        "unique_scenes": 2100,
+        "unique_anchors": 24592
+      },
+      "harm_vs_linear": {
+        "common_point_count": 442263,
+        "better_point_count": 68930,
+        "worse_point_count": 50380,
+        "tied_point_count": 322953,
+        "improvement_sum": 10698437.331630018,
+        "harm_sum": 6304784.360016536,
+        "signed_error_change_sum": -4393652.97161348,
+        "mean_error_change": -9.93448009807169,
+        "positive_delta_tail": {
+          "point_count": 50380,
+          "p95": 333.4338106890754,
+          "p99": 641.9312945730711
+        },
+        "severe_harm": {
+          "100": {
+            "threshold_m": 100.0,
+            "count": 23359,
+            "cumulative_harm_m": 5035076.040686186
+          },
+          "1000": {
+            "threshold_m": 1000.0,
+            "count": 211,
+            "cumulative_harm_m": 399837.03628682264
+          },
+          "10000": {
+            "threshold_m": 10000.0,
+            "count": 0,
+            "cumulative_harm_m": 0.0
+          }
+        },
+        "squared_error_change_sum_m2": -8489483088.726156,
+        "net_identity_residual_m": 1.862645149230957e-09
+      },
+      "regional_deltas_vs_linear": {
+        "anchor_inside_support": {
+          "common_point_count": 322953,
+          "better_point_count": 0,
+          "worse_point_count": 0,
+          "tied_point_count": 322953,
+          "improvement_sum": -0.0,
+          "harm_sum": 0.0,
+          "signed_error_change_sum": 0.0,
+          "mean_error_change": 0.0,
+          "positive_delta_tail": {
+            "point_count": 0,
+            "p95": null,
+            "p99": null
+          },
+          "severe_harm": {
+            "100": {
+              "threshold_m": 100.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            },
+            "1000": {
+              "threshold_m": 1000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            },
+            "10000": {
+              "threshold_m": 10000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            }
+          },
+          "squared_error_change_sum_m2": 0.0,
+          "net_identity_residual_m": 0.0
+        },
+        "anchor_outside_helper_supported": {
+          "common_point_count": 90769,
+          "better_point_count": 55007,
+          "worse_point_count": 35762,
+          "tied_point_count": 0,
+          "improvement_sum": 9517875.813069412,
+          "harm_sum": 5119806.574832795,
+          "signed_error_change_sum": -4398069.238236618,
+          "mean_error_change": -48.45342835369585,
+          "positive_delta_tail": {
+            "point_count": 35762,
+            "p95": 381.20480790911205,
+            "p99": 736.8037564970359
+          },
+          "severe_harm": {
+            "100": {
+              "threshold_m": 100.0,
+              "count": 18044,
+              "cumulative_harm_m": 4294409.55742867
+            },
+            "1000": {
+              "threshold_m": 1000.0,
+              "count": 211,
+              "cumulative_harm_m": 399837.03628682264
+            },
+            "10000": {
+              "threshold_m": 10000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            }
+          },
+          "squared_error_change_sum_m2": -8402588102.107747,
+          "net_identity_residual_m": -9.313225746154785e-10
+        },
+        "predicted_group_no_support": {
+          "common_point_count": 28541,
+          "better_point_count": 13923,
+          "worse_point_count": 14618,
+          "tied_point_count": 0,
+          "improvement_sum": 1180561.5185606028,
+          "harm_sum": 1184977.7851837415,
+          "signed_error_change_sum": 4416.266623138879,
+          "mean_error_change": 0.15473412365154968,
+          "positive_delta_tail": {
+            "point_count": 14618,
+            "p95": 172.67469875850037,
+            "p99": 203.89277487977202
+          },
+          "severe_harm": {
+            "100": {
+              "threshold_m": 100.0,
+              "count": 5315,
+              "cumulative_harm_m": 740666.4832575156
+            },
+            "1000": {
+              "threshold_m": 1000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            },
+            "10000": {
+              "threshold_m": 10000.0,
+              "count": 0,
+              "cumulative_harm_m": 0.0
+            }
+          },
+          "squared_error_change_sum_m2": -86894986.61840582,
+          "net_identity_residual_m": 1.964508555829525e-10
+        }
+      },
+      "remaining_component_metrics": {
+        "point_equal": {
+          "unit_count": 109365,
+          "mae": 854.9651433332167,
+          "mse": 23220031.266290992,
+          "rmse": 4818.716765518699,
+          "point_count": 109365,
+          "p95": 2671.0371125061192,
+          "p99": 15308.003249786134
+        },
+        "scene_target_equal": {
+          "unit_count": 2256,
+          "mae": 815.7291345589521,
+          "mse": 20526398.21484854,
+          "rmse": 4530.6068263366815
+        },
+        "scene_equal_point_mean": {
+          "unit_count": 170,
+          "mae": 833.9255196603784,
+          "mse": 29421328.891014524,
+          "rmse": 5424.143148093948
+        },
+        "scene_equal_target_mean": {
+          "unit_count": 170,
+          "mae": 791.2451464080805,
+          "mse": 24854314.630151756,
+          "rmse": 4985.410176720844
+        }
+      }
+    }
+  },
+  "scope": "090A/B local terminal review before C and full three-arm table",
+  "decision": "Accept the two executions and close further A/B seed/parameter expansion under the frozen screen; preserve the already scheduled C and original full CPU comparison. No method promotion or added-budget causal claim before C.",
+  "reaggregation_method": "Independently sum scene population/harm/severe-harm records and unit_count-weighted MAE/MSE, then sqrt pooled MSE; repeat globally, per38 components and outside largest. Numeric rel_tol1e-10/abs_tol1e-5 applies only to floating summation order, not experiment acceptance.",
+  "local_review_scope": "Committed run/fit/endpoint metadata, aggregate and per-scene/component values only. Full checkpoints, 4000-batch JSONL and NPZ remain on server and were not replayed locally; pooled P95/P99 use returned exact raw-point quantiles, never scene-quantile averaging.",
+  "full_A_B_exposure_dictionaries_equal": true,
+  "actual_updates_each": 4000,
+  "parameter_count_each": 109732,
+  "trainable_parameter_count_each": 4578,
+  "source_teacher_updates": 4000,
+  "added_updates": 4000,
+  "total_stage_updates": 8000,
+  "budget_control_C_available": false,
+  "complete_three_arm_pairing_available": false,
+  "old066_acceptance": "REJECTED",
+  "test_opened": false,
+  "A_mask_and_B_tradeoff": {
+    "posthoc_mask_A_position": {
+      "unit_count": 442263,
+      "mae": 579.9357934078794,
+      "mse": 10811616.478407986,
+      "rmse": 3288.1022609414063,
+      "point_count": 442263,
+      "p95": 1939.6162870490089,
+      "p99": 7812.954950243349
+    },
+    "B_minus_posthoc_mask_A": {
+      "mae": 0.8733097743892131,
+      "rmse": -1.8070665771379026,
+      "p95": -16.226559102998863,
+      "p99": 4.451958093520261
+    },
+    "B_minus_A": {
+      "mae": 6.530621606684235,
+      "rmse": -0.32458016237706033,
+      "p95": -16.739178611574516,
+      "p99": 7.301861129927602
+    },
+    "interpretation": "B is not uniformly better than A or A-mask. B has lower RMSE/P95 than A-mask but higher MAE/P99. A-mask remains a predeclared diagnostic, not a promoted candidate. Shared cached data allow marginal metric comparison here; full raw-point B/A matching remains for the original three-arm table."
+  },
+  "corrections": [
+    {
+      "claim": "090A violates inside teacher protection because teacher_inside_exact_verified=false.",
+      "correction": "False. The predeclared all_queries A arm is allowed to change inside predictions; only B has the exact inside-protection contract. This is expected arm behavior, not execution failure or a reason to mark A rejected."
+    },
+    {
+      "claim": "B barely changes the whole-group unsupported region because mean MAE delta is only+0.155m.",
+      "correction": "Unsupported at point level. That region has13923 improved and14618 worsened points; average absolute error change is82.882145m, with1,180,561.519m total improvement versus1,184,977.785m total harm. The small net mean reflects cancellation, not unchanged states.",
+      "mean_absolute_error_change_m": 82.88214511560015
+    },
+    {
+      "claim": "The protected-region result demonstrates learned support-aware reliability or no inside harm.",
+      "correction": "B inside equality is imposed by its output mask. A has a net7.747m inside improvement but138910 inside points worsen; its net gain is descriptively split between inside and outside. These counts do not establish a learned reliability mechanism or absence of harmful corrections.",
+      "A_inside_share_of_net_absolute_error_reduction": 0.3435941018621415,
+      "A_opportunity_share_of_net_absolute_error_reduction": 0.6237350342401565,
+      "A_no_support_share_of_net_absolute_error_reduction": 0.032670863897702
+    }
+  ]
+}

@@ -6,7 +6,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 
 日常开发和服务器回传统一使用 **`main`**；本地工作目录为 `/Users/a1/Projects/association-code`。历史研究分支已合入main并退役，实验按提交保留，不再维护多条长期分支。
 
-Post088包已完成本地对抗性审查与必要修复，**633项全仓测试通过**。统一执行冻结`e718fca51be65992efd94e3f85a1d482637f2f93`；首轮四卡090A、090B、093A、093B，后续091A、091B、090C、094A、094B，095独立CPU审计；旧092已撤销。具体[审查结论](docs/reports/2026-10-24-post088-integration-review.md)与[当前交接](HandOver/Handover.md)包含终点、来源和失败停止条件。READY与push不表示服务器已运行，新Level1效果尚未知；默认仍056＋原linear，完整强领域baseline与TCM充分性仍未补齐。
+Post088已发布，冻结e718fca。090A/B已完成并执行验收，对072C的MAE分别改善2.7872%／1.6817%，均未过3%筛选；C及完整三臂表待回，暂不晋级。095原件审计已结案，其query宏平均反转高度依赖4335，不能据此判断下游价值。按最新回执093A/B、091A/B运行中，090C及094A/B排队；实际状态见[交接](HandOver/Handover.md)，解释见[阶段复核](docs/research_status.md#090ab与095阶段结果复核2026-10-24)。软件633项通过不等于实验成功；默认056＋原linear、T_test封存、066 REJECTED保持。
 
 ## 现在看哪里
 

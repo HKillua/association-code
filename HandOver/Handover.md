@@ -1,32 +1,24 @@
 # 当前交接
 
-## Post088本地审查修复后发布：四卡首轮090A、090B、093A、093B
+## Post088结果复核：090A/B及095已完成，C预算对照与其余固定任务继续
 
-2026-10-24，用户已明确授权审查、直接修正、测试、合入main/push及本课题预算，无需再次请批。本地已接收增量包并独立修复验收缺口，**全仓633项通过、独立复审通过；当前统一执行冻结为`e718fca51be65992efd94e3f85a1d482637f2f93`**。旧包042bc06及外部环境403记录为历史，不能继续用旧冻结执行。本次main发布具体合同，以下均为LOCAL_TO_SERVER / READY，尚无本批新S2L领取回执；push不表示服务器已启动。
+2026-10-24，本地同步`c01d366`；090A/B和095已有COMPLETED回执，本地复核通过执行。**090A/B尚无复验资格：MAE改善分别2.7872%与1.6817%，均未达预定3%；090C和完整三臂表未返回，不能排除追加预算解释。** 其余合同和统一实施冻结`e718fca51be65992efd94e3f85a1d482637f2f93`保持，不修改活动checkout或原运行记录，不新增训练。
 
-详细依据见[集成对抗性审查](../docs/reports/2026-10-24-post088-integration-review.md)、[总设计](../docs/specs/post088-completion-value.md)。旧092已SUPERSEDED，不可领取。088是已完成的一遍TCM基础端点；其128维feature误差不能代替下游物理/关联指标，也不构成完整TMTAFF复现。
+来源为[090A回执](S2L-20261024-090A.md)、[090B回执](S2L-20261024-090B.md)、[095回执](S2L-20261024-095.md)，研究解释以[本地复核](../docs/research_status.md#090ab与095阶段结果复核2026-10-24)为准。状态来自最新Git回执，不是本地实时监控；旧092禁止领取，T_test封存、066保持REJECTED。
 
-### 第一轮：最多四个单卡并行
+| 任务 | 当前状态与本地决定 |
+|---|---|
+| [090A](L2S-20261024-090.md) | **COMPLETED，执行验收；科学晋级未通过**。4000更新、teacher冻结、源初值/曝光和V300通过；MAE574.2785m。A按合同允许修改全部query，inside变化不是违规，不可据此“修复A保护”。 |
+| [090B](L2S-20261024-090.md) | **COMPLETED，执行验收；科学晋级未通过**。MAE580.8091m，inside逐值保持；完整三臂表仍待C。无支撑区MAE净+0.155m不等于预测几乎不动，正负误差变化有抵消。见[复核记录](results/LEVEL1-FROZEN-ADAPTER-20261024-090B/local-review.json)。 |
+| [093A/B](L2S-20261024-093.md) | **RUNNING，按最新回执**。learned/hold TFM于13:40:27／13:42:09UTC领取，各1000更新；保持原协议，不因090结果改设置。 |
+| [091A/B](L2S-20261024-091.md) | **RUNNING，按最新回执**。090A/B释放后按队列于14:31:07／14:34:59UTC领取，各4000更新；校准与T探针按原合同。 |
+| [090C](L2S-20261024-090.md) | **READY，未领取，下一空槽优先**。必要追加预算控制，fresh Adam全模型4000；不因A/B未过3%而取消既定控制，不改其预算。 |
+| [094A/B](L2S-20261024-094.md) | **READY，未领取**。排在090C之后，空槽顺次领取；同源learned/hold TAM各4000。 |
+| [095](L2S-20261024-095.md) | **COMPLETED，执行验收并结案**。原件24599片段→300场/38组件闭合；零权重/原卷/前向。组件等权与组件外的query方向反转高度依赖4335，不能泛化。见[复核](results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/local-review.json)。不重跑。 |
 
-| 槽位／任务 | 当前状态 | 执行合同与固定终点 |
-|---|---|---|
-| 槽1：090A |**SERVER_TO_LOCAL / COMPLETED**：逐字块 sha256 `cd750f42a3b53a8eb88ae3507c77947a5d7b3691aac4af335c3bd1b1639edfc8`（仅填 task_arm=090A／task_gpu_uuid），单元 `mtad-963699caece8`，`GPU-c5a00c37`(index0，快照24,247MiB／util0%)，13:37:44Z提交；退出0、launcher 3,140.976 s（程序3,136.696 s）、`retries=0`、4h线未触。109,732总参数／**可训练4,578**，teacher 105,154 `teacher_unchanged=true`；配072C `source_final_parameters_exact`／`initial_sampler_rng_exact`／4000batch／`sampling_exposure_exact` 全true（1,566,596点）；裁剪3,390/4,000（84.75%），峰值17.9MiB，teacher4000＋新增4000=8000（非等预算）。**点等权MAE 590.7436→574.2785：改善2.7872%，差0.21pp未达3%**；RMSE −2.595／P95 −26.272／P99 −15.580、其余三加权与最大组件外非劣、266/300场、34/38组件改善；`original072C_screen_passed=false`、`eligible_for_replication=false`、**`teacher_inside_exact_verified=false`（inside 237.6874→229.9401，保护区被改动）**、`added_budget_control_passed=null`（090C未跑，不能排除追加预算解释）。posthoc_mask_A 579.9358为固定诊断。见[回执](S2L-20261024-090A.md)| [090](L2S-20261024-090.md)，冻结072C、全query新读出，追加4000更新，CPU完整初末V。 |
-| 槽2：090B |**SERVER_TO_LOCAL / COMPLETED**：同逐字块 sha256 `cd750f42…`（task_arm=090B→anchor-unsupported），单元 `mtad-1bd422a78e12`，`GPU-6811d9c0`(index1，快照24,247MiB/0%)，13:39:05Z提交；退出0、launcher 3,188.575 s、`retries=0`、4h线未触。109,732参数／可训练4,578／teacher 105,154 `teacher_unchanged=true`、`branch_seed=20351023`；配072C全true（1,566,596点）；裁剪2,380/4,000（59.5%，A为84.75%），峰值17.9MiB。实际作用域：`valid_increment_allowed_queries=589,560`（37.63%有效点可改），`valid_anchor_supported=977,036` 按构造保持。**点等权MAE 590.7436→580.8091（改善1.6817%，未达3%）**，四种加权/RMSE/P95/P99/最大组件外全不退，229/300场、30/38组件改善；`predeclared_method_candidate=true`、**`teacher_inside_exact_verified=true`（inside 237.6874 逐值不变，A则被改为229.9401）**、`eligible_for_replication=false`、`added_budget_control_passed=null`。见[回执](S2L-20261024-090B.md)| [090](L2S-20261024-090.md)，同初值新读出仅Anchor无支撑query修正，追加4000更新；保留原全部有效点分母。 |
-| 槽3：093A |**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `ad43030630a7ae02fda53c85626b0abd769cff28308d3968502663bd5ad8100e`；来源前检返回 `READY_DEPENDENCIES`（phase tfm／policy learned，绑定088）后按现场FIFO取 `GPU-efbe9d07`(index2)提交，单元 `mtad-ae7ad5eb25d1`、8h仅提醒；13:40:27Z，现 phase `tfm`。| [093](L2S-20261024-093.md)，冻结088 learned completion，fresh TFM1000，0/final完整V oracle物理端点。 |
-| 槽4：093B |**SERVER_TO_LOCAL / RUNNING**：同块（policy state_hold／suffix hold，sha256 `ad43030630a7ae02fda53c85626b0abd769cff28308d3968502663bd5ad8100e`），来源前检通过；`GPU-1043f26a`(index3)，单元 `mtad-2c7a37ed732f`、8h仅提醒；13:42:09Z，现 phase `tfm`。| [093](L2S-20261024-093.md)，同088投影、state_hold current-tau，fresh TFM1000；同初参/实际采样。 |
+**回执解释勘误（原S2L保留）：** 只有090B要求inside精确保护，A的全query行为符合合同；B无支撑区平均净差很小但平均绝对误差变化约82.88m。095标题把query组件等权结果误写为“一步”，真正一步组件等权model仍更差；query宏平均、before和最大组件外的方向反转不能脱离4335单场贡献解读。以上均不要求修改生产代码、放宽门槛或另开诊断。
 
-槽号只是队列位置，**不是预先指定物理GPU index**。服务器按现场FIFO和实际空闲情况选UUID，每臂单GPU/CPU4；全局最多四个已领取单卡。预读数据、校准、完整评价和CPU联表按内存/I/O错峰，可间隔启动；训练可并行。不得终止他人进程或把仍占GPU的CPU评价进程当成已释放卡。
-
-### 后续固定队列：每空一槽领取下一项
-
-| 顺序／任务 | 当前状态 | 固定范围 |
-|---|---|---|
-| 1：091A |**SERVER_TO_LOCAL / RUNNING**：090A 终态并确认 index0 释放（`is-active=inactive`、显存12MiB）后按队列顺序接入；逐字块 sha256 `2acc0d825651973177cdd7eb54d3758d049d3c19adc20bd52bb90574ac771c84`（仅填 task_arm=091A→radial-linear／task_gpu_uuid），`GPU-c5a00c37`(index0，快照空闲24,247MiB／util0%)、CPU4、4h仅提醒；14:31:07Z提交。| [091](L2S-20261024-091.md)，PTFM标准化径向线性目标，T-only初始均值校准＋固定T探针，fresh4000。 |
-| 2：091B |**SERVER_TO_LOCAL / RUNNING**：090B 终态并确认 index1 释放（unit inactive、显存12MiB）后按队列顺序接入；同逐字块 sha256 `2acc0d82…`（task_arm=091B→geodesic-linear），`GPU-6811d9c0`(index1，快照空闲24,247MiB/util0%)、CPU4、4h仅提醒；14:34:59Z提交。| [091](L2S-20261024-091.md)，Haversine线性目标，同一校准规则与配对样本，fresh4000。 |
-| 3：090C | READY，未领取，必要预算对照 | [090](L2S-20261024-090.md)，同072C final全原模型fresh Adam微调4000。不能因A/B先回分数取消本控制。 |
-| 4：094A | READY，未领取 | [094](L2S-20261024-094.md)，冻结088 learned，仅TAM4000；T-only校准margin、固定final全V候选和原阈值协议。 |
-| 5：094B | READY，未领取 | [094](L2S-20261024-094.md)，同源state_hold，仅TAM4000；同校准样本/规则、各自margin，不在联表重选阈值。 |
-| CPU独立：095 |**SERVER_TO_LOCAL / COMPLETED**：逐字块 sha256 `1d7251c74744c1160f7785418cb5628080371859f1453013ed56d60f1b56fac4`，单元 `mtad-24222b2f7da0`，退出0、launcher 17.269 s（程序17.020 s）、CPU4零GPU/零模型/零前向/零checkpoint/零原卷、1h线未触。实读088完整`completion-evaluation.json` 216,831,323 B（本次算得 sha256 `ff8c5dd49aa8a001…`），300场／24,599片段／38组件闭合、`aggregation_verified=true`。一步 model 0.0299894 对 hold 0.0175013（+71.35%）；query all 0.0203170 对 0.0187430，inside逐值相同(共享插值)、before model更好(0.023675/0.025644)、after model差(+82.63%)；组件单位等权均值反而model更好(0.025797/0.039743)，最大组件占正SSE差额81.12%／净差额220.16%，组件外model更好(0.028113/0.035822)。region×distance联合表按原件不可得，未从边际拼接。见[回执](S2L-20261024-095.md)| [095](L2S-20261024-095.md)，一次CPU4读取完整088的24599条per_fragment，零模型/前向/训练/原卷；不作GPU前置。 |
+当前四个运行槽为093A/B与091A/B；后续固定次序090C→094A→094B。全局最多四个已领取单卡，现场FIFO/实际资源；CPU联表错峰。090完整表待A/B/C、091/093/094各待本族两臂成功后执行，各一次，不能用缺失控制宣布晋级。095不再是待回项。
 
 ### 来源、验收与回传
 
