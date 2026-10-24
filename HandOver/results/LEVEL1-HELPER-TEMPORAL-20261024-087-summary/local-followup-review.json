@@ -1,0 +1,220 @@
+{
+  "source_commit": "cf21b1b",
+  "review_date": "2026-10-24",
+  "review_timezone": "Asia/Shanghai",
+  "review_type": "INDEPENDENT_RETURNED_AGGREGATE_FOLLOWUP",
+  "execution_accepted": true,
+  "decision": "KEEP_087_CURRENT_RECIPE_CLOSED_NO_MATCHED_SEED_OR_PARAMETER_SWEEP",
+  "inputs": {
+    "global_and_component_aggregates": "summary.json.gz",
+    "scene_aggregates": "scene-summary.json.gz",
+    "arm_metadata": [
+      "../LEVEL1-HELPER-TEMPORAL-20261024-087A/fit-run.json",
+      "../LEVEL1-HELPER-TEMPORAL-20261024-087B/fit-run.json"
+    ],
+    "training_windows": [
+      "../LEVEL1-HELPER-TEMPORAL-20261024-087A/fit-training-windows.json",
+      "../LEVEL1-HELPER-TEMPORAL-20261024-087B/fit-training-windows.json"
+    ],
+    "receipts": [
+      "../../S2L-20261024-087A.md",
+      "../../S2L-20261024-087B.md"
+    ]
+  },
+  "actual_checks": {
+    "count": 18649,
+    "all_passed": true,
+    "scope": [
+      "Sum five returned position-population counts over all 300 scene rows and compare with the global summary.",
+      "For the complete population, each of 38 components, and the population outside the largest component: sum unit_count and independently reconstruct MAE/MSE by unit-count weighting for every returned region, method and weighting. Empty populations have count checks only.",
+      "Reaggregate global harm_sum, improvement_sum and better/worse/tied point counts from scene rows for linear, pre_pool, shuffled and preserved.",
+      "For shuffled and preserved, reaggregate each returned support-helper cross cell's error sum, squared-error sum, improvement sum, harm sum and signed delta versus linear from scene rows; separately assert cross-cell point-count closure.",
+      "Recompute the improved-scene and improved-component counts used in interpreting both frozen screens. These descriptive calculations and separate cross-count assertions are not added to the explicit 18649 loop counter."
+    ],
+    "floating_accumulation_tolerances": {
+      "relative_tolerance": 1e-10,
+      "weighted_mae_mse_absolute_tolerance": 1e-7,
+      "global_harm_improvement_count_absolute_tolerance": 1e-6,
+      "cross_additive_absolute_tolerance": 1e-5,
+      "population_and_weighting_unit_counts": "exact integer equality",
+      "purpose": "Local floating accumulation checks only; these tolerances do not replace the frozen scientific screening thresholds."
+    },
+    "max_weighted_metric_normalized_difference": 5.783480679049576e-14,
+    "normalization": "absolute difference / max(1, absolute reported metric)",
+    "max_weighted_mae_difference_m": 2.2282620193436742e-11,
+    "global_p95_p99_independently_recomputed": false,
+    "local_raw_checkpoint_jsonl_npz_replay": false,
+    "local_model_forwards": 0,
+    "local_training_updates": 0
+  },
+  "primary_result": {
+    "covered_position_points": 442263,
+    "scene_count": 300,
+    "component_count": 38,
+    "linear_mae_m": 590.7435832803362,
+    "shuffled_mae_m": 592.5791927985551,
+    "preserved_mae_m": 612.6133294724414,
+    "shuffled_minus_linear_mae_m": 1.8356095182189165,
+    "preserved_minus_linear_mae_m": 21.86974619210514,
+    "preserved_minus_shuffled_mae_m": 20.0341366738966,
+    "improved_scenes_vs_linear": {
+      "shuffled": 137,
+      "preserved": 50
+    },
+    "improved_components_vs_linear": {
+      "shuffled": 15,
+      "preserved": 4
+    },
+    "frozen_screen_passed": {
+      "shuffled": false,
+      "preserved": false
+    },
+    "qualification": "Preserved is worse on all four MAE weightings; shuffled is better on two and worse on two. Preserved has slightly better pooled RMSE/P99 than linear, so not all metrics deteriorate."
+  },
+  "preserved_vs_linear_error_accounting": {
+    "net_absolute_error_increase_m": 9672179.560158996,
+    "additional_harm_relative_to_fixed095_m": 6914303.22600716,
+    "lost_improvement_relative_to_fixed095_m": 2757876.33414869,
+    "additional_harm_fraction_of_net_increase": 0.7148650604552568,
+    "lost_improvement_fraction_of_net_increase": 0.28513493954441793,
+    "by_support_region": {
+      "anchor_inside_support": {
+        "point_count": 322953,
+        "linear_mae_m": 237.6874027190748,
+        "preserved_mae_m": 265.7475135655111,
+        "net_error_increase_m": 9062096.978186674,
+        "additional_harm_m": 8944558.882333472,
+        "lost_improvement_m": 117538.09585320204
+      },
+      "anchor_outside_helper_supported": {
+        "point_count": 90769,
+        "linear_mae_m": 1080.9675757129276,
+        "preserved_mae_m": 1089.1933915470745,
+        "net_error_increase_m": 746649.0774505754,
+        "additional_harm_m": -1999712.03934934,
+        "lost_improvement_m": 2746361.116799921
+      },
+      "predicted_group_no_support": {
+        "point_count": 28541,
+        "linear_mae_m": 3026.6572202128027,
+        "preserved_mae_m": 3021.872296927659,
+        "net_error_increase_m": -136566.49548140055,
+        "additional_harm_m": -30543.616976963705,
+        "lost_improvement_m": -106022.87850443693
+      }
+    },
+    "interpretation": "Disjoint descriptive output-error accounting, not causal shares of training mechanisms. Negative additional harm or lost improvement denotes improvement in that respective quantity."
+  },
+  "preserved_vs_linear_nonempty_cross_cells": {
+    "anchor_inside_support__zero": {
+      "point_count": 163954,
+      "mae_difference_m": 17.306748897571254,
+      "fraction_of_global_net_error_difference": 0.2933682828264902
+    },
+    "anchor_inside_support__one": {
+      "point_count": 133100,
+      "mae_difference_m": 40.11698326502653,
+      "fraction_of_global_net_error_difference": 0.5520545229093109
+    },
+    "anchor_inside_support__two_or_more": {
+      "point_count": 25899,
+      "mae_difference_m": 34.17181346226684,
+      "fraction_of_global_net_error_difference": 0.09150117523717555
+    },
+    "anchor_outside_helper_supported__one": {
+      "point_count": 36204,
+      "mae_difference_m": 34.26120703118727,
+      "fraction_of_global_net_error_difference": 0.12824335318037963
+    },
+    "anchor_outside_helper_supported__two_or_more": {
+      "point_count": 54565,
+      "mae_difference_m": -9.048724675277981,
+      "fraction_of_global_net_error_difference": -0.051047818005829596
+    },
+    "predicted_group_no_support__zero": {
+      "point_count": 28541,
+      "mae_difference_m": -4.78492328514767,
+      "fraction_of_global_net_error_difference": -0.014119516147526939
+    }
+  },
+  "exploratory_scene_sensitivity": {
+    "scope": "Post-result descriptive sensitivity only; does not alter the complete-population result, frozen screen, model choice or evaluation population.",
+    "preserved_vs_linear_mae": {
+      "largest_scene_net_degradation_share": 0.07265616871463579,
+      "largest_scene_id": "3772",
+      "exclude_top_10_rule": "For each scene compute (preserved point MAE - linear point MAE) * covered points; sort descending and exclude the first ten. Recompute the point-weighted MAE difference over all remaining scene rows.",
+      "remaining_mae_difference_after_excluding_top_10_m": 17.612759498848693,
+      "interpretation": "The complete-population MAE degradation is not driven only by the largest adverse scene or the ten largest adverse scene contributions."
+    },
+    "preserved_vs_linear_sse": {
+      "complete_population_sse_difference_m2": -38619048815.84083,
+      "scene_3035_sse_difference_m2": -44041036784.98424,
+      "scene_3035_fraction_of_net_sse_difference": 1.1403967248131552,
+      "excluding_3035_linear_rmse_m": 2928.5099500431406,
+      "excluding_3035_preserved_rmse_m": 2930.6195898228757,
+      "interpretation": "The small pooled RMSE advantage is sensitive to scene3035: that scene contributes114.04% of the net SSE reduction, and the RMSE direction reverses after excluding it. A share above100% reflects offsetting deterioration elsewhere; it is not causal attribution. No analogous leave-one-scene-out P99 was computed without raw point arrays."
+    },
+    "outside_largest_component": {
+      "point_count": 109365,
+      "linear_mae_m": 866.4773967119845,
+      "shuffled_mae_m": 870.6582054660234,
+      "preserved_mae_m": 893.1554573665136,
+      "linear_rmse_m": 4820.735994214255,
+      "preserved_rmse_m": 4828.36508262678
+    }
+  },
+  "sampled_training_window_description": {
+    "shuffled_all_4000_updates_linear_mean": 2.417440151451645,
+    "preserved_all_4000_updates_linear_mean": 2.3997795359938023,
+    "shuffled_last_1000_updates_linear_mean": 2.0608491756630314,
+    "preserved_last_1000_updates_linear_mean": 2.0116687331757808,
+    "method": "Arithmetic mean of equal100-successful-update window means, using the paired original batches.",
+    "interpretation": "Preserved has slightly lower sampled training loss but worse V MAE. Different windows contain different random batches; these are not fixed-probe convergence curves and do not locate or prove overfitting, convergence or a benefit from extra training."
+  },
+  "returned_execution_evidence": {
+    "parameter_count_each_arm": 109042,
+    "parameter_decomposition": {
+      "original_transformer": 105154,
+      "pointwise_helper_branch": 2448,
+      "bidirectional_gru": 1440
+    },
+    "successful_updates_each_arm": 4000,
+    "sampled_anchors_each_arm": 32000,
+    "valid_T_position_exposures_each_arm": 1566596,
+    "paired_common_initial_parameters_and_batches": true,
+    "paired_added_initial_parameters": true,
+    "independent_route_rng_and_actual_routes_verified": true,
+    "T_planned_changed_slots_each_arm": 2081585,
+    "T_applied_changed_slots": {
+      "shuffled": 2081585,
+      "preserved": 0
+    },
+    "V_planned_changed_slots_each_arm": 579887,
+    "V_applied_changed_slots": {
+      "shuffled": 579887,
+      "preserved": 0
+    },
+    "phi_nonzero_gradient_updates_each_arm": 3998,
+    "temporal_nonzero_gradient_updates_each_arm": 3998,
+    "initial_torch_rng_exact_checked": false,
+    "local_provenance_limit": "These execution and parameter checks are returned server evidence inspected against the contract, not locally repeated checkpoint/JSONL/NPZ proofs."
+  },
+  "remaining_receipt_correction": {
+    "file": "../../S2L-20261024-087B.md",
+    "location": "Final server erratum, item3",
+    "original_wording": "机会区内单 helper 子集约 −34.26 m 退化",
+    "correct_wording": "机会区内单 helper 子集约 +34.26 m 退化",
+    "computed_difference_m": 34.26120703118727,
+    "impact": "Sign typo only; the qualitative deterioration and closure decision are unchanged. Original S2L is preserved."
+  },
+  "interpretation_boundaries": [
+    "Same-capacity A/B arms cannot identify extra parameter count as the cause of their difference.",
+    "Routing changes in both training and evaluation; this experiment does not isolate the causal effect of either stage alone.",
+    "Nonzero branch gradients establish participation in optimization, not successful identity or reliability learning.",
+    "A single failed recipe does not establish that temporal correspondence is universally useless or never used by the network.",
+    "087 preserves complete input and physical priors; its predominantly additional-harm failure should not be equated with083's deletion intervention or089's T-prior changes.",
+    "Repeated V use, shared identities and one training seed limit generalization claims; 38 components are not independent training replications.",
+    "The favorable multi-helper opportunity cell is post-result descriptive evidence and does not override the failed predeclared strong-baseline screen.",
+    "No new model run, diagnostic request, endpoint selection, population exclusion for acceptance, or test-set access follows from this review."
+  ]
+}
