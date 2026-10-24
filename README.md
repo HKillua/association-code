@@ -6,7 +6,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 
 日常开发和服务器回传统一使用 **`main`**；本地工作目录为 `/Users/a1/Projects/association-code`。历史研究分支已合入main并退役，实验按提交保留，不再维护多条长期分支。
 
-Post088冻结e718fca。091A/B及CPU表已完成并复核：位置MAE734.6245／740.8373m，未胜fixed.95的721.1745m，按预定出口关闭目标桥接。090A/B改善未达3%，C及完整表待回；095已结案。按最新回执093A/B、090C、094A运行中，094B排队。状态见[交接](HandOver/Handover.md)，判断见[091审查](docs/research_status.md#091ab目标桥接结案复核2026-10-25)。633项软件检查不等于新模型成绩，默认056＋原linear、T_test封存与066 REJECTED保持。
+Post088冻结e718fca。090完整三臂表已复核：A/B未过3%及对C预算控制，固定adapter配方结案；C虽MAE564.8340m最低，RMSE却退化，不自动晋升。091目标桥接、095审计也已结案。仅093A/B、094A/B及两组CPU表待回，按原合同继续。状态见[交接](HandOver/Handover.md)，判断见[090完整审查](docs/research_status.md#090三臂预算对照与结案2026-10-25)。默认056＋原linear、T_test封存与066 REJECTED保持，软件633项通过不等于实验成功。
 
 ## 现在看哪里
 

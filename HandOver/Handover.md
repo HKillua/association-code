@@ -1,26 +1,28 @@
 # 当前交接
 
-## 091目标桥接结案；等待090C与补全下游配对
+## 090与091已结案；仅待093/094补全下游价值
 
-北京时间2026-10-25，本地同步`eb3a827`并复核091A/B与双臂CPU表：**三项COMPLETED、执行验收；两臂均未胜fixed.95／072C，按冻结出口关闭本次目标桥接，不扫alpha／学习率／步数，不补seed。** 090A/B及095已结案的阶段判断不变；090C及其CPU三臂表、093A/B与094A/B仍按原合同完成。统一实施冻结e718fca保持，无新增训练。
+北京时间2026-10-25，本地同步`7cc8252`并完成090C与CPU三臂整表复核：**090A/B/C及整表全部COMPLETED并执行验收，固定adapter配方关闭，不补seed／容量／作用域／步数。** C的MAE564.8340m优于A/B，但RMSE比072C差33.3156m；A/B未过原3%和对C预算控制。091、095已结案。仅093A/B与094A/B及两组CPU配对表仍待回，统一实施e718fca、原合同及预算保持，无新增训练。
 
-来源为[090A回执](S2L-20261024-090A.md)、[090B回执](S2L-20261024-090B.md)、[095回执](S2L-20261024-095.md)，研究解释以[本地复核](../docs/research_status.md#090ab与095阶段结果复核2026-10-24)为准。状态来自最新Git回执，不是本地实时监控；旧092禁止领取，T_test封存、066保持REJECTED。
+来源为[090C回执](S2L-20261024-090C.md)、[090完整表](S2L-20261024-090-summary.md)及原090A/B记录，研究解释以[完整结案复核](../docs/research_status.md#090三臂预算对照与结案2026-10-25)为准。状态来自最新Git回执，不是本地实时监控；旧092禁止领取，T_test封存、066保持REJECTED。
 
 | 任务 | 当前状态与本地决定 |
 |---|---|
 | [090A](L2S-20261024-090.md) | **COMPLETED，执行验收；科学晋级未通过**。4000更新、teacher冻结、源初值/曝光和V300通过；MAE574.2785m。A按合同允许修改全部query，inside变化不是违规，不可据此“修复A保护”。 |
-| [090B](L2S-20261024-090.md) | **COMPLETED，执行验收；科学晋级未通过**。MAE580.8091m，inside逐值保持；完整三臂表仍待C。无支撑区MAE净+0.155m不等于预测几乎不动，正负误差变化有抵消。见[复核记录](results/LEVEL1-FROZEN-ADAPTER-20261024-090B/local-review.json)。 |
+| [090B](L2S-20261024-090.md) | **COMPLETED，执行验收；科学晋级未通过**。MAE580.8091m，inside逐值保持；完整三臂表已验收，对C预算控制未通过。无支撑区MAE净+0.155m不等于预测几乎不动，正负误差变化有抵消。见[复核记录](results/LEVEL1-FROZEN-ADAPTER-20261024-090B/local-review.json)。 |
 | [093A/B](L2S-20261024-093.md) | **RUNNING，按最新回执**。learned/hold TFM于13:40:27／13:42:09UTC领取，各1000更新；保持原协议，不因090结果改设置。 |
 | [091A/B](L2S-20261024-091.md) | **A/B及CPU配对表COMPLETED，执行验收，配方关闭**。位置MAE734.6245／740.8373m，仍差于fixed.95的721.1745m；两项screen各自均false。B−A MAE+6.2129m，294/300场及38/38组件更差，但P99略好，不能称全指标零收益。校准/探针解释见[本地复核](../docs/research_status.md#091ab目标桥接结案复核2026-10-25)及[精简审计](results/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091-summary/local-review.json)。不重领。 |
-| [090C](L2S-20261024-090.md) | **COMPLETED，执行验收；追加预算对照已交付**。090A终态并确认index0释放后按FIFO接入：逐字块sha256 `cd750f42…`（task_arm=090C→full-finetune），`GPU-c5a00c37`(index0，快照24,247MiB／util0%)、CPU4、4h未触，单元`mtad-7eac118c9bb2.service`，15:39:04Z提交、16:38:35Z退出0（launcher 3,571.735 s／程序3,563.590 s）。105,154参数**全部可训练**（teacher_unchanged=false），配对072C `source_final_parameters_exact`／`initial_sampler_rng_exact`／4000batch／`sampling_exposure_exact` 全true，`clipped_updates=4000/4000`、峰值19.5MiB。**590.7436→564.8340 m（−25.9096，改善4.3859%），但RMSE +33.3156；P95 −70.5867、P99 −68.6443**，四加权与最大组件外（866.4774→833.5450）皆改善，259/300场、31/38组件；support内部237.6874→234.1698（全模型微调会改支撑区）。`predeclared_method_candidate=false`、`original072C_screen_passed=false`，**是对照不是候选**：单纯追加4000预算的MAE收益大于A（−16.4650）与B（−9.9345），尾部A/B略优。**三臂CPU表已完成**（`mtad-f1721591695a`，227.046 s、退出0、零前向、`PAIR_VERIFIED`、`initial_output_source_final_exact=true`、`protected_inside_teacher_exact=true`）：全方法点等权 MAE 为 linear 590.7436／A 574.2785／B 580.8091／**C 564.8340**，四种加权与最大组件外（866.4774／848.1350／854.9651／833.5450）均为 C 最优；程序对两臂均记 `added_budget_control_passed=false`（A−C +9.4445、B−C +15.9751，仅 RMSE 优约36 m）。见[090C回执](S2L-20261024-090C.md)、[三臂联表](S2L-20261024-090-summary.md) |
+| [090C](L2S-20261024-090.md) | **C及完整三臂CPU表COMPLETED，执行验收，090配方结案**。fresh Adam全模型追加4000更新，MAE564.8340m（−4.3859%），但RMSE+33.3156m；仍只改变位置，速度／航向沿Mean。A/B MAE均未胜C，仅RMSE更低，不能称稳定尾部优势；C也未通过原物理筛选，不自动替换默认072C。见[回执](S2L-20261024-090C.md)、[整表](S2L-20261024-090-summary.md)、[本地复核](results/LEVEL1-FROZEN-ADAPTER-20261024-090-summary/local-review.json)及[结案判断](../docs/research_status.md#090三臂预算对照与结案2026-10-25)。不重领。 |
 | [094A/B](L2S-20261024-094.md) | **A/B均RUNNING**。A：091B终态并确认index1释放后按FIFO接入，逐字块sha256 `8c4349c5…`（task_arm=094A→learned），`GPU-6811d9c0`(index1，快照24,247MiB／util0%)、CPU4、8h仅提醒，单元`mtad-91693675b597.service`，15:43:34Z提交。B：090C终态并确认index0释放（unit inactive、显存12MiB）后接入，同块（task_arm=094B→state_hold），`GPU-c5a00c37`(index0，快照24,247MiB／util0%)，单元`mtad-194bf23e185c.service`，16:39:18Z提交。两臂来源前检均READY_DEPENDENCIES（phase tam，绑定088），仅TAM4000＋T-only校准margin与原阈值协议；五臂队列至此全部领取完毕。 |
 | [095](L2S-20261024-095.md) | **COMPLETED，执行验收并结案**。原件24599片段→300场/38组件闭合；零权重/原卷/前向。组件等权与组件外的query方向反转高度依赖4335，不能泛化。见[复核](results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/local-review.json)。不重跑。 |
 
 **回执解释勘误（原S2L保留）：** 只有090B要求inside精确保护，A的全query行为符合合同；B无支撑区平均净差很小但平均绝对误差变化约82.88m。095标题把query组件等权结果误写为“一步”，真正一步组件等权model仍更差；query宏平均、before和最大组件外的方向反转不能脱离4335单场贡献解读。以上均不要求修改生产代码、放宽门槛或另开诊断。
 
-当前四个运行槽为093A/B、094A与094B；090C已终态，队列已空（本轮五臂＋091两臂全部领取）。全局最多四个已领取单卡，现场FIFO/实际资源；CPU联表错峰。090完整表待A/B/C；093/094各待本族两臂成功后执行，各一次，不能用缺失控制宣布晋级。091及其CPU表、095均不再是待回项。
+当前四个运行槽为093A/B、094A/B，本批九GPU臂均已领取、无未领取队列。093/094各待本族两臂成功后执行一次CPU表；090/091及各自CPU表、095已结案，不再领取或轮询原任务。全局最多四单卡，现场FIFO/实际资源，CPU/I/O错峰。
 
 **091新增解释边界：** 初始数据项均值已按T完整曝光校准匹配，alpha数值含单位，低alpha／少裁剪不能证明监督被压弱。固定T探针的数据项略差，但L2大幅下降，完整正则化目标仍改善；小净MAE变化不等于预测不动。原平方目标换线性确实缓解了旧086B退化，但不足以形成有效候选；不据此添加新的L2或校准消融。原S2L保留，当前解释以[本地审查](../docs/research_status.md#091ab目标桥接结案复核2026-10-25)为准。
+
+**090新增勘误（不改原S2L）：** C只预测二维位置残差，不改速度／航向。其`original072C_screen_passed=false`数值原因是RMSE退化，非候选标签另管资格。C对072C的改善I为28912098.4m、伤害H为17453251.1m，原整表正文写反；同一072C参照的>10000m额外伤害点为A0/B0/C36，不混用A/B对C的17/20。C是fresh Adam＋重放样本＋全参数更新的总策略，未赢C不证明A/B的全部收益均由预算造成。详见[结案审查](../docs/research_status.md#090三臂预算对照与结案2026-10-25)。
 
 ### 来源、验收与回传
 
