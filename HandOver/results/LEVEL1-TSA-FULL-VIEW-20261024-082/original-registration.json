@@ -1,0 +1,178 @@
+{
+ "registered_at_utc": "2026-10-24T00:05:21.056421Z",
+ "note": "082原件保留服务器：fit权重、逐调用JSONL、final-scores、data_audit.json、system逐场NPZ/scene-summary/score-diagnostics 与未压缩的 system/summary.json 均不回传。Git内 system-summary.json.gz 是该未压缩原件的gzip副本，gunzip逐字节相同（sha256见下）；其余回传件为逐字节复制。Git回传不含本清单自身。 fit/run.json（4,240,157B 未压缩，含逐场景/逐锚点曝光与逐batch配对报告）以 fit-run.json.gz gzip副本回传并逐字节校验；fit/training-windows.json 仍为逐字节复制。",
+ "system_summary_original_sha256": "95f5b788e4f1bfc2d5e6ed6a1a8e003e38fa7032dab2a603a7addc9a14f946d0",
+ "system_summary_gunzip_equals_original": true,
+ "server_originals": [
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/run.json",
+   "bytes": 1354,
+   "mtime_utc": "2026-10-23T23:59:50.310640Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/summary.json",
+   "bytes": 411219,
+   "mtime_utc": "2026-10-23T23:59:50.310640Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/execution.json",
+   "bytes": 1690,
+   "mtime_utc": "2026-10-23T23:59:50.314640Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/final-endpoint.json",
+   "bytes": 478025,
+   "mtime_utc": "2026-10-23T23:51:21.510876Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/data_audit.json",
+   "bytes": 1368096,
+   "mtime_utc": "2026-10-23T23:45:37.591049Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/fit/run.json",
+   "bytes": 4240157,
+   "mtime_utc": "2026-10-23T23:49:33.066929Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/fit/training-windows.json",
+   "bytes": 1951,
+   "mtime_utc": "2026-10-23T23:49:32.762929Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/fit/final.pt",
+   "bytes": 5822318,
+   "mtime_utc": "2026-10-23T23:49:32.758929Z",
+   "note": "权重／逐调用日志／normalizer 留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/fit/step-0.pt",
+   "bytes": 1985066,
+   "mtime_utc": "2026-10-23T23:45:57.827039Z",
+   "note": "权重／逐调用日志／normalizer 留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/fit/training.jsonl",
+   "bytes": 134336330,
+   "mtime_utc": "2026-10-23T23:49:32.382930Z",
+   "note": "权重／逐调用日志／normalizer 留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/fit/pool-audit.json",
+   "bytes": 336,
+   "mtime_utc": "2026-10-23T23:45:55.307040Z",
+   "note": "074D侧pool审计引用原件"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/final-scores",
+   "bytes": 25511501,
+   "files": 301,
+   "note": "评分与view明细留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/system/predictions",
+   "bytes": 247532658,
+   "files": 300,
+   "note": "六臂逐场预测NPZ留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/system/system-predictions",
+   "bytes": 332591237,
+   "files": 300,
+   "note": "系统逐场预测NPZ留服务器"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/system/run.json",
+   "bytes": 542,
+   "mtime_utc": "2026-10-23T23:59:49.630641Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/system/summary.json",
+   "bytes": 18505912,
+   "mtime_utc": "2026-10-23T23:59:12.082658Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/system/scene-summary.json.gz",
+   "bytes": 14449292,
+   "mtime_utc": "2026-10-23T23:59:49.630641Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1/system/score-diagnostics.json.gz",
+   "bytes": 1256922,
+   "mtime_utc": "2026-10-23T23:59:10.698658Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1-launch/status.json",
+   "bytes": 528,
+   "mtime_utc": "2026-10-23T23:59:51.466640Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-23T23:59:51.466640Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1-launch/request.json",
+   "bytes": 1572,
+   "mtime_utc": "2026-10-23T23:33:53.103498Z"
+  },
+  {
+   "path": "runs/LEVEL1-TSA-FULL-VIEW-20261024-082-attempt-1-launch/launch.json",
+   "bytes": 1309,
+   "mtime_utc": "2026-10-23T23:33:53.227498Z"
+  }
+ ],
+ "server_originals_total_bytes": 788498017,
+ "git_returned": [
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/082-key-metrics.json",
+   "bytes": 36678,
+   "mtime_utc": "2026-10-24T00:05:46.210481Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/execution.json",
+   "bytes": 1690,
+   "mtime_utc": "2026-10-24T00:04:31.870514Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/final-endpoint.json",
+   "bytes": 478025,
+   "mtime_utc": "2026-10-24T00:04:31.870514Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/fit-run.json.gz",
+   "bytes": 945325,
+   "mtime_utc": "2026-10-24T00:06:12.410470Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/run.json",
+   "bytes": 1354,
+   "mtime_utc": "2026-10-24T00:04:31.870514Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/summary.json",
+   "bytes": 411219,
+   "mtime_utc": "2026-10-24T00:04:31.870514Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/system-run.json",
+   "bytes": 542,
+   "mtime_utc": "2026-10-24T00:04:33.070514Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/system-summary.json.gz",
+   "bytes": 1112886,
+   "mtime_utc": "2026-10-24T00:04:32.946514Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-TSA-FULL-VIEW-20261024-082/fit/training-windows.json",
+   "bytes": 1951,
+   "mtime_utc": "2026-10-24T00:04:31.878514Z"
+  }
+ ],
+ "git_returned_total_bytes": 2989670,
+ "git_returned_file_count": 9,
+ "note_key_metrics": "082-key-metrics.json 已剔除 per_scene／scene_ids／scores／components 大列表（完整逐场与组件在服务器原件 system/summary.json，其gzip副本 system-summary.json.gz 已回传），只保留聚合与组件计数。",
+ "fit_run_original_sha256": "cba4f72b513890b44bb836e21d2f96b8e7a30664e1a11afd51897c7fca9182b2",
+ "fit_run_gunzip_equals_original": true
+}
