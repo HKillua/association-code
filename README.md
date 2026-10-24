@@ -60,4 +60,4 @@ python -m unittest discover -s tests
 
 078A/B/C和080全部完成并复核：[078/080审查与下一步](docs/research_status.md#078080完成复核与081082决定2026-10-24)。078C仅比原linear低1.60m，场景等权和部分尾部反向，未晋级；相对初值累计伤害下降有复验线索。080不支持“T强V弱”，类先验与候选组成需分别解释。下一轮081只补pre/weighted两臂匹配seed，082只改TSA训练视图crop→full；不为第四空卡追加任务。实现及实际领取状态见[交接索引](HandOver/Handover.md)，push不代表已启动。
 
-082已完成并复核：full训练改善当前TSA适配，但位置覆盖仍仅34.24%，按预定条件暂停，不自动加步；081A/B已领取仍待终态。见[082审查](docs/research_status.md#082验收与暂停决定2026-10-24)。
+081A/B与整表已完成并复核：weighted相对pre在第二seed的MAE增加16.381m、RMSE增加30.641m、H增加31.23%，四项预定出口均失败；关闭当前配方、不追加第三seed。082当前TSA适配亦暂停。**当前无RUNNING／新READY，默认仍为056关联＋原线性Transformer。** 见[081收尾](docs/research_status.md#081双seed收尾与阶段决定2026-10-24)；强领域baseline缺口与T_test封存状态保持。
