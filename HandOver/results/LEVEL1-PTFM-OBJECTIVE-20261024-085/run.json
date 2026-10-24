@@ -1,0 +1,18 @@
+{
+  "scope": "085-ptfm-objective-cache-audit",
+  "status": "COMPLETED",
+  "direct": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-20261023-074C-attempt-1",
+  "residual": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1",
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "checkpoints_opened": false,
+  "raw_archives_opened": false,
+  "test_opened": false,
+  "cpu_threads": 4,
+  "old066_acceptance": "REJECTED",
+  "current_ptfm_recipes": "CLOSED",
+  "advisory_reached": false,
+  "phase": "completed",
+  "completed_scenes": 300,
+  "elapsed_seconds": 178.66752933198586
+}
