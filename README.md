@@ -6,7 +6,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 
 日常开发和服务器回传统一使用 **`main`**；本地工作目录为 `/Users/a1/Projects/association-code`。历史研究分支已合入main并退役，实验按提交保留，不再维护多条长期分支。
 
-083–089均已结案；088一遍TCM端点执行验收，但原生一步feature MSE比state_hold高71.35%，自然query支撑外高20.93%，不等于已知最终任务效果。旧未发布092撤销，按[088后重设计](docs/specs/post088-completion-value.md)改为093学习补全/状态保持的TFM配对、094同策略TAM配对，095零前向原件审计；090三臂与091两臂保留。共九个GPU作业、最多四个已领取单卡；首轮090A、090B、093A、093B，后续091A、091B、090C、094A、094B。冻结、发布、领取只认[当前交接](HandOver/Handover.md)，新训练成绩尚不存在。默认仍056关联＋原linear，完整强领域baseline与TCM训练充分性均未补齐。
+Post088包已完成本地对抗性审查与必要修复，**633项全仓测试通过**。统一执行冻结`e718fca51be65992efd94e3f85a1d482637f2f93`；首轮四卡090A、090B、093A、093B，后续091A、091B、090C、094A、094B，095独立CPU审计；旧092已撤销。具体[审查结论](docs/reports/2026-10-24-post088-integration-review.md)与[当前交接](HandOver/Handover.md)包含终点、来源和失败停止条件。READY与push不表示服务器已运行，新Level1效果尚未知；默认仍056＋原linear，完整强领域baseline与TCM充分性仍未补齐。
 
 ## 现在看哪里
 
