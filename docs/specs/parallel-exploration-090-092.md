@@ -98,7 +98,7 @@ TAM当前算法实际整批pair64计算关联loss；配置中的pair_microbatch8
 
 ## 7. 实现验收与交付状态
 
-对应合同为[090](frozen-position-adapter-090.md)、[091](ptfm-position-objectives-091.md)、[092](level1-tmtaff-downstream-092.md)。2026-10-24三线实现、实际focused检查与独立审查已完成；冻结提交由随后的L2S发布记录引用。验收覆盖：
+对应合同为[090](frozen-position-adapter-090.md)、[091](ptfm-position-objectives-091.md)、[092](level1-tmtaff-downstream-092.md)。2026-10-24三线实现、实际focused检查与独立审查已完成；实际冻结代码为`0d1f817b6fd8f40dbd6f7b6fb9b4e9a386c71427`，L2S发布记录引用该版本。验收覆盖：
 
 | 接受条件 | 验证证据 |
 |---|---|
