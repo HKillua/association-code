@@ -62,11 +62,20 @@ def declared_manifest():
     return read_json(ROOT/'configs/data/mtad-level1-scene3000.json')
 
 
-def adapter_metadata(path):
-    from tools.experiments.frozen_position_adapter_fit import frozen_configuration
+def adapter_metadata(path, *, profile='090'):
+    if profile == '090':
+        from tools.experiments.frozen_position_adapter_fit import frozen_configuration
+    elif profile == '097':
+        from tools.experiments.sequence_budget_replication import frozen_configuration, SCOPE
+    else:
+        raise ValueError('unknown added-budget comparison profile')
     path = Path(path).resolve()
     run, summary, fit = [read_json(path/name) for name in ('run.json', 'summary.json', 'fit/run.json')]
     config = frozen_configuration(run['configuration']); steps = config['training']['updates']
+    if profile == '097' and (run.get('scope') != SCOPE or summary.get('scope') != SCOPE
+            or run.get('experiment_id') != '097A' or summary.get('experiment_id') != '097A'
+            or config['model']['mode'] != 'full_finetune'):
+        raise ValueError('097 comparison accepts only its declared second-seed full-finetune arm')
     manifest = declared_manifest()
     for record in (run, summary, fit):
         if (record.get('status') != 'COMPLETED' or record.get('configuration') != config
@@ -281,6 +290,12 @@ def screen(summary, scenes, method):
 
 def run(args):
     if args.cpu_threads != 4: raise ValueError('090 CPU comparison requires CPU4')
+    profile = getattr(args, 'profile', '090')
+    if profile not in ('090', '097'):
+        raise ValueError('unknown added-budget comparison profile')
+    if profile == '097' and (getattr(args, 'all_run', None) or getattr(args, 'missing_run', None)
+                             or not getattr(args, 'finetune_run', None)):
+        raise ValueError('097 compares only full-finetune097A with its own073C baseline')
     torch.set_num_threads(4); output = Path(args.output).resolve()
     paths = [Path(v).resolve() for v in (getattr(args, k, None) for k in ('all_run', 'missing_run', 'finetune_run')) if v]
     if not paths: raise ValueError('090 comparison requires at least one completed new arm')
@@ -297,9 +312,10 @@ def run(args):
     state = dict(status='RUNNING', completed_scenes=0, model_forwards=0, optimizer_updates=0, test_opened=False)
     write_json(output/'run.json', state)
     try:
-        arms = {'linear': _metadata(reference, '072C_transformer4000')}
+        source_arm = '072C_transformer4000' if profile == '090' else '073C_transformer4000_seed21'
+        arms = {'linear': _metadata(reference, source_arm)}
         for path in paths:
-            name, arm = adapter_metadata(path)
+            name, arm = adapter_metadata(path, profile=profile)
             if name in arms: raise ValueError('090 repeated arm in comparison')
             arms[name] = arm
         first = arms['linear']
@@ -333,13 +349,29 @@ def run(args):
                 whole_group_and_aligned_arrays_reconstructed=True, quantiles_from_full_error_arrays=True,
                 candidate=False, model_forwards=0, training_updates=0),
             interpretation='Additional-budget frozen-teacher adaptation and full fine-tuning. Reused V/shared identities/single seed; no independent significance or convergence claim.')
-        summary['scientific_screen'] = {name: screen(summary, scene_rows, name) for name in arms if name != 'linear'}
+        if profile == '090':
+            summary['scientific_screen'] = {name: screen(summary, scene_rows, name) for name in arms if name != 'linear'}
+        else:
+            # Keep the old 090 nomination/screen exclusive to its own experiment.
+            table = summary['position_weightings']['all']
+            baseline, final = table['linear']['point_equal'], table['finetune']['point_equal']
+            summary['budget_characterization'] = dict(source_identity='073C', seed=20261021,
+                source_updates=pairing['matched_updates'], added_updates=pairing['matched_updates'],
+                total_stage_updates=2*pairing['matched_updates'], fresh_adam=True,
+                original_sample_replay=True, default_promoted=False,
+                relative_mae_reduction=1-final['mae']/baseline['mae'],
+                deltas={key: final[key]-baseline[key] for key in ('mae', 'rmse', 'p95', 'p99')},
+                interpretation='Fixed second-seed budget sensitivity, not a new-method screen or convergence claim.')
+        summary.update(comparison_profile=profile, source_reference_arm=source_arm)
         write_json_gzip(output/'summary.json.gz', summary); write_json_gzip(output/'scene-summary.json.gz', scene_rows)
-        table = ['# 090 强模型保持、缺失区修正与追加预算对照', '', '| 方法 | MAE m | RMSE m | P95 m | P99 m |', '|---|---:|---:|---:|---:|']
+        title = '# 090 强模型保持、缺失区修正与追加预算对照' if profile == '090' else '# 097A 强基线第二seed追加预算敏感性'
+        table = [title, '', '| 方法 | MAE m | RMSE m | P95 m | P99 m |', '|---|---:|---:|---:|---:|']
         for name in methods:
             metric = summary['position_weightings']['all'][name]['point_equal']
             table.append('| '+name+' | '+' | '.join(f'{metric[k]:.6f}' for k in ('mae', 'rmse', 'p95', 'p99'))+' |')
-        table += ['', 'A/B 的 initial 是072C final；新增4000成功更新使用 fresh Adam。posthoc_mask_A只是固定的零训练控制。',
+        explanation = ('A/B 的 initial 是072C final；新增4000成功更新使用 fresh Adam。posthoc_mask_A只是固定的零训练控制。'
+            if profile == '090' else '097A initial 为073C final，fresh Adam追加4000并重放原采样；速度/航向保持Mean。不作自动晋级或收敛声明。')
+        table += ['', explanation,
             '完整人口、三互斥支撑区、四权重、H/I、逐场/身份组件及最大组件外见 JSON；不按区域择优。']
         (output/'report.md').write_text('\n'.join(table)+'\n')
         state.update(status='COMPLETED', population=summary['population']); write_json(output/'run.json', state)

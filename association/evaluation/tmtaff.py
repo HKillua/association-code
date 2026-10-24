@@ -111,12 +111,54 @@ def _inference_device(device, model_device, fusion_device):
     return requested
 
 
+def predicted_observed_controls(values, observed, groups):
+    """Anchor and equal-visible-node mean on the same predicted partition.
+
+    Query-aligned physical values are available only within observed support.
+    For native inputs these include deterministic interpolation of the selected
+    native observations; they are not all measured samples. No reference,
+    identity, latent completion, extrapolation or group repair is used.
+    Longitude/heading use circular means; an undefined circular mean stays
+    unavailable rather than inventing an angle or deleting the group.
+    """
+    values, observed = np.asarray(values), np.asarray(observed)
+    result = {'predicted_anchor': [], 'predicted_mean': []}
+    for members in groups:
+        anchor = members[0]
+        result['predicted_anchor'].append(dict(node_indices=members,
+            states=values[anchor].copy(),
+            prediction_valid=np.repeat(observed[anchor, :, None], 4, axis=1)))
+        selected, mask = values[members], observed[members]
+        count = mask.sum(axis=0)
+        valid = np.repeat((count > 0)[:, None], 4, axis=1)
+        mean = np.full(values.shape[1:], np.nan, dtype=np.float64)
+        for column in (0, 2):
+            summed = np.where(mask, selected[..., column], 0.).sum(axis=0)
+            mean[:, column] = np.where(count > 0, summed / np.maximum(count, 1), np.nan)
+        for column in (1, 3):
+            radians = np.deg2rad(np.where(mask, selected[..., column], 0.))
+            sine = np.where(mask, np.sin(radians), 0.).sum(axis=0)
+            cosine = np.where(mask, np.cos(radians), 0.).sum(axis=0)
+            available = (count > 0) & (np.hypot(sine, cosine) > 1e-12 * count)
+            angle = np.rad2deg(np.arctan2(sine, cosine))
+            angle = (angle + 180) % 360 - 180 if column == 1 else angle % 360
+            mean[:, column] = np.where(available, angle, np.nan)
+            valid[:, column] = available
+        # Position is a paired latitude/longitude measurement.
+        valid[:, :2] &= valid[:, 1, None]
+        mean[~valid] = np.nan
+        result['predicted_mean'].append(dict(node_indices=members,
+            states=mean, prediction_valid=valid))
+    return result
+
+
 @stable_evaluation_parameters
 @torch.inference_mode()
 def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       batch_tracks, pair_batch_size, select_on_validation,
                       threshold, singleton_policy, check=None, progress=None,
-                      prediction_writer=None, oracle_only=False):
+                      prediction_writer=None, oracle_only=False,
+                      association_records=None, predicted_controls=False):
     """Return full-V association plus predicted/oracle/simple/single-source fusion.
 
     ``singleton_policy`` is explicitly 'missing' or 'observed'. The latter
@@ -136,11 +178,21 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     Explicit oracle_only skips TAM entirely and evaluates only true-identity
     fusion and its ordinary controls; it is a component diagnostic, not a
     predicted-association system result.
+    Explicit association_records reuses a completed, caller-bound TAM score
+    cache. All scene/candidate fields are checked against prepared inputs; no
+    new TAM scoring or threshold selection occurs. Explicit predicted_controls
+    adds physical support-interpolation controls on the identical partition.
     """
     if not isinstance(oracle_only, bool):
         raise ValueError('oracle_only must be boolean')
     if oracle_only and (select_on_validation or threshold is not None):
         raise ValueError('oracle_only excludes association scoring and threshold selection')
+    if not isinstance(predicted_controls, bool):
+        raise ValueError('predicted_controls must be boolean')
+    if oracle_only and (association_records is not None or predicted_controls):
+        raise ValueError('oracle_only excludes predicted records and controls')
+    if association_records is not None and select_on_validation:
+        raise ValueError('cached TAM scores require the original fixed threshold')
     for value in (batch_tracks, pair_batch_size):
         if isinstance(value, bool) or not isinstance(value, int) or value < 1:
             raise ValueError('inference batch sizes must be positive integers')
@@ -155,6 +207,17 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     scenes = list(scenes)
     if not scenes or len({str(s['scene_id']) for s in scenes}) != len(scenes):
         raise ValueError('a nonempty list of distinct validation scenes is required')
+    cached_records = None if association_records is None else list(association_records)
+    if cached_records is not None:
+        if len(cached_records) != len(scenes):
+            raise ValueError('cached TAM scores omit validation scenes')
+        from association.evaluation.association import _records
+        _records(cached_records)
+        for scene, record in zip(scenes, cached_records):
+            for key in ('scene_id', 'component_id', 'node_ids', 'identities', 'sources',
+                        'intervals', 'pairs', 'labels'):
+                if not np.array_equal(np.asarray(scene[key]), np.asarray(record[key])):
+                    raise ValueError('cached TAM input/candidate population differs: ' + key)
     adapter = getattr(model, 'input_adapter', 'registered_v1')
     if any(scene.get('input_adapter', 'registered_v1') != adapter for scene in scenes):
         raise ValueError('all validation scenes must match the model input adapter')
@@ -186,7 +249,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                 check()
             latent = model.complete(torch.as_tensor(x[offset:offset+batch_tracks], device=device, dtype=dtype),
                                     torch.as_tensor(mask[offset:offset+batch_tracks], device=device))
-            embedding = None if oracle_only else model.tam_encoder(latent).flatten(1)
+            embedding = (None if oracle_only or cached_records is not None
+                         else model.tam_encoder(latent).flatten(1))
             if not torch.isfinite(latent).all() or (embedding is not None and not torch.isfinite(embedding).all()):
                 raise FloatingPointError('nonfinite completed or association features')
             completed.append(latent.cpu())
@@ -200,14 +264,15 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         if len(pairs) and ((pairs < 0).any() or (pairs >= len(x)).any() or (pairs[:, 0] >= pairs[:, 1]).any()):
             raise ValueError('invalid candidate pair')
         scores = []
-        for offset in range(0, 0 if oracle_only else len(pairs), pair_batch_size):
+        for offset in range(0, 0 if oracle_only or cached_records is not None else len(pairs), pair_batch_size):
             if check:
                 check()
             nodes, inverse = np.unique(pairs[offset:offset+pair_batch_size], return_inverse=True)
             value = model.score_pairs(embeddings[nodes].to(device), inverse.reshape(-1, 2))
             scores.append(value.cpu().numpy())
         record = {key: scene[key] for key in ('scene_id', 'component_id', 'node_ids', 'identities', 'sources', 'intervals', 'labels')}
-        record.update(pairs=pairs, scores=np.concatenate(scores) if scores else np.empty(0))
+        record.update(pairs=pairs, scores=(np.asarray(cached_records[scene_index]['scores']).copy()
+            if cached_records is not None else np.concatenate(scores) if scores else np.empty(0)))
         records.append(record)
         cached.append(latents)
         report_progress('completion' if oracle_only else 'association_scoring', scene_index+1)
@@ -217,6 +282,7 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     association = None if oracle_only else evaluate_scenes(records, threshold)
     sources = sorted({str(source) for scene in scenes for source in scene['sources']})
     methods = {key: [] for key in ([] if oracle_only else ['predicted']) + ['oracle', 'simple_fusion_oracle']
+               + (['predicted_anchor', 'predicted_mean'] if predicted_controls else [])
                + ['single_source:' + source for source in sources]}
     per_scene = []
     oracle_common = []
@@ -263,6 +329,11 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                 generated.append(row)
             outputs[kind] = evaluate_full_scene(generated, grouping_kind=kind,
                                                 node_input_support=support, **common)
+        if predicted_controls:
+            for name, generated in predicted_observed_controls(
+                    scene['values'], scene['observed'], groupings['predicted']).items():
+                outputs[name] = evaluate_full_scene(generated, grouping_kind='predicted',
+                    node_input_support=support, **common)
         node_valid = np.repeat(np.asarray(scene['observed'])[..., None], 4, axis=-1)
         simple = simple_fusion_outputs(scene['values'], node_valid, scene['identities'], scene['sources'])
         outputs['simple_fusion_oracle'] = evaluate_full_scene(simple, grouping_kind='oracle', **common)
@@ -303,6 +374,10 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
     report_progress('completed', len(scenes), fusion_forward_count=fusion_steps)
     return dict(association=association, selection=selection, threshold=threshold, records=[] if oracle_only else records,
                 fusion=fusion_report, oracle_only=oracle_only,
+                **({'association_scores_reused': True, 'tam_scoring_forwards': 0}
+                   if cached_records is not None else {}),
+                **({'predicted_controls': 'same predicted groups; selected-observation support interpolation; anchor/equal-visible-node mean; no outside-support extrapolation or learned completion'}
+                   if predicted_controls else {}),
                 **({'oracle_common_support': dict(
                     policy='per-attribute intersection of TFM, simple fusion and truth on all target rows; no common prediction yields null error; full coverage remains in fusion',
                     fusion={name: aggregate_fusion_reports([row['methods'][name] for row in oracle_common])

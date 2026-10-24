@@ -1,0 +1,317 @@
+{
+  "review_id": "LOCAL-090-OVERNIGHT-20261025",
+  "source_commit": "7cc8252fd277068b7806747bd37ca78d8041f319",
+  "status": "COMPLETED",
+  "scope": "Local arithmetic audit of returned aggregate/300-scene/38-component summaries and scientific screens; no checkpoint or original NPZ/JSONL replay.",
+  "input_files": [
+    "summary.json.gz",
+    "scene-summary.json.gz"
+  ],
+  "checks": {
+    "numeric_equalities": 117486,
+    "max_normalized_absolute_error": 1.5694545498040667e-11,
+    "failures": [],
+    "scene_count": 300,
+    "component_count": 38,
+    "quantiles_reaggregated_from_scene_quantiles": false,
+    "screen_recomputed": true
+  },
+  "population": {
+    "available_target_points": 454952,
+    "covered_target_points": 442263,
+    "missing_prediction_points": 12689,
+    "available_target_trajectories": 9099,
+    "covered_target_trajectories": 8742,
+    "point_coverage": 0.9721091455801931
+  },
+  "arms": {
+    "adapter_all": {
+      "metrics": {
+        "unit_count": 442263,
+        "mae": 574.2784815755844,
+        "mse": 10801869.542309577,
+        "rmse": 3286.6197745266454,
+        "point_count": 442263,
+        "p95": 1940.1289065575845,
+        "p99": 7810.105047206942
+      },
+      "versus_linear": {
+        "common_point_count": 442263,
+        "better_point_count": 255346,
+        "worse_point_count": 186917,
+        "tied_point_count": 0,
+        "improvement_sum": 18472541.14087035,
+        "harm_sum": 11190635.86561966,
+        "signed_error_change_sum": -7281905.275250692,
+        "mean_error_change": -16.465101704756428,
+        "positive_delta_tail": {
+          "point_count": 186917,
+          "p95": 189.2726536649073,
+          "p99": 440.3888512549046
+        },
+        "severe_harm": {
+          "100": {
+            "threshold_m": 100.0,
+            "count": 21896,
+            "cumulative_harm_m": 5168967.85277715
+          },
+          "1000": {
+            "threshold_m": 1000.0,
+            "count": 302,
+            "cumulative_harm_m": 508593.9729032945
+          },
+          "10000": {
+            "threshold_m": 10000.0,
+            "count": 0,
+            "cumulative_harm_m": 0.0
+          }
+        },
+        "squared_error_change_sum_m2": -7545942483.588477,
+        "net_identity_residual_m": 0.0
+      },
+      "scene_wins_vs_linear": 266,
+      "component_wins_vs_linear": 34,
+      "scene_wins_vs_finetune": 96,
+      "component_wins_vs_finetune": 15
+    },
+    "adapter_missing": {
+      "metrics": {
+        "unit_count": 442263,
+        "mae": 580.8091031822686,
+        "mse": 10799736.104501683,
+        "rmse": 3286.2951943642684,
+        "point_count": 442263,
+        "p95": 1923.38972794601,
+        "p99": 7817.4069083368695
+      },
+      "versus_linear": {
+        "common_point_count": 442263,
+        "better_point_count": 68930,
+        "worse_point_count": 50380,
+        "tied_point_count": 322953,
+        "improvement_sum": 10698437.331630018,
+        "harm_sum": 6304784.360016536,
+        "signed_error_change_sum": -4393652.97161348,
+        "mean_error_change": -9.93448009807169,
+        "positive_delta_tail": {
+          "point_count": 50380,
+          "p95": 333.4338106890754,
+          "p99": 641.9312945730711
+        },
+        "severe_harm": {
+          "100": {
+            "threshold_m": 100.0,
+            "count": 23359,
+            "cumulative_harm_m": 5035076.040686186
+          },
+          "1000": {
+            "threshold_m": 1000.0,
+            "count": 211,
+            "cumulative_harm_m": 399837.03628682264
+          },
+          "10000": {
+            "threshold_m": 10000.0,
+            "count": 0,
+            "cumulative_harm_m": 0.0
+          }
+        },
+        "squared_error_change_sum_m2": -8489483088.726156,
+        "net_identity_residual_m": 1.862645149230957e-09
+      },
+      "scene_wins_vs_linear": 229,
+      "component_wins_vs_linear": 30,
+      "scene_wins_vs_finetune": 65,
+      "component_wins_vs_finetune": 9
+    },
+    "finetune": {
+      "metrics": {
+        "unit_count": 442263,
+        "mae": 564.8340061095184,
+        "mse": 11039205.87695423,
+        "rmse": 3322.530041542774,
+        "point_count": 442263,
+        "p95": 1895.81429165806,
+        "p99": 7757.040654130591
+      },
+      "versus_linear": {
+        "common_point_count": 442263,
+        "better_point_count": 246960,
+        "worse_point_count": 195303,
+        "tied_point_count": 0,
+        "improvement_sum": 28912098.403526887,
+        "harm_sum": 17453251.075224098,
+        "signed_error_change_sum": -11458847.328302791,
+        "mean_error_change": -25.90957717083001,
+        "positive_delta_tail": {
+          "point_count": 195303,
+          "p95": 254.11871957218239,
+          "p99": 757.0866721009659
+        },
+        "severe_harm": {
+          "100": {
+            "threshold_m": 100.0,
+            "count": 28804,
+            "cumulative_harm_m": 10105984.991312062
+          },
+          "1000": {
+            "threshold_m": 1000.0,
+            "count": 1226,
+            "cumulative_harm_m": 3480917.7961471514
+          },
+          "10000": {
+            "threshold_m": 10000.0,
+            "count": 36,
+            "cumulative_harm_m": 1078350.8762638404
+          }
+        },
+        "squared_error_change_sum_m2": 97419136885.44998,
+        "net_identity_residual_m": -1.862645149230957e-09
+      },
+      "scene_wins_vs_linear": 259,
+      "component_wins_vs_linear": 31,
+      "scene_wins_vs_finetune": 0,
+      "component_wins_vs_finetune": 0
+    }
+  },
+  "c_sse_concentration": {
+    "net_change_m2": 97419136885.44998,
+    "largest_increases": [
+      [
+        "3035",
+        132782461808.16037
+      ],
+      [
+        "4335",
+        8564577797.199774
+      ],
+      [
+        "4513",
+        4861508892.969416
+      ],
+      [
+        "2308",
+        1616920832.2470315
+      ],
+      [
+        "629",
+        1174108134.5566804
+      ]
+    ],
+    "largest_increase_share_of_net": 1.3630018295511308
+  },
+  "scientific_screen": {
+    "adapter_all": {
+      "original072C_screen_passed": false,
+      "relative_mae_reduction": 0.027871824884365126,
+      "required_reduction": 0.03,
+      "deltas_vs072C": {
+        "mae": -16.465101704751874,
+        "rmse": -2.594669383458495,
+        "p95": -26.272118085929378,
+        "p99": -15.579869767234413
+      },
+      "nonpoint_mae_nonworse": true,
+      "outside_largest_component_nonworse": true,
+      "improved_scenes": 266,
+      "total_scenes": 300,
+      "improved_components": 34,
+      "total_components": 38,
+      "added_budget_control_passed": false,
+      "deltas_vs_added_budget": {
+        "mae": 9.44447546606591,
+        "rmse": -35.91026701612873,
+        "p95": 44.314614899524486,
+        "p99": 53.064393076350825
+      },
+      "predeclared_method_candidate": false,
+      "eligible_for_replication": false,
+      "teacher_inside_exact_verified": false,
+      "numerical_guard_m": 1e-06,
+      "interpretation": "Single-seed resource screen; missing C cannot exclude added-budget explanation. posthoc_mask_A is a fixed diagnostic, not a nominated candidate."
+    },
+    "adapter_missing": {
+      "original072C_screen_passed": false,
+      "relative_mae_reduction": 0.016816907333808917,
+      "required_reduction": 0.03,
+      "deltas_vs072C": {
+        "mae": -9.934480098067638,
+        "rmse": -2.919249545835555,
+        "p95": -43.011296697503894,
+        "p99": -8.278008637306812
+      },
+      "nonpoint_mae_nonworse": true,
+      "outside_largest_component_nonworse": true,
+      "improved_scenes": 229,
+      "total_scenes": 300,
+      "improved_components": 30,
+      "total_components": 38,
+      "added_budget_control_passed": false,
+      "deltas_vs_added_budget": {
+        "mae": 15.975097072750145,
+        "rmse": -36.23484717850579,
+        "p95": 27.57543628794997,
+        "p99": 60.36625420627843
+      },
+      "predeclared_method_candidate": true,
+      "eligible_for_replication": false,
+      "teacher_inside_exact_verified": true,
+      "numerical_guard_m": 1e-06,
+      "interpretation": "Single-seed resource screen; missing C cannot exclude added-budget explanation. posthoc_mask_A is a fixed diagnostic, not a nominated candidate."
+    },
+    "finetune": {
+      "original072C_screen_passed": false,
+      "relative_mae_reduction": 0.04385926128379536,
+      "required_reduction": 0.03,
+      "deltas_vs072C": {
+        "mae": -25.909577170817784,
+        "rmse": 33.31559763267023,
+        "p95": -70.58673298545386,
+        "p99": -68.64426284358524
+      },
+      "nonpoint_mae_nonworse": true,
+      "outside_largest_component_nonworse": true,
+      "improved_scenes": 259,
+      "total_scenes": 300,
+      "improved_components": 31,
+      "total_components": 38,
+      "added_budget_control_passed": null,
+      "deltas_vs_added_budget": null,
+      "predeclared_method_candidate": false,
+      "eligible_for_replication": false,
+      "teacher_inside_exact_verified": false,
+      "numerical_guard_m": 1e-06,
+      "interpretation": "Single-seed resource screen; missing C cannot exclude added-budget explanation. posthoc_mask_A is a fixed diagnostic, not a nominated candidate."
+    }
+  },
+  "receipt_corrections": [
+    {
+      "source": "S2L-20261024-090-summary.md",
+      "issue": "C improvement/harm sums swapped in parenthetical prose",
+      "correct": "finetune-minus-linear improvement_sum=28912098.403526887, harm_sum=17453251.075224098, H-I=-11458847.328302791 m."
+    },
+    {
+      "source": "S2L-20261024-090C.md",
+      "issue": "claims full-model fine-tuning rewrites all output attributes",
+      "correct": "Only position changes; speed/course remain ordinary Mean, enforced in evaluator exact(states[:,2:],Mean)."
+    },
+    {
+      "source": "S2L-20261024-090C.md and S2L-20261024-090-summary.md",
+      "issue": "confounds candidate nomination with original072C scalar screen",
+      "correct": "original072C_screen_passed excludes candidate nomination; C fails it because RMSE rises. predeclared_method_candidate=false separately blocks eligibility."
+    },
+    {
+      "source": "S2L-20261024-090-summary.md",
+      "issue": "describes A/B advantage over C as generic tail advantage",
+      "correct": "A/B have smaller RMSE; C has smaller MAE, P95 and P99. This is a metric tradeoff, not A/B tail dominance or causal proof of freezing."
+    },
+    {
+      "source": "S2L-20261024-090-summary.md",
+      "issue": "says all three arms have nonzero >10000m harm without a common comparator",
+      "correct": "Relative to linear, A/B severe-harm >10000m counts are 0/0, C=36. Cross-arm relative harms use different reference predictions and cannot support that common-reference sentence."
+    }
+  ],
+  "decision": "090 A/B/C and CPU table execution accepted at returned-evidence level; current adapter candidate closes. C is a budget control with average/tail tradeoff, not automatic default promotion or a convergence proof.",
+  "test_opened": false,
+  "model_forwards": 0,
+  "optimizer_updates": 0
+}
