@@ -1,0 +1,30 @@
+{
+ "run_id": "LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091-summary-attempt-1",
+ "note": "091 two-arm CPU4 cached comparison; zero model forwards, zero optimizer updates. Native summary and comparison stay on server; summary returned as gzip copy, per-scene table is derived and labelled.",
+ "derived_or_aggregate": [
+  "summary.json.gz",
+  "scene-comparison-derived.json.gz"
+ ],
+ "server_originals": [
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091-summary-attempt-1/summary.json",
+   "bytes": 17685815,
+   "sha256": "399e0d0cc6fcbc42260c40152e750e152fa45ef5437a13984e9a4744c220cce1",
+   "mtime_local": "2026-10-24T23:51:52+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091-summary-attempt-1/comparison.json.gz",
+   "bytes": 12585800,
+   "sha256": "686e72d1cd79fcc986bec9ba73e361080aedec6155193f11927afba6040fd2fc",
+   "mtime_local": "2026-10-24T23:51:51+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091-summary-attempt-1/run.json",
+   "bytes": 178,
+   "sha256": "e3ec37248b68bb3e725ba584df1d0983a806172b4dfea809901a860ca2417037",
+   "mtime_local": "2026-10-24T23:51:52+0800"
+  }
+ ],
+ "server_originals_tree_bytes": 30271793,
+ "server_originals_file_count": 3
+}
