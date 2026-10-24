@@ -24,6 +24,14 @@
 
 094B回传的4,439,092候选中99.8779%被接受，不能凭高召回称关联可用，也不因负结果临时删掉096B。096按预定完整系统检验覆盖与误差传播，两个provider使用各自原阈值，不能唯一归因补全。097表比较每个seed自己的追加训练前后差值；fresh Adam＋原批次重放不等于纯步数效应或充分收敛，不自动晋升090C/097A。
 
+**服务器领取登记（2026-10-25 06:59 北京时间／22:59:13Z，本次唯一控制服务）：**
+
+- 逐字块 sha256 `4173032b68be3e3b0fd6b3714ff84689b61e2c9b120ec969935693463e112e2a`（原样执行，`bash -n` 通过，无占位符；含 `--print-plan` 预检）；checkout `association-code-run096-097-night` 停在 `8b4705daf51cc9b1e72b29d6ebcd1cb8c4e7cace`；输出 `runs/LEVEL1-POST088-NIGHT-20261025-096-097-attempt-1` 与 `-launch` 均为新目录。
+- 单元 `mtad-a15de726acdc.service`：`Linger=yes`、`ActiveState=active`、`SubState=running`、`status.json=RUNNING`、`launch.json.status=SUBMITTED`、`time_advisory_issued=false`；控制服务 `CUDA_VISIBLE_DEVICES=` 空，不占 GPU 名额。
+- `plan.json`：`max_gpu_claims=4`、`max_cpu_comparisons=1`；096A←093A＋094A、096B←093B＋094B、097A 无依赖；另 093/094/096/097 四张 CPU 表按依赖串行（每次最多一张）。
+- 提交后实测（不只看 SUBMITTED）：queue 已为 096B 启动 `completion_system_evaluate.py --check-source-only`（PID 3977245，来源 094B＋093B），尚无子任务输出目录；index0（`GPU-c5a00c37`）与 index3（`GPU-1043f26a`）当前 util 0、显存 12 MiB，index1/index2 仍由 094A/093A 占用。
+- 本轮**不手工领取** 096/097 或任一 CPU 表，全部交由该控制服务按真实终态接续；093A/094A 终态后由其自动提交。
+
 ## 090/091及093/094原批结案快照（dfe639e；新任务以顶部096—097合同为准）
 
 北京时间2026-10-25，本地同步`7cc8252`并完成090C与CPU三臂整表复核：**090A/B/C及整表全部COMPLETED并执行验收，固定adapter配方关闭，不补seed／容量／作用域／步数。** C的MAE564.8340m优于A/B，但RMSE比072C差33.3156m；A/B未过原3%和对C预算控制。091、095已结案。仅093A/B与094A/B及两组CPU配对表仍待回，统一实施e718fca、原合同及预算保持，无新增训练。
