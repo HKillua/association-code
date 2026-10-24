@@ -36,10 +36,11 @@ def production_contract(config, manifest, alignment, profile='pilot1000'):
     backbone = config['model']['backbone']
     suffixes = {'pilot1000': 'level1', 'extended4000': 'extended-level1',
                 'replica4000': 'extended-replica-level1', 'harm4000': 'relative-harm-level1',
-                'harm-replica4000': 'relative-harm-replica-level1'}
+                'harm-replica4000': 'relative-harm-replica-level1',
+                'helper-dropout4000': 'helper-dropout-level1'}
     if profile not in suffixes:
         raise ValueError('unknown sequence training profile')
-    if profile in ('replica4000', 'harm4000', 'harm-replica4000') and backbone != 'transformer':
+    if profile in ('replica4000', 'harm4000', 'harm-replica4000', 'helper-dropout4000') and backbone != 'transformer':
         raise ValueError('replica and relative-harm profiles declare the Transformer backbone only')
     if config != read_json(ROOT/f'configs/sequence-position-{backbone}-{suffixes[profile]}.json'):
         updates = 1000 if profile == 'pilot1000' else 4000
@@ -69,6 +70,7 @@ def bind_linear_control(path, config, source, manifest):
     source = Path(source).resolve()
     expected = deepcopy(config)
     expected.update(scope=SCOPE, position_loss='linear')
+    expected.pop('augmentation', None)
     steps = expected['training']['updates']
     run, summary, fit = [read_json(path/name) for name in ('run.json', 'summary.json', 'fit/run.json')]
     for record in (run, summary, fit):
@@ -113,8 +115,9 @@ def run(args):
     production_contract(config, manifest, alignment, profile=profile)
     paired_control = getattr(args, 'paired_control', None)
     harm_objective = config['position_loss'] == RELATIVE_HARM_LOSS
-    if harm_objective != (paired_control is not None):
-        raise ValueError('only relative-harm profiles require --paired-control')
+    dropout = profile == 'helper-dropout4000'
+    if (harm_objective or dropout) != (paired_control is not None):
+        raise ValueError('relative-harm and helper-dropout profiles require --paired-control')
     if paired_control is not None:
         paired_control = Path(paired_control).resolve()
         if output == paired_control or output in paired_control.parents or paired_control in output.parents:
@@ -125,7 +128,8 @@ def run(args):
              'extended4000': '072-generic-sequence-position-extended4000',
              'replica4000': '073-generic-sequence-position-replica4000',
              'harm4000': '074-transformer-relative-harm4000',
-             'harm-replica4000': '074-transformer-relative-harm-replica4000'}[profile]
+             'harm-replica4000': '074-transformer-relative-harm-replica4000',
+             'helper-dropout4000': '083-transformer-helper-fragment-dropout4000'}[profile]
     state = dict(scope=scope, profile=profile, status='RUNNING', phase='source_binding',
         configuration=config, backbone=config['model']['backbone'], source_system=str(source),
         train_device=args.device, inference_device='cpu', cpu_threads=4, optimizer_updates=0,
@@ -205,7 +209,12 @@ def run(args):
                 'Speed and heading remain Mean controls, not learned outputs.'])
         if paired_control is not None:
             summary.update(paired_control=str(paired_control), training_pairing=training['paired_control'])
-            summary['limitations'].append('Relative harm is against fixed .95 error, not an absolute-tail guarantee; optimizer/clip scaling changes are part of the intervention.')
+            if harm_objective:
+                summary['limitations'].append('Relative harm is against fixed .95 error, not an absolute-tail guarantee; optimizer/clip scaling changes are part of the intervention.')
+            if dropout:
+                summary.update(augmentation=config['augmentation'], augmentation_exposure=training['augmentation_exposure'],
+                    augmentation_applied_only_to_training=True)
+                summary['limitations'].append('Whole-helper removal changes information, training physical base and wrong-helper contamination jointly; it is not an isolated causal test of missing-input robustness. Validation uses full frozen groups.')
         write_json(output/'summary.json', summary)
         state.update(status='COMPLETED', phase='completed', elapsed_seconds=time.monotonic()-started)
         write_json(output/'run.json', state)
@@ -232,9 +241,9 @@ def main(argv=None):
     parser.add_argument('--device', choices=('cpu', 'cuda:0'), default='cuda:0')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--time-policy', choices=('advisory',), default='advisory')
-    parser.add_argument('--profile', choices=('pilot1000', 'extended4000', 'replica4000', 'harm4000', 'harm-replica4000'), default='pilot1000',
+    parser.add_argument('--profile', choices=('pilot1000', 'extended4000', 'replica4000', 'harm4000', 'harm-replica4000', 'helper-dropout4000'), default='pilot1000',
                         help='explicit fresh budget/seed; extended profiles are not resumed pilots')
-    parser.add_argument('--paired-control', help='074 only: completed same-seed072C/073C run root; never resumed')
+    parser.add_argument('--paired-control', help='074/083: completed same-seed072C/073C run root; never resumed')
     args = parser.parse_args(argv)
 
     def cancel(signum, frame):

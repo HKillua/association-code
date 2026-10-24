@@ -255,3 +255,20 @@ T侧读取079已保存同场full评分、两头完整视图映射及两种负域
 - 082全V候选、原anchor_direct、阈值选择规则与074D一致，阈值数值可不同。系统记录074D和056共同点及各自覆盖/重复；不能用条件MAE排名，也不要求新分组保留056覆盖。原source缓存需复核预测与人口，真值只参与事后评价，不用于决定新的视图/分组。
 
 两项均保持有限实验出口；软件通过不代表真实结果或作者方法复现。T_test封存、066保持REJECTED。
+
+
+## 083—085：片段可用性初筛与两项只读封口（2026-10-24）
+
+用户已授权实现和自主发布；软件通过及独立review后才READY。仅083一个GPU候选，084/085不作为其前置条件，不填满卡扩展配置。
+
+**083**：原072C linear Transformer105154参数/76特征，seed20261023、4000成功更新、batch8、Adam .001、clip1、固定final。新增scope `sequence-position-helper-dropout-v1`；独立NumPy RNG seed20344023，各helper整片段p=.5删除、anchor必留、允许全空。原采样器先生成scene/anchor/mode/member/target mask，再做drop；保留原batch配对072C，另存实际retained_members/drop_mask、原/新helper支撑和同/异身份计数，计数仅审计，不用于删除决策。训练物理base/Mean/features由保留成员重建；监督目标不变，V无增强。保存增强RNG且只将成功optimizer更新计入曝光；失败不重试。不resume、不调p/步数、不使用V选择checkpoint。
+
+CPU step0/final完整V300，step0逐值fixed.95；比较072C公共初值、原始4000batch、成功曝光、全部9353输出组/610重复/442263有效位置点；四种MAE加权、RMSE/P95/P99、H/I及100/1000/10000m伤害、支撑/0-1-多helper、逐场/38组件及最大组件外。标准化输出保持速度航向Mean。训练augmentation是真实输入/先验/污染强度的总干预，不称纯特征正则或已证明分布根因。
+
+初筛继续门槛在结果前冻结：相对072C点等权MAE至少下降3%，RMSE及P99不增加（数值guard1e-6m）；另外三种MAE加权、最大组件外MAE不退化，超过半数场景及半数组件MAE改善。全部通过才值得安排候选和关键对照的匹配第二seed；即使通过也不自动晋级论文方法。未通过关闭本配方，不按局部分层或换指标挽救，不自动p搜索。3%是本项目资源分配门槛，不是统计显著性或安全保证。任何结果都需报告实际幅度及负面局部。
+
+**084**：仅两份完整078B/081A fit/run＋training.jsonl和081整表摘要。按真正成功更新重聚原始点曝光、每anchor有效点平均后batch平均的loss系数、scene等权、唯一scene-anchor-mode及模式分层；零监督anchor仍占batch分母，系数质量可能小于1。点比例/系数不是梯度贡献；V汇总不足以恢复逐anchor系数时记未知，不推断真helper联合分布，不拟合训练比例。无权重/前向/压缩卷/T_test，1次CPU4、1h仅提醒。
+
+**085**：仅074C/076B已保存CPU step0/final预测、目标/mask、任务权重、训练normalizer与JSONL。先复现原物理指标和完整人口，再逐输出组/唯一采用组分开重算原标准化位置MSE、速度MSE、圆周航向MAE及每组任务sigma/exp(-sigma)。不能用跨batch平均sigma与loss反造历史加权目标，L2及固定T端点不可恢复就记未知。无权重/前向/原卷/T_test，1次CPU4、1h仅提醒。若没有确定实现错误或可分离冲突证据，结束本PTFM配方修复，不自动重训或建立新原生管线。
+
+三任务各一次、失败保全不原样重试；066仍REJECTED、T_test封存。独立checkout冻结代码；083预算含完整CPU评价和一次缓存对照，4h仅提醒，预计1—2h仅参考历史运行。084/085错峰CPU/IO，不加载模型。不把软件测试或push说成服务器实验成绩。

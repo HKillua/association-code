@@ -17,6 +17,10 @@ from association.models.helper_sequence import (SCOPE as HELPER_SCOPE,
     ROUTING_SEMANTICS as HELPER_ROUTING, AGGREGATIONS, HelperSequencePosition,
     helper_sequence_inputs, initialize_from_reference)
 from association.training.evidence_fusion import TRAIN_MODES, prepare_evidence_scenes, training_members
+from association.training.helper_dropout import (SCOPE as HELPER_DROPOUT_SCOPE,
+    KIND as HELPER_DROPOUT_KIND, drop_helper_fragments, dropout_audit,
+    empty_exposure as empty_dropout_exposure, commit_exposure as commit_dropout_exposure,
+    validate_rng_state as validate_augmentation_rng_state)
 from association.utils.runtime import write_json
 
 LOSS_SEMANTICS = 'mean_valid_position_linear_haversine_m_div_1000_all_queries_no_auxiliary'
@@ -38,8 +42,10 @@ def _make_model(config):
 def configuration(value):
     expected = {'scope', 'routing_semantics', 'position_loss', 'data', 'motion_observation_policy',
                 'train_splits', 'model', 'training'}
+    dropout = isinstance(value, dict) and value.get('scope') == HELPER_DROPOUT_SCOPE
+    if dropout: expected.add('augmentation')
     if (not isinstance(value, dict) or set(value) != expected
-            or (value['scope'], value['position_loss']) not in ((SCOPE, 'linear'), (RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS), (HELPER_SCOPE, 'linear'))
+            or (value['scope'], value['position_loss']) not in ((SCOPE, 'linear'), (RELATIVE_HARM_SCOPE, RELATIVE_HARM_LOSS), (HELPER_SCOPE, 'linear'), (HELPER_DROPOUT_SCOPE, 'linear'))
             or value['routing_semantics'] != routing_semantics(value)
             or value['motion_observation_policy'] != 'canonical_all' or value['train_splits'] != ['T_core']
             or value['data'] != dict(length=64, max_observations=128, time_unit_seconds=20.,
@@ -56,6 +62,8 @@ def configuration(value):
         raise ValueError('sequence baseline architecture is fixed apart from the declared backbone')
     if value['position_loss'] == RELATIVE_HARM_LOSS and model['backbone'] != 'transformer':
         raise ValueError('relative-harm intervention declares only the Transformer backbone')
+    if dropout and model['backbone'] != 'transformer':
+        raise ValueError('helper dropout declares only the original linear Transformer')
     training = value['training']
     if not isinstance(training, dict) or set(training) != {
             'seed', 'updates', 'batch_size', 'learning_rate', 'gradient_clip', 'advisory_seconds'}:
@@ -68,16 +76,29 @@ def configuration(value):
         if (isinstance(number, bool) or not isinstance(number, (int, float))
                 or not math.isfinite(number) or number <= 0):
             raise ValueError(key + ' must be finite and positive')
+    if dropout:
+        augmentation = value['augmentation']
+        if (not isinstance(augmentation, dict) or set(augmentation) != {'kind', 'probability', 'seed'}
+                or augmentation['kind'] != HELPER_DROPOUT_KIND
+                or type(augmentation['probability']) not in (int, float) or augmentation['probability'] != .5
+                or type(augmentation['seed']) is not int or augmentation['seed'] != training['seed'] + 83000):
+            raise ValueError('helper dropout requires frozen p=0.5 and independent seed=training seed+83000')
     return value
 
 
-def _save(path, model, optimizer, step, config, rng):
-    torch.save(dict(scope=config['scope'], routing_semantics=routing_semantics(config),
+def _save(path, model, optimizer, step, config, rng, augmentation_rng=None):
+    saved = dict(scope=config['scope'], routing_semantics=routing_semantics(config),
         loss_semantics=loss_semantics(config), configuration=config, step=step, actual_updates=step,
         motion_observation_policy='canonical_all', model=model.state_dict(),
         optimizer=optimizer.state_dict(), numpy_rng=rng.bit_generator.state,
         torch_rng=torch.get_rng_state(),
-        cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None), path)
+        cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None)
+    if config['scope'] == HELPER_DROPOUT_SCOPE:
+        if augmentation_rng is None: raise ValueError('dropout checkpoint requires augmentation RNG')
+        saved.update(augmentation=copy.deepcopy(config['augmentation']),
+            augmentation_rng=copy.deepcopy(augmentation_rng.bit_generator.state),
+            augmentation_applied_only_to_training=True)
+    torch.save(saved, path)
 
 
 def load_checkpoint(path, *, device='cpu'):
@@ -85,6 +106,13 @@ def load_checkpoint(path, *, device='cpu'):
     if not isinstance(saved, dict) or not isinstance(saved.get('configuration'), dict):
         raise ValueError('sequence checkpoint configuration required')
     config = configuration(saved['configuration'])
+    if config['scope'] == HELPER_DROPOUT_SCOPE:
+        if (saved.get('augmentation') != config['augmentation']
+                or saved.get('augmentation_applied_only_to_training') is not True):
+            raise ValueError('helper dropout checkpoint augmentation contract mismatch')
+        validate_augmentation_rng_state(saved.get('augmentation_rng'))
+    elif any(k in saved for k in ('augmentation', 'augmentation_rng', 'augmentation_applied_only_to_training')):
+        raise ValueError('original sequence checkpoint cannot be relabelled with dropout state')
     if (saved.get('scope') != config['scope']
             or saved.get('routing_semantics') != routing_semantics(config)
             or saved.get('loss_semantics') != loss_semantics(config)
@@ -119,6 +147,7 @@ def _reference_pair(path, config, scene_ids):
     record = json.loads((path/'run.json').read_text())
     expected = copy.deepcopy(config)
     expected.update(scope=SCOPE, position_loss='linear', routing_semantics=ROUTING_SEMANTICS)
+    expected.pop('augmentation', None)
     if config['scope'] == HELPER_SCOPE:
         expected['model'].pop('aggregation')
         expected['model']['backbone'] = 'transformer'
@@ -182,8 +211,9 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
         raise ValueError('sequence fit requires distinct nonempty T_core scenes only')
     harm_objective = config['position_loss'] == RELATIVE_HARM_LOSS
     helper = config['scope'] == HELPER_SCOPE
-    if (harm_objective or helper) != (paired_reference_fit is not None):
-        raise ValueError('relative-harm/helper training requires a frozen same-seed linear control')
+    dropout = config['scope'] == HELPER_DROPOUT_SCOPE
+    if (harm_objective or helper or dropout) != (paired_reference_fit is not None):
+        raise ValueError('relative-harm/helper/dropout training requires a frozen same-seed linear control')
     reference = _reference_pair(paired_reference_fit, config, scene_ids) if paired_reference_fit is not None else None
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -191,6 +221,7 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
     training = config['training']
     torch.manual_seed(training['seed'])
     rng = np.random.default_rng(training['seed'])
+    augmentation_rng = np.random.default_rng(config['augmentation']['seed']) if dropout else None
     model = _make_model(config)
     if helper:
         initialize_from_reference(model, reference['initial']['model'], branch_seed=training['seed'] + 78000)
@@ -219,6 +250,12 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                                      for population in ('all_queries', 'valid_position_queries')},
             helper_gradients=dict(phi_nonzero_updates=0, scorer_nonzero_updates=0),
             scientific_status='single-seed helper representation screen; weights are latent, not physical reliability')
+    if dropout:
+        state.update(augmentation=copy.deepcopy(config['augmentation']),
+            augmentation_exposure=empty_dropout_exposure(),
+            augmentation_applied_only_to_training=True,
+            batch_semantics='original pre-drop plan pairs with control; augmentation_batch is actual retained evidence',
+            scientific_status='single-factor T-only helper fragment dropout; no validation dropout or frequency matching')
     if reference is not None:
         state['paired_control'] = dict(fit=reference['path'], status='PENDING', initial_parameters_exact=False,
             initial_sampler_rng_exact=False, actual_successful_batches_matched=0,
@@ -226,7 +263,7 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
     write_json(output / 'run.json', state)
     rows = []
     try:
-        _save(output / 'step-0.pt', model, optimizer, 0, config, rng)
+        _save(output / 'step-0.pt', model, optimizer, 0, config, rng, augmentation_rng)
         if reference is not None:
             old = reference['initial']
             current = model.state_dict()
@@ -241,6 +278,10 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                     or (not helper and not torch.equal(torch.get_rng_state(), old['torch_rng']))):
                 raise ValueError('relative-harm fresh initial parameters or sampler RNG differ from linear control')
             state['paired_control'].update(initial_parameters_exact=True, initial_sampler_rng_exact=True)
+            if dropout:
+                state['paired_control'].update(initial_torch_rng_exact=True,
+                    batch_comparison='original pre-drop members, eligibility and unchanged target masks',
+                    initialization='same-seed linear step0 tensors verified exact; fresh Adam; no resumed optimizer')
             if helper:
                 state['paired_control'].update(initial_parameters_scope='all original common tensors; first76 projection columns',
                     added_projection_zero=True, branch_seed=training['seed'] + 78000,
@@ -258,11 +299,15 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             mode = TRAIN_MODES[(step - 1) % len(TRAIN_MODES)]
             batch, samples, linear, logarithmic, optimized = [], [], [], [], []
             helper_batch = []
+            augmentation_batch = []
+            augmentation_rng_before = copy.deepcopy(augmentation_rng.bit_generator.state) if dropout else None
             for _ in range(training['batch_size']):
                 scene = train[int(rng.integers(len(train)))]
                 anchor = int(rng.integers(len(scene['identities'])))
                 members = training_members(scene, anchor, mode)
-                result = model(*(helper_sequence_inputs if helper else sequence_inputs)(scene['motion'], members, device=device))
+                retained, drop_mask = (drop_helper_fragments(members, augmentation_rng, config['augmentation']['probability'])
+                                       if dropout else (members, None))
+                result = model(*(helper_sequence_inputs if helper else sequence_inputs)(scene['motion'], retained, device=device))
                 target = torch.as_tensor(scene['target'][anchor], dtype=torch.float64, device=device)
                 valid = torch.as_tensor(scene['valid'][anchor], dtype=torch.bool, device=device)
                 losses, diagnostics = sequence_objectives(result, target, valid, position_loss=config['position_loss'])
@@ -276,6 +321,9 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                 support = scene['motion']['support']
                 eligible = ~support[anchor] & support[members[1:]].any(0)
                 samples.append(diagnostics)
+                if dropout:
+                    augmentation_batch.append(dropout_audit(scene, members, retained, drop_mask,
+                        valid[:, :2].all(-1).cpu().numpy()))
                 if helper:
                     counts = support[members[1:]].sum(0)
                     valid_positions = valid[:, :2].all(-1).cpu().numpy()
@@ -307,6 +355,8 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             audit['sampled_anchors'] += len(batch)
             audit['valid_position_points'] += count
             audit['nonzero_gradient_updates'] += int(norm > 0)
+            if dropout:
+                commit_dropout_exposure(state['augmentation_exposure'], augmentation_batch)
             if helper:
                 for sample_counts in helper_batch:
                     for population, counts in sample_counts.items():
@@ -350,6 +400,10 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
                 gradient_clip_scale=min(1., training['gradient_clip'] / (float(norm) + 1e-6)))
             if helper:
                 row.update(helper_support_batch=helper_batch, helper_gradients=branch_grad)
+            if dropout:
+                row.update(augmentation_batch=augmentation_batch,
+                    augmentation_rng_before=augmentation_rng_before,
+                    augmentation_rng_after=copy.deepcopy(augmentation_rng.bit_generator.state))
             rows.append(row)
             with (output / 'training.jsonl').open('a') as handle:
                 handle.write(json.dumps(row, allow_nan=False) + '\n')
@@ -358,7 +412,7 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
             if _sampling_exposure(audit) != _sampling_exposure(reference['exposure']):
                 raise ValueError('relative-harm successful sampling exposure differs from linear control')
             state['paired_control'].update(status='COMPLETED', sampling_exposure_exact=True)
-        _save(output / 'final.pt', model, optimizer, training['updates'], config, rng)
+        _save(output / 'final.pt', model, optimizer, training['updates'], config, rng, augmentation_rng)
         write_json(output / 'training-windows.json', _windows(rows))
         state.update(status='COMPLETED', elapsed_seconds=time.monotonic() - started,
                      final_checkpoint='final.pt', trained_scene_count=len(audit['scenes']))
@@ -372,7 +426,7 @@ def train_sequence_position(train_raw, config, output, *, device='cpu', check=No
         write_json(output / 'run.json', state)
         write_json(output / 'training-windows.json', _windows(rows))
         try:
-            _save(output / 'interrupted.pt', model, optimizer, state['optimizer_updates'], config, rng)
+            _save(output / 'interrupted.pt', model, optimizer, state['optimizer_updates'], config, rng, augmentation_rng)
         except BaseException as save_error:
             state['recovery_checkpoint_error'] = f'{type(save_error).__name__}: {save_error}'
             write_json(output / 'run.json', state)
