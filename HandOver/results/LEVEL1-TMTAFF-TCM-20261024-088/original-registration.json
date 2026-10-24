@@ -1,0 +1,86 @@
+{
+  "frozen_code": "a3e92a9",
+  "git_returned": [
+    {
+      "bytes": 532655,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T12:16:05.577Z",
+      "path": "HandOver/results/LEVEL1-TMTAFF-TCM-20261024-088/run.json",
+      "sha256": "b75ff8c979dc70f5af5abf9fd0d196cb25b4a2ef04df74c5926bae00b9e812dc"
+    },
+    {
+      "bytes": 154,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T12:15:46.509Z",
+      "path": "HandOver/results/LEVEL1-TMTAFF-TCM-20261024-088/evaluation-progress.json",
+      "sha256": "56f755260734c0c3b10eba7cfd85f58dbc5760259909462e9ebe0cf5633619cf"
+    },
+    {
+      "bytes": 126250,
+      "copy": "gzip of uncompressed original",
+      "gunzip_equals_original": true,
+      "gzip_sha256": "80f92c8a30b6d44ef5e8667ca353629fda96bcbaa4f8f0c7a6050358df470144",
+      "mtime_utc": "2026-10-24T10:18:29.124Z",
+      "original_bytes": 1257136,
+      "original_sha256": "17acd58236d6217ec7791a0b7da20c96e810159cf6b4760bd53ed0b98777382d",
+      "path": "HandOver/results/LEVEL1-TMTAFF-TCM-20261024-088/history.json.gz"
+    },
+    {
+      "bytes": 418890,
+      "copy": "gzip of uncompressed original",
+      "gunzip_equals_original": true,
+      "gzip_sha256": "7e17a9af93c3744df7e2fdee72b15003063fd6a53c4db4af53bb5197214b5b8b",
+      "mtime_utc": "2026-10-24T10:18:31.216Z",
+      "original_bytes": 6540084,
+      "original_sha256": "2583529569be5a68e5ec295a1702f6facf3a6f61767c24d6a3d478528e4fb027",
+      "path": "HandOver/results/LEVEL1-TMTAFF-TCM-20261024-088/coverage.json.gz"
+    },
+    {
+      "bytes": 425732,
+      "copy": "gzip of uncompressed original",
+      "gunzip_equals_original": true,
+      "gzip_sha256": "3c44f21bde64e2e6856c120a0405af998a3d339cf635514e045de2cccf8b8a80",
+      "mtime_utc": "2026-10-24T12:16:05.533Z",
+      "original_bytes": 7819824,
+      "original_sha256": "c9b8b3b87e96057c108ed2c4d36cf14db0765a92dcd9431175982829a30ef4f9",
+      "path": "HandOver/results/LEVEL1-TMTAFF-TCM-20261024-088/summary.json.gz"
+    },
+    {
+      "bytes": 45146,
+      "copy": "derived aggregate, NOT a replay input",
+      "path": "HandOver/results/LEVEL1-TMTAFF-TCM-20261024-088/completion-evaluation-aggregate.json",
+      "sha256": "f457d06b7df2a7d8fcc5f3c3a46f7609f29a6c370cdc3805e4d1659b8602e0c1"
+    }
+  ],
+  "git_returned_total_bytes": 1548827,
+  "large_originals_on_server": {
+    "checkpoint.pt": 72469516,
+    "completion-evaluation.json": 216831323,
+    "coverage.json": 6540084,
+    "history.json": 1257136,
+    "preparation.json": 676811226,
+    "summary.json": 7819824
+  },
+  "launcher_elapsed_seconds": 10315.590300415643,
+  "launcher_returncode": 0,
+  "note": "088 的 checkpoint.pt（72,469,516 B）、completion-evaluation.json（216,831,323 B，含 24,599 条逐片段明细）与 preparation.json（676,811,226 B）留在服务器；回传的 history/coverage/summary 为未压缩原件的 gzip 副本并逐字节校验，另附 completion-evaluation 的聚合摘要（明确标注不是重放输入）。",
+  "registered_at_utc": "2026-10-24T12:19:29Z",
+  "server_originals_grand_total_bytes": 982265377,
+  "server_originals_grand_total_files": 19,
+  "server_originals_tree_totals": [
+    {
+      "file_content_bytes": 982261918,
+      "file_count": 8,
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-TCM-20261024-088-attempt-1"
+    },
+    {
+      "file_content_bytes": 3459,
+      "file_count": 11,
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-TCM-20261024-088-attempt-1-launch"
+    }
+  ],
+  "server_run_dir": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-TCM-20261024-088-attempt-1",
+  "task": "088",
+  "time_advisory_issued": false,
+  "unit": "mtad-28dadd8e6ba9.service"
+}
