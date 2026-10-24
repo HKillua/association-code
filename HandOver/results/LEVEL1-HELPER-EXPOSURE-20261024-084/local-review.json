@@ -1,0 +1,67 @@
+{
+  "source_commit": "478764d",
+  "status": "EXECUTION_ACCEPTED_WITH_INTERPRETATION_CORRECTIONS",
+  "checks": [
+    {
+      "seed": 20261023,
+      "successful_updates": 4000,
+      "sample_count": 32000,
+      "valid_position_points": 1566596,
+      "zero_supervision_samples": 4,
+      "mode_coefficients_reaggregated": true,
+      "valid_point_to_loss_coefficient_difference_percentage_points": {
+        "zero": 0.44277861641223715,
+        "one": 0.10128887843769974,
+        "two_or_more": -0.5565674948498245
+      },
+      "maximum_four_valid_weighting_range_percentage_points": 0.5565674948498245,
+      "multi_helper_coefficient_contribution": {
+        "clean": {
+          "all_sample_coefficient": 0.08216414570705345,
+          "fraction_of_multi_coefficient": 0.2860045615318057
+        },
+        "clean_plus_wrong": {
+          "all_sample_coefficient": 0.20511849505571428,
+          "fraction_of_multi_coefficient": 0.7139954384682087
+        },
+        "wrong_only": {
+          "all_sample_coefficient": 0.0,
+          "fraction_of_multi_coefficient": 0.0
+        }
+      }
+    },
+    {
+      "seed": 20261021,
+      "successful_updates": 4000,
+      "sample_count": 32000,
+      "valid_position_points": 1561794,
+      "zero_supervision_samples": 6,
+      "mode_coefficients_reaggregated": true,
+      "valid_point_to_loss_coefficient_difference_percentage_points": {
+        "zero": 0.2629882951330764,
+        "one": 0.09498120834048329,
+        "two_or_more": -0.37671950347309413
+      },
+      "maximum_four_valid_weighting_range_percentage_points": 0.4325007556512994,
+      "multi_helper_coefficient_contribution": {
+        "clean": {
+          "all_sample_coefficient": 0.08357462968488269,
+          "fraction_of_multi_coefficient": 0.288867523035855
+        },
+        "clean_plus_wrong": {
+          "all_sample_coefficient": 0.20574356298196864,
+          "fraction_of_multi_coefficient": 0.7111324769641559
+        },
+        "wrong_only": {
+          "all_sample_coefficient": 0.0,
+          "fraction_of_multi_coefficient": 0.0
+        }
+      }
+    }
+  ],
+  "source_path_correction": "Accepted: old078B S2L and fit config bind LEVEL1-HELPER-SEQUENCE, not erroneous L2S SCREEN prefix; no new population.",
+  "limits": [
+    "Full original training.jsonl remains server-side; this local review recomputes returned aggregate identities, not all 8000 original batches.",
+    "No causal attribution of training failure or fitted dropout probability."
+  ]
+}
