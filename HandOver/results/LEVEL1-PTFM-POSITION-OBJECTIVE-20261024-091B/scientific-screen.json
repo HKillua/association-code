@@ -1,0 +1,40 @@
+{
+  "versus_fixed_prior095": {
+    "worth_matched_replication": false,
+    "relative_mae_reduction": -0.027265058576573464,
+    "required_mae_reduction": 0.03,
+    "deltas": {
+      "mae": 19.662864492796757,
+      "rmse": 4.257621061000918,
+      "p95": 2.980758206624614,
+      "p99": -11.788903047393433
+    },
+    "numerical_guard_m": 1e-06,
+    "nonpoint_mae_nonworse": false,
+    "outside_largest_component_nonworse": false,
+    "improved_scenes": 44,
+    "total_scenes": 300,
+    "improved_components": 3,
+    "total_components": 38,
+    "interpretation": "Single-seed resource screen, not significance, baseline validity or automatic method promotion."
+  },
+  "versus_transformer": {
+    "worth_matched_replication": false,
+    "relative_mae_reduction": -0.2540759939769288,
+    "required_mae_reduction": 0.03,
+    "deltas": {
+      "mae": 150.09376310744403,
+      "rmse": 41.28585567756727,
+      "p95": 810.9586028575029,
+      "p99": 223.4525017623555
+    },
+    "numerical_guard_m": 1e-06,
+    "nonpoint_mae_nonworse": false,
+    "outside_largest_component_nonworse": false,
+    "improved_scenes": 10,
+    "total_scenes": 300,
+    "improved_components": 2,
+    "total_components": 38,
+    "interpretation": "Single-seed resource screen, not significance, baseline validity or automatic method promotion."
+  }
+}

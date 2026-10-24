@@ -1,0 +1,1605 @@
+{
+  "windows": [
+    {
+      "first_step": 1,
+      "last_step": 100,
+      "loss_mean": 1.2049396195887292,
+      "task_losses_mean": [
+        0.3189819927618582,
+        0.11721497922646174,
+        0.8581543266945565
+      ],
+      "gradient_norm_median": 0.15680525451898575,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2049396195887294,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.109618352835886,
+        1.076058771359562,
+        1.137650942629322
+      ],
+      "l2_mean": 0.00760616485029459,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.2892020202409675,
+        "radial-linear": 0.18712709872169767,
+        "geodesic-linear": 3.785767549357767
+      }
+    },
+    {
+      "first_step": 101,
+      "last_step": 200,
+      "loss_mean": 1.1957838647322305,
+      "task_losses_mean": [
+        0.29151472819236274,
+        0.08543566115100562,
+        0.8466580653443441
+      ],
+      "gradient_norm_median": 0.12893439829349518,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.195783864732231,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0915714180907443,
+        1.1029434216087295,
+        1.1109330449504218
+      ],
+      "l2_mean": 0.0006617308387649245,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.2847926843556189,
+        "radial-linear": 0.1735018824408384,
+        "geodesic-linear": 3.4597783674090175
+      }
+    },
+    {
+      "first_step": 201,
+      "last_step": 300,
+      "loss_mean": 1.206415316060943,
+      "task_losses_mean": [
+        0.32340908217849984,
+        0.06728779364833105,
+        0.8659147684067372
+      ],
+      "gradient_norm_median": 0.11987032368779182,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2064153160609432,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0984231606348533,
+        1.089968742080413,
+        1.1102689760170075
+      ],
+      "l2_mean": 9.131303730100626e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.42157598970845916,
+        "radial-linear": 0.19456532712211794,
+        "geodesic-linear": 3.8383094853664876
+      }
+    },
+    {
+      "first_step": 301,
+      "last_step": 400,
+      "loss_mean": 1.189974428750807,
+      "task_losses_mean": [
+        0.27408642024809143,
+        0.06668989416554333,
+        0.8695276719631327
+      ],
+      "gradient_norm_median": 0.11924106627702713,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1899744287508065,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.097838699688538,
+        1.0919394734814263,
+        1.108278257701977
+      ],
+      "l2_mean": 2.5355393881909548e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.22086195214945295,
+        "radial-linear": 0.16444160823350862,
+        "geodesic-linear": 3.2529343318433632
+      }
+    },
+    {
+      "first_step": 401,
+      "last_step": 500,
+      "loss_mean": 1.1927378628137522,
+      "task_losses_mean": [
+        0.28237672243692763,
+        0.06893419304333119,
+        0.8860371260596284
+      ],
+      "gradient_norm_median": 0.1234029121696949,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1927378628137526,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0930834676867576,
+        1.1040977532647627,
+        1.1005234928110612
+      ],
+      "l2_mean": 1.3971097159810596e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.25028154980751904,
+        "radial-linear": 0.17118092294079376,
+        "geodesic-linear": 3.3513259580575037
+      }
+    },
+    {
+      "first_step": 501,
+      "last_step": 600,
+      "loss_mean": 1.1946967664333583,
+      "task_losses_mean": [
+        0.2882534332957454,
+        0.06863205567508036,
+        0.8548879743663348
+      ],
+      "gradient_norm_median": 0.09458538889884949,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1946967664333588,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.104042676587252,
+        1.093384745675973,
+        1.1004026674996057
+      ],
+      "l2_mean": 8.764636813793913e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.215556515006604,
+        "radial-linear": 0.17197121267936644,
+        "geodesic-linear": 3.421072406982851
+      }
+    },
+    {
+      "first_step": 601,
+      "last_step": 700,
+      "loss_mean": 1.1826670510152812,
+      "task_losses_mean": [
+        0.252164287041514,
+        0.0708869588209978,
+        0.8531556148116488
+      ],
+      "gradient_norm_median": 0.12455270439386368,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1826670510152812,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0981310745636677,
+        1.101144712765443,
+        1.0978688193947357
+      ],
+      "l2_mean": 5.332813484528742e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.14474836125732005,
+        "radial-linear": 0.15221070030783718,
+        "geodesic-linear": 2.992756320578264
+      }
+    },
+    {
+      "first_step": 701,
+      "last_step": 800,
+      "loss_mean": 1.1945282087955253,
+      "task_losses_mean": [
+        0.2877477603822467,
+        0.07349219404436502,
+        0.8524743924408703
+      ],
+      "gradient_norm_median": 0.13234912604093552,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1945282087955258,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.099458124130274,
+        1.1038498388968643,
+        1.0953462984514013
+      ],
+      "l2_mean": 3.942523348996474e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3131871184982951,
+        "radial-linear": 0.17148248386665368,
+        "geodesic-linear": 3.4150709393453282
+      }
+    },
+    {
+      "first_step": 801,
+      "last_step": 900,
+      "loss_mean": 1.2038421319363137,
+      "task_losses_mean": [
+        0.31568952980461196,
+        0.0731240211754645,
+        0.8491760056627189
+      ],
+      "gradient_norm_median": 0.1130773313343525,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2038421319363135,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0948826523226804,
+        1.09766907732625,
+        1.1032923613868333
+      ],
+      "l2_mean": 2.9686116999982915e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3011447508034737,
+        "radial-linear": 0.18845542514435476,
+        "geodesic-linear": 3.746691677666441
+      }
+    },
+    {
+      "first_step": 901,
+      "last_step": 1000,
+      "loss_mean": 1.1884113141905286,
+      "task_losses_mean": [
+        0.27351687264976193,
+        0.07307914833514431,
+        0.8634833610663073
+      ],
+      "gradient_norm_median": 0.10411478579044342,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3329166666666663,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.097239023307273,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1884113141905286,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0998914025997322,
+        1.094983631268178,
+        1.098607247299618
+      ],
+      "l2_mean": 3.101075978975132e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.31372689312770746,
+        "radial-linear": 0.1644981043604355,
+        "geodesic-linear": 3.246174781572513
+      }
+    },
+    {
+      "first_step": 1001,
+      "last_step": 1100,
+      "loss_mean": 1.2010530809803084,
+      "task_losses_mean": [
+        0.30732237693659525,
+        0.06854192866542358,
+        0.8803305164969544
+      ],
+      "gradient_norm_median": 0.10365946218371391,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.201053080980308,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.1016960129513547,
+        1.1041643881401604,
+        1.093600512319863
+      ],
+      "l2_mean": 4.49491571089311e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3541878927416736,
+        "radial-linear": 0.1863113353654351,
+        "geodesic-linear": 3.6473879660870185
+      }
+    },
+    {
+      "first_step": 1101,
+      "last_step": 1200,
+      "loss_mean": 1.206038620366846,
+      "task_losses_mean": [
+        0.3222789950962084,
+        0.06920097857726826,
+        0.8785434375618754
+      ],
+      "gradient_norm_median": 0.11696158349514008,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2060386203668458,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.099967370292771,
+        1.0992927979138165,
+        1.1033381775729934
+      ],
+      "l2_mean": 8.23519931827832e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.5285826267607412,
+        "radial-linear": 0.19315982474736323,
+        "geodesic-linear": 3.8248972956467924
+      }
+    },
+    {
+      "first_step": 1201,
+      "last_step": 1300,
+      "loss_mean": 1.1949948453273371,
+      "task_losses_mean": [
+        0.2891476699776818,
+        0.06586420669996125,
+        0.8424421964034379
+      ],
+      "gradient_norm_median": 0.12710928916931152,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1949948453273371,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0900285017629452,
+        1.1009020829228628,
+        1.105942819927218
+      ],
+      "l2_mean": 8.86343071670126e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.26784177094293116,
+        "radial-linear": 0.17188605935216184,
+        "geodesic-linear": 3.4316854581541985
+      }
+    },
+    {
+      "first_step": 1301,
+      "last_step": 1400,
+      "loss_mean": 1.2074795346805443,
+      "task_losses_mean": [
+        0.3307215341198094,
+        0.06602131760071117,
+        0.8530912849578399
+      ],
+      "gradient_norm_median": 0.13144388794898987,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3329166666666663,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.097239023307273,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2074795346805443,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0934492903130297,
+        1.094138120391936,
+        1.104288457178245
+      ],
+      "l2_mean": 1.141211630510952e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3602977772656776,
+        "radial-linear": 0.19672666316104095,
+        "geodesic-linear": 3.925095711215653
+      }
+    },
+    {
+      "first_step": 1401,
+      "last_step": 1500,
+      "loss_mean": 1.1999544128840993,
+      "task_losses_mean": [
+        0.30402637264796845,
+        0.067030224398178,
+        0.9013020256498397
+      ],
+      "gradient_norm_median": 0.12042379006743431,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1999544128840993,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0971622036380808,
+        1.0983494919226506,
+        1.0991899627715058
+      ],
+      "l2_mean": 4.982896123237879e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3253769729823388,
+        "radial-linear": 0.1819553626078351,
+        "geodesic-linear": 3.608270064883916
+      }
+    },
+    {
+      "first_step": 1501,
+      "last_step": 1600,
+      "loss_mean": 1.2065817989488028,
+      "task_losses_mean": [
+        0.3239085308420793,
+        0.0715650690618067,
+        0.8858058520858811
+      ],
+      "gradient_norm_median": 0.1047958992421627,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.206581798948803,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0964871622085903,
+        1.098429044547368,
+        1.1019180007708957
+      ],
+      "l2_mean": 1.3893503930830776e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.34833361974999205,
+        "radial-linear": 0.19431947638389208,
+        "geodesic-linear": 3.844237081864262
+      }
+    },
+    {
+      "first_step": 1601,
+      "last_step": 1700,
+      "loss_mean": 1.1836152906052533,
+      "task_losses_mean": [
+        0.2550090058114304,
+        0.06778697549437233,
+        0.8681216387962583
+      ],
+      "gradient_norm_median": 0.11600183695554733,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1836152906052528,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0987856406443628,
+        1.0968194033750043,
+        1.1004210898755509
+      ],
+      "l2_mean": 1.493750436566188e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.152453273372077,
+        "radial-linear": 0.1524836776749148,
+        "geodesic-linear": 3.0265182389641656
+      }
+    },
+    {
+      "first_step": 1701,
+      "last_step": 1800,
+      "loss_mean": 1.1873892073341412,
+      "task_losses_mean": [
+        0.26633075599809464,
+        0.06858016446599807,
+        0.8671651426580056
+      ],
+      "gradient_norm_median": 0.09096600115299225,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1873892073341414,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0966829466008483,
+        1.0979938823715663,
+        1.0998541861207212
+      ],
+      "l2_mean": 1.8791564383491278e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.15166291624045203,
+        "radial-linear": 0.15859372683471748,
+        "geodesic-linear": 3.16088793829264
+      }
+    },
+    {
+      "first_step": 1801,
+      "last_step": 1900,
+      "loss_mean": 1.1972887942471153,
+      "task_losses_mean": [
+        0.2960295167370164,
+        0.06889223790923749,
+        0.8685505780620383
+      ],
+      "gradient_norm_median": 0.11237995699048042,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.197288794247115,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0983157164597783,
+        1.097748468885605,
+        1.0984949411061518
+      ],
+      "l2_mean": 2.719421112260534e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.25914124767967556,
+        "radial-linear": 0.17836874714923595,
+        "geodesic-linear": 3.5133611412094257
+      }
+    },
+    {
+      "first_step": 1901,
+      "last_step": 2000,
+      "loss_mean": 1.2004642233137808,
+      "task_losses_mean": [
+        0.3055558039370132,
+        0.06485418914173112,
+        0.8656247899560158
+      ],
+      "gradient_norm_median": 0.10386712849140167,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2004642233137808,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.097587536091028,
+        1.10131045601493,
+        1.0956480727708102
+      ],
+      "l2_mean": 8.986039642877585e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3813959602611423,
+        "radial-linear": 0.1830245519876255,
+        "geodesic-linear": 3.626421783396002
+      }
+    },
+    {
+      "first_step": 2001,
+      "last_step": 2100,
+      "loss_mean": 1.1970688705771702,
+      "task_losses_mean": [
+        0.2953697457271816,
+        0.06616478903945192,
+        0.8648064017791925
+      ],
+      "gradient_norm_median": 0.12021113932132721,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1970688705771704,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.1011808545792292,
+        1.096494494638179,
+        1.098185478833474
+      ],
+      "l2_mean": 4.6078600848886706e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3159788885465772,
+        "radial-linear": 0.1760741301213416,
+        "geodesic-linear": 3.505530794244026
+      }
+    },
+    {
+      "first_step": 2101,
+      "last_step": 2200,
+      "loss_mean": 1.1920534902214512,
+      "task_losses_mean": [
+        0.28032360466002515,
+        0.0674129156597599,
+        0.851704264924005
+      ],
+      "gradient_norm_median": 0.11120034754276276,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1920534902214512,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0989501551049123,
+        1.0973752332288462,
+        1.099537307366771
+      ],
+      "l2_mean": 2.366377182170254e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.26523612179422457,
+        "radial-linear": 0.16885869897713957,
+        "geodesic-linear": 3.326958981766745
+      }
+    },
+    {
+      "first_step": 2201,
+      "last_step": 2300,
+      "loss_mean": 1.1900262355900837,
+      "task_losses_mean": [
+        0.2783616368484271,
+        0.06783571682950688,
+        0.8560349014965515
+      ],
+      "gradient_norm_median": 0.1163501963019371,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3329166666666663,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.097239023307273,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1900262355900835,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0989085530615244,
+        1.0963000018988107,
+        1.0965484643853347
+      ],
+      "l2_mean": 3.4380726981453335e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.16431487819935955,
+        "radial-linear": 0.1669660607330723,
+        "geodesic-linear": 3.303673798770294
+      }
+    },
+    {
+      "first_step": 2301,
+      "last_step": 2400,
+      "loss_mean": 1.1923400961935091,
+      "task_losses_mean": [
+        0.2811834225761982,
+        0.07247539494472069,
+        0.867712941620876
+      ],
+      "gradient_norm_median": 0.11022187024354935,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1923400961935096,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0986716070686262,
+        1.0978391956539661,
+        1.0965895894306092
+      ],
+      "l2_mean": 2.3586057295688077e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.2056310143462543,
+        "radial-linear": 0.16802837334192922,
+        "geodesic-linear": 3.3371635413947685
+      }
+    },
+    {
+      "first_step": 2401,
+      "last_step": 2500,
+      "loss_mean": 1.2032607668786495,
+      "task_losses_mean": [
+        0.3139454346316191,
+        0.0717214855113485,
+        0.8574505769037688
+      ],
+      "gradient_norm_median": 0.09353535994887352,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2032607668786495,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0975797325571415,
+        1.1015871129294301,
+        1.0967234601719078
+      ],
+      "l2_mean": 2.0952057374756804e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.4367617107020412,
+        "radial-linear": 0.1893596461669292,
+        "geodesic-linear": 3.725992268111255
+      }
+    },
+    {
+      "first_step": 2501,
+      "last_step": 2600,
+      "loss_mean": 1.1977129108235616,
+      "task_losses_mean": [
+        0.3014216625488606,
+        0.06952815666979208,
+        0.8511569616046778
+      ],
+      "gradient_norm_median": 0.10148933529853821,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3329166666666663,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.097239023307273,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1977129108235618,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.096738836774047,
+        1.0984607531749513,
+        1.0965652108269708
+      ],
+      "l2_mean": 1.926925758652942e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3273081215864064,
+        "radial-linear": 0.18121449032560352,
+        "geodesic-linear": 3.5773566365636897
+      }
+    },
+    {
+      "first_step": 2601,
+      "last_step": 2700,
+      "loss_mean": 1.1960754432631382,
+      "task_losses_mean": [
+        0.29238946378508457,
+        0.06859342565381374,
+        0.8518751838646808
+      ],
+      "gradient_norm_median": 0.11067743226885796,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1960754432631382,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0996729659758675,
+        1.0967496819245175,
+        1.0981556556103482
+      ],
+      "l2_mean": 5.578290483754245e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3137162350109316,
+        "radial-linear": 0.17453421894988547,
+        "geodesic-linear": 3.4701599741966676
+      }
+    },
+    {
+      "first_step": 2701,
+      "last_step": 2800,
+      "loss_mean": 1.194585647115126,
+      "task_losses_mean": [
+        0.28792007534104835,
+        0.06912097434986264,
+        0.8419969595135859
+      ],
+      "gradient_norm_median": 0.1176493652164936,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1945856471151257,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.097044109186998,
+        1.0994276660582378,
+        1.0996342228198495
+      ],
+      "l2_mean": 6.460862769017695e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3964069732797425,
+        "radial-linear": 0.17023194058417196,
+        "geodesic-linear": 3.4171160214944853
+      }
+    },
+    {
+      "first_step": 2801,
+      "last_step": 2900,
+      "loss_mean": 1.1979204376771475,
+      "task_losses_mean": [
+        0.2979244470271131,
+        0.06496444198319852,
+        0.8512320858529148
+      ],
+      "gradient_norm_median": 0.12608586251735687,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1979204376771475,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.1010627359431042,
+        1.0949616567483487,
+        1.1000941374873812
+      ],
+      "l2_mean": 1.2445743996067904e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3288618393069027,
+        "radial-linear": 0.17623671150257952,
+        "geodesic-linear": 3.5358507041418985
+      }
+    },
+    {
+      "first_step": 2901,
+      "last_step": 3000,
+      "loss_mean": 1.1927737708404036,
+      "task_losses_mean": [
+        0.28248444651688165,
+        0.06609960842232639,
+        0.9067865982766635
+      ],
+      "gradient_norm_median": 0.12403009459376335,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1927737708404036,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.1009397255277718,
+        1.0949997587869376,
+        1.0985751150713532
+      ],
+      "l2_mean": 7.405604101222707e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.23643322834751243,
+        "radial-linear": 0.16968319813957297,
+        "geodesic-linear": 3.352604457582328
+      }
+    },
+    {
+      "first_step": 3001,
+      "last_step": 3100,
+      "loss_mean": 1.205002909371231,
+      "task_losses_mean": [
+        0.3191718621093623,
+        0.06873589840763254,
+        0.863398062366858
+      ],
+      "gradient_norm_median": 0.11307534575462341,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.205002909371231,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.098214592045086,
+        1.0999498303861406,
+        1.0977818991525952
+      ],
+      "l2_mean": 4.3794651764983426e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.30219739939679213,
+        "radial-linear": 0.19195990155714118,
+        "geodesic-linear": 3.788020971904209
+      }
+    },
+    {
+      "first_step": 3101,
+      "last_step": 3200,
+      "loss_mean": 1.1884275176754397,
+      "task_losses_mean": [
+        0.2694456870219899,
+        0.07005332287409259,
+        0.86077753751476
+      ],
+      "gradient_norm_median": 0.10763471573591232,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1884275176754393,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.09894229119678,
+        1.100061658269439,
+        1.0970663582995952
+      ],
+      "l2_mean": 4.3198430557822575e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.18855565273377778,
+        "radial-linear": 0.16264489786278105,
+        "geodesic-linear": 3.197856811321013
+      }
+    },
+    {
+      "first_step": 3201,
+      "last_step": 3300,
+      "loss_mean": 1.2029546606995338,
+      "task_losses_mean": [
+        0.3130271160942718,
+        0.06953436263929123,
+        0.8427916882591273
+      ],
+      "gradient_norm_median": 0.11292199417948723,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.202954660699534,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.1006777123898583,
+        1.0988316446919664,
+        1.0963681039283193
+      ],
+      "l2_mean": 3.934290245979355e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.31018994424089524,
+        "radial-linear": 0.18349151158003543,
+        "geodesic-linear": 3.715093406741174
+      }
+    },
+    {
+      "first_step": 3301,
+      "last_step": 3400,
+      "loss_mean": 1.19620681869074,
+      "task_losses_mean": [
+        0.2927835900678909,
+        0.06978547354550252,
+        0.8571968751619892
+      ],
+      "gradient_norm_median": 0.10846637561917305,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.19620681869074,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0970325027070233,
+        1.1028927837716906,
+        1.09603816688857
+      ],
+      "l2_mean": 1.6884054703041328e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.23531236709038017,
+        "radial-linear": 0.17525349877958987,
+        "geodesic-linear": 3.4748375752075504
+      }
+    },
+    {
+      "first_step": 3401,
+      "last_step": 3500,
+      "loss_mean": 1.1942807426558955,
+      "task_losses_mean": [
+        0.2870053619633574,
+        0.07652362576497124,
+        0.8520018578731897
+      ],
+      "gradient_norm_median": 0.10137639194726944,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1942807426558957,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0932409227514968,
+        1.1041025422285697,
+        1.098555197409747
+      ],
+      "l2_mean": 1.185227689347812e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3181585958760395,
+        "radial-linear": 0.17382762143927422,
+        "geodesic-linear": 3.406259947168024
+      }
+    },
+    {
+      "first_step": 3501,
+      "last_step": 3600,
+      "loss_mean": 1.1956292599921516,
+      "task_losses_mean": [
+        0.29105091397212557,
+        0.07398545532088324,
+        0.8500170811025979
+      ],
+      "gradient_norm_median": 0.12994331121444702,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1956292599921519,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.093890353923173,
+        1.1010374256624447,
+        1.1010600140561138
+      ],
+      "l2_mean": 1.0686564778552565e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.22305266152861697,
+        "radial-linear": 0.17492342601032004,
+        "geodesic-linear": 3.4542736904562474
+      }
+    },
+    {
+      "first_step": 3601,
+      "last_step": 3700,
+      "loss_mean": 1.2040827854173572,
+      "task_losses_mean": [
+        0.3164114902477423,
+        0.07176703667423662,
+        0.8638576567664613
+      ],
+      "gradient_norm_median": 0.11077580228447914,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2040827854173572,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0966790212164583,
+        1.1025121439817371,
+        1.0972523049359884
+      ],
+      "l2_mean": 8.011462055037555e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3989971728750449,
+        "radial-linear": 0.18704321835503332,
+        "geodesic-linear": 3.755260106228375
+      }
+    },
+    {
+      "first_step": 3701,
+      "last_step": 3800,
+      "loss_mean": 1.1959355301648444,
+      "task_losses_mean": [
+        0.29196972449020353,
+        0.07965773989283503,
+        0.8734583385116643
+      ],
+      "gradient_norm_median": 0.13231957703828812,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1959355301648442,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0991849268487517,
+        1.1025771911904771,
+        1.0955860004700324
+      ],
+      "l2_mean": 4.7506149785476735e-05,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.25720855936106907,
+        "radial-linear": 0.17435036461884681,
+        "geodesic-linear": 3.465178390791307
+      }
+    },
+    {
+      "first_step": 3801,
+      "last_step": 3900,
+      "loss_mean": 1.2046500678350922,
+      "task_losses_mean": [
+        0.31811333750094767,
+        0.06964712282691249,
+        0.8397611481076652
+      ],
+      "gradient_norm_median": 0.10336323082447052,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.2046500678350922,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0969314837758817,
+        1.102908763478136,
+        1.0948686413490463
+      ],
+      "l2_mean": 7.333750345424051e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.30186426306997993,
+        "radial-linear": 0.19067937883690164,
+        "geodesic-linear": 3.7754581056494825
+      }
+    },
+    {
+      "first_step": 3901,
+      "last_step": 4000,
+      "loss_mean": 1.196987636908211,
+      "task_losses_mean": [
+        0.29512604472030374,
+        0.06866015514829481,
+        0.8596974280688053
+      ],
+      "gradient_norm_median": 0.10876525938510895,
+      "clipped_updates": 0,
+      "actual_task_coefficients_mean": [
+        0.3333333333333329,
+        0.0,
+        0.0
+      ],
+      "actual_task_regularizers_mean": [
+        1.0986122886681082,
+        0.0,
+        0.0
+      ],
+      "actual_task_contributions_mean": [
+        1.1969876369082109,
+        0.0,
+        0.0
+      ],
+      "task_sigmas_mean": [
+        1.0973925547650714,
+        1.0999500140708323,
+        1.0986350104641385
+      ],
+      "l2_mean": 4.006465351267252e-06,
+      "position_objective": "geodesic-linear",
+      "position_loss_scale": 0.08425820883164674,
+      "raw_position_sample_means": {
+        "normalized_squared": 0.3570735110319194,
+        "radial-linear": 0.17735145777511466,
+        "geodesic-linear": 3.502638482500673
+      }
+    }
+  ],
+  "selection": false
+}

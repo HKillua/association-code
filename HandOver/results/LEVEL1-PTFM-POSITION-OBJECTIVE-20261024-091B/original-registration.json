@@ -1,0 +1,246 @@
+{
+ "run_id": "LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1",
+ "note": "Returned files are verbatim copies of program artifacts; gzip copies are labelled and verified by gunzip hash. Summaries are not replay inputs.",
+ "derived_or_aggregate": [
+  "summary.json",
+  "scientific-screen.json",
+  "endpoint-comparison.json",
+  "fit-run.json",
+  "loss-calibration.json",
+  "training-windows.json",
+  "fixed-training-probe.json",
+  "initial-summary.json.gz",
+  "final-summary.json.gz"
+ ],
+ "server_originals_tree_totals": {
+  "file_count": 1827,
+  "content_bytes": 1712693793,
+  "directory_inode_bytes_not_included": true
+ },
+ "server_directory_entry_counts": {
+  "initial": 6,
+  "fit": 9,
+  "final": 6,
+  "initial/scenes": 300,
+  "initial/system-predictions": 300,
+  "initial/predictions": 300,
+  "final/scenes": 300,
+  "final/system-predictions": 300,
+  "final/predictions": 300
+ },
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/run.json",
+   "bytes": 1861,
+   "sha256": "0608f4ac44958f168c7f45b8d6321e9cb88f03cb2df51c53ad1d3fb2e6189036",
+   "mtime_local": "2026-10-24T23:40:53+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "summary.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/summary.json",
+   "bytes": 7103,
+   "sha256": "f4a00743a5850d82953b4493ae6f3744fe898c9c2b7e08feb9f207db23faf778",
+   "mtime_local": "2026-10-24T23:40:53+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "scientific-screen.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/scientific-screen.json",
+   "bytes": 1324,
+   "sha256": "fccdc9bd4da7b3d75430d7768b7a3f9c8ca98f669d2cf7e704a34dac1950712a",
+   "mtime_local": "2026-10-24T23:40:53+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "endpoint-comparison.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/endpoint-comparison.json",
+   "bytes": 1574,
+   "sha256": "b89f38b2beca736e17ef4139aeefd681223a9ec1a00bc5a9ac6ad7c1e2837628",
+   "mtime_local": "2026-10-24T23:38:03+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "execution.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/execution.json",
+   "bytes": 2280,
+   "sha256": "8651a23e58eda079d2e9a7bafd23d16176d54c874aeb417cafd34eac7a60abc1",
+   "mtime_local": "2026-10-24T23:40:53+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "source-binding.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/source-binding.json",
+   "bytes": 11152,
+   "sha256": "882fbce4223fecfdf3c1e8e5834e14406e80a491670a26940303102b2d602953",
+   "mtime_local": "2026-10-24T22:35:06+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "fit-run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/run.json",
+   "bytes": 663545,
+   "sha256": "d2cd44a6b49d7ae711d204b04b94591bebcd60ccdcfb09c116eba68df6b0286a",
+   "mtime_local": "2026-10-24T23:23:15+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "loss-calibration.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/loss-calibration.json",
+   "bytes": 936,
+   "sha256": "4f8c26e8472719d07c68fad67dfc58834375d34149f997cbd98d8519eccd1bc6",
+   "mtime_local": "2026-10-24T23:05:08+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "training-windows.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/training-windows.json",
+   "bytes": 42239,
+   "sha256": "3b6e73b23adace6faa24710bc106d38c689b40e0cd97a278e86591b851718635",
+   "mtime_local": "2026-10-24T23:23:10+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "fixed-training-probe.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/fixed-training-probe.json",
+   "bytes": 960425,
+   "sha256": "fbf1b644a391c7e09a55e21f67890419a2091038341bc237fb45f1efac5fa9e2",
+   "mtime_local": "2026-10-24T23:23:15+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "normalizer.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/normalizer.json",
+   "bytes": 739,
+   "sha256": "84c5fa79c5683521b3637db661f4594f0e1f3b38a513309474c19517e686cdb2",
+   "mtime_local": "2026-10-24T23:03:27+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "initial-run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/initial/run.json",
+   "bytes": 5319,
+   "sha256": "a1b084106771717f382827f8e64b6145f90fd1d0de814662a6dce5a11d33aa98",
+   "mtime_local": "2026-10-24T23:29:39+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "final-run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/final/run.json",
+   "bytes": 5324,
+   "sha256": "6b24dc163ead0c316fe4a02e8cf81ff508a413176ce11001e84f5ba2d7b8c7bf",
+   "mtime_local": "2026-10-24T23:37:40+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "final-scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/final/scene-summary.json.gz",
+   "bytes": 1213933,
+   "sha256": "50dae40277204f3602a6b8d72a22bb5ba67f7037a3097728a867fb19387aeb99",
+   "mtime_local": "2026-10-24T23:37:39+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "initial-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/initial/summary.json",
+   "source_bytes": 7367569,
+   "returned_bytes": 385525,
+   "source_sha256": "1087def7d4c8a47e7d912c240170f25d1085d0c29d8fc7b6d68ca494a764f3c1",
+   "gunzip_equals_original": true,
+   "mtime_local": "2026-10-24T23:29:39+0800",
+   "mode": "gzip copy of uncompressed original (mtime=0)"
+  },
+  {
+   "returned_name": "final-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/final/summary.json",
+   "source_bytes": 7422724,
+   "returned_bytes": 451360,
+   "source_sha256": "7795ceceeb31ba552aa5944eb266565e77e370e831232cb93e0e5b61dedc9a38",
+   "gunzip_equals_original": true,
+   "mtime_local": "2026-10-24T23:37:40+0800",
+   "mode": "gzip copy of uncompressed original (mtime=0)"
+  }
+ ],
+ "returned_total_bytes": 3754639,
+ "server_originals_retained_sample": [
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/preparation.json",
+   "bytes": 622925338,
+   "sha256": "0c6a560c8143f303a39000f51b932669ca17e3e125e09cd2b24ea93fe646dd78",
+   "mtime_local": "2026-10-24T22:58:26+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/step-0.pt",
+   "bytes": 804134,
+   "sha256": "de9e01f7dadafe2190c0fbeb667a8a157e986c3ade4f44b5c5e45d818e94bbaa",
+   "mtime_local": "2026-10-24T23:05:08+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/final.pt",
+   "bytes": 2397766,
+   "sha256": "d42eaa7e2226429ab9221687505440a0197950aa3354be417e92b966a2d4a3cc",
+   "mtime_local": "2026-10-24T23:23:10+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/training.jsonl",
+   "bytes": 10307984,
+   "sha256": "952556ec2567db52054cdf6f9068cb40a28ca2aff17254a7e1052f550a1e4170",
+   "mtime_local": "2026-10-24T23:23:10+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/fit/fixed-training-probe-plan.json",
+   "bytes": 327708,
+   "sha256": "d2ba5c3c6920af3426fdcb5bcb2810baaa3549af434df52297553eb1301eb3ae",
+   "mtime_local": "2026-10-24T23:05:08+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/initial/summary.json",
+   "bytes": 7367569,
+   "sha256": "1087def7d4c8a47e7d912c240170f25d1085d0c29d8fc7b6d68ca494a764f3c1",
+   "mtime_local": "2026-10-24T23:29:39+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/final/summary.json",
+   "bytes": 7422724,
+   "sha256": "7795ceceeb31ba552aa5944eb266565e77e370e831232cb93e0e5b61dedc9a38",
+   "mtime_local": "2026-10-24T23:37:40+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/ptfm-comparison.json.gz",
+   "bytes": 1693148,
+   "sha256": "2b75d080531f1c7a3f6ccfdf0cdc73c5c5d17d3759c606f9574a5769311ee925",
+   "mtime_local": "2026-10-24T23:38:59+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/position-only-comparison.json.gz",
+   "bytes": 1786584,
+   "sha256": "fd994da9bb82993efea25be14b02c952555bbf6c816b414155218cb86c775ea6",
+   "mtime_local": "2026-10-24T23:39:56+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/transformer-comparison.json.gz",
+   "bytes": 1826264,
+   "sha256": "d62ba1f4ffed1eb0b5a2ce3bb1053e8dd5c91f32ac1415cd95340f9f07bb2888",
+   "mtime_local": "2026-10-24T23:40:53+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/initial-ptfm-comparison.json.gz",
+   "bytes": 652451,
+   "sha256": "b87b4567485c5bc7e1f6f220449b37f38750f591424b215e41e7561de2b2c779",
+   "mtime_local": "2026-10-24T23:30:34+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/initial-position-only-comparison.json.gz",
+   "bytes": 652460,
+   "sha256": "0c01f41f73fd4168d09e42eed2c92433cbcfa677d668341fe5953e2f31434c0e",
+   "mtime_local": "2026-10-24T23:31:32+0800"
+  },
+  {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-POSITION-OBJECTIVE-20261024-091B-attempt-1/initial/scene-summary.json.gz",
+   "bytes": 1019599,
+   "sha256": "6d3045194f15d7be9d6d84d5bfdc228f9d0a58f02e18871f555533da1a94ceae",
+   "mtime_local": "2026-10-24T23:29:37+0800"
+  }
+ ]
+}
