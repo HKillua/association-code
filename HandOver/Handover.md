@@ -30,6 +30,7 @@
 - 单元 `mtad-a15de726acdc.service`：`Linger=yes`、`ActiveState=active`、`SubState=running`、`status.json=RUNNING`、`launch.json.status=SUBMITTED`、`time_advisory_issued=false`；控制服务 `CUDA_VISIBLE_DEVICES=` 空，不占 GPU 名额。
 - `plan.json`：`max_gpu_claims=4`、`max_cpu_comparisons=1`；096A←093A＋094A、096B←093B＋094B、097A 无依赖；另 093/094/096/097 四张 CPU 表按依赖串行（每次最多一张）。
 - 提交后实测（不只看 SUBMITTED）：queue 已为 096B 启动 `completion_system_evaluate.py --check-source-only`（PID 3977245，来源 094B＋093B），尚无子任务输出目录；index0（`GPU-c5a00c37`）与 index3（`GPU-1043f26a`）当前 util 0、显存 12 MiB，index1/index2 仍由 094A/093A 占用。
+- 控制服务首次接续实测（23:02Z）：**096B** 已提交，单元 `mtad-0f6ff7294d95.service`，`GPU-c5a00c37`(index0，提交前 util 0／12 MiB)，来源 094B＋093B，`--completion-policy state_hold`；**097A** 已提交，单元 `mtad-a7b83f3e6bf0.service`，`GPU-1043f26a`(index3，util 0／14 MiB)，来源 056 system＋073C，seed20261021。两臂均 `status.json=RUNNING`、advisory 未触、各自独立 output/launcher。至此 093A(index2)、094A(index1)、096B(index0)、097A(index3) 共四个已领取单卡，达到全局上限；096A 仍在等 093A＋094A。
 - 本轮**不手工领取** 096/097 或任一 CPU 表，全部交由该控制服务按真实终态接续；093A/094A 终态后由其自动提交。
 
 ## 090/091及093/094原批结案快照（dfe639e；新任务以顶部096—097合同为准）
