@@ -95,3 +95,10 @@ python -m unittest tests.test_completion_policy tests.models.test_timed_models \
 095主代理另用真实088已回传run/summary/history/coverage通过正式配置预检，再确认其聚合摘录被明确拒绝为per_fragment输入；未运行正式24599片段聚合。工具只按场保留完整物理数组，但精确尾部误差向量与checkpoint仍随人口占内存；没有实测正式Level1峰值RSS，CPU/I/O需现场错峰。
 
 新GPU效果、完整095聚合和服务器领取均未知。代码验证、freeze、发布、领取、执行验收及科研选择是不同状态；原实验目录不改写、不自动重跑。旧092的退役只影响未发布计划，不改已完成088。
+
+
+### 冻结与访问状态
+
+实现冻结`042bc0628dbdac3137a15c8ca386b03f452baca8`；九段L2S执行/联表Bash块、224处相关相对链接、新JSON及diff whitespace检查通过。090/091/093/094/095具体交接已READY，旧092 SUPERSEDED。最后同步远程`8ca1bb350ddb8352bbdcf1736219293c73eb75b4`没有新实验，只补086/088独立结案审查；其原件与本次`post088-redesign-review.json`均保留。
+
+发布尝试实际失败：git HTTPS没有可用用户名凭据；GitHub插件create_tree返回403 `Resource not accessible by integration`。这不是自动审批系统驳回，也不需要重复批准科研预算。本地提交已完成，远程尚未取得本批代码；将全部相对该远程base的提交、更新文件、协议和审查打包为可快进git bundle。不声称服务器已运行或卡已占用。需有写权限的开发环境合入/推送后，按当前HandOver领取；不在活动实验checkout直接pull，不强推，不覆盖源运行。

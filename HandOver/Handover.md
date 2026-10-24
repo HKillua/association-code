@@ -6,6 +6,8 @@
 
 **旧092未发布/未领取，现SUPERSEDED，禁止按旧包领取；改为093两个TFM臂和094两个TAM臂。** 统一实现及40项针对性检查、独立review完成，冻结代码`042bc0628dbdac3137a15c8ca386b03f452baca8`；以下具体交接READY；此前没有090以后新臂的服务器领取回执。090/091科学方案保持，统一更新调度；088已完成，不再是活动GPU依赖。
 
+**本次交付状态：本地代码与具体合同已READY，冻结`042bc0628dbdac3137a15c8ca386b03f452baca8`；远程发布尚未成功。** CLI推送因缺少HTTPS凭据失败，GitHub插件create_tree返回403 `Resource not accessible by integration`，不是实验预算审批或自动审批拒绝。最近实际同步的远程为`8ca1bb3`，它尚不含本批新合同。新GPU/095未启动、未领取；完整git bundle随交付包提供，可在有仓库写权限的干净开发checkout快进合入并推送，再依当前索引领取。不能用旧092包代替。
+
 | 任务 | 当前状态 | 固定范围 |
 |---|---|---|
 | [090A/B/C](L2S-20261024-090.md) | READY；未领取 | 同072C final各追加4000：A冻结teacher全query增量、B仅Anchor无支撑增量、C全原模型fresh Adam预算对照；同实际32000样本；完整缓存A-mask诊断。 |
