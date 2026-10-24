@@ -1,0 +1,206 @@
+{
+  "source_commit": "c571993",
+  "acceptance": "EXECUTION_ACCEPTED_WITH_INTERPRETATION_CORRECTIONS",
+  "raw_server_inputs_replayed_locally": false,
+  "scope": "reaggregate returned2100-scene and81-cell arrays; inspect frozen source/provenance, no new training/forward",
+  "checks": {
+    "equations": 23771,
+    "relative_tolerance": 1e-10,
+    "absolute_tolerance": 1e-06,
+    "max_normalized_difference": 1.109319043003605e-12,
+    "ordered_T_scene_ids_exact": true,
+    "scene_count": 2100,
+    "cross_cells": 81,
+    "successful_sample_count": 32000,
+    "zero_supervision_count": 4,
+    "coefficient_mass_expected": 0.999875
+  },
+  "global_metrics": {
+    "all_query_count": 2048000,
+    "all_query_displacement_sum_m": 4040596228.8849406,
+    "point_count": 1566596,
+    "full_sum_m": 5469194675.328155,
+    "dropped_sum_m": 4684204525.625928,
+    "full_square_sum_m2": 188186549262483.84,
+    "dropped_square_sum_m2": 127679275317537.98,
+    "displacement_sum_m": 2327868912.771748,
+    "harm_sum_m": 640312917.1135517,
+    "improvement_sum_m": 1425303066.8157332,
+    "coefficient_mass": 0.9998750000005038,
+    "full_coefficient_m": 3502.49489718914,
+    "dropped_coefficient_m": 2958.187454887846,
+    "displacement_coefficient_m": 1495.0296590844287,
+    "harm_coefficient_m": 394.3604711510151,
+    "improvement_coefficient_m": 938.6679134523496,
+    "point_mae_full_m": 3491.132797050519,
+    "all_query_displacement_mean_m": 1972.9473773852249,
+    "point_mae_dropped_m": 2990.0526527745046,
+    "point_rmse_full_m": 10960.131950788205,
+    "point_rmse_dropped_m": 9027.795190208406,
+    "sample_equal_linear_loss_full": 3.50249489718914,
+    "sample_equal_linear_loss_dropped": 2.9581874548878457,
+    "loss_global_denominator_samples": 32000,
+    "signed_absolute_error_change_m": -784990149.7022266,
+    "signed_loss_coefficient_change_m": -544.307442301294
+  },
+  "by": {
+    "mode": {
+      "clean": {
+        "valid_points": 520861,
+        "full_mae_m": 1484.7153332036319,
+        "dropped_mae_m": 1771.6624609573755,
+        "mae_change_m": 286.9471277537435,
+        "signed_error_change_m": 149459567.90894258,
+        "global_sample_loss_coefficient_change_m": 87.00762486143276,
+        "net_error_change_share": -0.19039674315102892,
+        "harm_sum_m": 216000848.0336933,
+        "improvement_sum_m": 66541280.12475162
+      },
+      "clean_plus_wrong": {
+        "valid_points": 525975,
+        "full_mae_m": 3003.294205811824,
+        "dropped_mae_m": 2999.3565622738724,
+        "mae_change_m": -3.9376435379519865,
+        "signed_error_change_m": -2071102.0598742962,
+        "global_sample_loss_coefficient_change_m": -17.974668438555113,
+        "net_error_change_share": 0.002638379679872334,
+        "harm_sum_m": 400514864.79866976,
+        "improvement_sum_m": 402585966.8585431
+      },
+      "wrong_only": {
+        "valid_points": 519760,
+        "full_mae_m": 5995.47231849013,
+        "dropped_mae_m": 4201.608582244084,
+        "mae_change_m": -1793.8637362460468,
+        "signed_error_change_m": -932378615.5512452,
+        "global_sample_loss_coefficient_change_m": -613.340398724212,
+        "net_error_change_share": 1.1877583634710933,
+        "harm_sum_m": 23797204.281190112,
+        "improvement_sum_m": 956175819.8324394
+      }
+    },
+    "original_region": {
+      "anchor_inside_support": {
+        "valid_points": 977036,
+        "full_mae_m": 1533.4651223192602,
+        "dropped_mae_m": 1533.4651223192602,
+        "mae_change_m": 0.0,
+        "signed_error_change_m": 0.0,
+        "global_sample_loss_coefficient_change_m": 0.0,
+        "net_error_change_share": -0.0,
+        "harm_sum_m": 0.0,
+        "improvement_sum_m": 0.0
+      },
+      "anchor_outside_helper_supported": {
+        "valid_points": 490209,
+        "full_mae_m": 7340.823609854118,
+        "dropped_mae_m": 5739.485915723296,
+        "mae_change_m": -1601.337694130822,
+        "signed_error_change_m": -784990149.7021761,
+        "global_sample_loss_coefficient_change_m": -544.3074423013345,
+        "net_error_change_share": 0.9999999999999356,
+        "harm_sum_m": 640312917.1135532,
+        "improvement_sum_m": 1425303066.8157341
+      },
+      "group_no_support": {
+        "valid_points": 99351,
+        "full_mae_m": 3748.389498996314,
+        "dropped_mae_m": 3748.389498996314,
+        "mae_change_m": 0.0,
+        "signed_error_change_m": 0.0,
+        "global_sample_loss_coefficient_change_m": 0.0,
+        "net_error_change_share": -0.0,
+        "harm_sum_m": 0.0,
+        "improvement_sum_m": 0.0
+      }
+    },
+    "original_bucket": {
+      "zero": {
+        "valid_points": 303223,
+        "full_mae_m": 2033.2078259665589,
+        "dropped_mae_m": 2033.2078259665589,
+        "mae_change_m": 0.0,
+        "signed_error_change_m": 0.0,
+        "global_sample_loss_coefficient_change_m": 0.0,
+        "net_error_change_share": -0.0,
+        "harm_sum_m": 0.0,
+        "improvement_sum_m": 0.0
+      },
+      "one": {
+        "valid_points": 804598,
+        "full_mae_m": 4213.883709837924,
+        "dropped_mae_m": 3127.611498279788,
+        "mae_change_m": -1086.2722115581355,
+        "signed_error_change_m": -874012448.8752527,
+        "global_sample_loss_coefficient_change_m": -580.7135110949373,
+        "net_error_change_share": 1.1134056257989928,
+        "harm_sum_m": 137363043.48422164,
+        "improvement_sum_m": 1011375492.359479
+      },
+      "two_or_more": {
+        "valid_points": 458775,
+        "full_mae_m": 3187.1764885768616,
+        "dropped_mae_m": 3381.2199721430447,
+        "mae_change_m": 194.04348356618314,
+        "signed_error_change_m": 89022299.17307568,
+        "global_sample_loss_coefficient_change_m": 36.40606879360257,
+        "net_error_change_share": -0.11340562579905601,
+        "harm_sum_m": 502949873.6293316,
+        "improvement_sum_m": 413927574.45625514
+      }
+    },
+    "retained_bucket": {
+      "zero": {
+        "valid_points": 810549,
+        "full_mae_m": 3199.2413112955737,
+        "dropped_mae_m": 2176.706533062891,
+        "mae_change_m": -1022.5347782326822,
+        "signed_error_change_m": -828814541.9617224,
+        "global_sample_loss_coefficient_change_m": -567.835782701273,
+        "net_error_change_share": 1.0558279518234972,
+        "harm_sum_m": 302895973.0327927,
+        "improvement_sum_m": 1131710514.99452
+      },
+      "one": {
+        "valid_points": 621766,
+        "full_mae_m": 3799.113017492049,
+        "dropped_mae_m": 3840.5085950258313,
+        "mae_change_m": 41.39557753378216,
+        "signed_error_change_m": 25738362.6608696,
+        "global_sample_loss_coefficient_change_m": 13.799238013669083,
+        "net_error_change_share": -0.03278813456529745,
+        "harm_sum_m": 267506972.12409016,
+        "improvement_sum_m": 241768609.4632209
+      },
+      "two_or_more": {
+        "valid_points": 134281,
+        "full_mae_m": 3827.001029667665,
+        "dropped_mae_m": 3961.68895721271,
+        "mae_change_m": 134.6879275450451,
+        "signed_error_change_m": 18086029.598676205,
+        "global_sample_loss_coefficient_change_m": 9.729102386269403,
+        "net_error_change_share": -0.023039817258263495,
+        "harm_sum_m": 69909971.95667036,
+        "improvement_sum_m": 51823942.35799332
+      }
+    }
+  },
+  "scene_counts": {
+    "point_mae_improved": 1227,
+    "point_mae_worsened": 873,
+    "sample_equal_improved": 1257,
+    "sample_equal_worsened": 843
+  },
+  "T_component_description": {
+    "count": 84,
+    "improved": 47,
+    "worsened": 37,
+    "note": "descriptive regrouping of sampled T exposures, not independent training repeats or V38 components"
+  },
+  "corrections": [
+    "Aggregate T prior improvement cannot rule out harmful prior shifts: clean gets worse and wrong_only drives118.78% of net point improvement.",
+    "original_singleton_anchors377 means original helper count zero, not one helper.",
+    "Changes confined to the old opportunity region follow fixed095 construction, not discovered causal localization."
+  ],
+  "decision": "Close089; keep083 p=.5 closed; retain running086A/087A/B/088 and queued086B unchanged; no new trial or diagnostic."
+}
