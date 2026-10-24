@@ -1,0 +1,87 @@
+{
+  "source_commit": "6513c4f",
+  "execution_accepted": true,
+  "decision": "CLOSE_CURRENT_P_HALF_RECIPE_NO_NEW_SEED_OR_P_SWEEP",
+  "local_review_scope": "Returned run/configuration/exposure and 300-scene aggregation only; full JSONL/checkpoints/NPZ stay on server. Pairing/RNG exactness reported by frozen server checker; no local claim of full array replay.",
+  "successful_updates": 4000,
+  "original_sampled_anchors": 32000,
+  "original_valid_training_points": 1566596,
+  "source_population": {
+    "target_identity_count": 9100,
+    "predicted_group_count": 9353,
+    "duplicate_prediction_group_count": 610,
+    "anchor_matched_target_count": 8743,
+    "reference_unavailable_target_count": 1
+  },
+  "position_population": {
+    "available_target_points": 454952,
+    "covered_target_points": 442263,
+    "missing_prediction_points": 12689,
+    "available_target_trajectories": 9099,
+    "covered_target_trajectories": 8742,
+    "point_coverage": 0.9721091455801931
+  },
+  "checked_aggregate_equalities": 41861,
+  "max_absolute_reaggregation_difference": 4.57763671875e-05,
+  "global_components_remaining_reaggregated": true,
+  "screen_recomputed": {
+    "worth_matched_replication": false,
+    "relative_mae_reduction": -0.10235624839290436,
+    "required_mae_reduction": 0.03,
+    "deltas": {
+      "mae": 60.466296946756415,
+      "rmse": 44.88062573820844,
+      "p95": 199.5156732184439,
+      "p99": 77.9363628014371
+    },
+    "nonpoint_mae_nonworse": false,
+    "outside_largest_component_nonworse": false,
+    "improved_scenes": 40,
+    "total_scenes": 300,
+    "improved_components": 6,
+    "total_components": 38,
+    "numerical_guard_m": 1e-06,
+    "interpretation": "Predeclared resource screen, not statistical significance or method promotion. Failed recipe closes; no probability sweep or automatic repeat."
+  },
+  "augmentation": {
+    "dropped_fraction": 0.4991587212563096,
+    "original_zero_helper_samples": 377,
+    "all_helpers_dropped_samples": 9651,
+    "valid_zero_helper_fraction_before": 0.19355532632535766,
+    "valid_zero_helper_fraction_after": 0.5173950399464827,
+    "zero_helper_samples_after": 10028,
+    "zero_helper_sample_fraction_after": 0.313375
+  },
+  "regional_net_error_contributions": {
+    "anchor_inside_support": {
+      "signed_error_change_m": 8205600.946934416,
+      "net_gap_share": 0.30684313591659806
+    },
+    "anchor_outside_helper_supported": {
+      "signed_error_change_m": 17683723.373238314,
+      "net_gap_share": 0.6612713888497428
+    },
+    "predicted_group_no_support": {
+      "signed_error_change_m": 852681.5663945009,
+      "net_gap_share": 0.03188547523365893
+    }
+  },
+  "raw_quantile_recomputation": "UNAVAILABLE: pooled quantiles cannot be reconstructed from scene quantiles; endpoint/comparison reported quantiles agree.",
+  "corrections": [
+    "MAE increases 10.2356%; negative relative_mae_reduction denotes deterioration, not negative MAE change.",
+    "377 original_singleton_anchors means no helpers, not one helper.",
+    "Actual drop rate 32040/64188=49.915872%, not50.07%.",
+    "40 scenes/6components improve: aggregate degradation is not deterioration of every scene/point.",
+    "Severe-harm marginal counts do not identify the overlap of affected points."
+  ],
+  "limitations": [
+    "Single seed and reused V; closes only this fixed dropout recipe, not all augmentation.",
+    "Changed training physical prior, information and wrong-helper contamination jointly; no isolated causal attribution.",
+    "Zero supported helper at a query is not absence of helpers over the entire offline sequence.",
+    "No post-hoc p fitting or automatic new diagnostics/training. T_test sealed and066 REJECTED."
+  ],
+  "largest_scene_contribution_to_net_mae_gap": {
+    "scene_id": "4167",
+    "share": 0.04637648666059938
+  }
+}
