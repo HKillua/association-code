@@ -57,7 +57,8 @@ class TimedAssociationModel(AssociationModel):
                               if config.heading_representation == 'circular_sincos' else None)
         # Construct exactly the old model first: changing the projection width
         # before this point would also change every later random initialization.
-        super().__init__(replace(config, heading_representation='linear_zscore'), branch)
+        super().__init__(replace(config, heading_representation='linear_zscore',
+                                 completion_policy='learned'), branch)
         self.config = config
         self.max_observations = max_observations
         if heading_statistics is not None:
@@ -95,6 +96,11 @@ class TimedAssociationModel(AssociationModel):
         expected = self._normalizer_heading(normalizer).to(self.heading_mean_std)
         if not torch.equal(expected, self.heading_mean_std):
             raise ValueError('normalizer differs from saved circular heading mean/std')
+
+    def set_completion_trainable(self, trainable: bool, include_embedding: bool = True):
+        if trainable and self.config.completion_policy == 'state_hold':
+            raise ValueError('state_hold requires frozen completion, not TCM or joint training')
+        return super().set_completion_trainable(trainable, include_embedding=include_embedding)
 
     def embed_states(self, states: Tensor, times: Tensor) -> Tensor:
         """Embed normalized physical states at explicit times in one shared space."""
@@ -184,6 +190,8 @@ class TimedAssociationModel(AssociationModel):
         Exact denominator: sum_tracks 2*(native_count-1)*d_model. Query states,
         query spacing, padding and reference targets never enter this loss.
         """
+        if self.config.completion_policy != 'learned':
+            raise ValueError('state_hold is not a trainable TCM objective')
         embedded = self.embed_inputs(values, observed)
         counts = observed[:, :self.max_observations].sum(1)
         total = embedded.sum() * 0 + next(self.tcm_encoder.parameters()).reshape(-1)[0] * 0
@@ -200,8 +208,32 @@ class TimedAssociationModel(AssociationModel):
             elements += targets.numel()
         return total / max(elements, 1)
 
+    def complete_state_hold(self, values: Tensor, observed: Tensor) -> Tensor:
+        """Use the same inside interpolation, re-embed endpoint state at query tau.
+
+        Neither padding nor outside query state contents are read. The control
+        never runs TCM or consumes random numbers. The old native input embedding
+        path is reused so inside-support features remain exactly unchanged.
+        """
+        embedded = self.embed_inputs(values, observed)
+        m = self.max_observations
+        counts = observed[:, :m].sum(1)
+        query_times = values[:, m:, 4]
+        last_indices = (counts - 1)[:, None]
+        last_times = values[:, :m, 4].gather(1, last_indices)
+        before = query_times < values[:, :1, 4]
+        after = query_times > last_times
+        first_states = values[:, :1, :4]
+        last_states = values[:, :m, :4].gather(1, last_indices[..., None].expand(-1, 1, 4))
+        held_states = torch.where(before[..., None], first_states,
+                                  torch.where(after[..., None], last_states, values[:, m:, :4]))
+        held = self.embed_states(held_states, query_times)
+        return torch.where((before | after)[..., None], held, embedded[:, m:])
+
     def complete(self, values: Tensor, observed: Tensor) -> Tensor:
         """Return [N,L,d] at physical queries, including tracks with zero query support."""
+        if self.config.completion_policy == 'state_hold':
+            return self.complete_state_hold(values, observed)
         embedded = self.embed_inputs(values, observed)
         m = self.max_observations
         completed = embedded[:, m:].clone()

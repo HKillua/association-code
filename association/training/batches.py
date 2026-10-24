@@ -20,6 +20,7 @@ class FrozenCompletionCache:
         self.entries = OrderedDict()
         self.bytes = self.hits = self.misses = self.evictions = 0
         self.peak_bytes = 0
+        self.completion_policy = model.config.completion_policy
         self.weight_versions = tuple((id(p), p._version) for p in
                                      model.completion_parameters(include_embedding=True))
 
@@ -32,6 +33,8 @@ class FrozenCompletionCache:
                     bytes=self.bytes, peak_bytes=self.peak_bytes, max_bytes=self.max_bytes)
 
     def get(self, keys):
+        if self.model.config.completion_policy != self.completion_policy:
+            raise ValueError('completion policy changed; discard the stale stage cache')
         if tuple((id(p), p._version) for p in self.model.completion_parameters(include_embedding=True)) != self.weight_versions:
             raise ValueError('completion weights changed; discard the stale stage cache')
         if len(set(keys)) != len(keys):

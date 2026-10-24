@@ -62,10 +62,12 @@
 
 范围、冻结版本、排队及终止条件只认[当前交接](../../HandOver/Handover.md)。五项GPU任务最多四项同时执行，CPU准备与评价错峰。
 
-### 090—092：新问题与条件下游
+### 090/091保留；088后新增093—095
 
 - `frozen_position_adapter_fit.py`：090A/B/C从真实072C final出发，对比冻结teacher全query增量、仅Anchor无支撑增量、fresh Adam全模型微调；同4000实际批次，每臂完整初末评价。`../analysis/compare_frozen_position_adapter.py`核三臂缓存并计算预声明A-mask诊断，零新前向。
 - `ptfm_position_objective_fit.py`：091A/B对齐086B初值/实际曝光，仅换为标准化径向线性或Haversine线性位置数据项；完整T曝光均值校准与固定T探针有独立来源标记。`../analysis/ptfm_position_objective_compare.py`汇合两个固定终点缓存。
-- `tmtaff_downstream_fit.py`：092依赖完成的088；`--check-source-only`在活动源上只读状态并返回75等待，不读checkpoint/不创建输出。就绪后调用现有TAM或TFM单阶段训练，完成后核真实冻结、同数据与全人口；两项互不依赖分数。
+- `tmtaff_downstream_fit.py`：旧092已SUPERSEDED，仅保留source检查复用和历史复现，不能领取旧臂。
+- `completion_value_fit.py`：093/094固定088来源的learned/state_hold独立TFM或TAM，真实初参/采样/RNG配对审计；`../analysis/compare_completion_policies.py`只读完整原件，核原始初末snapshot、候选、缓存与原阈值，生成两阶段各自联表。
+- `../analysis/tcm_completion_audit.py`：095只读088完整per_fragment，零权重/原卷/前向，回聚场景/组件/支撑与长度及误差集中度。
 
-七项新GPU作业的范围见[总设计](../../docs/specs/parallel-exploration-090-092.md)，冻结与可领取状态只认索引。090/091每臂4000；092 TAM4000、TFM1000。088计入全局四单卡上限，未满足依赖不占名额；不以入口存在代替发布或领取。
+当前共九个GPU臂30000更新与CPU095；090/091各4000，093各1000，094各4000。088已完成，首轮090A、090B、093A、093B，接续091A、091B、090C、094A、094B。范围见[088后设计](../../docs/specs/post088-completion-value.md)，冻结与可领取状态只认当前索引。代码存在不代表发布、领取或训练成绩。

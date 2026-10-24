@@ -35,6 +35,8 @@ def main(argv=None):
     parser.add_argument('--resume', help='an INTERRUPTED run; output must be a new directory')
     parser.add_argument('--initialize-tcm-from',
                         help='COMPLETED TCM-only run directory; new phase tam/tfm initialization, not resume')
+    parser.add_argument('--pairing-audit', action='store_true',
+                        help='new native tam/tfm only: save untouched initial stage and ordered successful pair draws')
     parser.add_argument('--cpu-threads', type=int, default=4)
     parser.add_argument('--time-policy', choices=('hard', 'advisory'),
                         help='override job timing only; advisory keeps the fixed update plan after the suggested duration')
@@ -58,6 +60,8 @@ def main(argv=None):
             raise ValueError('--initialize-tcm-from requires a new --phase tam/tfm run, not --resume')
         if args.phase in ('tam', 'tfm') and not args.resume and not args.initialize_tcm_from:
             raise ValueError('--phase tam/tfm requires --initialize-tcm-from for a new run')
+        if args.pairing_audit and (args.phase not in ('tam', 'tfm') or args.resume or args.inspect_only):
+            raise ValueError('--pairing-audit requires a new phase tam/tfm fit')
         if args.inspect_only and args.save_predictions:
             raise ValueError('--save-predictions applies to fit, not inspect-only')
         if args.phase not in ('full', 'tfm') and args.save_predictions:
@@ -72,6 +76,8 @@ def main(argv=None):
                 or config['scope'] != 'TMTAFF-time-adapted-v1'):
             raise ValueError('Explicit TMTAFF-time-adapted-v1 configuration required')
         model, fusion = ModelConfig(**config['model']), PairFusionConfig(**config['fusion'])
+        if model.completion_policy == 'state_hold' and args.phase not in ('tam', 'tfm'):
+            raise ValueError('state_hold requires a frozen native tam/tfm phase')
         if (model.length, model.d_model) != (fusion.length, fusion.d_model):
             raise ValueError('Model and fusion length/dimension must agree')
         if (not {'max_observations', 'time_unit_seconds'}.issubset(config['data'])
@@ -109,6 +115,7 @@ def main(argv=None):
             alignment_by_scene=runtime.read_json(args.alignment), check=check)
         preparation = {'status': 'INSPECTED' if args.inspect_only else 'PREPARED', 'phase': args.phase,
                        'initialize_tcm_from': args.initialize_tcm_from,
+                       'pairing_audit': args.pairing_audit,
                        'report_phase': 'input preparation before model construction',
                        'configuration': config, 'cpu_threads': args.cpu_threads,
                        'dataset': dataset['report'], 'elapsed_seconds': time.monotonic()-started,
@@ -124,7 +131,8 @@ def main(argv=None):
                 result = train_complete(dataset['train'], dataset['validation'], model, fusion,
                     training, output, device=args.device, resume_from=args.resume,
                     initial_elapsed_seconds=time.monotonic()-started, save_predictions=args.save_predictions,
-                    phase=args.phase, initialize_tcm_from=args.initialize_tcm_from)
+                    phase=args.phase, initialize_tcm_from=args.initialize_tcm_from,
+                    pairing_audit=args.pairing_audit)
             except BaseException as error:
                 training_error = error
                 raise

@@ -388,7 +388,7 @@ def _targets(scenes, groups, device):
 def train_complete(train_scenes, validation_scenes, model_config, fusion_config, config,
                    output, *, device='cpu', resume_from=None, max_updates_this_call=None,
                    evaluation_fn=None, initial_elapsed_seconds=0.0, save_predictions=False, phase='full',
-                   initialize_tcm_from=None):
+                   initialize_tcm_from=None, pairing_audit=False):
     """Train supplied physical scenes; native ZIP preparation is a separate caller.
 
     ``fusion_targets`` maps identity strings to states[L,4]/valid[L,4] and
@@ -412,10 +412,19 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     Explicit phase='tfm' transfers only that completed TCM into a fresh frozen-
     completion fusion run. It trains true pairs, never runs TAM/calibration, and
     evaluates configured oracle endpoints on full V without checkpoint selection.
+    Explicit pairing_audit records one untouched fresh-stage checkpoint and the
+    actual ordered successful pair draws. It is for new native TAM/TFM runs only;
+    it changes no sampling, objective, masks or optimizer updates.
     """
     started = time.monotonic()
     requested_phase = phase
     config = _configuration(config, phase=requested_phase)
+    if not isinstance(pairing_audit, bool):
+        raise ValueError('pairing_audit must be boolean')
+    if pairing_audit and (requested_phase not in ('tam', 'tfm') or resume_from is not None):
+        raise ValueError('pairing_audit requires a new frozen TAM/TFM run, not resume')
+    if model_config.completion_policy == 'state_hold' and requested_phase not in ('tam', 'tfm'):
+        raise ValueError('state_hold requires a native frozen TAM/TFM phase, not TCM/full/JOINT')
     active_stages = {'full': STAGES, 'tcm': STAGES[:1], 'tam': STAGES[1:2], 'tfm': STAGES[2:3]}[requested_phase]
     stage_limit = STAGES.index(active_stages[-1]) + 1
     if initialize_tcm_from is not None and (requested_phase not in ('tam', 'tfm') or resume_from is not None):
@@ -471,10 +480,14 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             raise ValueError('stage initialization requires a COMPLETED TCM-only endpoint')
         # TAM is newly initialized (unused for TFM); its dropout and negative
         # loss scale may differ without altering the transferred completion.
+        # A frozen state-hold control retains those exact weights and selects
+        # its explicit provider only at completion time.
         # Do not relax completion architecture, representation, or data checks.
         source_model_config = ModelConfig(**completion_source['model_config'])
-        if (asdict(replace(source_model_config, tam_dropout=model_config.tam_dropout,
-                          contrastive_negative_scale=model_config.contrastive_negative_scale)) != asdict(model_config)
+        if (source_model_config.completion_policy != 'learned'
+                or asdict(replace(source_model_config, tam_dropout=model_config.tam_dropout,
+                          contrastive_negative_scale=model_config.contrastive_negative_scale,
+                          completion_policy=model_config.completion_policy)) != asdict(model_config)
                 or source_config['branch'] != config['branch']
                 or completion_source.get('input_adapter') != 'native_time_v1'
                 or completion_source['max_observations'] != train_scenes[0]['max_observations']
@@ -485,6 +498,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
         normalizer = copy.deepcopy(completion_source['normalizer'])
         initialization = dict(source_run=str(previous.resolve()), source_phase='tcm',
             source_tcm_updates=tcm_updates,
+            source_completion_policy=source_model_config.completion_policy,
+            target_completion_policy=model_config.completion_policy,
             source_tam_dropout=source_model_config.effective_tam_dropout,
             target_tam_dropout=model_config.effective_tam_dropout,
             source_contrastive_negative_scale=source_model_config.contrastive_negative_scale,
@@ -547,6 +562,7 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
     run = {'status': 'RUNNING', 'phase': requested_phase, 'training_stages': list(active_stages),
            'config': config, 'input_adapter': adapter, 'split_unit': split_unit,
            'requested_model_config': asdict(model_config), 'effective_margin': effective_margin,
+           'completion_policy': model_config.completion_policy, 'pairing_audit': pairing_audit,
            'margin_calibration': calibration,
            'initialization': initialization,
            'scope': (('TMTAFF time/output-scale-adapted approximate reference'
@@ -651,10 +667,11 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 optimizer.load_state_dict(saved['optimizer'])
             _restore_rng(saved['rng'], track_rng, tfm_rng, sampler, device)
 
-        def checkpoint():
+        def checkpoint(*, pairing_initial=False):
             check()
             payload = {'format_version': 1, 'phase': requested_phase, 'training_stages': list(active_stages),
                        'config': config, 'model_config': asdict(model_config),
+                       'completion_policy': model_config.completion_policy, 'pairing_audit': pairing_audit,
                        'effective_margin': effective_margin, 'margin_calibration': calibration,
                        'initialization': initialization,
                        'input_adapter': adapter, 'split_unit': split_unit,
@@ -668,6 +685,13 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             temporary = output / 'checkpoint.pt.tmp'
             torch.save(payload, temporary)
             temporary.replace(output / 'checkpoint.pt')
+            if pairing_initial:
+                initial_path = output / 'pairing-initial.pt'
+                if (not pairing_audit or cursor['update'] != 0 or cursor['completed_updates'] != 0
+                        or optimizer is None or optimizer.state or initial_path.exists()):
+                    raise ValueError('pairing initial requires untouched fresh Adam and no previous artifact')
+                torch.save(payload, initial_path)
+                run['pairing_initial'] = str(initial_path.resolve())
             if requested_phase == 'tfm' and cursor['update'] in config['fusion_monitor_updates']:
                 endpoint_path = output / 'snapshots' / f"update-{cursor['update']:06d}.pt"
                 endpoint_path.parent.mkdir(exist_ok=True)
@@ -755,6 +779,10 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 # Durable boundary: a later interruption resumes the same m,
                 # before any main pair-sampler draw or TAM parameter update.
                 checkpoint()
+            if pairing_audit and cursor['completed_updates'] == 0:
+                # Calibration restores every training RNG. This captures its
+                # effective margin, unchanged head parameters and fresh Adam.
+                checkpoint(pairing_initial=True)
             check()
             update = cursor['update'] + 1
             plateau = max(1, math.ceil(total_updates / 4))
@@ -812,6 +840,16 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                         gradient_clip=config['gradient_clip'], check=check)
                 row['sampling'] = sampler.batch_metadata(groups)
                 row['pair_count'], row['positive_pairs'] = metadata['pair_count'], metadata['positive_pairs']
+                if pairing_audit:
+                    row['actual_samples'] = [dict(scene_index=int(si), scene_id=train_scenes[si]['scene_id'],
+                        pair_indices=np.asarray(indices).astype(int).tolist(),
+                        pairs=np.asarray(train_scenes[si]['pairs'])[indices].astype(int).tolist(),
+                        labels=np.asarray(train_scenes[si]['labels'])[indices].astype(int).tolist())
+                        for si, indices in groups]
+                    row['supervision_counts'] = dict(
+                        association_labels=metadata['pair_count'] if phase == 'TAM_FROZEN' else 0,
+                        positive_labels=metadata['positive_pairs'], negative_labels=metadata['negative_pairs'],
+                        fusion_attributes=list(row.get('fusion_valid_counts', [0, 0, 0, 0])))
             if device.type == 'cuda':
                 torch.cuda.synchronize(device)
             row.update(stage=phase, update=update, learning_rate=lr, seconds=time.monotonic() - step_started)

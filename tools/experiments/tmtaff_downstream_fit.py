@@ -47,7 +47,8 @@ def _canonical(config, phase):
     return dict(config, training=_configuration(config['training'], phase=phase))
 
 
-def check_source(source, manifest_path, alignment_path, config_path, phase, *, cpu_threads=None):
+def check_source(source, manifest_path, alignment_path, config_path, phase, *, cpu_threads=None,
+                 profile=None):
     """Bind a *finished* 088 endpoint to the frozen 092 phase and Level1 data."""
     source = Path(source)
     run_path = source / 'run.json'
@@ -69,7 +70,7 @@ def check_source(source, manifest_path, alignment_path, config_path, phase, *, c
     from association.data.archive import validate_manifest
     from association.models.fusion import PairFusionConfig
     from association.models.tmtaff import ModelConfig
-    profile = _experiment_contract(phase)
+    profile = _experiment_contract(phase) if profile is None else profile
     expected_source = _canonical(profile['source'], 'tcm')
     target = _canonical(_json(config_path), phase)
     _require(target == _canonical(profile['target'], phase), '092 target configuration differs')

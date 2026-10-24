@@ -30,6 +30,9 @@ class ModelConfig:
     tam_dropout: float | None = None
     # Explicit objective adaptation; the printed paper formula remains default.
     contrastive_negative_scale: str = "paper"
+    # The state-hold control is available only in the native-time frozen stages.
+    # Keeping the default here also restores historical checkpoints unchanged.
+    completion_policy: str = "learned"
 
     def __post_init__(self):
         for name in ("input_dim", "d_model", "nhead", "num_layers", "dim_feedforward", "length"):
@@ -54,6 +57,8 @@ class ModelConfig:
             raise ValueError("inverse_margin requires the linear contrastive positive term")
         if self.heading_representation not in ("linear_zscore", "circular_sincos"):
             raise ValueError("heading_representation must be linear_zscore or circular_sincos")
+        if self.completion_policy not in ("learned", "state_hold"):
+            raise ValueError("completion_policy must be learned or state_hold")
 
     @property
     def effective_tam_dropout(self) -> float:
@@ -91,6 +96,8 @@ class AssociationModel(nn.Module):
             raise ValueError("branch must be 'ce' or 'contrastive'")
         if config.heading_representation != "linear_zscore":
             raise ValueError("circular heading representation requires the native-time model")
+        if config.completion_policy != "learned":
+            raise ValueError("state_hold completion requires the native-time model")
         self.config = config
         self.branch = branch
         self._completion_frozen = False
