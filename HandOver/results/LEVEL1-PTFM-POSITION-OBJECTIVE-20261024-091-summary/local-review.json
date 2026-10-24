@@ -1,0 +1,567 @@
+{
+  "source_commit": "eb3a827",
+  "execution_accepted": true,
+  "decision": "CLOSE_CURRENT_091_OBJECTIVE_BRIDGE_NO_SEED_ALPHA_LR_OR_UPDATE_SWEEP",
+  "local_review_scope": "Returned run/configuration/exposure/scene/component summaries and fixed-screen metadata only; original checkpoints, JSONL and NPZ remain server-side. Pairwise H/I independently pooled from returned components, not per-point replay. Global P95/P99 read from saved pooled raw-point reports, not reconstructed from scene percentiles.",
+  "independent_reaggregation": {
+    "checks": 113722,
+    "maximum_absolute_difference": 0.029771804809570312,
+    "maximum_normalized_difference": 8.82628866351539e-12,
+    "method": "Per-scene unit-count weighted MAE/MSE and sqrt pooled MSE, physical counts and metrics; global, all38 components and outside largest; saved initial prior summaries; component-level H/I additivity and independently re-evaluated prior screen. rel_tol=1e-11/abs_tol=1e-6 handles accumulation order only.",
+    "maximum_absolute_difference_unit_caution": "The largest absolute residual is in summed squared errors, not a position-metre tolerance; normalized error is given alongside and no acceptance margin changed."
+  },
+  "successful_updates_each": 4000,
+  "sampled_anchors_each": 32000,
+  "valid_training_position_points": 1566596,
+  "full_exposure_equal": true,
+  "normalizer_equal": true,
+  "configuration_only_position_objective_differs": true,
+  "validation_population": {
+    "scenes": 300,
+    "components": 38,
+    "groups": 9353,
+    "duplicates": 610,
+    "valid_position_points": 442263,
+    "valid_position_targets": 8742
+  },
+  "same_population_final": {
+    "091A": {
+      "unit_count": 442263,
+      "mae": 734.6244790492099,
+      "mse": 11084605.374067487,
+      "rmse": 3329.3550988243182,
+      "point_count": 442263,
+      "p95": 2773.7145021724496,
+      "p99": 8063.188121659956
+    },
+    "091B": {
+      "unit_count": 442263,
+      "mae": 740.8373463877803,
+      "mse": 11092232.245553568,
+      "rmse": 3330.500299587671,
+      "point_count": 442263,
+      "p95": 2777.359627501017,
+      "p99": 8049.137418736532
+    }
+  },
+  "screen_vs_prior_recomputed": {
+    "091A": {
+      "worth_matched_replication": false,
+      "relative_mae_reduction": -0.01865012904905437,
+      "deltas": {
+        "mae": 13.449997154226367,
+        "rmse": 3.1124202976479864,
+        "p95": -0.6643671219426324,
+        "p99": 2.2617998760306364
+      },
+      "nonpoint_mae_nonworse": false,
+      "outside_largest_component_nonworse": false,
+      "improved_scenes": 70,
+      "improved_components": 7
+    },
+    "091B": {
+      "worth_matched_replication": false,
+      "relative_mae_reduction": -0.02726505857657348,
+      "deltas": {
+        "mae": 19.662864492796757,
+        "rmse": 4.257621061000918,
+        "p95": 2.980758206624614,
+        "p99": -11.788903047393433
+      },
+      "nonpoint_mae_nonworse": false,
+      "outside_largest_component_nonworse": false,
+      "improved_scenes": 44,
+      "improved_components": 3
+    }
+  },
+  "B_minus_A": {
+    "deltas": {
+      "mae": 6.2128673385703905,
+      "rmse": 1.145200763352932,
+      "p95": 3.6451253285672465,
+      "p99": -14.050702923424069
+    },
+    "mae_improved_scenes": 6,
+    "mae_worse_scenes": 294,
+    "mae_improved_components": 0,
+    "mae_worse_components": 38,
+    "net_sae_change_m": 2747721.3477513967,
+    "net_sse_change_m2": 3373083064.078329,
+    "top_positive_scene_sse": [
+      {
+        "scene_id": "3035",
+        "component_id": "component-23608a7a22c5322f7254ffc1",
+        "n": 3614,
+        "mae_delta": 27.018665376712534,
+        "sse_delta": 4372798170.559521
+      },
+      {
+        "scene_id": "4335",
+        "component_id": "component-5ee24adf22c874beaf8d076d",
+        "n": 1736,
+        "mae_delta": 7.815916972633204,
+        "sse_delta": 276527001.4993613
+      },
+      {
+        "scene_id": "629",
+        "component_id": "component-9ea441151d6468bd21826aea",
+        "n": 1417,
+        "mae_delta": 21.851242383923477,
+        "sse_delta": 134609064.02216485
+      },
+      {
+        "scene_id": "25",
+        "component_id": "component-9ea441151d6468bd21826aea",
+        "n": 1409,
+        "mae_delta": 10.217275202021028,
+        "sse_delta": 106008055.52750978
+      },
+      {
+        "scene_id": "3272",
+        "component_id": "component-d29cb6bc9ce95155a0bf2abe",
+        "n": 270,
+        "mae_delta": 8.14382557048748,
+        "sse_delta": 78248638.68609801
+      }
+    ],
+    "top_negative_scene_sse": [
+      {
+        "scene_id": "1981",
+        "component_id": "component-23608a7a22c5322f7254ffc1",
+        "n": 1732,
+        "mae_delta": 3.674424681770006,
+        "sse_delta": -322768180.0175086
+      },
+      {
+        "scene_id": "4316",
+        "component_id": "component-c7082a697d934f0004db48b9",
+        "n": 1431,
+        "mae_delta": 5.196016162191199,
+        "sse_delta": -255935500.1294788
+      },
+      {
+        "scene_id": "1043",
+        "component_id": "component-9ea441151d6468bd21826aea",
+        "n": 307,
+        "mae_delta": 2.618809221610718,
+        "sse_delta": -253329836.8014562
+      },
+      {
+        "scene_id": "3365",
+        "component_id": "component-9ea441151d6468bd21826aea",
+        "n": 1566,
+        "mae_delta": 4.183681937234724,
+        "sse_delta": -228375973.5346759
+      },
+      {
+        "scene_id": "4410",
+        "component_id": "component-23608a7a22c5322f7254ffc1",
+        "n": 18226,
+        "mae_delta": 6.067809871178383,
+        "sse_delta": -203883181.38710934
+      }
+    ],
+    "harm_improvement": {
+      "common_point_count": 442263,
+      "better_point_count": 191775,
+      "worse_point_count": 250488,
+      "tied_point_count": 0,
+      "improvement_sum": 5668353.652949516,
+      "harm_sum": 8416075.000701107,
+      "signed_error_change_sum": 2747721.347751593,
+      "mean_error_change": 6.21286733855555,
+      "positive_delta_tail": {
+        "point_count": 250488,
+        "p95": 61.70837461120904,
+        "p99": 94.63212118651037
+      },
+      "improvement_tail": {
+        "point_count": 191775,
+        "p95": 61.0897772396908,
+        "p99": 79.02801520759508
+      },
+      "absolute_change_tail": {
+        "point_count": 442263,
+        "p95": 61.45747006001573,
+        "p99": 87.92153739405605
+      },
+      "harm_above_native_threshold": {
+        "10": 199748,
+        "100": 2248,
+        "1000": 44,
+        "10000": 1
+      }
+    }
+  },
+  "screen_vs_transformer_recomputed": {
+    "091A": {
+      "worth_matched_replication": false,
+      "relative_mae_reduction": -0.24355896507570737,
+      "deltas": {
+        "mae": 143.88089576887364,
+        "rmse": 40.14065491421434,
+        "p95": 807.3134775289357,
+        "p99": 237.50320468577956
+      },
+      "nonpoint_mae_nonworse": false,
+      "outside_largest_component_nonworse": false,
+      "improved_scenes": 10,
+      "improved_components": 2
+    },
+    "091B": {
+      "worth_matched_replication": false,
+      "relative_mae_reduction": -0.25407599397692876,
+      "deltas": {
+        "mae": 150.09376310744403,
+        "rmse": 41.28585567756727,
+        "p95": 810.9586028575029,
+        "p99": 223.4525017623555
+      },
+      "nonpoint_mae_nonworse": false,
+      "outside_largest_component_nonworse": false,
+      "improved_scenes": 10,
+      "improved_components": 2
+    }
+  },
+  "own_endpoint_harm": {
+    "091A": {
+      "source": {
+        "common_point_count": 442263,
+        "better_point_count": 177966,
+        "worse_point_count": 264297,
+        "tied_point_count": 0,
+        "improvement_sum": 9908198.52586299,
+        "harm_sum": 15856634.617282286,
+        "signed_error_change_sum": 5948436.091419297,
+        "mean_error_change": 13.449997154225647,
+        "positive_delta_tail": {
+          "point_count": 264297,
+          "p95": 88.71796838826126,
+          "p99": 95.59374493134374
+        }
+      },
+      "mean_absolute_error_change_m": 58.25681357731774,
+      "caution": "Change in scalar error, not state displacement; no per-point local replay."
+    },
+    "091B": {
+      "source": {
+        "common_point_count": 442263,
+        "better_point_count": 169939,
+        "worse_point_count": 272324,
+        "tied_point_count": 0,
+        "improvement_sum": 10865985.846321488,
+        "harm_sum": 19562143.285492375,
+        "signed_error_change_sum": 8696157.43917089,
+        "mean_error_change": 19.662864492781196,
+        "positive_delta_tail": {
+          "point_count": 272324,
+          "p95": 107.51612021463069,
+          "p99": 145.68268735873335
+        }
+      },
+      "mean_absolute_error_change_m": 68.80098297124982,
+      "caution": "Change in scalar error, not state displacement; no per-point local replay."
+    }
+  },
+  "SSE_contribution_sensitivity": {
+    "scene3035_B_minus_A_sse_m2": 4372798170.559521,
+    "scene3035_share_of_net_B_minus_A_sse": 1.2963802217406575,
+    "remaining_scenes_net_sse_m2": -999715106.4811916,
+    "caution": "Descriptive contribution split; not deleted or causal attribution. MAE worsens broadly in294 scenes and38 components despite SSE concentration."
+  },
+  "receipt_corrections": [
+    "B has worse MAE/RMSE/P95 than A, but better P99 and a slightly better no-support stratum; do not claim no benefit in every metric.",
+    "Different alpha values multiply different units, and both initially calibrated sample means match the same reference objective. Coefficient magnitude or zero clipping alone does not show data losses were scaled small or prove L2 dominance.",
+    "Small mean loss/MAE changes do not demonstrate unchanged predictions; no new training or deployment rule is justified.",
+    "Both calibrated linear strategies substantially mitigate old086B deterioration; lack of gain over fixedprior/strong072C closes the recipe, but does not erase this objective-strategy effect. It is not pure exponent causality because initial-mean normalization and optimization balance also differ."
+  ],
+  "pending": "090C/three-arm table and093/094 completion-value tasks unchanged; no new READY",
+  "test_opened": false,
+  "old066_acceptance": "REJECTED",
+  "mitigation_vs_old086B": {
+    "091A": {
+      "same_population_point_deltas_vs086B": {
+        "mae": -759.4243000462973,
+        "rmse": -1164.4254925418268,
+        "p95": -1576.3798140391177,
+        "p99": -1537.3206442835308
+      },
+      "mae_improved_scenes": 298,
+      "mae_worse_scenes": 2,
+      "mse_improved_scenes": 276,
+      "mae_improved_components": 37,
+      "mae_improves_all_four_weightings": true,
+      "common_scene_and_point_population_verified": true,
+      "reference_scene_source": "LEVEL1-PTFM-OBJECTIVE-CONTROL-20261024-086B/ptfm-comparison.json.gz",
+      "H_I_returned": {
+        "common_point_count": 442263,
+        "better_point_count": 398185,
+        "worse_point_count": 44078,
+        "tied_point_count": 0,
+        "improvement_sum": 372484225.68338746,
+        "harm_sum": 36618956.472011,
+        "signed_error_change_sum": -335865269.2113766,
+        "mean_error_change": -759.4243000462997,
+        "positive_delta_tail": {
+          "point_count": 44078,
+          "p95": 2543.3042330072826,
+          "p99": 4940.552877883656
+        },
+        "improvement_tail": {
+          "point_count": 398185,
+          "p95": 2702.069035990198,
+          "p99": 5422.0377898362085
+        },
+        "absolute_change_tail": {
+          "point_count": 442263,
+          "p95": 2676.280622253527,
+          "p99": 5399.000769195265
+        },
+        "harm_above_native_threshold": {
+          "10": 42981,
+          "100": 35535,
+          "1000": 12282,
+          "10000": 89
+        }
+      }
+    },
+    "091B": {
+      "same_population_point_deltas_vs086B": {
+        "mae": -753.2114327077269,
+        "rmse": -1163.2802917784738,
+        "p95": -1572.7346887105505,
+        "p99": -1551.3713472069549
+      },
+      "mae_improved_scenes": 298,
+      "mae_worse_scenes": 2,
+      "mse_improved_scenes": 276,
+      "mae_improved_components": 37,
+      "mae_improves_all_four_weightings": true,
+      "common_scene_and_point_population_verified": true,
+      "reference_scene_source": "LEVEL1-PTFM-OBJECTIVE-CONTROL-20261024-086B/ptfm-comparison.json.gz",
+      "H_I_returned": {
+        "common_point_count": 442263,
+        "better_point_count": 396734,
+        "worse_point_count": 45529,
+        "tied_point_count": 0,
+        "improvement_sum": 369814263.04111266,
+        "harm_sum": 36696715.17748779,
+        "signed_error_change_sum": -333117547.863625,
+        "mean_error_change": -753.211432707744,
+        "positive_delta_tail": {
+          "point_count": 45529,
+          "p95": 2502.878119549856,
+          "p99": 4790.281643209367
+        },
+        "improvement_tail": {
+          "point_count": 396734,
+          "p95": 2705.241243398979,
+          "p99": 5419.231864907002
+        },
+        "absolute_change_tail": {
+          "point_count": 442263,
+          "p95": 2671.2668493573906,
+          "p99": 5383.645129915173
+        },
+        "harm_above_native_threshold": {
+          "10": 44379,
+          "100": 36298,
+          "1000": 12250,
+          "10000": 88
+        }
+      }
+    }
+  },
+  "training_metadata_verified": {
+    "091A": {
+      "parameter_count": 196935,
+      "successful_updates": 4000,
+      "sampled_anchors": 32000,
+      "valid_position_points": 1566596,
+      "task_valid_counts": [
+        1566596,
+        1566646,
+        1565549
+      ],
+      "training_scene_count": 2100,
+      "unique_exposed_scenes": 2100,
+      "unique_exposed_anchors": 24592,
+      "gradient_clipping": {
+        "clipped_updates": 1
+      },
+      "returned_source072C_pair_check": {
+        "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit",
+        "status": "PAIR_VERIFIED",
+        "matched_updates": 4000,
+        "matched_anchors": 32000,
+        "interpretation": "Actual scene/anchor/member exposure only; model, state objectives and initialization differ.",
+        "actual_successful_batches_exact": true
+      },
+      "returned_source076B_pair_check": {
+        "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit",
+        "status": "PAIR_VERIFIED",
+        "matched_updates": 4000,
+        "matched_anchors": 32000,
+        "interpretation": "All initial parameters, normalizer and actual samples match076B; only objective strategy changes.",
+        "initial_parameters_exact": true,
+        "initial_parameters_exact_except_position_rows": true,
+        "position_rows_zero": true,
+        "normalizer_exact": true,
+        "initial_sampler_rng_exact": true,
+        "initial_torch_rng_exact": true,
+        "actual_successful_batches_exact": true,
+        "all_task_counts_exact": true,
+        "full_exposure_exact": true
+      },
+      "returned_source086B_pair_check": {
+        "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-OBJECTIVE-CONTROL-20261024-086B-attempt-1/fit",
+        "status": "PAIR_VERIFIED",
+        "matched_updates": 4000,
+        "matched_anchors": 32000,
+        "initial_parameters_exact": true,
+        "actual_successful_batches_exact": true,
+        "full_exposure_exact": true
+      },
+      "note": "Original tensor/RNG/batch checks were run by frozen server checker; local review compares returned metadata and exposures, not raw checkpoints."
+    },
+    "091B": {
+      "parameter_count": 196935,
+      "successful_updates": 4000,
+      "sampled_anchors": 32000,
+      "valid_position_points": 1566596,
+      "task_valid_counts": [
+        1566596,
+        1566646,
+        1565549
+      ],
+      "training_scene_count": 2100,
+      "unique_exposed_scenes": 2100,
+      "unique_exposed_anchors": 24592,
+      "gradient_clipping": {
+        "clipped_updates": 0
+      },
+      "returned_source072C_pair_check": {
+        "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit",
+        "status": "PAIR_VERIFIED",
+        "matched_updates": 4000,
+        "matched_anchors": 32000,
+        "interpretation": "Actual scene/anchor/member exposure only; model, state objectives and initialization differ.",
+        "actual_successful_batches_exact": true
+      },
+      "returned_source076B_pair_check": {
+        "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-RESIDUAL-20261024-076B-attempt-1/fit",
+        "status": "PAIR_VERIFIED",
+        "matched_updates": 4000,
+        "matched_anchors": 32000,
+        "interpretation": "All initial parameters, normalizer and actual samples match076B; only objective strategy changes.",
+        "initial_parameters_exact": true,
+        "initial_parameters_exact_except_position_rows": true,
+        "position_rows_zero": true,
+        "normalizer_exact": true,
+        "initial_sampler_rng_exact": true,
+        "initial_torch_rng_exact": true,
+        "actual_successful_batches_exact": true,
+        "all_task_counts_exact": true,
+        "full_exposure_exact": true
+      },
+      "returned_source086B_pair_check": {
+        "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PTFM-OBJECTIVE-CONTROL-20261024-086B-attempt-1/fit",
+        "status": "PAIR_VERIFIED",
+        "matched_updates": 4000,
+        "matched_anchors": 32000,
+        "initial_parameters_exact": true,
+        "actual_successful_batches_exact": true,
+        "full_exposure_exact": true
+      },
+      "note": "Original tensor/RNG/batch checks were run by frozen server checker; local review compares returned metadata and exposures, not raw checkpoints."
+    }
+  },
+  "fixed_training_probe_and_calibration_audit": {
+    "independent_numeric_checks": 1586,
+    "maximum_normalized_difference": 2.36e-15,
+    "maximum_absolute_difference": 4.66e-09,
+    "sample_presentations": 768,
+    "unique_scenes": 640,
+    "unique_anchors": 763,
+    "mode_presentations": {
+      "clean": 256,
+      "clean_plus_wrong": 256,
+      "wrong_only": 256
+    },
+    "valid_position_points": 37707,
+    "ordered_samples_equal_across_all_six_probe_endpoints": true,
+    "arms": {
+      "091A": {
+        "position_objective": "radial-linear",
+        "alpha": 1.6711376580911148,
+        "all_T_initial_data_term": 0.09837131549304744,
+        "endpoints": {
+          "initial": {
+            "calibrated_position_data": 0.10249073975376756,
+            "L2": 0.020800000056624413,
+            "regularized_objective": 1.2219030284785017,
+            "point_mae_m": 3741.912760144894,
+            "point_rmse_m": 11201.068072010043
+          },
+          "source086B_final": {
+            "calibrated_position_data": 0.10453213075735983,
+            "L2": 0.0014040431706234813,
+            "regularized_objective": 1.2045484625960932,
+            "point_mae_m": 3823.514263773429,
+            "point_rmse_m": 8042.697260506625
+          },
+          "final": {
+            "calibrated_position_data": 0.10271005595823705,
+            "L2": 1.8404974753138958e-06,
+            "regularized_objective": 1.201324185123822,
+            "point_mae_m": 3748.286863569312,
+            "point_rmse_m": 11194.334152368243
+          }
+        }
+      },
+      "091B": {
+        "position_objective": "geodesic-linear",
+        "alpha": 0.08425820883164674,
+        "all_T_initial_data_term": 0.09837131549304744,
+        "endpoints": {
+          "initial": {
+            "calibrated_position_data": 0.1048707696990299,
+            "L2": 0.020800000056624413,
+            "regularized_objective": 1.224283058423764,
+            "point_mae_m": 3741.912760144894,
+            "point_rmse_m": 11201.068072010043
+          },
+          "source086B_final": {
+            "calibrated_position_data": 0.10620615137172341,
+            "L2": 0.0014040431706234813,
+            "regularized_objective": 1.2062224832104567,
+            "point_mae_m": 3823.514263773429,
+            "point_rmse_m": 8042.697260506625
+          },
+          "final": {
+            "calibrated_position_data": 0.10499524788522191,
+            "L2": 2.8089525585528463e-06,
+            "regularized_objective": 1.2036103455058902,
+            "point_mae_m": 3743.882512652604,
+            "point_rmse_m": 11156.574925055855
+          }
+        }
+      }
+    },
+    "interpretation": "On this fixed training-exposure subset the own calibrated data term worsens slightly but L2 decreases enough that the full regularized objective improves. This is accounting, not proof that L2 is the sole failure cause or a full-T learning conclusion. Alpha values use different units; their size and clipping counts do not identify data-gradient weakness. No independent generalization or convergence claim."
+  },
+  "probe_error_change_caution": {
+    "A_sample_absolute_MAE_change_mean_m": 49.115,
+    "B_sample_absolute_MAE_change_mean_m": 59.921,
+    "B_max_sample_MAE_change_m": 1275.529,
+    "A_better_worse": [
+      306,
+      462
+    ],
+    "B_better_worse": [
+      299,
+      469
+    ],
+    "interpretation": "Sample error changes, not state displacement. Small net MAE is compatible with offsetting improvements and harms; exact source precision remains in probe files."
+  }
+}
