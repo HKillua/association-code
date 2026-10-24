@@ -40,14 +40,49 @@ def service_inactive(launch):
     unit = launch.get('unit')
     if launch.get('backend') != 'systemd' or not isinstance(unit, str) or not unit.endswith('.service'):
         raise ValueError('a recorded systemd user service is required; no session fallback')
-    result = subprocess.run(['systemctl', '--user', 'show', unit, '--property=ActiveState', '--value'],
+    result = subprocess.run(['systemctl', '--user', 'show', unit,
+                             '--property=LoadState', '--property=ActiveState'],
                             capture_output=True, text=True, timeout=10, check=False)
+    values = dict(line.split('=', 1) for line in result.stdout.splitlines() if '=' in line)
+    # Successful transient units may already have been collected. Require
+    # affirmative unit state, so an unavailable user bus never frees a claim.
+    if values.get('LoadState') == 'not-found' and values.get('ActiveState') == 'inactive':
+        return True
     if result.returncode != 0:
         raise RuntimeError('cannot establish service state: ' + unit)
-    return result.stdout.strip() in ('inactive', 'failed')
+    if 'LoadState' not in values or 'ActiveState' not in values:
+        raise RuntimeError('incomplete service state: ' + unit)
+    return values['ActiveState'] in ('inactive', 'failed')
 
 
-def recorded_state(output, *, require_verification=False, inactive=service_inactive):
+def launcher_alive(launch):
+    """An unfinished submission may still be between recording and systemd-run."""
+    pid = launch.get('launcher_pid')
+    if not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0:
+        return False
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+    return True
+
+
+def submission_failure_details(output):
+    record = Path(str(output) + '-launch')
+    if (record / 'launch.json').exists() and not (record / 'status.json').exists():
+        launch = read(record / 'launch.json')
+        if launch.get('status') in ('SUBMITTING', 'SUBMISSION_UNKNOWN', 'FAILED') and launch.get('unit'):
+            request = record / 'request.json'
+            gpu = not request.exists() or bool(read(request).get('environment', {}).get('CUDA_VISIBLE_DEVICES'))
+            return dict(reason='ambiguous interrupted submission; ownership retained for server inspection',
+                        gpu_claim_preserved=gpu)
+    return {}
+
+
+def recorded_state(output, *, require_verification=False, inactive=service_inactive,
+                   submitting_alive=launcher_alive):
     """Wait for the launcher cleanup as well as a successful scientific wrapper."""
     output = Path(output)
     record = Path(str(output) + '-launch')
@@ -67,6 +102,9 @@ def recorded_state(output, *, require_verification=False, inactive=service_inact
             return 'FAILED'
     if not (record / 'status.json').exists():
         if launch.get('status') == 'SUBMITTED' and inactive(launch):
+            return 'FAILED'
+        if (launch.get('status') == 'SUBMITTING' and inactive(launch)
+                and not submitting_alive(launch)):
             return 'FAILED'
         return 'WAITING'
     status = read(record / 'status.json')
@@ -97,7 +135,8 @@ def active_gpu_claims(run_root, inactive=service_inactive):
             launch_path = record / 'launch.json'
             if launch_path.exists():
                 launch = read(launch_path)
-                if launch.get('unit') and inactive(launch):
+                if (launch.get('unit') and inactive(launch)
+                        and (launch.get('status') == 'SUBMITTED' or (record / 'status.json').exists())):
                     continue
                 if not launch.get('unit') and launch.get('status') in ('FAILED', 'SUBMISSION_UNKNOWN'):
                     continue
@@ -112,7 +151,12 @@ def active_gpu_claims(run_root, inactive=service_inactive):
             continue
         launch = read(launch_path)
         if launch.get('status') in ('FAILED', 'SUBMISSION_UNKNOWN'):
-            if not launch.get('unit') or inactive(launch):
+            if not launch.get('unit'):
+                continue
+            # An interrupted/unknown systemd-run might still activate later.
+            # Without worker evidence, retain ownership for server inspection.
+            if not status_path.exists():
+                active.append(str(record))
                 continue
         if launch.get('status') == 'SUBMITTED' and launch.get('unit') and inactive(launch):
             continue
@@ -218,6 +262,15 @@ def dependency_decision(dependencies, states):
     return 'READY' if all(states.get(key) == 'COMPLETED' for key in dependencies) else 'WAITING'
 
 
+def queue_gpu_claims(plan, state):
+    # Only this controller's completed launcher calls can prove a pre-unit
+    # failure. Unknown historical partial records stay conservatively reserved.
+    proven = {job['output'] + '-launch' for job in plan['jobs']
+              if state['jobs'].get(job['id'], {}).get('pre_unit_failure_confirmed')
+              and not (Path(job['output'] + '-launch') / 'launch.json').exists()}
+    return [record for record in active_gpu_claims(plan['run_root']) if record not in proven]
+
+
 def run_queue(plan, output, allowed, *, poll_seconds=60):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -240,10 +293,12 @@ def run_queue(plan, output, allowed, *, poll_seconds=60):
                     state['jobs'][job['id']] = dict(status='BLOCKED', reason='output exists without a launch record; never overwrite')
                 elif existing != 'NOT_STARTED':
                     state['jobs'][job['id']] = dict(previous, status=existing, existing_attempt_reused=True)
+                    if existing == 'FAILED':
+                        state['jobs'][job['id']].update(submission_failure_details(job['output']))
                 else:
                     state['jobs'].setdefault(job['id'], dict(status='WAITING', attempts=0))
             statuses = {**state['sources'], **{key: value['status'] for key, value in state['jobs'].items()}}
-            gpu_claims = active_gpu_claims(plan['run_root'])
+            gpu_claims = queue_gpu_claims(plan, state)
             state['active_gpu_claims'] = gpu_claims
             cpu_busy = any(not job['gpu'] and state['jobs'][job['id']]['status'] not in DONE
                            and Path(job['output'] + '-launch').exists() for job in plan['jobs'])
@@ -282,7 +337,7 @@ def run_queue(plan, output, allowed, *, poll_seconds=60):
                         current.update(status='FAILED', reason='source preflight failed', exit_code=result.returncode)
                         continue
                     # Preflight can take minutes; recheck actual resources immediately before submit.
-                    gpu_claims = active_gpu_claims(plan['run_root'])
+                    gpu_claims = queue_gpu_claims(plan, state)
                     if (len(gpu_claims) >= 4 or gpu not in available_gpus(allowed)
                             or gpu in reserved_gpus(gpu_claims, allowed)):
                         continue
@@ -303,9 +358,18 @@ def run_queue(plan, output, allowed, *, poll_seconds=60):
                     except subprocess.TimeoutExpired:
                         submission_code = None
                 observed = 'SUBMITTED' if submission_code == 0 else recorded_state(job['output'])
+                if (submission_code != 0 and not (Path(record) / 'launch.json').exists()):
+                    # launch_detached writes its unit before invoking systemd-run.
+                    # The launcher has now returned (or was killed by our timeout),
+                    # so no unit-less partial record can acquire ownership later.
+                    observed = 'FAILED'
+                    current.update(pre_unit_failure_confirmed=True,
+                                   reason='own launcher ended before recording a unit; no retry')
                 if observed in ('NOT_STARTED', 'UNTRACKED'):
                     observed = 'FAILED'
                 current.update(status=observed, submission_exit_code=submission_code)
+                if observed == 'FAILED':
+                    current.update(submission_failure_details(job['output']))
                 if observed not in DONE:
                     if job['gpu']:
                         gpu_claims.append(record)

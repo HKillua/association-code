@@ -59,16 +59,50 @@ class OvernightQueueTests(unittest.TestCase):
         self.assertEqual(queue.recorded_state(output, inactive=lambda _: False), 'RUNNING')
         self.assertEqual(len(queue.active_gpu_claims(self.root, inactive=lambda _: False)), 1)
 
-    def test_dead_submitted_unit_without_worker_status_releases_its_slot(self):
+    def test_dead_acknowledged_unit_releases_but_unknown_submission_keeps_ownership(self):
         output = self.record('dead', state='RUNNING', code=None)
         launch = Path(str(output) + '-launch')
         (launch / 'status.json').unlink()
         for state in ('SUBMITTED', 'SUBMISSION_UNKNOWN'):
             queue.write(launch / 'launch.json', dict(status=state, backend='systemd', unit='known.service'))
             self.assertEqual(queue.recorded_state(output, inactive=lambda _: True), 'FAILED')
-            self.assertEqual(queue.active_gpu_claims(self.root, inactive=lambda _: True), [])
+            self.assertEqual(bool(queue.active_gpu_claims(self.root, inactive=lambda _: True)),
+                             state == 'SUBMISSION_UNKNOWN')
         queue.write(launch / 'launch.json', dict(status='SUBMISSION_UNKNOWN', backend='systemd'))
         self.assertEqual(queue.active_gpu_claims(self.root, inactive=lambda _: False), [])
+
+    def test_interrupted_submission_ends_wait_but_keeps_ambiguous_gpu_ownership(self):
+        output = self.record('interrupted-submit', state='RUNNING', code=None)
+        launch = Path(str(output) + '-launch')
+        (launch / 'status.json').unlink()
+        queue.write(launch / 'launch.json', dict(status='SUBMITTING', backend='systemd',
+                    unit='known.service', launcher_pid=123))
+        for unit_inactive, process_alive, expected in [
+                (True, True, 'WAITING'), (False, False, 'WAITING'), (True, False, 'FAILED')]:
+            self.assertEqual(queue.recorded_state(output, inactive=lambda _: unit_inactive,
+                              submitting_alive=lambda _: process_alive), expected)
+            claims = queue.active_gpu_claims(self.root, inactive=lambda _: unit_inactive)
+            self.assertTrue(claims)
+        self.assertTrue(queue.submission_failure_details(output)['gpu_claim_preserved'])
+        (launch / 'request.json').unlink()
+        self.assertTrue(queue.active_gpu_claims(self.root, inactive=lambda _: True))
+        queue.write(launch / 'status.json', dict(status='FAILED', returncode=1))
+        self.assertEqual(queue.active_gpu_claims(self.root, inactive=lambda _: True), [])
+
+    def test_collected_units_are_inactive_but_bus_failures_do_not_release_claims(self):
+        launch = dict(backend='systemd', unit='old.service')
+        for returncode in (0, 4):
+            with patch.object(queue.subprocess, 'run', return_value=SimpleNamespace(
+                    returncode=returncode, stdout='LoadState=not-found\nActiveState=inactive\n')):
+                self.assertTrue(queue.service_inactive(launch))
+        for stdout in ('', 'ActiveState=inactive\n'):
+            with patch.object(queue.subprocess, 'run', return_value=SimpleNamespace(
+                    returncode=1, stdout=stdout)):
+                with self.assertRaisesRegex(RuntimeError, 'cannot establish'):
+                    queue.service_inactive(launch)
+        with patch.object(queue.subprocess, 'run', return_value=SimpleNamespace(
+                returncode=0, stdout='LoadState=loaded\nActiveState=active\n')):
+            self.assertFalse(queue.service_inactive(launch))
 
     def test_global_gpu_count_keeps_foreign_pending_and_cleanup_claims(self):
         self.record('done')
@@ -163,6 +197,96 @@ class OvernightQueueTests(unittest.TestCase):
              patch.object(queue.subprocess, 'run', side_effect=AssertionError('duplicate submit')):
             self.assertEqual(queue.run_queue(plan, self.root / 'queue', ['GPU-one']), 0)
         self.assertTrue(queue.read(self.root / 'queue/run.json')['jobs']['existing']['existing_attempt_reused'])
+
+    def test_partial_record_after_failed_launcher_is_terminal_without_retry(self):
+        plan = dict(code=str(queue.ROOT), run_root=str(self.root), sources={}, jobs=[
+            dict(id='partial', output=str(self.root / 'partial'), argv=['unused'], dependencies=[],
+                 gpu=False, preflight=None, max_seconds=3600)])
+        submitted = []
+
+        def interrupted_launch(argv, **kwargs):
+            submitted.append(argv)
+            Path(argv[argv.index('--record-dir') + 1]).mkdir()
+            return SimpleNamespace(returncode=1)
+
+        with patch.object(queue, 'active_gpu_claims', return_value=[]), \
+             patch.object(queue.subprocess, 'run', side_effect=interrupted_launch):
+            self.assertEqual(queue.run_queue(plan, self.root / 'queue', ['GPU-one']), 1)
+        self.assertEqual(len(submitted), 1)
+        self.assertEqual(queue.read(self.root / 'queue/run.json')['jobs']['partial']['status'], 'FAILED')
+
+    def test_proven_own_pre_unit_failure_does_not_starve_independent_gpu_job(self):
+        plan = dict(code=str(queue.ROOT), run_root=str(self.root), sources={}, jobs=[
+            dict(id=name, output=str(self.root / name), argv=['unused'], dependencies=[],
+                 gpu=True, preflight=['preflight'] if name == 'independent' else None, max_seconds=3600)
+            for name in ('partial', 'independent')])
+        submitted = []
+        original = queue.recorded_state
+
+        def launch(argv, **kwargs):
+            if '--record-dir' not in argv:
+                return SimpleNamespace(returncode=0)
+            record = Path(argv[argv.index('--record-dir') + 1])
+            name = record.name.removesuffix('-launch')
+            submitted.append(name)
+            if name == 'partial':
+                record.mkdir()
+                return SimpleNamespace(returncode=1)
+            self.record(name)
+            return SimpleNamespace(returncode=0)
+
+        original_claims = queue.active_gpu_claims
+        with patch.object(queue, 'recorded_state', side_effect=lambda path, **kw:
+                          original(path, **kw, inactive=lambda _: True)), \
+             patch.object(queue, 'active_gpu_claims', side_effect=lambda path:
+                          original_claims(path, inactive=lambda _: True)), \
+             patch.object(queue, 'available_gpus', return_value=['GPU-one']), \
+             patch.object(queue.subprocess, 'run', side_effect=launch), patch.object(queue.time, 'sleep'):
+            self.assertEqual(queue.run_queue(plan, self.root / 'queue', ['GPU-one']), 1)
+        self.assertEqual(submitted, ['partial', 'independent'])
+        state = queue.read(self.root / 'queue/run.json')
+        self.assertTrue(state['jobs']['partial']['pre_unit_failure_confirmed'])
+        self.assertEqual(state['jobs']['independent']['status'], 'COMPLETED')
+        # An unproven historical partial record is never released by this rule.
+        self.assertTrue(original_claims(self.root, inactive=lambda _: True))
+        (self.root / 'partial-launch/launch.json').write_text('{}')
+        with patch.object(queue, 'active_gpu_claims', return_value=[str(self.root / 'partial-launch')]):
+            self.assertEqual(queue.queue_gpu_claims(plan, state), [str(self.root / 'partial-launch')])
+
+    def test_dispatch_never_exceeds_four_claims_and_keeps_cpu_phase_devices_reserved(self):
+        devices = ['GPU-one', 'GPU-two', 'GPU-three', 'GPU-four']
+        for index, gpu in enumerate(devices[:3]):
+            self.record('old-' + str(index), state='RUNNING', code=None, gpu=gpu)
+        plan = dict(code=str(queue.ROOT), run_root=str(self.root), sources={}, jobs=[
+            dict(id='new-' + str(index), output=str(self.root / ('new-' + str(index))),
+                 argv=['unused'], dependencies=[], gpu=True, preflight=None, max_seconds=3600)
+            for index in range(5)])
+        phase, submitted, maximum = [0], [], [0]
+        original_state, original_claims = queue.recorded_state, queue.active_gpu_claims
+        inactive = lambda _: phase[0] > 0
+
+        def launch(argv, **kwargs):
+            record = Path(argv[argv.index('--record-dir') + 1])
+            gpu = next(value.split('=', 1)[1] for value in argv if value.startswith('CUDA_VISIBLE_DEVICES='))
+            claims = original_claims(self.root, inactive=inactive)
+            maximum[0] = max(maximum[0], len(claims) + 1)
+            self.assertNotIn(gpu, queue.reserved_gpus(claims, devices))
+            submitted.append((record.name, gpu, phase[0]))
+            self.record(record.name.removesuffix('-launch'), gpu=gpu)
+            return SimpleNamespace(returncode=0)
+
+        with patch.object(queue, 'recorded_state', side_effect=lambda path, **kw:
+                          original_state(path, **kw, inactive=inactive)), \
+             patch.object(queue, 'active_gpu_claims', side_effect=lambda path:
+                          original_claims(path, inactive=inactive)), \
+             patch.object(queue, 'available_gpus', return_value=devices), \
+             patch.object(queue.subprocess, 'run', side_effect=launch), \
+             patch.object(queue.time, 'sleep', side_effect=lambda _: phase.__setitem__(0, phase[0] + 1)):
+            self.assertEqual(queue.run_queue(plan, self.root / 'queue', devices), 0)
+        self.assertEqual(len(submitted), 5)
+        self.assertEqual(submitted[0][1:], ('GPU-four', 0))
+        self.assertTrue(all(item[2] > 0 for item in submitted[1:]))
+        self.assertLessEqual(maximum[0], 4)
 
 
 if __name__ == '__main__':
