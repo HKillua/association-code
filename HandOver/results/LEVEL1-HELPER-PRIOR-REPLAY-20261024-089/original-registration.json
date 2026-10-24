@@ -1,0 +1,147 @@
+{
+  "frozen_code": "a3e92a9",
+  "git_returned": [
+    {
+      "already_gzip": false,
+      "bytes": 407,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T09:56:05.605Z",
+      "path": "HandOver/results/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089/run.json",
+      "sha256": "908197be74414f08c2503ba98ce89e53cde023ad9ee782f0a86f0c101594a447"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 1034,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T09:29:44.834Z",
+      "path": "HandOver/results/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089/execution.json",
+      "sha256": "c6cc0ef3745b307f9877f3afc7ff8295adcec58b037bd9aeb3ece2441c9b32b7"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 1816,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T09:29:58.114Z",
+      "path": "HandOver/results/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089/source-verification.json",
+      "sha256": "4f8b56d8d89399cf74d65b16f9e6b188a1c70204a2100a2480909f0e7f381a3a"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 98992,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T09:56:05.605Z",
+      "path": "HandOver/results/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089/summary.json",
+      "sha256": "961eef429780234f90382601c80ff27b4cd28e00f14c081bf524270907eb35d9"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 541516,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T09:56:05.601Z",
+      "path": "HandOver/results/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089/scene-summary.json.gz",
+      "sha256": "800195c1928445bf95d0b0977116b1120b8d52ed41ee55614a415a3f0bd2dca3"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 1562,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T09:56:05.605Z",
+      "path": "HandOver/results/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089/report.md",
+      "sha256": "d76e4378bcdf9da8f129ba382ce3951c8e29bb90698d37e9500558d64b66256e"
+    }
+  ],
+  "git_returned_total_bytes": 645327,
+  "inputs_read_only": [
+    {
+      "bytes": 1748,
+      "mtime_utc": "2026-10-24T06:54:56.290Z",
+      "path": "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/run.json",
+      "sha256": "23c729b14fa1cd8a8cbc9391d2072a4d191e20226c2061a54cedf943232cfda0"
+    },
+    {
+      "bytes": 2202,
+      "mtime_utc": "2026-10-24T06:54:56.290Z",
+      "path": "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/execution.json",
+      "sha256": "0b9029faa15cb80b4d3d0493dae1d38e84818d829f1a036f42889642d3e7520a"
+    },
+    {
+      "bytes": 662814,
+      "mtime_utc": "2026-10-24T06:41:24.057Z",
+      "path": "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/run.json",
+      "sha256": "3923e5d5f297620a75480f05d49307eb1f0d283b3ae1182bb394109b759d26aa"
+    },
+    {
+      "bytes": 30584642,
+      "mtime_utc": "2026-10-24T06:41:23.917Z",
+      "path": "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/training.jsonl",
+      "sha256": "9ad51ba3149e46ac391f3c1613bf81354f116830884377055421028199840ae3"
+    },
+    {
+      "bytes": 622925339,
+      "mtime_utc": "2026-10-24T06:21:23.215Z",
+      "path": "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/preparation.json",
+      "sha256": "not_recomputed_over_40MB"
+    },
+    {
+      "bytes": 1485,
+      "mtime_utc": "2026-10-23T09:28:56.557Z",
+      "path": "runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/run.json",
+      "sha256": "9a04c66858604d05f446d03bd4e7510833b0a0e7481e9afef79896c454eb72f4"
+    },
+    {
+      "bytes": 1951,
+      "mtime_utc": "2026-10-23T09:28:56.557Z",
+      "path": "runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/execution.json",
+      "sha256": "435066c5d07b6cdfc833059d99ca4a562d85a3496e4a72722fa2b58f14a7312e"
+    },
+    {
+      "bytes": 660856,
+      "mtime_utc": "2026-10-23T09:15:27.393Z",
+      "path": "runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit/run.json",
+      "sha256": "3b1ae3dea1d8ed69c3019afa69beebc01ea09161cc939075770201f2295849ef"
+    },
+    {
+      "bytes": 7542335,
+      "mtime_utc": "2026-10-23T09:15:27.225Z",
+      "path": "runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit/training.jsonl",
+      "sha256": "452a39a45627ee5ba5a2fd564fabd0c074590a67ebbe9397ad0f79c9d75a52ee"
+    },
+    {
+      "bytes": 794580,
+      "mtime_utc": "2026-10-24T09:29:42.510Z",
+      "path": "/home/wangguangjie/djs/association-code-run089/configs/data/mtad-level1-scene3000.json",
+      "sha256": "5741ecb45aead2983ac778236da1a6ca4956ee85e44cc1f1fa345ffb9d3fd054"
+    },
+    {
+      "bytes": 186797,
+      "mtime_utc": "2026-10-24T09:29:42.506Z",
+      "path": "/home/wangguangjie/djs/association-code-run089/configs/data/mtad-level1-alignment.json",
+      "sha256": "cb22855424b37254dd7c31830a61144e432712f9a50c0fa6bec369a97d0fcafd"
+    },
+    {
+      "bytes": 1073741824,
+      "mtime_utc": "2026-10-16T06:21:16.000Z",
+      "path": "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+      "sha256": "not_recomputed_over_40MB"
+    },
+    {
+      "bytes": 1073741824,
+      "mtime_utc": "2026-10-16T05:44:43.000Z",
+      "path": "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+      "sha256": "not_recomputed_over_40MB"
+    },
+    {
+      "bytes": 534048695,
+      "mtime_utc": "2026-10-16T05:49:52.000Z",
+      "path": "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+      "sha256": "not_recomputed_over_40MB"
+    }
+  ],
+  "launcher_elapsed_seconds": 1583.8148910892196,
+  "note": "089六个输出全部逐字节复制；scene-summary.json.gz 为程序原生 gzip 未再压缩。输入原件（083/072C 的 run/execution/fit/training.jsonl、083 preparation.json 622,925,338 B、原冻结checkout的manifest/alignment与三个Level1压缩卷）只读未改动；>40MB 的原件未重算sha256（登记字节/mtime，其sha256已在各自任务回执登记）。",
+  "registered_at_utc": "2026-10-24T09:57:57Z",
+  "returncode": 0,
+  "server_run_dir": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-PRIOR-REPLAY-20261024-089-attempt-1",
+  "task": "089",
+  "unit": "mtad-130e17628227.service"
+}

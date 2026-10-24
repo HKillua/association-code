@@ -9,7 +9,7 @@
 | [088 Level1 TCM](L2S-20261024-088.md) |**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `d406d2b565f5cf9a…`，单元 `mtad-28dadd8e6ba9`，`GPU-c5a00c37…`(index0)、CPU4、整链8h仅提醒；提交 09:24:48Z。| 单GPU/CPU4，2424更新覆盖一次155134片段；完整V特征诊断，零下游。首批 |
 | [086A 固定三任务](L2S-20261024-086.md) |**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `d9b5e833e7883fb7…`（仅填 task_arm/task_gpu_uuid），单元 `mtad-4e94dfda48c1`，`GPU-1043f26a…`(index3)、CPU4、4h仅提醒；提交 09:28:52Z，phase `prepareT2100V300`。| 单GPU/CPU4，4000更新，配对076B；完整V与自身/076B/072C对照。首批 |
 | [086B 仅位置](L2S-20261024-086.md) |**SERVER_TO_LOCAL / WAITING_DEPENDENCIES**：全局四个已领取单卡已满（088／087A／087B／086A），本臂等首个空槽按同逐字块接入一次，不提前占卡、不扩配置。| 同位置系数，4000更新。首个单卡空槽接入；两臂成功后一次CPU配对表 |
-| [089 原输入审计](L2S-20261024-089.md) |**SERVER_TO_LOCAL / RUNNING**：逐字块 sha256 `caa1fd5a37769ae6…`，单元待登记，CPU4／`CUDA_VISIBLE_DEVICES=`空、1h仅提醒；提交 09:29:42Z。| 一次CPU4；按原日志重放T-only物理初值与loss系数，无权重/网络/前向；与GPU准备和评价错峰 |
+| [089 原输入审计](L2S-20261024-089.md) | **SERVER_TO_LOCAL / COMPLETED**：逐字块 sha256 `caa1fd5a…`，单元 `mtad-130e17628227`，退出0、launcher 1,583.815 s（程序1,580.766 s），CPU4零GPU/零模型/零前向/零checkpoint/零optimizer，`raw_archive_split="T_core only"`、`validation_payloads_read=false`、2,100场全完成。`LOG_REPLAY_VERIFIED`（sampler/augRNG/batch对全重放）。**丢弃后fixed.95起点MAE 3491.133→2990.053 m（−501.080，−14.35%）、样本等权loss 3.5025→2.9582 km**，位移系数1495.030 m、harm 394.360/improvement 938.668；81格mode×region×bucket保留。故083退让不能用"起点被推离"解释，但不分离机制、不分配比例。见[回执](S2L-20261024-089.md)|已结案一次；不据此追加训练、不扫p、不补seed|
 
 全局最多四个已领取单卡，按实验室FIFO与实际CPU/内存/I/O；五项GPU作业独立，089不是前置。087和086每臂完成即可回传，不因先返成绩取消另一固定臂；配对整表仅在各自两臂均成功后执行。各一次，失败保全、不自动原样重试或改预算；不改任何活动checkout/运行原件。087/086各4h、088整链8h、CPU审计/整表1h均仅提醒，预计耗时不等于自动终止；以真实领取时间和回执判断。
 
