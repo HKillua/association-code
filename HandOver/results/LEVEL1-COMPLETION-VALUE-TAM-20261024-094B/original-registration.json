@@ -1,0 +1,91 @@
+{
+ "run_id": "LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1",
+ "note": "094B TAM-only arm. summary returned as gzip copy; coverage and history returned as labelled derived extracts; all originals stay on server.",
+ "derived_or_aggregate": [
+  "summary.json.gz",
+  "coverage-summary-derived.json",
+  "history-trajectory-derived.json"
+ ],
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 1342740,
+   "sha256": "9eb3fd3a29c76f08c640a1e23127fa430394d45ebf108e00e62d0751450417a2",
+   "mtime_local": "2026-10-25T01:43:31+0800"
+  },
+  {
+   "returned_name": "completion-value-verification.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/completion-value-verification.json",
+   "mode": "byte-identical copy",
+   "bytes": 1411,
+   "sha256": "706ba672c3c1eb6cc8d22f8e43a7bd2b8f5139f058b7adf8836521965e24b5ca",
+   "mtime_local": "2026-10-25T01:45:14+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/summary.json",
+   "source_bytes": 14774190,
+   "returned_bytes": 921911,
+   "source_sha256": "5508c9134097532460d3eece49584ca43d874c723ec86f729d0c1683301f8c3d",
+   "gunzip_equals_original": true,
+   "mode": "gzip copy (mtime=0)"
+  }
+ ],
+ "returned_total_bytes": 3137725,
+ "server_originals_retained": {
+  "run.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/run.json",
+   "bytes": 1342740,
+   "sha256": "9eb3fd3a29c76f08c640a1e23127fa430394d45ebf108e00e62d0751450417a2",
+   "mtime_local": "2026-10-25T01:43:31+0800"
+  },
+  "summary.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/summary.json",
+   "bytes": 14774190,
+   "sha256": "5508c9134097532460d3eece49584ca43d874c723ec86f729d0c1683301f8c3d",
+   "mtime_local": "2026-10-25T01:43:31+0800"
+  },
+  "completion-value-verification.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/completion-value-verification.json",
+   "bytes": 1411,
+   "sha256": "706ba672c3c1eb6cc8d22f8e43a7bd2b8f5139f058b7adf8836521965e24b5ca",
+   "mtime_local": "2026-10-25T01:45:14+0800"
+  },
+  "coverage.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/coverage.json",
+   "bytes": 11294345,
+   "sha256": "0b43587e7bf7a1878728c85e868a6225fed1b3f1f6d1ac67509b2fe78827cb70",
+   "mtime_local": "2026-10-25T01:43:20+0800"
+  },
+  "history.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/history.json",
+   "bytes": 31125966,
+   "sha256": "e996aae1adc4d36019334e7453b0f809a0a218760811d9e6c1a3b11ba686c52a",
+   "mtime_local": "2026-10-25T01:43:18+0800"
+  },
+  "checkpoint.pt": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/checkpoint.pt",
+   "bytes": 105899788,
+   "sha256": "71356b530e107b652d6f4070b9c77a7aaf2c95d184cebd810c276a52a548caf8",
+   "mtime_local": "2026-10-25T01:43:13+0800"
+  },
+  "preparation.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/preparation.json",
+   "bytes": 676811376,
+   "sha256": "1f662f1d749bde80ee26ab04fc3e4632b9b7decf13693e13582804b7ba77cf6b",
+   "mtime_local": "2026-10-25T01:44:23+0800"
+  }
+ },
+ "server_association_scores": {
+  "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1/association-scores",
+  "entries": [
+   "update-004000"
+  ]
+ },
+ "server_tree": {
+  "files": 309,
+  "bytes": 919335378
+ }
+}
