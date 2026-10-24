@@ -1,12 +1,12 @@
 # 当前交接
 
-2026-10-24新增：**083／084／085已完成开发和独立审查，LOCAL_TO_SERVER / READY**，实施冻结`1cac26c`。用户已授权自主预算，不再询问批准。新任务尚无服务器领取回执；READY和push不表示RUNNING。081/082等历史任务已结案，不重领。
+2026-10-24新增：**083／084／085已完成开发和独立审查，LOCAL_TO_SERVER / READY**，实施冻结`1cac26c`。用户已授权自主预算，不再询问批准。新任务尚无服务器领取回执；READY和push不表示RUNNING。081/082等历史任务已结案，不重领。 **服务器补登：083／084／085已各自按冻结块领取一次（084 已COMPLETED并回传，083／085 RUNNING）；084 的 078B 输入前缀需本地确认，见其回执首节。**
 
 | 当前任务 | 状态 | 固定范围 |
 |---|---|---|
-| [083 helper片段丢弃](L2S-20261024-083.md) | **LOCAL_TO_SERVER / READY** | 1×单GPU/CPU4 fresh4000，seed20261023，原linear Transformer仅T整helper p=.5丢弃；严格配072C原采样；CPU初末V300及一次缓存表。训练链4h、CPU表1h仅提醒 |
-| [084 曝光系数核查](L2S-20261024-084.md) | **LOCAL_TO_SERVER / READY** | CPU4、零权重/前向/训练；078B/081A完整日志＋081摘要，点曝光与真正loss系数分开，1h仅提醒 |
-| [085 PTFM目标封口](L2S-20261024-085.md) | **LOCAL_TO_SERVER / READY** | CPU4、零权重/前向/训练；074C/076B首末缓存与原目标/物理误差重放，固定T端点UNKNOWN，1h仅提醒 |
+| [083 helper片段丢弃](L2S-20261024-083.md) | **SERVER_TO_LOCAL / RUNNING**：已按逐字块（sha256 `3ceff831…`）领取一次，单元 `mtad-04139d509436`，`GPU-c5a00c37…`(index0，领取前实测空闲 24,247 MiB／util 0%)、CPU4、4 h 仅提醒；提交 06:00:54Z，phase `prepare_T2100_V300`。| 1×单GPU/CPU4 fresh4000，seed20261023，原linear Transformer仅T整helper p=.5丢弃；严格配072C原采样；CPU初末V300及一次缓存表。训练链4h、CPU表1h仅提醒 |
+| [084 曝光系数核查](L2S-20261024-084.md) | **SERVER_TO_LOCAL / COMPLETED**：退出0、实耗6.025 s、CPU4零前向零权重零原卷；两seed 4000更新/32000样本全 `VERIFIED`，四种口径系数差<0.5个百分点（质量0.999875/0.9998125，缺口＝4/6个零监督样本），`wrong_only` 的≥2系数恒0。**交接块内 078B 目录前缀写为 SCREEN，实际为 SEQUENCE；仅改该行后执行并登记两版sha256。** 见[回执](S2L-20261024-084.md)| CPU4、零权重/前向/训练；078B/081A完整日志＋081摘要，点曝光与真正loss系数分开，1h仅提醒 |
+| [085 PTFM目标封口](L2S-20261024-085.md) | **SERVER_TO_LOCAL / RUNNING**：已按逐字块（sha256 `aa75cdfa…`）领取一次，单元 `mtad-ddbc81e09155`，CPU4、1 h 仅提醒；提交 06:01:07Z，phase `validate_cache_and_logs`。| CPU4、零权重/前向/训练；074C/076B首末缓存与原目标/物理误差重放，固定T端点UNKNOWN，1h仅提醒 |
 
 各一次、失败保全不自动重试。084/085不是083前置；CPU/IO准备错峰，全局最多四单卡，但本轮仅一项GPU候选，不为占卡扩配置。083预估领取后约1—2h（非承诺），按真实回执判断。T_test封存，066保持REJECTED；没有新成果排名，领域强基线缺口保留。
 

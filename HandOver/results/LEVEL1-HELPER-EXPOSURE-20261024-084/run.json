@@ -1,0 +1,21 @@
+{
+  "status": "COMPLETED",
+  "completed_fits": 2,
+  "cpu_only": true,
+  "cpu_threads": 4,
+  "workers": 1,
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "checkpoints_opened": false,
+  "raw_archives_read": false,
+  "test_opened": false,
+  "old066_acceptance": "REJECTED",
+  "inputs": {
+    "fits": [
+      "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-SEQUENCE-20261024-078B-attempt-1/fit",
+      "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-REPLICATION-20261024-081A-attempt-1/fit"
+    ],
+    "validation_summary": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1/summary.json.gz"
+  },
+  "elapsed_seconds": 5.799996851012111
+}
