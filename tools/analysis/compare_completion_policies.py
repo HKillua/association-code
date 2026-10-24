@@ -335,6 +335,35 @@ def _compare_tfm(arms):
         interpretation='oracle-only fixed-final pilot; no predicted-group system score, no independent-test or multiseed claim')
 
 
+def _group_totals(rows):
+    """Pool scene-local identities; never merge equal IDs across scenes.
+
+    This is representative-identity coverage of the declared target inventory,
+    not valid-reference point coverage or a physical fusion score.
+    """
+    names = ('declared_target_count', 'anchor_matched_target_count',
+             'unmatched_target_count', 'duplicate_anchor_group_count')
+    result = {name: sum(row[name] for row in rows) for name in names}
+    result.update(scene_count=len(rows), predicted_group_count=sum(len(row['groups']) for row in rows),
+                  node_count=sum(row['group_diagnostics']['node_count'] for row in rows))
+    _require(result['anchor_matched_target_count'] + result['unmatched_target_count']
+             == result['declared_target_count'], 'group target accounting disagrees')
+    _require(result['anchor_matched_target_count'] + result['duplicate_anchor_group_count']
+             == result['predicted_group_count'], 'group duplicate accounting disagrees')
+    result['declared_target_coverage'] = (result['anchor_matched_target_count'] / result['declared_target_count']
+                                        if result['declared_target_count'] else None)
+    tp = sum(row['group_diagnostics']['correct_same_identity_pairs'] for row in rows)
+    fp = sum(row['group_diagnostics']['merge_pairs'] for row in rows)
+    fn = sum(row['group_diagnostics']['split_pairs'] for row in rows)
+    result['co_membership'] = dict(tp=tp, fp=fp, fn=fn,
+        precision=tp / (tp + fp) if tp + fp else None,
+        recall=tp / (tp + fn) if tp + fn else None,
+        micro_f1=2 * tp / (2 * tp + fp + fn) if 2 * tp + fp + fn else 1.)
+    result['coverage_scope'] = ('scene-local declared target identities represented by first-node anchors; '
+                                'includes targets without valid reference, not physical point coverage')
+    return result
+
+
 def _compare_tam(arms):
     from association.evaluation.association import evaluate_scenes, compare_predictions
     from association.evaluation.grouping import group_predicted_tracks
@@ -369,6 +398,7 @@ def _compare_tam(arms):
             for index, nodes in enumerate(groups):
                 memberships[nodes] = index
             anchors = [str(record['identities'][nodes[0]]) for nodes in groups]
+            _require(set(anchors).issubset(contract['target_ids']), 'anchor identity outside declared targets')
             grouping[side].append(dict(scene_id=record['scene_id'], component_id=record['component_id'],
                 groups=groups, group_diagnostics=group_membership_diagnostics(memberships, record['identities']),
                 declared_target_count=len(contract['target_ids']), anchor_matched_target_count=len(set(anchors)),
@@ -384,14 +414,19 @@ def _compare_tam(arms):
         rows = {side: [row for row in records[side] if str(row['component_id']) == component] for side in SIDES}
         components.append(dict(component_id=component, scene_count=counts[component],
             association={side: evaluate_scenes(rows[side], thresholds[side]) for side in SIDES},
+            grouping={side: _group_totals([row for row in grouping[side]
+                       if str(row['component_id']) == component]) for side in SIDES},
             paired_edges=compare_predictions(rows['state_hold'], rows['learned'], thresholds['state_hold'], thresholds['learned'])))
     outside = {side: [row for row in records[side] if str(row['component_id']) != largest] for side in SIDES}
     return dict(scene_count=len(population), component_count=len(counts), thresholds=thresholds,
         margins={side: arms[side]['final']['effective_margin'] for side in SIDES},
         association=evaluations, grouping=grouping,
+        grouping_totals={side: _group_totals(grouping[side]) for side in SIDES},
         grouping_policy='actual anchor_direct/input-order groups; no transitive connected-component replacement',
         per_component=components, largest_component=dict(component_id=largest, scene_count=counts[largest]),
         outside_largest_component={side: evaluate_scenes(outside[side], thresholds[side]) for side in SIDES},
+        outside_largest_component_grouping={side: _group_totals([row for row in grouping[side]
+            if str(row['component_id']) != largest]) for side in SIDES},
         paired_edges=compare_predictions(records['state_hold'], records['learned'], thresholds['state_hold'], thresholds['learned']),
         interpretation='completion with the same T-only margin-calibration rule and V-threshold rule; '
             'margins/thresholds may differ; V-selected pipeline comparison, not pure representation causality',

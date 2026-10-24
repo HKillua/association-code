@@ -67,6 +67,53 @@ class FrozenPositionAdapterTests(unittest.TestCase):
             config['training']['updates'] += 1
             with self.assertRaises(ValueError): entry.production_contract(config, manifest, alignment)
 
+    def test_fully_supported_and_unsupervised_batches_preserve_teacher_and_denominator(self):
+        teacher = SequencePosition(backbone='transformer').eval()
+        model = FrozenPositionAdapter(mode='anchor_unsupported')
+        initialize_from_teacher(model, teacher.state_dict(), branch_seed=20351023)
+        motion = motion_fixture(); args = list(sequence_inputs(motion, [0, 1, 2]))
+        support = torch.ones(len(args[0]), dtype=torch.bool)
+        args[1][:, 57] = 1.
+        with torch.no_grad(): model.adapter[2].bias.fill_(.02)
+        expected = teacher(*args)['states'].detach()
+        for has_reference in (True, False):
+            model.train(); model.zero_grad(set_to_none=True)
+            result = model(*args, support)
+            target = expected.clone(); target[:, 0] += .01
+            valid = torch.full_like(target, has_reference, dtype=torch.bool)
+            losses, diagnostics = sequence_objectives(result, target, valid)
+            self.assertEqual(diagnostics['valid_position_points'], len(target) if has_reference else 0)
+            self.assertTrue(torch.equal(result['states'], expected))
+            self.assertFalse(result['update_allowed'].any())
+            losses['linear'].backward()
+            self.assertTrue(all(p.grad is None for p in model.teacher.parameters()))
+            self.assertTrue(all(p.grad is not None and torch.count_nonzero(p.grad) == 0
+                                for p in model.adapter.parameters()))
+            self.assertEqual(float(losses['linear'].detach()) > 0, has_reference)
+
+    def test_successful_route_audit_rejects_mask_and_summary_misreporting(self):
+        config = dict(model=dict(mode='anchor_unsupported'), data=dict(length=4))
+        sample = dict(valid_position_points=3, eligible_query_points=2, eligible_valid_position_points=1)
+        route = dict(all_queries=4, anchor_supported_queries=2, valid_queries=3, valid_anchor_supported_queries=2,
+                     increment_allowed_queries=2, valid_increment_allowed_queries=1)
+        rows = [dict(batch=[sample], route_batch=[route])]
+        run = dict(configuration=config, route_exposure=route.copy())
+        exposure, observed = compare.verify_route_exposure(run, rows)
+        self.assertEqual(exposure, route)
+        self.assertEqual(observed[0][0]['valid_anchor_supported_queries'], 2)
+        changed = deepcopy(run); changed['route_exposure']['valid_queries'] += 1
+        with self.assertRaisesRegex(ValueError, 'recorded route exposure'):
+            compare.verify_route_exposure(changed, rows)
+        changed = deepcopy(rows); changed[0]['route_batch'][0]['increment_allowed_queries'] = 4
+        with self.assertRaisesRegex(ValueError, 'correction scope'):
+            compare.verify_route_exposure(run, changed)
+        changed = deepcopy(rows); changed[0]['route_batch'][0]['valid_anchor_supported_queries'] = 0
+        with self.assertRaisesRegex(ValueError, 'intersections are impossible'):
+            compare.verify_route_exposure(run, changed)
+        changed = deepcopy(rows); changed[0]['route_batch'] = []
+        with self.assertRaisesRegex(ValueError, 'missing samples'):
+            compare.verify_route_exposure(run, changed)
+
     def test_real_source_three_fits_save_load_complete_endpoints_and_cached_table(self):
         from tools.experiments import sequence_position_fit as original
         with TemporaryDirectory() as directory:
@@ -110,6 +157,7 @@ class FrozenPositionAdapterTests(unittest.TestCase):
                 for mode in entry.CONFIGS:
                     name, arm = compare.adapter_metadata(root/mode); arms[name] = arm
             self.assertTrue(summary['pairing']['ab_initial_parameters_exact'])
+            self.assertTrue(all(arm['successful_route_exposure_recomputed'] for arm in summary['pairing']['arms'].values()))
             self.assertTrue(summary['protected_inside_teacher_exact'])
             self.assertEqual(summary['position_population']['covered_target_points'], 127)
             self.assertIn('posthoc_mask_A', summary['methods'])

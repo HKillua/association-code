@@ -131,6 +131,11 @@ def validate_completed_run(output, phase, policy, *, bound=None):
     _require(phase in ('tam', 'tfm') and policy in POLICIES, 'unknown completion-value arm')
     run = source_checks._json(output / 'run.json')
     preparation = source_checks._json(output / 'preparation.json')
+    # The saved preparation is evidence, not authority to redefine the frozen
+    # experiment. Recheck the public profile even in read-only postflight.
+    expected_target = source_checks._canonical(_experiment_contract(phase, policy)['target'], phase)
+    _require(source_checks._canonical(preparation['configuration'], phase) == expected_target,
+             'saved preparation differs from the frozen completion-value configuration')
     saved = torch.load(output / 'checkpoint.pt', map_location='cpu', weights_only=True)
     initial = torch.load(output / 'pairing-initial.pt', map_location='cpu', weights_only=True)
     if bound is None:
@@ -141,8 +146,9 @@ def validate_completed_run(output, phase, policy, *, bound=None):
                  'source088 is not completed')
         source = torch.load(source_path / 'checkpoint.pt', map_location='cpu', weights_only=True)
         bound = dict(source=str(source_path), phase=phase, checkpoint=source,
-            target=source_checks._canonical(preparation['configuration'], phase),
+            target=expected_target,
             validation_pairs=sum(row['pair_count'] for row in source['data_contract'][1]))
+    _require(bound['target'] == expected_target, 'bound target differs from the frozen completion-value configuration')
     report = source_checks.verify_endpoint(output, bound)
     expected_model = ModelConfig(**bound['target']['model'])
     actual_model = ModelConfig(**saved['model_config'])

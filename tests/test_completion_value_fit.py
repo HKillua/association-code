@@ -203,6 +203,38 @@ class CompletionValueFitTests(unittest.TestCase):
                 cli.validate_completed_run(output, 'tfm', 'state_hold')
         torch.save(original, path)
 
+        # A stale/contradictory terminal run or journal cannot be accepted just
+        # because checkpoint.pt has the desired endpoint and total exposures.
+        for name, mutate in (
+            ('run.json', lambda value: value['cursor'].update(completed_updates=1)),
+            ('history.json', lambda value: value[0].update(loss=value[0]['loss'] + 1.)),
+            ('coverage.json', lambda value: value['TFM_FROZEN'].update(pair_presentations=1)),
+        ):
+            artifact_path = output / name
+            original_bytes = artifact_path.read_bytes()
+            value = runtime.read_json(artifact_path)
+            mutate(value)
+            try:
+                runtime.write_json(artifact_path, value)
+                with self.assertRaises(ValueError, msg=name):
+                    cli.validate_completed_run(output, 'tfm', 'state_hold')
+            finally:
+                artifact_path.write_bytes(original_bytes)
+
+        tam_output = self.root / 'tam-state_hold'
+        tam_summary = runtime.read_json(tam_output / 'summary.json')
+        score_index_path = Path(tam_summary['endpoint_score_records']) / 'index.json'
+        original_index = score_index_path.read_bytes()
+        for field, wrong in (('update', 1), ('split', 'T_test'), ('test_opened', True)):
+            try:
+                index = runtime.read_json(score_index_path)
+                index['binding'][field] = wrong
+                runtime.write_json(score_index_path, index)
+                with self.assertRaisesRegex(ValueError, 'provenance', msg=field):
+                    cli.validate_completed_run(tam_output, 'tam', 'state_hold')
+            finally:
+                score_index_path.write_bytes(original_index)
+
         # Read the actual complete caches and saved weights; model construction,
         # checkpoint-to-model loading and training are forbidden in comparison.
         with (patch.object(comparator, '_expected_configuration',
@@ -222,6 +254,17 @@ class CompletionValueFitTests(unittest.TestCase):
                 self.assertTrue(compared['pairing']['ordered_successful_samples_equal'])
                 self.assertFalse(compared['pairing']['initial_predictions_required_equal'])
                 self.assertEqual(compared['comparison']['scene_count'], 2)
+                if phase == 'tam':
+                    # The second V scene has a declared target but no nodes.
+                    # It stays in the target denominator of the grouped report.
+                    for side in cli.POLICIES:
+                        totals = compared['comparison']['grouping_totals'][side]
+                        self.assertEqual(totals['declared_target_count'], 4)
+                        self.assertEqual(totals['node_count'], 4)
+                        self.assertEqual(totals['anchor_matched_target_count'] + totals['unmatched_target_count'], 4)
+                        self.assertGreaterEqual(totals['unmatched_target_count'], 1)
+                        self.assertEqual(totals['anchor_matched_target_count'] + totals['duplicate_anchor_group_count'],
+                                         totals['predicted_group_count'])
 
             # Same valid pair population/counts and matching checkpoint/history
             # are insufficient: changing the actual draw order breaks pairing.

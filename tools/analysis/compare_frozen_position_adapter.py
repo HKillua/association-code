@@ -25,6 +25,37 @@ from tools.analysis.compare_position_benchmarks import ROOT, CONTROLS, INPUT_KEY
 from tools.analysis.compare_position_harm import _cache, _visible_opportunity, harm_statistics
 
 NAMES = {'all_queries': 'adapter_all', 'anchor_unsupported': 'adapter_missing', 'full_finetune': 'finetune'}
+ROUTE_INPUT_KEYS = ('all_queries', 'anchor_supported_queries', 'valid_queries', 'valid_anchor_supported_queries')
+ROUTE_KEYS = (*ROUTE_INPUT_KEYS, 'increment_allowed_queries', 'valid_increment_allowed_queries')
+
+
+def verify_route_exposure(run, rows):
+    """Rebuild routing counts from successful batches, not summary assertions."""
+    config = run['configuration']; mode = config['model']['mode']; q = config['data']['length']
+    totals = dict.fromkeys(ROUTE_KEYS, 0); observed_routes = []
+    for row in rows:
+        routes = row.get('route_batch', [])
+        if len(routes) != len(row['batch']):
+            raise ValueError('090 successful route batch is missing samples')
+        observed = []
+        for sample, route in zip(row['batch'], routes):
+            if (set(route) != set(ROUTE_KEYS) or any(type(route[k]) is not int or not 0 <= route[k] <= q for k in ROUTE_KEYS)
+                    or route['all_queries'] != q or route['valid_queries'] != sample['valid_position_points']):
+                raise ValueError('090 route population differs from actual sampled queries')
+            support, valid, joint = (route[k] for k in ROUTE_INPUT_KEYS[1:])
+            if (not max(0, valid+support-q) <= joint <= min(valid, support)
+                    or sample['eligible_query_points'] > q-support
+                    or sample['eligible_valid_position_points'] > valid-joint):
+                raise ValueError('090 route support/valid intersections are impossible')
+            expected = (q-support, valid-joint) if mode == 'anchor_unsupported' else (q, valid)
+            if (route['increment_allowed_queries'], route['valid_increment_allowed_queries']) != expected:
+                raise ValueError('090 logged applied route violates declared correction scope')
+            for key in ROUTE_KEYS: totals[key] += route[key]
+            observed.append({key: route[key] for key in ROUTE_INPUT_KEYS})
+        observed_routes.append(observed)
+    if totals != run.get('route_exposure'):
+        raise ValueError('090 successful routes do not reproduce recorded route exposure')
+    return totals, observed_routes
 
 
 def declared_manifest():
@@ -76,12 +107,17 @@ def verify_pairing(arms):
     old, old_rows, old_exposure = _sequence_sampling(reference/'fit')
     _, old_final = load_teacher(reference/'fit/final.pt')
     _, old_initial = load_teacher(reference/'fit/step-0.pt')
-    results, initial_states = {}, {}
+    results, initial_states, reference_routes = {}, {}, None
     samples = lambda rows: [{k: row[k] for k in ('step', 'mode', 'batch')} for row in rows]
     for name, arm in arms.items():
         if name == 'linear': continue
         fit = arm['path']/'fit'; new, rows, exposure = _sequence_sampling(fit)
         config = new['configuration']; mode = config['model']['mode']
+        route_exposure, observed_routes = verify_route_exposure(new, rows)
+        if reference_routes is None:
+            reference_routes = observed_routes
+        elif observed_routes != reference_routes:
+            raise ValueError('090 paired arms disagree on actual observed support/valid routes')
         if (source_configuration(config) != old['configuration'] or samples(rows) != samples(old_rows)
                 or exposure != old_exposure or new['training_scene_ids'] != old['training_scene_ids']
                 or arm['paired_control'] != reference):
@@ -112,7 +148,8 @@ def verify_pairing(arms):
             actual_successful_batches_exact=True, sampling_exposure_exact=True, teacher_unchanged=unchanged,
             matched_updates=len(rows), matched_anchors=exposure['sampled_anchors'], exposure=exposure,
             parameter_count=new['parameter_count'], trainable_parameter_count=new['trainable_parameter_count'],
-            source_updates=old_final['step'], added_updates=len(rows), route_exposure=new['route_exposure'])
+            source_updates=old_final['step'], added_updates=len(rows), route_exposure=route_exposure,
+            successful_route_exposure_recomputed=True)
     if 'adapter_all' in initial_states and 'adapter_missing' in initial_states and not _exact(
             initial_states['adapter_all'], initial_states['adapter_missing']):
         raise ValueError('090A/B initial tensors must be identical')

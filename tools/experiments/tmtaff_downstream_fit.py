@@ -161,15 +161,24 @@ def verify_endpoint(output, bound):
     saved = torch.load(output / 'checkpoint.pt', map_location='cpu', weights_only=True)
     run, summary = _json(output / 'run.json'), _json(output / 'summary.json')
     stage = 'TAM_FROZEN' if phase == 'tam' else 'TFM_FROZEN'
+    stage_index = 1 if phase == 'tam' else 2
     updates = bound['target']['training']['updates'][stage]
     _require(run.get('status') == 'COMPLETED' and run.get('final_evaluation_status') == 'COMPLETED'
              and run.get('phase') == phase and saved.get('phase') == phase
              and run.get('test_opened') is False and summary.get('test_opened') is False
              and saved['training_stages'] == [stage]
-             and saved['cursor']['completed_updates'] == updates
-             and saved['config'] == bound['target']['training']
+             and saved['cursor'] == dict(stage=stage_index, update=updates, completed_updates=updates)
+             and run['cursor'] == dict(stage=stage_index + 1, update=0, completed_updates=updates)
+             and run.get('checkpoint_cursor') == saved['cursor']
+             and run['config'] == saved['config'] == bound['target']['training']
              and [(row['stage'], row['update']) for row in saved['history']] == [(stage, i) for i in range(1, updates + 1)],
              '092 endpoint phase/update/final-evaluation contract differs')
+    _require(_json(output / 'history.json') == runtime.jsonable(saved['history'])
+             and _json(output / 'coverage.json') == runtime.jsonable(saved['coverage']) == summary['coverage']
+             and run['initialization'] == saved['initialization'] == summary['initialization']
+             and all(math.isfinite(row[key]) for row in saved['history']
+                     for key in ('loss', 'gradient_norm')),
+             'endpoint successful-update journals or initialization disagree')
     _require(saved['normalizer'] == source['normalizer'] == summary['normalizer']
              and saved['data_contract'] == source['data_contract']
              and saved['initialization']['source_run'] == bound['source'],
@@ -201,7 +210,9 @@ def verify_endpoint(output, bound):
                  and len(summary['validation_score_records']) == 1
                  and summary['validation_score_records'][0]['update'] == updates,
                  'TAM must score the fixed final full V without physical fusion')
-        records = runtime.load_records(summary['endpoint_score_records'])
+        records = runtime.load_records(summary['endpoint_score_records'], expected_binding=dict(
+            phase='tam', stage=stage, update=updates, split='V_select',
+            threshold=evaluation['threshold'], effective_margin=saved['effective_margin'], test_opened=False))
         _require([row['scene_id'] for row in records] == ids, 'TAM score population/order differs')
         for record, row in zip(records, rows):
             _require(record['node_ids'] == row['node_ids'] and len(record['pairs']) == row['pair_count']

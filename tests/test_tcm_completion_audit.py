@@ -22,7 +22,7 @@ class TcmCompletionAuditTests(unittest.TestCase):
                                                                T_head=[], T_test=['sealed']),
                              components=dict(t='T', a='large', b='large', c='small', sealed='test'))
         audit.write(self.root / 'manifest.json', self.manifest)
-        self.expected = dict(manifest=self.manifest, training=dict(updates=dict(TCM=1)),
+        self.expected = dict(manifest=self.manifest, training=dict(updates=dict(TCM=1), batch_tracks=2),
                              model=dict(d_model=2, length=4), train_fragments=2,
                              validation_fragments=3, dimension=2, queries=4)
         coverage = {key: dict(track_presentations=0, pair_presentations=0) for key in
@@ -30,13 +30,16 @@ class TcmCompletionAuditTests(unittest.TestCase):
         coverage['TCM'].update(track_presentations=2, unique_track_count=2, completed_epochs=1, scene_ids=['t'])
         audit.write(self.source / 'run.json', dict(status='COMPLETED', phase='tcm', final_evaluation_status='COMPLETED',
             training_stages=['TCM'], test_opened=False, config=self.expected['training'], selection_performed=False,
+            input_adapter='native_time_v1', split_unit='scene',
             cursor=dict(stage=1, update=0, completed_updates=1),
             checkpoint_cursor=dict(stage=0, update=1, completed_updates=1), requested_model_config=self.expected['model']))
         audit.write(self.source / 'summary.json', dict(phase='tcm', test_opened=False, selection_performed=False,
             completion_evaluation='completion-evaluation.json', coverage=coverage,
             normalizer=dict(training_splits=['T_core'], training_scene_ids=['t'])))
         audit.write(self.source / 'coverage.json', coverage)
-        audit.write(self.source / 'history.json', [dict(stage='TCM', update=1, track_presentations=2)])
+        audit.write(self.source / 'history.json', [dict(stage='TCM', update=1, track_presentations=2,
+            tcm_sampling=dict(strategy='ordered_fragment', epoch=1, batch_in_epoch=1,
+                batches_per_epoch=1, eligible_tracks=2, pool_start=0, pool_stop=2, completed_epochs=1))])
         # Invalid checkpoint content proves this audit does not need a loadable model.
         (self.source / 'checkpoint.pt').write_text('Never opened by095')
         fragments = [self.fragment('a', 'x', 0, 2, [3, 1, 5, 9], [4, 1, 5, 4], [True, True, False, True]),
@@ -160,6 +163,23 @@ class TcmCompletionAuditTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'TCM endpoint'):
             audit.run(self.args('wrong_phase'), expected=self.expected)
         self.assertEqual(audit.read(self.source / 'run.json')['phase'], 'full')
+
+    def test_rejects_wrong_adapter_cursor_and_sampling_even_when_totals_match(self):
+        original_run = audit.read(self.source / 'run.json')
+        original_history = audit.read(self.source / 'history.json')
+        for name in ('adapter', 'cursor', 'pool'):
+            run, history = copy.deepcopy(original_run), copy.deepcopy(original_history)
+            if name == 'adapter':
+                run['input_adapter'] = 'registered'
+            elif name == 'cursor':
+                run['cursor']['stage'] = 0
+            else:
+                history[0]['tcm_sampling'].update(pool_start=2, pool_stop=4)
+            audit.write(self.source / 'run.json', run)
+            audit.write(self.source / 'history.json', history)
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                audit.run(self.args(name), expected=self.expected)
+            self.assertEqual(audit.read(self.root / name / 'run.json')['status'], 'FAILED')
 
 
 if __name__ == '__main__':

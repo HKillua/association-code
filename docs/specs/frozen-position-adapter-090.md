@@ -31,6 +31,8 @@
 
 A/B 输入为原可见 76 维特征和冻结 Transformer 最终 64 维隐状态，拼接 140→32 SiLU→2。新输出层 weight/bias 置零；同一独立 branch seed=`training.seed+90000`。输出单位 km→m，在 teacher 预测位置的局部北/东切平面增量后 ECEF 归一化。teacher 使用 eval、requires_grad=False、无 optimizer 条目；首末全部参数逐值核验并拒绝 teacher 梯度。A/B 总参数 109732。C 不新增输出分支。
 
+这里没有增加原始 helper 信息、逐 helper 表示或新的时序编码能力：64 维隐状态完全来自已有 teacher，76 维也与 072C 相同。它是**冻结表征的新读出与修正作用域实验**，不能把增益解释成获得了新的 helper 证据；C 的全模型参数更新能力与 A/B 不同，也不能把 C 的差异仅归因于作用域。
+
 初始输出所有臂都必须与 072C **final** 每个原输出组完全一致，包括重复/未引用组；不是旧模型 step0 或 fixed .95。速度/航向保持原 Mean；身份、标签、真值误差不进入预测/路由。
 
 ## 训练与预算
@@ -38,6 +40,8 @@ A/B 输入为原可见 76 维特征和冻结 Transformer 最终 64 维隐状态�
 各臂新增 4000 次成功更新，batch8、Adam lr .001、clip1、无权重衰减、linear Haversine km。**fresh Adam**，不加载旧 optimizer；C 必须称“追加预算全模型微调”，不能称恢复原协议续训。NumPy sampler 从原 seed 重启，实际每个 batch 的 scene、anchor、mode、members、有效点和机会点逐项匹配原 072C 的 4000 条成功更新日志；与 A/B/C 彼此的成功曝光也必须一致。
 
 每个 anchor 仍按全部有效位置点平均，再按原 batch 平均。B 不删除已支撑样本、不以可修正点重归一化；已支撑部分对 adapter 只是常数损失。无参考点的 query 不凭空加入目标。原始 T/V 顺序、真实时间、单位和 masks 全保留。训练不做 V 选择或区域挑选。每次单卡、CPU4，墙时 advisory，失败不自动重试/降级。
+
+成功更新日志逐样本记录全部/有效 query、anchor 支撑交集，以及实际允许修正的全部/有效 query 数。CPU 联表从成功 batch 重新累加，检查支持集合交集的合法范围、B 的实际允许量等于无支撑量，并检查 A/B/C 的可见支撑曝光一致；不只信任汇总 `route_exposure`。全支撑或零有效样本仍保留原分母，允许零梯度更新，计入实际采样和成功更新，但不能把零有效点报成额外有效监督。
 
 预算解释：所有臂依赖已有 4000 更新 teacher，再各用 4000 新更新。不能拿 A/B 的两阶段收益当作与原 072C 等总预算。C 使用同追加批次/optimizer设置以控制追加曝光；参数容量和更新参数数仍不同，分别报告。
 

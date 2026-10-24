@@ -176,9 +176,10 @@ def audit(source, manifest, expected, check=lambda: None):
     require(run.get('status') == 'COMPLETED' and run.get('phase') == 'tcm'
             and run.get('final_evaluation_status') == 'COMPLETED'
             and run.get('training_stages') == ['TCM'] and run.get('test_opened') is False
+            and run.get('input_adapter') == 'native_time_v1' and run.get('split_unit') == 'scene'
             and run.get('config') == expected['training'] and run.get('selection_performed') is False,
             'source is not the fixed completed088 TCM endpoint')
-    require(run['cursor']['completed_updates'] == updates
+    require(run['cursor'] == dict(stage=1, update=0, completed_updates=updates)
             and run['checkpoint_cursor'] == dict(stage=0, update=updates, completed_updates=updates)
             and all(run['requested_model_config'].get(key) == value for key, value in expected['model'].items()),
             '088 cursor or model configuration differs')
@@ -197,6 +198,17 @@ def audit(source, manifest, expected, check=lambda: None):
             and coverage['TCM']['completed_epochs'] == 1
             and coverage['TCM']['scene_ids'] == manifest['splits']['T_core'],
             '088 successful updates or one-pass training population differs')
+    batch_size = expected['training']['batch_tracks']
+    require(updates == math.ceil(expected['train_fragments'] / batch_size),
+            '088 ordered-fragment update budget differs from one pass')
+    for index, row in enumerate(history):
+        start = index * batch_size
+        stop = min(start + batch_size, expected['train_fragments'])
+        require(row['track_presentations'] == stop - start and row.get('tcm_sampling') == dict(
+            strategy='ordered_fragment', epoch=1, batch_in_epoch=index + 1,
+            batches_per_epoch=updates, eligible_tracks=expected['train_fragments'],
+            pool_start=start, pool_stop=stop, completed_epochs=int(index + 1 == updates)),
+            '088 ordered-fragment ranges or final short-tail differ')
     for stage in ('TAM_FROZEN', 'TFM_FROZEN', 'JOINT'):
         require(coverage[stage]['track_presentations'] == coverage[stage]['pair_presentations'] == 0,
                 '088 source trained a downstream stage')

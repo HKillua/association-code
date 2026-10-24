@@ -132,7 +132,8 @@ def train_frozen_position_adapter(train_raw, config, output, *, paired_reference
         branch_seed=training['seed']+90000, prediction_scope=config['model']['mode'],
         loss_semantics=sequence.LOSS_SEMANTICS, routing_semantics=ROUTING,
         gradient_clipping=dict(clipped_updates=0, successful_update_fraction=0.),
-        route_exposure=dict(all_queries=0, anchor_supported_queries=0, valid_queries=0, valid_anchor_supported_queries=0),
+        route_exposure=dict(all_queries=0, anchor_supported_queries=0, valid_queries=0, valid_anchor_supported_queries=0,
+            increment_allowed_queries=0, valid_increment_allowed_queries=0),
         paired_control=dict(status='PENDING', fit=str(Path(paired_reference_fit).resolve()),
             source_final_parameters_exact=True, initial_sampler_rng_exact=True, actual_successful_batches_matched=0,
             sampling_exposure_exact=False, teacher_unchanged=None), advisory_reached=False)
@@ -165,8 +166,14 @@ def train_frozen_position_adapter(train_raw, config, output, *, paired_reference
                 batch.append(dict(scene_id=str(scene['scene_id']), anchor_index=anchor, node_id=str(scene['node_ids'][anchor]),
                     members=[int(x) for x in members], valid_position_points=diag['valid_position_points'],
                     eligible_query_points=int(eligible.sum()), eligible_valid_position_points=int((eligible & valid_positions).sum())))
+                allowed = (result['update_allowed'].detach().cpu().numpy() if model.adapter is not None
+                           else np.ones(len(anchor_support), dtype=bool))
+                expected_allowed = ~support[anchor] if model.mode == 'anchor_unsupported' else np.ones(len(anchor_support), dtype=bool)
+                if not np.array_equal(allowed, expected_allowed):
+                    raise ValueError('090 actual training route differs from declared visible scope')
                 routes.append(dict(all_queries=len(anchor_support), anchor_supported_queries=int(support[anchor].sum()),
-                    valid_queries=int(valid_positions.sum()), valid_anchor_supported_queries=int((valid_positions & support[anchor]).sum())))
+                    valid_queries=int(valid_positions.sum()), valid_anchor_supported_queries=int((valid_positions & support[anchor]).sum()),
+                    increment_allowed_queries=int(allowed.sum()), valid_increment_allowed_queries=int((valid_positions & allowed).sum())))
             old_row = reference['rows'][step-1]
             if old_row['mode'] != mode or old_row['batch'] != batch:
                 raise ValueError(f'090 original actual batch differs before update {step}')
