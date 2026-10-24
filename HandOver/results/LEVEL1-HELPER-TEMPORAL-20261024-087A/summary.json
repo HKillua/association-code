@@ -1,0 +1,106 @@
+{
+  "scope": "087-helper-temporal-position",
+  "status": "COMPLETED",
+  "configuration": {
+    "scope": "helper-temporal-position-v1",
+    "routing_semantics": "warm095-allquery-helper-bidirectional-gru-correspondence-v1",
+    "position_loss": "linear",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "hidden_size": 64,
+      "num_layers": 2,
+      "initial_gate": 0.95,
+      "correspondence": "shuffled"
+    },
+    "training": {
+      "seed": 20261023,
+      "updates": 4000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 14400.0
+    }
+  },
+  "optimizer_updates": 4000,
+  "endpoints": {
+    "initial": {
+      "directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087A-attempt-1/initial",
+      "checkpoint": {
+        "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087A-attempt-1/fit/step-0.pt",
+        "step": 0,
+        "actual_updates": 0,
+        "configured_final_updates": 4000,
+        "routing_semantics": "warm095-allquery-helper-bidirectional-gru-correspondence-v1",
+        "position_loss": "linear",
+        "correspondence": "shuffled"
+      }
+    },
+    "final": {
+      "directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087A-attempt-1/final",
+      "checkpoint": {
+        "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-TEMPORAL-20261024-087A-attempt-1/fit/final.pt",
+        "step": 4000,
+        "actual_updates": 4000,
+        "configured_final_updates": 4000,
+        "routing_semantics": "warm095-allquery-helper-bidirectional-gru-correspondence-v1",
+        "position_loss": "linear",
+        "correspondence": "shuffled"
+      }
+    }
+  },
+  "endpoint_comparison": "endpoint-comparison.json",
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "paired_control": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1",
+  "pre_pool_control": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-SEQUENCE-20261024-078B-attempt-1",
+  "training_pairing": {
+    "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit",
+    "status": "COMPLETED",
+    "initial_parameters_exact": true,
+    "initial_sampler_rng_exact": true,
+    "actual_successful_batches_matched": 4000,
+    "sampling_exposure_exact": true,
+    "initialization": "original step0 common tensors; independent new branch; fresh Adam",
+    "initial_parameters_scope": "all original common tensors; first76 projection columns",
+    "added_projection_zero": true,
+    "branch_seed": 20348223
+  },
+  "inference_device": "cpu",
+  "test_opened": false,
+  "scientific_status": "single-seed temporal correspondence screen; beating shuffled is insufficient without strong072C gain",
+  "limitations": [
+    "Same reused V300 and shared identities; not independent generalization.",
+    "Both temporal arms have109042 parameters; reference072C has105154. Shuffling creates artificial temporal switches.",
+    "Learned feature-pooling weights are not physical confidence or causal attribution.",
+    "All four physical outputs retained; speed/heading are frozen Mean, not learned here.",
+    "Training synthetic groups differ from frozen056 deployment groups."
+  ],
+  "reference_comparison": "reference-comparison/summary.json.gz",
+  "scientific_screen": {
+    "worth_matched_replication": false,
+    "relative_mae_reduction": -0.0031072864270924594,
+    "required_mae_reduction": 0.03,
+    "deltas": {
+      "mae": 1.8356095182189165,
+      "rmse": 4.77021460829792,
+      "p95": 0.041087536663781066,
+      "p99": 61.247500992175446
+    },
+    "nonpoint_mae_nonworse": false,
+    "outside_largest_component_nonworse": false,
+    "improved_scenes": 137,
+    "total_scenes": 300,
+    "improved_components": 15,
+    "total_components": 38,
+    "numerical_guard_m": 1e-06,
+    "interpretation": "Frozen strong072C screening; single seed only licenses matched confirmation, never automatic method promotion."
+  }
+}
