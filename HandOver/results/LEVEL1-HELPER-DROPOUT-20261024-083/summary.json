@@ -1,0 +1,138 @@
+{
+  "scope": "083-transformer-helper-fragment-dropout4000",
+  "profile": "helper-dropout4000",
+  "status": "COMPLETED",
+  "configuration": {
+    "scope": "sequence-position-helper-dropout-v1",
+    "routing_semantics": "warm095-allquery-tangent-residual-position-v1",
+    "position_loss": "linear",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "backbone": "transformer",
+      "hidden_size": 64,
+      "num_layers": 2,
+      "initial_gate": 0.95
+    },
+    "training": {
+      "seed": 20261023,
+      "updates": 4000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 14400.0
+    },
+    "augmentation": {
+      "kind": "helper_fragment_dropout",
+      "probability": 0.5,
+      "seed": 20344023
+    }
+  },
+  "optimizer_updates": 4000,
+  "endpoints": {
+    "initial": {
+      "directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/initial",
+      "checkpoint": {
+        "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/step-0.pt",
+        "step": 0,
+        "actual_updates": 0,
+        "configured_final_updates": 4000,
+        "routing_semantics": "warm095-allquery-tangent-residual-position-v1",
+        "position_loss": "linear",
+        "backbone": "transformer"
+      }
+    },
+    "final": {
+      "directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/final",
+      "checkpoint": {
+        "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/final.pt",
+        "step": 4000,
+        "actual_updates": 4000,
+        "configured_final_updates": 4000,
+        "routing_semantics": "warm095-allquery-tangent-residual-position-v1",
+        "position_loss": "linear",
+        "backbone": "transformer"
+      }
+    }
+  },
+  "endpoint_comparison": "endpoint-comparison.json",
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "inference_device": "cpu",
+  "test_opened": false,
+  "scientific_status": "bounded generic position-only pilot; no automatic method promotion",
+  "limitations": [
+    "4000 updates and one seed do not prove competitive baseline convergence.",
+    "Shared physical warm start; not original LSTM/PTFM/TMTAFF reproduction.",
+    "Full-Q two-dimensional residual is unrestricted by the gate opportunity mask.",
+    "Offline canonical inputs, reused V300, shared identities and synthetic training groups.",
+    "Speed and heading remain Mean controls, not learned outputs.",
+    "Whole-helper removal changes information, training physical base and wrong-helper contamination jointly; it is not an isolated causal test of missing-input robustness. Validation uses full frozen groups."
+  ],
+  "paired_control": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1",
+  "training_pairing": {
+    "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit",
+    "status": "COMPLETED",
+    "initial_parameters_exact": true,
+    "initial_sampler_rng_exact": true,
+    "actual_successful_batches_matched": 4000,
+    "sampling_exposure_exact": true,
+    "initialization": "same-seed linear step0 tensors verified exact; fresh Adam; no resumed optimizer",
+    "initial_torch_rng_exact": true,
+    "batch_comparison": "original pre-drop members, eligibility and unchanged target masks"
+  },
+  "augmentation": {
+    "kind": "helper_fragment_dropout",
+    "probability": 0.5,
+    "seed": 20344023
+  },
+  "augmentation_exposure": {
+    "successful_updates": 4000,
+    "sampled_anchors": 32000,
+    "original_helpers": 64188,
+    "retained_helpers": 32148,
+    "dropped_helpers": 32040,
+    "all_helpers_dropped_anchors": 9651,
+    "original_singleton_anchors": 377,
+    "original_identity": {
+      "correct_helpers": 42860,
+      "wrong_helpers": 21328
+    },
+    "retained_identity": {
+      "correct_helpers": 21449,
+      "wrong_helpers": 10699
+    },
+    "original_support": {
+      "all_queries": {
+        "zero": 665073,
+        "one": 923366,
+        "multiple": 459561
+      },
+      "valid_position_queries": {
+        "zero": 303223,
+        "one": 804598,
+        "multiple": 458775
+      }
+    },
+    "retained_support": {
+      "all_queries": {
+        "zero": 1232330,
+        "one": 681148,
+        "multiple": 134522
+      },
+      "valid_position_queries": {
+        "zero": 810549,
+        "one": 621766,
+        "multiple": 134281
+      }
+    }
+  },
+  "augmentation_applied_only_to_training": true
+}

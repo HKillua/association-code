@@ -1,0 +1,237 @@
+{
+  "amended_at_utc": "2026-10-24T07:02:32Z",
+  "frozen_code": "1cac26c",
+  "git_returned": [
+    {
+      "already_gzip": false,
+      "bytes": 1748,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:54:56.290Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/run.json",
+      "sha256": "23c729b14fa1cd8a8cbc9391d2072a4d191e20226c2061a54cedf943232cfda0"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 4876,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:54:56.286Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/summary.json",
+      "sha256": "b3df3bd0f0ddccf8d0b8ca80ff73e8ad97270cef44c0af3f47758f2000d4b0c9"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 2202,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:54:56.290Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/execution.json",
+      "sha256": "0b9029faa15cb80b4d3d0493dae1d38e84818d829f1a036f42889642d3e7520a"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 5326,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:47:54.847Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/initial-run.json",
+      "sha256": "35af9bfad76732eeccb7967e5bc7504bbd94c11af58c9d7d2ce02277384a1849"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 5333,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:54:15.246Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/final-run.json",
+      "sha256": "fced8c9d13820ca40bec6d1f12cba77bd489885954778c3c2385d478714115a8"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 662814,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:41:24.057Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/fit-run.json",
+      "sha256": "3923e5d5f297620a75480f05d49307eb1f0d283b3ae1182bb394109b759d26aa"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 14287,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:41:24.005Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/fit-training-windows.json",
+      "sha256": "156b6577b0863bee38d5d85714cc21a6747061209f4a38e9e2f8cadd23a8737c"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 351,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:59:03.446Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/comparison-run.json",
+      "sha256": "8b1093467dcfe6ddd0cda78d15a73c23a10fc787ba761d88fa865f300f182620"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 1281,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:59:03.446Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/comparison-report.md",
+      "sha256": "82ba5a19d268142dfe98ae0784940bc75617de076aa3ab925630215809c8b8dc"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 376245,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:59:00.830Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/comparison-summary.json.gz",
+      "sha256": "3e94d4d88dd2068ce21b0f80a05b72a8e8ffc12ff52b62bb8ef4ea04e46de205"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 1699613,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T06:59:03.446Z",
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/comparison-scene-summary.json.gz",
+      "sha256": "18f3d1e0c8e4b5bb9e6c32d39a165c2d5d61cf002b09fe5d68fcd8c65a0d1a35"
+    },
+    {
+      "bytes": 443471,
+      "copy": "gzip of uncompressed original",
+      "gunzip_equals_original": true,
+      "original_bytes": 4163348,
+      "path": "HandOver/results/LEVEL1-HELPER-DROPOUT-20261024-083/endpoint-comparison.json.gz",
+      "sha256_gzip": "2b8f409118e2365ba1b3464d76de957953ea393ebaad3cd7fef533529d6324fd",
+      "sha256_original": "ad81d54d08495b83ddcd5fd533f2a2ee043d411272d8ee948426706f1bf71598"
+    }
+  ],
+  "git_returned_total_bytes": 3217547,
+  "note": "083 的 fit 权重、30,584,642 B training.jsonl、622,925,339 B preparation.json 与两端点逐场/逐组预测 NPZ 全部留服务器；回传的 endpoint-comparison.json 是未压缩原件（4,163,348 B）的 gzip 副本并逐字节校验；comparison 的两个 .gz 为程序原生 gzip，未再次压缩。",
+  "registered_at_utc": "2026-10-24T07:01:10Z",
+  "server_comparison_dir": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-comparison",
+  "server_originals": [
+    {
+      "bytes": 1299330,
+      "kind": "file",
+      "mtime_utc": "2026-10-24T06:41:23.985Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/final.pt",
+      "sha256": "5777d1fb1e8851af2a694f4711f05d27ad395722595988da2cb4d7b219c90e2b"
+    },
+    {
+      "bytes": 437330,
+      "kind": "file",
+      "mtime_utc": "2026-10-24T06:21:26.291Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/step-0.pt",
+      "sha256": "15b09455c7139997859ce9e06c98bcf6b6931984240147c2d3a51903f73d8cb6"
+    },
+    {
+      "bytes": 30584642,
+      "kind": "file",
+      "mtime_utc": "2026-10-24T06:41:23.917Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/fit/training.jsonl",
+      "sha256": "9ad51ba3149e46ac391f3c1613bf81354f116830884377055421028199840ae3"
+    },
+    {
+      "bytes": 622925339,
+      "kind": "file",
+      "mtime_utc": "2026-10-24T06:21:23.215Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/preparation.json",
+      "sha256": "4661acdd84b8dce2018a3a9d116842ffb394fb8bcb9cd2549de3714091578ff0"
+    },
+    {
+      "bytes_including_directory_inode": 481073569,
+      "file_content_bytes": 481069473,
+      "file_count": 903,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:47:54.847Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/initial"
+    },
+    {
+      "bytes_including_directory_inode": 487671013,
+      "file_content_bytes": 487666917,
+      "file_count": 903,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:54:15.246Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/final"
+    },
+    {
+      "bytes": 756899,
+      "kind": "file",
+      "mtime_utc": "2026-10-24T06:47:53.056Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/initial/scene-summary.json.gz",
+      "sha256": "26c91c2c323d003633ef8275d8b4d29ca74b2ccc466b9e8eb504052655a2b655"
+    },
+    {
+      "bytes": 902802,
+      "kind": "file",
+      "mtime_utc": "2026-10-24T06:54:14.546Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/final/scene-summary.json.gz",
+      "sha256": "0bddc7b89065b59c3a15ececd746dc66776f81cf83fa9e3d4bb6a07497eea30e"
+    },
+    {
+      "bytes_including_directory_inode": 279150575,
+      "file_content_bytes": 279138287,
+      "file_count": 300,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:47:32.848Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/initial/system-predictions"
+    },
+    {
+      "bytes_including_directory_inode": 201678934,
+      "file_content_bytes": 201666646,
+      "file_count": 300,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:53:56.310Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1/final/predictions"
+    },
+    {
+      "bytes_including_directory_inode": 8076,
+      "file_content_bytes": 3980,
+      "file_count": 11,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:54:57.978Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-launch"
+    },
+    {
+      "bytes_including_directory_inode": 7061,
+      "file_content_bytes": 2965,
+      "file_count": 11,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:59:03.886Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-comparison-launch"
+    },
+    {
+      "bytes_including_directory_inode": 2081586,
+      "file_content_bytes": 2077490,
+      "file_count": 4,
+      "kind": "directory",
+      "mtime_utc": "2026-10-24T06:59:03.446Z",
+      "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-comparison"
+    }
+  ],
+  "server_originals_note": "server_originals 目录条目存在包含关系（initial/final 已含其子目录），因此逐条相加会重复计数；权威口径见 server_originals_tree_totals，它按不重叠的四个顶层目录各自遍历文件内容求和。",
+  "server_originals_total_bytes": 2108577156,
+  "server_originals_total_bytes_is_sum_of_listed_entries_including_overlaps": true,
+  "server_originals_total_bytes_method": "directory entries include the directory inode; see server_originals file_content_bytes for pure content",
+  "server_originals_tree_grand_total_bytes": 1630916741,
+  "server_originals_tree_grand_total_files": 1842,
+  "server_originals_tree_totals": {
+    "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1": {
+      "file_content_bytes": 1628832306,
+      "file_count": 1816
+    },
+    "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-comparison": {
+      "file_content_bytes": 2077490,
+      "file_count": 4
+    },
+    "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-comparison-launch": {
+      "file_content_bytes": 2965,
+      "file_count": 11
+    },
+    "runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1-launch": {
+      "file_content_bytes": 3980,
+      "file_count": 11
+    }
+  },
+  "server_run_dir": "/home/wangguangjie/djs/association-code/runs/LEVEL1-HELPER-DROPOUT-20261024-083-attempt-1",
+  "task": "083",
+  "units": {
+    "arm": "mtad-04139d509436.service",
+    "comparison": "mtad-e31a9710f54f.service"
+  }
+}

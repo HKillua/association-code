@@ -1,10 +1,10 @@
 # 当前交接
 
-2026-10-24本地已同步`478764d`并复核：**083已领取，最新回执RUNNING；084/085已COMPLETED并验收执行，结案不重领。没有新的READY。** 084来源路径笔误已确认并修正，不涉及换人口；两份S2L的科研解释有勘误，以[本地复核](../docs/research_status.md#084085回执复核与勘误2026-10-24)和local-review为准，原回执保留。083按原冻结`1cac26c`继续，不受本次文档更新影响。
+2026-10-24本地已同步`478764d`并复核：**083已领取，最新回执RUNNING；084/085已COMPLETED并验收执行，结案不重领。没有新的READY。** 084来源路径笔误已确认并修正，不涉及换人口；两份S2L的科研解释有勘误，以[本地复核](../docs/research_status.md#084085回执复核与勘误2026-10-24)和local-review为准，原回执保留。083按原冻结`1cac26c`继续，不受本次文档更新影响。 **服务器补登：083 臂与CPU配对表均已 COMPLETED／退出0（launcher 3,243.227 s＋172.724 s，零重试），预声明 screen `worth_matched_replication=False`，四种加权与最大组件内外一律退让，见[083回执](S2L-20261024-083.md)；084／085 两处科研解释的服务器勘误随同一回执追加。**
 
 | 当前任务 | 状态 | 固定范围 |
 |---|---|---|
-| [083 helper片段丢弃](L2S-20261024-083.md) | **SERVER_TO_LOCAL / RUNNING**：已按逐字块（sha256 `3ceff831…`）领取一次，单元 `mtad-04139d509436`，`GPU-c5a00c37…`(index0，领取前实测空闲 24,247 MiB／util 0%)、CPU4、4 h 仅提醒；提交 06:00:54Z，phase `prepare_T2100_V300`。| 1×单GPU/CPU4 fresh4000，seed20261023，原linear Transformer仅T整helper p=.5丢弃；严格配072C原采样；CPU初末V300及一次缓存表。训练链4h、CPU表1h仅提醒 |
+| [083 helper片段丢弃](L2S-20261024-083.md) | **SERVER_TO_LOCAL / COMPLETED（含CPU配对表）**：臂单元 `mtad-04139d509436` 退出0、launcher3,243.227 s、4000成功更新、零重试、4h线未触达；`GPU-c5a00c37…`(index0,快照空闲24,247MiB)。`PAIR_VERIFIED`：初参数/采样器/torch RNG/原batch/32,000anchor/1,566,596点逐项同072C，且 `augmentation_draws_replayed=true`。丢 32,040/64,188 helper（50.07%）、9,651 anchor helper全丢、有效≥2支撑档 458,775→134,281。裁剪3,958（98.95%）、峰值19.5MiB。**四种加权与全部支撑分层、最大组件内外一律退让：点等权 MAE 590.7436→651.2099（−10.24%）、RMSE+44.881、P95+199.516、P99+77.936；two_or_more 层 +24.6%；逐场40/300、逐组件6/38；H 21.62M→27.17M。预声明 screen `worth_matched_replication=False`。** 见[回执](S2L-20261024-083.md)|已结案一次尝试，不扫p、不追加seed/复验、不原样重试；配方关闭由本地按冻结出口裁决|
 | [084 曝光系数核查](L2S-20261024-084.md) | **SERVER_TO_LOCAL / COMPLETED，本地执行验收**：两seed4000/32000曝光闭合，路径SEQUENCE确认。全局有效点频与系数最大差约0.56pp；多helper系数约28.6%/28.9%来自clean，非仅clean_plus_wrong。见[复算](results/LEVEL1-HELPER-EXPOSURE-20261024-084/local-review.json) | 已结案，不重领，不据此改083 p |
 | [085 PTFM目标封口](L2S-20261024-085.md) | **SERVER_TO_LOCAL / COMPLETED，本地执行验收**：1200端点逐场/38组件重聚。076B raw位置loss上升，但完整多任务目标3.7413→3.5119下降；点MAE721.17→1609.06（+887.89m）。不能称不存在目标取舍；固定T未知、因果未隔离。见[复算](results/LEVEL1-PTFM-OBJECTIVE-20261024-085/local-review.json) | 已结案，当前PTFM修复停止，不重训 |
 
