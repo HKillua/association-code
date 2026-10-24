@@ -1,0 +1,53 @@
+{
+  "status": "COMPLETED",
+  "population_and_masks_exact": true,
+  "model_forwards": 0,
+  "test_opened": false,
+  "final_minus_initial": {
+    "position": {
+      "common_point_count": 442263,
+      "better_point_count": 45832,
+      "worse_point_count": 396431,
+      "tied_point_count": 0,
+      "improvement_sum": 37127537.04640496,
+      "harm_sum": 378941242.34920067,
+      "signed_error_change_sum": 341813705.3027958,
+      "mean_error_change": 772.8742972005251,
+      "positive_delta_tail": {
+        "point_count": 396431,
+        "p95": 2726.031331592015,
+        "p99": 5441.496793236322
+      }
+    },
+    "speed": {
+      "common_point_count": 442476,
+      "better_point_count": 442044,
+      "worse_point_count": 432,
+      "tied_point_count": 0,
+      "improvement_sum": 19949612.34973423,
+      "harm_sum": 13851.417508245628,
+      "signed_error_change_sum": -19935760.932225987,
+      "mean_error_change": -45.05501074007627,
+      "positive_delta_tail": {
+        "point_count": 432,
+        "p95": 55.850909510615686,
+        "p99": 1078.883535346853
+      }
+    },
+    "heading": {
+      "common_point_count": 442000,
+      "better_point_count": 218838,
+      "worse_point_count": 223162,
+      "tied_point_count": 0,
+      "improvement_sum": 1637291.2122201126,
+      "harm_sum": 1703563.4302782943,
+      "signed_error_change_sum": 66272.21805818155,
+      "mean_error_change": 0.14993714492801255,
+      "positive_delta_tail": {
+        "point_count": 223162,
+        "p95": 18.75411954184127,
+        "p99": 25.193667493089038
+      }
+    }
+  }
+}
