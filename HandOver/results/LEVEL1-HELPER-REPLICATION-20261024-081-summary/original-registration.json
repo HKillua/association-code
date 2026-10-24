@@ -1,0 +1,71 @@
+{
+ "registered_at_utc": "2026-10-24T00:42:48.539063Z",
+ "note": "081双臂整表原件保留服务器；回传件逐字节复制（.gz未再压缩）。Git回传不含本清单自身。",
+ "server_originals": [
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1/report.md",
+   "bytes": 886,
+   "mtime_utc": "2026-10-24T00:42:23.907743Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1/run.json",
+   "bytes": 378,
+   "mtime_utc": "2026-10-24T00:42:23.907743Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1/scene-summary.json.gz",
+   "bytes": 2391401,
+   "mtime_utc": "2026-10-24T00:42:23.907743Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1/summary.json.gz",
+   "bytes": 374255,
+   "mtime_utc": "2026-10-24T00:42:19.675818Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1-launch/status.json",
+   "bytes": 527,
+   "mtime_utc": "2026-10-24T00:42:24.363734Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1-launch/exit_code.txt",
+   "bytes": 2,
+   "mtime_utc": "2026-10-24T00:42:24.363734Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1-launch/request.json",
+   "bytes": 1173,
+   "mtime_utc": "2026-10-24T00:38:24.492028Z"
+  },
+  {
+   "path": "runs/LEVEL1-HELPER-REPLICATION-20261024-081-summary-attempt-1-launch/launch.json",
+   "bytes": 1351,
+   "mtime_utc": "2026-10-24T00:38:24.568028Z"
+  }
+ ],
+ "server_originals_total_bytes": 2769973,
+ "git_returned": [
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-REPLICATION-20261024-081-summary/report.md",
+   "bytes": 886,
+   "mtime_utc": "2026-10-24T00:42:48.531312Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-REPLICATION-20261024-081-summary/run.json",
+   "bytes": 378,
+   "mtime_utc": "2026-10-24T00:42:48.531312Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-REPLICATION-20261024-081-summary/scene-summary.json.gz",
+   "bytes": 2391401,
+   "mtime_utc": "2026-10-24T00:42:48.535312Z"
+  },
+  {
+   "path": "HandOver/results/LEVEL1-HELPER-REPLICATION-20261024-081-summary/summary.json.gz",
+   "bytes": 374255,
+   "mtime_utc": "2026-10-24T00:42:48.531312Z"
+  }
+ ],
+ "git_returned_total_bytes": 2766920,
+ "git_returned_file_count": 4
+}
