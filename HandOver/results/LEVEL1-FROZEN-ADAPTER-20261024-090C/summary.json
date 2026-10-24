@@ -1,0 +1,113 @@
+{
+  "scope": "090-source-final-position",
+  "status": "COMPLETED",
+  "configuration": {
+    "scope": "frozen-position-adapter-090-v1",
+    "routing_semantics": "teacher-final-tangent-increment-visible-anchor-support-v1",
+    "position_loss": "linear",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "mode": "full_finetune",
+      "adapter_hidden_size": 32
+    },
+    "training": {
+      "seed": 20261023,
+      "updates": 4000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 14400.0
+    }
+  },
+  "optimizer_updates": 4000,
+  "endpoints": {
+    "initial": {
+      "directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1/initial",
+      "checkpoint": {
+        "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1/fit/step-0.pt",
+        "step": 0,
+        "actual_updates": 0,
+        "configured_final_updates": 4000,
+        "source_teacher_checkpoint": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit/final.pt",
+        "source_teacher_updates": 4000,
+        "routing_semantics": "teacher-final-tangent-increment-visible-anchor-support-v1",
+        "position_loss": "linear",
+        "mode": "full_finetune"
+      }
+    },
+    "final": {
+      "directory": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1/final",
+      "checkpoint": {
+        "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1/fit/final.pt",
+        "step": 4000,
+        "actual_updates": 4000,
+        "configured_final_updates": 4000,
+        "source_teacher_checkpoint": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit/final.pt",
+        "source_teacher_updates": 4000,
+        "routing_semantics": "teacher-final-tangent-increment-visible-anchor-support-v1",
+        "position_loss": "linear",
+        "mode": "full_finetune"
+      }
+    }
+  },
+  "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+  "paired_control": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1",
+  "training_pairing": {
+    "status": "COMPLETED",
+    "fit": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-072C-attempt-1/fit",
+    "source_final_parameters_exact": true,
+    "initial_sampler_rng_exact": true,
+    "actual_successful_batches_matched": 4000,
+    "sampling_exposure_exact": true,
+    "teacher_unchanged": false
+  },
+  "inference_device": "cpu",
+  "test_opened": false,
+  "source_teacher_updates": 4000,
+  "additional_updates": 4000,
+  "total_stage_updates": 8000,
+  "parameter_count": 105154,
+  "trainable_parameter_count": 105154,
+  "scientific_status": "Additional-budget adapter or full-model fine-tuning; source Adam not resumed.",
+  "limitations": [
+    "Reused V300 and correlated identities; single seed is not independent generalization.",
+    "Existing 4000-update teacher plus 4000 added updates; not equal total budget to original072C.",
+    "Support is visible observation span, not accuracy or noise-free evidence.",
+    "All helpers remain available; speed/course remain ordinary Mean.",
+    "Synthetic T groups differ from frozen056 deployment groups."
+  ],
+  "reference_comparison": "reference-comparison/summary.json.gz",
+  "scientific_screen": {
+    "original072C_screen_passed": false,
+    "relative_mae_reduction": 0.04385926128379536,
+    "required_reduction": 0.03,
+    "deltas_vs072C": {
+      "mae": -25.909577170817784,
+      "rmse": 33.31559763267023,
+      "p95": -70.58673298545386,
+      "p99": -68.64426284358524
+    },
+    "nonpoint_mae_nonworse": true,
+    "outside_largest_component_nonworse": true,
+    "improved_scenes": 259,
+    "total_scenes": 300,
+    "improved_components": 31,
+    "total_components": 38,
+    "added_budget_control_passed": null,
+    "deltas_vs_added_budget": null,
+    "predeclared_method_candidate": false,
+    "eligible_for_replication": false,
+    "teacher_inside_exact_verified": false,
+    "numerical_guard_m": 1e-06,
+    "interpretation": "Single-seed resource screen; missing C cannot exclude added-budget explanation. posthoc_mask_A is a fixed diagnostic, not a nominated candidate."
+  }
+}
