@@ -448,5 +448,151 @@
         7028515391.978591
       ]
     ]
+  },
+  "20261024_attachment_review": {
+    "cutoff": "2d7cc74",
+    "new_experiment_results_since_97d6afc": false,
+    "helper_cohorts": {
+      "zero": {
+        "points": 192495,
+        "mae_delta_weighted_minus_pre": 5.200511368372645,
+        "sae_delta": 1001072.4358548922
+      },
+      "one": {
+        "points": 169304,
+        "mae_delta_weighted_minus_pre": 45.35811162124088,
+        "sae_delta": 7679309.729922566
+      },
+      "two_or_more": {
+        "points": 80464,
+        "mae_delta_weighted_minus_pre": -17.84253300484727,
+        "sae_delta": -1435681.5757020307
+      }
+    },
+    "support_regions": {
+      "anchor_inside_support": {
+        "points": 322953,
+        "mae_delta_weighted_minus_pre": 17.129594953118925,
+        "sae_delta": 5532054.078894616,
+        "share_of_net_delta": 0.7636000977698268
+      },
+      "anchor_outside_helper_supported": {
+        "points": 90769,
+        "mae_delta_weighted_minus_pre": 18.786151011615857,
+        "sae_delta": 1705200.1411733597,
+        "share_of_net_delta": 0.23537206541142064
+      },
+      "predicted_group_no_support": {
+        "points": 28541,
+        "mae_delta_weighted_minus_pre": 0.2609008096474099,
+        "sae_delta": 7446.370008146727,
+        "share_of_net_delta": 0.0010278368188669806
+      }
+    },
+    "linear_remaining_error_by_region": {
+      "20261023": {
+        "anchor_inside_support": {
+          "points": 322953,
+          "mae": 237.6874027190748,
+          "sae_share": 0.2938095227067969
+        },
+        "anchor_outside_helper_supported": {
+          "points": 90769,
+          "mae": 1080.9675757129276,
+          "sae_share": 0.3755524482861905
+        },
+        "predicted_group_no_support": {
+          "points": 28541,
+          "mae": 3026.6572202128027,
+          "sae_share": 0.3306380290070215
+        }
+      },
+      "20261021": {
+        "anchor_inside_support": {
+          "points": 322953,
+          "mae": 237.3149619574992,
+          "sae_share": 0.28566968947839794
+        },
+        "anchor_outside_helper_supported": {
+          "points": 90769,
+          "mae": 1161.6200644267876,
+          "sae_share": 0.3930079859130033
+        },
+        "predicted_group_no_support": {
+          "points": 28541,
+          "mae": 3020.4523938781335,
+          "sae_share": 0.32132232460861077
+        }
+      }
+    },
+    "helper_exposure_views": {
+      "T_all_queries": {
+        "counts": {
+          "zero": 668003,
+          "one": 921430,
+          "multiple": 458567
+        },
+        "fractions": {
+          "zero": 0.32617333984375,
+          "one": 0.4499169921875,
+          "multiple": 0.22390966796875
+        }
+      },
+      "T_valid_position_queries": {
+        "counts": {
+          "zero": 304596,
+          "one": 799459,
+          "multiple": 457739
+        },
+        "fractions": {
+          "zero": 0.1950295621573652,
+          "one": 0.5118850501410558,
+          "multiple": 0.2930853877015791
+        }
+      },
+      "V_all_output_group_queries": {
+        "counts": {
+          "zero": 332380,
+          "one": 180624,
+          "two_or_more": 85588
+        },
+        "fractions": {
+          "zero": 0.555269699561638,
+          "one": 0.30174810221319365,
+          "two_or_more": 0.1429821982251684
+        }
+      },
+      "V_all_output_group_valid_position_queries": {
+        "counts": {
+          "zero": 219927,
+          "one": 172122,
+          "two_or_more": 80765
+        },
+        "fractions": {
+          "zero": 0.46514485611678164,
+          "one": 0.3640374438997153,
+          "two_or_more": 0.17081769998350302
+        }
+      },
+      "V_unique_selected_valid_position_queries": {
+        "counts": {
+          "zero": 192495,
+          "one": 169304,
+          "two_or_more": 80464
+        },
+        "fractions": {
+          "zero": 0.43525006613711753,
+          "one": 0.38281294162070983,
+          "two_or_more": 0.18193699224217263
+        }
+      }
+    },
+    "limits": [
+      "Strata contributions describe net error differences, not causal attribution; helper and support partitions overlap.",
+      "Single-helper weighted/pre operations are identical at the same parameters. Post-training difference does not diagnose pointwise attention selection.",
+      "T effective loss is per-anchor valid-query mean, then batch mean; valid-query exposure shares are not these loss coefficients or gradient contributions.",
+      "Full predicted group has no support at a query does not mean no evidence exists at other times. Its error share is not recoverable gain.",
+      "T modes contain distinct member inputs; deduplicating by anchor alone mixes modes."
+    ]
   }
 }
