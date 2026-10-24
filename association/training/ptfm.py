@@ -5,15 +5,20 @@ from pathlib import Path
 import numpy as np
 import torch
 from association.models.ptfm import (PTFM,SCOPE,ROUTING_SEMANTICS,LOSS_SEMANTICS,ptfm_inputs,objectives,
-    RESIDUAL_SCOPE,RESIDUAL_ROUTING_SEMANTICS,RESIDUAL_LOSS_SEMANTICS)
+    RESIDUAL_SCOPE,RESIDUAL_ROUTING_SEMANTICS,RESIDUAL_LOSS_SEMANTICS,POSITION_OBJECTIVES)
 from association.training.evidence_fusion import TRAIN_MODES,prepare_evidence_scenes,training_members
 from association.utils.runtime import read_json,write_json
 
 
 OBJECTIVE_SCOPE='ptfm-prior095-objective-control-v1'
+POSITION_OBJECTIVE_SCOPE='ptfm-prior095-position-objective-v1'
 
 def objective_mode(value):
     return value.get('objective_mode','adaptive')
+
+
+def position_objective(value):
+    return value.get('position_objective')
 
 def configuration(value):
     residual=value.get('model',{}).get('position_output')=='prior095_residual'
@@ -22,6 +27,11 @@ def configuration(value):
     if residual:model['position_output']='prior095_residual'
     keys={'scope','routing_semantics','data','motion_observation_policy','train_splits','training','model'}
     if objective_mode(value)!='adaptive':keys.add('objective_mode')
+    if position_objective(value) is not None:
+        from association.evaluation.ptfm_position_objectives import CALIBRATION
+        keys.update(('position_objective','position_loss_normalization'))
+        if value.get('position_loss_normalization')!=CALIBRATION:
+            raise ValueError('091 frozen T-only loss normalization differs')
     if (set(value)!=keys
             or value['scope']!=scope or value['routing_semantics']!=route
             or value['data']!=dict(length=64,max_observations=128,time_unit_seconds=20.,reference_longitude_policy='shortest_arc')
@@ -41,6 +51,12 @@ def configuration(value):
 
 def semantics(config):
     mode=objective_mode(config)
+    if position_objective(config) is not None:
+        if (position_objective(config) not in POSITION_OBJECTIVES or mode!='position-only'
+                or config.get('model',{}).get('position_output')!='prior095_residual'):
+            raise ValueError('091 requires residual position-only PTFM and declared position objective')
+        return (POSITION_OBJECTIVE_SCOPE,RESIDUAL_ROUTING_SEMANTICS,
+                'ptfm-prior095-position-only-T-initial-mean-calibrated-'+position_objective(config)+'-v1')
     if mode!='adaptive':
         if mode not in ('fixed-equal','position-only') or config.get('model',{}).get('position_output')!='prior095_residual':
             raise ValueError('086 requires residual PTFM and a fixed objective mode')
@@ -108,6 +124,7 @@ def _paired_ptfm_reference(path,config,scene_ids,check=None):
         raise ValueError('direct PTFM pairing is only defined for residual PTFM')
     path=Path(path).resolve();run=read_json(path/'run.json')
     direct=copy.deepcopy(config)
+    direct.pop('position_objective',None);direct.pop('position_loss_normalization',None)
     control=objective_mode(config)!='adaptive'
     if control:
         direct.pop('objective_mode');direct.update(scope=RESIDUAL_SCOPE,routing_semantics=RESIDUAL_ROUTING_SEMANTICS)
@@ -158,6 +175,38 @@ def _paired_ptfm_reference(path,config,scene_ids,check=None):
     return dict(path=str(path),rows=rows,normalizer=normalizer,initial=endpoints[0],exposure=run['exposure'])
 
 
+def _paired_position_reference(path,config,scene_ids,ptfm_reference,check=None):
+    """091 also binds completed086B, independently of its076B initial source."""
+    if position_objective(config) is None:raise ValueError('091 source binding requires new position objective')
+    path=Path(path).resolve();run=read_json(path/'run.json')
+    expected=copy.deepcopy(config);expected.pop('position_objective');expected.pop('position_loss_normalization')
+    expected['scope']=OBJECTIVE_SCOPE
+    if (run.get('status')!='COMPLETED' or run.get('configuration')!=expected
+            or run.get('optimizer_updates')!=config['training']['updates'] or run.get('test_opened') is not False
+            or run.get('training_scene_ids')!=scene_ids or run.get('normalizer')!=ptfm_reference['normalizer']
+            or run.get('exposure')!=ptfm_reference['exposure'] or run.get('final_checkpoint')!='final.pt'
+            or run.get('normalizer_sampler_replay_exact') is not True):
+        raise ValueError('091 requires completed086B with exact frozen protocol/normalizer/exposure')
+    with (path/'training.jsonl').open() as handle:rows=[json.loads(line) for line in handle]
+    actual=[{key:row.get(key) for key in ('step','mode','batch')} for row in rows]
+    original=[{key:row.get(key) for key in ('step','mode','batch')} for row in ptfm_reference['rows']]
+    if actual!=original:raise ValueError('091 source086B actual successful batches differ from076B')
+    saved={}
+    with torch.random.fork_rng(devices=[]):
+        for filename,step in (('step-0.pt',0),('final.pt',config['training']['updates'])):
+            if check:check()
+            model,payload=load_checkpoint(path/filename)
+            if payload['configuration']!=expected or payload['actual_updates']!=step or payload['normalizer']!=run['normalizer']:
+                raise ValueError('091 source086B actual checkpoint differs')
+            if step==0:
+                _check_initial_pair(model,ptfm_reference['initial'],exact=True)
+                old=ptfm_reference['initial']
+                if payload['numpy_rng']!=old['numpy_rng'] or not torch.equal(payload['torch_rng'],old['torch_rng']):
+                    raise ValueError('091 source086B initial RNG differs')
+            saved[step]=payload;del model
+    return dict(path=str(path),configuration=expected,rows=rows,initial=saved[0],final=saved[config['training']['updates']])
+
+
 def _check_initial_pair(model,saved,*,exact=False):
     current=model.state_dict();reference=saved['model']
     if set(current)!=set(reference):raise ValueError('PTFM paired initial parameter names differ')
@@ -171,10 +220,13 @@ def _check_initial_pair(model,saved,*,exact=False):
 
 def _save(path,model,optimizer,step,config,rng,normalizer):
     scope,route,loss=semantics(config)
+    extra={}
+    if position_objective(config) is not None:
+        extra['loss_calibration']=getattr(model,'position_loss_calibration',None)
     torch.save(dict(scope=scope,routing_semantics=route,loss_semantics=loss,
         configuration=config,normalizer=normalizer,step=step,actual_updates=step,model=model.state_dict(),
         optimizer=optimizer.state_dict(),numpy_rng=rng.bit_generator.state,torch_rng=torch.get_rng_state(),
-        cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None),path)
+        cuda_rng=torch.cuda.get_rng_state_all() if torch.cuda.is_initialized() else None,**extra),path)
 
 
 def load_checkpoint(path,*,device='cpu'):
@@ -194,6 +246,9 @@ def load_checkpoint(path,*,device='cpu'):
     if step==config['training']['updates'] and saved['numpy_rng']!=norm['planned_sampler_final_rng']:
         raise ValueError('PTFM final checkpoint sampling/normalization exposure differs')
     model=PTFM(norm,position_mode=position_mode(config)).to(device);model.load_state_dict(saved['model'],strict=True)
+    if position_objective(config) is not None:
+        from association.evaluation.ptfm_position_objectives import validate_calibration
+        model.position_loss_calibration=validate_calibration(saved.get('loss_calibration'),config)
     if (not torch.equal(model.mean.cpu(),torch.tensor(norm['mean'],dtype=torch.float64))
             or not torch.equal(model.scale.cpu(),torch.tensor(norm['scale'],dtype=torch.float64))
             or not all(torch.isfinite(p).all() for p in model.parameters())):
@@ -208,7 +263,8 @@ def load_checkpoint(path,*,device='cpu'):
     return model,saved
 
 
-def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_reference_fit=None,paired_ptfm_fit=None):
+def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_reference_fit=None,paired_ptfm_fit=None,
+               paired_position_fit=None):
     config=copy.deepcopy(configuration(config));train_raw=list(train_raw)
     ids=[str(s['scene_id']) for s in train_raw]
     if not ids or len(set(ids))!=len(ids) or any(s.get('split')!='T_core' for s in train_raw):
@@ -231,12 +287,22 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
     if objective_mode(config)!='adaptive':
         state['interpretation']='PTFM fixed objective strategy control, not author reproduction or sigma-only causality'
         state['paired_ptfm_control']['interpretation']='All initial parameters, normalizer and actual samples match076B; only objective strategy changes.'
+    if position_objective(config) is not None:
+        state['interpretation']='091 calibrated position-only objective strategy bridge; not pure geometry/gradient causality or author reproduction'
+        state['paired_position_control']=dict(fit=str(Path(paired_position_fit).resolve()) if paired_position_fit else None,status='PENDING')
+    elif paired_position_fit is not None:
+        raise ValueError('paired086B source is only accepted by091')
     write_json(output/'run.json',state);model=optimizer=norm=None;windows=[];window=[]
     try:
         reference=_paired_reference(paired_reference_fit,config,ids) if paired_reference_fit else None
         if position_mode(config)=='prior095_residual' and paired_ptfm_fit is None:
             raise ValueError('PTFM residual training requires the completed direct PTFM paired control')
         ptfm_reference=_paired_ptfm_reference(paired_ptfm_fit,config,ids,check) if paired_ptfm_fit else None
+        position_reference=None
+        if position_objective(config) is not None:
+            if paired_position_fit is None or ptfm_reference is None:
+                raise ValueError('091 requires both completed076B and086B controls')
+            position_reference=_paired_position_reference(paired_position_fit,config,ids,ptfm_reference,check)
         train=prepare_evidence_scenes(train_raw,check=check,motion_observation_policy='canonical_all')
         if any(not len(s['identities']) for s in train):raise ValueError('PTFM cannot drop empty train scenes')
         norm=fit_normalizer(train,config,check);write_json(output/'normalizer.json',norm)
@@ -253,7 +319,33 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                 initial_parameters_exact_except_position_rows=True,
                 position_rows_zero=True,normalizer_exact=True,initial_sampler_rng_exact=True,initial_torch_rng_exact=True)
         state['parameter_count']=sum(p.numel() for p in model.parameters());state['normalizer']=norm
+        calibration=probe=None
+        if position_reference is not None:
+            from association.evaluation.ptfm_position_objectives import calibrate_initial_inputs,fixed_training_probe,PROBE_UPDATES
+            initial_rng=torch.get_rng_state().clone();sampler_state=copy.deepcopy(rng.bit_generator.state)
+            calibration=calibrate_initial_inputs(train,position_reference['rows'],config,norm,paired_position_fit,check)
+            if not torch.equal(initial_rng,torch.get_rng_state()) or sampler_state!=rng.bit_generator.state:
+                raise ValueError('091 calibration changed original training RNG')
+            model.position_loss_calibration=calibration;state['loss_calibration']=calibration
+            write_json(output/'loss-calibration.json',calibration)
+            plan=position_reference['rows'][:min(PROBE_UPDATES,t['updates'])]
+            write_json(output/'fixed-training-probe-plan.json',dict(source_fit=position_reference['path'],
+                split='T_core',selection=False,source_updates=len(plan),
+                rows=[{k:r[k] for k in ('step','mode','batch')} for r in plan]))
         _save(output/'step-0.pt',model,optimizer,0,config,rng,norm)
+        if position_reference is not None:
+            initial_rng=torch.get_rng_state().clone();sampler_state=copy.deepcopy(rng.bit_generator.state)
+            probe=dict(scope='091-fixed-training-exposure-probe',selection=False,test_opened=False,endpoints={})
+            probe['endpoints']['initial']=fixed_training_probe(model,train,position_reference['rows'],config,
+                source_fit=output,label='initial',check=check)
+            with torch.random.fork_rng(devices=[]):
+                old_model,_=load_checkpoint(Path(paired_position_fit)/'final.pt')
+                probe['endpoints']['source086B_final']=fixed_training_probe(old_model,train,position_reference['rows'],config,
+                    source_fit=paired_position_fit,label='source086B_final',check=check)
+                del old_model
+            if not torch.equal(initial_rng,torch.get_rng_state()) or sampler_state!=rng.bit_generator.state:
+                raise ValueError('091 calibration/probe changed original training RNG')
+            write_json(output/'fixed-training-probe.json',probe)
         fit_started=time.monotonic();cuda=torch.device(device).type=='cuda'
         if cuda:torch.cuda.reset_peak_memory_stats(device)
         for step in range(1,t['updates']+1):
@@ -266,7 +358,9 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                     include_prior=position_mode(config)=='prior095_residual'))
                 target=torch.as_tensor(scene['target'][anchor],dtype=torch.float64,device=device)
                 valid=torch.as_tensor(scene['valid'][anchor],dtype=torch.bool,device=device)
-                loss,diag=objectives(model,result,target,valid,mode=objective_mode(config));(loss/t['batch_size']).backward()
+                extra={} if calibration is None else dict(position_objective=position_objective(config),
+                    position_loss_scale=calibration['alpha'][position_objective(config)])
+                loss,diag=objectives(model,result,target,valid,mode=objective_mode(config),**extra);(loss/t['batch_size']).backward()
                 losses.append(float(loss.detach()));diags.append(diag)
                 absent+=int((~result['helper_present']).sum())
                 eligible=~scene['motion']['support'][anchor]&scene['motion']['support'][members[1:]].any(0)
@@ -306,6 +400,10 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                 for field in ('actual_task_coefficients','actual_task_regularizers','actual_task_contributions'):
                     row[field]=np.mean([d[field] for d in diags],axis=0).tolist()
                 row['objective_mode']=objective_mode(config)
+            if calibration is not None:
+                row.update(position_objective=position_objective(config),position_loss_scale=calibration['alpha'][position_objective(config)],
+                    raw_position_sample_means={key:float(np.mean([d['raw_position_sample_means'][key] for d in diags]))
+                        for key in ('normalized_squared','radial-linear','geodesic-linear')})
             with (output/'training.jsonl').open('a') as handle:handle.write(json.dumps(row,allow_nan=False)+'\n')
             window.append(row)
             if step%100==0 or step==t['updates']:
@@ -317,6 +415,11 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
                     for field in ('actual_task_coefficients','actual_task_regularizers','actual_task_contributions','task_sigmas'):
                         windows[-1][field+'_mean']=np.mean([r[field] for r in window],0).tolist()
                     windows[-1]['l2_mean']=float(np.mean([r['l2'] for r in window]))
+                if calibration is not None:
+                    windows[-1].update(position_objective=position_objective(config),
+                        position_loss_scale=calibration['alpha'][position_objective(config)],
+                        raw_position_sample_means={key:float(np.mean([r['raw_position_sample_means'][key] for r in window]))
+                            for key in ('normalized_squared','radial-linear','geodesic-linear')})
                 window=[];write_json(output/'training-windows.json',dict(windows=windows,selection=False))
             state.update(elapsed_seconds=time.monotonic()-started,training_seconds=time.monotonic()-fit_started,
                          peak_cuda_memory_allocated_bytes=torch.cuda.max_memory_allocated(device) if cuda else 0)
@@ -333,6 +436,14 @@ def train_ptfm(train_raw,config,output,*,device='cpu',check=None,paired_referenc
             state['paired_ptfm_control'].update(status='PAIR_VERIFIED',actual_successful_batches_exact=True,
                 all_task_counts_exact=True,full_exposure_exact=True)
         _save(output/'final.pt',model,optimizer,t['updates'],config,rng,norm)
+        if position_reference is not None:
+            probe['endpoints']['final']=fixed_training_probe(model,train,position_reference['rows'],config,
+                source_fit=output,label='final',check=check)
+            write_json(output/'fixed-training-probe.json',probe)
+            state['paired_position_control'].update(status='PAIR_VERIFIED',matched_updates=t['updates'],
+                matched_anchors=audit['sampled_anchors'],initial_parameters_exact=True,
+                actual_successful_batches_exact=True,full_exposure_exact=True)
+            state['fixed_training_probe']='fixed-training-probe.json'
         state.update(status='COMPLETED',final_checkpoint='final.pt',trained_scene_count=len(audit['scenes']))
         write_json(output/'run.json',state);return state
     except BaseException as error:

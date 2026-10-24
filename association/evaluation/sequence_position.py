@@ -179,7 +179,8 @@ def _pool(rows, arrays):
 
 
 def evaluate_sequence_position(model, validation_raw, source056, metadata, output, check=None, *, initial=False,
-                               predictor=None, evaluation_scope='071-sequence-position-evaluation'):
+                               predictor=None, evaluation_scope='071-sequence-position-evaluation',
+                               residual_key='group_tangent_residual_m'):
     source056, output = Path(source056).resolve(), Path(output).resolve()
     protected = source056.parent
     if output == protected or output in protected.parents or protected in output.parents:
@@ -235,12 +236,15 @@ def evaluate_sequence_position(model, validation_raw, source056, metadata, outpu
             row, data = _scene(fragment, artifact, reports, residual, sid, component)
             row['position_weightings'] = _weighted([row], [data])
             write_json_gzip(output/'scenes'/f'scene-{sid}.json.gz', row)
-            payload = dict(group_tangent_residual_m=residual,
+            payload = dict(
                 group_anchor_node_indices=np.asarray([group[0] for group in groups], np.int64),
                 **{key: fragment[key] for key in ('node_ids', 'identities', 'target_identity_ids',
                     'native_states', 'support', 'nearest_seconds', 'exact_observation', 'query_seconds',
                     'learned_assoc_group_offsets', 'learned_assoc_group_node_indices')},
                 **{method+'_group_states': artifact[method]['group_states'] for method in METHODS}, **data)
+            if not residual_key.startswith('group_') or residual_key in payload:
+                raise ValueError('sequence residual cache key must be explicit and distinct from physical inputs')
+            payload[residual_key] = residual
             if set(extra_payload) & set(payload):
                 raise ValueError('sequence diagnostic payload cannot replace physical inputs or outputs')
             payload.update(extra_payload)

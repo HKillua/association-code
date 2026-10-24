@@ -17,6 +17,29 @@ RESIDUAL_SCOPE='ptfm-prior095-residual-v1'
 RESIDUAL_ROUTING_SEMANTICS='anchor-supported-helper-fullstate-maskcontext-prior095-residual-v1'
 RESIDUAL_LOSS_SEMANTICS='ptfm-prior095-residual-normalized-position-speed-mse-native-circular-heading-adaptive-v1'
 POSITION_MODES=('direct','prior095_residual')
+POSITION_OBJECTIVES=('radial-linear','geodesic-linear')
+
+
+def position_objective_values(states,target,valid,scale):
+    """091 per-query errors; target masking precedes all geographic arithmetic."""
+    from association.models.evidence_fusion import physical_errors
+    if (states.shape!=target.shape or valid.shape!=target.shape or valid.dtype!=torch.bool
+            or states.ndim!=2 or states.shape[-1]!=4 or scale.shape!=(4,)
+            or not torch.isfinite(states).all() or not torch.isfinite(target[valid]).all()
+            or not torch.isfinite(scale).all() or (scale<=0).any()):
+        raise ValueError('091 requires finite native states, positive scales and task masks')
+    mask=valid[:,:2].all(-1)
+    safe=torch.where(mask[:,None],target,torch.zeros_like(target))
+    # Only position columns are relevant; invalid auxiliary values cannot leak.
+    safe=torch.cat((safe[:,:2],torch.zeros_like(safe[:,2:])),dim=-1)
+    delta=torch.stack(((states[:,0]-safe[:,0])/scale[0],
+        (torch.remainder(states[:,1]-safe[:,1]+180.,360.)-180.)/scale[1]),dim=-1)
+    values={'normalized_squared':delta.square().sum(-1),
+            'radial-linear':torch.linalg.vector_norm(delta,dim=-1),
+            'geodesic-linear':physical_errors(states,safe)[:,0]/1000.}
+    if any(not torch.isfinite(value[mask]).all() for value in values.values()):
+        raise FloatingPointError('091 nonfinite valid position objective')
+    return values,mask
 
 
 def _short(x):
@@ -196,7 +219,7 @@ class PTFM(nn.Module):
         return sum(value.square().sum() for name,value in self.temporal.named_parameters() if 'weight' in name)
 
 
-def objectives(model,result,target,valid,*,mode='adaptive'):
+def objectives(model,result,target,valid,*,mode='adaptive',position_objective=None,position_loss_scale=None):
     """Paper adaptive objective with per-task valid masks and native-angle loss.
 
     Position is squared standardized local lat/lon distance; speed standardized
@@ -205,6 +228,13 @@ def objectives(model,result,target,valid,*,mode='adaptive'):
     nor sigma. No labels are used in inference or normalizer fitting.
     """
     if mode not in ('adaptive','fixed-equal','position-only'):raise ValueError('unknown PTFM objective mode')
+    if position_objective is not None:
+        if (position_objective not in POSITION_OBJECTIVES or mode!='position-only'
+                or isinstance(position_loss_scale,bool) or not isinstance(position_loss_scale,(int,float))
+                or not math.isfinite(position_loss_scale) or position_loss_scale<=0):
+            raise ValueError('091 requires position-only, a declared objective and positive frozen scale')
+    elif position_loss_scale is not None:
+        raise ValueError('position loss calibration requires an explicit091 objective')
     if target.shape!=result['states'].shape or valid.shape!=target.shape or valid.dtype!=torch.bool:
         raise ValueError('PTFM requires per-attribute target masks')
     if not torch.isfinite(target[valid]).all(): raise ValueError('valid PTFM truth must be finite')
@@ -215,6 +245,10 @@ def objectives(model,result,target,valid,*,mode='adaptive'):
     dlat=result['states'][:,0]-safe[:,0]
     dlon=torch.remainder(result['states'][:,1]-safe[:,1]+180.,360.)-180.
     position=(dlat/model.scale[0]).square()+(dlon/model.scale[1]).square()
+    raw_position=None
+    if position_objective is not None:
+        raw_position,_=position_objective_values(result['states'],target,valid,model.scale)
+        position=position_loss_scale*raw_position[position_objective]
     speed=((result['states'][:,2]-safe[:,2])/model.scale[2]).square()
     heading=(torch.remainder(result['states'][:,3]-safe[:,3]+180.,360.)-180.).abs()/model.scale[3]
     masks=(valid[:,:2].all(-1),valid[:,2],valid[:,3]); losses=[]; sigmas=[]; counts=[]
@@ -233,8 +267,13 @@ def objectives(model,result,target,valid,*,mode='adaptive'):
     contributions=[coefficient*loss+regularizer for coefficient,loss,regularizer in zip(coefficients,losses,regularizers)]
     total=sum(contributions)+zero
     if not torch.isfinite(total): raise FloatingPointError('nonfinite PTFM objective')
-    return total,dict(task_valid_counts=counts,task_losses=[float(x.detach()) for x in losses],
+    diagnostic=dict(task_valid_counts=counts,task_losses=[float(x.detach()) for x in losses],
                       task_sigmas=[float(x.detach()) for x in sigmas],
                       objective_mode=mode,actual_task_coefficients=[float(x.detach()) for x in coefficients],
                       actual_task_regularizers=[float(x.detach()) for x in regularizers],
                       actual_task_contributions=[float(x.detach()) for x in contributions])
+    if raw_position is not None:
+        diagnostic.update(position_objective=position_objective,position_loss_scale=position_loss_scale,
+            raw_position_sample_means={name:float(value[masks[0]].detach().mean()) if counts[0] else 0.
+                                       for name,value in raw_position.items()})
+    return total,diagnostic

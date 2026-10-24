@@ -6,7 +6,7 @@ MTAD不完整多源航迹的关联与状态恢复研究。与TMTAFF对齐输入�
 
 日常开发和服务器回传统一使用 **`main`**；本地工作目录为 `/Users/a1/Projects/association-code`。历史研究分支已合入main并退役，实验按提交保留，不再维护多条长期分支。
 
-083–085已结案，整helper丢弃配方关闭；默认仍为056关联＋原线性Transformer。当前推进086A/B目标策略、087A/B时序对应、088 Level1 TCM与089 T-only审计，五项GPU任务最多四项同时执行。具体冻结版本与领取状态见[交接](HandOver/Handover.md)，审查边界见[并行合同](docs/specs/post083-parallel-design.md)。
+083–087及089已结案，固定配方未取得主线竞争增量；默认仍为056关联＋原线性Transformer。088 Level1 TCM按原合同继续，最新尚无完成回执。下一批为090三臂强线增量/预算对照、091两臂位置目标桥接、092同源TAM/TFM两个下游阶段，共七个新GPU作业，全局最多四个单卡同时领取。090/091不依赖088；092仅待有效TCM终态。设计与固定出口见[090—092合同](docs/specs/parallel-exploration-090-092.md)，是否已冻结、发布及领取以[当前交接](HandOver/Handover.md)为准，代码存在不等于服务器已开始。
 
 ## 现在看哪里
 

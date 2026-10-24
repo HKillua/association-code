@@ -61,3 +61,11 @@
 - `../analysis/helper_prior_replay.py`：089按原日志重放T-only删除前后物理初值和loss系数；不读权重、不前向、不读V/test payload。
 
 范围、冻结版本、排队及终止条件只认[当前交接](../../HandOver/Handover.md)。五项GPU任务最多四项同时执行，CPU准备与评价错峰。
+
+### 090—092：新问题与条件下游
+
+- `frozen_position_adapter_fit.py`：090A/B/C从真实072C final出发，对比冻结teacher全query增量、仅Anchor无支撑增量、fresh Adam全模型微调；同4000实际批次，每臂完整初末评价。`../analysis/compare_frozen_position_adapter.py`核三臂缓存并计算预声明A-mask诊断，零新前向。
+- `ptfm_position_objective_fit.py`：091A/B对齐086B初值/实际曝光，仅换为标准化径向线性或Haversine线性位置数据项；完整T曝光均值校准与固定T探针有独立来源标记。`../analysis/ptfm_position_objective_compare.py`汇合两个固定终点缓存。
+- `tmtaff_downstream_fit.py`：092依赖完成的088；`--check-source-only`在活动源上只读状态并返回75等待，不读checkpoint/不创建输出。就绪后调用现有TAM或TFM单阶段训练，完成后核真实冻结、同数据与全人口；两项互不依赖分数。
+
+七项新GPU作业的范围见[总设计](../../docs/specs/parallel-exploration-090-092.md)，冻结与可领取状态只认索引。090/091每臂4000；092 TAM4000、TFM1000。088计入全局四单卡上限，未满足依赖不占名额；不以入口存在代替发布或领取。
