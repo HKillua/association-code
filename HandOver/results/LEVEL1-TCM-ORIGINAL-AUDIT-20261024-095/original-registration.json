@@ -1,0 +1,62 @@
+{
+  "ended_at_utc": "2026-10-24T13:43:45.598104+00:00",
+  "frozen_code": "e718fca51be65992efd94e3f85a1d482637f2f93",
+  "git_returned": [
+    {
+      "already_gzip": false,
+      "bytes": 402,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T13:43:45.536Z",
+      "path": "HandOver/results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/run.json",
+      "sha256": "7e6d6da2df733090905fcef36240da89865a742d5768fcdc61a2d4ee5d42e54c"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 1040,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T13:43:28.516Z",
+      "path": "HandOver/results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/execution.json",
+      "sha256": "d8f7405c5f39abf72e5cc4c8a33ef5ad2f2e5d053dd19b9530373898a304b9cc"
+    },
+    {
+      "already_gzip": false,
+      "bytes": 174103,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T13:43:45.532Z",
+      "path": "HandOver/results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/summary.json",
+      "sha256": "44a9cdee73f5059081e0fdd53878265c5d5c0aa463bbf0d28d5f3553f7778d89"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 260173,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T13:43:45.484Z",
+      "path": "HandOver/results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/scene-summary.json.gz",
+      "sha256": "cc5d4bb3e360b0d7f5c80b9056b26ebd8d7a4eca50df3b67eb5bc7eae0b1b758"
+    },
+    {
+      "already_gzip": true,
+      "bytes": 35045,
+      "copy": "verbatim",
+      "mtime_utc": "2026-10-24T13:43:45.524Z",
+      "path": "HandOver/results/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095/component-summary.json.gz",
+      "sha256": "c6ebcbf7cfbd15bda675c47fe74dc2346c53657569dbb042c963718b635a14d9"
+    }
+  ],
+  "git_returned_total_bytes": 470763,
+  "launcher_elapsed_seconds": 17.268796880729496,
+  "launcher_returncode": 0,
+  "note": "095 五个输出全部逐字节复制；两个 .gz 为程序原生 gzip 未再压缩。唯一大输入是 088 的 completion-evaluation.json（216,831,323 B，含 24,599 条 per_fragment），本次实际计算其 sha256 并登记；088 原件未改写，Git 的 completion-evaluation-aggregate.json 未被用作输入。",
+  "registered_at_utc": "2026-10-24T13:45:17Z",
+  "server_run_dir": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TCM-ORIGINAL-AUDIT-20261024-095-attempt-1",
+  "source_original_read_only": {
+    "bytes": 216831323,
+    "mtime_utc": "2026-10-24T12:16:03.273Z",
+    "path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-TCM-20261024-088-attempt-1/completion-evaluation.json",
+    "sha256": "ff8c5dd49aa8a0010d021e6fb42de66c29e74b9d282ed1ddd6ae378afe4b2380"
+  },
+  "submitted_at_utc": "2026-10-24T13:43:28.437521+00:00",
+  "task": "095",
+  "time_advisory_issued": false,
+  "unit": "mtad-24222b2f7da0.service"
+}
