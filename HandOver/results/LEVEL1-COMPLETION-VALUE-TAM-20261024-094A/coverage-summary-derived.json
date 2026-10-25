@@ -1,0 +1,62 @@
+{
+ "not_a_replay_input": true,
+ "derived_by": "SERVER_AI: list fields reduced to lengths; counts verbatim",
+ "stages": {
+  "TCM": {
+   "scenes": 0,
+   "tracks": 0,
+   "pairs": 0,
+   "track_presentations": 0,
+   "pair_presentations": 0,
+   "positive_pair_presentations": 0,
+   "scene_ids": 0,
+   "unique_scene_count": 0,
+   "unique_track_count": 0,
+   "unique_pair_count": 0,
+   "positive_scene_ids": 0,
+   "negative_scene_ids": 0
+  },
+  "TAM_FROZEN": {
+   "scenes": 2052,
+   "tracks": 98429,
+   "pairs": 166754,
+   "track_presentations": 241675,
+   "pair_presentations": 256000,
+   "positive_pair_presentations": 128000,
+   "scene_ids": 2052,
+   "unique_scene_count": 2052,
+   "unique_track_count": 98429,
+   "unique_pair_count": 166754,
+   "positive_scene_ids": 1783,
+   "negative_scene_ids": 1784
+  },
+  "TFM_FROZEN": {
+   "scenes": 0,
+   "tracks": 0,
+   "pairs": 0,
+   "track_presentations": 0,
+   "pair_presentations": 0,
+   "positive_pair_presentations": 0,
+   "scene_ids": 0,
+   "unique_scene_count": 0,
+   "unique_track_count": 0,
+   "unique_pair_count": 0,
+   "positive_scene_ids": 0,
+   "negative_scene_ids": 0
+  },
+  "JOINT": {
+   "scenes": 0,
+   "tracks": 0,
+   "pairs": 0,
+   "track_presentations": 0,
+   "pair_presentations": 0,
+   "positive_pair_presentations": 0,
+   "scene_ids": 0,
+   "unique_scene_count": 0,
+   "unique_track_count": 0,
+   "unique_pair_count": 0,
+   "positive_scene_ids": 0,
+   "negative_scene_ids": 0
+  }
+ }
+}
