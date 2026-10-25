@@ -6,10 +6,10 @@
 
 | 新任务 | 当前状态 | 固定预算与比较 |
 |---|---|---|
-| 098A／098B | READY；优先B/A，须先通过旧队列提交排空检查 | seed23 generic／relation，各从072C final新增4000；对090C强预算Transformer |
+| 098A／098B | **均RUNNING（2026-10-25 08:10Z 提交）**。排空检查通过（`DRAINED: yes`，旧队列 096A 已提交）后在同一 flock 内串行提交：**098B** relation，单元`mtad-7e7cd99f97fe.service`，`GPU-efbe9d07`(index2)，08:10:11Z；**098A** generic，单元`mtad-2b37323512eb.service`，`GPU-1043f26a`(index3)，08:10:44Z。两臂各 4000 新增更新、来源 072C final、预算对照 090C，4h advisory；提交时 claims 分别为 1 与 2。 |
 
 **服务器来源预核登记（2026-10-25 15:10 北京时间／07:10Z）：** 098 实施冻结 `1a4234f6c4b7248910edc5caf3a36317fa17ad78` 已核为 commit；新 checkout `association-code-run098A` 建成（未创建 098B/C/D checkout、无任何 098 输出或 launcher）。四臂 `--check-source-only` 全部返回 `READY_DEPENDENCIES: completed same-seed teacher and budget baseline verified`：098A/B 绑 072C＋090C，098C/D 绑 073C＋097A。**资源闸门未开**：`assert_gpu_dispatch_drained` 对旧 096—097 控制目录报 `WAITING_RESOURCE`（`LEVEL1-COMPLETION-SYSTEM-20261025-096A-attempt-1-launch/request.json` 不存在＝096A 尚未提交），符合"旧队列仍有未提交 GPU 任务时不得抢卡"的合同；未执行 flock 提交、未占用任何 098 GPU。按合同保持 WAITING_RESOURCE，不做口头协调替代；待 096A 由旧控制器提交或进入不可逆终态后，再对同一冻结 checkout 复核 output/launcher 仍不存在并执行带锁资源检查与 launcher。
-| 098C／098D | READY；D/C接续，有合法空槽可并行 | seed21 generic／relation，各从073C final新增4000；对097A |
+| 098C／098D | **READY，等合法空槽**。当前 3 个已领取单卡（096A index0、098B index2、098A index3），index1 有他人 compute 进程不满足 idle-only；无空闲 UUID 可提交，按 D→C 顺序等待。 |
 | 098 seed23／seed21 CPU表 | READY，分别依赖该seed两个新臂COMPLETED | 完整缓存、同人口/尾部/组件/偏置开关，0新训练/前向 |
 | 098双seed结案 | READY，依赖两CPU表COMPLETED | 重算3%／1%与全部门槛，只有两个seed均通过才进入独立确认 |
 
@@ -30,7 +30,7 @@
 | 093A/B | **B COMPLETED，已完成本地回传聚合复核；A仍RUNNING**，CPU表待A成功 | 原TFM各1000，旧冻结e718fca |
 | 094A | **COMPLETED（执行验收通过）**。单元`mtad-91693675b597`、`GPU-6811d9c0`(index1)，15:43:34Z→**2026-10-25 08:05:42Z**退出0，launcher **58,928.942 s（16h22m）**、`time_advisory_issued=true`、`deadline_exceeded=false`；4000更新／256,000对（128k正/128k负）／2,052场，训练净耗48,119.7 s、峰值415.6MiB、loss 26.1001→18.7488（max 193.7392）、梯度均值7.9574／max 923.36。`validate_every_updates=4000`，故盘上cursor=0不可读作未训练。**关联：macro-F1 0.1544686、micro-F1 0.0110510、精确率0.0055562、召回0.9993110（TP 24,658／FP 4,413,234／FN 17／TN 1,183），阈值−1.6035e-05、margin 74.5034**；与094B同型近乎全接受，`full_system_evaluated=false`。见[回执](S2L-20261024-094A.md) |
 | 094B | COMPLETED，回传300场统计重聚一致；仍核服务器原件与服务释放 | Macro-F1 .154991，precision .005542，近乎全接受；不是物理性能 |
-| 096A | READY，队列待093A＋094A成功 | learned完整系统V300，0训练，单GPU/CPU4，8h advisory |
+| 096A | **RUNNING**。旧控制器在 094A 终态后自动预核并提交：单元`mtad-11e76d7fa8c3.service`、`GPU-c5a00c37`(index0)、08:09:10Z，`completion_policy=learned`，来源 094A(4000)＋093A(1000)＋088，阈值 −1.6035346561693586e-05，0 训练。 |
 | 096B | **COMPLETED（执行验收通过，负结果）**。队列自动提交`mtad-0f6ff7294d95`、`GPU-c5a00c37`(index0)，23:02:34Z→04:36:50Z退出0（launcher 20,056.470 s／程序20,049.599 s、8h线未触），0训练／融合前向39,761／阈值−2.0559586189e-05沿用未重选、分数复用094B。**实际预测组：位置MAE 57,215.0796m（RMSE 77,090.58）、覆盖仅3.5678%（16,232/454,952，缺438,720）**；同组anchor插值仅737.7171m（2.3952%覆盖），mean控制42,264.58m；oracle配对下TFM融合49,644.79m（99.99%覆盖）、simple fusion 1,289.4812、single_source9001 236.7109。关联与094B同值（macro .154991／micro .011022／precision .005542／recall .995745）。结论：高召回关联3.57%覆盖+未收敛融合头使完整系统不可用；补全策略比较待096A。见[回执](S2L-20261025-096B.md) |
 | 097A | **COMPLETED（执行验收通过，预算表征非候选）**。队列自动提交：单元`mtad-a7b83f3e6bf0`、`GPU-1043f26a`(index3)、23:02:46Z→00:01:58Z退出0、launcher 3,552.219 s／程序3,548.210 s、4h线未触。073C final→fresh Adam 4000，105,154参数全可训练，配对`source_final_parameters_exact`／`initial_sampler_rng_exact`／4000batch／`sampling_exposure_exact`全true，32,000 anchor／1,561,794有效点（seed21采样）、裁剪4000/4000、峰值19.5MiB。**606.6241→583.9756 m（−22.6485，−3.7335%）、RMSE −11.4382、P95 −60.6115、P99 −490.2591**，四加权与最大组件外（911.9931→872.9174）全改善；`default_promoted=false`。与090C只比各自seed增量：seed21 RMSE也改善，故090C的RMSE退化不宜当作该预算策略的固定属性。见[回执](S2L-20261025-097A.md) |
 | 093/094/096/097 CPU表 | **093-summary、097-summary COMPLETED；094/096 表待依赖**。093表（`mtad-`单元，326.678 s、退出0、零前向）：配对校验全true（初参／优化器／RNG／有序样本／任务计数／语义合同／冻结权重），两臂终值 **49,629.3723 对 49,644.7920 m（A−B −15.4197，0.031%）**，逐场194/300、逐组件26/38偏learned，但P99 +68.11反向；池化P95/P99 138,607.21/245,557.47 对 138,650.28/245,489.36；最大组件外47,117.06对47,133.34。补全策略无可用物理差别，`promotion_performed=false`。见[093表回执](S2L-20261024-093-summary.md)、[097表回执](S2L-20261025-097-summary.md) |
