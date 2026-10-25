@@ -24,6 +24,8 @@
 - `baselines`：独立文献方法相关实现。
 - `tools/experiments`、`tools/analysis`：实际运行入口与仍被使用的比较工具。
 - `configs`：冻结配置与数据名单；存在不代表可以领取。
-- `tests`：必要科学契约和小型贯通检查，不以测试数量作为科研产出。
+- `tests/data`、`models`、`training`、`evaluation`、`integration`：必要科学契约和小型贯通；共享小样例统一在`tests/fixtures`，不再在根目录堆实验脚本。
 
 本地主仓为`/Users/a1/Projects/association-code`，统一main协作；服务器运行独立冻结checkout。数据、权重、预测及runs不随文档清理删除。旧副本通过Git查看，不复制另一套archive。协作规则见[AGENTS](AGENTS.md)。
+
+维护原则：新实验尽量复用现有训练/评价入口；结案后保留关键结论和必要汇总，清除逐臂重复回传与专属临时工具。旧代码按需从Git恢复，不把历史实验全部挂在日常工作树中。

@@ -2,7 +2,7 @@
 
 This module does not choose reference alignment, target groups, or recursive
 fusion. The undisclosed FC width and interpretation of Eq. 20 are explicit.
-See ``docs/specs/tmtaff-fusion.md`` for the reproduction boundary.
+See ``docs/specs/tmtaff-reference.md`` for the reproduction boundary.
 """
 
 from dataclasses import dataclass

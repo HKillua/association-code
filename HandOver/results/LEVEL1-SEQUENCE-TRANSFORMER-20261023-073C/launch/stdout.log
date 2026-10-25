@@ -1,6 +1,0 @@
-replica4000 phase: prepare_T2100_V300
-replica4000 phase: fit4000
-replica4000 phase: evaluate_cpu_initial
-replica4000 phase: evaluate_cpu_final
-replica4000 phase: paired_endpoint_comparison
-COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-TRANSFORMER-20261023-073C-attempt-1

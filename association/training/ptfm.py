@@ -98,7 +98,7 @@ def fit_normalizer(train,config,check=None):
 
 
 def _paired_reference(path,config,scene_ids):
-    from tools.analysis.compare_position_benchmarks import _sequence_sampling
+    from association.evaluation.position_sources import _sequence_sampling
     from association.training.sequence_position import load_checkpoint as sequence_checkpoint
     path=Path(path).resolve();run,rows,exposure=_sequence_sampling(path)
     expected=run['configuration']

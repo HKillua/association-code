@@ -21,7 +21,7 @@ from association.models.sequence_position import tangent_position
 from association.training.frozen_position_adapter import load_checkpoint, source_configuration, _exact
 from association.training.sequence_position import load_checkpoint as load_teacher
 from association.utils.runtime import read_json, write_json, write_json_gzip
-from tools.analysis.compare_position_benchmarks import ROOT, CONTROLS, INPUT_KEYS, _metadata, _pool, _sequence_sampling
+from association.evaluation.position_sources import ROOT, CONTROLS, INPUT_KEYS, _metadata, _pool, _sequence_sampling
 from tools.analysis.compare_position_harm import _cache, _visible_opportunity, harm_statistics
 
 NAMES = {'all_queries': 'adapter_all', 'anchor_unsupported': 'adapter_missing', 'full_finetune': 'finetune'}

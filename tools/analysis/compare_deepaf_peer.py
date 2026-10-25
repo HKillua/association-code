@@ -25,8 +25,8 @@ from association.training import deepaf_peer as trainer
 from association.training.frozen_position_adapter import _exact
 from association.utils.runtime import read_json, write_json, write_json_gzip
 from tools.analysis import compare_frozen_position_adapter as budget_compare
-from tools.analysis import compare_query_relation as relation_compare
-from tools.analysis.compare_position_benchmarks import (
+from association.evaluation import relation_sources as relation_compare
+from association.evaluation.position_sources import (
     ROOT, CONTROLS, INPUT_KEYS, _metadata, _pool, _sequence_sampling,
 )
 from tools.analysis.compare_position_harm import _cache, _visible_opportunity

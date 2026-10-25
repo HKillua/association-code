@@ -18,7 +18,7 @@ from association.evaluation.support_gate_objectives import _artifact, _check_art
 from association.evaluation.system_attribution import _same
 from association.training.sequence_position import load_checkpoint
 from association.utils.runtime import read_json, write_json, write_json_gzip
-from tools.analysis.compare_position_benchmarks import CONTROLS, INPUT_KEYS, _metadata, _pool, _sequence_sampling
+from association.evaluation.position_sources import CONTROLS, INPUT_KEYS, _metadata, _pool, _sequence_sampling
 
 METHODS = (*CONTROLS, 'fixed_prior095', 'linear', 'harm')
 HARM_THRESHOLDS_M = (100., 1000., 10000.)

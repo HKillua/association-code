@@ -29,7 +29,7 @@ from association.utils.runtime import read_json, write_json
 from tools.analysis.compare_association_duration import _load_metadata
 from tools.analysis.learned_group_oracle import _bind_source
 from tools.analysis.compare_frozen_position_adapter import adapter_metadata, verify_pairing as verify_budget_pairing
-from tools.analysis.compare_position_benchmarks import _metadata as source_metadata
+from association.evaluation.position_sources import _metadata as source_metadata
 from tools.experiments.sequence_position_fit import ROOT, bind_linear_control, production_contract as original_contract
 
 SCOPE = '099-deepaf-pv-peer-feasibility'

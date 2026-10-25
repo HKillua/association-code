@@ -33,7 +33,7 @@ def endpoint_model(path,step,config,training):
 
 
 def bind_paired_control(path,source):
-    from tools.analysis.compare_position_benchmarks import _metadata
+    from association.evaluation.position_sources import _metadata
     bound=_metadata(path,'072C_transformer4000')
     if Path(bound['source_system']).resolve()!=source:raise ValueError('074C control must bind the same056 final1000 source')
     return bound

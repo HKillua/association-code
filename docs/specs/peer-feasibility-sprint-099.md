@@ -4,7 +4,7 @@
 
 用户于2026-10-25明确：可以投入两到三周，但最终必须稳定胜过同行，眼下先快速判断有没有机会。本轮先补上**一个可信、同任务的同行位置融合对照**，再决定是否值得继续投入；内部Transformer与generic-set仍是机制对照，不能代替同行。
 
-本合同建立在当前Level1／fixed056／Q64协议上，不将本项目的米制位置MAE与论文中不同定义的经纬度mME直接排榜。当前090C／097A的全人口位置MAE为564.834006／583.975593m；这只说明本项目当前量级，尚不证明胜过同行。098四臂仍执行[原合同](query-relation-fusion-098.md)，本文件不改变其训练、3%／1%、尾部、组件和bias-off门槛，也不因099结果自动晋升模型或开放测试。
+本合同建立在当前Level1／fixed056／Q64协议上，不将本项目的米制位置MAE与论文中不同定义的经纬度mME直接排榜。当前090C／097A的全人口位置MAE为564.834006／583.975593m；这只说明本项目当前量级，尚不证明胜过同行。098四臂及双seed总表已结案，未通过原合同的3%／1%、尾部、组件和bias-off晋级条件；099结果不改变这项结论，也不自动晋升模型或开放测试。
 
 **状态：HOLD_REAL_DATA_REVIEW。** 真实MTAD上尚无DeepAF结果。[方法边界](../reports/2026-10-25-deepaf-method-audit.md)保留生产实现与坐标修复；自建模拟仅是排错，相关实验流程退役，不再作为正式同行资格前置。后续将必要真实输入/单位/mask核验并入正常适配训练，而非增加模拟关卡。下列有限预算是待发布方案，不授权服务器领取。
 
@@ -113,7 +113,7 @@ P/V结构、单位转换、q0初始化、TBPTT1、监督及输入差异统一在
 | A/B同初始化／采样、8000固定final | 本轮trainer的实际training.jsonl、fit/run.json及checkpoint | replay重算与两网成功更新闭合，不能只信summary计数 |
 | 同人口真实cache比较 | `tools/analysis/compare_deepaf_peer.py --ours-run … --peer-run … --output …` | INPUT_KEYS、组／GT／mask逐值一致；从缓存回算MAE／RMSE／尾部；0前向、0训练 |
 | A/B独立选更强peer | 同一入口`--select-lr --peer-a … --peer-b … --output …` | 两个完整fixed-final缓存重算，低MAE胜、精确平手0.001；selection.json可绑定099C |
-| 数据篡改与指标真值检查 | `tests/test_deepaf_peer_comparison.py` | 小fixture的已知真实MAE闭合，mask／GT／组变更被拒绝，不额外模型前向 |
+| 数据篡改与指标真值检查 | `tests/evaluation/test_deepaf_peer_comparison.py` | 小fixture的已知真实MAE闭合，mask／GT／组变更被拒绝，不额外模型前向 |
 | 运行与资源事实 | 独立L2S及服务器S2L | 实现版本、来源路径、实际领取、退出与端点证据；只有具体新READY可执行 |
 
 本轮最快有用产物是“合格同行直接比较表＋上述四态决定”。论文额外表格、完整四属性追榜和内部消融都不能阻塞这个产物。

@@ -30,7 +30,7 @@ python -m unittest discover -s tests -q
 全仓运行后最后修订队列inactive/no-worker-status释放和缺失request归属保守处理边界，针对最终队列版本再次执行：
 
 ```text
-python -m unittest tests.test_post088_overnight_queue -q
+python -m unittest tests.integration.test_post088_overnight_queue -q
 11 tests / 0.022 s / OK
 ```
 

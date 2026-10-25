@@ -246,7 +246,7 @@ def train(archive_path, manifest, protocol_config, config, device, output):
                    "V_select_scope_coverage": audit["V_select_scope_coverage"],
                    "interpretation": "Exploratory validation-selected offline adaptation; not original online "
                                      "TSA-cTFER, not held-out test, no convergence or novelty claim.",
-                   "conformance_document": "docs/tsactfer_adaptation.md"}
+                   "conformance_document": "docs/mtad_data_protocols.md"}
         runtime.write_json(run.path / "summary.json", summary)
         runtime.write_json(run.path / "history.json", history)
         run.check()

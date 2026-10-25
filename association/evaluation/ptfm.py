@@ -217,7 +217,7 @@ def _compare_control(current,control,*,control_method='learned_sequence',initial
     """
     from association.evaluation.support_gate_objectives import _read,_artifact
     from association.evaluation.physical import _check_valid_states
-    from tools.analysis.compare_position_benchmarks import INPUT_KEYS
+    from association.evaluation.position_sources import INPUT_KEYS
     current,control=Path(current),Path(control)
     left,right=[read_json(path/'summary.json') for path in (current,control)]
     if (any(v.get('status')!='COMPLETED' or v.get('device')!='cpu' or v.get('test_opened') is not False
