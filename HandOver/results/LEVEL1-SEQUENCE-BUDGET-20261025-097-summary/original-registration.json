@@ -1,0 +1,39 @@
+{
+ "run_id": "LEVEL1-SEQUENCE-BUDGET-20261025-097-summary-attempt-1",
+ "note": "097 two-seed added-budget table; program-native outputs returned verbatim. Zero forwards.",
+ "server_originals": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-BUDGET-20261025-097-summary-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 156,
+   "sha256": "6e53e18c5c00bd495977cec65ea33f76546a4b8efc088d279255b1286129134b",
+   "mtime_local": "2026-10-25T08:02:32+0800"
+  },
+  {
+   "returned_name": "summary.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-BUDGET-20261025-097-summary-attempt-1/summary.json",
+   "mode": "byte-identical copy",
+   "bytes": 9505,
+   "sha256": "e899ba231bb6dc174ce7fd47f123691d95cd4444affe42ce76139b529daadb91",
+   "mtime_local": "2026-10-25T08:02:32+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-BUDGET-20261025-097-summary-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 452,
+   "sha256": "7d63bad150ae17556e1d48e21343d4033a7240cd72e34b12b1966c0beb341769",
+   "mtime_local": "2026-10-25T08:02:32+0800"
+  },
+  {
+   "returned_name": "scene-summary.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-BUDGET-20261025-097-summary-attempt-1/scene-summary.json",
+   "mode": "byte-identical copy",
+   "bytes": 351384,
+   "sha256": "610dc56ccdc620f111f5f5151d4d4d0a5d20193d1493809511befd1e126c5721",
+   "mtime_local": "2026-10-25T08:02:32+0800"
+  }
+ ],
+ "returned_total_bytes": 361497
+}

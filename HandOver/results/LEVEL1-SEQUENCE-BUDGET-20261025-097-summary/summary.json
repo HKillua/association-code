@@ -1,0 +1,300 @@
+{
+  "status": "COMPLETED",
+  "scope": "097-two-within-seed-added-budget-changes",
+  "arms": [
+    {
+      "seed": 20261023,
+      "source_identity": "072C",
+      "added_arm": "090C",
+      "source_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1",
+      "source_updates": 4000,
+      "added_updates": 4000,
+      "total_updates": 8000,
+      "baseline": {
+        "unit_count": 442263,
+        "mae": 590.7435832803362,
+        "mse": 10818931.658026854,
+        "rmse": 3289.214443910104,
+        "point_count": 442263,
+        "p95": 1966.401024643514,
+        "p99": 7825.684916974176
+      },
+      "final": {
+        "unit_count": 442263,
+        "mae": 564.8340061095184,
+        "mse": 11039205.87695423,
+        "rmse": 3322.530041542774,
+        "point_count": 442263,
+        "p95": 1895.81429165806,
+        "p99": 7757.040654130591
+      },
+      "delta": {
+        "mae": -25.909577170817784,
+        "rmse": 33.31559763267023,
+        "p95": -70.58673298545386,
+        "p99": -68.64426284358524
+      },
+      "relative_mae_reduction": 0.04385926128379536,
+      "full_population": {
+        "available_target_points": 454952,
+        "covered_target_points": 442263,
+        "missing_prediction_points": 12689,
+        "available_target_trajectories": 9099,
+        "covered_target_trajectories": 8742,
+        "point_coverage": 0.9721091455801931
+      },
+      "group_population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 9353,
+        "duplicate_prediction_group_count": 610,
+        "anchor_matched_target_count": 8743,
+        "reference_unavailable_target_count": 1
+      },
+      "weightings": {
+        "linear": {
+          "point_equal": {
+            "unit_count": 442263,
+            "mae": 590.7435832803362,
+            "mse": 10818931.658026854,
+            "rmse": 3289.214443910104,
+            "point_count": 442263,
+            "p95": 1966.401024643514,
+            "p99": 7825.684916974176
+          },
+          "scene_target_equal": {
+            "unit_count": 8742,
+            "mae": 588.4567184303615,
+            "mse": 10867075.173632199,
+            "rmse": 3296.524711515477
+          },
+          "scene_equal_point_mean": {
+            "unit_count": 300,
+            "mae": 660.0388023984616,
+            "mse": 18905204.96329673,
+            "rmse": 4348.01161029921
+          },
+          "scene_equal_target_mean": {
+            "unit_count": 300,
+            "mae": 636.5662731407627,
+            "mse": 16320329.139284922,
+            "rmse": 4039.8427121962213
+          }
+        },
+        "finetune": {
+          "point_equal": {
+            "unit_count": 442263,
+            "mae": 564.8340061095184,
+            "mse": 11039205.87695423,
+            "rmse": 3322.530041542774,
+            "point_count": 442263,
+            "p95": 1895.81429165806,
+            "p99": 7757.040654130591
+          },
+          "scene_target_equal": {
+            "unit_count": 8742,
+            "mae": 560.9331806765964,
+            "mse": 10978571.435264684,
+            "rmse": 3313.39273785416
+          },
+          "scene_equal_point_mean": {
+            "unit_count": 300,
+            "mae": 627.6478005152815,
+            "mse": 18878930.916991152,
+            "rmse": 4344.989173403214
+          },
+          "scene_equal_target_mean": {
+            "unit_count": 300,
+            "mae": 602.8547996562916,
+            "mse": 16242745.296966223,
+            "rmse": 4030.228938530195
+          }
+        }
+      },
+      "scene_directions": {
+        "improved": 259,
+        "worsened": 41,
+        "tied": 0,
+        "total": 300
+      },
+      "component_directions": {
+        "improved": 31,
+        "worsened": 7,
+        "tied": 0,
+        "total": 38
+      },
+      "outside_largest_component": {
+        "linear": {
+          "unit_count": 109365,
+          "mae": 866.4773967119845,
+          "mse": 23239495.525912896,
+          "rmse": 4820.735994214255,
+          "point_count": 109365,
+          "p95": 2704.8732949436826,
+          "p99": 15354.397850019208
+        },
+        "finetune": {
+          "unit_count": 109365,
+          "mae": 833.5450159645989,
+          "mse": 23201865.086737085,
+          "rmse": 4816.831436404754,
+          "point_count": 109365,
+          "p95": 2597.4361437655343,
+          "p99": 15245.032233374108
+        }
+      },
+      "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+      "within_seed_pair_verified": true
+    },
+    {
+      "seed": 20261021,
+      "source_identity": "073C",
+      "added_arm": "097A",
+      "source_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-SEQUENCE-BUDGET-20261025-097A-attempt-1",
+      "source_updates": 4000,
+      "added_updates": 4000,
+      "total_updates": 8000,
+      "baseline": {
+        "unit_count": 442263,
+        "mae": 606.6241180263506,
+        "mse": 10981289.173905537,
+        "rmse": 3313.802826648794,
+        "point_count": 442263,
+        "p95": 2046.7394804649823,
+        "p99": 8599.756195328237
+      },
+      "final": {
+        "unit_count": 442263,
+        "mae": 583.9755934731481,
+        "mse": 10905612.149799498,
+        "rmse": 3302.3646300491255,
+        "point_count": 442263,
+        "p95": 1986.127997833589,
+        "p99": 8109.497096464769
+      },
+      "delta": {
+        "mae": -22.648524553202492,
+        "rmse": -11.438196599668572,
+        "p95": -60.6114826313933,
+        "p99": -490.25909886346744
+      },
+      "relative_mae_reduction": 0.03733535129940002,
+      "full_population": {
+        "available_target_points": 454952,
+        "covered_target_points": 442263,
+        "missing_prediction_points": 12689,
+        "available_target_trajectories": 9099,
+        "covered_target_trajectories": 8742,
+        "point_coverage": 0.9721091455801931
+      },
+      "group_population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 9353,
+        "duplicate_prediction_group_count": 610,
+        "anchor_matched_target_count": 8743,
+        "reference_unavailable_target_count": 1
+      },
+      "weightings": {
+        "linear": {
+          "point_equal": {
+            "unit_count": 442263,
+            "mae": 606.6241180263506,
+            "mse": 10981289.173905537,
+            "rmse": 3313.802826648794,
+            "point_count": 442263,
+            "p95": 2046.7394804649823,
+            "p99": 8599.756195328237
+          },
+          "scene_target_equal": {
+            "unit_count": 8742,
+            "mae": 598.0511855665718,
+            "mse": 10911088.464776205,
+            "rmse": 3303.1936765464125
+          },
+          "scene_equal_point_mean": {
+            "unit_count": 300,
+            "mae": 688.7031720390279,
+            "mse": 19166755.247781817,
+            "rmse": 4377.985295519141
+          },
+          "scene_equal_target_mean": {
+            "unit_count": 300,
+            "mae": 657.7261690785102,
+            "mse": 16480124.170977768,
+            "rmse": 4059.5719196705663
+          }
+        },
+        "finetune": {
+          "point_equal": {
+            "unit_count": 442263,
+            "mae": 583.9755934731481,
+            "mse": 10905612.149799498,
+            "rmse": 3302.3646300491255,
+            "point_count": 442263,
+            "p95": 1986.127997833589,
+            "p99": 8109.497096464769
+          },
+          "scene_target_equal": {
+            "unit_count": 8742,
+            "mae": 577.0408714987889,
+            "mse": 10915762.04506144,
+            "rmse": 3303.9010343927434
+          },
+          "scene_equal_point_mean": {
+            "unit_count": 300,
+            "mae": 655.0667405394622,
+            "mse": 18921353.18580994,
+            "rmse": 4349.868180279713
+          },
+          "scene_equal_target_mean": {
+            "unit_count": 300,
+            "mae": 627.7835113761536,
+            "mse": 16382623.84187357,
+            "rmse": 4047.5454094887646
+          }
+        }
+      },
+      "scene_directions": {
+        "improved": 239,
+        "worsened": 61,
+        "tied": 0,
+        "total": 300
+      },
+      "component_directions": {
+        "improved": 32,
+        "worsened": 6,
+        "tied": 0,
+        "total": 38
+      },
+      "outside_largest_component": {
+        "linear": {
+          "unit_count": 109365,
+          "mae": 911.9930997290785,
+          "mse": 23797230.154557306,
+          "rmse": 4878.240477319389,
+          "point_count": 109365,
+          "p95": 2972.13102297489,
+          "p99": 16506.806230518974
+        },
+        "finetune": {
+          "unit_count": 109365,
+          "mae": 872.917412567012,
+          "mse": 23371537.120590687,
+          "rmse": 4834.411765726073,
+          "point_count": 109365,
+          "p95": 2909.5989205624164,
+          "p99": 16102.144370325903
+        }
+      },
+      "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+      "within_seed_pair_verified": true
+    }
+  ],
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "test_opened": false,
+  "checkpoint_or_raw_prediction_replay": false,
+  "quantiles_averaged": false,
+  "cross_seed_parameter_or_sample_equality_required": false,
+  "default_promoted": false,
+  "interpretation": "Each seed compares its own4000 endpoint with a fresh-Adam4000 replay. Two development seeds are not independent generalization, optimizer continuation or convergence evidence."
+}
