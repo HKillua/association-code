@@ -1,0 +1,12 @@
+{
+  "status": "COMPLETED",
+  "phase": "tfm",
+  "source_runs": {
+    "learned": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1",
+    "state_hold": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093B-attempt-1"
+  },
+  "training_updates": 0,
+  "model_forward_count": 0,
+  "test_opened": false,
+  "elapsed_seconds": 301.5666672489606
+}
