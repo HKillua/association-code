@@ -1,0 +1,75 @@
+{
+ "run_id": "LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1",
+ "note": "093A learned arm; program summary 365 MB stays on server; aggregates and per-scene A/B comparison are labelled derived.",
+ "derived_or_aggregate": [
+  "endpoint-aggregates-derived.json",
+  "ab-scene-derived.json.gz",
+  "history-trajectory-derived.json"
+ ],
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 534611,
+   "sha256": "669930e9cb4183e3938aa037f82799cda95abcc9eb8b2518a92dfcbf0a5d9596",
+   "mtime_local": "2026-10-25T14:56:17+0800"
+  },
+  {
+   "returned_name": "completion-value-verification.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/completion-value-verification.json",
+   "mode": "byte-identical copy",
+   "bytes": 1399,
+   "sha256": "45afa76439baee46df6c2fb7f6d460865a3372b5e7cbdd7b2ba0f90ec9ee54a7",
+   "mtime_local": "2026-10-25T14:57:53+0800"
+  },
+  {
+   "returned_name": "ab-scene-derived.json.gz",
+   "returned_bytes": 7830,
+   "mode": "derived gzip"
+  }
+ ],
+ "returned_total_bytes": 543840,
+ "server_originals": {
+  "summary.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/summary.json",
+   "bytes": 364893811,
+   "sha256": "76b52fbb2c4c173f398713cb81c4122df0a03f6bbff7fbdc47a644774d20ecac",
+   "mtime_local": "2026-10-25T14:56:16+0800"
+  },
+  "preparation.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/preparation.json",
+   "bytes": 676811404,
+   "sha256": "dcc0686f2f5d2b23e613962f845810a8cc3b5686c91a3e66df6b27429cf55e3e",
+   "mtime_local": "2026-10-25T14:57:03+0800"
+  },
+  "checkpoint.pt": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/checkpoint.pt",
+   "bytes": 139526416,
+   "sha256": "926bec46da45bd00c316c856b92d78cdabfa8c3a3891be8da41f01af558b18c3",
+   "mtime_local": "2026-10-25T14:55:43+0800"
+  },
+  "history.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/history.json",
+   "bytes": 7637112,
+   "sha256": "81bad463e67d4c7c6df3755710e54a732bb1a61cc11eb07f97bb06799d1b39a5",
+   "mtime_local": "2026-10-25T14:55:44+0800"
+  },
+  "coverage.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/coverage.json",
+   "bytes": 2744798,
+   "sha256": "ac100a555ff861ba1280aa97aa95abb67688d0d3ea0e296c6b4b079ee750afcc",
+   "mtime_local": "2026-10-25T14:55:45+0800"
+  },
+  "pairing-initial.pt": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TFM-20261024-093A-attempt-1/pairing-initial.pt",
+   "bytes": 54265974,
+   "sha256": "29ffd4de6493cd1e3145af7fb98af4efb343a962d5430bae5f2beb49de980722",
+   "mtime_local": "2026-10-25T01:54:57+0800"
+  }
+ },
+ "server_tree": {
+  "files": 1215,
+  "bytes": 2646786071
+ }
+}
