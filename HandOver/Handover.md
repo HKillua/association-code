@@ -7,6 +7,8 @@
 | 新任务 | 当前状态 | 固定预算与比较 |
 |---|---|---|
 | 098A／098B | READY；优先B/A，须先通过旧队列提交排空检查 | seed23 generic／relation，各从072C final新增4000；对090C强预算Transformer |
+
+**服务器来源预核登记（2026-10-25 15:10 北京时间／07:10Z）：** 098 实施冻结 `1a4234f6c4b7248910edc5caf3a36317fa17ad78` 已核为 commit；新 checkout `association-code-run098A` 建成（未创建 098B/C/D checkout、无任何 098 输出或 launcher）。四臂 `--check-source-only` 全部返回 `READY_DEPENDENCIES: completed same-seed teacher and budget baseline verified`：098A/B 绑 072C＋090C，098C/D 绑 073C＋097A。**资源闸门未开**：`assert_gpu_dispatch_drained` 对旧 096—097 控制目录报 `WAITING_RESOURCE`（`LEVEL1-COMPLETION-SYSTEM-20261025-096A-attempt-1-launch/request.json` 不存在＝096A 尚未提交），符合"旧队列仍有未提交 GPU 任务时不得抢卡"的合同；未执行 flock 提交、未占用任何 098 GPU。按合同保持 WAITING_RESOURCE，不做口头协调替代；待 096A 由旧控制器提交或进入不可逆终态后，再对同一冻结 checkout 复核 output/launcher 仍不存在并执行带锁资源检查与 launcher。
 | 098C／098D | READY；D/C接续，有合法空槽可并行 | seed21 generic／relation，各从073C final新增4000；对097A |
 | 098 seed23／seed21 CPU表 | READY，分别依赖该seed两个新臂COMPLETED | 完整缓存、同人口/尾部/组件/偏置开关，0新训练/前向 |
 | 098双seed结案 | READY，依赖两CPU表COMPLETED | 重算3%／1%与全部门槛，只有两个seed均通过才进入独立确认 |
@@ -52,7 +54,7 @@
 - `plan.json`：`max_gpu_claims=4`、`max_cpu_comparisons=1`；096A←093A＋094A、096B←093B＋094B、097A 无依赖；另 093/094/096/097 四张 CPU 表按依赖串行（每次最多一张）。
 - 提交后实测（不只看 SUBMITTED）：queue 已为 096B 启动 `completion_system_evaluate.py --check-source-only`（PID 3977245，来源 094B＋093B），尚无子任务输出目录；index0（`GPU-c5a00c37`）与 index3（`GPU-1043f26a`）当前 util 0、显存 12 MiB，index1/index2 仍由 094A/093A 占用。
 - 控制服务首次接续实测（23:02Z）：**096B** 已提交，单元 `mtad-0f6ff7294d95.service`，`GPU-c5a00c37`(index0，提交前 util 0／12 MiB)，来源 094B＋093B，`--completion-policy state_hold`；**097A** 已提交，单元 `mtad-a7b83f3e6bf0.service`，`GPU-1043f26a`(index3，util 0／14 MiB)，来源 056 system＋073C，seed20261021。两臂均 `status.json=RUNNING`、advisory 未触、各自独立 output/launcher。至此 093A(index2)、094A(index1)、096B(index0)、097A(index3) 共四个已领取单卡，达到全局上限；096A 仍在等 093A＋094A。
-- **服务器更正（2026-10-25 05:25Z）：094A 的"0/4000 更新"不是实况。** 代码只在校准后与每 1000 次更新的验证后调用 `checkpoint()`（`tmtaff.py:701-704` 写 `history.json`/`coverage.json`），更新 1–999 期间不落盘；因此盘上 `history.json` 3 B、`checkpoint.pt` 停在 16:18:58Z 只能说明"尚未到第一个 1000 更新边界"，不能说明没在训练。实测该进程 13 h 39 m 墙时对应 13 h 39 m CPU（单核满载）、SM 8–11%、无 I/O，符合 learned 补全逐条自回归的特征（每次 miss 对 64 条 track 跑 `model.complete`，`batches.py:52-68`）。按 094B 的约 25 个新 track/更新与 093A 的约 0.7–0.85 s/track 推算，1000 更新约需 5–6 h 再加验证，故本臂总时长预计数十小时，8 h advisory 早已越过且按合同继续；096A 与 094-summary 在此期间保持 WAITING。
+- **服务器更正（2026-10-25 05:25Z）：094A 的"0/4000 更新"不是实况。** 代码只在校准后与每 1000 次更新的验证后调用 `checkpoint()`（`tmtaff.py:701-704` 写 `history.json`/`coverage.json`），更新 1–999 期间不落盘；因此盘上 `history.json` 3 B、`checkpoint.pt` 停在 16:18:58Z **不能**推出"还没到 1000 更新"——A 的真实 `validate_every_updates=4000`，除校准外整段训练只在第 4000 更新后落盘；当前既无实时更新数，也无可靠 ETA。实测该进程 13 h 39 m 墙时对应 13 h 39 m CPU（单核满载）、SM 8–11%、无 I/O，符合 learned 补全逐条自回归的特征（每次 miss 对 64 条 track 跑 `model.complete`，`batches.py:52-68`）。8 h advisory 早已越过且按合同继续；096A 与 094-summary 在此期间保持 WAITING。此前"约 5–6 h 到 1000 更新"的推算按错误校验步长写成，撤回。
 - 本轮**不手工领取** 096/097 或任一 CPU 表，全部交由该控制服务按真实终态接续；093A/094A 终态后由其自动提交。
 
 ## 090/091及093/094原批结案快照（dfe639e；新任务以顶部096—097合同为准）
@@ -73,7 +75,7 @@
 
 **回执解释勘误（原S2L保留）：** 只有090B要求inside精确保护，A的全query行为符合合同；B无支撑区平均净差很小但平均绝对误差变化约82.88m。095标题把query组件等权结果误写为“一步”，真正一步组件等权model仍更差；query宏平均、before和最大组件外的方向反转不能脱离4335单场贡献解读。以上均不要求修改生产代码、放宽门槛或另开诊断。
 
-当前两个运行槽为093A与094A；093B、094B已终态。093A 在 u0 端点完成后做汇总（u1000 未开始），094A 仍在 `tam`（见下方服务器更正：盘上"0 更新"不等于无进展）。094/093 各待本族两臂齐备后执行一次 CPU4 表；090/091/095 已结案。全局最多四单卡，现场 FIFO/实际资源。
+当前两个运行槽为093A与094A；093B、094B已终态。093A 在 u0 端点完成后做汇总（u1000 未开始），094A 仍在 `tam`；其 `validate_every_updates=4000`，除校准外整段训练只在第 4000 更新后落盘，故盘上 cursor 0 既不表示"不到 1000"，也不能给出实时更新数或可靠 ETA。094/093 各待本族两臂齐备后执行一次 CPU4 表；090/091/095 已结案。全局最多四单卡，现场 FIFO/实际资源。
 
 **091新增解释边界：** 初始数据项均值已按T完整曝光校准匹配，alpha数值含单位，低alpha／少裁剪不能证明监督被压弱。固定T探针的数据项略差，但L2大幅下降，完整正则化目标仍改善；小净MAE变化不等于预测不动。原平方目标换线性确实缓解了旧086B退化，但不足以形成有效候选；不据此添加新的L2或校准消融。原S2L保留，当前解释以[本地审查](../docs/research_status.md#091ab目标桥接结案复核2026-10-25)为准。
 
