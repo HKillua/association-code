@@ -33,6 +33,7 @@ from association.models.deepaf_peer import DeepAFPeer
 from association.utils.runtime import write_json
 
 SCOPE = 'deepaf-native-core-probe-v1'
+QUALIFICATION_SCOPE = 'deepaf-native-adapted-qualification-v1'
 MODES = ('CV', 'CA', 'CT')
 ARMS = ('native_labels', 'adapted_labels')
 SEED = 20261025
@@ -202,13 +203,48 @@ def _metrics(position, velocity):
 
 
 @torch.no_grad()
-def evaluate(model, scenes):
+def truth_reset_shadow(model, visible, closed_loop, truth_position):
+    """Oracle diagnostic: reset only previous P, never the real feedback path.
+
+    Each shadow query keeps the ACTUAL closed-loop previous V and P/V histories.
+    k=0 has no preceding truth within the evaluated sequence and retains the
+    given noisy OLS initialization. It is reported separately, not as a reset.
+    """
+    b, q = visible['valid'].shape[:2]
+    truth = torch.as_tensor(truth_position, dtype=torch.float64)
+    if truth.shape != (b, q, 2) or not torch.isfinite(truth).all():
+        raise ValueError('finite evaluated truth positions [B,Q,2] required for oracle diagnostic')
+    previous_p = torch.cat((visible['position'][:, None], truth[:, :-1]), 1)
+    previous_v = torch.cat((visible['velocity'][:, None], closed_loop['velocity'][:, :-1]), 1)
+    live = closed_loop['cache']['valid']
+    difference = visible['measurements'] - previous_p[:, :, None]
+    candidates = torch.cat((previous_v[:, :, None], difference), 2)
+    candidates = torch.where(live[..., None], candidates, torch.zeros_like(candidates)).float() / SCALE
+    ph, vh = closed_loop['cache']['ph'], closed_loop['cache']['vh']
+    outputs = [[], []]
+    # Match the actual rollout's batch shape for each query; no shadow feedback.
+    for k in range(q):
+        hv = torch.ones(ph[:, k].shape[:2], dtype=torch.bool)
+        outputs[0].append(model.position_network(candidates[:, k], live[:, k], ph[:, k], hv))
+        outputs[1].append(model.velocity_network(candidates[:, k], live[:, k], vh[:, k], hv))
+    p, v = (torch.stack(values, 1).double() * SCALE for values in outputs)
+    result = dict(position=previous_p + p, velocity=v, previous_position=previous_p)
+    if any(not torch.isfinite(value).all() for value in result.values()):
+        raise FloatingPointError('nonfinite truth-reset diagnostic output')
+    return result
+
+
+@torch.no_grad()
+def evaluate(model, scenes, *, truth_reset=False):
     model.eval()
-    rows = []
+    rows, shadow_rows = [], []
     for start in range(0, len(scenes), 8):
         chosen = scenes[start:start + 8]
         visible = observable_batch(chosen)
-        result = rollout(model, visible)
+        result = rollout(model, visible, cache=truth_reset)
+        shadow = (truth_reset_shadow(model, visible, result,
+                  np.stack([s['truth_position'][INITIAL_COUNT:] for s in chosen]))
+                  if truth_reset else None)
         q = result['position'].shape[1]
         extrapolated = visible['position'][:, None] + torch.arange(1, q + 1)[None, :, None] * visible['velocity'][:, None]
         for i, scene in enumerate(chosen):
@@ -226,6 +262,13 @@ def evaluate(model, scenes):
                 queries=q, position_errors_m=pe.tolist(), velocity_errors_mps=ve.tolist(),
                 control_position_errors_m=ce.tolist(), control_velocity_errors_mps=cv.tolist(),
                 centroid_position_errors_m=ae.tolist(), centroid_velocity_errors_mps=av.tolist()))
+            if shadow is not None:
+                spe = np.linalg.norm(shadow['position'][i].numpy() - truth, axis=-1)
+                sve = np.linalg.norm(shadow['velocity'][i].numpy() - vel, axis=-1)
+                shadow_rows.append(dict(scene_id=scene['scene_id'], motion=scene['motion'],
+                    position_errors_m=spe.tolist(), velocity_errors_mps=sve.tolist(),
+                    first_query_without_reset=_metrics(spe[:1], sve[:1]),
+                    reset_queries_only=_metrics(spe[1:], sve[1:])))
     groups = {}
     for mode in ('all', *MODES):
         selected = [row for row in rows if mode == 'all' or row['motion'] == mode]
@@ -236,7 +279,24 @@ def evaluate(model, scenes):
             np.concatenate([row['control_velocity_errors_mps'] for row in selected])), visible_centroid=_metrics(
             np.concatenate([row['centroid_position_errors_m'] for row in selected]),
             np.concatenate([row['centroid_velocity_errors_mps'] for row in selected])))
-    return dict(groups=groups, scenes=rows)
+    result = dict(groups=groups, scenes=rows)
+    if truth_reset:
+        shadow_groups = {}
+        for mode in ('all', *MODES):
+            selected = [row for row in shadow_rows if mode == 'all' or row['motion'] == mode]
+            shadow_groups[mode] = dict(scene_count=len(selected),
+                first_query_without_reset=_metrics(
+                    np.asarray([row['position_errors_m'][0] for row in selected]),
+                    np.asarray([row['velocity_errors_mps'][0] for row in selected])),
+                reset_queries_only=_metrics(
+                    np.concatenate([row['position_errors_m'][1:] for row in selected]),
+                    np.concatenate([row['velocity_errors_mps'][1:] for row in selected])))
+        result['truth_reset_previous_position_only'] = dict(oracle_diagnostic=True, peer_score=False,
+            feedback_used=False, reset_query_indices=list(range(1, q)),
+            first_query_policy='original noisy OLS initialization; no reset',
+            retained='actual closed-loop previous V, P/V histories and visible measurements',
+            groups=shadow_groups, scenes=shadow_rows)
+    return result
 
 
 def split_counts(scenes):
@@ -247,9 +307,16 @@ def split_counts(scenes):
                 empty_real_candidate_frames=sum(not len(z) for s in scenes for z in s['measurements']))
 
 
-def run_probe(output, *, updates=256, train_per_motion=64, test_per_motion=32, seed=SEED):
-    if type(updates) is not int or not 1 <= updates <= 256 or type(seed) is not int:
-        raise ValueError('fixed probe allows 1..256 updates and an integer seed')
+def run_probe(output, *, updates=256, train_per_motion=64, test_per_motion=32, seed=SEED,
+              qualification=False, midpoint=256):
+    # Small direct-call settings are for CPU tests; the qualification CLI below
+    # fixes population, seed, 1024 updates and the 256-update intermediate endpoint.
+    limit = 1024 if qualification else 256
+    if type(updates) is not int or not 1 <= updates <= limit or type(seed) is not int:
+        raise ValueError(f'fixed probe allows 1..{limit} updates and an integer seed')
+    if qualification and (type(midpoint) is not int or not 0 < midpoint < updates):
+        raise ValueError('qualification requires a positive intermediate endpoint before final')
+    arms = ('adapted_labels',) if qualification else ARMS
     output = Path(output)
     if output.exists():
         raise FileExistsError('native probe output exists; no retry/overwrite')
@@ -262,12 +329,17 @@ def run_probe(output, *, updates=256, train_per_motion=64, test_per_motion=32, s
     initial_state = deepcopy(model.state_dict())
     output.mkdir(parents=True)
     start = time.monotonic()
-    state = dict(scope=SCOPE, status='RUNNING', device='cpu', cpu_threads=1, seed=seed,
+    state = dict(scope=QUALIFICATION_SCOPE if qualification else SCOPE,
+                 status='RUNNING', device='cpu', cpu_threads=1, seed=seed,
                  configuration=dict(updates=updates, batch_size=8, learning_rate=.001, gradient_clip=1.,
                      train_per_motion=train_per_motion, test_per_motion=test_per_motion),
                  train_population=split_counts(train), heldout_population=split_counts(test),
                  completed_arms=[], updates_by_arm={}, test_used_for_selection=False,
                  original_paper_reproduction=False, production_level1=False)
+    if qualification:
+        state.update(arms=list(arms), endpoint_updates=[0, midpoint, updates],
+                     oracle_shadow_is_peer_score=False, validation_checkpoint_selection=False,
+                     fresh_training_not_resume=True)
     state.update(model_configuration=model.configuration,
         parameter_count=sum(p.numel() for p in model.parameters()),
         split_seeds=dict(train=seed, heldout=seed+1, sample_order=seed+2),
@@ -283,27 +355,56 @@ def run_probe(output, *, updates=256, train_per_motion=64, test_per_motion=32, s
         control_contract='OLS-CV extrapolation and all-candidate centroid; empty centroid uses OLS-CV, centroid velocity is its consecutive position difference')
     write_json(output/'run.json', state)
     try:
-        initial = evaluate(model, test)
+        initial = evaluate(model, test, truth_reset=qualification)
         write_json(output/'initial-heldout.json', initial)
         finals, training = {}, {}
-        for arm in ARMS:
+        for arm in arms:
             model.load_state_dict(initial_state)
             if any(not torch.equal(value, initial_state[key]) for key, value in model.state_dict().items()):
                 raise ValueError('native probe arms must share exactly the initial parameters')
             optimizer = torch.optim.Adam(model.parameters(), lr=.001)
             journal = []
+            endpoints = {}
+            def save_endpoint(step):
+                path = output/f'{arm}-step{step}.pt'
+                torch.save(dict(scope=state['scope'], arm=arm, completed_updates=step,
+                    configuration=deepcopy(state['configuration']), model_configuration=model.configuration,
+                    seed=seed, split_seeds=state['split_seeds'], model=deepcopy(model.state_dict()),
+                    optimizer=deepcopy(optimizer.state_dict()), torch_rng_state=torch.get_rng_state(),
+                    planned_scene_indices=plan.copy(), completed_sampling_records=deepcopy(journal)), path)
+                evaluation = initial if step == 0 else evaluate(model, test, truth_reset=True)
+                evaluation_path = output/f'{arm}-step{step}-heldout.json'
+                write_json(evaluation_path, evaluation)
+                endpoints[str(step)] = dict(checkpoint=path.name, evaluation=evaluation_path.name,
+                    completed_updates=step, closed_loop=evaluation['groups'],
+                    oracle_previous_position_only=evaluation['truth_reset_previous_position_only']['groups'])
+                state.update(endpoints=endpoints, active_arm=arm, elapsed_seconds=time.monotonic()-start)
+                write_json(output/'run.json', state)
+                return evaluation
+            if qualification:
+                save_endpoint(0)
             for step, indices in enumerate(plan, 1):
                 loss = train_update(model, optimizer, [train[i] for i in indices], arm)
-                journal.append(dict(step=step, scene_indices=indices.tolist(), **loss))
+                row = dict(step=step, scene_indices=indices.tolist(), **loss)
+                if qualification:
+                    row['scene_ids'] = [train[i]['scene_id'] for i in indices]
+                journal.append(row)
                 state['updates_by_arm'][arm] = step
+                if qualification:
+                    with (output/(arm+'-sampling.jsonl')).open('a') as stream:
+                        stream.write(json.dumps(row, allow_nan=False)+'\n')
+                    if step in (midpoint, updates):
+                        endpoint_evaluation = save_endpoint(step)
                 if step % 32 == 0:
                     state.update(active_arm=arm, elapsed_seconds=time.monotonic() - start)
                     write_json(output/'run.json', state)
                     print(f'{arm}: {step}/{updates}', flush=True)
-            training[arm], finals[arm] = journal, evaluate(model, test)
+            training[arm], finals[arm] = journal, (endpoint_evaluation if qualification else evaluate(model, test))
             write_json(output/(arm+'-training.json'), journal)
             write_json(output/(arm+'-heldout.json'), finals[arm])
             state['completed_arms'].append(arm)
+            if qualification:
+                state['endpoints'] = endpoints
         summary = dict(state, status='COMPLETED', initial=initial['groups'],
             final={arm: value['groups'] for arm, value in finals.items()},
             same_initial_parameters=True, same_sampled_scene_order=True,
@@ -325,11 +426,20 @@ def run_probe(output, *, updates=256, train_per_motion=64, test_per_motion=32, s
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--updates', type=int, default=256)
+    parser.add_argument('--mode', choices=('labels', 'qualification'), default='labels')
+    parser.add_argument('--updates', type=int)
     parser.add_argument('--train-per-motion', type=int, default=64)
     parser.add_argument('--test-per-motion', type=int, default=32)
     args = parser.parse_args(argv)
-    result = run_probe(**vars(args))
+    options = vars(args).copy()
+    mode = options.pop('mode')
+    if mode == 'qualification':
+        if (args.updates not in (None, 1024) or args.train_per_motion != 64 or args.test_per_motion != 32):
+            parser.error('qualification is fixed: adapted_labels, 1024 updates, train192/heldout96, endpoints0/256/1024')
+        options.update(updates=1024, qualification=True)
+    elif args.updates is None:
+        options['updates'] = 256
+    result = run_probe(**options)
     print(json.dumps(dict(status=result['status'], output=str(Path(args.output).resolve()),
         actual_updates=result['actual_updates'], elapsed_seconds=result['elapsed_seconds']),
         ensure_ascii=False, allow_nan=False))
