@@ -1,0 +1,12 @@
+{
+  "status": "COMPLETED",
+  "phase": "tam",
+  "source_runs": {
+    "learned": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094A-attempt-1",
+    "state_hold": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094B-attempt-1"
+  },
+  "training_updates": 0,
+  "model_forward_count": 0,
+  "test_opened": false,
+  "elapsed_seconds": 242.96863848809153
+}

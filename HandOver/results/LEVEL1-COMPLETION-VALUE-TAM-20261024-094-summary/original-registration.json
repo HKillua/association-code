@@ -1,0 +1,31 @@
+{
+ "run_id": "LEVEL1-COMPLETION-VALUE-TAM-20261024-094-summary-attempt-1",
+ "note": "094 A/B paired association comparison; native outputs returned verbatim, zero forwards.",
+ "server_originals": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094-summary-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 420,
+   "sha256": "ab14ae8f3425684220ed086441a0c9d5de6261bb5c7bb272aef66afc494a4ce4",
+   "mtime_local": "2026-10-25T16:13:16+0800"
+  },
+  {
+   "returned_name": "summary.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094-summary-attempt-1/summary.json",
+   "mode": "byte-identical copy",
+   "bytes": 2105,
+   "sha256": "25537901d06fae77b077ddd7108ee0e3cd9df1489f94a2737f4607dfabcdffb3",
+   "mtime_local": "2026-10-25T16:13:16+0800"
+  },
+  {
+   "returned_name": "comparison.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COMPLETION-VALUE-TAM-20261024-094-summary-attempt-1/comparison.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 238765,
+   "sha256": "591ff739252a512b62269a82f47d74c4650911afd4001427e710eacd9862ff96",
+   "mtime_local": "2026-10-25T16:13:16+0800"
+  }
+ ],
+ "returned_total_bytes": 241290
+}
