@@ -71,6 +71,9 @@ def build_motion_evidence(native_values, native_times, native_observed, query_se
     north/east plane with Earth radius 6,371,000 m and cos(mean visible latitude)
     for east. Both velocity arrays use that same plane and actual seconds; their
     last axis is [north, east]. These are diagnostics, not calibrated covariance.
+    ``ols_slope_degrees_per_second`` retains the all-native OLS angular rate in
+    [latitude, unwrapped longitude], before that plane-specific conversion.
+    Consumers using a different position chart must transform this rate there.
 
     Exact observations mean equality of query and visible native timestamp.
     Interpolated support is reported separately and is not an exact observation.
@@ -104,6 +107,7 @@ def build_motion_evidence(native_values, native_times, native_observed, query_se
     return dict(states=states, support=control['regions']['inside_support'],
         nearest_seconds=control['nearest_seconds'], native_count=sizes, span_seconds=span,
         fit_rmse_m=residual_rms,
+        ols_slope_degrees_per_second=control['ols_slope_degrees_per_second'].copy(),
         ols_velocity_mps=control['ols_slope_degrees_per_second']*scale,
         endpoint_velocity_mps=control['endpoint_slope_degrees_per_second']*scale,
         sources=source_values.copy(), query_seconds=np.asarray(query_seconds, dtype=np.float64).copy(),

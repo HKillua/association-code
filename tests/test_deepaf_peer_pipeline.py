@@ -12,6 +12,7 @@ import torch
 from association.utils.runtime import read_json, write_json
 from association.evaluation import deepaf_peer as evaluation
 from association.models.deepaf_peer import DeepAFPeer
+from association.training import deepaf_peer as peer_training
 from tests.evaluation.test_support_gate import support_gate_cache_fixture
 from tests.training.test_support_gate import tiny_train
 from tools.experiments import sequence_position_fit as original
@@ -50,6 +51,11 @@ class DeepAFPeerPipelineTests(unittest.TestCase):
         with TemporaryDirectory() as directory, ExitStack() as stack:
             root = Path(directory)
             source, metadata, validation = support_gate_cache_fixture(root)
+            for scene in validation:
+                # This cached interface fixture has no original observations.
+                # Supply explicit synthetic rates, never a query-state OLS refit.
+                motion = scene['motion']
+                motion['ols_slope_degrees_per_second'] = np.full((len(motion['states']), 2), 1e-5)
             write_json(source/'run.json', dict(status='COMPLETED'))
             train = tiny_train()
             manifest = dict(splits={'T_core': [str(s['scene_id']) for s in train], 'V_select': ['3035']},
@@ -99,6 +105,16 @@ class DeepAFPeerPipelineTests(unittest.TestCase):
             self.assertEqual(result['optimizer_updates'], 8)
             self.assertFalse(result['test_opened'])
             self.assertEqual(read_json(root/'peer/run.json')['completed_endpoints'], ['initial', 'mid', 'final'])
+            # Changed bootstrap semantics must not silently reinterpret a v1
+            # checkpoint, whether only its envelope or also its config is old.
+            for legacy_config in (False, True):
+                saved = torch.load(root/'peer/fit/final.pt', map_location='cpu', weights_only=False)
+                saved['routing_semantics'] = 'fixed056-pv-closed-loop-tbptt1-v1'
+                if legacy_config:
+                    saved['configuration']['routing_semantics'] = saved['routing_semantics']
+                torch.save(saved, root/'legacy-bootstrap.pt')
+                with self.assertRaises(ValueError):
+                    peer_training.load_checkpoint(root/'legacy-bootstrap.pt')
             for label in ('initial', 'mid', 'final'):
                 summary = read_json(root/'peer'/label/'summary.json')
                 self.assertEqual(summary['model_forwards'], 4)

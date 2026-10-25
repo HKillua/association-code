@@ -39,7 +39,7 @@ from association.training.evidence_fusion import (
 from association.utils.runtime import read_json, write_json
 
 SCOPE = 'deepaf-pv-position-peer-v1'
-ROUTING_SEMANTICS = 'fixed056-pv-closed-loop-tbptt1-v1'
+ROUTING_SEMANTICS = 'fixed056-pv-closed-loop-tbptt1-v2'
 LOSS_SEMANTICS = 'pv-desired-increment-mse-v1'
 OPTIMIZER_INITIALIZATION = 'scratch Adam; continuous across replay cycles; no source state inherited'
 HEARTBEAT_INTERVAL = 100

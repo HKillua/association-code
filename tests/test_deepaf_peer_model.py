@@ -5,6 +5,7 @@ import unittest
 import numpy as np
 import torch
 
+from association.data.motion_evidence import build_motion_evidence
 from association.models.deepaf_peer import (
     DeepAFPeer, EARTH_RADIUS_M, MODEL_CONFIG, deepaf_batch_inputs, deepaf_inputs,
     deepaf_objectives, deepaf_supervision, local_to_positions, mahalanobis_scores,
@@ -13,13 +14,25 @@ from association.models.deepaf_peer import (
 from tests.test_sequence_position import motion_fixture
 
 
+def deepaf_motion_fixture():
+    """Interface-only fixture: explicitly declared synthetic angular-rate evidence.
+
+    The shared fixture has no original observations; these rates are not fitted
+    from its interpolated query states or asserted to be native-data estimates.
+    """
+    motion = motion_fixture()
+    motion['ols_slope_degrees_per_second'] = np.array(
+        [[2e-5, 3e-5], [2e-5, 3e-5], [3e-5, 2e-5]])
+    return motion
+
+
 class DeepAFPeerModelTests(unittest.TestCase):
     def setUp(self):
         torch.set_num_threads(1)
         torch.manual_seed(20261023)
 
     def inputs(self, members=(0, 1, 2)):
-        return deepaf_inputs(motion_fixture(), list(members))
+        return deepaf_inputs(deepaf_motion_fixture(), list(members))
 
     def test_source_core_architecture_and_exact_distance_scoring(self):
         model = DeepAFPeer()
@@ -65,7 +78,7 @@ class DeepAFPeerModelTests(unittest.TestCase):
                 if name in ('target', 'reference', 'identities', 'fusion_targets', 'source'):
                     raise AssertionError('truth or identity entered the model')
                 return super().__getitem__(name)
-        motion = VisibleOnly(motion_fixture(), identities=object(), target=object())
+        motion = VisibleOnly(deepaf_motion_fixture(), identities=object(), target=object())
         first = deepaf_inputs(motion, [0, 1, 2])
         reverse = deepaf_inputs(motion, [0, 2, 1])
         for key in first:
@@ -76,6 +89,71 @@ class DeepAFPeerModelTests(unittest.TestCase):
         for bad in ([], [0., 1.], [0, 0], [0, 9]):
             with self.assertRaises(ValueError):
                 deepaf_inputs(motion, bad)
+
+    def test_bootstrap_is_tangent_derivative_at_actual_initial_chart_origin(self):
+        # Real visible observations span latitudes 70--75 degrees. Their old
+        # mean-latitude plane makes the initial east velocity about 12% too low.
+        times = np.linspace(0., 54000., 128)
+        anchor = np.column_stack((70. + 5. * times / times[-1],
+                                  25. * times / times[-1],
+                                  np.full_like(times, 20.), np.zeros_like(times)))
+        helper = anchor.copy()
+        helper[:, :2] += [-4., 2.]
+        rate = torch.tensor([5., 25.], dtype=torch.float64) / times[-1]
+        for members in ([0], [0, 1]):
+            # A supported helper and an initially unsupported anchor activate
+            # fixed095 for the mixed-origin case, using real native support.
+            start = -1000. if len(members) > 1 else 0.
+            motion = build_motion_evidence(np.stack((anchor, helper)),
+                np.stack((times, times - 1000.)), np.ones((2, len(times)), bool),
+                np.linspace(start, times[-1], 64), ['a', 'b'])
+            inputs = deepaf_inputs(motion, members)
+            origin = inputs['origin_latlon']
+            # This curve is translated to base0. The test deliberately also
+            # covers mixed base0 != the original anchor's first position.
+            if len(members) > 1:
+                anchor_initial = torch.as_tensor(motion['states'][0, 0, :2])
+                self.assertFalse(torch.equal(origin, anchor_initial))
+                self.assertNotEqual(float(origin[0]), float(anchor_initial[0]))
+            epsilon = .1
+            finite_difference = (positions_to_local(origin + epsilon * rate, origin)
+                                 - positions_to_local(origin - epsilon * rate, origin)) / (2. * epsilon)
+            torch.testing.assert_close(inputs['initial_velocity_mps'], finite_difference,
+                                       rtol=1e-8, atol=1e-7)
+            if len(members) == 1:
+                old = torch.as_tensor(motion['ols_velocity_mps'][0])
+                self.assertLess(float(old[1] / inputs['initial_velocity_mps'][1]), .89)
+                dt = inputs['query_seconds'][1] - inputs['query_seconds'][0]
+                self.assertGreater(float(torch.linalg.vector_norm(
+                    (old - inputs['initial_velocity_mps']) * dt)), 1800.)
+
+    def test_native_ols_rate_survives_when_query_interpolation_has_zero_slope(self):
+        # The middle observation is not a query. Refitting just the two query
+        # values would erase its contribution to the actual native OLS rate.
+        times = np.array([0., 1., 100.])
+        values = np.array([[20., 0., 2., 0.],
+                           [20.001, .002, 2., 0.],
+                           [20., 0., 2., 0.]])
+        motion = build_motion_evidence(values[None], times[None],
+            np.ones((1, 3), bool), np.array([0., 100.]), ['a'])
+        centred = times - times.mean()
+        native_rate = (centred[:, None] * (values[:, :2] - values[:, :2].mean(0))).sum(0) / (centred @ centred)
+        np.testing.assert_allclose(motion['ols_slope_degrees_per_second'][0], native_rate,
+                                   rtol=1e-12, atol=1e-15)
+        np.testing.assert_array_equal(motion['states'][0, 0, :2], motion['states'][0, 1, :2])
+        inputs = deepaf_inputs(motion, [0])
+        self.assertGreater(float(torch.linalg.vector_norm(inputs['initial_velocity_mps'])), 0.)
+
+    def test_bootstrap_rejects_missing_or_invalid_native_angular_rate(self):
+        with self.assertRaisesRegex(ValueError, 'ols_slope_degrees_per_second'):
+            deepaf_inputs(motion_fixture(), [0])
+        for invalid in (np.zeros((2, 2)), np.zeros((3, 1)),
+                        np.full((3, 2), np.nan), np.full((3, 2), np.inf)):
+            with self.subTest(shape=invalid.shape, first=invalid[0, 0]):
+                motion = deepaf_motion_fixture()
+                motion['ols_slope_degrees_per_second'] = invalid
+                with self.assertRaisesRegex(ValueError, 'OLS angular rates'):
+                    deepaf_inputs(motion, [0])
 
     def test_closed_loop_equations_use_previous_v_and_cache_false_is_identical(self):
         inputs = self.inputs()
@@ -234,12 +312,9 @@ class DeepAFPeerModelTests(unittest.TestCase):
             for bias in ((100., -80.), (-40., 50.)):
                 position = local_to_positions(truth_m + torch.tensor(bias, dtype=torch.float64), origin)
                 observations.append(torch.cat((position, truth[:, 2:]), -1).numpy())
-            motion = dict(states=np.stack(observations), query_seconds=times.numpy(),
-                support=np.ones((2, q), bool), nearest_seconds=np.zeros((2, q)),
-                exact_observation=np.ones((2, q), bool), native_count=np.full(2, q),
-                span_seconds=np.full(2, float(times[-1])), fit_rmse_m=np.zeros(2),
-                ols_velocity_mps=np.tile(velocity.numpy(), (2, 1)),
-                endpoint_velocity_mps=np.tile(velocity.numpy(), (2, 1)))
+            motion = build_motion_evidence(np.stack(observations),
+                np.tile(times.numpy(), (2, 1)), np.ones((2, q), bool),
+                times.numpy(), ['a', 'b'])
             rows.append(deepaf_inputs(motion, [0, 1]))
             targets.append(truth)
         batch, target = deepaf_batch_inputs(rows), torch.stack(targets)

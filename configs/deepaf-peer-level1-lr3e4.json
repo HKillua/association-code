@@ -1,6 +1,6 @@
 {
   "scope": "deepaf-pv-position-peer-v1",
-  "routing_semantics": "fixed056-pv-closed-loop-tbptt1-v1",
+  "routing_semantics": "fixed056-pv-closed-loop-tbptt1-v2",
   "loss_semantics": "pv-desired-increment-mse-v1",
   "data": {
     "length": 64,

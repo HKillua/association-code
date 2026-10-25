@@ -22,7 +22,7 @@ from torch import nn
 from association.models.sequence_position import EARTH_RADIUS_M, sequence_inputs
 
 SCOPE = 'deepaf-pv-position-peer-v1'
-ROUTING_SEMANTICS = 'fixed056-pv-closed-loop-tbptt1-v1'
+ROUTING_SEMANTICS = 'fixed056-pv-closed-loop-tbptt1-v2'
 LOSS_SEMANTICS = 'pv-desired-increment-mse-v1'
 MODEL_CONFIG = dict(hidden_size=32, num_layers=6, num_heads=4,
                     feedforward_size=64, history_length=5,
@@ -110,6 +110,12 @@ def deepaf_inputs(motion, members, *, device='cpu'):
     The existing fixed095 and ordinary Mean are independently reconstructed.
     The anchor's observable interpolation/extrapolation is always available;
     helpers are available only where their ordinary support mask permits.
+
+    Bootstrap translates the visible anchor's OLS angular-rate trajectory to
+    the initial fixed095 position (which can differ from the anchor position).
+    Its tangent derivative at that log-chart origin is R*[dlat, cos(lat)*dlon].
+    This is a local initialization, not an OLS refit in the spherical chart or
+    the log-map Jacobian of the original anchor curve at an arbitrary point.
     """
     members = np.asarray(members)
     states = np.asarray(motion['states'], np.float64)
@@ -117,6 +123,11 @@ def deepaf_inputs(motion, members, *, device='cpu'):
             or len(set(members.tolist())) != len(members) or (members < 0).any()
             or (members >= len(states)).any()):
         raise ValueError('distinct integer anchor/helper indices are required')
+    if 'ols_slope_degrees_per_second' not in motion:
+        raise ValueError('visible-native ols_slope_degrees_per_second is required for DeepAF bootstrap')
+    angular_rates = np.asarray(motion['ols_slope_degrees_per_second'], np.float64)
+    if angular_rates.shape != (len(states), 2) or not np.isfinite(angular_rates).all():
+        raise ValueError('finite visible-native OLS angular rates [N,2] are required')
     members = np.r_[members[:1], np.sort(members[1:])]
     base, _, mean = sequence_inputs(motion, members, device=device)
     origin = base[0, :2].clone()
@@ -124,11 +135,12 @@ def deepaf_inputs(motion, members, *, device='cpu'):
     support = torch.as_tensor(np.asarray(motion['support'])[members], dtype=torch.bool, device=device).clone()
     helper_count = support[1:].sum(0)
     support[0] = True
-    velocity = torch.as_tensor(np.asarray(motion['ols_velocity_mps'])[members[0]],
-                               dtype=torch.float64, device=device)
+    angular_rate = torch.as_tensor(angular_rates[members[0]], dtype=torch.float64, device=device)
+    velocity = EARTH_RADIUS_M * torch.deg2rad(angular_rate) * torch.stack(
+        (origin.new_tensor(1.), torch.deg2rad(origin[0]).cos()))
     times = torch.as_tensor(motion['query_seconds'], dtype=torch.float64, device=device)
     if velocity.shape != (2,) or not torch.isfinite(velocity).all():
-        raise ValueError('finite visible anchor OLS velocity in north/east m/s is required')
+        raise ValueError('finite initial-chart OLS tangent velocity in north/east m/s is required')
     return dict(base_states=base, mean_states=mean,
                 measurements_m=positions_to_local(positions, origin[None, None, :]),
                 candidate_valid=support, query_seconds=times,

@@ -6,7 +6,7 @@
 
 本合同建立在当前Level1／fixed056／Q64协议上，不将本项目的米制位置MAE与论文中不同定义的经纬度mME直接排榜。当前090C／097A的全人口位置MAE为564.834006／583.975593m；这只说明本项目当前量级，尚不证明胜过同行。098四臂仍执行[原合同](query-relation-fusion-098.md)，本文件不改变其训练、3%／1%、尾部、组件和bias-off门槛，也不因099结果自动晋升模型或开放测试。
 
-**状态：SOFTWARE_VERIFIED_NOT_DISPATCHED。** 下列科学边界、训练配方与有限预算已确定；完整实现通过23项本地检查和独立科学／集成审阅，见[验收记录](../reports/2026-10-25-099-peer-feasibility-review.md)。可领取实施冻结以独立L2S为准。本文、配置文件或CPU检查的存在都不是服务器领取、GPU运行或同行质量合格的证据。
+**状态：HOLD_METHOD_QUALIFICATION。** 用户最新要求先确保DeepAF方法。既有23项[软件检查](../reports/2026-10-25-099-peer-feasibility-review.md)只证明该适配可运行；本轮[原文方法审计](../reports/2026-10-25-deepaf-method-audit.md)已修复初始化坐标问题，并完成两种标签解释各256更新的独立合成诊断。两臂有学习但仍明显漂移，不能据此认证方法或否定原方法；训练语义、充分训练与真实Level1适配仍待核验。099A/B/C正式比较暂停，不按旧READY或旧冻结领取。下列有限预算保留为后续计划，方法资格核验及新实施冻结完成前不能据此启动。
 
 ## 日历截止与每次必须交付的决定
 
@@ -60,9 +60,9 @@
 
 下列适配选择已于2026-10-25冻结；它们不是作者未公开训练细节的原值。实现负责人须保持代码、配置及L2S一致，完成必要CPU小样本检查后才可发布；不能先运行再根据成绩解释。
 
-- scope=`deepaf-pv-position-peer-v1`，routing=`fixed056-pv-closed-loop-tbptt1-v1`，loss=`pv-desired-increment-mse-v1`；dropout0，P/V均直接`Linear(32,2)`输出且用常规Xavier初始化，无carry skip、fixed095残差头或来源warm start。
+- scope=`deepaf-pv-position-peer-v1`，routing=`fixed056-pv-closed-loop-tbptt1-v2`，loss=`pv-desired-increment-mse-v1`；v2修正初始化坐标，拒绝旧v1检查点被静默复用。dropout0，P/V均直接`Linear(32,2)`输出且用常规Xavier初始化，无carry skip、fixed095残差头或来源warm start。
 - 局部坐标原点固定取可见fixed095在第一query的位置，球面log／exp映射米制位置；对跖奇异输入显式失败，不静默裁剪后继续。anchor候选始终可见，包括观测外推；helper只在其真实support内参与，加上上一query的V虚拟候选。两个网络共享同一候选集，不用本query的V替换P输入。
-- 初始OLS速度只来自可见量测，初始两历史各一条有效OLS速度，其余零padding／mask；q0虚拟前位置为`-OLS_velocity * first_actual_dt`。encoder无位置编码，decoder按5条历史的时间顺序使用sinusoidal编码。
+- 初始速度来自原始可见anchor的native OLS经纬角速度，将该角速度轨迹平移到实际fixed095初始位置后，按球面log图原点的切向导数`R*rad([dlat,dlon])*[1,cos(base0_lat)]`转换；不直接复用另一经纬平面的`ols_velocity_mps`，也不从Q64重采样后重新拟合。初始两历史各一条有效速度，其余零padding／mask；q0虚拟前位置为`-initial_velocity * first_actual_dt`。encoder无位置编码，decoder按5条历史的时间顺序使用sinusoidal编码。
 - P监督为`(truth_position_k - stopgrad(predicted_position_prev))/actual_dt`，V监督为相邻合法GT位置之差除真实时间；q0用前向差分，不能跨过无效GT空洞。二者均以10m/s缩放后MSE，先每组对有效点取均值再batch均值，P/V同权。reference只进训练目标和事后评价，不进预测状态历史。
 - 每个batch先对8组／64query做无梯度闭环rollout，缓存本步候选与历史，然后按固定query microbatch64重算并累积梯度，一次Adam联合更新P/V。这是明确的TBPTT1适配，不是跨64步的完整反传，也不是GT历史teacher forcing；cached replay与直接预测数值必须一致。
 

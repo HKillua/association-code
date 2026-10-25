@@ -1,0 +1,325 @@
+{
+  "scope": "deepaf-native-core-probe-v1",
+  "status": "COMPLETED",
+  "device": "cpu",
+  "cpu_threads": 1,
+  "seed": 20261025,
+  "configuration": {
+    "updates": 256,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "gradient_clip": 1.0,
+    "train_per_motion": 64,
+    "test_per_motion": 32
+  },
+  "train_population": {
+    "scenes": 192,
+    "future_scans": 4800,
+    "target_detections": 4321,
+    "missed_target_detections": 479,
+    "clutter_candidates": 38349,
+    "empty_real_candidate_frames": 0
+  },
+  "heldout_population": {
+    "scenes": 96,
+    "future_scans": 2400,
+    "target_detections": 2165,
+    "missed_target_detections": 235,
+    "clutter_candidates": 19174,
+    "empty_real_candidate_frames": 0
+  },
+  "completed_arms": [
+    "native_labels",
+    "adapted_labels"
+  ],
+  "updates_by_arm": {
+    "native_labels": 256,
+    "adapted_labels": 256
+  },
+  "test_used_for_selection": false,
+  "original_paper_reproduction": false,
+  "production_level1": false,
+  "model_configuration": {
+    "hidden_size": 32,
+    "num_layers": 6,
+    "num_heads": 4,
+    "feedforward_size": 64,
+    "history_length": 5,
+    "velocity_scale_mps": 10.0,
+    "dropout": 0.0
+  },
+  "parameter_count": 265732,
+  "split_seeds": {
+    "train": 20261025,
+    "heldout": 20261026,
+    "sample_order": 20261027
+  },
+  "simulation_contract": {
+    "dt_seconds": 1.0,
+    "samples": 31,
+    "duration_seconds": 30.0,
+    "initial_observations": 6,
+    "initial_segment_correctly_associated_and_given": true,
+    "position_noise_sigma_m": 50.0,
+    "detection_probability": 0.9,
+    "clutter_poisson_mean": 8.0,
+    "clutter_halfwidth_m": 500.0,
+    "initial_speed_range_mps": [
+      100.0,
+      250.0
+    ],
+    "speed_bounds_mps": [
+      50.0,
+      300.0
+    ],
+    "cv_acceleration_sigma_each_axis_mps2": 10.0,
+    "ca_acceleration_mean_each_axis_mps2": 10.0,
+    "ca_acceleration_variance_each_axis": 10.0,
+    "ct_omega_radians_per_second": [
+      -0.05235987755982988,
+      0.20943951023931953
+    ],
+    "cv_ca_position_rule": "trapezoid after velocity norm projection",
+    "ct_position_rule": "exact circular integral",
+    "history_initialization": "OLS fit to the six given noisy observations, five fitted differences",
+    "association_gate": false,
+    "automatic_birth_death": false,
+    "all_real_candidates_used": true
+  },
+  "control_contract": "OLS-CV extrapolation and all-candidate centroid; empty centroid uses OLS-CV, centroid velocity is its consecutive position difference",
+  "active_arm": "adapted_labels",
+  "elapsed_seconds": 276.1265316250028,
+  "initial": {
+    "all": {
+      "scene_count": 96,
+      "deepaf": {
+        "position_mae_m": 2383.4849627145486,
+        "position_rmse_m": 2897.784375121144,
+        "velocity_rmse_mps": 212.6094615953995
+      },
+      "visible_cv": {
+        "position_mae_m": 1331.6150360367553,
+        "position_rmse_m": 1990.721263521201,
+        "velocity_rmse_mps": 171.71983015877083
+      },
+      "visible_centroid": {
+        "position_mae_m": 120.31607846812729,
+        "position_rmse_m": 137.23365682314432,
+        "velocity_rmse_mps": 192.71315201169497
+      }
+    },
+    "CV": {
+      "scene_count": 32,
+      "deepaf": {
+        "position_mae_m": 2269.7363963161265,
+        "position_rmse_m": 2705.9215232614424,
+        "velocity_rmse_mps": 191.2368674280178
+      },
+      "visible_cv": {
+        "position_mae_m": 485.5564195505314,
+        "position_rmse_m": 669.2657450316176,
+        "velocity_rmse_mps": 55.90664821950175
+      },
+      "visible_centroid": {
+        "position_mae_m": 118.9027947988152,
+        "position_rmse_m": 135.42341221299918,
+        "velocity_rmse_mps": 191.76575926712687
+      }
+    },
+    "CA": {
+      "scene_count": 32,
+      "deepaf": {
+        "position_mae_m": 2891.1509123662645,
+        "position_rmse_m": 3541.426277499421,
+        "velocity_rmse_mps": 254.25217714748473
+      },
+      "visible_cv": {
+        "position_mae_m": 1677.9604583181115,
+        "position_rmse_m": 2199.7160121821576,
+        "velocity_rmse_mps": 189.5774305749843
+      },
+      "visible_centroid": {
+        "position_mae_m": 122.28115195679271,
+        "position_rmse_m": 138.77022118417653,
+        "velocity_rmse_mps": 194.712595371147
+      }
+    },
+    "CT": {
+      "scene_count": 32,
+      "deepaf": {
+        "position_mae_m": 1989.5675794612557,
+        "position_rmse_m": 2308.192254790702,
+        "velocity_rmse_mps": 185.45252878227276
+      },
+      "visible_cv": {
+        "position_mae_m": 1831.3282302416233,
+        "position_rmse_m": 2569.483659294809,
+        "velocity_rmse_mps": 222.2564840690125
+      },
+      "visible_centroid": {
+        "position_mae_m": 119.76428864877394,
+        "position_rmse_m": 137.48656236971112,
+        "velocity_rmse_mps": 191.64544255312276
+      }
+    }
+  },
+  "final": {
+    "native_labels": {
+      "all": {
+        "scene_count": 96,
+        "deepaf": {
+          "position_mae_m": 821.2485692483237,
+          "position_rmse_m": 1124.8123724186933,
+          "velocity_rmse_mps": 115.25074779056536
+        },
+        "visible_cv": {
+          "position_mae_m": 1331.6150360367553,
+          "position_rmse_m": 1990.721263521201,
+          "velocity_rmse_mps": 171.71983015877083
+        },
+        "visible_centroid": {
+          "position_mae_m": 120.31607846812729,
+          "position_rmse_m": 137.23365682314432,
+          "velocity_rmse_mps": 192.71315201169497
+        }
+      },
+      "CV": {
+        "scene_count": 32,
+        "deepaf": {
+          "position_mae_m": 788.5242887218554,
+          "position_rmse_m": 1102.7410539187615,
+          "velocity_rmse_mps": 101.96536932326639
+        },
+        "visible_cv": {
+          "position_mae_m": 485.5564195505314,
+          "position_rmse_m": 669.2657450316176,
+          "velocity_rmse_mps": 55.90664821950175
+        },
+        "visible_centroid": {
+          "position_mae_m": 118.9027947988152,
+          "position_rmse_m": 135.42341221299918,
+          "velocity_rmse_mps": 191.76575926712687
+        }
+      },
+      "CA": {
+        "scene_count": 32,
+        "deepaf": {
+          "position_mae_m": 1122.5569099484624,
+          "position_rmse_m": 1426.3494282727538,
+          "velocity_rmse_mps": 132.99464767169027
+        },
+        "visible_cv": {
+          "position_mae_m": 1677.9604583181115,
+          "position_rmse_m": 2199.7160121821576,
+          "velocity_rmse_mps": 189.5774305749843
+        },
+        "visible_centroid": {
+          "position_mae_m": 122.28115195679271,
+          "position_rmse_m": 138.77022118417653,
+          "velocity_rmse_mps": 194.712595371147
+        }
+      },
+      "CT": {
+        "scene_count": 32,
+        "deepaf": {
+          "position_mae_m": 552.6645090746536,
+          "position_rmse_m": 738.3075889537065,
+          "velocity_rmse_mps": 108.46055388161346
+        },
+        "visible_cv": {
+          "position_mae_m": 1831.3282302416233,
+          "position_rmse_m": 2569.483659294809,
+          "velocity_rmse_mps": 222.2564840690125
+        },
+        "visible_centroid": {
+          "position_mae_m": 119.76428864877394,
+          "position_rmse_m": 137.48656236971112,
+          "velocity_rmse_mps": 191.64544255312276
+        }
+      }
+    },
+    "adapted_labels": {
+      "all": {
+        "scene_count": 96,
+        "deepaf": {
+          "position_mae_m": 528.5299848871451,
+          "position_rmse_m": 780.9049502472589,
+          "velocity_rmse_mps": 110.3836692259893
+        },
+        "visible_cv": {
+          "position_mae_m": 1331.6150360367553,
+          "position_rmse_m": 1990.721263521201,
+          "velocity_rmse_mps": 171.71983015877083
+        },
+        "visible_centroid": {
+          "position_mae_m": 120.31607846812729,
+          "position_rmse_m": 137.23365682314432,
+          "velocity_rmse_mps": 192.71315201169497
+        }
+      },
+      "CV": {
+        "scene_count": 32,
+        "deepaf": {
+          "position_mae_m": 485.0543198285339,
+          "position_rmse_m": 769.0400964535459,
+          "velocity_rmse_mps": 105.60588891321503
+        },
+        "visible_cv": {
+          "position_mae_m": 485.5564195505314,
+          "position_rmse_m": 669.2657450316176,
+          "velocity_rmse_mps": 55.90664821950175
+        },
+        "visible_centroid": {
+          "position_mae_m": 118.9027947988152,
+          "position_rmse_m": 135.42341221299918,
+          "velocity_rmse_mps": 191.76575926712687
+        }
+      },
+      "CA": {
+        "scene_count": 32,
+        "deepaf": {
+          "position_mae_m": 729.4197015866104,
+          "position_rmse_m": 973.5435976030108,
+          "velocity_rmse_mps": 128.0500444884063
+        },
+        "visible_cv": {
+          "position_mae_m": 1677.9604583181115,
+          "position_rmse_m": 2199.7160121821576,
+          "velocity_rmse_mps": 189.5774305749843
+        },
+        "visible_centroid": {
+          "position_mae_m": 122.28115195679271,
+          "position_rmse_m": 138.77022118417653,
+          "velocity_rmse_mps": 194.712595371147
+        }
+      },
+      "CT": {
+        "scene_count": 32,
+        "deepaf": {
+          "position_mae_m": 371.11593324629087,
+          "position_rmse_m": 538.7279624958495,
+          "velocity_rmse_mps": 94.89070359495024
+        },
+        "visible_cv": {
+          "position_mae_m": 1831.3282302416233,
+          "position_rmse_m": 2569.483659294809,
+          "velocity_rmse_mps": 222.2564840690125
+        },
+        "visible_centroid": {
+          "position_mae_m": 119.76428864877394,
+          "position_rmse_m": 137.48656236971112,
+          "velocity_rmse_mps": 191.64544255312276
+        }
+      }
+    }
+  },
+  "same_initial_parameters": true,
+  "same_sampled_scene_order": true,
+  "actual_updates": {
+    "native_labels": 256,
+    "adapted_labels": 256
+  },
+  "interpretation": "Native-style core diagnostic with given correct initialization; not full tracking reproduction or Level1 peer qualification.",
+  "label_selection_performed": false,
+  "method_promoted": false
+}
