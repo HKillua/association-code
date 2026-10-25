@@ -1,0 +1,39 @@
+{
+ "run_id": "LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison-attempt-1",
+ "note": "098 seed23 paired table; native outputs verbatim, zero forwards.",
+ "server_originals": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 482,
+   "sha256": "fcb3d561e725b7c892fcce338fead76181fdc4974de72aba94f6bfe1241efae0",
+   "mtime_local": "2026-10-25T18:15:35+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 1328,
+   "sha256": "b357825a86fba027bcbe0d683c971811f645ded2946f5f0435a208371b9751c5",
+   "mtime_local": "2026-10-25T18:15:35+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 589309,
+   "sha256": "b4edc68cf702a5d679369696ec96a0592b07fd39c37e97bcc9c3d7abc9453bb5",
+   "mtime_local": "2026-10-25T18:15:30+0800"
+  },
+  {
+   "returned_name": "scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison-attempt-1/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 2990772,
+   "sha256": "c0581a29a6463deb14dde67bd8d7d228d8829f27f8c91a29af3a64e326553d6f",
+   "mtime_local": "2026-10-25T18:15:35+0800"
+  }
+ ],
+ "returned_total_bytes": 3581891
+}
