@@ -7,6 +7,8 @@ loaded or forwarded here, and the original failed066 acceptance is unchanged.
 from __future__ import annotations
 
 import math
+import gzip
+import json
 from pathlib import Path
 
 import torch
@@ -18,7 +20,83 @@ from association.evaluation.support_gate_objectives import (
 from association.evaluation.system_attribution import _same
 from association.models.support_gate import mix_gate_states
 from association.utils.runtime import read_json, write_json_gzip
-from tools.analysis.support_gate_diagnostics import bind_source
+
+# Shared source binding retained after retiring the standalone 069 diagnostic.
+ROOT = Path(__file__).resolve().parents[2]
+TASK = 'LEVEL1-SUPPORT-GATE-20261023-068-attempt-1'
+METHODS = ['anchor', 'mean_supported', 'attribute_hybrid', 'support_switch', 'learned_gate']
+
+
+def read(path):
+    path = Path(path)
+    if not path.exists():
+        path = path.with_suffix(path.suffix + '.gz')
+    with (gzip.open(path, 'rt', encoding='utf-8') if path.suffix == '.gz'
+          else path.open(encoding='utf-8')) as stream:
+        return json.load(stream)
+
+
+def bind_source(source):
+    """Bind existing records and inventory, never deserialize a checkpoint."""
+    if source.name != TASK:
+        raise ValueError('069 requires the original068 attempt-1 directory')
+    config = read(ROOT/'configs/support-gate-level1.json')
+    manifest = read(ROOT/'configs/data/mtad-level1-scene3000.json')
+    ids = manifest['splits']['V_select']
+    components = {sid: str(manifest['components'][sid]) for sid in ids}
+    run, summary = read(source/'run.json'), read(source/'summary.json')
+    for record in (run, summary):
+        if (record.get('status') != 'COMPLETED'
+                or record.get('scope') != '068-support-prior-position-pilot'
+                or record.get('configuration') != config or record.get('optimizer_updates') != 1000
+                or record.get('test_opened') is not False or record.get('inference_device') != 'cpu'):
+            raise ValueError('068 completed fixed-1000 CPU endpoint protocol required')
+    parent = Path(run.get('source_system', ''))
+    if (summary.get('source_system') != str(parent) or parent.name != 'system'
+            or parent.parent.name != 'LEVEL1-ASSOCIATION-20261022-056-attempt-1'
+            or run.get('completed_endpoints') != ['initial', 'final']
+            or run.get('old066_acceptance') != 'REJECTED' or run.get('retries') != 0
+            or any(run.get(key) is not False for key in ('association_recomputed',
+                'threshold_reselected', 'validation_groups_recomputed', 'validation_selection'))):
+        raise ValueError('068 immutable056 provenance/selection boundary differs')
+    preflight = read(source/'preflight/report.json')
+    if (preflight.get('status') != 'PASS' or preflight.get('requested_scene_ids') != ['3035', '2535']
+            or preflight.get('training_gate_passed') is not True
+            or preflight.get('data_contract_reproduced') is not True
+            or preflight.get('anomalies_removed') is not False):
+        raise ValueError('068 original two-scene preflight required')
+    endpoints = {}
+    expected_inventory = {f'states-{sid}.npz' for sid in ids}
+    for label, step, filename in (('initial', 0, 'step-0.pt'), ('final', 1000, 'final.pt')):
+        endpoint = source/label
+        report, record = read(endpoint/'summary.json'), read(endpoint/'run.json')
+        checkpoint = dict(path=str(source/'fit'/filename), step=step, actual_updates=step,
+            configured_final_updates=1000, routing_semantics=config['routing_semantics'])
+        for item in (report, record):
+            if (item.get('status') != 'COMPLETED' or item.get('device') != 'cpu'
+                    or item.get('source_system') != str(parent) or item.get('scene_ids') != ids
+                    or item.get('checkpoint') != checkpoint or item.get('test_opened') is not False
+                    or item.get('optimizer_updates') != 0
+                    or any(item.get(key) is not False for key in
+                           ('groups_recomputed', 'scores_recomputed', 'threshold_reselected'))):
+                raise ValueError('068 endpoint provenance differs: ' + label)
+        if (report.get('method_names') != METHODS or report.get('scene_count') != 300
+                or report.get('component_count') != 38 or report.get('fragment_count') != 24599
+                or report.get('dataset_level') != 'Level1' or report.get('split') != 'V_select'
+                or report.get('ordinary_source_replay_exact') is not True
+                or report.get('fixed_population_verified') is not True
+                or record.get('completed_scenes') != 300 or record.get('total_scenes') != 300
+                or {sid: cid for cid, part in report['components'].items() for sid in part['scene_ids']} != components):
+            raise ValueError('068 endpoint full V300 population differs: ' + label)
+        for directory in ('predictions', 'system-predictions'):
+            if {path.name for path in (endpoint/directory).glob('*.npz')} != expected_inventory:
+                raise ValueError('068 missing/extra cached scenes: ' + str(endpoint/directory))
+        endpoints[label] = report
+    fit = read(source/'fit/run.json')
+    if (fit.get('configuration') != config or fit.get('training_scene_ids') != manifest['splits']['T_core']
+            or fit.get('test_opened') is not False):
+        raise ValueError('068 training config/T2100 registry differs')
+    return dict(scene_ids=ids, components=components, endpoints=endpoints, source_run=run)
 
 
 def _verify_route(directory, sid, *, initial=False):

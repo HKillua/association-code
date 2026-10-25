@@ -1,2 +1,0 @@
-已缓存 /tmp/062_scene1.pkl
-[pass1-与单元同环境] env(OMP/MKL/BLAS)=('4', '4', '4') set_num_threads=未设 torch实际线程=4 utility_dtype=float32 max_utility_diff=1.072884e-06 超容差元素=0/9984 utility_close=True helper_diff=3.969e-07 anchor_diff=3.969e-07 最大处saved=0.755463 current=0.755464 bound=8.554634e-06

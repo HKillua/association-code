@@ -77,4 +77,4 @@
 
 集合注意力与偏置均为O(QH²)，关系偏置临时量为Q×H×H×4；实际最大helper组、显存、完整端点耗时待服务器记录。4000更新与匹配曝光不等于相同FLOPs／墙时；4h仅提醒，不能因包内小型CPU检查断言会更快。对新臂使用相同预声明配方，失败保全，不事后缩小batch或截断helper。
 
-最终本地验证、来源范围及修复证据见[导入审查](../reports/2026-10-25-098-import-review.md)。软件检查不代表正式实验；两seed结案重新计算已完成单seed表的门槛，不声称再次独立重放服务器原始NPZ。
+最终本地验证、来源范围及修复证据见[导入审查](https://github.com/HKillua/association-code/blob/1a25183/docs/reports/2026-10-25-098-import-review.md)。软件检查不代表正式实验；两seed结案重新计算已完成单seed表的门槛，不声称再次独立重放服务器原始NPZ。

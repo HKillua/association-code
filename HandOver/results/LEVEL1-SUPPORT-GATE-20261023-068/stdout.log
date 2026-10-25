@@ -1,7 +1,0 @@
-068 phase: preflight3035_2535
-068 phase: prepare_T2100_V300
-068 phase: fit1000
-068 phase: evaluate_cpu_initial
-068 phase: evaluate_cpu_final
-068 phase: paired_endpoint_comparison
-COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-SUPPORT-GATE-20261023-068-attempt-1

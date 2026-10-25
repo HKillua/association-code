@@ -115,9 +115,9 @@ python -m unittest tests.test_completion_policy tests.models.test_timed_models \
 
 090/091保持原预算与出口；093是oracle真组下的物理模块对照；094是补全＋同T校准规则＋同V阈值规则的管线比较，独立margin和阈值带来的总效应不能只归因表示。单seed、重复V、跨场共享身份、TCM一遍训练限制继续保留。未增加第十个GPU臂、参数扫描或新网络。
 
-本批执行由用户2026-10-24明确授权严格审查后直接合入main/push并按四卡交接；不再有凭据或审批阻碍的预设。具体本地测试、独立审查和发布结果见[集成审查报告](../reports/2026-10-24-post088-integration-review.md)。push仅发布合同，服务器领取后才是RUNNING。
+本批执行由用户2026-10-24明确授权严格审查后直接合入main/push并按四卡交接；不再有凭据或审批阻碍的预设。具体本地测试、独立审查和发布结果见[集成审查报告](https://github.com/HKillua/association-code/blob/1a25183/docs/reports/2026-10-24-post088-integration-review.md)。push仅发布合同，服务器领取后才是RUNNING。
 
 
 ### 本地正式发布冻结
 
-2026-10-24，本地全仓633项通过（81.597秒），8个CLI help、11份JSON和9段Bash解析通过；修复后独立复审无阻断。实际执行冻结`e718fca51be65992efd94e3f85a1d482637f2f93`，五份L2S与当前索引统一引用该提交。包内042bc06及403发布失败记录仅保留历史，本次通过有写权限的本地main发布；没有S2L就不写RUNNING。完整证据见[集成审查报告](../reports/2026-10-24-post088-integration-review.md)。
+2026-10-24，本地全仓633项通过（81.597秒），8个CLI help、11份JSON和9段Bash解析通过；修复后独立复审无阻断。实际执行冻结`e718fca51be65992efd94e3f85a1d482637f2f93`，五份L2S与当前索引统一引用该提交。包内042bc06及403发布失败记录仅保留历史，本次通过有写权限的本地main发布；没有S2L就不写RUNNING。完整证据见[集成审查报告](https://github.com/HKillua/association-code/blob/1a25183/docs/reports/2026-10-24-post088-integration-review.md)。

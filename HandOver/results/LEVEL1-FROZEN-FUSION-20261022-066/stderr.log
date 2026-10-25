@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "/home/wangguangjie/djs/association-code-run066/tools/analysis/frozen_fusion_transfer.py", line 379, in <module>
-    main()
-  File "/home/wangguangjie/djs/association-code-run066/tools/analysis/frozen_fusion_transfer.py", line 373, in main
-    run(args)
-  File "/home/wangguangjie/djs/association-code-run066/tools/analysis/frozen_fusion_transfer.py", line 343, in run
-    raise ValueError(f'output replay rejected: {len(rejected)}/{audit["total_replays"]} sources; '
-ValueError: output replay rejected: 47/900 sources; full audit saved, unvalidated-summary.json is not an accepted system result

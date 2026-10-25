@@ -1,9 +1,0 @@
-OLS组数 10 utility形状 (52, 64, 3) atol/rtol 1e-06 1e-05
-threads= 1 max_diff=7.152557e-07 超容差=0 utility_close=True 同进程两次相同=None 最大处saved=1.633817 current=1.633817 bound=1.733817e-05 helper_diff=3.969e-07 anchor_diff=3.969e-07
-threads= 2 max_diff=7.152557e-07 超容差=0 utility_close=True 同进程两次相同=False 最大处saved=1.633817 current=1.633817 bound=1.733817e-05 helper_diff=3.969e-07 anchor_diff=3.969e-07
-threads= 4 max_diff=1.072884e-06 超容差=0 utility_close=True 同进程两次相同=False 最大处saved=0.755463 current=0.755464 bound=8.554634e-06 helper_diff=3.969e-07 anchor_diff=3.969e-07
-threads= 8 max_diff=7.152557e-07 超容差=0 utility_close=True 同进程两次相同=False 最大处saved=1.633817 current=1.633817 bound=1.733817e-05 helper_diff=3.969e-07 anchor_diff=3.969e-07
-threads=16 max_diff=1.072884e-06 超容差=0 utility_close=True 同进程两次相同=False 最大处saved=-1.065652 current=-1.065651 bound=1.165652e-05 helper_diff=4.523e-07 anchor_diff=4.523e-07
-threads=32 max_diff=9.536743e-07 超容差=0 utility_close=True 同进程两次相同=False 最大处saved=-1.065652 current=-1.065651 bound=1.165652e-05 helper_diff=4.523e-07 anchor_diff=4.523e-07
-threads= 1 max_diff=7.152557e-07 超容差=0 utility_close=True 同进程两次相同=False 最大处saved=1.633817 current=1.633817 bound=1.733817e-05 helper_diff=3.969e-07 anchor_diff=3.969e-07
-线程数无关的数组本身：saved utility 与 float32 往返全等 True

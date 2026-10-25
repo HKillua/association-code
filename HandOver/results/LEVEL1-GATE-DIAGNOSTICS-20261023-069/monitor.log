@@ -1,4 +1,0 @@
-[19:27:50Z] 状态 None->RUNNING rc=None advisory=False elapsed=None
-[19:28:20Z] 状态 RUNNING->COMPLETED rc=0 advisory=False elapsed=70.91443043481559
-[19:28:20Z] 终态 COMPLETED exit_code存在=True 内容=0
-[19:28:20Z] 监视结束

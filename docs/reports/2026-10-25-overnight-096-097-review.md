@@ -4,7 +4,7 @@
 
 ## 最新科学结果
 
-090C和三臂CPU表完成。新增独立审计从300场重聚全体、38组件、最大组件外、四种加权、H/I与SSE等117486个数值等式，无失败，最大归一化差约3.38e-13。精确输入与边界见[审计记录](../../HandOver/results/LEVEL1-FROZEN-ADAPTER-20261024-090-summary/overnight-local-review.json)。本地没有加载服务器原权重、原始NPZ或完整训练JSONL；分位数引用原逐点统计，未平均场景分位数。
+090C和三臂CPU表完成。新增独立审计从300场重聚全体、38组件、最大组件外、四种加权、H/I与SSE等117486个数值等式，无失败，最大归一化差约3.38e-13。精确输入与边界见[审计记录](https://github.com/HKillua/association-code/blob/1a25183/HandOver/results/LEVEL1-FROZEN-ADAPTER-20261024-090-summary/overnight-local-review.json)。本地没有加载服务器原权重、原始NPZ或完整训练JSONL；分位数引用原逐点统计，未平均场景分位数。
 
 C位置MAE590.7436→564.8340m（−4.3859%），RMSE3289.2144→3322.5300m。A/B比C的MAE差9.4445/15.9751m，P95/P99也更差，只有RMSE更小约36m。当前adapter配方按原出口关闭，C不自动晋升默认。S2L的I/H反写、全部属性改写、screen与candidate混淆及泛化“尾部更优”等勘误写入研究状态，原S2L不改。
 

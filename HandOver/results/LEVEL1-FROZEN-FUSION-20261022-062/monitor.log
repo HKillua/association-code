@@ -1,4 +1,0 @@
-[06:50:06Z] 状态变化 None -> RUNNING rc=None advisory=False elapsed=None
-[06:53:37Z] 状态变化 RUNNING -> FAILED rc=1 advisory=False elapsed=222.47886635409668
-[06:53:37Z] 终态 FAILED exit_code文件存在=True 内容=1
-[06:53:37Z] 监视结束

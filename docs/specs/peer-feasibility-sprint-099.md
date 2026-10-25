@@ -6,7 +6,7 @@
 
 本合同建立在当前Level1／fixed056／Q64协议上，不将本项目的米制位置MAE与论文中不同定义的经纬度mME直接排榜。当前090C／097A的全人口位置MAE为564.834006／583.975593m；这只说明本项目当前量级，尚不证明胜过同行。098四臂仍执行[原合同](query-relation-fusion-098.md)，本文件不改变其训练、3%／1%、尾部、组件和bias-off门槛，也不因099结果自动晋升模型或开放测试。
 
-**状态：HOLD_METHOD_QUALIFICATION。** 用户最新要求先确保DeepAF方法。既有23项[软件检查](../reports/2026-10-25-099-peer-feasibility-review.md)只证明该适配可运行；本轮[原文方法审计](../reports/2026-10-25-deepaf-method-audit.md)已修复初始化坐标问题，并完成两种标签解释各256更新的独立合成诊断。两臂有学习但仍明显漂移，不能据此认证方法或否定原方法；训练语义、充分训练与真实Level1适配仍待核验。099A/B/C正式比较暂停，不按旧READY或旧冻结领取。下列有限预算保留为后续计划，方法资格核验及新实施冻结完成前不能据此启动。
+**状态：HOLD_REAL_DATA_REVIEW。** 真实MTAD上尚无DeepAF结果。[方法边界](../reports/2026-10-25-deepaf-method-audit.md)保留生产实现与坐标修复；自建模拟仅是排错，相关实验流程退役，不再作为正式同行资格前置。后续将必要真实输入/单位/mask核验并入正常适配训练，而非增加模拟关卡。下列有限预算是待发布方案，不授权服务器领取。
 
 ## 日历截止与每次必须交付的决定
 
@@ -56,26 +56,9 @@
 
 全局最多四个单卡任务；098现有任务不取消、不改活动checkout、不被099另建抢卡队列挤占。099C的条件领取由正式L2S与唯一执行路径规定，代码存在或push成功不等于已经排队运行。
 
-## 已定实现块与READY前验收
+## 实现与真实评价边界
 
-下列适配选择已于2026-10-25冻结；它们不是作者未公开训练细节的原值。实现负责人须保持代码、配置及L2S一致，完成必要CPU小样本检查后才可发布；不能先运行再根据成绩解释。
-
-- scope=`deepaf-pv-position-peer-v1`，routing=`fixed056-pv-closed-loop-tbptt1-v2`，loss=`pv-desired-increment-mse-v1`；v2修正初始化坐标，拒绝旧v1检查点被静默复用。dropout0，P/V均直接`Linear(32,2)`输出且用常规Xavier初始化，无carry skip、fixed095残差头或来源warm start。
-- 局部坐标原点固定取可见fixed095在第一query的位置，球面log／exp映射米制位置；对跖奇异输入显式失败，不静默裁剪后继续。anchor候选始终可见，包括观测外推；helper只在其真实support内参与，加上上一query的V虚拟候选。两个网络共享同一候选集，不用本query的V替换P输入。
-- 初始速度来自原始可见anchor的native OLS经纬角速度，将该角速度轨迹平移到实际fixed095初始位置后，按球面log图原点的切向导数`R*rad([dlat,dlon])*[1,cos(base0_lat)]`转换；不直接复用另一经纬平面的`ols_velocity_mps`，也不从Q64重采样后重新拟合。初始两历史各一条有效速度，其余零padding／mask；q0虚拟前位置为`-initial_velocity * first_actual_dt`。encoder无位置编码，decoder按5条历史的时间顺序使用sinusoidal编码。
-- P监督为`(truth_position_k - stopgrad(predicted_position_prev))/actual_dt`，V监督为相邻合法GT位置之差除真实时间；q0用前向差分，不能跨过无效GT空洞。二者均以10m/s缩放后MSE，先每组对有效点取均值再batch均值，P/V同权。reference只进训练目标和事后评价，不进预测状态历史。
-- 每个batch先对8组／64query做无梯度闭环rollout，缓存本步候选与历史，然后按固定query microbatch64重算并累积梯度，一次Adam联合更新P/V。这是明确的TBPTT1适配，不是跨64步的完整反传，也不是GT历史teacher forcing；cached replay与直接预测数值必须一致。
-
-| 已定项 | 仍须核查的实现风险 | 可观察验收 |
-|---|---|---|
-| 候选生成、初始状态和短历史 | Q64如何取每成员候选；零helper／不足5历史如何处理；初始P/V是否只用可见量测 | 原始候选、mask、初始状态可回算；空集仍输出且不删目标；置换无序候选不改变预测 |
-| P目标与递推基点 | P标签是GT相邻差还是相对预测基点的纠偏速度；不能用GT差训练却悄悄换部署基点并将爆炸归为方法无效 | 训练公式和推理公式一致列明；实际dt与单位往返检查；teacher forcing与free rollout差异显式报告 |
-| V目标与暴露方式 | V使用几何速度还是其他标签；不能把native speed直接冒充米／秒；GT不可进入验证输入 | 修改reference仅改变训练损失／事后指标，不改变验证预测；V参与后续虚拟候选而非闲置头 |
-| P/V损失、mask及梯度 | 保留原MSE意图，联合权重／归一化必须固定；detach、截断反传与完整rollout长度明确 | 两网有限梯度且实际更新；每属性有效标签数记账；少量训练样本可学且完整链路能保存／加载 |
-| 训练机会与选模 | batch、裁剪、dropout、Adam细节、成功更新记账、抽样重放、final端点 | A/B初始参数与实际成功batch一致；P/V每网8000成功更新；无V选checkpoint；无test访问 |
-| 数据缓存与成本 | 和090C／097A／098复用的输入与population必须逐值对应 | 原始cache重算位置MAE／RMSE／分位；GT／mask／组篡改被拒绝；记录真实吞吐和峰值显存 |
-
-小样本训练或单元测试证明实现链条，不能单独证明同行适配已具竞争力或充分训练。若首个有效运行在8000终点仍明显改善，训练充分性列为未解决；不能以统一8000步为由自动认证peer，也不能自动加步追到胜利。
+P/V结构、单位转换、q0初始化、TBPTT1、监督及输入差异统一在[DeepAF实现边界](../reports/2026-10-25-deepaf-method-audit.md)。生产配置与代码保留，必要软件检查聚焦单位/梯度/真实输入隔离/完整人口；不能用自建合成训练作为方法资格或原文成绩复现。真实数据上训练质量和适配是否合理须由实际结果判断，不因同行输给我们就自动合格。
 
 ## 可信同行的最低质量门槛
 
@@ -131,6 +114,6 @@
 | 同人口真实cache比较 | `tools/analysis/compare_deepaf_peer.py --ours-run … --peer-run … --output …` | INPUT_KEYS、组／GT／mask逐值一致；从缓存回算MAE／RMSE／尾部；0前向、0训练 |
 | A/B独立选更强peer | 同一入口`--select-lr --peer-a … --peer-b … --output …` | 两个完整fixed-final缓存重算，低MAE胜、精确平手0.001；selection.json可绑定099C |
 | 数据篡改与指标真值检查 | `tests/test_deepaf_peer_comparison.py` | 小fixture的已知真实MAE闭合，mask／GT／组变更被拒绝，不额外模型前向 |
-| 运行与资源事实 | 独立L2S及服务器S2L | 实现冻结、来源路径、实际领取、退出与端点证据；未通过前保持NOT_READY |
+| 运行与资源事实 | 独立L2S及服务器S2L | 实现版本、来源路径、实际领取、退出与端点证据；只有具体新READY可执行 |
 
 本轮最快有用产物是“合格同行直接比较表＋上述四态决定”。论文额外表格、完整四属性追榜和内部消融都不能阻塞这个产物。

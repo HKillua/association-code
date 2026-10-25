@@ -1,6 +1,0 @@
-extended4000 phase: prepare_T2100_V300
-extended4000 phase: fit_independent_linear
-extended4000 phase: evaluate_cpu_initial
-extended4000 phase: evaluate_cpu_final
-extended4000 phase: own_endpoint_comparison
-COMPLETED: /home/wangguangjie/djs/association-code/runs/LEVEL1-GATE-LINEAR-20261023-073A-attempt-1

@@ -1,81 +1,22 @@
-# 当前运行入口
+# 运行与分析入口
 
-先读[交接索引](../../HandOver/Handover.md)。正式数据为Level1，历史任务已结案；配置和命令存在不表示授权。
+只从[当前交接](../../HandOver/Handover.md)领取。模型/配置/CLI存在不表示需要运行，历史入口不恢复旧授权。
 
-| 入口 | 用途 |
-| --- | --- |
-| `evidence_association_fit.py` | OLS证据关联训练；固定终点、普通/配对困难采样和实际曝光审计 |
-| `evidence_fusion_fit.py` | 属性utility融合训练；`check`为合成检查，Level1真实fit绑定当前OLS工作点 |
-| `support_gate_fit.py` | 068：3035／2535输入预核→T_core受限位置门控1000更新→固定056分组CPU初始化及终点评价；一条失败即停的链 |
-| `support_gate_linear_fit.py` | 已完成070：只改线性位置损失，逐批配对068，复用原CPU初始化；保留复现入口，不重领 |
-| `support_gate_replication.py` | 071A/B：独立启动新seed Log／线性1000更新及CPU两端点评价；compare仅在两臂完成后核实际配对 |
-| `sequence_position_fit.py` | LSTM／Transformer二维位置恢复；extended4000为072，harm4000／harm-replica4000为074A/B，必须绑定同seed完整旧控制；CPU两端点 |
-| `helper_sequence_fit.py` | 078三臂筛选；`--profile replica081`仅pre/weighted新seed复验，分别严格绑定072C/073C公共初值和4000实际批次，CPU两端点 |
-| `../analysis/compare_helper_sequence.py` | 078或显式`replica081`单臂/完整profile缓存比较，禁止混seed，H/I/尾部/组件/helper分层，无前向 |
-| `../analysis/tsactfer_input_probe.py` | 079冻结074D，在固定32个T场比较裁窗/完整×同/跨场负例；零训练，非全候选成绩 |
-| `ptfm_fit.py` | 074C：双流PTFM四状态任务适配，T-only归一化、与072C实际批次配对；CPU两端点及真实缓存对照 |
-| `ptfm_residual_fit.py` | 076B：只改PTFM位置为固定.95物理初值＋零初始化残差；配对074C全部初参例外与实际批次，并保留072C曝光比较 |
-| `../analysis/ptfm_speed_diagnostics.py` | 076A：只读074C及056缓存；固定零速控制、原生分布、逐目标动态与相邻有效查询变化，不加载权重或前向 |
-| `tsactfer_level1_fit.py` | 074D：TSA原生时间128点Level1适配，双头固定final评分、全候选及论文资格子集、六臂系统与056共同点 |
-| `tsactfer_full_view_fit.py` | 082：只把训练裁窗改为完整native128，逐batch/初值绑定074D；固定final六臂和074D/056共同点比较 |
-| `../analysis/tsactfer_population_probe.py` | 080：只读074D/079缓存，同规则T/V平衡及V完整候选对照、固定先验AP、margin均值分解；零GPU/前向/权重加载 |
-| `constant_gate_fit.py` | 072A：原071B实际T样本上的1001点全局标量搜索，固定后一次完整CPU V评价 |
-| `../analysis/compare_position_benchmarks.py` | 071整表；显式三项072输入后核常数与4000更新终点、真实采样前缀及同人口；不做模型前向 |
-| `../analysis/tsactfer_score_diagnostics.py` | 075：只读074D固定final评分及成功训练日志；两头排序／原阈值错误／时间资格与同场负例曝光，不加载权重或重新选阈值 |
-| `../analysis/compare_position_harm.py` | 074A/B分别核同seed旧Transformer缓存、实际训练配对、累计改善／伤害与尾部，不做模型前向 |
-| `../analysis/compare_residual_shrink.py` | 077：两seed既有CPU缓存上固定残差减半，复现旧配对指标、全组球面重放、I/H及残差几何；无权重加载、前向或系数搜索 |
-| `level1_system_evaluate.py` | 普通/学习关联与普通/学习融合的完整系统评价；保存全部目标、分组、mask和路由 |
-| `level1_ols_working_point.py` | Level1纯OLS开发工作点，不加载学习权重 |
-| `tmtaff_complete_fit.py` / `tmtaff_complete_evaluate.py` | TMTAFF参考各阶段训练和冻结评价，保留完整baseline实现 |
-| `tsactfer_fit.py` | 历史TSA离线入口，不作为074D的Level1固定终点入口 |
-| `make_scene_manifest.py` / `prepare_scene_data.py` | 数据名单生成和时间/人口准备；当前名单已冻结，不重复生成 |
-| `launch_detached.py` | 服务器服务管理器托管单次作业，保存真实退出状态 |
-| `../analysis/frozen_fusion_transfer.py` | 062—066：056固定组与三个057冻结融合的七臂比较；旧验收失败，不恢复额度 |
-| `../analysis/compare_association_duration.py` | 保留共同人口、代表变化、增/失覆盖的跨轮缓存比较；亦提供062源重放函数 |
-| `../analysis/learned_group_oracle.py` | 有限候选Oracle诊断及062来源检查；061已结案，不恢复执行额度 |
-| `../analysis/compare_physical_predictions.py` | 通用物理预测比较 |
-| `../analysis/support_gate_diagnostics.py` | 069：只读068两端点、训练日志及两场预检，重算log目标／曝光／固定reference段贡献，无模型前向 |
-| `../setup/gpu_allocation.py` | 已获批任务的现场资源选择，不终止他人进程 |
+| 范围 | 入口 |
+|---|---|
+| 数据 | `make_scene_manifest.py`、`prepare_scene_data.py`；当前名单已冻结，不重复生成 |
+| 学习关联/属性融合 | `evidence_association_fit.py`、`evidence_fusion_fit.py`、`level1_system_evaluate.py` |
+| 位置恢复与预算控制 | `sequence_position_fit.py`、`frozen_position_adapter_fit.py`、`sequence_budget_replication.py` |
+| 098已结案 | `query_relation_fit.py`、`../analysis/compare_query_relation.py`、`../analysis/summarize_query_relation.py`；只保复核能力，不续训 |
+| TMTAFF参考及在途096 | `tmtaff_complete_fit.py`／`tmtaff_complete_evaluate.py`、`completion_value_fit.py`、`completion_system_evaluate.py` |
+| 096原有限队列 | `post088_overnight_queue.py`；已有服务持有接续权，不重复领取 |
+| DeepAF待真实适配 | `deepaf_peer_fit.py`、`../analysis/compare_deepaf_peer.py`；099 HOLD，未形成可信同行成绩 |
+| PTFM/TSA参考 | `ptfm_fit.py`及位置适配入口、`tsactfer_level1_fit.py`／`tsactfer_full_view_fit.py`；已有负结果，不冒称作者复现 |
+| 服务托管 | `launch_detached.py`；一次性服务、真实退出记录、墙时advisory |
+| 共享比较 | `../analysis/compare_association_duration.py`、`compare_position_benchmarks.py`、`compare_position_harm.py`、`compare_frozen_position_adapter.py`、`compare_physical_predictions.py` |
 
-所有CLI支持`--help`。分卷输入使用`--archive PART1 PART2 PART3`，顺序固定，无需合并或全面解压。[数据文件与固定人口](../../configs/data/README.md)
+旧名的`frozen_fusion_transfer`、`learned_group_oracle`及部分比较器仍供当前输入来源与缓存核验，不能按编号删除。其他门控/helper入口也保留被当前模块引用的实现；它们不是新任务清单。
 
-### 098当前主线：位置融合四臂
+已结案一次性审计和DeepAF自建模拟训练入口已删除，必要数值/梯度/评价测试保留。[历史与恢复](../../docs/history/README.md)
 
-- `query_relation_fit.py`：072C/073C final暖启动、全参数fresh Adam4000、原batch重放；generic set与固定运动关系bias各两个seed。`--check-source-only`核已完成来源与090C/097A预算baseline。CPU initial/final全人口评价，relation额外同权重bias-off端点。
-- `../analysis/compare_query_relation.py`：单seed同预算/同人口缓存表，3%强baseline＋1%generic及尾部、组件、机制干预门槛；零前向/训练。
-- `../analysis/summarize_query_relation.py`：重新核两张完成表及逐场门槛，两个seed都过才进入独立确认；不自动晋升默认或开放T_test。
-
-范围、冻结、优先顺序、资源及一次性启动只认[098交接](../../HandOver/L2S-20261025-098.md)。使用既有launcher，不增加与096争抢的自动队列。`fit/heartbeat.json`每100个成功更新记录实时进度；不要将运行中`fit/run.json`旧快照当作零更新。
-
-系统评价默认普通控制只包含Mean。需要完整对照时显式指定`--ordinary-controls anchor mean_supported attribute_hybrid`；学习关联显式使用`--association-endpoint final`，提供原run、checkpoint、scores、summary和data-audit，避免用selected替代预定终点。062有独立冻结入口及[具体交接](../../HandOver/L2S-20261022-062.md)。
-
-模型、监督、配对采样、输入与指标定义集中在[方法规格](../../docs/specs/evidence-association-fusion.md)；参考模型见[TMTAFF实现](../../docs/specs/tmtaff-reference.md)。旧Cooperative候选、已结案一次性分析及专用测试已退役，历史原件见[摘要](../../docs/history/README.md)。不得按真实身份删难例；normalizer只拟合训练，T_test封存。
-
-### 083–085 已结案入口（不可重领）
-
-- `sequence_position_fit.py --profile helper-dropout4000`：原linear Transformer固定4000更新，仅T整helper片段p=.5丢弃，原采样严格配072C；V完整组。冻结配置`configs/sequence-position-transformer-helper-dropout-level1.json`。
-- `tools/analysis/compare_helper_dropout.py`：原始batch/独立增强RNG重放、首末checkpoint绑定、完整缓存比较和预声明screen，不前向。
-- `tools/analysis/helper_exposure_audit.py`：078B/081A成功训练日志的点曝光/真实loss系数/去重模式核查，只读。
-- `tools/analysis/ptfm_objective_audit.py`：074C/076B既有首末缓存的原任务目标/物理误差及训练趋势核查，不读checkpoint或前向。
-
-均只按HandOver当前READY领取，不能从入口列表自行追加实验。
-
-
-### 086–089 并行批次
-
-- `helper_temporal_fit.py`：087A/B同架构、同初值与原采样，只改变新增BiGRU分支的跨查询helper对应；每臂自带072C/078B比较。`../analysis/compare_helper_temporal.py`生成双臂缓存整表。
-- `ptfm_objective_fit.py`：086A固定三任务系数、086B仅位置监督，与076B初值及实际批次配对；每臂自带初末/076B/072C比较。`../analysis/ptfm_objective_compare.py`汇合两臂。
-- `tmtaff_complete_fit.py --phase tcm`：088 fresh Level1一遍TCM覆盖与完整V特征诊断，不执行TAM/TFM/JOINT。
-- `../analysis/helper_prior_replay.py`：089按原日志重放T-only删除前后物理初值和loss系数；不读权重、不前向、不读V/test payload。
-
-范围、冻结版本、排队及终止条件只认[当前交接](../../HandOver/Handover.md)。五项GPU任务最多四项同时执行，CPU准备与评价错峰。
-
-### 090/091保留；088后新增093—095
-
-- `frozen_position_adapter_fit.py`：090A/B/C从真实072C final出发，对比冻结teacher全query增量、仅Anchor无支撑增量、fresh Adam全模型微调；同4000实际批次，每臂完整初末评价。`../analysis/compare_frozen_position_adapter.py`核三臂缓存并计算预声明A-mask诊断，零新前向。
-- `ptfm_position_objective_fit.py`：091A/B对齐086B初值/实际曝光，仅换为标准化径向线性或Haversine线性位置数据项；完整T曝光均值校准与固定T探针有独立来源标记。`../analysis/ptfm_position_objective_compare.py`汇合两个固定终点缓存。
-- `tmtaff_downstream_fit.py`：旧092已SUPERSEDED，仅保留source检查复用和历史复现，不能领取旧臂。
-- `completion_value_fit.py`：093/094固定088来源的learned/state_hold独立TFM或TAM，真实初参/采样/RNG配对审计；`../analysis/compare_completion_policies.py`只读完整原件，核原始初末snapshot、候选、缓存与原阈值，生成两阶段各自联表。
-- `../analysis/tcm_completion_audit.py`：095只读088完整per_fragment，零权重/原卷/前向，回聚场景/组件/支撑与长度及误差集中度。
-
-当前共九个GPU臂30000更新与CPU095；090/091各4000，093各1000，094各4000。088已完成，首轮090A、090B、093A、093B，接续091A、091B、090C、094A、094B。范围见[088后设计](../../docs/specs/post088-completion-value.md)，冻结与可领取状态只认当前索引。代码存在不代表发布、领取或训练成绩。
+默认普通控制仅Mean；完整系统对照应按合同明确`anchor mean_supported attribute_hybrid`及实际关联终点，不用selected替代final。所有比较保完整目标、mask、覆盖和重复，不能删难例或混排不同人口。分卷按`--archive PART1 PART2 PART3`传入，数据路径见[数据清单](../../configs/data/README.md)。

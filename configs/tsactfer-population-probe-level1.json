@@ -1,7 +1,0 @@
-{
-  "scope": "080-tsa-population-probe-v1",
-  "seed": 20261024,
-  "scene_count": 32,
-  "pairs_per_head_scene": 32,
-  "advisory_seconds": 3600
-}
