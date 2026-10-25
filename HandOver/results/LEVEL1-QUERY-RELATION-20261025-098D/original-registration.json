@@ -1,0 +1,136 @@
+{
+ "run_id": "LEVEL1-QUERY-RELATION-20261025-098D-attempt-1",
+ "note": "098D seed21 query-relation arm; weights/JSONL/NPZ stay on server.",
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 1851,
+   "sha256": "f3fac206bdb67db564af64145de9cfe844cf1d5d6340b6e55fbb3e2a57201b34",
+   "mtime_local": "2026-10-25T19:20:30+0800"
+  },
+  {
+   "returned_name": "summary.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/summary.json",
+   "mode": "byte-identical copy",
+   "bytes": 4851,
+   "sha256": "56b4e12eacb1579e741f838fbe2404903f89703832d226a9ffd3b6a20c1abad0",
+   "mtime_local": "2026-10-25T19:20:30+0800"
+  },
+  {
+   "returned_name": "execution.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/execution.json",
+   "mode": "byte-identical copy",
+   "bytes": 2162,
+   "sha256": "93d000b1424ea183803ceb6c7c2fb0b5d60a95b0c424ce0162e804bc840f0848",
+   "mtime_local": "2026-10-25T19:20:30+0800"
+  },
+  {
+   "returned_name": "source-binding.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/source-binding.json",
+   "mode": "byte-identical copy",
+   "bytes": 800207,
+   "sha256": "63c737fa9a8d78868b088da967a3f427033d8f5815a7f1f11e0fc35ddfe72e0e",
+   "mtime_local": "2026-10-25T18:09:39+0800"
+  },
+  {
+   "returned_name": "fit-run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/fit/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 665668,
+   "sha256": "8ed1af13a4182038bc461f217a8765c6bf6ef2be659a714313ef360ed8615a6b",
+   "mtime_local": "2026-10-25T18:59:07+0800"
+  },
+  {
+   "returned_name": "training-windows.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/fit/training-windows.json",
+   "mode": "byte-identical copy",
+   "bytes": 14301,
+   "sha256": "cef993c3092f545e5b3f1d0d8bdaaeb13d657773794644892ae7672819538b49",
+   "mtime_local": "2026-10-25T18:59:06+0800"
+  },
+  {
+   "returned_name": "initial-scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/initial/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 902735,
+   "sha256": "da6fb4735190e4eb15505ea1d7d64928a292130f4e17419e6767af68abbb0c13",
+   "mtime_local": "2026-10-25T19:06:01+0800"
+  },
+  {
+   "returned_name": "initial-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/initial/summary.json",
+   "source_bytes": 4894674,
+   "returned_bytes": 265267,
+   "source_sha256": "74862ca426e2ebdb2efce3068c27a9d5c71070b77fb3a1363ec97c2393b6fae1",
+   "gunzip_equals_original": true,
+   "mode": "gzip copy (mtime=0)"
+  },
+  {
+   "returned_name": "final-scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/final/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 902668,
+   "sha256": "e702b1aa6aec4990c42f76dd0343677be521279352d9250453f0ff0fb2af1a86",
+   "mtime_local": "2026-10-25T19:13:00+0800"
+  },
+  {
+   "returned_name": "final-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/final/summary.json",
+   "source_bytes": 4894321,
+   "returned_bytes": 265057,
+   "source_sha256": "9a8fc89fafefcb5a3570d26f8c5c3513e1c717d9efff34f1b7acf84368ac84e2",
+   "gunzip_equals_original": true,
+   "mode": "gzip copy (mtime=0)"
+  },
+  {
+   "returned_name": "relation_off-scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/relation_off/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 902607,
+   "sha256": "326e87b315620bd097560d7b68e12cb80705a117d9f52bfea085c6a1ce5c8cfb",
+   "mtime_local": "2026-10-25T19:20:17+0800"
+  },
+  {
+   "returned_name": "relation_off-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/relation_off/summary.json",
+   "source_bytes": 4894205,
+   "returned_bytes": 265063,
+   "source_sha256": "ce5beb73530f2ce3c14c6ff96794f514adc4abcfb5b807c5c56791b6b8288c68",
+   "gunzip_equals_original": true,
+   "mode": "gzip copy (mtime=0)"
+  }
+ ],
+ "returned_total_bytes": 4992437,
+ "server_originals": {
+  "preparation.json": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/preparation.json",
+   "bytes": 622925338,
+   "sha256": "a6d1113aa360b73b8b9d9bf50199accec0d4ad331f837711774dcc788f81b6c5",
+   "mtime_local": "2026-10-25T18:31:44+0800"
+  },
+  "fit/final.pt": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/fit/final.pt",
+   "bytes": 1801402,
+   "sha256": "b967ce7cdf660e36cd2bb166087aa1de95f18e33c68ad3d6349cbd784379fcca",
+   "mtime_local": "2026-10-25T18:59:06+0800"
+  },
+  "fit/step-0.pt": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/fit/step-0.pt",
+   "bytes": 889110,
+   "sha256": "c1d49eafce51092ff088e82fd663cb36a185161f02c785dc1c8600aa9f6d0b59",
+   "mtime_local": "2026-10-25T18:31:48+0800"
+  },
+  "fit/training.jsonl": {
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098D-attempt-1/fit/training.jsonl",
+   "bytes": 15371748,
+   "sha256": "3011a6502b1a3dedb5a56b64884114b9e48316ab53d0d7bcc401ef3d0372359f",
+   "mtime_local": "2026-10-25T18:59:06+0800"
+  }
+ },
+ "server_tree": {
+  "files": 2723,
+  "bytes": 2159157295
+ }
+}

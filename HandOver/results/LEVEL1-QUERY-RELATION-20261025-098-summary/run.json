@@ -1,0 +1,14 @@
+{
+  "scope": "098-query-relation-two-seed-closeout",
+  "status": "COMPLETED",
+  "model_forwards": 0,
+  "optimizer_updates": 0,
+  "test_opened": false,
+  "default_promoted": false,
+  "input_tables": {
+    "20261023": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison-attempt-1",
+    "20261021": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-seed21-comparison-attempt-1"
+  },
+  "eligible_for_independent_confirmation": false,
+  "gates_recomputed": true
+}

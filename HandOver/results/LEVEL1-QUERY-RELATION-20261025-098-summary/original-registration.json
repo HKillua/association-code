@@ -1,0 +1,31 @@
+{
+ "run_id": "LEVEL1-QUERY-RELATION-20261025-098-summary-attempt-1",
+ "note": "098 two-seed close-out; native outputs verbatim, zero forwards.",
+ "server_originals": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-summary-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 537,
+   "sha256": "5e7365a41d29908cd605513bf350b1b1eadf2474f424e3c6e7ca29afd44d97d2",
+   "mtime_local": "2026-10-25T20:40:33+0800"
+  },
+  {
+   "returned_name": "summary.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-summary-attempt-1/summary.json",
+   "mode": "byte-identical copy",
+   "bytes": 12054,
+   "sha256": "c351ce5b6da4d348b3a435c6fef04cf6a79173e15161a5f575b143121840af2c",
+   "mtime_local": "2026-10-25T20:40:33+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-QUERY-RELATION-20261025-098-summary-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 1290,
+   "sha256": "957173d32fbf2fce81de78471ea62757759b5fc4bcc3553e5474b647a81d0816",
+   "mtime_local": "2026-10-25T20:40:33+0800"
+  }
+ ],
+ "returned_total_bytes": 13881
+}
