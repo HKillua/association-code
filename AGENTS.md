@@ -32,6 +32,8 @@ baseline修复与候选并行，以完整系统收益判断价值，关联F1胜�
 
 ## 数据与验收
 
+用户2026-10-25选定A（位置融合与恢复）并明确要求快速推进创新/现有基线比较。新主线为[098固定四臂](docs/specs/query-relation-fusion-098.md)：generic/relation各两个seed，继承072C/073C final、各新增4000、复用090C/097A强预算baseline；具体[READY交接](HandOver/L2S-20261025-098.md)。不等待旧093A/094A/096A，不改其活动checkout或096队列接续权，不另建抢卡队列；全局四单卡继续。两seed预定3%/1%及尾部/组件/机制门槛决定去留，不自动延长或开测试。发布不等于服务器已领取。
+
 [数据约定](docs/data_contract.md)是时间、单位、mask、标签、划分及评价的唯一规则入口；[方法契约](docs/specs/evidence-association-fusion.md)和[TMTAFF参考契约](docs/specs/tmtaff-reference.md)定义实现边界。normalizer只拟合训练，T_test封存；旧Level2人口／optimizer不能挪用到Level1。
 
 最终系统同时验收关联、物理恢复、覆盖与错误传播；每项贡献有对应对照，同一机制上下游收益不重复算创新。普通插值／OLS收益不算学习贡献，latent MSE不算物理米误差，独立模块数字不拼成系统分数。报告完整人口和共同点，不删难例／改验收抬分。反复使用V、共享身份和单seed限制必须披露；loss下降、CPU检查或正常退出不构成方法验收。

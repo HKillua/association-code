@@ -39,6 +39,14 @@
 
 所有CLI支持`--help`。分卷输入使用`--archive PART1 PART2 PART3`，顺序固定，无需合并或全面解压。[数据文件与固定人口](../../configs/data/README.md)
 
+### 098当前主线：位置融合四臂
+
+- `query_relation_fit.py`：072C/073C final暖启动、全参数fresh Adam4000、原batch重放；generic set与固定运动关系bias各两个seed。`--check-source-only`核已完成来源与090C/097A预算baseline。CPU initial/final全人口评价，relation额外同权重bias-off端点。
+- `../analysis/compare_query_relation.py`：单seed同预算/同人口缓存表，3%强baseline＋1%generic及尾部、组件、机制干预门槛；零前向/训练。
+- `../analysis/summarize_query_relation.py`：重新核两张完成表及逐场门槛，两个seed都过才进入独立确认；不自动晋升默认或开放T_test。
+
+范围、冻结、优先顺序、资源及一次性启动只认[098交接](../../HandOver/L2S-20261025-098.md)。使用既有launcher，不增加与096争抢的自动队列。`fit/heartbeat.json`每100个成功更新记录实时进度；不要将运行中`fit/run.json`旧快照当作零更新。
+
 系统评价默认普通控制只包含Mean。需要完整对照时显式指定`--ordinary-controls anchor mean_supported attribute_hybrid`；学习关联显式使用`--association-endpoint final`，提供原run、checkpoint、scores、summary和data-audit，避免用selected替代预定终点。062有独立冻结入口及[具体交接](../../HandOver/L2S-20261022-062.md)。
 
 模型、监督、配对采样、输入与指标定义集中在[方法规格](../../docs/specs/evidence-association-fusion.md)；参考模型见[TMTAFF实现](../../docs/specs/tmtaff-reference.md)。旧Cooperative候选、已结案一次性分析及专用测试已退役，历史原件见[摘要](../../docs/history/README.md)。不得按真实身份删难例；normalizer只拟合训练，T_test封存。
