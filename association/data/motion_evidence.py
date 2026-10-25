@@ -10,6 +10,7 @@ import numpy as np
 
 from association.data.archive import DataError, MTADArchive, validate_manifest
 from association.data.native import _record
+from association.data.source_events import source_events
 from association.data.legacy_dataset import validate_archive
 from association.data.timed import prepare_timed_scene
 from association.evaluation.native_motion import _short_delta, predict_native_positions
@@ -154,17 +155,20 @@ def scene_motion_evidence(scene, *, motion_observation_policy='selected_cap128')
 
 
 def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_evaluation_metadata=False,
-                          motion_observation_policy='selected_cap128'):
+                          motion_observation_policy='selected_cap128', retain_native_events=False):
     """Prepare one frozen T_core or V_select split, without reading references.
 
     Process one scene at a time; retain only compact motion evidence and original
-    candidate metadata. Empty scenes survive and use their declared label bounds
+    candidate metadata. Opt-in event retention keeps every canonical real point,
+    independently of the selected-cap view. Empty scenes use their label bounds
     for the query grid. Labels never enter nonempty scene grids or predictions.
     """
     if split not in ('T_core', 'V_select'):
         raise DataError('motion evidence permits only explicit T_core or V_select; T_test is sealed')
     if not isinstance(include_evaluation_metadata, bool):
         raise ValueError('include_evaluation_metadata must be boolean')
+    if not isinstance(retain_native_events, bool):
+        raise ValueError('retain_native_events must be boolean')
     policy = validate_motion_observation_policy(motion_observation_policy)
     validate_manifest(manifest)
     scenes = []
@@ -187,6 +191,8 @@ def prepare_motion_scenes(archive_path, manifest, split, check=None, *, include_
                 query = np.linspace(start, stop, DATA['length'])
             prepared = prepare_timed_scene(native, **DATA, query_times=query)
             motion = scene_motion_evidence(prepared, motion_observation_policy=policy)
+            if retain_native_events:
+                motion = dict(motion, native_events=source_events(prepared))
             metadata = {}
             if policy != 'selected_cap128':
                 metadata['motion_observation_policy'] = policy

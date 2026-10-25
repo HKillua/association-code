@@ -10,6 +10,7 @@ import numpy as np
 import torch
 
 from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
+from association.data.source_events import source_events
 from association.evaluation.fusion_controls import ordinary_fusion, metrics, rms_haversine_scores
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
 from association.models.evidence_fusion import (ATTRIBUTE_NAMES, EvidenceFusion, evidence_fusion_loss,
@@ -201,9 +202,12 @@ def validate_training_population(train, validation):
     return split_unit
 
 
-def prepare_evidence_scenes(scenes, check=None, *, motion_observation_policy='selected_cap128', grouping=None):
+def prepare_evidence_scenes(scenes, check=None, *, motion_observation_policy='selected_cap128', grouping=None,
+                           retain_native_events=False):
     """Separate target-free motion construction from labels and training targets."""
     policy = validate_motion_observation_policy(motion_observation_policy)
+    if not isinstance(retain_native_events, bool):
+        raise ValueError('retain_native_events must be boolean')
     grouping_configuration({'grouping': grouping})
     result = []
     for scene in scenes:
@@ -212,6 +216,8 @@ def prepare_evidence_scenes(scenes, check=None, *, motion_observation_policy='se
         if scene['split'] not in ('T_core', 'V_select'):
             raise ValueError('only T_core and V_select are permitted; T_test remains sealed')
         motion = scene_motion_evidence(scene, motion_observation_policy=policy)
+        if retain_native_events and 'native_events' not in motion:
+            motion = dict(motion, native_events=source_events(scene))
         n = len(motion['states'])
         pairs = np.column_stack(np.triu_indices(n, 1))
         scores = np.empty(len(pairs), np.float64)

@@ -18,6 +18,7 @@ from association.data.native import iter_native_split_from_archive
 from association.data.reference_states import iter_reference_states
 from association.data.timed import _settings, prepare_timed_scene
 from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
+from association.data.source_events import source_events
 
 
 def _request(manifest, train_splits, data_config, alignment_by_scene, *, validation_only=False):
@@ -54,7 +55,7 @@ def _request(manifest, train_splits, data_config, alignment_by_scene, *, validat
 
 def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                        alignment_by_scene, check=None, motion_observation_policy=None,
-                       validation_only=False):
+                       validation_only=False, retain_native_events=False):
     """Return train/validation scene lists and a JSON-compatible preparation report.
 
     Every label-derived A-B identity is a target, including targets whose nodes
@@ -65,8 +66,12 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
     With validation_only=True, read only V_select payloads and return an empty
     train list. The original manifest stays intact, and alignment is required
     only for V_select; no training population or statistics are prepared.
+    retain_native_events keeps uncapped canonical events inside motion before
+    releasing duplicate track containers; the default legacy payload is unchanged.
     """
     started = time.monotonic()
+    if not isinstance(retain_native_events, bool):
+        raise DataError('retain_native_events must be a boolean')
     if motion_observation_policy is not None:
         validate_motion_observation_policy(motion_observation_policy)
     splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene,
@@ -96,12 +101,15 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                         raise DataError(f'Scene {sid}: empty scene label range must have positive duration')
                     query = np.linspace(start, stop, data_config['length'])
                 prepared = prepare_timed_scene(native, **input_config, query_times=query)
-                if motion_observation_policy is not None:
+                if motion_observation_policy is not None or retain_native_events:
                     # Compute offline candidate evidence while this scene's
                     # dense tracks are in memory, then retain only N-by-Q arrays.
                     prepared['motion'] = scene_motion_evidence(prepared,
-                        motion_observation_policy=motion_observation_policy)
-                    prepared['motion_observation_policy'] = motion_observation_policy
+                        motion_observation_policy=motion_observation_policy or 'selected_cap128')
+                    if motion_observation_policy is not None:
+                        prepared['motion_observation_policy'] = motion_observation_policy
+                    if retain_native_events:
+                        prepared['motion']['native_events'] = source_events(prepared)
                 # The capped native arrays are sufficient for training. Keep
                 # canonical point/selection diagnostics, not duplicate raw tracks.
                 prepared.pop('tracks', None)
@@ -171,6 +179,9 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
             scene_reports[-1]['split_unit'] = 'scene'
         if motion_observation_policy is not None:
             scene_reports[-1]['motion_native_point_count'] = int(scene['motion']['native_count'].sum())
+        if retain_native_events:
+            scene_reports[-1]['native_event_count'] = sum(
+                len(record['times']) for record in scene['motion']['native_events'])
     report = dict(scope='TMTAFF-time-adapted-v1', training_splits=loaded_train_splits, selection_split='V_select',
         training_scene_ids=[s['scene_id'] for s in training], validation_scene_ids=[s['scene_id'] for s in validation],
         data_config=dict(data_config), reference_longitude_policy=longitude_policy,
@@ -181,4 +192,6 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
         report['split_unit'] = 'scene'
     if motion_observation_policy is not None:
         report['motion_observation_policy'] = motion_observation_policy
+    if retain_native_events:
+        report['native_event_policy'] = 'all-canonical-real-events-original-node-index-v1'
     return dict(train=training, validation=validation, report=report)

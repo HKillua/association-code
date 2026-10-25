@@ -41,3 +41,31 @@ def tiny_train():
         for target in scene['fusion_targets'].values():
             target['states'][:, 0] += .02
     return train
+
+
+def native_query_training_fixture():
+    """Three recorded batches from tiny timestamped fixtures; software checks only."""
+    from association.training.evidence_fusion import prepare_evidence_scenes, training_members, TRAIN_MODES
+    train = tiny_train()
+    for scene in train:
+        scene['tracks'] = [dict(node_id=node_id, source=scene['sources'][node],
+            canonical_times=scene['native_times'][node, scene['native_observed'][node]].copy(),
+            canonical_values=scene['native_values'][node, scene['native_observed'][node]].copy())
+            for node, node_id in enumerate(scene['node_ids'])]
+    prepared = prepare_evidence_scenes(train, motion_observation_policy='canonical_all', retain_native_events=True)
+    rows = []
+    for step, mode in enumerate(TRAIN_MODES, 1):
+        batch = []
+        for slot in range(2):
+            scene = prepared[(step+slot) % len(prepared)]
+            anchor = (step+slot) % len(scene['identities'])
+            members = training_members(scene, anchor, mode)
+            valid = scene['valid'][anchor, :, :2].all(-1)
+            support = scene['motion']['support']
+            eligible = ~support[anchor] & support[members[1:]].any(0)
+            batch.append(dict(scene_id=str(scene['scene_id']), anchor_index=anchor,
+                node_id=str(scene['node_ids'][anchor]), members=members,
+                valid_position_points=int(valid.sum()), eligible_query_points=int(eligible.sum()),
+                eligible_valid_position_points=int((eligible & valid).sum())))
+        rows.append(dict(step=step, mode=mode, batch=batch))
+    return train, rows

@@ -7,6 +7,7 @@
 | 数据准备 | `make_scene_manifest.py`、`prepare_scene_data.py`；现有名单冻结，不重复生成 |
 | 学习关联／属性融合／完整系统 | `evidence_association_fit.py`、`evidence_fusion_fit.py`、`level1_system_evaluate.py` |
 | 位置网络与预算控制 | `sequence_position_fit.py`、`frozen_position_adapter_fit.py`、`sequence_budget_replication.py` |
+| 100原生事件机会筛查 | `native_query_fit.py`、`../analysis/compare_native_query.py`；共享090C底座，T0/T1/T2固定预算，真实执行看交接 |
 | TMTAFF阶段与独立评价 | `tmtaff_complete_fit.py`、`tmtaff_complete_evaluate.py`、`tmtaff_downstream_fit.py`、`completion_value_fit.py`、`completion_system_evaluate.py` |
 | 096原有限队列 | `post088_overnight_queue.py`；已有服务持有接续权，不重复提交 |
 | DeepAF真实适配准备 | `deepaf_peer_fit.py`、`../analysis/compare_deepaf_peer.py`；099 HOLD |
