@@ -26,6 +26,11 @@ def evaluate_query_relation(model, validation_raw, source056, metadata, output, 
     no teacher forward is repeated. Source/checkpoint/data binding is owned by
     the runner and rechecked by the independent cached comparison.
     """
+    output = Path(output)
+    # Refusing a duplicate invocation must not rewrite a previously completed
+    # endpoint in the failure handler below.
+    if output.exists():
+        raise FileExistsError('098 output already exists; no reuse or retry')
     enabled = model.mode == 'relation' if relation_enabled is None else relation_enabled
     if type(enabled) is not bool or (enabled and model.mode != 'relation'):
         raise ValueError('098 relation switch must agree with the declared model')

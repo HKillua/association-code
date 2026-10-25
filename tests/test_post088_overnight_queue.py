@@ -158,6 +158,74 @@ class OvernightQueueTests(unittest.TestCase):
         self.assertEqual(queue.dependency_decision(['a'], {'a': 'RUNNING'}), 'WAITING')
         self.assertEqual(queue.dependency_decision([], {}), 'READY')
 
+    def dispatch_barrier_fixture(self):
+        output = self.root/'LEVEL1-POST088-NIGHT-20261025-096-097-attempt-1'
+        output.mkdir()
+        plan = queue.build_plan(self.root, [self.root/'part1'])
+        queue.write(output/'plan.json', plan)
+        state = dict(status='RUNNING', jobs={job['id']: dict(status='WAITING') for job in plan['jobs']})
+        queue.write(output/'run.json', state)
+        for job in plan['jobs']:
+            if not job['gpu']:
+                continue
+            record = Path(job['output']+'-launch')
+            record.mkdir()
+            queue.write(record/'request.json', dict(argv=job['argv'], cwd=plan['code'],
+                backend='systemd', time_policy='advisory', environment={
+                    'CUDA_VISIBLE_DEVICES': 'GPU-c5a00c37-f181-90b3-f220-be6e7457f473'}))
+            queue.write(record/'launch.json', dict(status='SUBMITTED', backend='systemd',
+                unit='mtad-a15de726acdc.service'))
+        return output, plan, state
+
+    def test_external_dispatch_waits_for_pending_old_gpu_but_not_running_children_or_cpu(self):
+        output, plan, state = self.dispatch_barrier_fixture()
+        # Persisted WAITING can be stale while its acknowledged reservation is
+        # already visible; the old queue cannot submit it twice.
+        self.assertEqual(queue.assert_gpu_dispatch_drained(output, self.root)['status'], 'GPU_DISPATCH_DRAINED')
+        first = next(job for job in plan['jobs'] if job['id'] == '096A')
+        Path(first['output']+'-launch/launch.json').unlink()
+        with self.assertRaisesRegex(RuntimeError, 'WAITING_RESOURCE'):
+            queue.assert_gpu_dispatch_drained(output, self.root)
+        # A frozen terminal dependency failure is never retried by the old
+        # controller; no need to stop it or wait for remaining CPU tables.
+        state['jobs']['096A'] = dict(status='BLOCKED', reason='required source failed')
+        queue.write(output/'run.json', state)
+        result = queue.assert_gpu_dispatch_drained(output, self.root)
+        self.assertEqual(result['jobs']['096A'], 'BLOCKED')
+        self.assertTrue(result['requires_fresh_resource_check'])
+
+    def test_external_dispatch_refuses_ambiguous_or_misbound_old_reservation(self):
+        output, plan, _ = self.dispatch_barrier_fixture()
+        job = next(row for row in plan['jobs'] if row['id'] == '096A')
+        request_path, launch_path = Path(job['output']+'-launch/request.json'), Path(job['output']+'-launch/launch.json')
+        original_request, original_launch = queue.read(request_path), queue.read(launch_path)
+        for status in ('SUBMITTING', 'SUBMISSION_UNKNOWN', 'FAILED'):
+            queue.write(launch_path, dict(original_launch, status=status))
+            with self.assertRaisesRegex(RuntimeError, 'WAITING_RESOURCE'):
+                queue.assert_gpu_dispatch_drained(output, self.root)
+        queue.write(launch_path, original_launch)
+        for changed in (dict(original_request, argv=['wrong']),
+                        dict(original_request, cwd=str(self.root/'other-checkout')),
+                        dict(original_request, environment={'CUDA_VISIBLE_DEVICES': '0'})):
+            queue.write(request_path, changed)
+            with self.assertRaisesRegex(RuntimeError, 'WAITING_RESOURCE'):
+                queue.assert_gpu_dispatch_drained(output, self.root)
+        queue.write(request_path, original_request)
+        self.assertEqual(queue.assert_gpu_dispatch_drained(output, self.root)['status'], 'GPU_DISPATCH_DRAINED')
+
+    def test_external_dispatch_refuses_unknown_controller_or_gpu_plan(self):
+        output, plan, state = self.dispatch_barrier_fixture()
+        state['status'] = 'FAILED'
+        queue.write(output/'run.json', state)
+        with self.assertRaisesRegex(RuntimeError, 'WAITING_RESOURCE'):
+            queue.assert_gpu_dispatch_drained(output, self.root)
+        state['status'] = 'RUNNING'
+        queue.write(output/'run.json', state)
+        plan['jobs'].append(dict(id='extra', gpu=True, output=str(self.root/'extra')))
+        queue.write(output/'plan.json', plan)
+        with self.assertRaisesRegex(RuntimeError, 'WAITING_RESOURCE'):
+            queue.assert_gpu_dispatch_drained(output, self.root)
+
     def test_one_attempt_failure_propagates_and_independent_job_completes(self):
         plan = dict(code=str(queue.ROOT), run_root=str(self.root), sources={}, jobs=[])
         for name, dependencies in [('bad', []), ('independent', []), ('dependent', ['bad'])]:

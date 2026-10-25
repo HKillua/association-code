@@ -12,6 +12,7 @@ import fcntl
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 import time
@@ -198,6 +199,65 @@ def available_gpus(allowed, *, run=subprocess.run):
         raise ValueError('an allowed GPU UUID is missing from nvidia-smi')
     return [uuid for uuid in allowed if uuid not in occupied
             and values[uuid][0] <= 256 and values[uuid][1] == 0]
+
+
+def assert_gpu_dispatch_drained(queue_output, run_root):
+    """Read-only barrier before external submissions beside the frozen queue.
+
+    The old controller cannot join a new submission lock. A resource snapshot
+    alone therefore races with its next dispatch. Permit an external dispatcher
+    only once every old GPU job is irreversibly terminal in the persisted queue
+    state, or has an acknowledged launcher reservation which the old controller
+    will never submit again. Running children/remaining CPU tables need not end.
+    The caller must then serialize its own check-through-launch window and
+    recheck ordinary GPU claims, UUID ownership and device availability.
+    """
+    root, output = Path(run_root).resolve(), Path(queue_output).resolve()
+    if output != root/'LEVEL1-POST088-NIGHT-20261025-096-097-attempt-1':
+        raise ValueError('096/097 dispatch barrier requires the registered controller output')
+    try:
+        plan, state = read(output/'plan.json'), read(output/'run.json')
+        jobs = plan['jobs']
+        if (plan.get('format') != 'post088_finite_queue_v1'
+                or Path(plan['run_root']).resolve() != root
+                or plan.get('retry_count') != 0 or plan.get('max_gpu_claims') != 4
+                or not isinstance(jobs, list) or len({job['id'] for job in jobs}) != len(jobs)
+                or any(type(job.get('gpu')) is not bool for job in jobs)
+                or state.get('status') not in ('RUNNING', 'COMPLETED', 'COMPLETED_WITH_FAILURES')
+                or not isinstance(state.get('jobs'), dict)):
+            raise ValueError('unknown controller plan/state')
+        gpu_jobs = {job['id']: job for job in jobs if job['gpu']}
+        outputs = {
+            '096A': 'LEVEL1-COMPLETION-SYSTEM-20261025-096A-attempt-1',
+            '096B': 'LEVEL1-COMPLETION-SYSTEM-20261025-096B-attempt-1',
+            '097A': 'LEVEL1-SEQUENCE-BUDGET-20261025-097A-attempt-1',
+        }
+        if set(gpu_jobs) != set(outputs):
+            raise ValueError('unknown GPU dispatch population')
+        evidence = {}
+        for name, job in gpu_jobs.items():
+            if Path(job['output']).resolve() != root/outputs[name]:
+                raise ValueError('GPU output differs from the frozen queue')
+            status = state['jobs'].get(name, {}).get('status')
+            if status in DONE:
+                evidence[name] = status
+                continue
+            record = Path(str(root/outputs[name])+'-launch')
+            request, launch = read(record/'request.json'), read(record/'launch.json')
+            gpu = request.get('environment', {}).get('CUDA_VISIBLE_DEVICES', '')
+            if (request.get('argv') != job['argv']
+                    or Path(request.get('cwd', '')).resolve() != Path(plan['code']).resolve()
+                    or request.get('backend') != 'systemd' or request.get('time_policy') != 'advisory'
+                    or not re.fullmatch(r'GPU-[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}', gpu)
+                    or launch.get('backend') != 'systemd' or launch.get('status') != 'SUBMITTED'
+                    or not re.fullmatch(r'mtad-[0-9a-f]{12}\.service', launch.get('unit', ''))):
+                raise ValueError('GPU launcher reservation is incomplete or unacknowledged: '+name)
+            evidence[name] = 'ACKNOWLEDGED_RESERVATION'
+        return dict(status='GPU_DISPATCH_DRAINED', jobs=evidence,
+                    controller_output=str(output), requires_fresh_resource_check=True)
+    except (OSError, ValueError, TypeError, KeyError, AttributeError) as error:
+        raise RuntimeError('WAITING_RESOURCE: old096/097 queue can still submit or its records are '
+                           'uncertain; leave controller and children unchanged: '+str(error)) from error
 
 
 def build_plan(run_root, archive, *, python=sys.executable, code=ROOT):

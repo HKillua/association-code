@@ -42,14 +42,31 @@ class QueryRelationPipelineTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             output = root/'endpoint'
-            output.mkdir()
-            write_json(output/'run.json', dict(status='COMPLETED'))
-            with patch.object(evaluation, 'evaluate_helper_sequence', return_value={}):
+            def completed_shared_evaluation(*args, **kwargs):
+                output.mkdir()
+                write_json(output/'run.json', dict(status='COMPLETED'))
+                return {}
+            with patch.object(evaluation, 'evaluate_helper_sequence', side_effect=completed_shared_evaluation):
                 with self.assertRaisesRegex(ValueError, 'incomplete scene traversal'):
                     evaluation.evaluate_query_relation(QueryRelationPosition(), [], root/'source',
                         {'scene_ids': ['3035']}, output,
                         source_teacher_checkpoint=root/'teacher/fit/final.pt')
             self.assertEqual(read_json(output/'run.json')['status'], 'FAILED')
+
+    def test_duplicate_endpoint_refusal_preserves_existing_completed_result(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root/'endpoint'
+            output.mkdir()
+            write_json(output/'run.json', dict(status='COMPLETED', completed_scenes=300))
+            original = (output/'run.json').read_bytes()
+            with patch.object(evaluation, 'evaluate_helper_sequence') as shared:
+                with self.assertRaises(FileExistsError):
+                    evaluation.evaluate_query_relation(QueryRelationPosition(), [], root/'source',
+                        {'scene_ids': ['3035']}, output,
+                        source_teacher_checkpoint=root/'teacher/fit/final.pt')
+            shared.assert_not_called()
+            self.assertEqual((output/'run.json').read_bytes(), original)
 
     def test_real_source_budget_two_modes_full_endpoints_and_independent_cached_table(self):
         with TemporaryDirectory() as directory, ExitStack() as stack:

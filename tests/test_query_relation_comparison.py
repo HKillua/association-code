@@ -96,7 +96,7 @@ class QueryRelationComparisonTests(unittest.TestCase):
         base, adapter, configs = tiny_configs()
         train = tiny_train()
         with TemporaryDirectory() as directory:
-            root = Path(directory)
+            root = Path(directory).resolve()
             train_sequence_position(train, base, root/'linear/fit')
             train_frozen_position_adapter(train, adapter, root/'budget/fit', paired_reference_fit=root/'linear/fit')
             arms = dict(linear=dict(path=root/'linear'),
@@ -126,7 +126,7 @@ class QueryRelationComparisonTests(unittest.TestCase):
     def test_real_cache_population_initial_source_and_fixed_weight_off_invariance(self):
         base, adapter, configs = tiny_configs()
         with TemporaryDirectory() as directory:
-            root = Path(directory)
+            root = Path(directory).resolve()
             source, metadata, validation = support_gate_cache_fixture(root)
             train_sequence_position(tiny_train(), base, root/'linear/fit')
             original, saved = load_checkpoint(root/'linear/fit/final.pt')
@@ -177,7 +177,7 @@ class QueryRelationComparisonTests(unittest.TestCase):
         from tools.analysis import summarize_query_relation as closeout
         manifest = dict(splits={'V_select': ['a', 'b', 'c']}, components={'a': '0', 'b': '1', 'c': '2'})
         with TemporaryDirectory() as directory:
-            root = Path(directory)
+            root = Path(directory).resolve()
 
             def table(seed, passed=True):
                 path = root/str(seed)
