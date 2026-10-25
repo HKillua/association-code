@@ -69,5 +69,120 @@ result={'scope':'Local independent aggregation of returned endpoint/scene suffic
 a=rd(D/'LEVEL1-COMPLETION-VALUE-TFM-20261024-093-summary/comparison.json.gz'); f=a['comparison']['endpoints'][-1]
 b=rd(D/'LEVEL1-COMPLETION-VALUE-TAM-20261024-094-summary/comparison.json.gz'); c=b['comparison']
 result['other_receipts']={'093':{'status':a['status'],'summary_elapsed_seconds':a['elapsed_seconds'],'final_updates':f['update'],'full_position':{k:{m:v for m,v in f['full'][k]['all']['position'].items() if m in ['mae','rmse','p99','intersection_count','available_target_count']} for k in ['learned','state_hold']},'scene_wins':f['scene_wins'],'component_wins':f['component_wins'],'limitation':'Both frozen heads remain very weak. A≈B does not prove completion cannot matter; no convergence or single-cause diagnosis.'},'094':{'status':b['status'],'summary_elapsed_seconds':b['elapsed_seconds'],'association':{k:{x:v[x] for x in ['pair_count','macro_f1','micro_f1','micro_precision','micro_recall','tp','fp','fn','tn']} for k,v in c['association'].items()},'grouping':c['grouping_totals'],'margins':c['margins'],'thresholds':c['thresholds'],'paired_edges':{k:v for k,v in c['paired_edges'].items() if k!='per_scene'},'limitation':'Whole validation selection pipelines, distinct margins/thresholds; not pure completion cause. Anchor identity coverage not physical point coverage.'},'096A':{'latest_receipt':'RUNNING claimed','submitted_utc':'2026-10-25T08:09:10Z','unit':'mtad-11e76d7fa8c3.service','gpu_index':0,'note':'Current Handover receipt only, not live health. No final metrics inspected.'}}
+
+def audit_completed_seed23(existing):
+    """Check newly returned CPU table, without rerunning any model or old table."""
+    directory = D/'LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison'
+    summary = rd(directory/'summary.json.gz')
+    rows = rd(directory/'scene-summary.json.gz')
+    run = rd(directory/'run.json')
+    checks = 0
+    max_delta = {'mae': 0.0, 'mse': 0.0, 'rmse': 0.0}
+    def same(a, b):
+        nonlocal checks
+        assert a == b, (a, b)
+        checks += 1
+    same(run['status'], 'COMPLETED')
+    for key in ('model_forwards', 'optimizer_updates'):
+        same(run[key], 0)
+        same(summary[key], 0)
+    same(run['test_opened'], False)
+    same(summary['test_opened'], False)
+    same(summary['seed'], 20261023)
+    same(len(rows), 300)
+    same([row['scene_ids'][0] for row in rows], summary['scene_ids'])
+    same(summary['population'], existing['groups'])
+    same(summary['position_population']['covered_target_points'], existing['population']['intersection_count'])
+    same(summary['position_population']['available_target_points'], existing['population']['available_target_count'])
+    for name, endpoint in existing['metrics'].items():
+        same(summary['position_weightings']['all'][name], endpoint['all'])
+        same(summary['remaining_components']['position_weightings']['all'][name], endpoint['outside_largest_component'])
+        for region, values in endpoint['regions'].items():
+            same(summary['position_weightings'][region][name]['point_equal'], values)
+    # Reaggregate only the newly returned table's scene sufficient statistics.
+    for section in ('position_weightings', 'helper_cohorts', 'group_cohorts'):
+        for stratum, methods in summary[section].items():
+            for method, weights in methods.items():
+                for weight, expected in weights.items():
+                    pieces = [row[section][stratum][method][weight] for row in rows]
+                    count = sum(piece['unit_count'] for piece in pieces)
+                    same(count, expected['unit_count'])
+                    if not count:
+                        continue
+                    for metric in ('mae', 'mse'):
+                        value = sum(piece[metric]*piece['unit_count'] for piece in pieces if piece['unit_count'])/count
+                        max_delta[metric] = max(max_delta[metric], abs(value-expected[metric]))
+                        assert math.isclose(value, expected[metric], rel_tol=1e-11, abs_tol=1e-6)
+                        checks += 1
+                    value = math.sqrt(sum(piece['mse']*piece['unit_count'] for piece in pieces if piece['unit_count'])/count)
+                    max_delta['rmse'] = max(max_delta['rmse'], abs(value-expected['rmse']))
+                    assert math.isclose(value, expected['rmse'], rel_tol=1e-11, abs_tol=1e-6)
+                    checks += 1
+    for key, value in summary['group_relation_population'].items():
+        same(sum(row['group_relation_population'][key] for row in rows), value)
+    same(all(row['no_multi_prediction_exact'] for row in rows), True)
+    same(summary['no_multi_prediction_exact'], True)
+    pairing = summary['pairing']
+    same(pairing['status'], 'PAIR_VERIFIED')
+    same(pairing['generic_relation_initial_parameters_exact'], True)
+    same(pairing['generic_relation_parameter_count_equal'], True)
+    for arm in ('generic', 'relation'):
+        for key in ('actual_successful_batches_exact', 'sampling_exposure_exact',
+                    'source_final_parameters_exact', 'initial_sampler_rng_exact',
+                    'final_sampler_rng_exact', 'final_parameters_changed'):
+            same(pairing['arms'][arm][key], True)
+        same(pairing['arms'][arm]['matched_updates'], 4000)
+    same(summary['initial_output_source_final_exact'], True)
+    # Re-evaluate frozen screen from already independently aggregated figures.
+    screen = summary['scientific_screen']
+    for key, control, required, majority in (('versus_budget', 'finetune', .03, True), ('versus_generic', 'generic', .01, False)):
+        comparison = existing['comparisons']['relation__minus__'+control]
+        same(screen[key]['deltas'], comparison['delta'])
+        same(screen[key]['relative_mae_reduction'], comparison['relative_mae_reduction'])
+        same(screen[key]['required_reduction'], required)
+        same(screen[key]['improved_scenes'], comparison['scenes']['better'])
+        same(screen[key]['improved_components'], comparison['components']['better'])
+        weights_ok = all(value <= 1e-6 for value in comparison['four_mae_weighting_deltas'].values())
+        outside_ok = comparison['outside_largest_delta_mae'] <= 1e-6
+        passed = comparison['relative_mae_reduction'] >= required and comparison['delta']['mae'] < -1e-6 and comparison['delta']['rmse'] <= 1e-6 and comparison['delta']['p99'] <= 1e-6 and weights_ok and outside_ok
+        if majority:
+            passed = passed and comparison['scenes']['better'] > 150 and comparison['components']['better'] > 19
+        same(screen[key]['all_mae_weightings_nonworse'], weights_ok)
+        same(screen[key]['outside_largest_component_nonworse'], outside_ok)
+        same(screen[key]['passed'], passed)
+    intervention = screen['fixed_weight_bias_intervention']
+    same(intervention['delta_mae_m'], existing['comparisons']['relation__minus__relation_off']['delta']['mae'])
+    multi_points = summary['group_cohorts']['any_multi_query']['relation']['point_equal']['unit_count']
+    same(intervention['groups_with_multi_query_valid_points'], multi_points)
+    same(intervention['passed'], intervention['delta_mae_m'] < -1e-6 and multi_points > 0 and summary['no_multi_prediction_exact'])
+    same(screen['seed_screen_passed'], False)
+    same(screen['outcome'], 'CURRENT_RELATION_RECIPE_NOT_ACCEPTED')
+    existing['seed23_cpu_table'] = {
+        'scope': 'New formal server-side raw-artifact pairing and cached comparison reviewed; local scene-summary reaggregation and original frozen gate recomputation only.',
+        'source_directory': str(directory.relative_to(R)),
+        'run': run,
+        'checks': checks,
+        'max_aggregation_absolute_difference': max_delta,
+        'endpoint_aggregates_equal_prior_local_audit': True,
+        'pairing_report': {key: value for key, value in pairing.items() if key not in ('budget_control', 'arms')},
+        'arm_pairing_report': {name: {key: value for key, value in arm.items() if key != 'helper_support_exposure'} for name, arm in pairing['arms'].items()},
+        'initial_output_source_final_exact': summary['initial_output_source_final_exact'],
+        'no_multi_prediction_exact': summary['no_multi_prediction_exact'],
+        'group_relation_population': summary['group_relation_population'],
+        'group_cohorts_relation': {key: value['relation']['point_equal'] for key, value in summary['group_cohorts'].items()},
+        'scientific_screen': screen,
+        'bias_intervention_point_error_differences': summary['relative_harm']['all']['relation__minus__relation_off'],
+        'code_checked': ['tools/analysis/compare_query_relation.py:verify_pairing', 'tools/analysis/compare_query_relation.py:scene_pair', 'tools/analysis/compare_query_relation.py:scientific_screen'],
+        'evidence_boundary': 'Server comparator loads actual checkpoints/ordered successful sample journals and cached input/truth/membership/prediction arrays before returning PAIR_VERIFIED. Local audit verifies returned summaries and checked code, but does not possess or independently replay raw tensors/JSONL/NPZ; no new GPU, model forward, or original ZIP read.',
+        's2l_interpretation_corrections': ['Generic does not beat the strong budget control; no stronger-budget-baseline signal.', 'A final fixed-weight bias switch does not rule out effects mediated through training, so the B-A training difference cannot be declared unrelated to all relationship-bias effects.']}
+    existing['missing_for_raw_audit'] = [
+        'raw initial/final tensors remain server-side; formal server verifier completed',
+        'actual ordered training JSONL remains server-side; formal server verifier completed',
+        'full prediction NPZ/membership arrays remain server-side; formal server verifier completed',
+        'native launcher exit/status files (exit0 currently S2L report)']
+    existing['decision'] = 'First seed fails frozen budget, generic and fixed-weight bias-benefit gates, confirmed by completed seed23 CPU table. Close expansion of this relation recipe; preserve running C/D and remaining original CPU tables. No model-category or full-peer superiority conclusion.'
+    return existing
+
+result = audit_completed_seed23(result)
 Path(__file__).with_name('audit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps({'checks':checks,'maxerr':maxerr,'comparisons':comparisons},ensure_ascii=False,indent=2))

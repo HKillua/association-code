@@ -1,6 +1,6 @@
 # 098第一seed审查与093/094收尾（2026-10-25）
 
-**决定：098第一seed未通过原冻结合同，关闭当前关系配方的扩展；已领取的C/D及原定CPU整表照合同完成，不中断、不改活动代码、不追加训练或调参。** 本轮没有新模型推理、训练或原始数据扫描。
+**决定：098第一seed未通过原冻结合同，关闭当前关系配方的扩展；已领取的C/D及剩余原定CPU整表照合同完成，不中断、不改活动代码、不追加训练或调参。** 本轮没有新模型推理、训练或原始数据扫描。后续返回的seed23正式CPU表已审，确认此前结论。
 
 098B相对旧072C的MAE下降3.042%，不是合同要求的“胜过同预算090C至少3%”。实际B输给090C，胜generic的幅度也不足1%，同权重关闭关系偏置没有损失收益。第二seed仍须如实结案，但不能把第一seed未通过改写成“双seed稳定成立”。
 
@@ -10,7 +10,17 @@ A/B返回`run.json`均为COMPLETED，源072C已完成4000更新，本轮fresh Ad
 
 本地按返回的逐场充分统计重聚全人口、38组件、最大组件外及各支撑区域，核四种权重MAE/MSE/RMSE、人口与普通控制一致。MAE最大重聚差为2.72e−11米；全局P95/P99直接取原整体摘要，**没有从逐场分位数拼接**。
 
-这不等于重新核验原始权重、每batch成员或预测NPZ。原`step-0.pt/final.pt`、训练JSONL及预测数组仍在服务器；真实初参数/逐批配对和无multi组bias开关逐值一致，须由原定CPU整表核验，不能由相同seed或曝光总数替代。来源与复算结果见[审计JSON](evidence/098-first-seed-20261025/audit.json)；[复算脚本](evidence/098-first-seed-20261025/recompute.py)只读取现有回传JSON，路径相对仓库定位。
+这不等于本地重新核验原始权重、每batch成员或预测NPZ。原`step-0.pt/final.pt`、训练JSONL及预测数组仍在服务器；后续正式CPU表已经完成这些原件核验并回传结果，见下一节。来源与复算结果见[审计JSON](evidence/098-first-seed-20261025/audit.json)；[复算脚本](evidence/098-first-seed-20261025/recompute.py)只读取现有回传JSON，路径相对仓库定位。
+
+## seed23正式CPU表补审
+
+[原表回执](../../HandOver/S2L-20261025-098-seed23.md)及其`run/summary/scene-summary/original-registration`已返回：COMPLETED，零前向、零更新，300场，S2L记录退出0、launcher 366.638秒。原`scientific_screen`为`CURRENT_RELATION_RECIPE_NOT_ACCEPTED`，预算、generic和功能开关三项均false；本地重新套用冻结规则得到同值。
+
+这份表增加了此前尚缺的**服务器原件校验证据**。检查比较器实际代码后确认：`verify_pairing`加载真实初/末权重、从源final重建预期初值，核generic/relation初参数逐值一致、实际成功batch的step/mode/scene/anchor/members和曝光一致，以及4000更新前后的采样RNG；结果为`PAIR_VERIFIED`。`scene_pair`逐场核输入、真值/mask、分组、helper成员、控制与初始输出、最终缓存几何；`initial_output_source_final_exact=true`。它没有模型前向，原件仍没有下载到本地，不能把这项服务器核验写成本地独立重放了权重或NPZ。
+
+9,353组中2,928组至少一个query有多个helper，6,425组全程没有该交互机会；后者bias开/关原预测逐值相同，`no_multi_prediction_exact=true`。前者对应146,140个选中有效位置点，故功能门槛失败不是“没有可交互人口”。这与某一query上的多个helper计数不是同一口径，不能把146,140改成80,464。新表四臂的全人口/区域/四权重、最大组件外指标与本地先前审计逐值一致；本次只重新聚合新表的逐场及helper/整组队列统计，MAE最大差3.28e−11米。
+
+回执的两处解释需收窄：generic也输给强同预算090C，因此不能称建立了更强的预算基线；终态同权重开关只能说明**最终预测不依赖该偏置获得实质收益**，不能排除偏置经训练过程改变权重，不能把B对A的全部训练差异断言为“与该机制无关”。这些边界不改变冻结合同不通过的决定。
 
 ## 同人口结果
 

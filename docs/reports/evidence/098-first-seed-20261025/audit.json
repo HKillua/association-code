@@ -645,13 +645,12 @@
       "outside_largest_delta_mae": 14.087970884618471
     }
   },
-  "decision": "First seed fails frozen budget and generic gates and same-weight bias-benefit gate. C/D and original CPU cached comparison remain to execute; no model-category or full-peer superiority conclusion.",
+  "decision": "First seed fails frozen budget, generic and fixed-weight bias-benefit gates, confirmed by completed seed23 CPU table. Close expansion of this relation recipe; preserve running C/D and remaining original CPU tables. No model-category or full-peer superiority conclusion.",
   "missing_for_raw_audit": [
-    "raw initial/final tensors",
-    "actual ordered training JSONL samples",
-    "full prediction NPZ/membership arrays",
-    "native launcher exit/status files (rc0 currently S2L report)",
-    "registered CPU joint table for group-level any_multi cohort and exact no_multi predictions"
+    "raw initial/final tensors remain server-side; formal server verifier completed",
+    "actual ordered training JSONL remains server-side; formal server verifier completed",
+    "full prediction NPZ/membership arrays remain server-side; formal server verifier completed",
+    "native launcher exit/status files (exit0 currently S2L report)"
   ],
   "other_receipts": {
     "093": {
@@ -785,5 +784,198 @@
       "gpu_index": 0,
       "note": "Current Handover receipt only, not live health. No final metrics inspected."
     }
+  },
+  "seed23_cpu_table": {
+    "scope": "New formal server-side raw-artifact pairing and cached comparison reviewed; local scene-summary reaggregation and original frozen gate recomputation only.",
+    "source_directory": "HandOver/results/LEVEL1-QUERY-RELATION-20261025-098-seed23-comparison",
+    "run": {
+      "scope": "098-query-relation-cached-comparison",
+      "status": "COMPLETED",
+      "model_forwards": 0,
+      "optimizer_updates": 0,
+      "test_opened": false,
+      "completed_scenes": 300,
+      "default_promoted": false,
+      "seed": 20261023,
+      "population": {
+        "target_identity_count": 9100,
+        "predicted_group_count": 9353,
+        "duplicate_prediction_group_count": 610,
+        "anchor_matched_target_count": 8743,
+        "reference_unavailable_target_count": 1
+      },
+      "seed_screen_passed": false
+    },
+    "checks": 1565,
+    "max_aggregation_absolute_difference": {
+      "mae": 3.2741809263825417e-11,
+      "mse": 9.834766387939453e-07,
+      "rmse": 9.049472282640636e-11
+    },
+    "endpoint_aggregates_equal_prior_local_audit": true,
+    "pairing_report": {
+      "status": "PAIR_VERIFIED",
+      "seed": 20261023,
+      "matched_updates": 4000,
+      "matched_anchors": 32000,
+      "generic_relation_initial_parameters_exact": true,
+      "generic_relation_parameter_count_equal": true,
+      "equal_compute_claimed": false,
+      "optimizer": "fresh Adam for the added stage; original successful samples replayed"
+    },
+    "arm_pairing_report": {
+      "generic": {
+        "actual_successful_batches_exact": true,
+        "sampling_exposure_exact": true,
+        "source_final_parameters_exact": true,
+        "initial_sampler_rng_exact": true,
+        "final_sampler_rng_exact": true,
+        "matched_updates": 4000,
+        "parameter_count": 109954,
+        "trainable_parameter_count": 109954,
+        "source_updates": 4000,
+        "added_updates": 4000,
+        "final_parameters_changed": true
+      },
+      "relation": {
+        "actual_successful_batches_exact": true,
+        "sampling_exposure_exact": true,
+        "source_final_parameters_exact": true,
+        "initial_sampler_rng_exact": true,
+        "final_sampler_rng_exact": true,
+        "matched_updates": 4000,
+        "parameter_count": 109954,
+        "trainable_parameter_count": 109954,
+        "source_updates": 4000,
+        "added_updates": 4000,
+        "final_parameters_changed": true
+      }
+    },
+    "initial_output_source_final_exact": true,
+    "no_multi_prediction_exact": true,
+    "group_relation_population": {
+      "all_output_groups": 9353,
+      "groups_with_any_multi_query": 2928,
+      "groups_with_no_multi_query": 6425
+    },
+    "group_cohorts_relation": {
+      "any_multi_query": {
+        "unit_count": 146140,
+        "mae": 550.0799372392446,
+        "mse": 2648298.147959695,
+        "rmse": 1627.3592559603105,
+        "point_count": 146140,
+        "p95": 2131.6134362273624,
+        "p99": 5655.452073987321
+      },
+      "no_multi_query": {
+        "unit_count": 296123,
+        "mae": 583.9757559711773,
+        "mse": 16145092.709360935,
+        "rmse": 4018.09565706952,
+        "point_count": 296123,
+        "p95": 1642.2369041248037,
+        "p99": 9665.316274299992
+      }
+    },
+    "scientific_screen": {
+      "candidate": "relation",
+      "seed_screen_passed": false,
+      "versus_budget": {
+        "passed": false,
+        "relative_mae_reduction": -0.014059567302924236,
+        "required_reduction": 0.03,
+        "deltas": {
+          "mae": 7.941321723877081,
+          "rmse": 95.8400676330075,
+          "p95": 9.463056745715676,
+          "p99": 141.2332683480072
+        },
+        "all_mae_weightings_nonworse": false,
+        "outside_largest_component_nonworse": false,
+        "improved_scenes": 142,
+        "total_scenes": 300,
+        "improved_components": 15,
+        "total_components": 38
+      },
+      "versus_generic": {
+        "passed": false,
+        "relative_mae_reduction": 0.0053050322466173805,
+        "required_reduction": 0.01,
+        "deltas": {
+          "mae": -3.0547973828458908,
+          "rmse": 59.25352275227442,
+          "p95": -30.02504872604004,
+          "p99": -11.545651994686523
+        },
+        "all_mae_weightings_nonworse": true,
+        "outside_largest_component_nonworse": true,
+        "improved_scenes": 190,
+        "total_scenes": 300,
+        "improved_components": 23,
+        "total_components": 38
+      },
+      "fixed_weight_bias_intervention": {
+        "passed": false,
+        "delta_mae_m": 8.429948320554104e-05,
+        "groups_with_multi_query_valid_points": 146140,
+        "no_multi_prediction_exact": true,
+        "checkpoint_selection": false
+      },
+      "generic_point_mae_better_than_budget": false,
+      "outcome": "CURRENT_RELATION_RECIPE_NOT_ACCEPTED",
+      "required_seeds": [
+        20261023,
+        20261021
+      ],
+      "default_promoted": false,
+      "test_opened": false,
+      "numerical_guard_m": 1e-06,
+      "interpretation": "Both preregistered seeds must pass. Generic-set gains alone are a task-baseline result; this screen does not establish early-pooling causality or held-out generalization."
+    },
+    "bias_intervention_point_error_differences": {
+      "common_point_count": 442263,
+      "better_point_count": 70641,
+      "worse_point_count": 74278,
+      "tied_point_count": 297344,
+      "improvement_sum": 293.1928493176373,
+      "harm_sum": 330.4753970206931,
+      "signed_error_change_sum": 37.28254770305576,
+      "mean_error_change": 8.42994953298281e-05,
+      "positive_delta_tail": {
+        "point_count": 74278,
+        "p95": 0.011716427856693199,
+        "p99": 0.060342499590080916
+      },
+      "severe_harm": {
+        "100": {
+          "threshold_m": 100.0,
+          "count": 0,
+          "cumulative_harm_m": 0.0
+        },
+        "1000": {
+          "threshold_m": 1000.0,
+          "count": 0,
+          "cumulative_harm_m": 0.0
+        },
+        "10000": {
+          "threshold_m": 10000.0,
+          "count": 0,
+          "cumulative_harm_m": 0.0
+        }
+      },
+      "squared_error_change_sum_m2": 437310.3435597285,
+      "net_identity_residual_m": -3.552713678800501e-14
+    },
+    "code_checked": [
+      "tools/analysis/compare_query_relation.py:verify_pairing",
+      "tools/analysis/compare_query_relation.py:scene_pair",
+      "tools/analysis/compare_query_relation.py:scientific_screen"
+    ],
+    "evidence_boundary": "Server comparator loads actual checkpoints/ordered successful sample journals and cached input/truth/membership/prediction arrays before returning PAIR_VERIFIED. Local audit verifies returned summaries and checked code, but does not possess or independently replay raw tensors/JSONL/NPZ; no new GPU, model forward, or original ZIP read.",
+    "s2l_interpretation_corrections": [
+      "Generic does not beat the strong budget control; no stronger-budget-baseline signal.",
+      "A final fixed-weight bias switch does not rule out effects mediated through training, so the B-A training difference cannot be declared unrelated to all relationship-bias effects."
+    ]
   }
 }
