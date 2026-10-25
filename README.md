@@ -13,7 +13,7 @@
 | [运行入口](tools/experiments/README.md) | 训练、评价和缓存比较代码 |
 | [历史摘要](docs/history/README.md) | 已结案正负结果与Git恢复位置 |
 
-098四臂及双seed表已完成，当前关系配方未过冻结门槛，不追加变体。096A最新回执仍为RUNNING，保留原任务收尾。099 DeepAF保持HOLD，尚无真实MTAD训练成绩。最新状态以交接原件为准，push不代表服务器已启动。
+100原生事件mean/query与原强模型继续训练已发布[READY](HandOver/L2S-20261026-100.md)，各4000更新，尚无实际领取或成绩。098已结案，不追加其变体；096A最新回执仍RUNNING，保留原任务收尾。099 DeepAF保持HOLD。最新状态以交接原件为准，push不代表服务器已启动。
 
 **DeepAF自建模拟只是排错记录，不是作者复现、MTAD成绩或同行资格证明。** 不再扩展合成训练，也不以它作为推进真实数据实验的前置门槛。保留生产实现及单位/梯度/评价检查；真实同任务比较须披露适配差异。[DeepAF边界](docs/reports/2026-10-25-deepaf-method-audit.md)
 
