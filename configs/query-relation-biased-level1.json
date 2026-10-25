@@ -1,0 +1,29 @@
+{
+  "scope": "query-relation-position-v1",
+  "routing_semantics": "source-final-query-set-relation-position-v1",
+  "position_loss": "linear",
+  "data": {
+    "length": 64,
+    "max_observations": 128,
+    "time_unit_seconds": 20.0,
+    "reference_longitude_policy": "shortest_arc"
+  },
+  "motion_observation_policy": "canonical_all",
+  "train_splits": [
+    "T_core"
+  ],
+  "model": {
+    "hidden_size": 64,
+    "num_layers": 2,
+    "initial_gate": 0.95,
+    "mode": "relation"
+  },
+  "training": {
+    "seed": 20261023,
+    "updates": 4000,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "gradient_clip": 1.0,
+    "advisory_seconds": 14400.0
+  }
+}
