@@ -1,0 +1,31 @@
+{
+  "command": ".venv/bin/python tools/analysis/deepaf_native_probe.py --mode qualification --output runs/DEEPAF-NATIVE-QUALIFICATION-20261025-local-attempt-1",
+  "code_commit": "7619fcf",
+  "actual_exit_code": 0,
+  "device": "cpu",
+  "threads": 1,
+  "python": "3.12.14",
+  "torch": "2.10.0",
+  "numpy": "2.5.4",
+  "raw_run": "/Users/a1/Projects/association-code/runs/DEEPAF-NATIVE-QUALIFICATION-20261025-local-attempt-1",
+  "raw_files_retained": [
+    "adapted_labels-step0.pt",
+    "adapted_labels-step256.pt",
+    "adapted_labels-step1024.pt",
+    "adapted_labels-step0-heldout.json",
+    "adapted_labels-step256-heldout.json",
+    "adapted_labels-step1024-heldout.json",
+    "adapted_labels-sampling.jsonl",
+    "adapted_labels-training.json"
+  ],
+  "original_package": "/Users/a1/Downloads/association-code-099-review.zip",
+  "prior_runtime": {
+    "torch": "2.5.1+cpu",
+    "numpy": "2.3.5"
+  },
+  "comparison": "Use this run step256 versus step1024. Original-package sampling matches, but losses are not bitwise equal; cause not decomposed.",
+  "independent_audit": "JSON errors regrouped independently; no extra inference or training. Endpoint/controls/shadow maximum discrepancy 0.",
+  "formal_099_status": "HOLD_METHOD_QUALIFICATION",
+  "production_level1": false,
+  "test_opened": false
+}
