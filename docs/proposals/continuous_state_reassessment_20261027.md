@@ -9,16 +9,16 @@ package_type: IDEA_PACKAGE
 package_version: research-pipeline-contract v1.0
 package_id: IDEA-STATE-DIAG-20261027
 idea_id: IDEA-STATE-DIAG-20261027
-plan_version: 1.0-design
+plan_version: 1.1-design
 created_at: 2026-10-27
 source_matrix_id: MC-RESTART-20261027
 selected_C_id: C03
 source_P_ids: [P03]
-source_F_ids: [F03, F07, F06, F10]
-source_M_ids: [M03, M06]
-source_E_ids: [E05, E07, E06, E10, E11]
+source_F_ids: [F03, F07, F06, F10, F11, F12, F13]
+source_M_ids: [M03, M06, M07]
+source_E_ids: [E05, E07, E06, E10, E11, E12, E13, E14, E15]
 source_transfer_id: TRANSFER-STATE-GNC-20261027
-source_ids: [MC-RESTART-20261027, SP-SQ-20261027, AP-XGNC-20261027-v1, AP-CGNSS-20261027-v1, AP-XCRU-20261027-v1, AP-TS-FIM-20261027-v1]
+source_ids: [MC-RESTART-20261027, SP-SQ-20261027, AP-XGNC-20261027-v1, AP-CGNSS-20261027-v1, AP-XCRU-20261027-v1, AP-TS-FIM-20261027-v1, AP-TEMPORAL-MPRF-20261027, AP-HOMOGRAPHY-TARGETED-20261027, AP-TFTS-TARGETED-20261027, AP-REGERROR-TARGETED-20261027]
 evidence_status: partial
 status: diagnostic
 next_skill: record-experiment
@@ -28,9 +28,11 @@ next_skill: record-experiment
 
 选用模式：Pattern 2（现象驱动），跨域机制作为条件性后续。已知现象是090C和普通控制在相同三个场景存在极端误差；**尚未知道是否同query、同方向，也没有证明存在可剔除的异常观测**。因此本轮选择的是诊断问题，尚未选择“必然有效”的最终网络。
 
-`research_question`：这些尾部是否包含可由其他可见约束识别的局部观测异常，使独立连续时间估计中的鲁棒重加权有作用条件；还是共同偏差、参考/对应链或动态模型失配占主导？
+`research_question`：这些尾部是否包含可由其他可见约束识别的局部观测异常，使独立连续时间估计中的鲁棒重加权有作用条件；还是源间共享相对偏差、共同绝对偏移、参考/对应链或动态模型失配占主导？
 
 `hypothesis_and_mechanism`（待验）：若尾部由部分不一致观测主导，且剩余观测能约束轨迹，则对二维物理残差的连续降权可能减少异常约束对解的拖拽；若所有来源一致偏移或组内错误轨迹自洽，残差降权缺少绝对真值信息，不应期待它自动恢复正确轨迹。平滑先验也可能将真实机动误判为异常。
+
+**1.1-design增量来源及影响**：用户提供的同MTAD清单经原文补核后进入矩阵E12–15。Temporal-MPRF的时间/序号同结构对照支持保留独立时序候选，但其标签去偏主基准和相对偏差压力测试都只评价关联。Homography的B→A配准仍可保留A的绝对偏差；TF-TS的差分亦不提供绝对零点。RegError的高召回伴随错误输出，低速散点是困难人口而非删除理由。故本次细化竞争解释和记录字段，仍不预选新网络，不将相对偏差全当局部外点；详细表与阅读边界见[来源矩阵E12–15](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md)。
 
 ## 2. 先做的诊断：只读已有证据
 
@@ -49,6 +51,7 @@ next_skill: record-experiment
 3. 从可见量测保留来源/片段身份、实际时刻、exact-observation、support、nearest_seconds、插值/外推标志；来源在该query的估计只用于诊断。**原生观测冲突与插值/外推产生的query估计冲突分开登记**；原始时刻不同不能直接当同时刻不一致，派生冲突也可能来自插值或运动模型。source support是时间覆盖，不能当观测准确度。
 4. 对极端行核reference的左右插值端点、时间offset、成员绑定及原数据单位；真实标签仅用于诊断/评价，不能作为候选推理输入。
 5. 分开记录“原始观测彼此冲突”“各来源相对真值同向偏移”“预测相对量测额外偏移”“reference/时间/绑定无法核对”。无法分类保留unknown，多因并存可多标，不强行互斥归因。
+6. 对已有三场的全部目标增加描述字段`relative_geometry_bias_candidate`：同一来源对在不同目标/时间的差向量是否出现一致结构；明确source身份、对齐方式、低速/机动条件，以及是否用真值对应才能构造。使用相同时间处理区分原生信息与插值派生差，不把未对齐坐标差称偏差估计。本轮不拟合新校准器、不扩数据；仅在少数尾部目标出现一致差不能证明场景共享。共同相对偏差、时间offset和相似航向群体仍可能互相混淆。
 
 ### 2.3 可检验预测与主要结果
 
@@ -57,6 +60,7 @@ next_skill: record-experiment
 | 竞争解释 | 应观察到什么 | 会削弱它的结果 |
 |---|---|---|
 | H-local：可分离局部异常 | 同query存在来源冲突且至少一部分观测与reference接近（只证明健康来源存在）；还须有不看reference的质量/冗余或时域证据能区分坏源 | 来源共同偏移、对称双源仅靠reference才能选对，或降权后只剩无约束区 |
+| H-relative：源间共享相对几何偏差 | 多个目标/时段的同源对差向量有共同结构，且并非仅随单个机动/插值区变化；明确是否依赖真值关联 | 方向/幅度随目标或时段明显改变，主要由时间offset/错组解释，或仅所选极端点一致 |
 | H-common：共同输入/参考/绑定问题 | 三方法同点同方向大误差；原始来源也一起偏，或时间/对应链有可定位不一致 | 三方法错点不同；原量测/参考链一致而090C额外偏离 |
 | H-model：模型/外推失配 | 普通控制与090C的误差向量、支撑/外推状态不同；真实转弯/长缺口处动力学先验解释不足 | 误差早已存在于全部可见来源，模型只继承共同偏移 |
 
@@ -76,6 +80,7 @@ next_skill: record-experiment
 
 - 三场逐点一致性、来源冲突/共同偏移、对应链已说明或明确unknown，即结束诊断。没有识别出主因也是有效结果，不继续穷举全数据。
 - 有直接材料显示时间/坐标/绑定实现错误：先提出该错误的最小修复及同人口验证，暂停鲁棒模型试验；原历史数字不静默替换。
+- 若更符合源间共享相对几何偏差，保留校准作为独立连接重新筛选，暂不进入局部降权pilot；未来须检验参数共享范围、未知对应和留出目标/时间，而非在V真值上拟合后宣称恢复。相对校准仍不提供共同绝对零点。
 - 主要表现为自洽共同偏移/错误整组，且无可见健康约束：本轮GNC迁移不进入pilot；需要可辨识bias或关联问题的新来源/连接，不能再加平滑模块。
 - 确有局部冲突、剩余约束可信，且存在不依赖reference的区分依据：可进入下面条件性pilot的实现设计；仅事后发现好源不满足此条件。仍不保证涨点，也不以这三个事后场景作为调参集。
 - 结果混合或unknown：保留条件分层，不强行给统一根因。只有提出能改变取舍的具体补证据项才再做一次定向检查；不自动加模型/seed/步数。
@@ -178,6 +183,6 @@ next_skill: discover-innovation
 
 `ethics_safety_privacy_or_compliance`：仅使用项目已有授权研究数据、缓存与公开论文/代码；不外传原AIS/目标信息，不开封存测试，不向作者/外部联系人自动发信；代码移植保留许可证和来源。
 
-`missing_evidence / transfer_condition_commitments`：同query原数组、独立健康约束、内点尺度、动态模型可辨识性、作者TMTAFF统计/反馈实现均未确定；不能写成已建立条件。上游来源链与主要反例已保留。没有本轮实际执行结果，因此不创建新的EXPERIMENT_RECORD或SQUEEZE_REPORT冒充完成闭环。
+`missing_evidence / transfer_condition_commitments`：同query原数组、独立健康约束、偏差的跨目标/时间共享范围、内点尺度、动态模型可辨识性、作者TMTAFF统计/反馈实现均未确定；不能写成已建立条件。上游来源链与主要反例已保留；Homography原刊PDF/表图及作者实现仍缺，相关噪声单元格/参数共享范围不用于确定配置。没有本轮实际执行结果，因此不创建新的EXPERIMENT_RECORD或SQUEEZE_REPORT冒充完成闭环。
 
 实际诊断执行后：`record-experiment`记录全部样本/缺项/偏差→`squeeze-experiment`区分观察与因果→增量Mode C判断C03条件→修订同一Idea或停止。只有新证据改变机制选择，才进入另一个连接；不自动恢复098/100或提前选定CRU/QuITE替补。

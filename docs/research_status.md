@@ -8,8 +8,8 @@
 
 ## 现在做什么
 
-1. **已完成本轮原文重审与正式矩阵。** TMTAFF/PTFM复读，新增CRU、GNC及GNSS迁移、GraFITi、QuITE、SAITS、CSDI、FIM；共10篇，其中6篇时序/连续动态方法。方法、主要表格、附录、反例及关键代码的实际覆盖见[完整分析与P×F矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md)，未将旧摘要标签或初筛线索当精读证明。
-2. **选定的是诊断Idea，不是已验证的新模型。** `MC-RESTART-20261027/C03 → IDEA-STATE-DIAG-20261027`：先查3035/2819/1043已有缓存中三方法是否同点/同向大错、来源冲突是否可辨识、reference/时间/绑定链是否一致。[设计、迁移条件与停止规则](proposals/continuous_state_reassessment_20261027.md)已写；尚未执行、未发布READY，不重复101全表。
+1. **已完成本轮原文重审与正式矩阵。** TMTAFF/PTFM及CRU、GNC、GNSS迁移、GraFITi、QuITE、SAITS、CSDI、FIM共10篇，用户补充同MTAD清单后又复核Temporal-MPRF；共11篇原文分析，另有Homography/TF-TS/RegError三篇定向补核。实际方法/表格/附录/代码覆盖及E12–15增量见[完整分析与P×F矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md)，不声称清单22篇均已重新精读。
+2. **选定的是诊断Idea，不是已验证的新模型。** `MC-RESTART-20261027/C03 → IDEA-STATE-DIAG-20261027`：先查3035/2819/1043已有缓存中三方法是否同点/同向大错、来源冲突是否可辨识、reference/时间/绑定链是否一致；plan 1.1补入共享相对偏差与共同绝对偏移的区分。[设计、迁移条件与停止规则](proposals/continuous_state_reassessment_20261027.md)已写；尚未执行、未发布READY，不重复101全表。
 3. 条件成立时，优先检验**独立连续时间状态估计→鲁棒残差优化**；090C仅作内部参考，不绑定骨架。共同偏差、对称双源、错误运动先验或降权后无约束会阻止该方案。QuITE/CRU保留候选，未提前决定替补；旧观测约束草案、098/100不自动恢复。
 4. 既有102指标补算保持原安排。TMTAFF指标定义继续统一，但作者ESD、TFM反馈、位置loss及训练分配仍缺实现说明；同任务适配比较不必等待作者原名单，不能用论文报数或失效适配证明我方胜出。
 
