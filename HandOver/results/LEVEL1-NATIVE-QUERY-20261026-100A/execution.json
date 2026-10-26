@@ -1,0 +1,48 @@
+{
+  "arguments": {
+    "config": "/home/wangguangjie/djs/association-code-run100A/configs/native-query-mean-level1.json",
+    "manifest": "/home/wangguangjie/djs/association-code-run100A/configs/data/mtad-level1-scene3000.json",
+    "alignment": "/home/wangguangjie/djs/association-code-run100A/configs/data/mtad-level1-alignment.json",
+    "source_system": "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+    "strong_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1",
+    "output": "/home/wangguangjie/djs/association-code/runs/LEVEL1-NATIVE-QUERY-20261026-100A-attempt-1",
+    "archive": [
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+      "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip"
+    ],
+    "device": "cuda:0",
+    "cpu_threads": 4,
+    "time_policy": "advisory"
+  },
+  "configuration": {
+    "scope": "native-query-fusion-100-v1",
+    "routing_semantics": "fixed090C-native-events-source-symmetric-v1",
+    "position_loss": "linear",
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc"
+    },
+    "motion_observation_policy": "canonical_all",
+    "train_splits": [
+      "T_core"
+    ],
+    "model": {
+      "hidden_dim": 64,
+      "patches": 8,
+      "heads": 4
+    },
+    "training": {
+      "seed": 20261023,
+      "updates": 4000,
+      "batch_size": 8,
+      "learning_rate": 0.001,
+      "gradient_clip": 1.0,
+      "advisory_seconds": 28800.0
+    },
+    "arm": "mean"
+  },
+  "test_opened": false
+}
