@@ -111,6 +111,8 @@ Eq22—27：每场`PCA=TP/(TP+FN)`，是召回率；`PFA=FP/(TP+FP)`，是错误
 
 关联四指标已由`association/evaluation/association.py`统一输出；融合附加统计从已对齐的唯一目标行计算，保留缺预测/缺真值，重复预测仍进入原人口计数但不增加论文目标数N。未来正常评价随结果生成，历史只有聚合MAE时不得倒推出ME/SD；已有预测数组可在具体CPU补算任务中复用，不为报告指标重新训练。
 
+**本步已实现的指标入口：** `tools/analysis/coordinate_metrics.py --paper-attributes --prediction-speed-unit kn --target-speed-unit mps`直接读取090C final已有四属性缓存，并从其原056关联摘要逐场TP/FP/FN/TN重建ITSA/MSTSA八项；不重选阈值、不打开模型/ZIP。`association/evaluation/paper_fusion_metrics.py`分别转换预测/真值速度，再按目标/场景层级汇总；调用方未明确单位时保持legacy native标注，不猜单位。102报告按本次8场实证采用reference m/s解释，明确不是全包单位已逐条证实。090C/Anchor/Mean共同人口，090C速度航向逐点核对等于Mean；原位置误差与坐标条件统计必须复现。新共享报告的严格完整列要求全部声明query都有真值/预测，比101旧coordinate严格列更严，两者分名保留。代码/相关CPU检查和原056计数复算已完成；真实速度/航向数值仍须服务器读取已有NPZ补算。
+
 ## 2026-10-26：当前Level1上的真实共同协议比较路线
 
 用户要求与TMTAFF在同一指标维度真实比较。推荐在**本项目同一Level1划分上实跑双方**，不把找到作者未公开的原场景名单设为前置条件；名称保持“同任务适配比较”，不冒称重现作者原表。下述为推进路线，不是新READY或已完成的配置修复。

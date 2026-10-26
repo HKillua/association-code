@@ -92,6 +92,65 @@ class PaperFusionMetricTests(unittest.TestCase):
                          ['scene_equal_target_mean']['ME'], 10)
         self.assertEqual(combined['all']['position']['mae'], report['full_target_metrics']['all']['position']['mae'])
 
+    def test_explicit_speed_units_convert_both_sides_to_kn_without_changing_arrays(self):
+        for prediction_unit, target_unit in [('kn', 'mps'), ('mps', 'mps'), ('mps', 'kn')]:
+            with self.subTest(prediction_unit=prediction_unit, target_unit=target_unit):
+                truth = np.zeros((1, 2, 4)); prediction = truth.copy()
+                truth[..., 2] = [10, 12]; prediction[..., 2] = [8, 9]
+                if prediction_unit == 'mps':
+                    prediction[..., 2] *= 1852/3600
+                if target_unit == 'mps':
+                    truth[..., 2] *= 1852/3600
+                before = prediction.copy(), truth.copy()
+                prediction.flags.writeable = truth.flags.writeable = False
+                valid = np.ones_like(truth, bool)
+                report = paper_fusion_scene(prediction, truth, valid, prediction_valid=valid,
+                    prediction_speed_unit=prediction_unit, target_speed_unit=target_unit)
+                row = report['attributes']['speed']
+                self.assertEqual(row['unit'], 'kn')
+                self.assertTrue(row['paper_unit_verified'])
+                self.assertAlmostEqual(row['target_mean']['ME'], 2.5)
+                self.assertAlmostEqual(row['target_mean']['MAE'], 2.5)
+                self.assertAlmostEqual(row['target_mean']['residual_SD'], math.sqrt(.5))
+                self.assertAlmostEqual(row['target_mean']['printed_Eq29_diagnostic'], math.sqrt(146.5))
+                self.assertEqual(report['metadata']['speed_units']['prediction_unit'], prediction_unit)
+                self.assertEqual(report['metadata']['speed_units']['target_unit'], target_unit)
+                combined = aggregate_paper_fusion([report, report])['attributes']['speed']
+                self.assertEqual(combined['unit'], 'kn')
+                self.assertAlmostEqual(combined['scene_equal_target_mean']['ME'], 2.5)
+                np.testing.assert_array_equal(prediction, before[0])
+                np.testing.assert_array_equal(truth, before[1])
+
+    def test_ambiguous_or_mixed_speed_declarations_are_not_silently_combined(self):
+        states = np.zeros((1, 2, 4)); valid = np.ones_like(states, bool)
+        for prediction_unit, target_unit in [('native', 'mps'), ('kn', 'native'), ('mph', 'mph')]:
+            with self.subTest(prediction_unit=prediction_unit, target_unit=target_unit):
+                with self.assertRaisesRegex(ValueError, 'speed units'):
+                    paper_fusion_scene(states, states, valid, prediction_valid=valid,
+                        prediction_speed_unit=prediction_unit, target_speed_unit=target_unit)
+        legacy = paper_fusion_scene(states, states, valid, prediction_valid=valid)
+        knots = paper_fusion_scene(states, states, valid, prediction_valid=valid,
+            prediction_speed_unit='kn', target_speed_unit='kn')
+        mixed = paper_fusion_scene(states, states, valid, prediction_valid=valid,
+            prediction_speed_unit='kn', target_speed_unit='mps')
+        for reports in ([legacy, knots], [knots, mixed]):
+            with self.assertRaisesRegex(ValueError, 'speed-unit declarations'):
+                aggregate_paper_fusion(reports)
+
+    def test_native_default_retains_legacy_values_and_can_pool_older_metadata(self):
+        states = np.zeros((1, 2, 4)); target = states.copy()
+        target[..., 2] = [2, 4]; valid = np.ones_like(states, bool)
+        default = paper_fusion_scene(states, target, valid, prediction_valid=valid)
+        explicit = paper_fusion_scene(states, target, valid, prediction_valid=valid,
+            prediction_speed_unit='native', target_speed_unit='native')
+        self.assertEqual(default, explicit)
+        self.assertEqual(default['attributes']['speed']['target_mean']['ME'], 3)
+        self.assertFalse(default['attributes']['speed']['paper_unit_verified'])
+        del explicit['metadata']['speed_units']
+        pooled = aggregate_paper_fusion([default, explicit])['attributes']['speed']
+        self.assertEqual(pooled['unit'], 'native_speed')
+        self.assertEqual(pooled['scene_equal_target_mean']['ME'], 3)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -7,7 +7,7 @@ import numpy as np
 
 from association.evaluation.fusion_controls import attribute_errors
 from tools.analysis.coordinate_metrics import (
-    METHODS, REGIONS, aggregate, coordinate_scene, evaluate_scene, pool_coordinates, report,
+    METHODS, REGIONS, aggregate, coordinate_scene, evaluate_scene, pool_coordinates, report, paper_tables,
 )
 
 
@@ -119,6 +119,27 @@ class CoordinateMetricsTests(unittest.TestCase):
             self.assertIn('6.24 ± 0.13', text)
             self.assertIn('10⁻⁴度', text)
             self.assertIn('零训练/前向', text)
+            # Same saved arrays, independently declared speed units. Only the
+            # report changes; input/position predictions are never rewritten.
+            new_row, new_vectors = evaluate_scene(root, 'a', paper_attributes=True,
+                prediction_speed_unit='kn', target_speed_unit='mps')
+            new_result = aggregate([new_row], [new_vectors])
+            attrs = new_result['paper_fusion_metrics']['learned_sequence']['attributes']
+            self.assertEqual(attrs['speed']['unit'], 'kn')
+            self.assertAlmostEqual(attrs['speed']['scene_equal_target_mean']['ME'], 10*3600/1852-10)
+            self.assertAlmostEqual(attrs['longitude']['scene_equal_target_mean']['ME'], 2.)
+            self.assertEqual(new_result['methods'], result['methods'])
+            new_result['association'] = {'variants': {
+                kind: {'values': dict(m_pca=90., mw_pca=89., m_pfa=10., mw_pfa=11.)}
+                for kind in ('itsa','mstsa')}}
+            table = paper_tables(new_result)
+            self.assertIn('mPCA %', table)
+            self.assertIn('speed | kn', table)
+            self.assertIn('heading | degree', table)
+            self.assertIn('作者ESD实现未核实', table)
+            self.assertIn('Mean速度/航向', table)
+            with np.load(root/'system-predictions/states-a.npz') as unchanged:
+                np.testing.assert_array_equal(unchanged['learned_sequence_aligned_prediction'], prediction)
 
 
 if __name__ == '__main__':
