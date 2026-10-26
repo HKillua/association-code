@@ -1,0 +1,39 @@
+{
+ "run_id": "LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1",
+ "note": "101 coordinate backfill; native outputs verbatim, zero forwards/training.",
+ "server_originals": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 484,
+   "sha256": "95dff40d24e5e0214bb6fa602648c5e6af68416e96df10119b336c82c378310e",
+   "mtime_local": "2026-10-26T15:11:25+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 2864,
+   "sha256": "0e56e2e0c4047af281cf0402674808f2a89f3354d6c3873942fb3f698725447c",
+   "mtime_local": "2026-10-26T15:11:25+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 154438,
+   "sha256": "42c9813241440543d816a74f8e4d8593bc3f24d7ea49400490dfab67db75039b",
+   "mtime_local": "2026-10-26T15:11:22+0800"
+  },
+  {
+   "returned_name": "scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 1113439,
+   "sha256": "ac66b9f2fb4ff28a92cf78ebc3ccaf08c6e990cc6988b1b21e8e4e6b28ea98c7",
+   "mtime_local": "2026-10-26T15:11:25+0800"
+  }
+ ],
+ "returned_total_bytes": 1271225
+}
