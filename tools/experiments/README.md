@@ -1,9 +1,10 @@
 # 运行入口
 
-仅从[当前交接](../../HandOver/Handover.md)领取。100三臂与CPU整表READY，096及其CPU表原合同收尾，099暂停；其余代码或配置存在不表示新授权。
+仅从[当前交接](../../HandOver/Handover.md)领取。当前仅101经纬度CPU补算READY；100/096已结案，099暂停，其余代码或配置存在不表示新授权。
 
 | 工作 | 入口 |
 |---|---|
+| 101已有090C经纬度补算 | `../analysis/coordinate_metrics.py`；只读final完整缓存，0训练/0前向/0GPU |
 | 数据准备 | `make_scene_manifest.py`、`prepare_scene_data.py`；现有名单冻结，不重复生成 |
 | 学习关联／属性融合／完整系统 | `evidence_association_fit.py`、`evidence_fusion_fit.py`、`level1_system_evaluate.py` |
 | 位置网络与预算控制 | `sequence_position_fit.py`、`frozen_position_adapter_fit.py`、`sequence_budget_replication.py` |
