@@ -2,6 +2,8 @@
 
 本页只维护共同协议边界、论文指标及其原表，不维护论文普查或下一批模型安排。当前数据规则见[数据约定](data_contract.md)，目标见[研究状态](research_status.md)。
 
+2026-10-27重新核读32页原文及关键图式，新增[TMTAFF方法/实现差异审查](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/tmtaff_reaudit_20261027.md)与[PTFM六表及任务边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/ptfm_reaudit_20261027.md)。本页指标定义不变；图12的CL方向、递归反馈与损失歧义见来源审查，不能以当前适配冒充作者精确复现。共同协议固定的是信息、监督/评价对象和人口；**Q64是当前共同评价时刻，不限制新模型内部必须用Q64网格、固定0.95或090C残差结构**。
+
 逐篇选数／处理证据已汇入[资料库最新同源论文清单](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/README.md)及原文笔记；旧12篇对照与2026-10-23竞争路线在Git903f679，避免同时维护两套不断增补的文献清单。
 
 ## 当前正式规模与未还原项
