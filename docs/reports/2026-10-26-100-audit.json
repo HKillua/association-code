@@ -1,0 +1,314 @@
+{
+  "scope": "Local recomputation of returned scene/component sufficient statistics; no raw prediction/weight/replay-log access or inference",
+  "source_server_commit": "3679f6c",
+  "checks": 71244,
+  "errors": [],
+  "scene_count": 300,
+  "component_count": 38,
+  "position_population": {
+    "available_target_points": 454952,
+    "covered_target_points": 442263,
+    "missing_prediction_points": 12689,
+    "available_target_trajectories": 9099,
+    "covered_target_trajectories": 8742,
+    "point_coverage": 0.9721091455801931
+  },
+  "population": {
+    "target_identity_count": 9100,
+    "predicted_group_count": 9353,
+    "duplicate_prediction_group_count": 610,
+    "anchor_matched_target_count": 8743,
+    "reference_unavailable_target_count": 1
+  },
+  "metrics": {
+    "strong": {
+      "point_equal": {
+        "unit_count": 442263,
+        "mae": 564.8340061095184,
+        "mse": 11039205.87695423,
+        "rmse": 3322.530041542774,
+        "point_count": 442263,
+        "p95": 1895.81429165806,
+        "p99": 7757.040654130591
+      },
+      "scene_target_equal": {
+        "unit_count": 8742,
+        "mae": 560.9331806765964,
+        "mse": 10978571.435264684,
+        "rmse": 3313.39273785416
+      },
+      "scene_equal_point_mean": {
+        "unit_count": 300,
+        "mae": 627.6478005152815,
+        "mse": 18878930.916991152,
+        "rmse": 4344.989173403214
+      },
+      "scene_equal_target_mean": {
+        "unit_count": 300,
+        "mae": 602.8547996562916,
+        "mse": 16242745.296966223,
+        "rmse": 4030.228938530195
+      }
+    },
+    "budget": {
+      "point_equal": {
+        "unit_count": 442263,
+        "mae": 564.9676070481082,
+        "mse": 11268777.302312829,
+        "rmse": 3356.8999541709354,
+        "point_count": 442263,
+        "p95": 1918.8418700466586,
+        "p99": 7809.281240592707
+      },
+      "scene_target_equal": {
+        "unit_count": 8742,
+        "mae": 559.7202449934301,
+        "mse": 11289568.015994463,
+        "rmse": 3359.9952404719957
+      },
+      "scene_equal_point_mean": {
+        "unit_count": 300,
+        "mae": 620.589471090994,
+        "mse": 19076560.61269052,
+        "rmse": 4367.672219007571
+      },
+      "scene_equal_target_mean": {
+        "unit_count": 300,
+        "mae": 593.9235858692587,
+        "mse": 16494466.23674187,
+        "rmse": 4061.3379860265104
+      }
+    },
+    "mean": {
+      "point_equal": {
+        "unit_count": 442263,
+        "mae": 566.0921337970436,
+        "mse": 11037591.657602021,
+        "rmse": 3322.2871124576245,
+        "point_count": 442263,
+        "p95": 1895.9302328235594,
+        "p99": 7763.582284267908
+      },
+      "scene_target_equal": {
+        "unit_count": 8742,
+        "mae": 562.2617090761521,
+        "mse": 10973523.66447216,
+        "rmse": 3312.6309278988747
+      },
+      "scene_equal_point_mean": {
+        "unit_count": 300,
+        "mae": 628.4606328521941,
+        "mse": 18874325.835460544,
+        "rmse": 4344.459210932995
+      },
+      "scene_equal_target_mean": {
+        "unit_count": 300,
+        "mae": 603.7739412419569,
+        "mse": 16239032.168155652,
+        "rmse": 4029.768252412991
+      }
+    },
+    "query": {
+      "point_equal": {
+        "unit_count": 442263,
+        "mae": 567.1867141503767,
+        "mse": 11035687.362196779,
+        "rmse": 3322.0005060500484,
+        "point_count": 442263,
+        "p95": 1895.7144375619444,
+        "p99": 7756.0435206917455
+      },
+      "scene_target_equal": {
+        "unit_count": 8742,
+        "mae": 563.2981573080501,
+        "mse": 10970507.815578396,
+        "rmse": 3312.1756921362726
+      },
+      "scene_equal_point_mean": {
+        "unit_count": 300,
+        "mae": 628.9876811252371,
+        "mse": 18873754.986520298,
+        "rmse": 4344.393511932396
+      },
+      "scene_equal_target_mean": {
+        "unit_count": 300,
+        "mae": 604.258375280847,
+        "mse": 16237818.11630635,
+        "rmse": 4029.617614154766
+      }
+    }
+  },
+  "regions_query_vs_strong": {
+    "anchor_inside_support": {
+      "count": 322953,
+      "fraction": 0.7302283935124575,
+      "mae": {
+        "strong": 234.169839771984,
+        "budget": 233.03941060314472,
+        "mean": 235.35689378130076,
+        "query": 237.64158836872195
+      },
+      "query_mae_delta": 3.4717485967340362,
+      "contribution_to_total_delta_m": 2.535169400472224
+    },
+    "anchor_outside_helper_supported": {
+      "count": 90769,
+      "fraction": 0.2052376074869478,
+      "mae": {
+        "strong": 971.4154479142813,
+        "budget": 975.3660439173657,
+        "mean": 973.3533881746158,
+        "query": 970.6171624522509
+      },
+      "query_mae_delta": -0.7982854620247264,
+      "contribution_to_total_delta_m": -0.1638381983175676
+    },
+    "predicted_group_no_support": {
+      "count": 28541,
+      "fraction": 0.06453399900059467,
+      "mae": {
+        "strong": 3013.3814858763685,
+        "budget": 3015.6789034393064,
+        "mean": 3013.28183178244,
+        "query": 3013.092906808372
+      },
+      "query_mae_delta": -0.28857906799543415,
+      "contribution_to_total_delta_m": -0.01862316128560989
+    }
+  },
+  "ranking_vs_strong": {
+    "budget": {
+      "strong": {
+        "scenes_improved": 164,
+        "components_improved": 29
+      }
+    },
+    "mean": {
+      "strong": {
+        "scenes_improved": 116,
+        "components_improved": 18
+      }
+    },
+    "query": {
+      "strong": {
+        "scenes_improved": 109,
+        "components_improved": 11
+      }
+    }
+  },
+  "outside_largest": {
+    "strong": {
+      "unit_count": 109365,
+      "mae": 833.5450159645989,
+      "mse": 23201865.086737085,
+      "rmse": 4816.831436404754,
+      "point_count": 109365,
+      "p95": 2597.4361437655343,
+      "p99": 15245.032233374108
+    },
+    "budget": {
+      "unit_count": 109365,
+      "mae": 830.4378562967948,
+      "mse": 23752440.60125226,
+      "rmse": 4873.64756637698,
+      "point_count": 109365,
+      "p95": 2647.661233005417,
+      "p99": 15417.627304082123
+    },
+    "mean": {
+      "unit_count": 109365,
+      "mae": 834.8601878133118,
+      "mse": 23195212.33578436,
+      "rmse": 4816.140813533629,
+      "point_count": 109365,
+      "p95": 2597.1142852824287,
+      "p99": 15264.10513138531
+    },
+    "query": {
+      "unit_count": 109365,
+      "mae": 835.655078484712,
+      "mse": 23190870.673011757,
+      "rmse": 4815.6900515929965,
+      "point_count": 109365,
+      "p95": 2601.5247497441524,
+      "p99": 15255.344460754794
+    }
+  },
+  "posthoc_return_strong_inside_support": {
+    "total_mae_delta_m": -0.1824613596031775,
+    "relative_improvement": 0.000323035365487182,
+    "warning": "Aggregate-only posthoc arithmetic for exact unchanged outside predictions, not an executed or selected method; not evidence of a learned causal mechanism."
+  },
+  "pairing_server_report": {
+    "status": "PAIR_VERIFIED",
+    "common_initial_tensors_exact": true,
+    "common_tensor_count": 19,
+    "budget_initial_equals_strong": true,
+    "native_zero_heads": true,
+    "matched_updates": 4000,
+    "matched_anchors": 32000,
+    "interpretation": "Actual scene/anchor/member and successful exposure pairing; wall time/parameter count need not match."
+  },
+  "training_server_report": {
+    "budget": {
+      "parameter_count": 210308,
+      "trainable_parameter_count": 105154,
+      "actual_successful_batches_exact": true,
+      "source_updates": 8000,
+      "added_updates": 4000,
+      "frozen_base_tensors_exact": true,
+      "fresh_adam": true,
+      "branch_changed": true,
+      "clipped_updates": 4000,
+      "clip_fraction": 1.0,
+      "first_window_mean_loss": 1.8216720202470278,
+      "last_window_mean_loss": 1.6067759875274703,
+      "loss_window_updates": 100,
+      "fit_elapsed_seconds": 2065.4606461082585,
+      "total_elapsed_seconds": 4545.740172444843,
+      "successful_update_seconds": 1714.6349820266478
+    },
+    "mean": {
+      "parameter_count": 140676,
+      "trainable_parameter_count": 35522,
+      "actual_successful_batches_exact": true,
+      "source_updates": 8000,
+      "added_updates": 4000,
+      "frozen_base_tensors_exact": true,
+      "fresh_adam": true,
+      "branch_changed": true,
+      "clipped_updates": 2066,
+      "clip_fraction": 0.5165,
+      "first_window_mean_loss": 1.9405038843199358,
+      "last_window_mean_loss": 1.7597619851278952,
+      "loss_window_updates": 100,
+      "fit_elapsed_seconds": 5582.423661336303,
+      "total_elapsed_seconds": 8489.88440138707,
+      "successful_update_seconds": 5209.619140295312
+    },
+    "query": {
+      "parameter_count": 140740,
+      "trainable_parameter_count": 35586,
+      "actual_successful_batches_exact": true,
+      "source_updates": 8000,
+      "added_updates": 4000,
+      "frozen_base_tensors_exact": true,
+      "fresh_adam": true,
+      "branch_changed": true,
+      "clipped_updates": 2020,
+      "clip_fraction": 0.505,
+      "first_window_mean_loss": 1.9404590501157117,
+      "last_window_mean_loss": 1.7587492911720708,
+      "loss_window_updates": 100,
+      "fit_elapsed_seconds": 3688.7183219050057,
+      "total_elapsed_seconds": 6660.689296067227,
+      "successful_update_seconds": 3319.5954435295425
+    }
+  },
+  "not_independently_recomputed": [
+    "P95/P99 require raw point-error arrays",
+    "actual checkpoint initial/final tensors",
+    "actual individual successful training batches"
+  ],
+  "decision": "No candidate promotion or automatic extra seed/T1P/retraining."
+}
