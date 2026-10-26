@@ -6,6 +6,7 @@
 
 | 文件 | 用途 |
 |---|---|
+| [科研流程规范](docs/research_workflow.md) | 用户指定的全文原则、强制五技能顺序与本轮纠正 |
 | [研究状态](docs/research_status.md) | 当前结果、主要缺口和下一步 |
 | [交接索引](HandOver/Handover.md) | 唯一当前执行名单与状态 |
 | [数据约定](docs/data_contract.md) | 划分、时间、单位、mask与评价人口 |
