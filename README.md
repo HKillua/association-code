@@ -13,7 +13,7 @@
 | [运行入口](tools/experiments/README.md) | 训练、评价和缓存比较代码 |
 | [历史摘要](docs/history/README.md) | 已结案正负结果与Git恢复位置 |
 
-100三臂与CPU整表已完成：原强模型MAE564.834m，继续训练564.968m，原生事件固定池化566.092m、attention汇总567.187m；当前候选不晋级，不自动追加训练。096完整系统也已结案为无效参考适配，099 DeepAF保持HOLD。**当前仅101 READY：已有090C预测的经纬度CPU补算，零训练/推理**；[本地分析与证据边界](docs/reports/2026-10-26-experiment-review.md)，实际执行以交接为准。
+100三臂与CPU整表已完成：原强模型MAE564.834m，继续训练564.968m，原生事件固定池化566.092m、attention汇总567.187m；当前候选不晋级，不自动追加训练。096完整系统也已结案为无效参考适配，099 DeepAF保持HOLD。**101经纬度CPU补算已完成并审阅，当前无READY**；[本地分析与证据边界](docs/reports/2026-10-26-experiment-review.md)，实际执行以交接为准。
 
 **DeepAF自建模拟只是排错记录，不是作者复现、MTAD成绩或同行资格证明。** 不再扩展合成训练，也不以它作为推进真实数据实验的前置门槛。保留生产实现及单位/梯度/评价检查；真实同任务比较须披露适配差异。[DeepAF边界](docs/reports/2026-10-25-deepaf-method-audit.md)
 

@@ -1,0 +1,127 @@
+{
+  "source_commit": "711a63f",
+  "source": "HandOver/results/LEVEL1-COORDINATE-METRICS-20261026-101",
+  "scope": "CPU reaggregation of returned per-scene statistics; no original NPZ/model/ZIP",
+  "numeric_checks": 50760,
+  "max_absolute_difference": 4.656612873077393e-10,
+  "quantiles": "Server original array statistics, not independently recoverable from aggregate rows",
+  "run_status": "COMPLETED",
+  "program_seconds": 46.37873459327966,
+  "launcher_exit": "0 reported in S2L; original launch/status/request not returned",
+  "population": {
+    "targets": 9100,
+    "groups": 9353,
+    "duplicate_groups": 610,
+    "available_position_points": 454952,
+    "evaluated_position_points": 442263,
+    "missing_prediction_points": 12689,
+    "reference_unavailable_targets": 1,
+    "covered_targets": 8742
+  },
+  "coordinate_unit": "1e-4 degree",
+  "ours_coordinate": {
+    "longitude_raw": {
+      "ME": 1.3135976590983633,
+      "MAE": 40.6805538333788,
+      "absolute_ME": 28.240661499219446,
+      "residual_SD": 65.87624395592911,
+      "printed_Eq29_diagnostic": 1331656.5843288207
+    },
+    "latitude_raw": {
+      "ME": -3.1756294887861536,
+      "MAE": 30.916266915243057,
+      "absolute_ME": 20.615975027379523,
+      "residual_SD": 45.959461430642016,
+      "printed_Eq29_diagnostic": 203466.16656526917
+    }
+  },
+  "regions": {
+    "anchor_inside_support": {
+      "point_fraction": 0.7302283935124575,
+      "mae_m": 234.1698397719853,
+      "absolute_error_fraction": 0.30273932528172487,
+      "squared_error_fraction": 0.5752957234328726
+    },
+    "anchor_outside_helper_supported": {
+      "point_fraction": 0.2052376074869478,
+      "mae_m": 971.4154479142754,
+      "absolute_error_fraction": 0.3529726968442016,
+      "squared_error_fraction": 0.16233902699592936
+    },
+    "predicted_group_no_support": {
+      "point_fraction": 0.06453399900059467,
+      "mae_m": 3013.381485876354,
+      "absolute_error_fraction": 0.3442879778740738,
+      "squared_error_fraction": 0.26236524957119806
+    }
+  },
+  "top_squared_error_concentration": {
+    "1": {
+      "scene_ids": [
+        "3035"
+      ],
+      "point_fraction": 0.008171608296420907,
+      "squared_error_fraction": 0.23670872971172788
+    },
+    "3": {
+      "scene_ids": [
+        "3035",
+        "2819",
+        "1043"
+      ],
+      "point_fraction": 0.010283473860576172,
+      "squared_error_fraction": 0.4159828837307686
+    },
+    "5": {
+      "scene_ids": [
+        "3035",
+        "2819",
+        "1043",
+        "4335",
+        "4739"
+      ],
+      "point_fraction": 0.024928605829562953,
+      "squared_error_fraction": 0.497349384397118
+    },
+    "10": {
+      "scene_ids": [
+        "3035",
+        "2819",
+        "1043",
+        "4335",
+        "4739",
+        "173",
+        "4513",
+        "1653",
+        "2988",
+        "4167"
+      ],
+      "point_fraction": 0.09270954160759548,
+      "squared_error_fraction": 0.6284919361995668
+    }
+  },
+  "gains": {
+    "anchor": {
+      "relative_mae_reduction": 0.3621866360598145,
+      "better_scenes": 293,
+      "better_components": 37,
+      "region_gain_fraction": {
+        "anchor_inside_support": 0.03394604554741878,
+        "anchor_outside_helper_supported": 0.9622742979229426,
+        "predicted_group_no_support": 0.0037796565296381313
+      }
+    },
+    "mean_supported": {
+      "relative_mae_reduction": 0.5387620359602091,
+      "better_scenes": 300,
+      "better_components": 38,
+      "region_gain_fraction": {
+        "anchor_inside_support": 0.7661931512353315,
+        "anchor_outside_helper_supported": 0.23196938322120195,
+        "predicted_group_no_support": 0.0018374655434659796
+      }
+    }
+  },
+  "raw_longitude_over180_count": 0,
+  "test_opened": false
+}
