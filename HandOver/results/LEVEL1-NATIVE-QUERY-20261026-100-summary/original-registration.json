@@ -1,0 +1,39 @@
+{
+ "run_id": "LEVEL1-NATIVE-QUERY-20261026-100-summary-attempt-1",
+ "note": "100 three-arm CPU table; native outputs verbatim, zero forwards.",
+ "server_originals": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-NATIVE-QUERY-20261026-100-summary-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 351,
+   "sha256": "a58117946c2d1ad0056ac190bc0831b608af6ff8b8f012a058fed133bcf3c180",
+   "mtime_local": "2026-10-26T13:38:15+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-NATIVE-QUERY-20261026-100-summary-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 963,
+   "sha256": "bea785b8b384ace1ddc633dda8ddc61791372e17507835dfd6f6fbd1cbb29427",
+   "mtime_local": "2026-10-26T13:38:15+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-NATIVE-QUERY-20261026-100-summary-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 538536,
+   "sha256": "a9ddfc2fe75eb3a1ff8fd76012bdb35c7a701e6f3104340e5ee69f48e6c9d117",
+   "mtime_local": "2026-10-26T13:38:08+0800"
+  },
+  {
+   "returned_name": "scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-NATIVE-QUERY-20261026-100-summary-attempt-1/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 2934096,
+   "sha256": "d9dd0cd46a5ec8e665bfd550e3a03fa0179ceafa5c1bdd08746f0f457dcb8af5",
+   "mtime_local": "2026-10-26T13:38:15+0800"
+  }
+ ],
+ "returned_total_bytes": 3473946
+}

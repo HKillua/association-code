@@ -4,7 +4,7 @@
 
 | 任务 | 当前状态 | 本地决定／入口 |
 |---|---|---|
-| 100A/B/C＋CPU整表 | **三臂均COMPLETED；CPU整表RUNNING**。T0（100C，`mtad-43e71beeb7a6`、4,545.7 s）**564.9676（+0.1336）**、RMSE +34.3698；T1（100A mean，`mtad-20dc50a95f88`、8,489.9 s、可训练35,522）**566.0921（+1.2581）**、RMSE −0.2429、P99 +6.5416；T2（100B query，`mtad-2d673f8c04c2`、6,660.7 s、可训练35,586）**567.1867（+2.3527）**、RMSE −0.5295。三臂均为090C final＋4000成功batch重放、`fixed_base_verified=true`、8h线未触；**没有任何一臂给出位置收益**。见[100A](S2L-20261026-100A.md)、[100B](S2L-20261026-100B.md)、[100C](S2L-20261026-100C.md) |
+| 100A/B/C＋CPU整表 | **全部COMPLETED；当前配方不接受**。CPU整表（`mtad-89c817287d22`，343.8 s、退出0、零前向、`PAIR_VERIFIED`、`frozen_base_arrays_exact=true`）：**strong 564.8340／budget 564.9676／mean 566.0921／query 567.1867 m**；最大组件外 budget 830.4379 最优。screen：mean 对 strong −0.2227%、对 budget −0.1990%；query 对 strong −0.4165%、对 budget −0.3928%，均为 `NO_CLEAR_SINGLE_SEED_ADVANTAGE`、`screen_passed=false`，四加权与组件外多不守。逐点 mean 对 budget 净 +497,337 m（更差）。**原生事件表示在本预算下无位置收益；不追加训练、不选赢家。** 见[整表回执](S2L-20261026-100-summary.md)、[100A](S2L-20261026-100A.md)、[100B](S2L-20261026-100B.md)、[100C](S2L-20261026-100C.md) |
 | 096A | **服务器COMPLETED／exit0，待本地完整科学审阅** | 回执8h11m、零训练；报告覆盖3.3557%、位置MAE58,587.02m，尚非有效TMTAFF复现。新成绩不作独立确认。[原回执](S2L-20261025-096A.md) |
 | 096B／097A及097表 | COMPLETED，已审 | 096B完整系统负结果；097为第二seed预算控制。096A及总表也已回传，不再等待或重交 |
 | 096-summary | **服务器COMPLETED／exit0，待本地完整科学审阅** | 回执287s、零前向，共同点learned59,898.42m／hold59,916.82m；该数值仅登记服务器报告，不以低覆盖结果认证同行。[原回执](S2L-20261025-096-summary.md) |
