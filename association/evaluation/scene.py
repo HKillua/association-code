@@ -14,6 +14,7 @@ from association.evaluation.grouping import _partition, group_tracks_by_identity
 from association.evaluation.physical import _check_valid_states, _mask, _states, evaluate_aligned_fusion, group_membership_diagnostics
 from association.data.reference_states import ALLOWED_SPLITS
 from association.evaluation.support import group_input_support
+from association.evaluation.paper_fusion_metrics import paper_fusion_scene
 
 
 INPUT_SUPPORT_REGIONS = ('anchor_support', 'helper_only_support', 'unsupported', 'unmatched_target')
@@ -175,6 +176,9 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
         'reference_unavailable_target_count': int((~truth_valid.any(axis=(1, 2))).sum()),
         'group_diagnostics': group_membership_diagnostics(memberships, nodes),
         'full_target_metrics': full,
+        'paper_fusion_metrics': paper_fusion_scene(
+            aligned_prediction[:len(targets)], aligned_truth[:len(targets)],
+            aligned_truth_valid[:len(targets)], prediction_valid=aligned_valid[:len(targets)]),
         'all_predicted_groups': per_group,
         'per_group_scope': 'all groups against their anchor identity; repeated targets, not a target-weighted metric',
         'region_definition': 'union of caller-declared original support over all nodes of each true identity',

@@ -10,6 +10,7 @@ from association.evaluation.learned_group_oracle import _helper_evidence,_visibl
 from association.evaluation.fusion_controls import attribute_errors
 from association.evaluation.support_control import support_switch_prediction
 from association.evaluation.system_attribution import ATTRIBUTES,_same,assert_metrics,pool_metrics
+from association.evaluation.paper_fusion_metrics import aggregate_paper_fusion
 from association.utils.runtime import read_json,write_json,write_json_gzip
 from tools.analysis.compare_association_duration import ARMS,_load_arrays,_replay
 from tools.analysis.frozen_fusion_transfer import frozen_motion,groups_from_cache
@@ -72,6 +73,7 @@ def _pool(rows,arrays):
         values=[r['methods'][method] for r in rows]
         result['methods'][method]=dict(population={k:sum(v['population'][k] for v in values) for k in values[0]['population']},
             full_target_metrics=pool_metrics([v['full_target_metrics'] for v in values]),
+            paper_fusion_metrics=aggregate_paper_fusion([v['paper_fusion_metrics'] for v in values]),
             attribute_quantiles={attr:{region:_quantiles(np.concatenate([d[method+'_'+attr+'_error'][
                 d['region_'+region]&np.isfinite(d[method+'_'+attr+'_error'])] for d in arrays])) for region in REGIONS} for attr in ATTRIBUTES})
     result['pairwise']={}
@@ -146,7 +148,9 @@ def evaluate_ptfm(model,validation_raw,source056,metadata,output,check=None,*,in
                     valid=common[...,list(columns)].all(-1)
                     if not np.isfinite(error[attr][valid]).all():raise ValueError('PTFM nonfinite valid error')
                     data[method+'_'+attr+'_error']=np.where(valid,error[attr],np.nan)
-                methods[method]=dict(population=_population(artifacts[method]),full_target_metrics=reports['learned_assoc_'+method]['full_target_metrics'])
+                methods[method]=dict(population=_population(artifacts[method]),
+                    full_target_metrics=reports['learned_assoc_'+method]['full_target_metrics'],
+                    paper_fusion_metrics=reports['learned_assoc_'+method]['paper_fusion_metrics'])
             used=np.zeros(len(groups),bool);used[selected[selected>=0]]=True
             availability={}
             for scope,use in (('all_output_groups',np.ones(len(groups),bool)),('unique_selected_groups',used)):

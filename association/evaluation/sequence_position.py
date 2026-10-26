@@ -18,6 +18,7 @@ from association.evaluation.fusion_controls import attribute_errors
 from association.evaluation.learned_group_oracle import _helper_evidence, _visible_regions, _quantiles
 from association.evaluation.support_control import support_switch_prediction
 from association.evaluation.system_attribution import ATTRIBUTES, _same, assert_metrics, pool_metrics
+from association.evaluation.paper_fusion_metrics import aggregate_paper_fusion
 from association.models.sequence_position import sequence_inputs, tangent_position
 from association.models.support_gate import mix_gate_states
 from association.utils.runtime import read_json, write_json, write_json_gzip
@@ -141,7 +142,8 @@ def _scene(fragment, artifacts, reports, residual, sid, component):
                 raise ValueError('071 nonfinite valid '+attr+' error')
             arrays[method+'_'+attr+'_error'] = np.where(mask, errors[attr], np.nan)
         methods[method] = dict(population=_population(artifacts[method]),
-            full_target_metrics=reports['learned_assoc_'+method]['full_target_metrics'])
+            full_target_metrics=reports['learned_assoc_'+method]['full_target_metrics'],
+            paper_fusion_metrics=reports['learned_assoc_'+method]['paper_fusion_metrics'])
     chosen = np.zeros(len(groups), bool)
     chosen[selected[selected >= 0]] = True
     routing = {}
@@ -161,6 +163,7 @@ def _pool(rows, arrays):
         result['methods'][method] = dict(
             population={key: sum(item['population'][key] for item in source) for key in source[0]['population']},
             full_target_metrics=pool_metrics([item['full_target_metrics'] for item in source]),
+            paper_fusion_metrics=aggregate_paper_fusion([item['paper_fusion_metrics'] for item in source]),
             attribute_quantiles={attr: {region: _quantiles(np.concatenate([
                 data[method+'_'+attr+'_error'][data['region_'+region] & np.isfinite(data[method+'_'+attr+'_error'])]
                 for data in arrays])) for region in REGIONS} for attr in ATTRIBUTES})

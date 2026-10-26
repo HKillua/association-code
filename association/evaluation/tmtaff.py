@@ -15,12 +15,18 @@ from association.evaluation.scene import evaluate_full_scene, simple_fusion_outp
 from association.evaluation.grouping import group_predicted_tracks, group_tracks_by_identity
 from association.evaluation.support import build_input_support
 from association.evaluation.association import evaluate_scenes, select_threshold
+from association.evaluation.paper_fusion_metrics import aggregate_paper_fusion, paper_fusion_scene
 from association.training.common import normalize_scene, stable_evaluation_parameters
 
 
 def aggregate_fusion_reports(reports):
     """Pool error numerators and coverage counts, never average scene RMSEs."""
     result = _aggregate_regions(reports, 'full_target_metrics', ('all', 'observed', 'missing'))
+    if any('paper_fusion_metrics' in report for report in reports):
+        if not all('paper_fusion_metrics' in report for report in reports):
+            raise ValueError('cannot pool an incomplete set of paper fusion reports')
+        result['paper_fusion_metrics'] = aggregate_paper_fusion(
+            [report['paper_fusion_metrics'] for report in reports])
     for key, names in (('input_support_metrics', INPUT_SUPPORT_REGIONS),
                        ('input_distance_metrics', INPUT_DISTANCE_REGIONS)):
         if any(key in report for report in reports):
@@ -353,7 +359,10 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                     shared[name] = {'full_target_metrics': _regions(
                         artifact['aligned_prediction'][:n], artifact['aligned_truth'][:n],
                         artifact['aligned_truth_valid'][:n], common_valid,
-                        artifact['aligned_observed'][:n])}
+                        artifact['aligned_observed'][:n]),
+                        'paper_fusion_metrics': paper_fusion_scene(
+                            artifact['aligned_prediction'][:n], artifact['aligned_truth'][:n],
+                            artifact['aligned_truth_valid'][:n], prediction_valid=common_valid)}
                 oracle_common.append(dict(scene_id=str(scene['scene_id']), methods=shared))
             if prediction_writer is not None:
                 if check:

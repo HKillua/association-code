@@ -40,6 +40,10 @@ class SequencePositionEvaluationTests(unittest.TestCase):
                 self.assertTrue(summary['ordinary_source_replay_exact'])
                 self.assertEqual(summary['methods']['learned_sequence']['population']['duplicate_prediction_group_count'], 1)
                 self.assertEqual(summary['methods']['learned_sequence']['population']['target_identity_count'], 5)
+                paper = summary['methods']['learned_sequence']['paper_fusion_metrics']
+                self.assertEqual(set(paper['attributes']), {'longitude', 'latitude', 'speed', 'heading'})
+                self.assertEqual(paper['attributes']['longitude']['declared_targets'], 5)
+                self.assertEqual(paper['attributes']['speed']['unit'], 'native_speed')
                 self.assertEqual(summary['methods']['learned_sequence']['full_target_metrics']['all']['position']['intersection_count'], 127)
                 self.assertEqual(summary['pairwise']['learned_sequence__minus__fixed_prior095']['all']['signed_error_change_sum'], 0.)
                 self.assertEqual(summary['component_count'], 1)
