@@ -30,4 +30,4 @@
 
 自建256/1024合成训练、影子诊断及重复JSON/报告不进入当前证据表，也不作为恢复099的门槛。它们只能支持有限的实现排错与可学习性观察。原件可在Git `e7e4a11`以及本地`runs/DEEPAF-NATIVE-QUALIFICATION-20261025-local-attempt-1`查阅，用户ZIP和模型权重未删除。
 
-保留必要的单位/坐标、真实参数更新、输入不读评价真值、完整人口及缓存比较检查。下一步直接围绕真实Level1适配设计有限执行，不继续优化自建模拟分数。具体同任务范围与上限见[099方案](../specs/peer-feasibility-sprint-099.md)，执行只认[交接](../../HandOver/Handover.md)。
+保留必要的单位/坐标、真实参数更新、输入不读评价真值、完整人口及缓存比较检查。下一步直接围绕真实Level1适配设计有限执行，不继续优化自建模拟分数。原099范围仅作[历史合同](https://github.com/HKillua/association-code/blob/903f679/docs/specs/peer-feasibility-sprint-099.md)留存；它已HOLD，后续具体任务只认[交接](../../HandOver/Handover.md)。

@@ -1,21 +1,14 @@
-# 当前必要结果
+# 保留结果索引
 
-这里只留当前结论与近期已审实验所需的小型回传。**这些文件是只读证据，不是训练、推理或缓存比较的运行输入。** 完整权重、逐批曝光、预测NPZ和日志保留在服务器原`runs`；当前状态以[交接索引](../Handover.md)为准。
+只读证据，不能代替服务器模型输入。当前任务只见[交接](../Handover.md)，事实解释见[研究分析](../../docs/reports/2026-10-26-experiment-review.md)。
 
-| 保留内容 | 用途 |
+| 保留目录 | 目的 |
 |---|---|
-| 101经纬度补算与逐场统计 | 原090C误差复现、论文单位/权重对齐与尾部定位 |
-| 100三臂及完整表 | 当前原生事件配方无主增量的证据 |
-| 093 TFM双臂端点聚合、093/094配对小摘要 | 096完整系统的父实验及失败解释 |
-| 096A/B及原完整系统总表 | 已结案的完整系统失败证据 |
-| 097双seed预算控制摘要 | 564.834/583.976m的强控制出处 |
-| 098两seed比较summary、双seed总summary与运行登记 | 保留完整人口、尾部、组件及原晋级失败判断；不只留headline |
+| `LEVEL1-COORDINATE-METRICS-20261026-101` | 当前102关联的既有坐标结果、mask与尾部证据 |
+| `LEVEL1-NATIVE-QUERY-20261026-100-summary` | 三臂合并的全人口、逐场/组件对照；不再保三套重复端点表 |
+| `LEVEL1-QUERY-RELATION-20261025-098-*` | 两seed比较与总表，保留原晋级失败的可核依据 |
+| `LEVEL1-SEQUENCE-BUDGET-20261025-097-summary` | 两seed强预算控制的来源 |
 
-其余已审来源052/056/072/073/088/090/095、098四臂明细与重复逐场表从工作树移除。**未改写保留的原JSON，也未把删减稿冒称原回执。** 正负结论见[历史摘要](../../docs/history/README.md)，第二轮清理前原件在Git [`9eefd2c`](https://github.com/HKillua/association-code/tree/9eefd2c)。原回执若引用已删工作副本，按原路径从该版本查看；服务器原输入路径不变。
+已审093/094/096机器副本、100逐臂冗余返回、重复自动report移出工作区，原件在Git [`903f679`](https://github.com/HKillua/association-code/tree/903f679)，更早来源见[历史摘要](../../docs/history/README.md)。没有改写保留的JSON，也没有将精简摘要冒称原始日志。
 
-```sh
-git show 9eefd2c:HandOver/S2L-20261025-098D.md
-git ls-tree -r --name-only 9eefd2c HandOver/results
-```
-
-按需导出单文件到仓库外，不恢复整树、不另造archive。后续回传优先一份运行登记与一份必要汇总；不要在fit/run、source-binding、各端点再次复制完整成功batch清单。真正需要核对逐批日志或原预测时，使用已登记原件，不以摘要替代。
+完整权重、成功batch日志与逐点NPZ仍在服务器原runs；原路径由各 `original-registration.json` 和旧Git回执保存。按需恢复单文件，不恢复整套旧READY，不新建archive副本。
