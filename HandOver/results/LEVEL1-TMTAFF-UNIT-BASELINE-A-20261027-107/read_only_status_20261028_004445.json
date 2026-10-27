@@ -1,0 +1,38 @@
+{
+  "checked_at_utc": "2026-10-27T16:44:45.022376+00:00",
+  "checked_at_beijing": "2026-10-28 00:44:45",
+  "operation": "single_read_only_check",
+  "service": {
+    "ActiveState": "active",
+    "SubState": "running",
+    "Result": "success",
+    "ExecMainStatus": 0
+  },
+  "chain": {
+    "status": "RUNNING",
+    "stage": "tcm",
+    "stage_status": "RUNNING",
+    "returncode": null
+  },
+  "tcm": {
+    "status": "RUNNING",
+    "cursor": {
+      "stage": 0,
+      "completed_updates": 2424
+    },
+    "checkpoint_cursor": {
+      "stage": 0,
+      "completed_updates": 2424
+    },
+    "final_evaluation_status": "NOT_STARTED",
+    "evaluation_progress_stage": "tcm_completion"
+  },
+  "tfm_run_json_exists_at_expected_path": false,
+  "limitations": [
+    "checkpoint content not parsed",
+    "evaluation progress counts not extracted in this read",
+    "service Result=success and ExecMainStatus=0 while active do not establish task completion",
+    "no model performance results read"
+  ],
+  "mutations_on_server": false
+}
