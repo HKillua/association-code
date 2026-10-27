@@ -19,6 +19,7 @@ from association.data.reference_states import iter_reference_states
 from association.data.timed import _settings, prepare_timed_scene
 from association.data.motion_evidence import scene_motion_evidence, validate_motion_observation_policy
 from association.data.source_events import source_events
+from association.data.physical_units import unit_metadata
 
 
 def _request(manifest, train_splits, data_config, alignment_by_scene, *, validation_only=False):
@@ -29,10 +30,11 @@ def _request(manifest, train_splits, data_config, alignment_by_scene, *, validat
             ('T_core',), ('T_core', 'T_head')):
         raise DataError('train_splits must explicitly be T_core or T_core+T_head in that order')
     required = {'length', 'max_observations', 'time_unit_seconds'}
-    if not required.issubset(data_config) or set(data_config) - required - {'reference_longitude_policy'}:
+    if not required.issubset(data_config) or set(data_config) - required - {'reference_longitude_policy', 'speed_unit_policy'}:
         raise DataError('data_config requires length/max_observations/time_unit_seconds; '
-                        'only reference_longitude_policy is optional')
-    _settings(**{key: data_config[key] for key in required})
+                        'only reference_longitude_policy/speed_unit_policy are optional')
+    _settings(**{key: data_config[key] for key in required},
+              speed_unit_policy=data_config.get('speed_unit_policy'))
     if data_config.get('reference_longitude_policy', 'linear') not in ('linear', 'shortest_arc'):
         raise DataError('reference_longitude_policy must be linear or shortest_arc')
     splits = ['V_select'] if validation_only else [*train_splits, 'V_select']
@@ -76,7 +78,12 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
         validate_motion_observation_policy(motion_observation_policy)
     splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene,
                                 validation_only=validation_only)
+    units = unit_metadata(data_config.get('speed_unit_policy'))
+    if units and (motion_observation_policy is not None or retain_native_events):
+        raise DataError('Physical speed units currently support timed TMTAFF only, not motion/native-events routes')
     input_config = {key: data_config[key] for key in ('length', 'max_observations', 'time_unit_seconds')}
+    if units:
+        input_config['speed_unit_policy'] = units['policy']
     longitude_policy = data_config.get('reference_longitude_policy', 'linear')
     scenes, populations = {}, {}
     if check:
@@ -152,6 +159,10 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                 scene['fusion_targets'] = build_scene_fusion_targets(scene, reference,
                     target_identity_ids=scene['target_identity_ids'], longitude_policy=longitude_policy,
                     **policies[sid])
+                if units:
+                    for target in scene['fusion_targets'].values():
+                        target['physical_units'] = dict(units)
+                        target['report']['velocity_units'] = 'mps; reference retained without conversion'
                 references_read.append({'scene_id': sid, 'split': split, 'member': reference['member'],
                                         'raw_row_count': len(reference['rows']), 'issue_count': len(reference['issues'])})
                 # Do not retain raw reference rows in the scene, report or closure.

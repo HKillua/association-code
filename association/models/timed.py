@@ -18,6 +18,7 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 
 from association.models.tmtaff import AssociationModel, ModelConfig, _causal_mask
+from association.data.physical_units import normalizer_speed_policy
 
 
 def continuous_time_encoding(times: Tensor, dimension: int) -> Tensor:
@@ -61,6 +62,9 @@ class TimedAssociationModel(AssociationModel):
                                  completion_policy='learned'), branch)
         self.config = config
         self.max_observations = max_observations
+        self.speed_unit_policy = normalizer_speed_policy(normalizer)
+        if self.speed_unit_policy is not None:
+            self.register_buffer('speed_unit_contract', torch.tensor(1, dtype=torch.int64))
         if heading_statistics is not None:
             self.register_buffer('heading_mean_std', heading_statistics)
             original = self.input_embedding
@@ -91,11 +95,25 @@ class TimedAssociationModel(AssociationModel):
 
     def validate_normalizer(self, normalizer: Mapping | None) -> None:
         """Reject a different physical interpretation of saved circular weights."""
+        if normalizer_speed_policy(normalizer) != self.speed_unit_policy:
+            raise ValueError('normalizer differs from model speed unit contract')
         if self.config.heading_representation == 'linear_zscore':
             return
         expected = self._normalizer_heading(normalizer).to(self.heading_mean_std)
         if not torch.equal(expected, self.heading_mean_std):
             raise ValueError('normalizer differs from saved circular heading mean/std')
+
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        incoming = state_dict.get(prefix + 'speed_unit_contract')
+        if self.speed_unit_policy is None:
+            if incoming is not None:
+                raise ValueError('physical-unit weights cannot be loaded into a legacy-unit model')
+        elif (not isinstance(incoming, Tensor) or incoming.shape != torch.Size([])
+              or incoming.dtype != torch.int64 or incoming.item() != 1):
+            raise ValueError('checkpoint is missing or contradicts the speed unit contract')
+        super()._load_from_state_dict(state_dict, prefix, local_metadata, strict,
+                                     missing_keys, unexpected_keys, error_msgs)
 
     def set_completion_trainable(self, trainable: bool, include_embedding: bool = True):
         if trainable and self.config.completion_policy == 'state_hold':

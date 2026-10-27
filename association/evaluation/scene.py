@@ -15,6 +15,7 @@ from association.evaluation.physical import _check_valid_states, _mask, _states,
 from association.data.reference_states import ALLOWED_SPLITS
 from association.evaluation.support import group_input_support
 from association.evaluation.paper_fusion_metrics import paper_fusion_scene
+from association.data.physical_units import unit_metadata
 
 
 INPUT_SUPPORT_REGIONS = ('anchor_support', 'helper_only_support', 'unsupported', 'unmatched_target')
@@ -34,19 +35,23 @@ def _identities(values, name):
     return result
 
 
-def _regions(prediction, truth, truth_valid, prediction_valid, observed):
-    return {
+def _regions(prediction, truth, truth_valid, prediction_valid, observed, *, speed_unit='native_speed'):
+    result = {
         name: evaluate_aligned_fusion(prediction, truth, truth_valid,
                                       prediction_valid=prediction_valid, region_mask=mask)
         for name, mask in (('all', np.ones(observed.shape, bool)),
                            ('observed', observed), ('missing', ~observed))
     }
+    if speed_unit != 'native_speed':
+        for row in result.values():
+            row['speed']['unit'] = speed_unit
+    return result
 
 
 def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
                         target_states, target_valid, node_observed, split,
                         grouping_kind, correspondence_policy, return_artifact=False,
-                        node_input_support=None):
+                        node_input_support=None, speed_unit_policy=None):
     """Evaluate all targets and all fixed-order predicted groups without I/O.
 
     ``group_outputs`` contains one prediction record per emitted group: each has
@@ -81,6 +86,9 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
     """
     if not isinstance(return_artifact, bool):
         raise ValueError('return_artifact must be boolean')
+    units = unit_metadata(speed_unit_policy)
+    speed_unit = 'mps' if units else 'native_speed'
+    paper_units = dict(prediction_speed_unit='mps', target_speed_unit='mps') if units else {}
     if split not in ALLOWED_SPLITS:
         raise ValueError('full-scene evaluation permits only explicit training/development splits; T_test is sealed')
     if grouping_kind not in ('predicted', 'oracle'):
@@ -152,7 +160,7 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
         aligned_prediction[row], aligned_valid[row] = prediction[group_index], valid[group_index]
         aligned_observed[row] = target_observed[anchor_rows[group_index]]
     full = _regions(aligned_prediction, aligned_truth, aligned_truth_valid,
-                    aligned_valid, aligned_observed)
+                    aligned_valid, aligned_observed, speed_unit=speed_unit)
     per_group = []
     for index, (members, anchor) in enumerate(zip(groups, anchor_rows)):
         per_group.append({
@@ -162,7 +170,7 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
             'has_position_output': bool(valid[index, :, :2].all(axis=-1).any()),
             'metrics': _regions(prediction[index:index+1], truth[anchor:anchor+1],
                                 truth_valid[anchor:anchor+1], valid[index:index+1],
-                                target_observed[anchor:anchor+1]),
+                                target_observed[anchor:anchor+1], speed_unit=speed_unit),
         })
     report = {
         'split': split, 'grouping_kind': grouping_kind,
@@ -178,12 +186,14 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
         'full_target_metrics': full,
         'paper_fusion_metrics': paper_fusion_scene(
             aligned_prediction[:len(targets)], aligned_truth[:len(targets)],
-            aligned_truth_valid[:len(targets)], prediction_valid=aligned_valid[:len(targets)]),
+            aligned_truth_valid[:len(targets)], prediction_valid=aligned_valid[:len(targets)], **paper_units),
         'all_predicted_groups': per_group,
         'per_group_scope': 'all groups against their anchor identity; repeated targets, not a target-weighted metric',
         'region_definition': 'union of caller-declared original support over all nodes of each true identity',
         'test_opened': False,
     }
+    if units:
+        report['physical_units'] = units
     aligned_groups = np.full(rows, -1, dtype=np.int64)
     for target_row, group_index in first_group.items():
         aligned_groups[target_row] = group_index
@@ -203,8 +213,11 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
                 np.where(group_support['helper_only_support'][group_index], 1, 2))
             nearest[row] = group_support['nearest_seconds'][group_index]
         def metrics(mask):
-            return evaluate_aligned_fusion(aligned_prediction, aligned_truth, aligned_truth_valid,
-                                           prediction_valid=aligned_valid, region_mask=mask)
+            result = evaluate_aligned_fusion(aligned_prediction, aligned_truth, aligned_truth_valid,
+                                             prediction_valid=aligned_valid, region_mask=mask)
+            if units:
+                result['speed']['unit'] = speed_unit
+            return result
         report['input_support_metrics'] = {
             name: metrics(support_kind == index) for index, name in enumerate(INPUT_SUPPORT_REGIONS)}
         distance_masks = (nearest <= 300, (nearest > 300) & (nearest <= 600),
@@ -240,6 +253,8 @@ def evaluate_full_scene(group_outputs, *, node_identities, target_identities,
             'grouping_kind': grouping_kind,
             'correspondence_policy': correspondence_policy,
         }
+        if units:
+            report['artifact'].update(state_speed_unit='mps', speed_unit_policy=units['policy'])
         if node_input_support is not None:
             report['artifact'].update(aligned_input_support_kind=support_kind,
                 aligned_nearest_input_seconds=nearest,

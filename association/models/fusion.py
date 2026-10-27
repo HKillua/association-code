@@ -13,6 +13,7 @@ from torch import Tensor, nn
 from torch.nn import functional as F
 
 from association.models.tmtaff import _causal_mask
+from association.data.physical_units import normalizer_speed_policy
 
 
 @dataclass(frozen=True)
@@ -55,6 +56,9 @@ class PairFusion(nn.Module):
     def __init__(self, config: PairFusionConfig, normalizer=None):
         super().__init__()
         self.config = config
+        self.speed_unit_policy = normalizer_speed_policy(normalizer)
+        if self.speed_unit_policy is not None:
+            self.register_buffer('speed_unit_contract', torch.tensor(1, dtype=torch.int64))
         if config.output_parameterization == "train_position_affine":
             if not isinstance(normalizer, dict) or not {"mean", "std"}.issubset(normalizer):
                 raise ValueError("train_position_affine requires the training normalizer mean/std")
@@ -121,6 +125,13 @@ class PairFusion(nn.Module):
 
     def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
                               missing_keys, unexpected_keys, error_msgs):
+        incoming = state_dict.get(prefix + 'speed_unit_contract')
+        if self.speed_unit_policy is None:
+            if incoming is not None:
+                raise ValueError('physical-unit fusion weights cannot use a legacy-unit normalizer')
+        elif (not isinstance(incoming, Tensor) or incoming.shape != torch.Size([])
+              or incoming.dtype != torch.int64 or incoming.item() != 1):
+            raise ValueError('fusion checkpoint is missing or contradicts the speed unit contract')
         self.validate_output_statistics(state_dict, prefix=prefix)
         super()._load_from_state_dict(state_dict, prefix, local_metadata, strict,
                                      missing_keys, unexpected_keys, error_msgs)

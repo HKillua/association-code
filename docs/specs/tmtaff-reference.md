@@ -51,3 +51,18 @@ checkpoint保存模型／fusion／loss、阶段optimizer、sampler/RNG、游标�
 保留真实小ZIP贯通、短轨与空场、时间平移／圆周边界、reference/padding隔离、双向next-time因果、微批分母、冻结／更新／中断恢复和全人口覆盖测试。软件通过只证明实现语义；历史033增训有特征收益、035/047关联仍弱、049/053B融合条件响应衰减，这些负结果不能因清理删除。
 
 baseline下一次预算须针对已有证据提出可区分机制的改动；不自动恢复被删除的一次性诊断或继续加步。当前运行与去留统一看[研究状态](../research_status.md)和[交接索引](../../HandOver/Handover.md)；不能以战胜退化参考宣称超过原文。
+
+## 2026-10-27：显式物理速度单位契约（本地实现，未发布实验）
+
+事实：当前Level1固定8个训练场景支持量测kn、reference m/s，范围与未知见[数据约定](../data_contract.md)。新四状态流程可在 `data` 显式设置 `speed_unit_policy: measurement_kn_reference_mps_v1`；未设置时所有旧输入、normalizer、checkpoint及指标数值/默认字段保持原行为。此开关不声称整个原包逐条单位已核，也不改变20秒仅为时间数值尺度的含义。
+
+新路径只在原生量测转为timed数组时将速度乘1852/3600；不改原CSV或传入native数据，不转换reference第二次。输入、训练normalizer、监督、TFM物理输出、普通控制和observed singleton均为m/s。物理误差为m/s；论文ME/SD通过既有接口将预测/真值分别从m/s转kn。位置、航向、mask、人口、query、损失公式、反馈和预算不改；单位改变后实际损失尺度与优化仍须用新运行评价，软件检查不认证科研性能。
+
+| 验收 | 实现与必要检查 |
+|---|---|
+| opt-in贯通，reference不二次换算 | 极小ZIP真实loader→normalizer→既有完整评价→NPZ导出；检查已知速度、控制/单例、物理/论文单位及人口 |
+| 旧默认不变 | 原timed输入、模型、融合/指标测试；默认与显式无策略的数组/元数据一致，不触碰102/103配置 |
+| 禁止串用旧单位 | adapter_config及physical_units双重绑定；模型/TFM新state_dict含整数单位版本buffer，缺失/不符即使strict=False也拒绝；旧模型拒新marker；阶段转移/resume核normalizer和数据合同 |
+| 不支持路由明确失败 | 未知策略、单位元数据不一致、目标声明缺失、混合训练/验证策略、motion/native_events组合在对应接口拒绝；本轮仅支持timed TMTAFF，不暗改090C |
+
+原始canonical tracks不随新prepared结果保留，避免其kn数值与已转换timed数组混用；调用者原对象不变。这个软件改动不提供新配置预算、READY或训练许可，也不修复历史四状态权重。固定056同任务比较仍须另立已定端点/曝光的实验合同。

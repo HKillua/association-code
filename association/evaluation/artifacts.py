@@ -37,6 +37,8 @@ def load_scene_prediction(path):
         arrays = {key: archive[key] for key in archive.files}
     scene = {key.removeprefix('scene__'): value for key, value in arrays.items() if key.startswith('scene__')}
     scene.update({key: metadata[key] for key in ('scene_id', 'component_id', 'split', 'input_adapter')})
+    if 'physical_units' in metadata:
+        scene['physical_units'] = dict(metadata['physical_units'])
     grid = scene['grid']
     if grid.ndim != 1 or not np.isfinite(grid).all() or (np.diff(grid) <= 0).any():
         raise ValueError('artifact grid must be a finite increasing vector')
@@ -160,6 +162,8 @@ class ScenePredictionWriter:
             split=scene['split'], component_id=str(scene['component_id']),
             input_adapter=scene.get('input_adapter', 'registered_v1'),
             arrays=list(arrays), methods=methods, test_opened=False)
+        if 'physical_units' in scene:
+            metadata['physical_units'] = dict(scene['physical_units'])
         # Validate small metadata before claiming files. An interrupted NPZ may
         # remain on disk, but is never advertised in index.json or overwritten.
         payload = json.dumps(metadata, ensure_ascii=False, indent=2, allow_nan=False) + '\n'

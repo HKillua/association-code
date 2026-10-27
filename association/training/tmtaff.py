@@ -28,6 +28,7 @@ from association.models.tmtaff import AssociationModel, ModelConfig
 from association.training.common import fit_normalizer, normalize_scene, score_reference, _optimizer, _update
 from association.training.sampling import BalancedScenePairSampler
 from association.training.batches import FrozenCompletionCache, _pair_batch
+from association.data.physical_units import validate_target_units, normalizer_speed_policy
 
 STAGES = ('TCM', 'TAM_FROZEN', 'TFM_FROZEN', 'JOINT')
 
@@ -155,6 +156,9 @@ def _scenes(train, validation, length):
     if len(adapters) != 1 or not adapters.issubset({'registered_v1', 'native_time_v1'}):
         raise ValueError('all train/validation scenes must use one explicit supported input adapter')
     timed = adapters == {'native_time_v1'}
+    speed_policies = {validate_target_units(scene) for scene in [*train, *validation]}
+    if len(speed_policies) != 1 or (not timed and next(iter(speed_policies)) is not None):
+        raise ValueError('all train/validation scenes must use one supported speed unit contract')
     if timed:
         from association.data.timed import validate_timed_scene
         policies = {(s['max_observations'], s['time_unit_seconds']) for s in [*train, *validation]}
@@ -241,6 +245,8 @@ def _scenes(train, validation, length):
                            native_observed_counts=np.asarray(scene['native_observed']).sum(1).tolist())
             if 'reference_alignment' in scene:
                 row['reference_alignment'] = copy.deepcopy(scene['reference_alignment'])
+            if 'physical_units' in scene:
+                row['physical_units'] = copy.deepcopy(scene['physical_units'])
             population_contract.append(row)
         contracts.append(population_contract)
         components.append(component_ids)
@@ -496,6 +502,11 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
                 or completion_source['normalizer'] != normalizer):
             raise ValueError('TCM initialization model, data contract or normalizer differs')
         normalizer = copy.deepcopy(completion_source['normalizer'])
+        if normalizer_speed_policy(normalizer) is not None:
+            marker = completion_source['states'][0].get('speed_unit_contract')
+            if (not isinstance(marker, torch.Tensor) or marker.shape != torch.Size([])
+                    or marker.dtype != torch.int64 or marker.item() != 1):
+                raise ValueError('TCM initialization checkpoint lacks the physical speed unit contract')
         initialization = dict(source_run=str(previous.resolve()), source_phase='tcm',
             source_tcm_updates=tcm_updates,
             source_completion_policy=source_model_config.completion_policy,
@@ -506,7 +517,8 @@ def train_complete(train_scenes, validation_scenes, model_config, fusion_config,
             target_contrastive_negative_scale=model_config.contrastive_negative_scale,
             transferred_modules=['input_embedding', 'tcm_encoder', 'tcm_decoder'],
             transferred_buffers=(['positions', 'heading_mean_std']
-                if model_config.heading_representation == 'circular_sincos' else ['positions']),
+                if model_config.heading_representation == 'circular_sincos' else ['positions'])
+                + (['speed_unit_contract'] if normalizer_speed_policy(normalizer) is not None else []),
             semantics=('frozen completion only; new TFM/objective, optimizer, RNG, history and elapsed budget; TAM unused'
                 if requested_phase == 'tfm' else
                 'frozen completion only; new TAM, optimizer, RNG, history and elapsed budget'))

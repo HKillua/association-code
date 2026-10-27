@@ -13,22 +13,25 @@ import numpy as np
 
 from association.data.archive import DataError
 from association.data.native import ALLOWED_SPLITS, SELECTION_POLICY, uniform_observation_indices
+from association.data.physical_units import KNOT_TO_MPS, unit_metadata, scene_speed_policy, normalizer_speed_policy
 
 ADAPTER = 'native_time_v1'
 INTERPOLATION = 'linear_lat_vel_shortest_lon_cou_signed_half_turn'
 STATE_FIELDS = ['lat', 'lon', 'vel', 'cou']
 
 
-def _settings(length, max_observations, time_unit_seconds):
+def _settings(length, max_observations, time_unit_seconds, speed_unit_policy=None):
     for name, value in (('length', length), ('max_observations', max_observations)):
         if isinstance(value, (bool, np.bool_)) or not isinstance(value, Integral) or value < 2:
             raise DataError(f'{name} must be an explicit integer >= 2')
     if (isinstance(time_unit_seconds, (bool, np.bool_)) or not isinstance(time_unit_seconds, Real)
             or not np.isfinite(time_unit_seconds) or time_unit_seconds <= 0):
         raise DataError('time_unit_seconds must be explicit, finite and positive')
+    units = unit_metadata(speed_unit_policy)
     return dict(length=int(length), max_observations=int(max_observations),
                 time_unit_seconds=float(time_unit_seconds), selection_policy=SELECTION_POLICY,
-                observation_interpolation=INTERPOLATION)
+                observation_interpolation=INTERPOLATION,
+                **({'speed_unit_policy': units['policy']} if units else {}))
 
 
 def _role(scene, training=False):
@@ -89,7 +92,7 @@ def _interpolate(times, values, query):
 
 
 def prepare_timed_scene(native_scene, *, length, max_observations,
-                        time_unit_seconds, query_times=None):
+                        time_unit_seconds, query_times=None, speed_unit_policy=None):
     """Keep every valid fragment, select native points, and define one output grid.
 
     Nonempty scenes use linspace(min canonical start, max canonical end, length).
@@ -99,7 +102,10 @@ def prepare_timed_scene(native_scene, *, length, max_observations,
     an audited engineering convention with no claimed truth-supported direction.
     """
     _role(native_scene)
-    config = _settings(length, max_observations, time_unit_seconds)
+    if 'input_adapter' in native_scene or 'physical_units' in native_scene:
+        raise DataError('prepare_timed_scene requires raw native inputs, not an already adapted scene')
+    config = _settings(length, max_observations, time_unit_seconds, speed_unit_policy)
+    units = unit_metadata(speed_unit_policy)
     length, maximum = config['length'], config['max_observations']
     tracks = native_scene['tracks']
     n = len(tracks)
@@ -120,6 +126,9 @@ def prepare_timed_scene(native_scene, *, length, max_observations,
                 or not np.isfinite(times).all() or (np.diff(times) <= 0).any()):
             raise DataError('Each canonical fragment needs at least two strictly increasing real times')
         _physical(values)
+        if units:
+            values = values.copy()
+            values[:, 2] *= KNOT_TO_MPS
         selected = uniform_observation_indices(len(times), maximum)
         size = len(selected)
         native_values[node, :size] = values[selected]
@@ -150,6 +159,11 @@ def prepare_timed_scene(native_scene, *, length, max_observations,
     canonical_count = sum(row['canonical_points'] for row in audits)
     selected_count = int(native_observed.sum())
     result = dict(native_scene)
+    if units:
+        # Raw canonical tracks would otherwise disagree with the converted
+        # timed arrays. This policy supports the timed four-state path only.
+        result.pop('tracks', None)
+        result['physical_units'] = units
     result.update(input_adapter=ADAPTER, adapter_config=config, **{key: config[key] for key in
         ('length', 'max_observations', 'time_unit_seconds', 'observation_interpolation')},
         time_origin_seconds=float(origin), native_values=native_values, native_times=native_times,
@@ -178,7 +192,8 @@ def validate_timed_scene(scene):
     _role(scene)
     if scene.get('input_adapter') != ADAPTER:
         raise DataError('Expected explicit native_time_v1 input adapter')
-    config = _settings(scene['length'], scene['max_observations'], scene['time_unit_seconds'])
+    policy = scene_speed_policy(scene)
+    config = _settings(scene['length'], scene['max_observations'], scene['time_unit_seconds'], policy)
     if scene.get('adapter_config') != config or scene.get('observation_interpolation') != INTERPOLATION:
         raise DataError('Timed input settings differ from the declared adapter configuration')
     length, maximum = config['length'], config['max_observations']
@@ -265,7 +280,8 @@ def fit_timed_normalizer(scenes):
         observed_point_count=count, training_scene_ids=ids,
         training_splits=list(dict.fromkeys(s['split'] for s in scenes)),
         constant_features=np.flatnonzero(constant).tolist(), input_adapter=ADAPTER,
-        adapter_config=dict(config), policy='training selected native four-state population moments only; std<1e-6 replaced by 1')
+        adapter_config=dict(config), policy='training selected native four-state population moments only; std<1e-6 replaced by 1',
+        **({'physical_units': unit_metadata(config['speed_unit_policy'])} if 'speed_unit_policy' in config else {}))
 
 
 def pack_timed_scene(scene, normalizer):
@@ -278,6 +294,8 @@ def pack_timed_scene(scene, normalizer):
     states as additional sensor tokens. Native padding is exactly zero.
     """
     validate_timed_scene(scene)
+    if normalizer_speed_policy(normalizer) != scene_speed_policy(scene):
+        raise DataError('Normalizer and scene use different speed unit contracts')
     if (normalizer.get('input_adapter') != ADAPTER
             or normalizer.get('adapter_config') != scene['adapter_config']
             or not normalizer.get('training_splits')

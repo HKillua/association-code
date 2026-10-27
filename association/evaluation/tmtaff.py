@@ -17,6 +17,7 @@ from association.evaluation.support import build_input_support
 from association.evaluation.association import evaluate_scenes, select_threshold
 from association.evaluation.paper_fusion_metrics import aggregate_paper_fusion, paper_fusion_scene
 from association.training.common import normalize_scene, stable_evaluation_parameters
+from association.data.physical_units import normalizer_speed_policy, unit_metadata, validate_target_units
 
 
 def aggregate_fusion_reports(reports):
@@ -56,7 +57,10 @@ def _aggregate_regions(reports, metric_key, regions):
                     ('coverage', 'intersection_count', 'available_target_count'),
                     ('trajectory_coverage', 'covered_target_trajectory_count', 'available_target_trajectory_count')):
                 pooled[ratio] = pooled[numerator] / pooled[denominator] if pooled[denominator] else None
-            pooled['unit'] = {'position': 'metres', 'speed': 'native_speed', 'heading': 'degrees'}[feature]
+            units = {row['unit'] for row in rows}
+            if len(units) > 1:
+                raise ValueError('cannot pool different physical units')
+            pooled['unit'] = next(iter(units), {'position': 'metres', 'speed': 'native_speed', 'heading': 'degrees'}[feature])
             result[region][feature] = pooled
     return result
 
@@ -72,6 +76,7 @@ def scene_input_support(scene):
 def _registered(scene, length):
     if scene.get('split') != 'V_select':
         raise ValueError('complete development evaluation requires V_select; T_test is sealed')
+    validate_target_units(scene)
     timed = scene.get('input_adapter') == 'native_time_v1'
     if timed:
         from association.data.timed import validate_timed_scene
@@ -225,11 +230,19 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                 if not np.array_equal(np.asarray(scene[key]), np.asarray(record[key])):
                     raise ValueError('cached TAM input/candidate population differs: ' + key)
     adapter = getattr(model, 'input_adapter', 'registered_v1')
+    speed_policy = normalizer_speed_policy(normalizer)
+    units = unit_metadata(speed_policy)
+    if units and adapter != 'native_time_v1':
+        raise ValueError('physical speed units require the native-time adapter')
+    if speed_policy != getattr(fusion, 'speed_unit_policy', None):
+        raise ValueError('fusion and normalizer use different speed unit contracts')
     if any(scene.get('input_adapter', 'registered_v1') != adapter for scene in scenes):
         raise ValueError('all validation scenes must match the model input adapter')
     if adapter == 'native_time_v1':
         model.validate_normalizer(normalizer)
     for scene in scenes:
+        if validate_target_units(scene) != speed_policy:
+            raise ValueError('scene targets and normalizer use different speed unit contracts')
         _registered(scene, model.config.length)
     device = _inference_device(device, next(model.parameters()).device, next(fusion.parameters()).device)
     dtype = next(model.parameters()).dtype
@@ -308,6 +321,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       target_states=truth, target_valid=valid, node_observed=scene['observed'],
                       split=scene['split'], correspondence_policy='anchor_identity_first',
                       return_artifact=prediction_writer is not None or oracle_only)
+        if units:
+            common['speed_unit_policy'] = speed_policy
         support = scene_input_support(scene)
         outputs = {}
         groupings = {'oracle': group_tracks_by_identity(scene['identities'], node_order='input')}
@@ -359,10 +374,11 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                     shared[name] = {'full_target_metrics': _regions(
                         artifact['aligned_prediction'][:n], artifact['aligned_truth'][:n],
                         artifact['aligned_truth_valid'][:n], common_valid,
-                        artifact['aligned_observed'][:n]),
+                        artifact['aligned_observed'][:n], speed_unit='mps' if units else 'native_speed'),
                         'paper_fusion_metrics': paper_fusion_scene(
                             artifact['aligned_prediction'][:n], artifact['aligned_truth'][:n],
-                            artifact['aligned_truth_valid'][:n], prediction_valid=common_valid)}
+                            artifact['aligned_truth_valid'][:n], prediction_valid=common_valid,
+                            **(dict(prediction_speed_unit='mps', target_speed_unit='mps') if units else {}))}
                 oracle_common.append(dict(scene_id=str(scene['scene_id']), methods=shared))
             if prediction_writer is not None:
                 if check:
@@ -382,6 +398,7 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         check()
     report_progress('completed', len(scenes), fusion_forward_count=fusion_steps)
     return dict(association=association, selection=selection, threshold=threshold, records=[] if oracle_only else records,
+                **({'physical_units': units} if units else {}),
                 fusion=fusion_report, oracle_only=oracle_only,
                 **({'association_scores_reused': True, 'tam_scoring_forwards': 0}
                    if cached_records is not None else {}),
