@@ -8,9 +8,9 @@
 
 ## 现在做什么
 
-1. **Mode C已吸收四篇新近来源及Homography全文复核。** 新增IEEE TSP2026未知时间对齐、Information Fusion2025 IFNet（2024在线）、ICLR2025 ACSSM、ICLR2026 T1。现为18篇独立论文，16篇正文层面分析＋TF-TS/RegError两篇定向，正式2025–2026共9篇；不把正文已读、代码静态核验、独立复现混为一谈。原表、公式、消融/负例和实现差异保存在[来源与Mode C 1.3](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-13)，现为6问题×20现象、11机制、19证据。TSP独立supp仍缺，IFNet/TSP作者专用实现未定位；ICLR两篇的可得代码已静态审查，未跑作者实验。
+1. **Mode C已补入TSP独立补充材料核验。** 四篇新近来源仍为IEEE TSP2026未知时间对齐、Information Fusion2025 IFNet（2024在线）、ICLR2025 ACSSM、ICLR2026 T1，另有Homography全文复核；18篇独立论文、16篇正文层面分析＋两篇定向、正式2025–2026共9篇均不变。[Mode C 1.4及来源](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-14)现为6问题×21现象/数学性质、11机制、19证据。TSP补充2页已全文/原图核读：命题1–3积分主线成立；式28印刷的B符号、配方常数和1/A²方差存在代数不一致，独立订正与反例已记入E16/F21/M08/C06。作者程序是否采用错误印刷式仍未知，不能据此否定原表或声称已复现。IFNet/TSP作者专用实现未定位；ICLR两篇代码仅静态审查，未跑作者实验。
 2. **三场诊断已实现，等待服务器真实回执。** `MC-RESTART-20261027/C03 → IDEA-STATE-DIAG-20261027`：查3035/2819/1043已有缓存中三方法是否同点/同向大错、来源冲突是否可辨识、reference/时间/绑定链是否一致，并区分共享相对偏差与共同绝对偏移。[设计、迁移条件与停止规则](proposals/continuous_state_reassessment_20261027.md)plan 1.3；[软件与真实输入路径检查](reports/2026-10-27-three-scene-software-verification.md)通过，原NPZ尚未本地重放，不能宣称诊断完成。103执行入口见交接，不重复101全表；实际结果回传后才Record→Squeeze→Mode C。新文献阅读与诊断并行，不预定方法。
-3. **没有预选新方法，GNC不享有优先级。** 新来源形成C06未知时间/空间偏差可辨识、C07相关信息与合法不确定性、C08观测/潜状态/信息集分离、C09细粒度跨来源模式传递四个连接；它们仍是候选，尚无目标域效果或新训练合同。下一步结合103实际证据及各候选自身成立条件，再由discover-innovation选一个连接写Idea；不能让旧模型接口或三个后验错例成为所有新方法的准入门槛。9/18近期论文只是半数，不宣称近年已占多数；后续新方法来源继续优先近两年高质量原文。旧结果保留，但不把单配方失败推广为整类失败。[条件、反例与筛选边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-13)
+3. **没有预选新方法，GNC不享有优先级。** 新来源形成C06未知时间/空间偏差可辨识、C07相关信息与合法不确定性、C08观测/潜状态/信息集分离、C09细粒度跨来源模式传递四个连接；它们仍是候选，尚无目标域效果或新训练合同。下一步结合103实际证据及各候选自身成立条件，再由discover-innovation选一个连接写Idea；不能让旧模型接口或三个后验错例成为所有新方法的准入门槛。9/18近期论文只是半数，不宣称近年已占多数；后续新方法来源继续优先近两年高质量原文。旧结果保留，但不把单配方失败推广为整类失败。[条件、反例与筛选边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-14)
 4. 既有102指标补算保持原安排。TMTAFF指标定义继续统一，但作者ESD、TFM反馈、位置loss及训练分配仍缺实现说明；同任务适配比较不必等待作者原名单，不能用论文报数或失效适配证明我方胜出。
 
 ## 保留的结论
