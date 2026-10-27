@@ -1,6 +1,6 @@
 # 当前研究状态
 
-更新：2026-10-27。本页是**当前研究目标、结论与下一步的唯一入口**；执行状态只看[HandOver](../HandOver/Handover.md)。正式数据MTAD Level1：T2100/V300/封存测试600，固定056组及共享身份限制见[数据约定](data_contract.md)。
+更新：2026-10-28。本页是**当前研究目标、结论与下一步的唯一入口**；执行状态只看[HandOver](../HandOver/Handover.md)。正式数据MTAD Level1：T2100/V300/封存测试600，固定056组及共享身份限制见[数据约定](data_contract.md)。
 
 ## 当前要解决什么
 
@@ -9,7 +9,7 @@
 ## 现在做什么
 
 0. **按用户最新要求扩大来源与baseline筛选，不限于原C08/C09/C10。** 本领域目标约80篇（直接航迹关联/融合/恢复与相邻跟踪/估计分别统计），跨领域约40篇，优先2025–2026高质量正式发表；逐级区分身份核验、正文分析、作者代码静态核查与真实复现。通过独立来源分析再增量进入现有Mode C，探索组合保留条件与反例，不先定方法找支持。[检索与阅读材料](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/README.md)。107固定合同继续，扩大文献范围不自动增加训练预算。
-1. **Mode C更新到1.12，纳入MH-GIN、HELIX、TWiX来源。** [矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-112)累计22篇方法论文、20篇正文分析＋两篇定向，正式2025–2026元数据13篇；TWiX实际读作者预印本、未核正式全文差异。现为6问题、40现象/数学性质、15机制、29证据；新连接C11–C14是条件性探索，不是确定方法。新扩展[120条候选](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/README.md)有3篇本轮完成正文分析和选定代码静态核查，另117条本轮只做题名/元数据初筛，其中一些此前已有正文分析，应引用先前来源包而不混称本轮新精读。源文母轨按经纬各轴0.5°筛查，后续另有插值和误差生成，不能作为成品无跳变保证；本包reference生成/时间/空间变换未明确。
+1. **Mode C更新到1.13，新增MH-GIN、HELIX、TWiX和DRC-TCN来源。** [矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-113)累计23篇方法论文、21篇正文分析＋两篇定向，正式2025–2026元数据14篇；TWiX实际读作者预印本、未核正式全文差异。现为6问题、42现象/数学性质、16机制、30证据；新连接C11–C14是条件性探索，不是确定方法。新扩展[120条候选](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/README.md)有4篇本轮完成正文分析和选定代码静态核查，另116条本轮只做题名/元数据初筛，其中一些此前已有正文分析，应引用先前来源包而不混称本轮新精读。DRC-TCN是闭集身份分类，公开代码的划分、归一化和损失与论文描述有差，不能直接作为同任务baseline。源文母轨按经纬各轴0.5°筛查，后续另有插值和误差生成，不能作为成品无跳变保证；本包reference生成/时间/空间变换未明确。
 2. **102/103已执行回传，本地核验通过；三场主因未唯一识别。** [完整实验记录/深挖/回执订正](reports/2026-10-27-returned-diagnostics-review.md)保留全部人口、对照和不利结果。103的5504声明query中4548可评；共同P95尾195点/15目标占090C SSE98.86%，现有标签下组成员一致，且部分近query原生量测相对reference已出现极大误差。090C三场MAE优于Mean而RMSE劣于Mean；不能只归因错helper、网络外推或直接判reference错误。C03旧GNC方案所需的可识别健康约束未建立，不进入该pilot。原任务结束，不重跑102/103。
 3. **相对配准C10获得有限的预测输入条件支持，尚无绝对精度收益证据。** [完整Record/Squeeze](reports/2026-10-27-predicted-registration-audit.md)：不看真实身份估计中心，三个场景留出组等权相对残差3179.501→629.063、3937.242→244.724、2903.963→621.317m；3035两个组恶化，1043仅两组留出。早晚query检查是离线插值条件，非在线预测。方向多样性/绝对锚点/全V效果仍未知；与C08/C09[重新比较](reports/2026-10-27-candidate-feasibility.md#candidate-comparison)，不因已有结构或消融容易先定方法。
 4. **104及105完成，原始reference已有短时大位移，根因仍未知。** [104记录](reports/2026-10-27-three-case-chain-review.md)的三场极值各±2 query、980项重放检查无不一致。[105记录](reports/2026-10-27-raw-case-chain-review.md)核对三个事后选定场景的六节点：原量测按既定规则重建后与103保留的完整五维canonical一致，三个目标的reference原始行也一致；三场所选目标的reference原始相邻时间点均可见数十公里短时位移。范围只限所查节点及目标，未证明真实航迹、时间或生成过程，亦不能推断全数据异常率。实际状态以[交接](../HandOver/Handover.md)为准。
