@@ -1,0 +1,149 @@
+{
+  "audit_date": "2026-10-27",
+  "audit_type": "existing_manifest_metadata_recalculation_no_new_experiment",
+  "source": "configs/data/mtad-level1-scene3000.json",
+  "read_scope": {
+    "manifest_only": true,
+    "archive_reads": 0,
+    "measurement_or_reference_reads": 0,
+    "test_payload_reads": 0,
+    "model_forwards": 0,
+    "optimizer_updates": 0
+  },
+  "units": {
+    "selection": "scene",
+    "component": "transitive connected component of scenes sharing original A identity; supplied by manifest",
+    "identity_overlap": "distinct A keys, copied from manifest; not independently reconstructed from labels"
+  },
+  "recalculated": {
+    "all_scene_count": 5000,
+    "selected_scene_count": 3000,
+    "unused_scene_count": 2000,
+    "shared_A_component_count": 119,
+    "splits": {
+      "T_core": {
+        "scene_count": 2100,
+        "component_count": 84,
+        "largest_component_scene_count": 966
+      },
+      "T_head": {
+        "scene_count": 0,
+        "component_count": 0,
+        "largest_component_scene_count": 0
+      },
+      "V_select": {
+        "scene_count": 300,
+        "component_count": 38,
+        "largest_component_scene_count": 130
+      },
+      "T_test": {
+        "scene_count": 600,
+        "component_count": 60,
+        "largest_component_scene_count": 240
+      }
+    },
+    "components_crossing_selected_splits": 58,
+    "largest_components_anonymous_rank": [
+      {
+        "rank": 1,
+        "all_scenes": 2204,
+        "T_core": 966,
+        "T_head": 0,
+        "V_select": 130,
+        "T_test": 240,
+        "unused": 868
+      },
+      {
+        "rank": 2,
+        "all_scenes": 1099,
+        "T_core": 437,
+        "T_head": 0,
+        "V_select": 59,
+        "T_test": 130,
+        "unused": 473
+      },
+      {
+        "rank": 3,
+        "all_scenes": 165,
+        "T_core": 69,
+        "T_head": 0,
+        "V_select": 6,
+        "T_test": 19,
+        "unused": 71
+      },
+      {
+        "rank": 4,
+        "all_scenes": 165,
+        "T_core": 68,
+        "T_head": 0,
+        "V_select": 20,
+        "T_test": 16,
+        "unused": 61
+      },
+      {
+        "rank": 5,
+        "all_scenes": 126,
+        "T_core": 43,
+        "T_head": 0,
+        "V_select": 8,
+        "T_test": 21,
+        "unused": 54
+      }
+    ],
+    "validation_largest_two_component_scene_counts": [
+      130,
+      59
+    ],
+    "validation_largest_two_component_fraction": 0.63,
+    "components_disjoint_from_current_training_and_validation": {
+      "component_count": 33,
+      "test_scene_count": 10,
+      "components_with_test_scenes": 9,
+      "unused_scene_count": 28,
+      "components_with_unused_scenes": 27
+    },
+    "components_disjoint_from_all_selected_splits": {
+      "component_count": 24,
+      "unused_scene_count": 25
+    }
+  },
+  "recorded_not_independently_rederived": {
+    "split_seed": 20,
+    "identity_independent": false,
+    "shared_A_counts": {
+      "T_core__T_test": 8634,
+      "T_core__V_select": 6053,
+      "V_select__T_test": 3437
+    },
+    "unique_A_counts_by_split": {
+      "T_core": 23902,
+      "T_head": 0,
+      "V_select": 7369,
+      "T_test": 11732
+    },
+    "prior_other_level_development": "Level2 experiments used overlapping source identities; this scene split is not an identity-independent holdout from that development."
+  },
+  "checks": {
+    "all_scene_ids_unique": true,
+    "scene_roles_cover_archive": true,
+    "selected_splits_pairwise_disjoint": true,
+    "selected_splits_match_scene_roles": true,
+    "component_members_partition_archive": true,
+    "component_mapping_matches_members": true,
+    "reconstructed_selection_matches_by_split": {
+      "T_core": true,
+      "T_head": true,
+      "V_select": true,
+      "T_test": true
+    },
+    "preview_scenes_remain_in_training": true,
+    "crossing_components_match_recorded_count": true,
+    "split_component_counts_match_recorded": true
+  },
+  "limitations": [
+    "Does not verify physical representativeness or scene difficulty.",
+    "Components and original A overlap originate in prior label audit; this pass checks metadata consistency, not raw labels.",
+    "Disjointness from current T/V does not imply independence from historical Level2 development.",
+    "No raw identity, coordinates, predictions, reference values or per-scene memberships are copied into this report."
+  ]
+}

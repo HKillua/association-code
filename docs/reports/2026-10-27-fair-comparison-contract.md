@@ -143,3 +143,54 @@ DE：物理单位链、固定TCM/TFM端点、缓存分数API、普通控制和�
 **固定停止与回传规则：** 0新增阈值选取/0T_test、无源代码伪装；输入/单位/组绑定不符、异常终止/非有限梯度/OOM、数据缺件或用户停止时，保留完整日志和失败状态，不自动重试、缩batch、删样本或加步。墙时为advisory，超建议时间仅记录并继续已冻结的同一次额度；不能将8h写成自动硬终止或借超时扩额度。u0、固定末步以及固定056预测组的完整人口和普通控制均需记录；新训练曝光按成功更新、唯一场/轨/对、对呈现、每属性有效监督、TCM/TFM各自GPU时/峰值分别记录，训练期`--pairing-audit`记录有序对抽样但不能证明原始训练浮点逐值重放。执行以后才有Record/Squeeze/Mode C；当前无新模型效果记录。
 
 设计参照[experimental-design技能](/Users/a1/.codex/skills/experimental-design/SKILL.md)中的实验单位、重复和避免伪重复原则；技能所属参考：Kassis et al., *Scientific Agent Skills: A Library of Procedural Knowledge for Research Agents*, 2026, [arXiv:2609.00065](https://arxiv.org/abs/2609.00065)。它是研究流程工具来源，不增加本项目目标领域核心论文数量或作者复现证据。
+
+### 8.3 待用户选择的具体A预算：新单位基线可行性诊断草案
+
+**DRAFT，未获训练授权，不是READY。** 本节把§8.2方案A落实为可审配置和命令形状，便于讨论计算投入；不选择新的研究机制，不替代后续事前Idea/独立交接，也不启动任何作业。对应[TCM草案](../../configs/tmtaff-tcm-unit-draft.json)和[TFM草案](../../configs/tmtaff-tfm-unit-draft.json)可被现有配置解析器读取，但文件存在不提供执行许可。当前训练权重不存在；106的最终人口核验、用户对预算的明确选择和后续独立执行合同均不得跳过。
+
+**要区分的三种差距：** （1）旧093A与新单位TFM的u0/u1000 **oracle**结果，是相近结构、损失和曝光下的修复前后诊断，用于观察原49.6km级失败是否仍存在；（2）新TFM固定末步在**056原预测组、全V300**上与普通控制及090C位置的比较，是本合同定义的同任务比较，包含错组、单例、缺预测和重复；（3）TMTAFF**论文原表**只作外部参照，因作者划分/窗口/阶段80 epochs分配及mESD实现未闭合，不能把其有符号ME与本项目米制MAE相减或计算提升率。三层分开列，不训练TAM，也不称完整TMTAFF系统复现。
+
+| 供决定的项目 | 草案A固定值与约束 |
+|---|---|
+| 目的与预测 | 检验从头纠正物理速度路径后，这个有限预算的时间适配能否产出可用的恢复结果。若oracle仍严重落后普通恢复控制，原失败不能仅以单位问题解释；即便改善也不能据此确定单位是唯一原因 |
+| 数据与确认条件 | 固定Level1 T2100/V300、Q64、cap128、reference gap600/shortest_arc、原056及090C来源；T_test不读。仅在106最终确认T可用轨155134、既定人口/选点和监督无未解释变化后，2424才代表完整1个有序epoch；不符则先分析，不默默改步数 |
+| TCM | 从头初始化模型及T内normalizer；`ordered_fragment`、batch64、2424成功更新，尾批62条；预计曝光155134轨及35555236双向transition，实际数单独记录。只取固定末步，不按V选择 |
+| TFM | completion仅转移上述新单位TCM并冻结；新TFM及optimizer，从头1000成功更新、batch64＝64000次正对呈现；seed20。仍按场均匀、场内抽正对，不足64有放回；记录实际unique场/轨/对及逐属性有效监督，64000不是独立样本或完整epoch |
+| 结构与优化 | 两份草案的model/fusion/training/train_splits逐项等于对应维护中的历史配置。128维、8头、6层、dropout0.1；TCM track_microbatch4、TFM pair_microbatch8；常数LR0.002、clip1、现有`standard_smooth_l1`及`shortest_arc`损失、`train_position_affine`输出；不另调超参、loss权重或采样 |
+| 端点与监测 | TCM2424末步；TFM仅u0及u1000的完整V oracle监测并保存预测，**固定使用u1000**。完成后额外做一次固定056全V评价及全部声明控制；不依据u0/u1000优劣换checkpoint，不新增阈值 |
+| 评价与统计 | 本文§6全部指标与人口报告；先覆盖/重复，再同一成对有效mask的MAE、RMSE、P95/P99，逐属性ME/标准残差SD，38共享身份组件及最大组件外。seed只有20，反复使用的V300是开发集；不声称独立泛化或稳定优势 |
+| 终止与出口 | 输入/单位/组/人口不符、数据缺件、非有限梯度、OOM或异常即停并留原件；不自动重试、缩batch、resume、追加seed/步数。正常结束后即使无改善也完整回传，依据失败层级再讨论；不自动转B或换研究方法 |
+| 计算投入 | 旧088＋093A单卡3090顺序墙时约20h09m，**另加尚未实测的新固定056全V评价成本**；新单位准备/缓存/共享负载可能不同，新总成本未知。配置8h是各阶段advisory而非8h硬预算，继续的只是预定2424/1000步；不是授权无限训练。一个TCM、一个TFM和一次固定组评价各一次尝试，按服务器FIFO安排，CPU4/显式单卡 |
+
+**配置差异和因果边界：** 两份draft相对各自当前`*-level1.json`只增加`data.speed_unit_policy=measurement_kn_reference_mps_v1`，其他显式字段无改动。这使输入量测kn转换m/s、reference保持m/s；T内重新估计normalizer、新TCM latent缓存和新权重均重新生成，不能加载旧单位权重再缩放输出。与真正历史088/093A运行相比，还存在当前单位标记/评价修订、额外`--pairing-audit`记录、固定056 wrapper与全人口/共同mask统计等工程和统计变化，运行环境及浮点轨迹也未声明完全重放；**不是只拨动一个开关的纯因果单位干预**。新旧oracle指标须核相同scene/target/query/valid人口后解释；固定056结果是新比较层，不冒充旧093A已有的预测组结果。保留相近预算是为定位基线可行性，不是为了认定旧预算充分，也不是作者80 epochs复现。
+
+以下为**不可直接复制执行的审阅模板**：尖括号是尚未在训练交接中冻结的来源/新目录/设备占位符；不得自行替换后开跑。实际路径、运行环境、106证据、用户选定A及新Idea/停止条款须进入以后独立合同。本轮不创建交接编号、不改领取表。
+
+```text
+python tools/experiments/tmtaff_complete_fit.py \
+  --phase tcm --config configs/tmtaff-tcm-unit-draft.json \
+  --archive <level1-part-1> <level1-part-2> <level1-part-3> \
+  --manifest <frozen-level1-manifest> --alignment <frozen-level1-alignment> \
+  --output <new-unit-tcm-attempt> --device <explicit-single-device> \
+  --cpu-threads 4 --time-policy advisory
+
+python tools/experiments/tmtaff_complete_fit.py \
+  --phase tfm --config configs/tmtaff-tfm-unit-draft.json \
+  --initialize-tcm-from <new-unit-completed-tcm-attempt> \
+  --archive <same-level1-part-1> <same-level1-part-2> <same-level1-part-3> \
+  --manifest <same-manifest> --alignment <same-alignment> \
+  --output <new-unit-tfm-attempt> --device <explicit-single-device> \
+  --cpu-threads 4 --time-policy advisory --pairing-audit --save-predictions
+
+python tools/experiments/tmtaff_fixed056_evaluate.py \
+  --tfm-run <new-unit-completed-tfm-attempt> \
+  --source-system <original056-system> --reference090c-run <original090c-run> \
+  --archive <same-level1-part-1> <same-level1-part-2> <same-level1-part-3> \
+  --manifest <same-manifest> --alignment <same-alignment> \
+  --output <new-fixed056-evaluation-attempt> --device <explicit-single-device> \
+  --cpu-threads 4
+```
+
+命令参数核对现有[训练入口](../../tools/experiments/tmtaff_complete_fit.py)及[评价入口](../../tools/experiments/tmtaff_fixed056_evaluate.py)；每个输出必须是新目录，TFM来源必须是本次完整TCM，评价来源必须是本次完整TFM末步。`--reference090c-run`是实际必需参数；TAM阶段与`--resume`均不在草案中。此处未执行这三条命令，未构建模型、读取原数据或消耗GPU预算。
+
+**需要用户决定的具体事项：** 是否选择“单seed20、TCM1遍＋TFM1000步＋0/末步oracle＋一次固定056全V”的A诊断，接受历史约20小时加新增评价且新成本未知。也可选择暂不训练，先讨论不同预算或目标；不能把“继续准备”、此前106授权或本草案被提交等同于选择A。选择后先完成正式事前记录和独立交接，再按该固定额度执行；结果回来后按Record→Squeeze→Mode C回流讨论。
