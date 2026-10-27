@@ -256,9 +256,14 @@ def common_target_metrics(artifacts):
     truth = base['aligned_truth'][:count]
     target_valid = base['aligned_truth_valid'][:count]
     observed = base['aligned_observed'][:count]
+    speed_unit = base.get('state_speed_unit', 'native_speed')
+    speed_policy = base.get('speed_unit_policy')
     common = np.ones_like(target_valid, bool)
     for name in names:
         artifact = artifacts[name]
+        if (artifact.get('state_speed_unit', 'native_speed') != speed_unit
+                or artifact.get('speed_unit_policy') != speed_policy):
+            raise ValueError('common-target comparison uses different speed units or policies')
         if (not np.array_equal(artifact['target_ids'], base['target_ids'])
                 or not np.array_equal(artifact['aligned_truth'][:count], truth, equal_nan=True)
                 or not np.array_equal(artifact['aligned_truth_valid'][:count], target_valid)
@@ -271,6 +276,8 @@ def common_target_metrics(artifacts):
         reports[name] = dict(full_target_metrics={region: evaluate_aligned_fusion(
             artifacts[name]['aligned_prediction'][:count], truth, target_valid,
             prediction_valid=common, region_mask=mask) for region, mask in regions.items()})
+        for region in reports[name]['full_target_metrics'].values():
+            region['speed']['unit'] = speed_unit
     return reports, common
 
 

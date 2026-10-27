@@ -212,6 +212,8 @@ class Fixed056IntegrationTests(NativeZipFixture, unittest.TestCase):
         self.assertEqual(len(writer.rows), 2)
         self.assertIn('canonical_all_anchor_ols', result['fusion'])
         self.assertEqual(writer.pooled()['canonical_all_anchor_ols']['tmtaff']['speed']['unit'], 'mps')
+        self.assertEqual(writer.rows[0]['pairs']['canonical_all_anchor_ols']['methods']
+                         ['tmtaff']['full_target_metrics']['all']['speed']['unit'], 'mps')
         first = result['per_scene'][0]['methods']['canonical_all_anchor_ols']
         self.assertGreater(len(first['unmatched_target_ids']), 0)
         self.assertTrue((self.root/'fair-predictions'/'000000.json').exists())

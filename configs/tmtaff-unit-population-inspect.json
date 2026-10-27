@@ -1,0 +1,31 @@
+{
+  "scope": "TMTAFF-unit-population-inspection-v1",
+  "train_splits": ["T_core"],
+  "data": {
+    "length": 64,
+    "max_observations": 128,
+    "time_unit_seconds": 20.0,
+    "reference_longitude_policy": "shortest_arc",
+    "speed_unit_policy": "measurement_kn_reference_mps_v1"
+  },
+  "expected": {
+    "T_core": {
+      "scene_count": 2100,
+      "node_count": 155134,
+      "native_point_count": 17932752,
+      "candidate_count": 27632584,
+      "positive_count": 155159,
+      "negative_count": 27477425
+    },
+    "V_select": {
+      "scene_count": 300,
+      "node_count": 24599,
+      "candidate_count": 4439092,
+      "target_count": 9100
+    }
+  },
+  "max_member_bytes": 268435456,
+  "max_address_space_bytes": 34359738368,
+  "pair_batch_size": 64,
+  "exposure_step_options": [1000, 4000]
+}

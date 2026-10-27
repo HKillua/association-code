@@ -1,0 +1,60 @@
+{
+  "scope": "existing 103 retained reference issue metadata; no ZIP access, no new experiment",
+  "scenes": [
+    {
+      "scene_id": "3035",
+      "target_index": 23,
+      "issue_count": 64,
+      "issue_counts_by_code": {
+        "duplicate_conflict": 64
+      },
+      "distinct_issue_rows": 128,
+      "selected_target_issue_count": 0,
+      "issue_count_matches_105": true,
+      "conflicting_group_count_by_field": {
+        "lat": 64,
+        "lon": 64,
+        "cou": 60,
+        "vel": 23
+      },
+      "selected_target_conflicting_group_count_by_field": {},
+      "issues_overlapping_105_selected_neighbor_rows": 0
+    },
+    {
+      "scene_id": "2819",
+      "target_index": 1,
+      "issue_count": 1,
+      "issue_counts_by_code": {
+        "duplicate_conflict": 1
+      },
+      "distinct_issue_rows": 2,
+      "selected_target_issue_count": 1,
+      "issue_count_matches_105": true,
+      "conflicting_group_count_by_field": {
+        "lat": 1,
+        "lon": 1,
+        "vel": 1,
+        "cou": 1
+      },
+      "selected_target_conflicting_group_count_by_field": {
+        "lat": 1,
+        "lon": 1,
+        "vel": 1,
+        "cou": 1
+      },
+      "issues_overlapping_105_selected_neighbor_rows": 0
+    },
+    {
+      "scene_id": "1043",
+      "target_index": 3,
+      "issue_count": 0,
+      "issue_counts_by_code": {},
+      "distinct_issue_rows": 0,
+      "selected_target_issue_count": 0,
+      "issue_count_matches_105": true,
+      "conflicting_group_count_by_field": {},
+      "selected_target_conflicting_group_count_by_field": {},
+      "issues_overlapping_105_selected_neighbor_rows": 0
+    }
+  ]
+}

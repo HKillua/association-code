@@ -120,7 +120,8 @@ def _request(split, max_points):
     return _max_points(max_points)
 
 
-def iter_native_split_from_archive(archive, manifest, split, *, max_points=None, check=None):
+def iter_native_split_from_archive(archive, manifest, split, *, max_points=None, check=None,
+                                   progress=None):
     """Yield one native scene at a time from an already open archive.
 
     Quarantined fragments retain their original diagnostics in each scene audit.
@@ -131,6 +132,8 @@ def iter_native_split_from_archive(archive, manifest, split, *, max_points=None,
     cap = _request(split, max_points)
     validate_archive(archive, manifest)
     for sid in manifest['splits'][split]:
+        if progress:
+            progress(dict(stage='observations', status='READING', split=split, scene_id=sid))
         if check:
             check()
         yield _record(archive.load_scene(sid), manifest['components'][sid], split, cap,

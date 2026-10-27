@@ -58,7 +58,7 @@ def _request(manifest, train_splits, data_config, alignment_by_scene, *, validat
 def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                        alignment_by_scene, check=None, motion_observation_policy=None,
                        validation_only=False, retain_native_events=False,
-                       validation_native_verifier=None):
+                       validation_native_verifier=None, progress=None):
     """Return train/validation scene lists and a JSON-compatible preparation report.
 
     Every label-derived A-B identity is a target, including targets whose nodes
@@ -77,6 +77,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
         raise DataError('retain_native_events must be a boolean')
     if validation_native_verifier is not None and not callable(validation_native_verifier):
         raise DataError('validation_native_verifier must be callable')
+    if progress is not None and not callable(progress):
+        raise DataError('progress must be callable')
     if motion_observation_policy is not None:
         validate_motion_observation_policy(motion_observation_policy)
     splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene,
@@ -95,7 +97,7 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
         for split in splits:
             populations[split] = []
             native_scenes = iter_native_split_from_archive(archive, manifest, split,
-                max_points=data_config['max_observations'], check=check)
+                max_points=data_config['max_observations'], check=check, progress=progress)
             for native in native_scenes:
                 if check:
                     check()
@@ -142,6 +144,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                 # Release this scene's full canonical tracks before loading next.
                 del native, labels
                 archive._label_cache.pop(sid, None)
+                if progress:
+                    progress(dict(stage='observations', status='COMPLETED', split=split, scene_id=sid))
             del native_scenes
         archive_members = list(archive.members_read)
     references_read = []
@@ -153,6 +157,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
             check()
         with closing(iter_reference_states(archive_path, manifest, split=split, scene_ids=scene_ids)) as stream:
             for sid in scene_ids:
+                if progress:
+                    progress(dict(stage='reference', status='READING', split=split, scene_id=sid))
                 # Check before advancing the generator, not after it has read
                 # another potentially large reference CSV.
                 if check:
@@ -172,6 +178,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                                         'raw_row_count': len(reference['rows']), 'issue_count': len(reference['issues'])})
                 # Do not retain raw reference rows in the scene, report or closure.
                 del reference
+                if progress:
+                    progress(dict(stage='reference', status='COMPLETED', split=split, scene_id=sid))
     if check:
         check()
     loaded_train_splits = [] if validation_only else list(train_splits)

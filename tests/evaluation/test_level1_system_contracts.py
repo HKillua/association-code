@@ -407,6 +407,25 @@ class Level1SystemContractTests(unittest.TestCase):
             self.assertEqual(metric['intersection_count'],1)
             self.assertEqual(metric['coverage'],.5)
 
+    def test_common_target_preserves_explicit_speed_units_and_rejects_mixed_units(self):
+        from association.data.physical_units import SPEED_UNIT_POLICY
+        truth = np.array([[[30., 120., 6., 90.]]])
+        prediction = truth.copy(); prediction[..., 2] += 2.
+        artifact = dict(target_ids=np.array(['a']), aligned_truth=truth,
+            aligned_truth_valid=np.ones_like(truth, bool), aligned_observed=np.ones((1, 1), bool),
+            aligned_prediction=prediction, aligned_prediction_valid=np.ones_like(truth, bool))
+        legacy, _ = common_target_metrics({'a': artifact, 'b': deepcopy(artifact)})
+        self.assertEqual(legacy['a']['full_target_metrics']['all']['speed']['unit'], 'native_speed')
+        current = dict(artifact, state_speed_unit='mps', speed_unit_policy=SPEED_UNIT_POLICY)
+        reports, _ = common_target_metrics({'a': current, 'b': deepcopy(current)})
+        speed = reports['a']['full_target_metrics']['all']['speed']
+        self.assertEqual(speed['unit'], 'mps')
+        self.assertEqual(speed['mae'], 2.)  # Only the label is preserved; no second conversion.
+        for changed in (artifact, dict(current, state_speed_unit='kn'),
+                        dict(current, speed_unit_policy='different')):
+            with self.assertRaisesRegex(ValueError, 'speed units or policies'):
+                common_target_metrics({'a': current, 'b': changed})
+
 
 
 if __name__ == '__main__':

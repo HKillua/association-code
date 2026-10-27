@@ -51,3 +51,15 @@
 - `new_M`：无直接验证的生成/错误机制；数据生成、时间语义和真值来源 `UN`。不能把原行一致升级成原数据正确。
 - `evidence_index`：`case-{3035,2819,1043}.json.gz` 的 `nodes`、`reference.endpoint_checks` 和 `reference.selected_neighbor_times`；`summary.json.gz`、`run.json`、launcher 原件；issue 定义见 `association/data/reference_states.py::_read_rows`。
 - `open_questions`：reference 的上游生成与变换、这些行的独立真值；整成员 issue 的具体分类/目标归属未随本回执公开。下一步先将证据合并既有 Mode C 并与用户讨论，不能自动扩范围或启动新训练。
+
+## 既有证据补核：reference issue 的具体类型
+
+2026-10-27 21:35–21:36（北京时间），仅在服务器读取103已保留的三个 `private-evidence-{scene}.json.gz` 中 `raw_reference.issues/rows`，与105公开计数及已选邻行行号比较；未重读ZIP、未重新执行103/105、未扩大场景、未重算评价或改数据。该项为现有记录的类型核验，不是新的独立实验。只回传[脱敏聚合](../../HandOver/results/LEVEL1-RAW-CASE-CHAIN-20261027-105/reference-issue-types-review.json)，未回传身份、绝对时间或位置。此前“类型未知”保留为当时回执状态，现补充如下：
+
+| 场景 | 具体类型/组数 | 涉及不重复原行数 | 与105所选目标的关系 | 与105端点/邻行的关系 |
+|---|---|---:|---|---|
+| 3035 | `duplicate_conflict`，64组 | 128 | 0组属于t23 | 无重合 |
+| 2819 | `duplicate_conflict`，1组 | 2 | 1组属于t1 | 无重合 |
+| 1043 | 无issue | 0 | 无 | 无 |
+
+3035的64组均存在纬度和经度数值冲突，其中60组航向冲突、23组速度冲突；2819该组四属性均冲突。组指同一数据包身份且同一时间的多行，不能当作64个目标。`targets._align_reference_rows`既定规则会将冲突时刻对应属性标无效，并保留该时刻于插值轴，避免跨过冲突点；本次没有修改规则，也未量化所有query受影响数量。这些冲突与前文不同时间点的大位移是两种现象，不能用前者直接解释后者。原始生成、身份及物理真值仍未知。
