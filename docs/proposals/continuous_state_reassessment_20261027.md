@@ -9,7 +9,7 @@ package_type: IDEA_PACKAGE
 package_version: research-pipeline-contract v1.0
 package_id: IDEA-STATE-DIAG-20261027
 idea_id: IDEA-STATE-DIAG-20261027
-plan_version: 1.2-design
+plan_version: 1.3-implementation
 created_at: 2026-10-27
 source_matrix_id: MC-RESTART-20261027
 selected_C_id: C03
@@ -86,6 +86,25 @@ next_skill: record-experiment
 - 主要表现为自洽共同偏移/错误整组，且无可见健康约束：本轮GNC迁移不进入pilot；需要可辨识bias或关联问题的新来源/连接，不能再加平滑模块。
 - 确有局部冲突、剩余约束可信，且存在不依赖reference的区分依据：将这一事实回填矩阵，支持鲁棒估计作为可行候选；仍须与近两年任务相关方法共同筛选，不能自动进入下面pilot。仅事后发现好源不满足此条件，也不以这三个事后场景作为调参集。
 - 结果混合或unknown：保留条件分层，不强行给统一根因。只有提出能改变取舍的具体补证据项才再做一次定向检查；不自动加模型/seed/步数。
+
+### 2.5 1.3实现与验收（2026-10-27）
+
+用户确认服务器继续按主仓领取。本轮实现为[三个场景脚本](../../tools/analysis/diagnose_three_scenes.py)，保留1.2的样本、问题与资源范围；不选新方法。仅增加可复核的输出契约。实际执行许可另见L2S-103；软件检查不算已完成三方法诊断。
+
+输入为090C根目录元数据、三个场景的fragment/system NPZ、原Level1字节分卷、原manifest/逐场alignment，以及101已存全V阈值汇总。核完整090C配置、4000步final的元数据、原source_system一致性；不读取权重。原cache的`native_states`是canonical_all插值/OLS外推的query估计。只为一致性检查重放原确定性输入函数，不重新运行网络/关联。
+
+| 验收项 | 可观察结果／核验 |
+|---|---|
+| 固定人口与对应 | 每个原target×64行均保留；固定first-anchor group、全部重复组和mask核对；基于原项目评价器的合成schema检查覆盖缺预测/缺参考/duplicate，不作为MTAD效果证据 |
+| 原输入链 | 仅读取3035/2819/1043；node/identity/query及query估计、support/exact/nearest逐值一致；真实ZIP输入路径已本地核验，服务器还须与原NPZ逐值核对 |
+| 参考链 | 原offset/gap/shortest_arc规则重放四属性和valid；每query原始左右端点（含重复/冲突）保留；软件检查验证offset/重复/超gap不被修复 |
+| 方向与距离 | 径向误差复用原Haversine；方向使用全场可见纬度均值定义的统一north/east米制平面，记录投影/球面范数比；零向量夹角为unknown，不填同向 |
+| 来源冲突 | `query_pairs`明确派生估计；`simultaneous_native_pairs`只取原生时间精确相等，不插值制造同时观测；无共同原生时刻保留unknown |
+| 相对结构与健康性 | 固定组配对与oracle同身份配对分开；跨目标相对向量按目标等权，仅描述一致性。最近原生点误差、query派生误差、组绑定目标误差分列，oracle接近不变成可用权重 |
+| 尾部及份额 | 使用101原全V各方法P95/P99，列八种重合模式及共同尾部AE/SSE份额；按原四支撑区和全部query报告，不在三场重新拟合阈值或算独立样本显著性 |
+| 输出与失败 | 新目录写run、summary、逐场summary、逐点与来源对表；原身份/坐标/端点完整原件留server private-evidence。缺件/重放不一致保存FAILED和已完成场，不补推理、不自动重试 |
+
+[实际软件核验记录](../reports/2026-10-27-three-scene-software-verification.md)保留命令、结果及边界。尚未有原预测NPZ的本地重放，故没有EXPERIMENT_RECORD/SQUEEZE_REPORT或新的H-local/H-common结论。服务器回传后才按`record-experiment → squeeze-experiment → Mode C`解释。
 
 ## 3. TRANSFER_PACKAGE：条件成立时怎样迁移
 
