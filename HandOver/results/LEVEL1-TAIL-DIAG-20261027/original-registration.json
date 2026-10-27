@@ -1,0 +1,27 @@
+{
+ "run_id": "LEVEL1-TAIL-DIAG-20261027",
+ "note": "Read-only posthoc diagnostic derived from returned 101/103 artifacts; not a replay input, not a new experiment.",
+ "inputs": [
+  "results/LEVEL1-COORDINATE-METRICS-20261026-101/scene-summary.json.gz",
+  "results/LEVEL1-COORDINATE-METRICS-20261026-101/summary.json.gz",
+  "results/LEVEL1-THREE-SCENE-DIAG-20261027-103/points-{3035,2819,1043}.json.gz"
+ ],
+ "zero_training_zero_forwards": true,
+ "returned_files": [
+  {
+   "returned_name": "analysis.json",
+   "bytes": 4165,
+   "sha256": "91af2b5bc6d9fc46a0cc208cc0edb17ef3490fa7a7774d8903b1851a5d83b177",
+   "mtime_local": "2026-10-27T14:41:21+0800",
+   "mode": "server-generated diagnostic"
+  },
+  {
+   "returned_name": "report.md",
+   "bytes": 2820,
+   "sha256": "edf43b5322523932ec6f6cdff2fd36c2a64bb9920c9718b9602a516f4634fad2",
+   "mtime_local": "2026-10-27T14:41:43+0800",
+   "mode": "server-generated diagnostic"
+  }
+ ],
+ "returned_total_bytes": 6985
+}
