@@ -1,0 +1,53 @@
+{
+  "checked_at_utc": "2026-10-27T14:26:12.274906+00:00",
+  "unit": "mtad-1e8d72c87900.service",
+  "service": {
+    "argv": [
+      "systemctl",
+      "--user",
+      "show",
+      "mtad-1e8d72c87900.service",
+      "-p",
+      "ActiveState",
+      "-p",
+      "SubState",
+      "-p",
+      "Restart",
+      "-p",
+      "MainPID",
+      "-p",
+      "ControlGroup"
+    ],
+    "returncode": 0,
+    "stdout": "Restart=no\nMainPID=714705\nControlGroup=/user.slice/user-1018.slice/user@1018.service/app.slice/mtad-1e8d72c87900.service\nActiveState=active\nSubState=running\n",
+    "stderr": ""
+  },
+  "linger": {
+    "argv": [
+      "loginctl",
+      "show-user",
+      "wangguangjie",
+      "-p",
+      "Linger"
+    ],
+    "returncode": 0,
+    "stdout": "Linger=yes\n",
+    "stderr": ""
+  },
+  "stage_process": {
+    "argv": [
+      "ps",
+      "-p",
+      "714941",
+      "-o",
+      "pid,ppid,pgid,stat,etime,comm"
+    ],
+    "returncode": 0,
+    "stdout": "    PID    PPID    PGID STAT     ELAPSED COMMAND\n 714941  714706  714706 Rl         01:10 python\n",
+    "stderr": ""
+  },
+  "chain_status": "RUNNING",
+  "stage": "tcm",
+  "stage_run_file_exists": false,
+  "note": "Submission-time observation only; missing stage run during input preparation is not a final result."
+}

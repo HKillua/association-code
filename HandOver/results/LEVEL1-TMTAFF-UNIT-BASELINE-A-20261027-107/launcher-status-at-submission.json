@@ -1,0 +1,13 @@
+{
+  "status": "RUNNING",
+  "worker_pid": 714705,
+  "payload_pid": 714706,
+  "payload_pgid": 714706,
+  "returncode": null,
+  "timed_out": false,
+  "worker_started_at": "2026-10-27T14:24:03.275566+00:00",
+  "backend": "systemd",
+  "time_policy": "advisory",
+  "time_advisory_issued": false,
+  "payload_started_at": "2026-10-27T14:24:03.277409+00:00"
+}

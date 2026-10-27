@@ -1,0 +1,21 @@
+{
+  "checked_at_utc": "2026-10-27T14:24:02.868276+00:00",
+  "requested_device": "auto",
+  "min_free_mib": 6144.0,
+  "memory_requirement_note": "Caller estimate only; the snapshot is not a reservation or a workload fit measurement.",
+  "shared_gpu_allowed": true,
+  "selected": {
+    "index": 3,
+    "uuid": "GPU-1043f26a-d4bd-7cd8-1089-ee9066f1ffcc",
+    "name": "NVIDIA GeForce RTX 3090",
+    "memory_total_mib": 24576.0,
+    "memory_free_mib": 13448.0,
+    "utilization_gpu": 100.0,
+    "meets_memory_estimate": true
+  },
+  "selection_reason": "Auto: highest free memory, then lowest known utilization, then lowest physical index; sharing is allowed.",
+  "status": "SELECTED",
+  "source_file": "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-UNIT-BASELINE-A-20261027-107-attempt-1-gpu-allocation.json",
+  "co_resident_process_count": 3,
+  "omitted": "Full candidate query/process records remain in server source_file; this is a derived summary, not an unmodified original."
+}

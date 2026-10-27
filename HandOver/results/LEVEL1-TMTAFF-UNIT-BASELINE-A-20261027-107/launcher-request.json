@@ -1,0 +1,40 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run107/tools/experiments/run_tmtaff_unit_baseline_A.py",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run107/configs/data/mtad-level1-scene3000.json",
+    "--alignment",
+    "/home/wangguangjie/djs/association-code-run107/configs/data/mtad-level1-alignment.json",
+    "--source-system",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-ASSOCIATION-20261022-056-attempt-1/system",
+    "--reference090c-run",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-UNIT-BASELINE-A-20261027-107-attempt-1",
+    "--device",
+    "cuda:0",
+    "--cpu-threads",
+    "4"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run107",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-1043f26a-d4bd-7cd8-1089-ee9066f1ffcc",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-27T14:24:03.126368+00:00",
+  "started_monotonic": 3041454.219507044,
+  "max_seconds": 86400.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

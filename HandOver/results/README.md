@@ -10,6 +10,7 @@
 | `LEVEL1-THREE-CASE-CHAIN-20261027-104` | 三个固定案例各5个query的原链核查；服务器数值/日志与本地由脱敏回执补绘的SVG分别保留 |
 | `LEVEL1-RAW-CASE-CHAIN-20261027-105` | 原CSV固定节点/reference一致性及脱敏issue类型；完整原行仍留服务器 |
 | `LEVEL1-TMTAFF-UNIT-PREP-20261027-106` | 新单位T/V完整人口、监督直方图、7200成员及实际退出；启动快照与最终原件分开命名 |
+| `LEVEL1-TMTAFF-UNIT-BASELINE-A-20261027-107` | 单次服务提交、实际argv/阶段起点及托管核验；GPU摘要明确删去其他进程细节，完整分配记录留服务器。启动快照不是最终结果 |
 | `LEVEL1-TAIL-DIAG-20261027` | 服务器事后派生件；`d6f79c8`改写其中方向/轴序/排名解释，原版本可从Git `a68fde4`恢复；以本地审计为结论入口 |
 | `LEVEL1-NATIVE-QUERY-20261026-100-summary` | 三臂合并的全人口、逐场/组件对照；不再保三套重复端点表 |
 | `LEVEL1-QUERY-RELATION-20261025-098-*` | 两seed比较与总表，保留原晋级失败的可核依据 |
