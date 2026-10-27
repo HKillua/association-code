@@ -169,7 +169,8 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                       batch_tracks, pair_batch_size, select_on_validation,
                       threshold, singleton_policy, check=None, progress=None,
                       prediction_writer=None, oracle_only=False,
-                      association_records=None, predicted_controls=False):
+                      association_records=None, predicted_controls=False,
+                      extra_predicted_controls=None):
     """Return full-V association plus predicted/oracle/simple/single-source fusion.
 
     ``singleton_policy`` is explicitly 'missing' or 'observed'. The latter
@@ -202,6 +203,9 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
         raise ValueError('predicted_controls must be boolean')
     if oracle_only and (association_records is not None or predicted_controls):
         raise ValueError('oracle_only excludes predicted records and controls')
+    if extra_predicted_controls is not None and (oracle_only or association_records is None
+            or not callable(extra_predicted_controls)):
+        raise ValueError('extra controls require cached association records and predicted groups')
     if association_records is not None and select_on_validation:
         raise ValueError('cached TAM scores require the original fixed threshold')
     for value in (batch_tracks, pair_batch_size):
@@ -355,6 +359,22 @@ def evaluate_complete(model, fusion, normalizer, scenes, *, device,
                     scene['values'], scene['observed'], groupings['predicted']).items():
                 outputs[name] = evaluate_full_scene(generated, grouping_kind='predicted',
                     node_input_support=support, **common)
+        if extra_predicted_controls is not None:
+            # Do not expose targets, labels, identities or references to the
+            # prediction callback. They are used below solely for evaluation.
+            visible = {key: scene[key] for key in ('scene_id', 'node_ids', 'sources',
+                'grid', 'native_values', 'native_times', 'native_observed', 'physical_units')}
+            extra = extra_predicted_controls(visible, groupings['predicted'])
+            if not isinstance(extra, dict) or not extra or set(extra) & set(outputs):
+                raise ValueError('extra control names must be nonempty and distinct')
+            if scene_index and set(extra) != set(extra_names):
+                raise ValueError('extra controls must have the same names across scenes')
+            if not scene_index:
+                extra_names = tuple(extra)
+                methods.update({name: [] for name in extra_names})
+            for name, entry in extra.items():
+                outputs[name] = evaluate_full_scene(entry['generated'], grouping_kind='predicted',
+                    node_input_support=entry['support'], **common)
         node_valid = np.repeat(np.asarray(scene['observed'])[..., None], 4, axis=-1)
         simple = simple_fusion_outputs(scene['values'], node_valid, scene['identities'], scene['sources'])
         outputs['simple_fusion_oracle'] = evaluate_full_scene(simple, grouping_kind='oracle', **common)

@@ -69,7 +69,7 @@ baseline下一次预算须针对已有证据提出可区分机制的改动；不
 
 ## 固定056同任务比较的接口边界
 
-[比较实现合同](../reports/2026-10-27-fair-comparison-contract.md)规定先做固定056预测组下的恢复/融合，再另评自己的关联完整系统。`evaluate_complete`已有缓存分数接口，但`tmtaff_complete_fit.py --phase tfm`当前监测与末步强制`oracle_only`；现096组合脚本绑定093/094，不能冒用为056。新评价wrapper须绑定056原final1000分数/阈值与保存组，不重跑TAM或选阈值；同一Q64、target registry、reference数组及完整人口逐项核验。
+[比较实现合同](../reports/2026-10-27-fair-comparison-contract.md)规定先做固定056预测组下的恢复/融合，再另评自己的关联完整系统。`tmtaff_complete_fit.py --phase tfm`的训练期监测与末步仍为`oracle_only`；096组合脚本绑定093/094，不能冒用为056。新增[固定056评价入口](../../tools/experiments/tmtaff_fixed056_evaluate.py)在训练完成后独立绑定原final1000分数/阈值与保存组，不重跑TAM或选阈值；核Q64、target registry、reference数组及完整人口。已完成软件验证，但无新单位训练端点，尚未真实运行V300比较。
 
 主表需同时给canonical_all Anchor-OLS/Mean-supported-OLS强控制及selected_cap128可见性匹配控制；现`predicted_observed_controls`仅cap128支撑内插值，不能替代前两者。最小路径从056原缓存复制四状态，仅速度kn→m/s，再复用普通控制，不改原缓存或放开新单位与motion/native_events混用限制。TMTAFF仍cap128，其输入预算差异与单例支撑外missing明确报告，不用不同有效人口的误差宣称胜出。
 

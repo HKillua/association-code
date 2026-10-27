@@ -1,0 +1,30 @@
+# 104原链核查：实际记录和边界
+
+## 实验记录
+
+`EXPERIMENT_RECORD: EXP-104-CHAIN-20261027; source_idea_id: IDEA-STATE-DIAG-20261027; plan_version: 1.4-chain-audit; status: completed; next_skill: squeeze-experiment`。事前计划见[Idea §2.6](../proposals/continuous_state_reassessment_20261027.md#chain-audit-104)，原始[回执](../../HandOver/S2L-20261027-104.md)和[回传数据](../../HandOver/results/LEVEL1-THREE-CASE-CHAIN-20261027-104/)保留。
+
+实际服务器运行一次，2026-10-27 09:26:03.537–09:26:06.394 UTC，程序2.857s，launcher 5.152s，退出0，CPU线程上限4，峰值193792 KiB；不训练、不前向、不读权重/ZIP/NPZ，不访问封存测试。固定3035 target23 query54–58、2819 target1 query58–62、1043 target3 query52–56，各5个query、每点两名成员。服务器无Matplotlib，原run记录`plots_complete=false`；本地仅用回传的去身份数据按原绘图入口补三张SVG，没有重跑诊断或读私有源。原run状态不能改称服务器有图。
+
+本地补图：[3035](../../HandOver/results/LEVEL1-THREE-CASE-CHAIN-20261027-104/case-3035.svg)、[2819](../../HandOver/results/LEVEL1-THREE-CASE-CHAIN-20261027-104/case-2819.svg)、[1043](../../HandOver/results/LEVEL1-THREE-CASE-CHAIN-20261027-104/case-1043.svg)。曲线相对中心query参考原点，图上的参考端点/原生点和090C/Anchor/Mean来自既有材料，非新前向。
+
+本地解压各case，逐项计数检查并核summary/中心表：3035有308项、2819有324项、1043有348项，共980项，失败0。复核是同一材料的二次汇总，不是独立实验或原始CSV复核。原103 private坐标/reference行仍在服务器，本地未读。
+
+| 场景/中心query | reference端点间隔/位置系数 | 两成员最近原生时刻距query | 两成员原生点与各自时刻reference距离 | 两成员query估计与绑定reference距离 | 090C距离 |
+|---|---|---|---|---|---|
+| 3035/56 | 264s / 0.660 | 1.543s / 190.333s | 727660.6m / 5144.2m | 733308.9m / 40964.8m | 733528.2m |
+| 2819/60 | 197s / 0.818 | 4.268s / 2.845s | 601059.5m / 518877.7m | 555268.7m / 543083.1m | 554960.3m |
+| 1043/54 | 293s / 0.769 | 4.410s / 6.695s | 434168.6m / 423959.8m | 448653.1m / 443927.4m | 447616.6m |
+
+3035第二成员处于支撑外，其query为外推值，**不能把5144m（该成员最近观测在自身时刻对reference）与40965m（外推query对绑定reference）当作同一时间/同一对象误差**。3035 query57/58及2819 query62的reference在支撑外，误差不可评，表中保留missing；1043 query52两来源query误差约2854/3860m而query54为约448653/443927m，显示邻近query差异，不以此断言真实运动轨迹。
+
+## Squeeze及对原回执表述的订正
+
+`SQUEEZE_REPORT: SQ-104-CHAIN-20261027; input: EXP-104-CHAIN-20261027; next_skill: deep-read Mode C`。
+
+- **直接证据**：在保留的材料及固定规则下，独立计算和103所留值在脚本容差内一致；部分近query原生观测与相应时刻reference相差数百公里，故巨大距离不只是网络输出与输入之间的差。
+- **不能推出**：回执标题“因此这些点的巨误差不是插值/端点/时间偏移实现造成的”和“不是内插或端点算法造成的”超出重放可证明范围。与同一规则重放一致，不能证明规则或原始时间含义正确；reference自身插值也可能偏离真实轨迹。103私有材料没有保留足以重建量测CSV→canonical的全部原行，本地亦未直接访问私有原件。103/104共用来源和既定协议，不是独立真值。
+- **竞争解释**：原量测/参考数据或身份关系异常、reference采样及插值语义、时间映射规则不适配、上游canonical处理、原模型行为等仍可能单独或共同作用。报告无决定性证据将其中某一项确认为根因。
+- **进一步限制**：三个场景因大误差事后选定，邻点事先按索引固定；不能据此估计总体错误率。现有标签一致不证明现实身份正确。090C预测向量从103回执继承，不是104新前向。
+
+服务器同时修改了原tail派生件的轴序/方向/排名解释；原提交`a68fde4`中的版本可从Git恢复，本报告不把修改后的派生件当独立证据。无新增模型性能或新方法选择；根据用户本轮要求，研究路线留待讨论。

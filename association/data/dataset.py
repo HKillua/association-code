@@ -57,7 +57,8 @@ def _request(manifest, train_splits, data_config, alignment_by_scene, *, validat
 
 def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                        alignment_by_scene, check=None, motion_observation_policy=None,
-                       validation_only=False, retain_native_events=False):
+                       validation_only=False, retain_native_events=False,
+                       validation_native_verifier=None):
     """Return train/validation scene lists and a JSON-compatible preparation report.
 
     Every label-derived A-B identity is a target, including targets whose nodes
@@ -74,6 +75,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
     started = time.monotonic()
     if not isinstance(retain_native_events, bool):
         raise DataError('retain_native_events must be a boolean')
+    if validation_native_verifier is not None and not callable(validation_native_verifier):
+        raise DataError('validation_native_verifier must be callable')
     if motion_observation_policy is not None:
         validate_motion_observation_policy(motion_observation_policy)
     splits, policies = _request(manifest, train_splits, data_config, alignment_by_scene,
@@ -97,6 +100,8 @@ def load_timed_dataset(archive_path, manifest, *, train_splits, data_config,
                 if check:
                     check()
                 sid = native['scene_id']
+                if split == 'V_select' and validation_native_verifier is not None:
+                    validation_native_verifier(native)
                 labels = archive.read_labels(sid)
                 target_ids = list(dict.fromkeys('-'.join(row['mmsi'].split('-')[:2]) for row in labels))
                 query = None

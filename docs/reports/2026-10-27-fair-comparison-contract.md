@@ -1,5 +1,27 @@
 # 固定056下的TMTAFF同任务比较：实现合同与预算边界
 
+**2026-10-27实现增量：** 下文保留实施前合同；现已新增[固定056评价入口](../../tools/experiments/tmtaff_fixed056_evaluate.py)、[共同控制](../../association/evaluation/fixed056_controls.py)和必要软件检查。入口核对新单位固定TFM/TCM端点、完整056组与分数、原可见量测重放、Q64和完整reference，输出四种普通控制、成对共同mask、38组件及090C位置共同人口；分阶段记录来源曝光和评价成本。真实新单位TFM权重尚不存在，完整V300端到端运行和最终成绩仍未完成，不能把合成检查称为同行比较。§4/§7过去时态的“缺口”保留为开发前基线，不是当前代码状态。用户要求在讨论并同意前不选择新思路、不发布训练任务。
+
+入口示例仅说明参数，**不构成运行授权**：
+
+```bash
+python tools/experiments/tmtaff_fixed056_evaluate.py \
+  --tfm-run <new-unit-completed-tfm> --source-system <056-system> \
+  --reference090c-run <090c-run> --archive <level1-part-1> <level1-part-2> <level1-part-3> \
+  --manifest <level1-manifest> --alignment <level1-alignment> \
+  --output <new-output-dir> --device <explicit-device>
+```
+
+090C对照仅比较位置共同有效点；其历史速度/航向沿用旧Mean，四属性论文数值仍见既有102，并标明旧单位解释，不混成新单位训练结果。作者ESD实现、充分训练量和独立泛化仍未知。
+
+软件验收命令（2026-10-27，本地`.venv`，退出0）：
+
+```bash
+.venv/bin/python -m unittest tests.evaluation.test_fixed056_controls tests.evaluation.test_complete_evaluation tests.data.test_timed_speed_units tests.evaluation.test_level1_system_contracts tests.evaluation.test_three_case_chain -q
+```
+
+44项通过。新增检查覆盖旧缓存速度复制转换不修改原数组、cap128与canonical_all分离、组顺序/单位拒错、冻结TCM/TFM端点与曝光、验证原生输入检查、固定reference/分数/组绑定、漏目标/重复、预测callback不接收reference，以及合成小样本从CLI到控制/共同mask/090C对照的连接。CLI小样本在文件来源/训练checkpoint绑定处使用测试替身，**不是完整真实数据或权重端到端验证**；真实接口仍需新单位端点和服务器原056/090C缓存。开发中发现测试fixture的错误字段和不完整训练配置并修正，未改变真实研究数据或训练记录。
+
 2026-10-27。本文核查现有代码，给出下一次实现必须满足的接口与评价对象；**没有运行训练、准备全量数据、打开T_test或发布训练READY**。已有接口为DE，最小实现设计为AI，充分训练量与作者ESD实现为UN。当前执行状态只读[交接](../../HandOver/Handover.md)。
 
 来源：Mode C 1.6 的P01/P02、F26–F29及E21/E22；[102/103实测](2026-10-27-returned-diagnostics-review.md)、[速度单位验收](2026-10-27-tmtaff-speed-unit-verification.md)、[TMTAFF维护契约](../specs/tmtaff-reference.md)、[数据约定](../data_contract.md)与[论文指标](../mtad_data_protocols.md)。本文件是比较实现合同，不是已选创新Idea，也不把软件通过算科研收益。
