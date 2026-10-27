@@ -1,0 +1,35 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run103/tools/analysis/diagnose_three_scenes.py",
+    "--source-run",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run103/configs/data/mtad-level1-scene3000.json",
+    "--alignment",
+    "/home/wangguangjie/djs/association-code-run103/configs/data/mtad-level1-alignment.json",
+    "--threshold-summary",
+    "/home/wangguangjie/djs/association-code-run103/HandOver/results/LEVEL1-COORDINATE-METRICS-20261026-101/summary.json.gz",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run103",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-27T06:22:59.480141+00:00",
+  "started_monotonic": 3012590.573469048,
+  "max_seconds": 600.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

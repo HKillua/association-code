@@ -1,0 +1,22 @@
+{
+  "status": "COMPLETED",
+  "scope": "090C-paper-metrics-102",
+  "source_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1",
+  "device": "cpu",
+  "optimizer_updates": 0,
+  "model_forwards": 0,
+  "checkpoint_loaded": false,
+  "archive_read": false,
+  "test_opened": false,
+  "groups_recomputed": false,
+  "threshold_reselected": false,
+  "completed_scenes": 300,
+  "time_policy": "advisory",
+  "speed_unit_contract": {
+    "prediction": "kn",
+    "target": "mps",
+    "report": "kn",
+    "basis": "Level1 first8 T_core numerical audit; reference mps interpretation, not full-package proof"
+  },
+  "elapsed_seconds": 55.16749599343166
+}

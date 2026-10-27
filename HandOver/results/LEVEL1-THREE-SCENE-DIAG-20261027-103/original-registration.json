@@ -1,0 +1,91 @@
+{
+ "run_id": "LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1",
+ "note": "native outputs verbatim; weights/NPZ not copied.",
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 8604,
+   "sha256": "426c3a2d1d8969b4f546a45dcc2bdaf5ff7eb61912f66ba2bbb51b00aecff8e1",
+   "mtime_local": "2026-10-27T14:23:33+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 16915,
+   "sha256": "9ed81f0e7a0da7516da77d557dd09ccfc46cecc5432e36823a1370bcd116db9d",
+   "mtime_local": "2026-10-27T14:23:33+0800"
+  },
+  {
+   "returned_name": "scene-3035.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/scene-3035.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 9525,
+   "sha256": "21abac41fcaf16da8733e90c8a8b685b6b838e11cb309153cf0648db59bb33d3",
+   "mtime_local": "2026-10-27T14:23:16+0800"
+  },
+  {
+   "returned_name": "scene-2819.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/scene-2819.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 5060,
+   "sha256": "28c63033c28bf5c4d2c69bb3afcba3dcc88f87276b37a95cfaa37d9ea36aa332",
+   "mtime_local": "2026-10-27T14:23:29+0800"
+  },
+  {
+   "returned_name": "scene-1043.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/scene-1043.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 4305,
+   "sha256": "02977f73845134c28db6379e4b5e5e5c7e84b52fef100ea18986614e283e3089",
+   "mtime_local": "2026-10-27T14:23:32+0800"
+  },
+  {
+   "returned_name": "points-3035.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/points-3035.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 2737698,
+   "sha256": "f9c1c24ecc67f1b9b78883a44a91edef7e394a97998d90d23bce0eb9bcdaa18d",
+   "mtime_local": "2026-10-27T14:23:21+0800"
+  },
+  {
+   "returned_name": "points-2819.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/points-2819.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 520925,
+   "sha256": "0365d7c032ffa9c452b08d49c687c797774fdaf24634cb9926f4f43bdf3d3d61",
+   "mtime_local": "2026-10-27T14:23:30+0800"
+  },
+  {
+   "returned_name": "points-1043.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1/points-1043.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 234507,
+   "sha256": "bcb64e2ebed9b9960206cb0abc5bdda1f2d1b1dfb91c9cf774e7adeae66e38d1",
+   "mtime_local": "2026-10-27T14:23:32+0800"
+  },
+  {
+   "returned_name": "launcher-request.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1-launch/request.json",
+   "mode": "byte-identical copy",
+   "bytes": 1462,
+   "sha256": "454e86a81f9d12329191f646e630a7f08f8a3bc93b4eda0b1663b7c5a077bb76",
+   "mtime_local": "2026-10-27T14:22:59+0800"
+  },
+  {
+   "returned_name": "launcher-status.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1-launch/status.json",
+   "mode": "byte-identical copy",
+   "bytes": 524,
+   "sha256": "b0a46054d2874ee8926d945306be8459580f982eb99bb8a09338936b40f0bc2c",
+   "mtime_local": "2026-10-27T14:23:33+0800"
+  }
+ ],
+ "returned_total_bytes": 3539525,
+ "server_tree": {
+  "files": 11,
+  "bytes": 7047315
+ }
+}

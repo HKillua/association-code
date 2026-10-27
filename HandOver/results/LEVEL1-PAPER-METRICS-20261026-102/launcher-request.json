@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run102/tools/analysis/coordinate_metrics.py",
+    "--source-run",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-FROZEN-ADAPTER-20261024-090C-attempt-1",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run102/configs/data/mtad-level1-scene3000.json",
+    "--paper-attributes",
+    "--prediction-speed-unit",
+    "kn",
+    "--target-speed-unit",
+    "mps",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run102",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-27T06:21:24.592820+00:00",
+  "started_monotonic": 3012495.686115047,
+  "max_seconds": 1800.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

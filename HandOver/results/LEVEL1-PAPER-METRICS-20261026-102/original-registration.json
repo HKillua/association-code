@@ -1,0 +1,59 @@
+{
+ "run_id": "LEVEL1-PAPER-METRICS-20261026-102-attempt-1",
+ "note": "native outputs verbatim; weights/NPZ not copied.",
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 684,
+   "sha256": "afc49ee1aecddca023dec13401efd69d94d544ed43d1d0e72c87c0ad7a7e56ae",
+   "mtime_local": "2026-10-27T14:22:36+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 6184,
+   "sha256": "108a910a84ffa51999a4e8328f7b4110bb50e4d88b75bd81c42eb058d777892b",
+   "mtime_local": "2026-10-27T14:22:36+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 213447,
+   "sha256": "f70d1cf2913ff59fc8c21f46194c6b67c5ec1b9f897496f5dc05261cdf3e880e",
+   "mtime_local": "2026-10-27T14:22:33+0800"
+  },
+  {
+   "returned_name": "scene-summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1/scene-summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 1521234,
+   "sha256": "38d8e57ba0faacdbdeb842935e507195ab7b51179c10c2d707dcde71e6225a0e",
+   "mtime_local": "2026-10-27T14:22:36+0800"
+  },
+  {
+   "returned_name": "launcher-request.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1-launch/request.json",
+   "mode": "byte-identical copy",
+   "bytes": 1075,
+   "sha256": "623146265631985607bade8d82fc7cbc89562d923f4d56dec22c9a0003d7584a",
+   "mtime_local": "2026-10-27T14:21:24+0800"
+  },
+  {
+   "returned_name": "launcher-status.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-PAPER-METRICS-20261026-102-attempt-1-launch/status.json",
+   "mode": "byte-identical copy",
+   "bytes": 523,
+   "sha256": "a3d3fd7ad9ce0613b6d9b067c47cbabd134f48813630047837b717633347ca66",
+   "mtime_local": "2026-10-27T14:22:39+0800"
+  }
+ ],
+ "returned_total_bytes": 1743147,
+ "server_tree": {
+  "files": 4,
+  "bytes": 1741549
+ }
+}

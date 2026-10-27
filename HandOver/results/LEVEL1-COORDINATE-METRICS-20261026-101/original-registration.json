@@ -35,5 +35,23 @@
    "mtime_local": "2026-10-26T15:11:25+0800"
   }
  ],
- "returned_total_bytes": 1271225
+ "returned_total_bytes": 1499,
+ "returned_files": [
+  {
+   "returned_name": "request.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1-launch/request.json",
+   "bytes": 975,
+   "sha256": "175bce6ccbe21b2199ef5aa49402d51c9e5930449003e2571f86dcea7123da1d",
+   "mtime_local": "2026-10-26T15:10:21+0800",
+   "mode": "byte-identical copy"
+  },
+  {
+   "returned_name": "status.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-COORDINATE-METRICS-20261026-101-attempt-1-launch/status.json",
+   "bytes": 524,
+   "sha256": "13c14a1380ab2cf03d33f54744fa43fa19dbf7dd19603910feff9ed97b360122",
+   "mtime_local": "2026-10-26T15:11:28+0800",
+   "mode": "byte-identical copy"
+  }
+ ]
 }
