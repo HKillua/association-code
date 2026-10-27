@@ -55,6 +55,25 @@ class Fixed056ControlTests(unittest.TestCase):
 
 
 class Fixed056IntegrationTests(NativeZipFixture, unittest.TestCase):
+    def test_paper_association_uses_full_same_and_cross_source_population(self):
+        from association.evaluation.association import evaluate_scenes
+        from tools.experiments.tmtaff_fixed056_evaluate import verify_056_association
+        records = [dict(scene_id='s', component_id='c', sources=np.array(['a', 'a', 'b']),
+            pairs=np.array([[0, 1], [0, 2], [1, 2]]), scores=np.array([1., 1., 0.]),
+            labels=np.array([1, 0, 1]), intervals=np.array([[0., 1.], [0., 1.], [0., 1.]]))]
+        original = evaluate_scenes(records, .5)
+        actual = verify_056_association(records, .5, original)
+        self.assertEqual(actual['itsa']['pair_count'], 1)
+        self.assertEqual(actual['mstsa']['pair_count'], 2)
+        self.assertEqual(actual['itsa']['paper_metrics']['m_pca'], 1.)
+        # 0.4 yields the same edge decisions as 0.5, but is not the saved threshold.
+        with self.assertRaisesRegex(ValueError, 'threshold'):
+            verify_056_association(records, .4, original)
+        changed = copy.deepcopy(original)
+        changed['mstsa']['per_scene'][0]['fp'] = 0
+        with self.assertRaisesRegex(ValueError, 'per-scene counts'):
+            verify_056_association(records, .5, changed)
+
     def test_native_verification_receives_only_validation_raw_inputs(self):
         seen = []
         def verify(native):
@@ -253,7 +272,8 @@ class Fixed056IntegrationTests(NativeZipFixture, unittest.TestCase):
         run = dict(config=dict(validation_batches=dict(tracks=4, pairs=4), singleton_policy='observed'))
         payload = dict(data_contract='stub-contract', cursor={'completed_updates': 1})
         bound = {'model': model, 'fusion': fusion, 'normalizer': norm}
-        metadata = dict(scene_ids=['2', '4'], association_threshold=1.)
+        from association.evaluation.association import evaluate_scenes
+        metadata = dict(scene_ids=['2', '4'], association_threshold=1., association=evaluate_scenes(records, 1.))
         with patch.object(cli, 'bind_endpoint', return_value=(run, cfg, payload)), \
              patch.object(cli, 'source_exposure', return_value={'fixture': True}), \
              patch.object(cli, '_load_metadata', return_value=metadata), \

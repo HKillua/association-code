@@ -25,7 +25,8 @@ from association.evaluation.evidence_fusion_combo import read_scores
 from association.evaluation.fixed056_controls import Fixed056Controls, NAMES
 from association.evaluation.grouping import group_predicted_tracks
 from association.evaluation.tsactfer_level1 import _records_for
-from association.evaluation.tsactfer_level1 import scope_metrics, verify_native_source
+from association.evaluation.tsactfer_level1 import verify_native_source
+from association.evaluation.association import evaluate_scenes
 from association.evaluation.fusion_controls import attribute_errors
 from association.evaluation.tmtaff import evaluate_complete
 from association.models.tmtaff import ModelConfig
@@ -150,6 +151,35 @@ def bind_scenes(scenes, records, source, metadata, reference090c=None):
             raise ValueError('fixed056 scores/threshold do not reproduce original ordered groups')
     return dict(scene_count=len(scenes), fixed_groups_exact=True,
                 aligned_reference_exact=True, scores_and_threshold_fixed=True)
+
+
+def verify_056_association(records, threshold, expected):
+    """Bind all original candidates and both paper scopes, scene by scene.
+
+    ITSA/MSTSA here mean same-source/cross-source across the complete frozen
+    candidate population. A separate short-window protocol must not be silently
+    introduced into the original 056/102 eight metrics.
+    """
+    if expected.get('threshold') != threshold:
+        raise ValueError('fixed056 original association threshold differs')
+    actual = evaluate_scenes(records, threshold)
+    for scope in ('all', 'itsa', 'mstsa'):
+        a = actual if scope == 'all' else actual[scope]
+        b = expected if scope == 'all' else expected[scope]
+        for key in ('tp', 'fp', 'fn', 'tn', 'pair_count'):
+            if a[key] != b[key]:
+                raise ValueError('fixed056 association aggregate differs: '+scope+'/'+key)
+        if len(a['per_scene']) != len(b['per_scene']):
+            raise ValueError('fixed056 association scene population differs: '+scope)
+        for left, right in zip(a['per_scene'], b['per_scene']):
+            for key in ('scene_id', 'component_id', 'pair_count', 'tp', 'fp', 'fn', 'tn'):
+                if left[key] != right[key]:
+                    raise ValueError('fixed056 association per-scene counts differ: '+scope+'/'+key)
+        for key in ('m_pca', 'mw_pca', 'm_pfa', 'mw_pfa'):
+            x, y = a['paper_metrics'][key], b['paper_metrics'][key]
+            if (x is None) != (y is None) or (x is not None and not np.isclose(x, y, rtol=1e-12, atol=1e-14)):
+                raise ValueError('fixed056 paper association metric differs: '+scope+'/'+key)
+    return actual
 
 
 class ComparisonWriter:
@@ -293,6 +323,8 @@ def main(argv=None):
         records = _records_for(read_scores(args.source_system.parent/'association/final-scores.npz'), scenes)
         verification = bind_scenes(scenes, records, args.source_system, metadata, args.reference090c_run)
         verification['raw_visible_to_frozen056_motion_exact'] = True
+        original_association = verify_056_association(records, metadata['association_threshold'], metadata['association'])
+        verification['association_scopes_and_scene_counts_exact'] = True
         model = load_complete_snapshot(args.tfm_run/'checkpoint.pt', device=args.device, selected=False)
         writer = ComparisonWriter(output/'predictions', args.reference090c_run)
         device = runtime.device_from_string(args.device)
@@ -319,7 +351,7 @@ def main(argv=None):
             pairwise_common_pooled=writer.pooled(),
             component_common={key: writer.pooled(value) for key, value in writer.component_errors.items()},
             excluding_largest_component=writer.largest_component_excluded(),
-            inherited_056_association=scope_metrics(records, metadata['association_threshold']),
+            inherited_056_association=original_association,
             evaluation_cost=cost,
             training_exposure=exposure, tfm_config=run['config'],
             tfm_cursor=payload['cursor'], test_opened=False))
