@@ -1,0 +1,123 @@
+{
+  "status": "COMPLETED",
+  "idea_id": "IDEA-STATE-DIAG-20261027",
+  "plan_version": "1.5-raw-csv-audit",
+  "start_utc": "2026-10-27T13:06:51.678831+00:00",
+  "argv": [
+    "/home/wangguangjie/djs/association-code-run105/tools/analysis/audit_raw_case_chain.py",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run105/configs/data/mtad-level1-scene3000.json",
+    "--source103",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1",
+    "--source104",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1"
+  ],
+  "completed_scenes": [
+    "3035",
+    "2819",
+    "1043"
+  ],
+  "read_members": [
+    {
+      "scene_id": "3035",
+      "kind": "labels",
+      "member": "数据集level1/关联表/关联结果-3035.csv",
+      "compressed_bytes": 2773,
+      "uncompressed_bytes": 8149,
+      "status": "READ",
+      "actual_uncompressed_bytes": 8149
+    },
+    {
+      "scene_id": "3035",
+      "kind": "measurements",
+      "member": "数据集level1/量测场景/场景-3035.csv",
+      "compressed_bytes": 1312367,
+      "uncompressed_bytes": 3803180,
+      "status": "READ",
+      "actual_uncompressed_bytes": 3803180
+    },
+    {
+      "scene_id": "3035",
+      "kind": "reference",
+      "member": "数据集level1/真实场景/场景-3035.csv",
+      "compressed_bytes": 224936,
+      "uncompressed_bytes": 896377,
+      "status": "READ",
+      "actual_uncompressed_bytes": 896377
+    },
+    {
+      "scene_id": "2819",
+      "kind": "labels",
+      "member": "数据集level1/关联表/关联结果-2819.csv",
+      "compressed_bytes": 687,
+      "uncompressed_bytes": 1755,
+      "status": "READ",
+      "actual_uncompressed_bytes": 1755
+    },
+    {
+      "scene_id": "2819",
+      "kind": "measurements",
+      "member": "数据集level1/量测场景/场景-2819.csv",
+      "compressed_bytes": 233187,
+      "uncompressed_bytes": 661703,
+      "status": "READ",
+      "actual_uncompressed_bytes": 661703
+    },
+    {
+      "scene_id": "2819",
+      "kind": "reference",
+      "member": "数据集level1/真实场景/场景-2819.csv",
+      "compressed_bytes": 12744,
+      "uncompressed_bytes": 46204,
+      "status": "READ",
+      "actual_uncompressed_bytes": 46204
+    },
+    {
+      "scene_id": "1043",
+      "kind": "labels",
+      "member": "数据集level1/关联表/关联结果-1043.csv",
+      "compressed_bytes": 315,
+      "uncompressed_bytes": 740,
+      "status": "READ",
+      "actual_uncompressed_bytes": 740
+    },
+    {
+      "scene_id": "1043",
+      "kind": "measurements",
+      "member": "数据集level1/量测场景/场景-1043.csv",
+      "compressed_bytes": 119147,
+      "uncompressed_bytes": 335448,
+      "status": "READ",
+      "actual_uncompressed_bytes": 335448
+    },
+    {
+      "scene_id": "1043",
+      "kind": "reference",
+      "member": "数据集level1/真实场景/场景-1043.csv",
+      "compressed_bytes": 6683,
+      "uncompressed_bytes": 24146,
+      "status": "READ",
+      "actual_uncompressed_bytes": 24146
+    }
+  ],
+  "optimizer_updates": 0,
+  "model_forwards": 0,
+  "npz_files_read": 0,
+  "checkpoint_files_read": 0,
+  "test_opened": false,
+  "groups_recomputed": false,
+  "threshold_reselected": false,
+  "address_space_limit_bytes": 8589934592,
+  "address_space_limit_scope": "per-process Linux virtual address space; not RSS",
+  "mismatch_count": 0,
+  "end_utc": "2026-10-27T13:06:57.331335+00:00",
+  "elapsed_seconds": 5.652539534959942,
+  "peak_rss_native_units": 153432,
+  "peak_rss_unit": "KiB"
+}

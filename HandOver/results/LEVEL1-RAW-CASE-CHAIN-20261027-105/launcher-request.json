@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run105/tools/analysis/audit_raw_case_chain.py",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run105/configs/data/mtad-level1-scene3000.json",
+    "--source103",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1",
+    "--source104",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run105",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-27T13:06:44.014174+00:00",
+  "started_monotonic": 3036814.860055547,
+  "max_seconds": 900.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

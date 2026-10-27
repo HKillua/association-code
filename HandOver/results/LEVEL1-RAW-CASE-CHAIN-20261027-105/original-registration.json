@@ -1,0 +1,78 @@
+{
+ "run_id": "LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1",
+ "note": "105 raw-CSV chain audit; de-identified numeric outputs only. private/ and raw CSVs stay on server (mode 700).",
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 3903,
+   "sha256": "eafb009198487c3f451f0fd103a5b84b3f543c520c652abb73e097f64156f472",
+   "mtime_local": "2026-10-27T21:06:57+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 2311,
+   "sha256": "0d14a8872177e3c150b68881d3026d7cb249fd56c60dd8d3d50f5d2b3d43a488",
+   "mtime_local": "2026-10-27T21:06:57+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 5633,
+   "sha256": "a0e9ff456ece17e585d161e0687a4be30c953b646ce425b1efca1654ed519fb5",
+   "mtime_local": "2026-10-27T21:06:57+0800"
+  },
+  {
+   "returned_name": "case-3035.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/case-3035.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 1905,
+   "sha256": "5641647cb162f29c58acd1588d315a055cf31c3dcdcedbeb6902798b807a4905",
+   "mtime_local": "2026-10-27T21:06:55+0800"
+  },
+  {
+   "returned_name": "case-2819.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/case-2819.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 2192,
+   "sha256": "97b3816deb47779dea424ac5bed8f650a36a9bf738ea98d53230b68240331134",
+   "mtime_local": "2026-10-27T21:06:56+0800"
+  },
+  {
+   "returned_name": "case-1043.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/case-1043.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 2928,
+   "sha256": "66a20fb9398bf1d5315707f5a8916e1578e6b732417090b577f7d78b48a3db48",
+   "mtime_local": "2026-10-27T21:06:57+0800"
+  },
+  {
+   "returned_name": "launcher-request.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1-launch/request.json",
+   "mode": "byte-identical copy",
+   "bytes": 1311,
+   "sha256": "c9476f8a3a6699b0817f759f69e5b3f27260db4ae381f54e349060da8f4a494d",
+   "mtime_local": "2026-10-27T21:06:44+0800"
+  },
+  {
+   "returned_name": "launcher-status.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1-launch/status.json",
+   "mode": "byte-identical copy",
+   "bytes": 525,
+   "sha256": "c5c51c8b8f29a670f68ce51fe59a7e12be40896f5e56d2ab92ae9139d284d8e2",
+   "mtime_local": "2026-10-27T21:06:57+0800"
+  }
+ ],
+ "returned_total_bytes": 20708,
+ "server_private_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-RAW-CASE-CHAIN-20261027-105-attempt-1/private",
+ "not_returned": [
+  "private/",
+  "raw CSV members",
+  "103 private package",
+  "original identities/coordinates"
+ ]
+}
