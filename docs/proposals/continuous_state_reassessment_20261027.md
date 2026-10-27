@@ -108,6 +108,26 @@ next_skill: record-experiment
 
 [实际软件核验记录](../reports/2026-10-27-three-scene-software-verification.md)保留命令、结果及边界。尚未有原预测NPZ的本地重放，故没有EXPERIMENT_RECORD/SQUEEZE_REPORT或新的H-local/H-common结论。服务器回传后才按`record-experiment → squeeze-experiment → Mode C`解释。
 
+<a id="chain-audit-104"></a>
+
+### 2.6 plan1.4：103之后的有限原链核查（执行前追加）
+
+2026-10-27。用户已同意继续；本节在104实现/实际执行前追加，保留上面的103原计划。`source_matrix_id=MC-RESTART-20261027@1.6`，`selected_C_id=C03`，新增依据`P03/F28/M03/M07/E22`与SQ-102-103。主模式仍为现象驱动诊断；这不是GNC或新网络实验。
+
+**问题及竞争解释：** 百公里极尾最早在哪个可核层出现：canonical观测、reference原端点/内插、时间映射或target/group绑定？原链重放不一致支持实现问题；重放一致而原关系异常只支持“异常已存在于现有材料”，不能判定量测、reference或真实身份谁错。生成规则或独立传感证据仍可能缺失。
+
+**固定对象与对照：** 3035 target23/query56、2819 target1/query60、1043 target3/query54；各取中心query前后各2个索引，至多15行，不按邻点误差增删。同目标邻点用于观察连续性，三个案例由既有极值事后选中，不估计总体异常率。仅使用103现存`private-evidence-{scene}.json.gz`、`points-{scene}.json.gz`和`scene-{scene}.json.gz`，不重读ZIP、不读权重、不前向，不修改组或时间规则。
+
+**可核与不可核：** 私有材料包含完整raw_reference行/原字符串、canonical input_tracks、身份解析审计、query参考端点。核原reference重复/冲突及左右端点、offset和插值系数、canonical量测最近点前后各1事件的实际时间与位移、node/label/target映射，独立重算reference位置和各source的局部NE误差，对照103公开记录。量测CSV→canonical的原行未完整保留，不能把canonical称未处理CSV；本轮明确这一断点，不为补它扩扫。按103场内可见纬度chart和原shortest_arc/最大gap规则核验，不改历史评价器。
+
+**主要结果与统计对象：** 三案例×固定邻点的分层证据表：层间重放差、端点/重复/内插状态、原时间及步长、映射一致性，以及最早可观察异常与未知层。连续性只报距离/时间/派生速度，不用自定“合理船速”阈值判真伪。保留全部邻点，invalid/missing为显式状态；不求p值、总体置信区间或方法增益。
+
+**资源、产物与停止：** 单次CPU，0训练/0GPU，最多4线程，建议墙时5分钟/内存2GiB；104使用独立run目录，固定三份私有包。每案一表一张局部相对坐标曲线及共用summary/run记录；不将绝对坐标/原身份上传Git，原端点和审计详情留服务器私有。曲线只是定位工具，不能替代数值核验。缺件或重放不符保留失败和已有输出，不自动重试；绘图依赖缺失须标记，不吞数值结果。
+
+**结果分支：** ①发现可复现实现错误→定位最小修复及受影响评价链，不直接改历史数据；②原材料关系异常但真实原因不可辨→保留全人口，登记unknown及所需生成/独立证据；③链条一致仍无法归因→本次诊断结束，不扩扫或反复检查。同样禁止删难点、reference修输入和“原链一致所以数据真实正确”的推论。
+
+三层检查：新颖性为无，本任务是核因所需证据；研究价值是决定是否应先修链、还是保留共同偏差未知；可归因性限于确定性重放，不能区分所有现实成因。`plan_version=1.4-chain-audit; status=diagnostic; next_skill=record-experiment`。实际命令/容差/一次尝试边界见独立L2S-104，执行后再记录事实并回流矩阵。
+
 ## 3. TRANSFER_PACKAGE：条件成立时怎样迁移
 
 ```yaml

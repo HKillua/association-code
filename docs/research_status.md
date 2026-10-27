@@ -8,10 +8,11 @@
 
 ## 现在做什么
 
-1. **Mode C已更新到1.6，完成回执→Record→Squeeze→矩阵回流。** [矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-16)仍为19篇独立论文、17篇正文分析＋两篇定向，正式2025–2026共10篇；现为6问题×29现象/数学性质、12机制、22证据。新增的是102/103诊断证据，不是新论文或独立算法重复。T-FoT-SP正式12页稿、部分作者实现等缺口仍按来源登记，不把预印本风险推给未读正式稿。
+1. **Mode C已更新到1.7，完成预测对应条件核查→Record→Squeeze→矩阵回流。** [矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-17)仍为19篇独立论文、17篇正文分析＋两篇定向，正式2025–2026共10篇；现为6问题×30现象/数学性质、12机制、23证据。新增E23来自同一103数据的有界分析，不是新论文或独立算法重复。T-FoT-SP正式12页稿、部分作者实现等缺口仍按来源登记，不把预印本风险推给未读正式稿。
 2. **102/103已执行回传，本地核验通过；三场主因未唯一识别。** [完整实验记录/深挖/回执订正](reports/2026-10-27-returned-diagnostics-review.md)保留全部人口、对照和不利结果。103的5504声明query中4548可评；共同P95尾195点/15目标占090C SSE98.86%，现有标签下组成员一致，且部分近query原生量测相对reference已出现极大误差。090C三场MAE优于Mean而RMSE劣于Mean；不能只归因错helper、网络外推或直接判reference错误。C03旧GNC方案所需的可识别健康约束未建立，不进入该pilot。原任务结束，不重跑102/103。
-3. **下一步先核有限极值的原量测—reference链，同时保留独立候选探索。** 优先利用103已有私有证据核2819 target1/query60、1043 target3/query54及同目标邻点的原端点/重复、时间映射、量测步长和标签对应；内部一致性仍可能不能区分真实错误，需要生成规则或独立证据。尚无新READY，不扩扫、不删难点或用reference修输入。[C09探索Idea](proposals/channel_routing_transfer_20261027.md)仍比较共享与逐通道路由，未冻结最终架构/训练量，也不能承诺修复共同极尾；C08等独立路线继续保留，三场不作统一准入门槛。GNC无优先级，090C不绑定新架构。
-4. **16项论文维度已补齐，公平同行比较仍未完成。** 102重现090C位置MAE564.834m；按当前单位解释，继承Mean的速度MAE55.538kn、圆周航向MAE75.936°，不能由位置优势推四状态良好。ME会抵消，标准残差SD与作者ESD仍分列。TMTAFF显式单位链已有[75项软件验收](reports/2026-10-27-tmtaff-speed-unit-verification.md)，未训练；同协议比较还需贯通固定056与共同canonical_all控制、预先明确TCM/TFM曝光及端点，不用现有失效适配或论文报数宣布胜负。
+3. **相对配准C10获得有限的预测输入条件支持，尚无绝对精度收益证据。** [完整Record/Squeeze](reports/2026-10-27-predicted-registration-audit.md)：不看真实身份估计中心，三个场景留出组等权相对残差3179.501→629.063、3937.242→244.724、2903.963→621.317m；3035两个组恶化，1043仅两组留出。早晚query检查是离线插值条件，非在线预测。方向多样性/绝对锚点/全V效果仍未知；与C08/C09[重新比较](reports/2026-10-27-candidate-feasibility.md#candidate-comparison)，不因已有结构或消融容易先定方法。
+4. **104已准备为唯一新READY：三个固定极值及各±2 query原链核查。** 3035 target23/query56、2819 target1/query60、1043 target3/query54，仅读103已留私有/公开证据，0训练/前向/ZIP/NPZ；[事前plan1.4](proposals/continuous_state_reassessment_20261027.md#chain-audit-104)。软件检查通过，尚无真实104回执。核reference原端点/重复、时间映射、canonical步长和标签解析；量测CSV→canonical原行缺口保留，不能仅凭一致性判现实谁错。按回执决定修实现或明确unknown后结束，不扩扫、不删难点或用reference修输入。C08/C09保持独立研究资格，GNC无优先级，090C不绑定新架构。
+5. **公平比较实施合同已明确，全链仍未贯通。** [合同](reports/2026-10-27-fair-comparison-contract.md)固定056组/Q64/完整人口，同时保留canonical_all强控制与cap128可见性匹配控制，明确新单位、TCM/TFM实际曝光与末步。缺口是固定056评价wrapper、共同控制和共同mask汇总；现TFM终评为oracle，不能冒充预测组成绩。显式单位链已有[软件验收](reports/2026-10-27-tmtaff-speed-unit-verification.md)，但新单位未训练、充分训练量未定，不发布训练READY。16论文维度与MAE/RMSE/尾部/覆盖/38组件/成本并报，作者ESD仍未知；不用失败适配或论文报数宣布胜负。
 
 ## 保留的结论
 
@@ -26,7 +27,7 @@
 
 ## 判断边界
 
-- 本轮遵循[完整科研流程](research_workflow.md)：103诊断Idea已实际执行并完成Record/Squeeze/Mode C回流；102和额外tail分别按指标合同/事后探索记录。C09方法Idea未执行，无新训练合同；软件验收不是科研成绩。
+- 本轮遵循[完整科研流程](research_workflow.md)：103及本地C10诊断各自完成Idea→实际执行→Record/Squeeze→Mode C；102和额外tail分别按指标合同/事后探索记录。104只有事前设计/实现/软件核验，未有真实回执；C09方法Idea未执行，无新训练合同。软件验收不是科研成绩。
 - 无效配方缺少新证据就换，不因沉没成本续训；单次负结果也不否定整类模型。旧099的10/28初判、11/1去留节点不因换候选重置；3%等是具体旧合同门槛，不是普适创新定义。
 - 论文指标按[统一定义](mtad_data_protocols.md)逐项补齐，另保留米制误差、尾部、覆盖/重复、场景/38组件。ME不是MAE；Level1量测kn/reference mps的已核范围见数据约定，历史原生速度不能冒称单位已统一。
 - V反复用于开发，且有共享身份；不声称独立测试泛化。T_test保持封存，不删难例、不拼不同人口或单模块冠军。

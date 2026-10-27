@@ -66,3 +66,11 @@ baseline下一次预算须针对已有证据提出可区分机制的改动；不
 | 不支持路由明确失败 | 未知策略、单位元数据不一致、目标声明缺失、混合训练/验证策略、motion/native_events组合在对应接口拒绝；本轮仅支持timed TMTAFF，不暗改090C |
 
 原始canonical tracks不随新prepared结果保留，避免其kn数值与已转换timed数组混用；调用者原对象不变。这个软件改动不提供新配置预算、READY或训练许可，也不修复历史四状态权重。固定056同任务比较仍须另立已定端点/曝光的实验合同。
+
+## 固定056同任务比较的接口边界
+
+[比较实现合同](../reports/2026-10-27-fair-comparison-contract.md)规定先做固定056预测组下的恢复/融合，再另评自己的关联完整系统。`evaluate_complete`已有缓存分数接口，但`tmtaff_complete_fit.py --phase tfm`当前监测与末步强制`oracle_only`；现096组合脚本绑定093/094，不能冒用为056。新评价wrapper须绑定056原final1000分数/阈值与保存组，不重跑TAM或选阈值；同一Q64、target registry、reference数组及完整人口逐项核验。
+
+主表需同时给canonical_all Anchor-OLS/Mean-supported-OLS强控制及selected_cap128可见性匹配控制；现`predicted_observed_controls`仅cap128支撑内插值，不能替代前两者。最小路径从056原缓存复制四状态，仅速度kn→m/s，再复用普通控制，不改原缓存或放开新单位与motion/native_events混用限制。TMTAFF仍cap128，其输入预算差异与单例支撑外missing明确报告，不用不同有效人口的误差宣称胜出。
+
+TCM按eligible轨/双向transition曝光，TFM按实际pair/有效监督曝光及unique覆盖分别计数；相同步数不等于同预算。比较实现合同中的一遍TCM/1000步TFM是历史计数示例，不是新预算。新单位路径须重建训练normalizer、权重与latent cache；不能缩放旧权重或混用旧cache。具体新配置、训练量、seed、固定末步和停止条件仍须在核新输入曝光后由独立执行合同冻结，不能为填数字冒称充分训练。
