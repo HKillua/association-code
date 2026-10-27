@@ -1,0 +1,256 @@
+{
+  "audit_date": "2026-10-27",
+  "source_directory": "HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106",
+  "audit_scope": "public count artifacts only; no private/raw/array reread",
+  "checks": 60778,
+  "failed_checks": [],
+  "independently_reaggregated": {
+    "T_core": {
+      "scene_count": 2100,
+      "node_count": 155134,
+      "native_point_count": 17932752,
+      "tcm_eligible_tracks": 155134,
+      "tcm_bidirectional_transitions": 35555236,
+      "candidate_count": 27632584,
+      "positive_count": 155159,
+      "negative_count": 27477425,
+      "target_count": 57359,
+      "target_without_input_count": 0,
+      "target_without_reference_count": 0,
+      "positive_pairs_with_any_empty_attribute": 51,
+      "positive_pairs_without_any_supervision": 8,
+      "target_valid_points": {
+        "cou": 2834449,
+        "position_joint": 2836570,
+        "vel": 2837070,
+        "lon": 2836590,
+        "lat": 2836572
+      },
+      "positive_pair_valid_query_totals": {
+        "cou": 7689531,
+        "position_joint": 7695554,
+        "vel": 7696897,
+        "lon": 7695599,
+        "lat": 7695554
+      },
+      "quarantine_counts": {
+        "valid_nodes": 155134,
+        "exact_duplicate_rows_removed": 0,
+        "measurement_rows_outside_label_interval_diagnostic_only": 0,
+        "quarantined_nodes": 0,
+        "candidate_nodes": 155134,
+        "positive_edges_lost_to_quarantine": 0
+      },
+      "quarantine_reasons": {},
+      "positive_eligible_scenes": 2100,
+      "positive_pool_smaller_than_pair_batch": 1542,
+      "exposure_expectations_not_training": [
+        {
+          "steps": 1000,
+          "pair_presentations": 64000,
+          "expected_unique_scenes": 795.743099289431,
+          "expected_unique_pairs": 28452.901573442636,
+          "expected_positive_pair_fraction": 0.1833789955686917
+        },
+        {
+          "steps": 4000,
+          "pair_presentations": 256000,
+          "expected_unique_scenes": 1787.5398127732617,
+          "expected_unique_pairs": 76490.99768531178,
+          "expected_positive_pair_fraction": 0.4929846008630617
+        }
+      ]
+    },
+    "V_select": {
+      "scene_count": 300,
+      "node_count": 24599,
+      "native_point_count": 2844556,
+      "tcm_eligible_tracks": 24599,
+      "tcm_bidirectional_transitions": 5639914,
+      "candidate_count": 4439092,
+      "positive_count": 24675,
+      "negative_count": 4414417,
+      "target_count": 9100,
+      "target_without_input_count": 0,
+      "target_without_reference_count": 0,
+      "positive_pairs_with_any_empty_attribute": 11,
+      "positive_pairs_without_any_supervision": 1,
+      "target_valid_points": {
+        "cou": 454689,
+        "position_joint": 454952,
+        "vel": 455162,
+        "lon": 454954,
+        "lat": 454953
+      },
+      "positive_pair_valid_query_totals": {
+        "cou": 1235350,
+        "position_joint": 1236075,
+        "vel": 1236659,
+        "lon": 1236084,
+        "lat": 1236078
+      },
+      "quarantine_counts": {
+        "valid_nodes": 24599,
+        "exact_duplicate_rows_removed": 0,
+        "measurement_rows_outside_label_interval_diagnostic_only": 0,
+        "quarantined_nodes": 0,
+        "candidate_nodes": 24599,
+        "positive_edges_lost_to_quarantine": 0
+      },
+      "quarantine_reasons": {},
+      "positive_eligible_scenes": 300,
+      "positive_pool_smaller_than_pair_batch": 214
+    }
+  },
+  "supervision_descriptive_statistics": {
+    "T_core": {
+      "positive_pool_min": 6,
+      "positive_pool_median": 30.0,
+      "positive_pool_max": 1773,
+      "histogram_distribution": {
+        "lat": {
+          "zero_query_pairs": 8,
+          "full64_query_pairs": 1101,
+          "mean_valid_queries_per_pair": 49.59785768147513,
+          "p10": 18,
+          "median": 61,
+          "p90": 62
+        },
+        "lon": {
+          "zero_query_pairs": 8,
+          "full64_query_pairs": 1101,
+          "mean_valid_queries_per_pair": 49.598147706546186,
+          "p10": 18,
+          "median": 61,
+          "p90": 62
+        },
+        "vel": {
+          "zero_query_pairs": 51,
+          "full64_query_pairs": 1114,
+          "mean_valid_queries_per_pair": 49.606513318595766,
+          "p10": 18,
+          "median": 61,
+          "p90": 62
+        },
+        "cou": {
+          "zero_query_pairs": 8,
+          "full64_query_pairs": 1069,
+          "mean_valid_queries_per_pair": 49.55903943696466,
+          "p10": 18,
+          "median": 61,
+          "p90": 62
+        },
+        "position_joint": {
+          "zero_query_pairs": 8,
+          "full64_query_pairs": 1101,
+          "mean_valid_queries_per_pair": 49.59785768147513,
+          "p10": 18,
+          "median": 61,
+          "p90": 62
+        }
+      },
+      "scenes_with_all_empty_positive_pairs": 8,
+      "scenes_with_any_zero_attribute_pair_total": 0,
+      "tcm_updates_one_pass_batch64": 2424,
+      "last_tcm_batch_tracks": 62,
+      "reference_issue_events": 20307,
+      "reference_raw_rows": 7834964
+    },
+    "V_select": {
+      "positive_pool_min": 8,
+      "positive_pool_median": 29.0,
+      "positive_pool_max": 1080,
+      "histogram_distribution": {
+        "lat": {
+          "zero_query_pairs": 1,
+          "full64_query_pairs": 163,
+          "mean_valid_queries_per_pair": 50.09434650455927,
+          "p10": 20,
+          "median": 61,
+          "p90": 62
+        },
+        "lon": {
+          "zero_query_pairs": 1,
+          "full64_query_pairs": 163,
+          "mean_valid_queries_per_pair": 50.094589665653494,
+          "p10": 20,
+          "median": 61,
+          "p90": 62
+        },
+        "vel": {
+          "zero_query_pairs": 11,
+          "full64_query_pairs": 164,
+          "mean_valid_queries_per_pair": 50.11789260385005,
+          "p10": 20,
+          "median": 61,
+          "p90": 62
+        },
+        "cou": {
+          "zero_query_pairs": 1,
+          "full64_query_pairs": 157,
+          "mean_valid_queries_per_pair": 50.06484295845998,
+          "p10": 20,
+          "median": 61,
+          "p90": 62
+        },
+        "position_joint": {
+          "zero_query_pairs": 1,
+          "full64_query_pairs": 163,
+          "mean_valid_queries_per_pair": 50.09422492401216,
+          "p10": 20,
+          "median": 61,
+          "p90": 62
+        }
+      },
+      "scenes_with_all_empty_positive_pairs": 1,
+      "scenes_with_any_zero_attribute_pair_total": 0,
+      "tcm_updates_one_pass_batch64": 385,
+      "last_tcm_batch_tracks": 23,
+      "reference_issue_events": 3937,
+      "reference_raw_rows": 1277263
+    }
+  },
+  "inventory_declared_size_statistics": {
+    "labels": {
+      "member_count": 2400,
+      "compressed_bytes_declared": 2723062,
+      "uncompressed_bytes_declared": 7874575,
+      "largest_uncompressed_member_bytes": 79440
+    },
+    "measurements": {
+      "member_count": 2400,
+      "compressed_bytes_declared": 1169392611,
+      "uncompressed_bytes_declared": 3412492949,
+      "largest_uncompressed_member_bytes": 35676784
+    },
+    "reference": {
+      "member_count": 2400,
+      "compressed_bytes_declared": 131728306,
+      "uncompressed_bytes_declared": 527542805,
+      "largest_uncompressed_member_bytes": 5272685
+    }
+  },
+  "process_stages": {
+    "observations": {
+      "scene_count": 2400,
+      "first_reading_elapsed_seconds": 7.854048672597855,
+      "last_completion_elapsed_seconds": 977.2194733018987,
+      "sum_logged_scene_duration_seconds": 967.083825447131,
+      "max_logged_scene_duration_seconds": 16.663686519954354
+    },
+    "reference": {
+      "scene_count": 2400,
+      "first_reading_elapsed_seconds": 977.2287919246592,
+      "last_completion_elapsed_seconds": 1438.7810590718873,
+      "sum_logged_scene_duration_seconds": 459.6402051979676,
+      "max_logged_scene_duration_seconds": 4.512809979263693
+    }
+  },
+  "peak_rss_mib": 3077.72265625,
+  "peak_rss_gib": 3.0055885314941406,
+  "limitations": [
+    "Per-pair masks and identity membership not independently reconstructed; all public count, histogram and scope invariants checked.",
+    "Exposure estimates are not training or convergence.",
+    "missing_identity=0 does not mean reference is valid at all query points."
+  ]
+}

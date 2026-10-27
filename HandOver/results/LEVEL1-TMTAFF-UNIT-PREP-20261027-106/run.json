@@ -1,0 +1,84 @@
+{
+  "status": "COMPLETED",
+  "idea_id": "IDEA-TMTAFF-UNIT-PREP-20261027",
+  "plan_version": "1.0",
+  "start_utc": "2026-10-27T13:42:46.189708+00:00",
+  "argv": [
+    "/home/wangguangjie/djs/association-code-run106/tools/analysis/inspect_tmtaff_population.py",
+    "--archive",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.001.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.002.zip",
+    "/home/wangguangjie/djs/data/mtad/数据集level1.zip.003.zip",
+    "--manifest",
+    "/home/wangguangjie/djs/association-code-run106/configs/data/mtad-level1-scene3000.json",
+    "--alignment",
+    "/home/wangguangjie/djs/association-code-run106/configs/data/mtad-level1-alignment.json",
+    "--config",
+    "/home/wangguangjie/djs/association-code-run106/configs/tmtaff-unit-population-inspect.json",
+    "--cpu-threads",
+    "4",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-TMTAFF-UNIT-PREP-20261027-106-attempt-1"
+  ],
+  "cpu_threads": 4,
+  "model_constructed": false,
+  "gpu_training_started": false,
+  "optimizer_updates": 0,
+  "model_forwards": 0,
+  "checkpoint_files_read": 0,
+  "test_opened": false,
+  "normalizer_fitted": false,
+  "completed_observation_scenes": 2400,
+  "completed_reference_scenes": 2400,
+  "configuration": {
+    "scope": "TMTAFF-unit-population-inspection-v1",
+    "train_splits": [
+      "T_core"
+    ],
+    "data": {
+      "length": 64,
+      "max_observations": 128,
+      "time_unit_seconds": 20.0,
+      "reference_longitude_policy": "shortest_arc",
+      "speed_unit_policy": "measurement_kn_reference_mps_v1"
+    },
+    "expected": {
+      "T_core": {
+        "scene_count": 2100,
+        "node_count": 155134,
+        "native_point_count": 17932752,
+        "candidate_count": 27632584,
+        "positive_count": 155159,
+        "negative_count": 27477425
+      },
+      "V_select": {
+        "scene_count": 300,
+        "node_count": 24599,
+        "candidate_count": 4439092,
+        "target_count": 9100
+      }
+    },
+    "max_member_bytes": 268435456,
+    "max_address_space_bytes": 34359738368,
+    "pair_batch_size": 64,
+    "exposure_step_options": [
+      1000,
+      4000
+    ]
+  },
+  "address_space_limit_bytes": 34359738368,
+  "address_space_limit_scope": "this process virtual address space; not RSS",
+  "last_event": {
+    "stage": "reference",
+    "status": "COMPLETED",
+    "split": "V_select",
+    "scene_id": "4968"
+  },
+  "mismatch_count": 0,
+  "read_member_count": 7200,
+  "declared_uncompressed_bytes_successful_members": 3947910329,
+  "end_utc": "2026-10-27T14:08:12.504591+00:00",
+  "elapsed_seconds": 1526.3149391678162,
+  "peak_rss_native_units": 3151588,
+  "peak_rss_unit": "KiB"
+}
