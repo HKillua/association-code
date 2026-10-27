@@ -1,171 +1,146 @@
 {
  "not_a_replay_input": true,
- "generated_by": "SERVER_AI read-only posthoc diagnostic",
+ "generated_by": "SERVER_AI read-only posthoc diagnostic (corrected 2026-10-27)",
  "inputs": [
-  "LEVEL1-COORDINATE-METRICS-20261026-101/scene-summary.json.gz",
-  "LEVEL1-COORDINATE-METRICS-20261026-101/summary.json.gz",
-  "LEVEL1-THREE-SCENE-DIAG-20261027-103/points-*.json.gz"
+  "results/LEVEL1-COORDINATE-METRICS-20261026-101/scene-summary.json.gz",
+  "results/LEVEL1-COORDINATE-METRICS-20261026-101/summary.json.gz",
+  "results/LEVEL1-THREE-SCENE-DIAG-20261027-103/points-{3035,2819,1043}.json.gz"
  ],
  "zero_training_zero_forwards": true,
- "A_all_scene_bias": {
-  "scope": "all-300-scene per-scene signed bias proxy (real units -> metres via global mean latitude 19.9927 deg)",
-  "scene_count": 300,
+ "axis_and_sign_contract": {
+  "scene_me": "101 target_mean ME = truth - prediction, order [east, north] in degrees; converted to metres here as lon->east, lat->north",
+  "tail_NE": "103 error_NE_m order [north, east], sign = prediction - truth (as implemented by 103)",
+  "do_not_mix": "the two objects are different: 101 scene residual vs 103 oracle inter-source difference"
+ },
+ "A_scene_residual_proxy": {
   "defined_scene_count": 300,
   "conversion": {
    "lat_m_per_1e4deg": 11.132,
-   "lon_m_per_1e4deg": 10.461143262797442
+   "lon_m_per_1e4deg": 10.461143262797442,
+   "latitude_basis_deg": 19.9927
   },
-  "aggregate_me_1e4deg": {
-   "lon": 1.3135976590983633,
-   "lat": -3.1756294887861536
+  "scene_lon_me_m": {
+   "mean": 13.741733301503327,
+   "median": 13.974234595481345,
+   "positive": 174,
+   "negative": 126
   },
-  "scene_me_metres": {
-   "lon_mean": 13.741733301503327,
-   "lon_median": 13.974234595481345,
-   "lat_mean": -35.35110746916746,
-   "lat_median": 6.111006496038762,
-   "mag_median": 85.24901958658876,
-   "mag_p90": 619.362733725625,
-   "mag_max": 5543.5844738327805,
-   "scenes_mag_gt_500m": 36,
-   "scenes_mag_gt_1000m": 13,
-   "scenes_mag_gt_2000m": 4,
-   "lon_positive": 174,
-   "lon_negative": 126,
-   "lat_positive": 161,
-   "lat_negative": 139
+  "scene_lat_me_m": {
+   "mean": -35.35110746916746,
+   "median": 6.111006496038762,
+   "positive": 161,
+   "negative": 139
+  },
+  "magnitude_m": {
+   "median": 85.24901958658876,
+   "p90_lower": 619.362733725625,
+   "p90_linear": 620.4402696041165,
+   "max": 5543.5844738327805,
+   "gt500": 36,
+   "gt1000": 13,
+   "gt2000": 4,
+   "quantile_method_note": "original file does not declare a quantile method; both lower and linear reported"
   },
   "concentration": {
    "total_AE_m": 249805182.04400995,
    "total_SSE_m2": 4882232308759.3545,
-   "top10_scene_AE_share": 0.31779147173017985,
-   "top30_scene_AE_share": 0.5704014450096703,
-   "top10_scene_SSE_share": 0.37129701117853725
+   "top10_by_AE_share_of_AE": 0.31779147173017985,
+   "top30_by_AE_share_of_AE": 0.5704014450096703,
+   "top10_by_AE_share_of_SSE": 0.37129701117853725,
+   "top10_by_SSE_share_of_SSE": 0.6284919361995669,
+   "scene_3035_rank_by_AE": 8,
+   "scene_3035_rank_by_SSE": 1
   },
-  "pearson_magME_vs_sceneMAE": 0.8601592281636775,
-  "top_scenes_by_AE": [
-   {
-    "scene": "4410",
-    "mae": 631.9229580779753,
-    "lon_me_m": -61.89503404633451,
-    "lat_me_m": -12.245629305251,
-    "points": 18226
-   },
-   {
-    "scene": "3772",
-    "mae": 600.5889025440707,
-    "lon_me_m": 43.34366222700228,
-    "lat_me_m": 28.090918160772855,
-    "points": 18769
-   },
-   {
-    "scene": "1653",
-    "mae": 856.219427677961,
-    "lon_me_m": -122.98399978377606,
-    "lat_me_m": -72.87342675445028,
-    "points": 10379
-   },
-   {
-    "scene": "3835",
-    "mae": 623.5068475857158,
-    "lon_me_m": 67.6570252740831,
-    "lat_me_m": 4.4300123558011055,
-    "points": 13659
-   },
-   {
-    "scene": "4202",
-    "mae": 543.390235583687,
-    "lon_me_m": -97.47387568016694,
-    "lat_me_m": 70.23345023983487,
-    "points": 14955
-   },
-   {
-    "scene": "282",
-    "mae": 555.9816133893542,
-    "lon_me_m": -45.923774784935844,
-    "lat_me_m": -7.4670819928932834,
-    "points": 12907
-   },
-   {
-    "scene": "4167",
-    "mae": 510.8937810803222,
-    "lon_me_m": 43.758673445151864,
-    "lat_me_m": -173.77346456931636,
-    "points": 13534
-   },
-   {
-    "scene": "3035",
-    "mae": 1808.003059723753,
-    "lon_me_m": 362.534617992824,
-    "lat_me_m": -195.03457227724763,
-    "points": 3614
-   },
-   {
-    "scene": "4600",
-    "mae": 450.8996091724009,
-    "lon_me_m": -56.25020137993267,
-    "lat_me_m": 29.25435750566038,
-    "points": 12383
-   },
-   {
-    "scene": "4513",
-    "mae": 3134.444530474028,
-    "lon_me_m": 782.9687739896815,
-    "lat_me_m": -373.71821722325905,
-    "points": 1550
-   }
-  ]
+  "pearson_magME_vs_sceneMAE": 0.8601592281636775
  },
  "B_common_tail_profile": {
-  "scope": "common-tail points at all-V P95 thresholds; descriptive only",
   "thresholds_m": {
    "learned_sequence": 1895.81429165806,
    "anchor": 3946.703787678813,
    "mean_supported": 3081.8286973213567
   },
-  "evaluated_points": 4548,
+  "evaluated_points": 5504,
   "common_tail_points": 195,
-  "tail_share_of_points": 0.04287598944591029,
-  "tail_by_scene": {
+  "by_scene": {
    "3035": 158,
    "2819": 20,
    "1043": 17
   },
-  "tail_by_region": {
-   "predicted_group_no_support": 89,
+  "by_region": {
    "anchor_outside_helper_supported": 54,
-   "anchor_inside_support": 52
+   "anchor_inside_support": 52,
+   "predicted_group_no_support": 89
   },
-  "tail_by_reference_kind": {
+  "by_reference_kind": {
    "interior": 195
   },
-  "tail_by_group_size": {
-   "2": 133,
+  "by_group_size": {
    "1": 50,
+   "2": 133,
    "3": 12
   },
-  "tail_by_supported_member_count": {
+  "by_supported_member_count": {
    "0": 89,
    "1": 71,
    "2": 35
   },
   "reference_gap_seconds": {
-   "defined": 195,
-   "gt0": 195,
+   "all_gt0": true,
+   "median": 110.0,
    "max": 574.0
   },
-  "error_NE_m": {
-   "north_mean": 6552.174730615233,
-   "east_mean": 4851.555418459349,
-   "north_positive": 43,
-   "east_positive": 96,
+  "pooled": {
+   "n": 195,
+   "north_mean": 4851.555418459349,
+   "north_median": -89.50746924962672,
+   "east_mean": 6552.174730615233,
+   "east_median": -3968.782100123293,
+   "north_positive": 96,
+   "east_positive": 43,
    "magnitude_median": 10576.128994242157,
    "magnitude_max": 733528.1949081265
   },
-  "all_points_by_scene": {
-   "3035": 3614,
-   "2819": 627,
-   "1043": 307
+  "by_scene_stats": {
+   "3035": {
+    "n": 158,
+    "north_mean": 4451.320336229766,
+    "north_median": 6954.573735624575,
+    "east_mean": -6196.750001339397,
+    "east_median": -4371.087207601355,
+    "north_positive": 88,
+    "east_positive": 17,
+    "magnitude_median": 10375.80505417094,
+    "magnitude_max": 733528.1949081265
+   },
+   "2819": {
+    "n": 20,
+    "north_mean": 20986.738883150858,
+    "north_median": -2476.977669494867,
+    "east_mean": 31952.72199737721,
+    "east_median": 4559.302910043614,
+    "north_positive": 6,
+    "east_positive": 11,
+    "magnitude_median": 9473.750785854998,
+    "magnitude_max": 554960.2839425546
+   },
+   "1043": {
+    "n": 17,
+    "north_mean": -10411.181422808653,
+    "north_median": -8529.525260215703,
+    "east_mean": 95159.18427847358,
+    "east_median": 25108.109196149006,
+    "north_positive": 2,
+    "east_positive": 15,
+    "magnitude_median": 29515.54990891505,
+    "magnitude_max": 447616.5593352815
+   }
   }
- }
+ },
+ "corrections_2026_10_27": [
+  "103 error_NE_m is [north, east] and sign = prediction - truth; the earlier version of this file mislabelled the axes and sign.",
+  "3035 is rank 8 by total AE and rank 1 by total SSE; \"top-1 absolute error scene\" was unsupported.",
+  "The 300-scene table is a scene-level residual proxy from paper-form ME (truth - prediction); it must not be described as extending 103 oracle inter-source bias to 300 scenes.",
+  "Top-10-by-AE accounts for 31.78% of AE and 37.13% of SSE; top-10-by-SSE accounts for 62.85% of SSE.",
+  "Per-scene medians differing by scene do not establish a constant offset per scene."
+ ]
 }

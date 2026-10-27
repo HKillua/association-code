@@ -1,0 +1,25 @@
+{
+  "argv": [
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run104/tools/analysis/audit_three_case_chain.py",
+    "--source-run",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run104",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "OPENBLAS_NUM_THREADS": "4"
+  },
+  "backend": "systemd",
+  "started_at": "2026-10-27T09:26:01.388336+00:00",
+  "started_monotonic": 3023572.481686123,
+  "max_seconds": 300.0,
+  "grace_seconds": 30.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}

@@ -1,0 +1,72 @@
+{
+ "run_id": "LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1",
+ "note": "104 fixed-case chain audit; de-identified numeric outputs only, no identities/coords. Plots missing (no matplotlib); plots_complete=false.",
+ "returned_files": [
+  {
+   "returned_name": "run.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1/run.json",
+   "mode": "byte-identical copy",
+   "bytes": 1389,
+   "sha256": "91812e006227e8adaa4852a03ba871f0485d675441372c617ffb7330a7904b37",
+   "mtime_local": "2026-10-27T17:26:06+0800"
+  },
+  {
+   "returned_name": "report.md",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1/report.md",
+   "mode": "byte-identical copy",
+   "bytes": 4555,
+   "sha256": "47d7181cb41bf3920143e885b52fbdd8f4a2b9ac359b1040b4a29d5f479010f1",
+   "mtime_local": "2026-10-27T17:26:06+0800"
+  },
+  {
+   "returned_name": "summary.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1/summary.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 20367,
+   "sha256": "f640d9c443eed2bcd320d02dfecf062cab32d58590fa5eeb67553abf3d0e430d",
+   "mtime_local": "2026-10-27T17:26:06+0800"
+  },
+  {
+   "returned_name": "case-3035.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1/case-3035.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 5851,
+   "sha256": "b3c44d973457b239453e6111745e0700981e5ca71f66c031640f2eddd7a88df7",
+   "mtime_local": "2026-10-27T17:26:05+0800"
+  },
+  {
+   "returned_name": "case-2819.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1/case-2819.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 6787,
+   "sha256": "14d2d4a089e12e79f89bed70bb9860e9cd580612ed5ca6e1f1a1222198489341",
+   "mtime_local": "2026-10-27T17:26:06+0800"
+  },
+  {
+   "returned_name": "case-1043.json.gz",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1/case-1043.json.gz",
+   "mode": "native gzip copy",
+   "bytes": 8129,
+   "sha256": "9bd7bee4d00bd1c6e87073f661f9cd8f7aef049ae0d913f349f7f659367113f9",
+   "mtime_local": "2026-10-27T17:26:06+0800"
+  },
+  {
+   "returned_name": "launcher-request.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1-launch/request.json",
+   "mode": "byte-identical copy",
+   "bytes": 865,
+   "sha256": "2d964df5a638067a45973e7e53e7f1cab05ba3a4f6dc32c5f85283880a094ce3",
+   "mtime_local": "2026-10-27T17:26:01+0800"
+  },
+  {
+   "returned_name": "launcher-status.json",
+   "server_path": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1-launch/status.json",
+   "mode": "byte-identical copy",
+   "bytes": 524,
+   "sha256": "d37e24aaebbe39baddb7d2572d3e709426c519b93a878732b22e0fcfefbf466b",
+   "mtime_local": "2026-10-27T17:26:06+0800"
+  }
+ ],
+ "returned_total_bytes": 48467,
+ "server_originals": {}
+}

@@ -1,0 +1,50 @@
+{
+  "status": "COMPLETED",
+  "idea_id": "IDEA-STATE-DIAG-20261027",
+  "plan_version": "1.4-chain-audit",
+  "argv": [
+    "/home/wangguangjie/djs/association-code-run104/tools/analysis/audit_three_case_chain.py",
+    "--source-run",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-CASE-CHAIN-20261027-104-attempt-1"
+  ],
+  "start_utc": "2026-10-27T09:26:03.537155+00:00",
+  "source_run": "/home/wangguangjie/djs/association-code/runs/LEVEL1-THREE-SCENE-DIAG-20261027-103-attempt-1",
+  "cases": [
+    {
+      "scene_id": "3035",
+      "target_index": 23,
+      "center_query": 56
+    },
+    {
+      "scene_id": "2819",
+      "target_index": 1,
+      "center_query": 60
+    },
+    {
+      "scene_id": "1043",
+      "target_index": 3,
+      "center_query": 54
+    }
+  ],
+  "completed_cases": [
+    "3035",
+    "2819",
+    "1043"
+  ],
+  "optimizer_updates": 0,
+  "model_forwards": 0,
+  "checkpoint_files_read": 0,
+  "archive_files_read": 0,
+  "npz_files_read": 0,
+  "test_opened": false,
+  "groups_recomputed": false,
+  "threshold_reselected": false,
+  "elapsed_seconds": 2.857328499201685,
+  "consistency_mismatch_count": 0,
+  "plots_complete": false,
+  "end_utc": "2026-10-27T09:26:06.394312+00:00",
+  "peak_rss_native_units": 193792,
+  "peak_rss_unit": "KiB"
+}

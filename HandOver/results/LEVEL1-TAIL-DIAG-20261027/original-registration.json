@@ -1,27 +1,22 @@
 {
  "run_id": "LEVEL1-TAIL-DIAG-20261027",
- "note": "Read-only posthoc diagnostic derived from returned 101/103 artifacts; not a replay input, not a new experiment.",
- "inputs": [
-  "results/LEVEL1-COORDINATE-METRICS-20261026-101/scene-summary.json.gz",
-  "results/LEVEL1-COORDINATE-METRICS-20261026-101/summary.json.gz",
-  "results/LEVEL1-THREE-SCENE-DIAG-20261027-103/points-{3035,2819,1043}.json.gz"
- ],
+ "note": "Read-only posthoc diagnostic over returned 101/103 artifacts; corrected axis/sign and ranking claims per local review; not a replay input.",
  "zero_training_zero_forwards": true,
  "returned_files": [
   {
    "returned_name": "analysis.json",
-   "bytes": 4165,
-   "sha256": "91af2b5bc6d9fc46a0cc208cc0edb17ef3490fa7a7774d8903b1851a5d83b177",
-   "mtime_local": "2026-10-27T14:41:21+0800",
-   "mode": "server-generated diagnostic"
+   "bytes": 4586,
+   "sha256": "e8e260af62b7547376d15fa31f0fd05e6162cda9a59a80e1a9bac862e338a581",
+   "mtime_local": "2026-10-27T17:27:32+0800",
+   "mode": "server-generated diagnostic (corrected)"
   },
   {
    "returned_name": "report.md",
-   "bytes": 2820,
-   "sha256": "edf43b5322523932ec6f6cdff2fd36c2a64bb9920c9718b9602a516f4634fad2",
-   "mtime_local": "2026-10-27T14:41:43+0800",
-   "mode": "server-generated diagnostic"
+   "bytes": 3866,
+   "sha256": "6f7942cd7c5c6e5883ab4ae972c270af82b581c90959abdb763b2e4a14f5cd7a",
+   "mtime_local": "2026-10-27T17:27:42+0800",
+   "mode": "server-generated diagnostic (corrected)"
   }
  ],
- "returned_total_bytes": 6985
+ "returned_total_bytes": 8452
 }
