@@ -67,12 +67,12 @@ next_skill: deep-read_Mode_C
 
 ## B. Fragment合法关系与容量
 
-结果应来自独立[事前Idea](../proposals/fragment_identity_capacity_20261029.md)及真实一次运行，本节不预填结果。
+110真实完成，全部条件/人口/独立复算与Squeeze见[完整报告](2026-10-29-fragment-capacity-review.md)；不把上界冒充具体方法成绩。
 
 ## C. 固定分数之后的决定
 
-结果应来自[事前Idea](../proposals/frozen_score_output_decision_diagnostic_20261029.md)及真实一次运行，本节不预填结果。
+109真实完成，完整9臂/3scope/38组件和不利结果见[Record/Squeeze](2026-10-29-frozen-decision-review.md)。敏感度不等可实现改进，后继另定114。
 
 ## D. 生成支撑与关联评分
 
-输入资格与可计算范围见[独立Idea/审计](../proposals/generated_support_score_diagnostic_20261029.md)。不能把107未训练TAM的输出当有效关联评分，也不能拼上另一模型056分数认证因果。
+输入资格与可计算范围见[独立Idea/审计](../proposals/generated_support_score_diagnostic_20261029.md)。112已完成，完整参考覆盖、O/G特征误差与正反异质性见[Record/Squeeze](2026-10-29-generated-support-review.md)。不能把107未训练TAM的输出当有效关联评分，也不能拼上另一模型056分数认证因果。
