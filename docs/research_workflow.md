@@ -3,7 +3,7 @@
 采用日期：2026-10-27。用户明确指定以下两份材料为整个项目必须遵循的科研方法，并要求覆盖飞书全文，不能只选五技能与避免死循环两节。
 
 - [飞书《视频文案》](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd)：2026-10-27通过浏览器逐节、滚动读取全文七个主题；页面显示最近修改为10月13日22:27，不把访问日写成原文更新日。
-- 用户附件 `5-skill-research-workflow.md`，版本 `research-pipeline-contract v1.0`：全文已读，完整字段与禁止跳步规则保存在本文附录。源文件在本地 `/Users/a1/Downloads/skills/5-skill-research-workflow.md`。
+- 用户附件 `5-skill-research-workflow.md`，版本 `research-pipeline-contract v1.0`：全文已读，完整字段与禁止跳步规则保存在本文附录。源文件现位于 `/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/5-skill-research-workflow.md`（2026-10-29核实目录迁移；历史读取日期不变）。
 
 这是**用户采纳的项目约定**，不是网页自行授予权限。覆盖本地阅读、研究设计、服务器实验交接、结果分析和写作；旧技能路由、历史方案与本规范冲突时，以用户最新要求和本规范为准。后续网页变化须实际核读并记录差异，不自动改项目规则。下文是来源要点的归纳及本项目落地解释，不冒称逐字原文。
 
@@ -92,9 +92,9 @@
 |---|---|
 | [飞书第1章附录：a–d定位、a–b创新方法论](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#Wq7gdDT11otUQsx36z6co1qhnjb) | 明确区分提出问题的新方案与已知问题的新解法；追踪、验证意外现象是发现全新问题的路线。不能用已知问题的新方法顶替问题发现。 |
 | [飞书第3章：关于第一章的补充](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#QxYsdMheSoUZfGxPbYecO8Din7b) | 组合此前未做的实验可产生原来两篇论文都未发现的问题/现象；另要求检查问题是否局限某个数据集。是探索启发，不是随机拼装即证明创新。 |
-| [用户deep-read原件C5/C6](/Users/a1/Downloads/skills/deep-read/SKILL.md:185) | 检查连接是否出现新冲突、反馈或识别问题；区分已有同类、近邻待比和未见同类但需检索，并注明范围/未知。候选P允许包含已知限制，不等全部已是新发现。 |
-| [用户discover-innovation工作原则](/Users/a1/Downloads/skills/discover-innovation/SKILL.md:74)及[新颖性检查](/Users/a1/Downloads/skills/discover-innovation/SKILL.md:189) | 真实问题先于新颖形式；换场景不自动等于解决新问题；按同问题、机制、任务及近似方法查近邻，不凭记忆声称没人做过。 |
-| [用户五技能契约](/Users/a1/Downloads/skills/5-skill-research-workflow.md:104) | 来源P/F仅为候选，Mode C连接不是最终方法；还须进入创新筛选与真实验证，不能用阅读数/包格式代替发现。 |
+| [用户deep-read原件C5/C6](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/deep-read/SKILL.md:185) | 检查连接是否出现新冲突、反馈或识别问题；区分已有同类、近邻待比和未见同类但需检索，并注明范围/未知。候选P允许包含已知限制，不等全部已是新发现。 |
+| [用户discover-innovation工作原则](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/discover-innovation/SKILL.md:74)及[新颖性检查](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/discover-innovation/SKILL.md:189) | 真实问题先于新颖形式；换场景不自动等于解决新问题；按同问题、机制、任务及近似方法查近邻，不凭记忆声称没人做过。 |
+| [用户五技能契约](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/5-skill-research-workflow.md:104) | 来源P/F仅为候选，Mode C连接不是最终方法；还须进入创新筛选与真实验证，不能用阅读数/包格式代替发现。 |
 
 以上为对原文的定位与释义，不把项目解释冒充原句。原件deep-read、discover-innovation及五技能契约与本次使用的安装副本比对无差异；不存在以副本版本不同解释执行偏差的依据。飞书本次只定向复核第1章相关流程/附录、第3章补充及五技能段落，页面仍标10月13日22:27修改，未再次全篇通读或修改网页。
 
