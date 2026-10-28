@@ -1,10 +1,11 @@
 # 当前交接
 
-更新：2026-10-29。**108/109/110/112均COMPLETED且本地核验；114静态分组pilot READY；113修复后固定评价运行中。107原失败保留，不重训。** 106/105/104/103/102已完成并核验，不重复领取。104实际范围与服务器回执过度归因的订正见[本地记录](../docs/reports/2026-10-27-three-case-chain-review.md)，105核验与深挖见[本地记录](../docs/reports/2026-10-27-raw-case-chain-review.md)。A授权不包含新增seed/步数/TAM或新方法训练。用户已另行明确允许推倒重来和重新选择研究思路，见[采纳流程](../docs/research_workflow.md)；这不改变107的冻结执行合同，新执行仍须在本表独立列为READY。
+更新：2026-10-29。**108/109/110/112均COMPLETED且本地核验；114静态分组pilot已完成并本地核验；113修复后固定评价运行中。107原失败保留，不重训。** 106/105/104/103/102已完成并核验，不重复领取。104实际范围与服务器回执过度归因的订正见[本地记录](../docs/reports/2026-10-27-three-case-chain-review.md)，105核验与深挖见[本地记录](../docs/reports/2026-10-27-raw-case-chain-review.md)。A授权不包含新增seed/步数/TAM或新方法训练。用户已另行明确允许推倒重来和重新选择研究思路，见[采纳流程](../docs/research_workflow.md)；这不改变107的冻结执行合同，新执行仍须在本表独立列为READY。
 
 | 任务 | 状态 | 执行／回执入口 |
 |---|---|---|
-| 114静态分组pilot | **READY，一次CPU4/4GiB预算/AS8GiB，0模型/前向/训练。** 固定V32六臂，只有事前decoded四条件过关才同一次服务扩至最多300且全臂保留；7新软件检查/独审通过。 | [L2S-114](L2S-20261029-114.md)、[事前Idea](../docs/proposals/static_partition_pilot_20261029.md)。新run114/attempt1；无训练后继 |
+| 115新组Mean位置控制 | **READY，一次CPU4/4GiB预算/AS8GiB，0GPU/模型/训练。** 仅114原V32四臂，真正重算Mean/A0先exact重放，完整target覆盖/重复及分别A0 common-valid位置误差；6软件回归与独审通过。 | [L2S-115](L2S-20261029-115.md)、[Idea1.0](../docs/proposals/static_partition_position_control_20261029.md)。新run115/attempt1，0自动扩量/训练 |
+| 114静态分组pilot | **COMPLETED，退出0，最终run118.060s／launcher122.513s，300场。** 仅WS过原V32 gate，原32不重跑、六臂均扩完268；WS decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，23场/4组件F1仍差，raw不变。 | [Record/Squeeze](../docs/reports/2026-10-29-static-partition-review.md)、[L2S-114](L2S-20261029-114.md)。冻结13ecf2f，服务mtad-92e24b30be2f；原run114保留，0训练，不重跑 |
 | 109固定分数决定诊断 | **COMPLETED，退出0，300场276.326s，RSS547921920B。** raw/A0完整绑定；234/300分区变化，但8随机序all宏F1全部更差/FP增加，不据敏感度认证新方法。 | [Record/Squeeze](../docs/reports/2026-10-29-frozen-decision-review.md)、[原L2S](L2S-20261029-109.md)。冻结af475e0，服务mtad-ee793415d2ba，原run109保留，不重跑 |
 | 110身份容量诊断 | **COMPLETED，退出0，300场4.685s。** 纯硬单射全部跨源真边条件上界55.5212%，同源真边8202、无共同Q64正边11063；不是当前anchor或MH成绩。 | [Record/Squeeze](../docs/reports/2026-10-29-fragment-capacity-review.md)、[原L2S](L2S-20261029-110.md)。冻结af475e0，服务mtad-ff360346dae5，原run110保留，不重跑 |
 | 112生成支撑报告 | **COMPLETED，退出0，8.201s，RSS540606464B。** V16/2379片段，G48.1078%、其中参考可评64.0818%；G model−hold特征MSE+.00886522，14场差/2场有益。非TAM或物理效果。 | [Record/Squeeze](../docs/reports/2026-10-29-generated-support-review.md)、[原L2S](L2S-20261029-112.md)。冻结1e55a7f，服务mtad-d8f0704d03f8，原run112保留，不重跑 |
