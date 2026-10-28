@@ -118,20 +118,80 @@ def source_exposure(run, payload):
                 note='Missing journal fields are null; unique exposures are not independent observations.')
 
 
+def _partition_membership(fragment, *, name):
+    """Validate an ordered, complete partition and derive its membership.
+
+    Historical 090C fragments save offsets/indices but no membership array.
+    Derivation is from those actual arrays, never a new grouping decision.
+    """
+    n = len(fragment['node_ids'])
+    offsets = np.asarray(fragment['learned_assoc_group_offsets'])
+    flat = np.asarray(fragment['learned_assoc_group_node_indices'])
+    if (offsets.ndim != 1 or not len(offsets) or offsets.dtype.kind not in 'iu'
+            or flat.shape != (n,) or flat.dtype.kind not in 'iu'
+            or offsets[0] != 0 or offsets[-1] != n
+            or np.any(offsets[1:] <= offsets[:-1])
+            or not np.array_equal(np.sort(flat), np.arange(n))):
+        raise ValueError(name+' ordered groups do not partition the complete nodes')
+    membership = np.empty(n, dtype=np.int64)
+    for group, (start, stop) in enumerate(zip(offsets[:-1], offsets[1:])):
+        membership[flat[start:stop]] = group
+    if ('learned_assoc_membership' in fragment
+            and not _equal(fragment['learned_assoc_membership'], membership)):
+        raise ValueError(name+' cached membership differs from its ordered groups')
+    if ('group_anchor_node_indices' in fragment
+            and not _equal(fragment['group_anchor_node_indices'], flat[offsets[:-1]])):
+        raise ValueError(name+' cached anchors differ from its ordered groups')
+    return membership
+
+
+def _bind_reference_fragment(fragment, old, record):
+    """Bind 090C's real legacy schema to the verified056 score population.
+
+    The caller must first bind completed090C metadata to this056 source.
+    Missing legacy sources are established transitively through exact node
+    order and the056 score cache. Missing membership is derived from the actual
+    complete partition. Neither missing field is inserted into the old cache.
+    """
+    for key in ('node_ids', 'sources'):
+        if not _equal(fragment[key], record[key]):
+            raise ValueError('056 score population differs from cached input: '+key)
+    for key in ('node_ids', 'identities', 'target_identity_ids', 'query_seconds',
+                'learned_assoc_group_offsets', 'learned_assoc_group_node_indices',
+                'native_states', 'support', 'nearest_seconds', 'exact_observation'):
+        if not _equal(fragment[key], old[key]):
+            raise ValueError('090C and 056 cached input/groups differ: '+key)
+    if 'sources' in old and not _equal(fragment['sources'], old['sources']):
+        raise ValueError('090C and 056 cached input/groups differ: sources')
+    if not _equal(_partition_membership(fragment, name='056'),
+                  _partition_membership(old, name='090C')):
+        raise ValueError('090C and 056 derived group memberships differ')
+    return dict(sources=('explicit_cache' if 'sources' in old else
+                         'verified056_scores_via_same_source_system_and_exact_node_order'),
+                membership=('explicit_cache_verified_against_ordered_partition'
+                            if 'learned_assoc_membership' in old else
+                            'derived_from_complete_ordered_partition'))
+
+
 def bind_scenes(scenes, records, source, metadata, reference090c=None):
     """Validate all saved groups and reference arrays before model inference."""
     if [str(s['scene_id']) for s in scenes] != metadata['scene_ids']:
         raise ValueError('prepared V scene order differs from fixed056')
+    if len(records) != len(scenes):
+        raise ValueError('fixed056 score records do not cover every prepared scene')
+    reference_bindings = []
+    if reference090c is not None:
+        reference_run = runtime.read_json(Path(reference090c)/'run.json')
+        if (reference_run.get('status') != 'COMPLETED'
+                or not reference_run.get('source_system')
+                or Path(reference_run['source_system']).resolve() != Path(source).resolve()):
+            raise ValueError('completed090C metadata does not bind this frozen056 source')
     for scene, record in zip(scenes, records):
         sid = str(scene['scene_id'])
         fragment, saved = _load_arrays(source, sid)
         if reference090c is not None:
             with np.load(Path(reference090c)/'final/predictions'/f'states-{sid}.npz', allow_pickle=False) as old:
-                for key in ('node_ids', 'identities', 'sources', 'target_identity_ids', 'query_seconds',
-                            'learned_assoc_group_offsets', 'learned_assoc_group_node_indices',
-                            'learned_assoc_membership', 'native_states', 'support', 'nearest_seconds'):
-                    if not _equal(fragment[key], old[key]):
-                        raise ValueError('090C and 056 cached input/groups differ: '+key)
+                reference_bindings.append(_bind_reference_fragment(fragment, old, record))
         _, _, _, truth, valid, _ = _replay(fragment, saved, metadata['expected'][sid])
         for key in ('node_ids', 'identities', 'sources'):
             if not np.array_equal(np.asarray(scene[key]), fragment[key]):
@@ -150,7 +210,15 @@ def bind_scenes(scenes, records, source, metadata, reference090c=None):
         if [list(group) for group in groups] != groups_from_cache(fragment, 'learned_assoc'):
             raise ValueError('fixed056 scores/threshold do not reproduce original ordered groups')
     return dict(scene_count=len(scenes), fixed_groups_exact=True,
-                aligned_reference_exact=True, scores_and_threshold_fixed=True)
+                aligned_reference_exact=True, scores_and_threshold_fixed=True,
+                reference090c_input_binding=(dict(scene_count=len(reference_bindings),
+                    source_system_metadata_exact=True,
+                    legacy_sources_bound_via056_scores=sum(row['sources'] != 'explicit_cache'
+                        for row in reference_bindings),
+                    legacy_membership_derived_from_ordered_partition=sum(
+                        row['membership'] == 'derived_from_complete_ordered_partition'
+                        for row in reference_bindings),
+                    exact_observation_checked=True) if reference090c is not None else None))
 
 
 def verify_056_association(records, threshold, expected):

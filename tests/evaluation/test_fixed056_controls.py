@@ -54,6 +54,99 @@ class Fixed056ControlTests(unittest.TestCase):
             controls_from_visible(changed, self.groups, self.fragment)
 
 
+class Fixed056LegacyReferenceBindingTests(unittest.TestCase):
+    """Actual090C writer omitted sources/membership, not its input partition."""
+
+    def setUp(self):
+        self.fragment = dict(node_ids=np.array(['n0', 'n1', 'n2']),
+            sources=np.array(['a', 'b', 'a']), identities=np.array(['t', 'u', 't']),
+            target_identity_ids=np.array(['t', 'u']), query_seconds=np.arange(4.),
+            learned_assoc_group_offsets=np.array([0, 2, 3]),
+            learned_assoc_group_node_indices=np.array([0, 2, 1]),
+            learned_assoc_membership=np.array([0, 1, 0]),
+            native_states=np.zeros((3, 4, 4)), support=np.ones((3, 4), bool),
+            nearest_seconds=np.zeros((3, 4)), exact_observation=np.zeros((3, 4), bool))
+        self.old = {key: value.copy() for key, value in self.fragment.items()
+                    if key not in ('sources', 'learned_assoc_membership')}
+        self.old['group_anchor_node_indices'] = np.array([0, 1])
+        self.record = {key: self.fragment[key].copy() for key in ('node_ids', 'sources')}
+
+    def test_real_legacy_schema_binds_without_inventing_fields(self):
+        from tools.experiments.tmtaff_fixed056_evaluate import _bind_reference_fragment
+        before = copy.deepcopy(self.old)
+        result = _bind_reference_fragment(self.fragment, self.old, self.record)
+        self.assertIn('verified056_scores', result['sources'])
+        self.assertEqual(result['membership'], 'derived_from_complete_ordered_partition')
+        self.assertEqual(set(self.old), set(before))
+        for key in before:
+            np.testing.assert_array_equal(self.old[key], before[key])
+        current = copy.deepcopy(self.fragment)
+        explicit = _bind_reference_fragment(self.fragment, current, self.record)
+        self.assertEqual(explicit['sources'], 'explicit_cache')
+
+    def test_source_and_every_remaining_input_binding_stay_strict(self):
+        from tools.experiments.tmtaff_fixed056_evaluate import _bind_reference_fragment
+        changed_record = copy.deepcopy(self.record)
+        changed_record['sources'][0] = 'b'
+        with self.assertRaisesRegex(ValueError, 'score population.*sources'):
+            _bind_reference_fragment(self.fragment, self.old, changed_record)
+        for key in ('node_ids', 'identities', 'target_identity_ids', 'query_seconds',
+                    'native_states', 'support', 'nearest_seconds', 'exact_observation'):
+            with self.subTest(key=key):
+                changed = copy.deepcopy(self.old)
+                value = changed[key]
+                value.flat[0] = ('changed' if value.dtype.kind in 'US' else
+                                 not value.flat[0] if value.dtype == bool else value.flat[0]+1)
+                with self.assertRaisesRegex(ValueError, key):
+                    _bind_reference_fragment(self.fragment, changed, self.record)
+        changed = dict(self.old, sources=np.array(['b', 'b', 'a']))
+        with self.assertRaisesRegex(ValueError, 'sources'):
+            _bind_reference_fragment(self.fragment, changed, self.record)
+
+    def test_partition_membership_and_anchors_cannot_be_skipped(self):
+        from tools.experiments.tmtaff_fixed056_evaluate import _bind_reference_fragment, _partition_membership
+        for fields, message in (
+                ({'learned_assoc_group_node_indices': np.array([0, 1, 2])}, 'group_node_indices'),
+                ({'group_anchor_node_indices': np.array([2, 1])}, 'anchors'),
+                ({'learned_assoc_membership': np.array([0, 0, 1])}, 'membership')):
+            with self.subTest(fields=list(fields)):
+                with self.assertRaisesRegex(ValueError, message):
+                    _bind_reference_fragment(self.fragment, dict(self.old, **fields), self.record)
+        bad = dict(self.fragment, learned_assoc_group_node_indices=np.array([0, 0, 1]))
+        with self.assertRaisesRegex(ValueError, 'partition'):
+            _partition_membership(bad, name='056')
+        bad = dict(self.fragment, learned_assoc_group_offsets=np.array([0, 2, 1, 3], np.uint64))
+        with self.assertRaisesRegex(ValueError, 'partition'):
+            _partition_membership(bad, name='056')
+
+    def test_bind_scenes_accepts_real_legacy_files_only_for_same_completed_source(self):
+        from pathlib import Path
+        import tempfile
+        from unittest.mock import patch
+        from association.utils import runtime
+        from tools.experiments import tmtaff_fixed056_evaluate as fixed
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary)/'056'
+            reference = Path(temporary)/'090c'
+            (reference/'final/predictions').mkdir(parents=True)
+            runtime.write_json(reference/'run.json', dict(status='COMPLETED', source_system=str(source)))
+            np.savez(reference/'final/predictions/states-s.npz', **self.old)
+            truth, valid = np.zeros((2, 4, 4)), np.ones((2, 4, 4), bool)
+            scene = dict(scene_id='s', **{key: self.fragment[key] for key in ('node_ids', 'identities', 'sources')},
+                grid=self.fragment['query_seconds'], fusion_targets={key: dict(states=truth[i], valid=valid[i])
+                    for i, key in enumerate(self.fragment['target_identity_ids'])})
+            record = dict(self.record, pairs=np.array([[0, 1], [0, 2], [1, 2]]), scores=np.array([0., 1., 0.]))
+            metadata = dict(scene_ids=['s'], association_threshold=.5, expected={'s': {}})
+            with patch.object(fixed, '_load_arrays', return_value=(self.fragment, {})), \
+                    patch.object(fixed, '_replay', return_value=(None, None, None, truth, valid, None)):
+                result = fixed.bind_scenes([scene], [record], source, metadata, reference)
+            binding = result['reference090c_input_binding']
+            self.assertEqual(binding['legacy_sources_bound_via056_scores'], 1)
+            self.assertEqual(binding['legacy_membership_derived_from_ordered_partition'], 1)
+            for status, origin in (('FAILED', source), ('COMPLETED', source/'other')):
+                runtime.write_json(reference/'run.json', dict(status=status, source_system=str(origin)))
+                with self.assertRaisesRegex(ValueError, 'completed090C metadata'):
+                    fixed.bind_scenes([scene], [record], source, metadata, reference)
 class Fixed056IntegrationTests(NativeZipFixture, unittest.TestCase):
     def test_paper_association_uses_full_same_and_cross_source_population(self):
         from association.evaluation.association import evaluate_scenes
