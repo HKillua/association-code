@@ -62,6 +62,8 @@ def validate_metric(item, dimension):
     if isinstance(square, bool) or not isinstance(square, (float, int)) or not math.isfinite(square) or square < 0:
         raise ValueError('feature squared error must be finite and nonnegative')
     count = item['feature_elements']
+    if count == 0 and square != 0:
+        raise ValueError('empty valid feature set must have zero squared-error sum')
     expected = square/count if count else None
     actual = item['feature_mse']
     if ((actual is None) != (expected is None) or

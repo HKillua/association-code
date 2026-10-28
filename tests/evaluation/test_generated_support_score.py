@@ -56,6 +56,8 @@ class GeneratedSupportReportTests(unittest.TestCase):
         self.assertIn('existing_source_output_only', result['full_V_source_aggregate']['status'])
 
     def test_corrupt_counts_population_or_metric_cannot_be_silently_dropped(self):
+        with self.assertRaisesRegex(ValueError, 'empty valid feature set'):
+            diagnostic.validate_metric(metric(1, 0, 3., 2), 2)
         baseline = report([row('1', 0)], ['1'])
         for defect in ('count', 'mse', 'duplicate', 'missing_scene'):
             data = copy.deepcopy(baseline)
