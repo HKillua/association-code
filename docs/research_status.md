@@ -1,6 +1,6 @@
 # 当前研究状态
 
-更新：2026-10-28。本页是**当前研究目标、结论与下一步的唯一入口**；执行状态只看[HandOver](../HandOver/Handover.md)。正式数据MTAD Level1：T2100/V300/封存测试600，共享身份限制见[数据约定](data_contract.md)。056仅是既有条件对照/诊断分组，不规定新方法的分组或骨架。
+更新：2026-10-29。本页是**当前研究目标、结论与下一步的唯一入口**；执行状态只看[HandOver](../HandOver/Handover.md)。正式数据MTAD Level1：T2100/V300/封存测试600，共享身份限制见[数据约定](data_contract.md)。056仅是既有条件对照/诊断分组，不规定新方法的分组或骨架。
 
 ## 当前要解决什么
 
@@ -12,7 +12,8 @@
 
 **当前研究判断：** 本领域已识别归一化/对齐与身份可分性的冲突、时空支持和局部质量选择，不能据这些宽概念认首次；它们仍可成为跨域适配入口。C45–49的精确迁移新颖性、可信方法的残余瓶颈与迁移效果尚未证实。当前选C45只是低成本问题资格/输入依赖诊断，尚未选EQ-Reg最终方法，不因旧骨架或来源venue预定答案。
 
-0. **本批C4–C7已补核，保留未知而非跳过判断。** [Mode C1.23](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-123)完成本批F101–123×P01–12的276格（45保留、231不建立，逐格状态/理由/M/E）、五条C的逐箭头/跨设置/独立性/反例及六维0–2比较；不声称本轮重审全部历史格。核心累计66（59正文层面/7定向），正式2025–26身份49，近期登记仍202（111领域及相邻/91跨域），MTAD确认仍23。新增CKSMO、RET仅定向，CPM仅方法片段；没有新全文或作者复现。[补证入口](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/cross_transfer_synthesis_20261028.md#10-标准补齐后的增量与当前贡献口径)及[原review订正](reports/2026-10-28-cross-transfer-workflow-review.md)保留每次判断和撤回原因。问题首次、方法/迁移新颖性及‘领域未很好解决’资格分别核。
+0. **深入阅读按用户70＋30目标继续，不把候选登记当完成。** [逐篇覆盖审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)核原66项中62项充分深入证据（40领域/相近＋22跨域，含CKSMO全文及MH/TSA既存全读复用），随后9个完整新AP去重后为**71项：领域/相近46/70、跨域25/30**，仍缺24/5。75核心来源中4项仍待补；ALD独立参数supp缺，不纳深入数。近期登记204（旧检索分组112领域及相邻/92跨域）与深入角色分组不同，不能相加。新批优先近两年高质量原文，核完整技术正文/主要结果消融/可得附录及作者核心实现；无代码、作者版和全部缺项逐篇明示，0作者复现。[本轮来源事件](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_updates_20261029.json)保留精确计数。
+   [Mode C1.24](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-124)已吸收CKSMO全文＋ESCI/SECL/ATENet/EchoMatch（该批70来源），补核228增量格，独立审查撤4个过度连接后保36格；另5份新AP待下一次回流。C50仅条件候选：SECL静默机制为条件DE，ATENet采样-标签关系只是作者SC动机，目标影响AI待核；不把两条当双实证或新发现。已知问题、现有条件性解法、方法/迁移新颖性与真实残余瓶颈分别核；CKSMO已有条件实证，不能继续仅记‘识别未解决’。
 1. **C45形成具体Idea及108零训练交接，实际结果待回执。** [Idea1.1](proposals/pair_representation_dependency_20261028.md)定义固定A/q/validity下四个可计算表示版本，区分固定B均值后归一化、额外min/range、逐时差分、rawB旁路；stats只恢复d而非B时形。一次CPU、固定T32、每source≤8anchor/16点窗，0reference/V/test/模型/训练，完整分母、碰撞直接比较和逐单位数值容差事前写明；软件检查及独立审查通过，108已READY，领取/执行只认[交接](../HandOver/Handover.md)。诊断成本低和条件代数清楚是本轮选C45而非C46/47的理由，不等最终方法已优选。若仅literal印刷版本有缺陷而可信同行已保信息、未证残余瓶颈，则不以它立EQ-Reg创新项目。C33[旧CPU设计](proposals/mtad_fragment_relation_diagnostic_20261028.md)仍未执行/未READY，不自动并入108；C46/47保留，C48/49需图/概率语义条件。真实108回传后再Record→Squeeze→Mode C，不倒填效果、不自动开启新训练。
 2. **102/103已执行回传，本地核验通过；三场主因未唯一识别。** [完整实验记录/深挖/回执订正](reports/2026-10-27-returned-diagnostics-review.md)保留全部人口、对照和不利结果。103的5504声明query中4548可评；共同P95尾195点/15目标占090C SSE98.86%，现有标签下组成员一致，且部分近query原生量测相对reference已出现极大误差。090C三场MAE优于Mean而RMSE劣于Mean；不能只归因错helper、网络外推或直接判reference错误。C03旧GNC方案所需的可识别健康约束未建立，不进入该pilot。原任务结束，不重跑102/103。
 3. **相对配准C10获得有限的预测输入条件支持，尚无绝对精度收益证据。** [完整Record/Squeeze](reports/2026-10-27-predicted-registration-audit.md)：不看真实身份估计中心，三个场景留出组等权相对残差3179.501→629.063、3937.242→244.724、2903.963→621.317m；3035两个组恶化，1043仅两组留出。早晚query检查是离线插值条件，非在线预测。方向多样性/绝对锚点/全V效果仍未知；与C08/C09[重新比较](reports/2026-10-27-candidate-feasibility.md#candidate-comparison)，不因已有结构或消融容易先定方法。
