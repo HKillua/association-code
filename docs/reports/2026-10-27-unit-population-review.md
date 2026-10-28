@@ -147,3 +147,71 @@
 本记录使用 [record-experiment](/Users/a1/.codex/skills/record-experiment/SKILL.md)、[squeeze-experiment](/Users/a1/.codex/skills/squeeze-experiment/SKILL.md) 和 [deep-read Mode C](/Users/a1/.codex/skills/deep-read/SKILL.md)，完成事实→解释边界→回流输入，不把人口准备包装为方法创新。
 
 证据原件：[run](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/run.json)、[launcher request](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/request.json)、[launcher status](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/status.json)、[summary](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/summary.json.gz)、[scenes](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/scenes.json.gz)、[inventory](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/member-inventory.json.gz)、[read-members](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/read-members.json.gz)、[progress](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/progress.jsonl)。本地复算只读这些公有产物和元数据，未重跑原任务。
+
+## 4. 2026-10-28事后Squeeze：片段数量与目标级训练测度
+
+本增量由用户要求分析矩阵时，E01的pair训练/目标评价与E26的正对人口交叉提出。**是对已完成106的事后再分析，没有原事前问题假设，不倒填Idea或预注册。** 输入仍是上面的2400场公有`scenes.json.gz`，以及已读数据/训练/评价代码；未读取ZIP、私有准备数组、107日志/权重或封存测试，0前向、0训练、0随机抽样。结果见[派生汇总](2026-10-28-fragment-weighting-reanalysis.json)。原106验收结论不改变。
+
+### 4.1 可由三个公有计数准确恢复什么
+
+对场景s，设T为有输入目标数，K为合法节点数，P为正对数，第j目标节点数为k_j。106全场`target_without_input_count=0`；[native.py](../../association/data/native.py:79)枚举所有i<j、身份相同即正对，故
+
+```math
+K=\sum_j k_j,\quad P=\sum_j\binom{k_j}{2},\quad
+\operatorname{Var}_{j\in s}(k_j)=\frac{K+2P}{T}-\left(\frac KT\right)^2.
+```
+
+这是同场目标的**总体描述方差**，不是估计误差方差或抽样置信区间。用整数`T*(K+2*P)-K*K>0`判断k是否不全相同，避免浮点误差制造异质性。若有目标无输入、正对过滤或其他正对语义，公式须重核，不能机械推广。本次另核每场候选数为K(K−1)/2、位置监督直方图之和为P；均通过。
+
+| 既定人口 | k不全相同的场景 | k全部相同的场景 | 同场k方差中位／P90 | 同场k变异系数中位 |
+|---|---:|---:|---|---:|
+| T_core2100 | **2082/2100（99.14%）** | 18 | 0.710010／1.061224 | 0.311273 |
+| V_select300 | **299/300（99.67%）** | 1 | 0.719894／1.061901 | 0.315739 |
+
+独立阅读者用同一公有JSON复算上述计数及中位方差一致，这属于独立算术核验，非独立数据复验。**k统计全部来源的片段数，尚未分离来源可见性与同源切碎程度。** 该描述覆盖现有固定人口，不是新的随机样本或独立复验；T/V有共享身份且V反复开发，不据两个分割数值相近推断外部泛化。计数只能恢复k的一、二阶矩，不能恢复每目标k、k≥2目标内部的完整分布，或与误差/机动/有效query的联合关系。
+
+### 4.2 与TFM训练、目标评价的具体联系
+
+当前[TFM_FROZEN采样](../../association/training/tmtaff.py:826)先均匀选有正对场景，再在场内均匀抽正对。有放回和不放回的期望身份呈现均满足
+
+```math
+\Pr(J=j\mid S=s)=\frac{\binom{k_j}{2}}{P_s},\quad
+\mathbb E[N_j\mid S=s]=B\frac{\binom{k_j}{2}}{P_s}.
+```
+
+因此在该人口/采样下，片段数改变会改变被抽中的目标分布；它不是任意想象出来的接口缺项。**但这还不等于证明有害偏置。** 新正对可以增加有价值的输入组合；pair预测和一组一输出预测本来不同，训练损失与mME/MAE等也不相同，不能要求所有优化权重都等于评价权重。
+
+仅在所有pair有相同有效query长度、先忽略不同pair预测与特征损失缩放时，场内目标权重才简化为`C(k_j,2)/P_s`。实际[fusion loss](../../association/training/fusion.py:106)按整个batch每属性有效点归一，[属性目标](../../association/models/fusion.py:247)又有不同函数及任务系数；其系数涉及`N_j*d_j / sum_l(N_l*d_l)`，不能把随机分母换成其期望，也不能将身份呈现概率直接叫精确梯度权重。TAM关联指标本来以pair计，**本问题不把pair级关联训练判为错误**；只追问TFM的目标级融合效益。
+
+正对池位置监督枚举总量/全目标各计一次的有效query比值，T为2.712979、V为2.716935；场比值范围分别0.828283–6.000000、1.345763–5.685484，中位2.749358/2.727841。这些不是训练曝光倍数或独立标签量。T最小比小于1也说明不能把该比简单称为“监督重复倍数”：全目标分母可包含没有正对的单轨目标；具体数量尚未从每目标原件恢复。
+
+### 4.3 观察、机制假设、反例分开
+
+- **DE＋代数**：现人口绝大多数场的目标片段数不全相同；在当前全正对/场内均匀采样下，对应身份呈现分布随片段数改变。读取及派生范围完整，统计为确定性描述，无需制造显著性p值。
+- **AI／待验**：如果片段形成主要反映报告切割而非更多独立信息，训练可能按切割粒度偏重某些目标，使pair风险与目标级风险发生不利偏离。尚未进行同一观测并集的重切片干预，也没有损失/梯度/误差的归因。
+- **反例/竞争解释**：更多片段可能承载真实中断、reset或不同噪声制度，更多pair可能正当地提高覆盖；同目标监督多次不等于独立噪声重复计数。相同k的场也可能因valid长度不同而有权重差异。
+- **UN**：是否造成总体或尾部退化；是否与旧失败相关；作者原采样是否同当前实现；领域是否已明确识别这个精确问题。一般类别不均衡、目标平衡采样和重复信息已有近邻，不能据本统计宣布新颖。
+
+```yaml
+package_type: SQUEEZE_REPORT
+package_version: research-pipeline-contract v1.0
+squeeze_id: SQ-106-FRAGMENT-WEIGHTING-20261028
+input_experiment_record_ids: [EXP-LEVEL1-TMTAFF-UNIT-PREP-20261027-106]
+source_idea_id: none_posthoc_reanalysis_of_existing_record
+claim_scope: fixed_2100_training_and_300_development_public_scene_counts_and_current_code
+data_quality_and_provenance_gaps: per_target_arrays_and_joint_error_distribution_not_accessed; shared_identity_and_development_use
+primary_result_with_uncertainty: deterministic_2082_of_2100_and_299_of_300_nonuniform_k; no_independent_repeat_or_performance_measure
+process_dynamics: no_new_training_or_optimization_trace
+mechanism_and_intermediate_findings: k_changes_pair_count_and_identity_sampling_probability; performance_path_is_AI
+errors_heterogeneity_and_boundary_conditions: per_scene_count_heterogeneity_only; finite_batch_valid_denominator_and_singletons_separate
+robustness_sensitivity_and_alternative_explanations: exact_integer_test; full_fixed_population; no_resegmentation_intervention; informative_fragment_boundaries_possible
+new_P: candidate_fragment_partition_and_target_risk_question_not_confirmed_domain_discovery
+new_F: per_scene_fragment_count_heterogeneity_and_conditional_identity_weighting
+new_M: AI_fragment_partition_changes_sampling_measure; harm_unknown
+evidence_index: report_section4; derived_json; original106_scenes; native79; tmtaff826; fusion106
+open_questions: actual_target_weights_and_error_relation; harmless_vs_informative_partition; nearest_field_problem_novelty
+next_routes: deep_read_Mode_C_increment; focused_novelty_and_condition_review
+next_skill: deep-read Mode C
+```
+
+复算方法完整由§4.1公式和原公有逐场字段给定：按split取全部行，分别以整数检验计数、计算上述方差及`CV=sqrt(T(K+2P)−K²)/K`；各分位采用索引`(n−1)p`的线性插值。只解析这一个公有JSON即可复核，不依赖新数据或拟合参数。该增量不提出改采样或增加107预算的执行许可。

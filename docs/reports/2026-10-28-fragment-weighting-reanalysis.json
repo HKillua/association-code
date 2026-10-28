@@ -1,0 +1,78 @@
+{
+  "analysis_id": "SQ-106-FRAGMENT-WEIGHTING-20261028",
+  "source_record": "EXP-LEVEL1-TMTAFF-UNIT-PREP-20261027-106",
+  "scope": "posthoc_reanalysis_existing_public_scene_counts; no new raw data, test, model, RNG or training",
+  "formula": {
+    "positive_pairs": "sum_t k_t*(k_t-1)/2",
+    "variance_k": "(K+2P)/T-(K/T)^2",
+    "exact_heterogeneity_test": "T*(K+2P)-K*K > 0",
+    "supervision_ratio": "positive_pair_position_query_total / unique_target_position_query_total"
+  },
+  "quantile": "linear interpolation, index (n-1)*p",
+  "splits": {
+    "T_core": {
+      "scene_count": 2100,
+      "nonuniform_k_scene_count": 2082,
+      "uniform_k_scene_count": 18,
+      "target_count": 57359,
+      "node_count": 155134,
+      "positive_pair_count": 155159,
+      "within_scene_variance_k": {
+        "min": 0.0,
+        "median": 0.7100100545488166,
+        "p90": 1.0612244897959184,
+        "max": 2.16
+      },
+      "within_scene_cv_k": {
+        "median": 0.31127255858482705,
+        "p90": 0.3955535172818131,
+        "max": 0.5600084530215783
+      },
+      "enumerated_position_supervision_ratio": {
+        "ratio_of_totals": 2.7129787031520465,
+        "scene_min": 0.8282828282828283,
+        "scene_median": 2.7493581999395955,
+        "scene_p90": 3.757705755782679,
+        "scene_max": 6.0,
+        "scene_count_with_nonzero_denominator": 2100
+      }
+    },
+    "V_select": {
+      "scene_count": 300,
+      "nonuniform_k_scene_count": 299,
+      "uniform_k_scene_count": 1,
+      "target_count": 9100,
+      "node_count": 24599,
+      "positive_pair_count": 24675,
+      "within_scene_variance_k": {
+        "min": 0.0,
+        "median": 0.7198942693448188,
+        "p90": 1.0619012188208619,
+        "max": 1.84
+      },
+      "within_scene_cv_k": {
+        "median": 0.31573900477632016,
+        "p90": 0.40377124906761813,
+        "max": 0.565194165260439
+      },
+      "enumerated_position_supervision_ratio": {
+        "ratio_of_totals": 2.716934973359827,
+        "scene_min": 1.3457627118644069,
+        "scene_median": 2.727841069413093,
+        "scene_p90": 3.8387916330011693,
+        "scene_max": 5.685483870967742,
+        "scene_count_with_nonzero_denominator": 300
+      }
+    }
+  },
+  "limitations": [
+    "k counts fragments across all sources; source visibility and within-source fragmentation are not separated",
+    "moments do not reconstruct per-target k or its joint distribution with valid points/errors",
+    "nonuniform counts do not establish performance harm or novelty",
+    "ratio of enumerated supervision is not realized exposure or independent-label count",
+    "pairwise training loss differs from group-level metrics in prediction object and functional form too",
+    "finite minibatch valid-count denominator must not be replaced by its expectation",
+    "current code/source review is not an author implementation reproduction"
+  ],
+  "independent_arithmetic_review": "Separate reader recomputed both split counts and medians from the same public scenes; not independent data or experiment replication"
+}
