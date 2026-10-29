@@ -153,18 +153,19 @@ def metrics(target_available, prediction_available, errors):
     return result, values
 
 
-def artifacts(path, names):
+def artifacts(path, names, *, template='WS_MEAN'):
     with np.load(path, allow_pickle=False) as payload:
-        prefix = 'WS_MEAN_'
+        prefix = template+'_'
         keys = {key[len(prefix):] for key in payload.files if key.startswith(prefix)}
         if 'aligned_prediction' not in keys:
             raise ValueError('saved complete artifact required')
         return {name: {key: payload[name+'_'+key] for key in keys} for name in names}
 
 
-def inspect_scene(saved, report, names, checks):
+def inspect_scene(saved, report, names, checks, *, expected_split='V_select'):
     base = saved[names[0]]
-    checks.exact(str(base['split']) == 'V_select' and str(base['grouping_kind']) == 'predicted'
+    checks.exact(expected_split in ('T_core', 'V_select')
+                 and str(base['split']) == expected_split and str(base['grouping_kind']) == 'predicted'
                  and str(base['correspondence_policy']) == 'anchor_identity_first', 'development-only artifact policy')
     t, g, n = len(base['target_ids']), len(base['group_states']), len(base['node_group_indices'])
     checks.exact(len(set(base['target_ids'].tolist())) == t, 'unique targets')
