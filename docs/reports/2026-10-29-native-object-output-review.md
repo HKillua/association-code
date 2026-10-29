@@ -1,6 +1,6 @@
 # 129：原生连续性候选、T拒配与完整对象输出
 
-2026-10-29。`EXPERIMENT_RECORD`及其后`SQUEEZE_REPORT`；上游[Idea 1.0](../proposals/object_hypothesis_pilot_20261029.md)、[实际合同](../../HandOver/L2S-20261029-129.md)。读取真实公开原件、保存数组及独立审计后记录，不倒填计划。证据目录：[129原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/129/)；原坐标、身份、原生事件、大预测保留服务器。
+2026-10-29。`EXPERIMENT_RECORD EXP-129-20261029`及其后`SQUEEZE_REPORT SQ-NATIVE-OBJECT-OUTPUT-129-20261029`；上游[Idea 1.0](../proposals/object_hypothesis_pilot_20261029.md)、[实际合同](../../HandOver/L2S-20261029-129.md)。读取真实公开原件、保存数组及独立审计后记录，不倒填计划。证据目录：[129原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/129/)；原坐标、身份、原生事件、大预测保留服务器。
 
 ## Record：实际执行与全部结果
 
