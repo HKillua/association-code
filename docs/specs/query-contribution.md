@@ -1,12 +1,14 @@
 # 可替换的查询贡献与物理恢复接口
 
-本页只规定新增软件接口，不发布实验或改变056、114、115及旧Mean配方。新接口不读取文件、不构组、不选对应，不接受identity、reference、目标有效mask或完整fragment字典。
+本页只规定新增软件接口，不发布实验或改变056、114、115、116及旧Mean配方。新接口不读取文件、不构组、不选对应，不接受identity、reference、目标有效mask或完整fragment字典。
 
 - `supported_query_weights(nearest_seconds, support, sources, groups, *, method)` 接收有限非负时距和布尔支撑`[N,Q]`、非空source字符串`[N]`及覆盖全部节点一次、按原index排列的partition。返回`weights[N,Q]`和仅含计数的audit。组外节点不能影响本组。
 - `source_balanced_supported` 在每组每query内，设有支撑source数为`Ns`、该source有支撑片段数为`ms`，每片段权重为`1/(Ns*ms)`。source只定义等价类，不预定质量；均匀复制某source的全部片段不改变恢复值（允许浮点舍入）。支撑不是量测准确性或校准协方差。
 - `nearest_supported` 仅在有支撑成员内选最近原生观测时距，平局选最小原index，得到one-hot权重。没有支撑时全部权重为0，不能选无支撑的近成员。
 - `recover_group_states(states, weights, groups)` 接收有限`states[N,Q,4]`（纬度、经度、速度、航向）及有限非负贡献质量，按组query总质量归一化。纬度/速度线性，经度/航向圆周均值；归一化圆周合量`<=1e-12`时对应角度回退组首anchor。总质量为0时整行回退首anchor；仅一个正权成员时完整复制该节点值，避免改变角度表示。返回`group_states[G,Q,4]`与回退计数audit。
 - `query_contribution(states, nearest_seconds, support, sources, groups, *, method)` 组合以上两步，返回`group_states`、`weights`及`audit`。所有组先得到输出，每个组只有首anchor回退规则；该输出不含真实身份，也不决定最终对应。
+- `emit_group_outputs(group_states, groups, *, node_count)` 是恢复器与评价之间的独立输出边界：接收有限`[G,Q,4]`（Q>0）和完整partition，逐组复制为`{node_indices, states}`记录；不选组、不删重复、不改变组顺序或首anchor。G与partition长度不符直接拒绝，不能由`zip`静默截断。`node_count`必须是显式非负整数；N=0时允许`[0,Q,4]`和空partition。输出数组及成员列表均不与输入共用可变存储。
+- `predict_group_outputs(states, nearest_seconds, support, sources, groups, *, method)` 是显式物理输入的薄组合入口，返回`group_states`、`group_outputs`、`weights`和`audit`。`source_balanced_supported`/`nearest_supported`直接复用以上W/恢复接口；`anchor`/`mean_supported`/`nearest_observation`直接调用历史`ordinary_fusion`并取各组首anchor，保留每值exact和历史回退，`weights=None`，不把旧Mean重写为新的归一化求和。历史`nearest_observation`仍可选择无support成员，不能混同`nearest_supported`。`audit`只带方法名及原有计数；不添加坐标、身份或source名。只有这五种固定方法名，无动态注册或plugin框架。
 
 输入不得被修改。Q必须大于0，N=0时允许空partition。未知方法、非法shape/非数值/非有限输入、负时距或权重、非布尔support、source长度/名称错误、重复/遗漏/越界/非整数或乱序partition均抛`ValueError`。audit只含方法名、各组query支持成员数、支持source数、source片段数最小/最大值及是否不均、回退计数；不包含source名、节点名或坐标。
 
@@ -17,5 +19,7 @@
 | R/W/恢复可独立替换且无组外影响 | 固定W替换states、隔离组输入、独立调用两步 |
 | 复制source、source重命名不影响质量假设 | 配对输入不变性检查 |
 | 拒绝非法输入且不修改输入 | 参数边界及数组前后对照 |
+| 旧三控制及新两控制从共同入口调用保持exact | 对既有算子的数组相等检查，含无support/角度回退/强anchor |
+| 替换恢复器后仍全组输出，无静默截断/别名 | 独立emit检查、非法G/partition检查；输出进入既有评价后coverage/duplicate/correspondence一致 |
 
-仅运行新增单元测试；小合成数据是软件行为证据，不是MTAD成绩。旧`ordinary_fusion`、`evaluate_full_scene`及对应policy保持原实现和数值。
+仅运行本次接口及必要调用链测试；小合成数据是软件行为证据，不是MTAD成绩。旧`ordinary_fusion`、`evaluate_full_scene`及对应policy保持原实现和数值。116工具仅改用独立emit包装，方法名、配方和默认范围不变；冻结runs不动。

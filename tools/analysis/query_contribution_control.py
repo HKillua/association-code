@@ -22,6 +22,7 @@ if __package__ in (None, ''):
 import numpy as np
 
 from association.evaluation.query_contribution import query_contribution
+from association.evaluation.group_prediction import emit_group_outputs
 from association.evaluation.paper_fusion_metrics import COUNTS, STATISTICS
 from tools.analysis import static_partition_position_control as old
 
@@ -120,7 +121,7 @@ def analyze_scene(fragment, memberships, retained115, public115):
     artifacts, methods, arrays = {}, {}, {}
     for name in METHODS:
         r, _ = name.split('_', 1)
-        outputs = [dict(node_indices=g, states=value) for g, value in zip(groups[r], predictions[name])]
+        outputs = emit_group_outputs(predictions[name], groups[r], node_count=len(states))
         report = old.evaluate_full_scene(outputs, node_identities=identities, target_identities=targets,
             target_states=truth, target_valid=valid, node_observed=support, split='V_select',
             grouping_kind='predicted', correspondence_policy='anchor_identity_first', return_artifact=True,
@@ -182,9 +183,9 @@ def paper_aggregate(rows):
     return out
 
 
-def aggregate(rows, arrays):
+def aggregate(rows, arrays, *, method_names=METHODS):
     out = dict(scene_count=len(rows), scene_ids=[r['scene_id'] for r in rows], methods={}, pairwise={})
-    for name in METHODS:
+    for name in method_names:
         values = [r['methods'][name] for r in rows]
         out['methods'][name] = dict(population={k: sum(v['population'][k] for v in values) for k in old.POPULATION_KEYS},
             unmatched_target_count=sum(v['unmatched_target_count'] for v in values),
