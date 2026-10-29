@@ -167,13 +167,15 @@ Q相对hard/linear的ΔMAE为−16.890631/−13.109370m，均12好/0差/1同场�
 - 上述独立工作只核**公开统计自洽**；AUROC/分位数、私有y/head参数/动作生成、特征与reference隔离并未由读JSON独立认证。第一次冻结`independent-saved-array-audit.json`实际`FAILED/exit1/KeyError`：5项exact、**0项numeric**，0.524386s、RSS93306880B；其scope仍带旧120/121/123/124描述，不能借此认证125。根因是旧auditor读取不存在的completed_scenes，125正式字段为completed_V_scenes；失败记录不改写。新审计另按123声明的原32谱系读取121保存控制。原科学run不重跑。
 - **新专用独立审计已完成**：冻结46902b3，服务mtad-78122f4f4933.service真实success/exit0、inactive/dead、Restart=no；输出independent-value-array-audit.json，32场/11臂55对/9组件及去最大共11聚合，88781 numeric、381477 exact、41404 null通过，七旧控224场景臂artifact exact。逐组/首代表/重复/完整reference registry/validity及同点误差、覆盖0变化独立重算；MAE/RMSE最大差1.916e-9m，P95 2.556e-9m，P99 2.094e-9m，MSE4.530e-6m²。程序17.626684s、launcher18.429599s、RSS150552576B另计。未核T拟合/teacher/head特征或动作合法性、support语义、论文属性/speed/heading、逐点利害和reference物理正确性；不能把主位置审计扩大到所有科学机制。原科学及审计冻结worktree均clean。
 
+**后到的T侧独立补证（UTC15:32:25–15:32:59）：** 冻结814affd，新输出independent-T-array-audit.json及单独T-audit-launcher，原科学125不重跑。3598exact/1808numeric通过，独立核32场/12组件、首anchor重复与eligible22627/全matched-refvalid37635两分母、球面hard−soft gain、48fold＋4fullT保存头及T-only normalizer/λ1参数；39个ridge与13个常量仅为审计参数重解，不保存新模型或择参。独立gain最大差4.906e-9m、符号不一致0，mean/std/beta和OOF全部收益指标差0；0teacher前向/0V payload。程序33.270113s、launcher33.724041s、RSS140509184B，服务终态success/exit0。未核teacher生成、特征构造/合法性、WS/中心、文件打开时序或reference物理语义；LOCO依然只隔离新head。该补证晚于131发布，不倒写为131启动前已完成。
+
 | 计划/核验项 | 实际事实 | 对解释的影响 |
 |---|---|---|
 | T32/12组件、V32/9组件、四head/11臂55对 | 按一次合同完成 | 未覆盖V余268/全300或新增组件分布 |
 | 训练冻结与0神经更新 | 1teacher、92前向、52解析fit，参数/阈值未搜索 | 有监督探针，不能称完全无训练/无需标签 |
 | 不改预测人口、缺失不删 | 同1427/1605/217及1125缺失点 | 位置收益不等系统覆盖/重复改进 |
 | 完整both/单源/no-support层 | 本125直接导出both，旧3层额外key未带入 | 保留旧121/124层证据；新gate域外exact约束不能冒充新独立分层审核 |
-| 独立保存数组审核 | 首次KeyError保留；另发专用主位置/人口审计通过 | 限定32场11臂55对及旧控绑定，T拟合/动作等未独立认证 |
+| 独立保存数组审核 | 首次KeyError保留；另发专用主位置/人口审计通过 | 限定32场11臂55对及旧控绑定，随后T参数/OOF补证通过；teacher/特征/动作路径未完整认证 |
 | 重复/不确定性 | 单次固定seed20置乱，没有多seed/外部队列或置信区间 | 场景/组件与去最大是描述稳健性，不是显著性或总体保证 |
 
 ## 8. Squeeze：支持什么、没有回答什么
@@ -208,7 +210,7 @@ results_with_uncertainty: T_full_common_delta_Q=-16.283220m;V_MAE447.060488->435
 all_runs_or_repetitions: one_scientific_attempt_exit0;first_independent_audit_FAILED_KeyError_numeric0
 observations_and_deviations: V_P95_worse,harm5779,coverage_and_duplicates_unchanged,old3_extra_strata_omitted
 actual_cost: program390.617800518s,launcher396.620508115s,peakRSS2000748544B,teacher1_forward92,analytic52_neural_updates0
-known_limits_and_missing_evidence: main_position_population_audit_passed_T_policy_unverified;LOCO_new_head_only;V32_not300;physical_quality_and_credible_peer_unverified
+known_limits_and_missing_evidence: main_position_population_and_T_parameter_OOF_audits_passed_feature_teacher_unverified;LOCO_new_head_only;V32_not300;physical_quality_and_credible_peer_unverified
 next_routes: squeeze_and_ModeC_then_frozen_broader_Idea
 next_skill: squeeze-experiment
 ```
@@ -218,7 +220,7 @@ package_type: SQUEEZE_REPORT
 package_version: research-pipeline-contract v1.0
 squeeze_id: SQ-CONDITIONAL-SOURCE-VALUE-125-20261029
 input_experiment_record_ids: [EXP-125-20261029]
-evidence_status: partial_main_position_population_audit_passed_T_policy_unverified
+evidence_status: partial_main_position_population_and_T_parameter_OOF_audits_passed_feature_teacher_unverified
 claim_scope: frozen_two_action_reference_risk_predictability_on_T_head_LOCO_and_original_V32
 primary_result_with_uncertainty: Q_vs_hard_V_deltaMAE=-11.999373m,deltaRMSE=-1.493750m,deltaP95=+1.915477m,deltaP99=0;30good1bad1tie_scenes,8good0bad1tie_components
 process_dynamics: 390.6178s_program,52_analytic_fits,92_teacher_forwards,0_neural_updates,advisory_not_exceeded
@@ -228,7 +230,7 @@ robustness_sensitivity_and_alternative_explanations: T12_component_LOCO_new_head
 new_P: 如何将可预测的两动作贡献收益扩展到完整人口并控制尾部且独立于上游开发历史
 new_F: 当前合法条件收益head在T和冻结V有净MAE增量，但不改善覆盖重复且部分尾部恶化
 new_M: AI条件交互可能有用；UN具体特征因果/物理可靠性
-open_questions: independent_T_fit_and_policy_audit;broader_and_upstream_isolated_transfer;tail_control;online_total_cost
+open_questions: feature_teacher_and_action_generation;broader_and_upstream_isolated_transfer;tail_control;online_total_cost
 next_routes: preserve_failed_audit_and_passed_separate_audit;deep-read_ModeC_before_broader_Idea
 next_skill: deep-read Mode C
 ```
