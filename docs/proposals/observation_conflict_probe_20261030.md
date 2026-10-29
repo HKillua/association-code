@@ -152,6 +152,40 @@ CPU≤4、RSS6GiB、AS12GiB，1800s advisory；0GPU/0神经更新/0新fit/0模�
 - 公共`scene-summary.json.gz`完整32行、`summary.json`全量/12组件/去最大、主格与有限交叉、全部6对偏好表、bootstrap、完整排除/缺失人口和字段单位。所有零格、null、坏例保留，无新模型checkpoint/部署权重文件。
 - `independent-audit.json`：独立核验完成/失败、覆盖和未审事项；只读独立调用另记成本，不冒充第二次科学尝试。
 
+公共结构固定为`scene-summary.json.gz`的32个按manifest顺序的scene rows，逐场原件为`scenes/scene-{sid}.json.gz`，每场含`scene_id/component_id`及完整分析块。`summary.json`含`all_components/by_component/without_largest_component/largest_component_id/primary_bootstrap`。每个分析块含`scope`（所有分母）、`full_population`（完整P点六臂）、`overall`（D2）、`main_cells`（A–U全6格）、`ols_subcells`（C/D×4全8格）、`role_cells`（3×6）、`purity_cells`（2×6）、`pairwise_preferences`（6对×strict相同/strict相反/tie/unknown四层）、`primary_estimands`（4项）及`scene_macro_estimands`（4项）。每格均有`query_count/component_count`、各偏好known/tie/strict计数、`preferences`（内含selection代价/regret/credit）、`actual`、`oracle`三个分开的统计对象，不将endpoint credit混入actual的方法指标。
+
+私有逐场`private/aligned-{sid}.npz`固定以下字段与次序；M为该场D2数，P为该场完整首代表可评位置点数，S为133该场源行数，Q为原query数。shape和编码也是独立审计合同，不能只靠自由文本解释：
+
+| 字段 | shape / 精确定义 |
+|---|---|
+| `node_ids/query_seconds/membership/component_id` | 原133 pack的节点/时间/分组绑定及场组件标量；保留原dtype与顺序 |
+| `group_indices/query_indices` | 各[M]，134主join键，唯一且沿134原顺序 |
+| `source_rows/quality_source_rows` | 各[M,2]，分别133与136对应源行；列0/1始终同一源成员 |
+| `source_row_133_to_136` | [S]，通过原成员集合唯一绑定的133→136完整双射 |
+| `endpoint_errors_m` | [M,2]，134原端点径向误差；列0为alpha=1，列1为alpha=0 |
+| `best_single_error_m/grid_error_m/gain_m/gap_bound_m/min_resultant` | 各[M]，134原字段；非有限界保留原状态，不补成0 |
+| `role_indices/group_pure` | [M,2]匿名role映射与[M]原组纯度；均仅用于诊断 |
+| `preference_names` | 固定`[LOO, OLS, NEAREST, QOOF]`，所有偏好数组第2维遵循此次序 |
+| `preference_values` | [M,4,2]：LOO/OLS为m²代理、NEAREST为源内min秒、QOOF为原分数，不跨列作同单位比较 |
+| `preference_known` | [M,4]，两源证据均known才为true；N/Q非有限直接失败，不降为unknown |
+| `preference_mass` | [M,4,2]，strict为one-hot、tie为各0.5；unknown占位全0，必须与known mask一起消费，不当作有效选择 |
+| `preference_winner` | [M,4]：−2未知，−1精确平局，0/1严格偏好源列；不编码匿名role |
+| `selection_cost_m/selection_regret_m/selection_credit` | 各[M,4]，§4.1定义；unknown为NaN，不能纳入有效分母 |
+| `actual_method_names` | 固定`[WS_SOURCE_EQUAL, WS_SOURCE_NEAREST, WS_OBS_OLS_F1, WS_OBS_OLS_F100, WS_OBS_LOO_F1, WS_OBS_LOO_F100, QUADRATIC_OOF_HARD]` |
+| `actual_error_m` | [M,7]，上述已存在真实输出的径向误差；不保存新计算的融合位置 |
+| `cell` | [M]，0/1/2/3/4/5分别A/B/C/D/E/U |
+| `ols_subcell` | [M]，非C/D为−1；C/D内0为O=L、1为O=N、2为O平局、3为O未知 |
+| `role_best` | [M]，0/1为严格最优端点的匿名role，2为原endpoint误差精确平局；不等于source_rows列号 |
+| `full_actual_error_m` | [P,6]，完整T可评点的原136六臂误差；没有第7列QOOF的补造值 |
+| `full_target_indices/full_query_indices/full_group_indices/full_source_count` | 各[P]，完整人口合法参考、首次组、query及支持层绑定 |
+| `D2_full_indices` | [M]，主D2每点在P人口中的唯一索引；应exact绑定全量误差前六列 |
+
+`scope`继承134原全部排除/缺失人口字段，另加`full_evaluable_position_points`，同时保留136完整人口所需绑定；不得只记录D2的成功join。public不包含源名称、身份或物理坐标；private保留这些必要映射供独立审计，不将它们加入任何偏好算法。
+
+`primary_bootstrap`固定4个key：`actual_LOO_minus_NEAREST`、`selection_L_minus_N`、`selection_O_minus_N`、`selection_Q_minus_N`，主条件均C∪D。每项保存原估计值、条件点数/组件数、2000/seed20、定义的抽样数/空抽样数和95%区间（不适用为null）；逐格C/D的结果只作描述，不再加一轮选择性显著检验。所有key共享同一组12组件抽样索引，先聚合每组件分子/分母再重抽，不构建2000×22627大重复数组。
+
+`alignment.json`公开部分只能含场景ID、字段/shape/人口计数及逐项绑定是否通过；实际node/source成员和双射必须进private。所有方法标签均明确为旧artifact或者diagnostic preference；不得输出新“138 predictor”checkpoint、轨迹或部署规则。
+
 最小验收（实现前冻结）：
 
 1. 用手算2源例验证strict/tie/unknown、互斥穷尽A–U、OLS8子格、role翻转映射与全部6偏好对；改变source名字/交换源行但保持成员对应时统计不变，匿名role只相应重标。
