@@ -6,6 +6,9 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 125条件贡献 | T32新head LOCO及冻结V32十一臂真实完成；二次比hard MAE447.060→435.061m，30场/8组件改善，P95略差/覆盖重复不变。主位置/人口独立核验通过、首次audit字段失败保留。是固定候选经验收益信号，非物理源健康。[Record/Squeeze](../reports/2026-10-29-conditional-source-value-review.md) |
+| 129原生对象输出 | T拒配有候选富集、duplicate217→175，但少24覆盖目标、混组增22；LOW同点MAE仅−.365m、P99+306.985m，宏F1升/微F1降。当前贪心组并入不晋级，保留组级拒配问题；可变R/decoded独立核验通过。[记录](../reports/2026-10-29-native-object-output-review.md) |
+| 128失败及130几何诊断 | 128遭oomd、6场部分产物和陈旧RUNNING保留；独立130导入6/补26成功。共同候选LOO AUC.448/.527未超过静态MIN .893，候选AUC不是F1，当前固定LOO结束，不否定原生时序；限定标签/人口/秩审计通过。[失败](../reports/2026-10-29-association-geometry-failure.md)/[130记录](../reports/2026-10-29-association-geometry-review.md) |
 | 124软贡献与中心幅度分离 | 原32/15臂105配对/0训练，320臂导入160新算；FixedHard447.060m，FixedSoft531.012、ShrinkHard455.287、组合555.446m。组合全部32场/9组件差，收缩P99改善伴随MAE/多数场损失；固定.75/m0=4不晋级，不自动扩量/搜参，不否定整类。独立主位置核验通过，[Record/Squeeze](../reports/2026-10-29-source-mix-shrink-review.md) |
 | 123源优先更广范围 | 2464臂导入/536新算、一次全V/0训练。新268 FixedLOW MAE500.498m较LOW579.614/FixedMean602.833更低，仍177场比FM差/P99差；LOW未见与去最大组件四指标输FM。全V FL491.889m，非普遍硬源优先或同行胜负。独立主位置核验通过，[Record/Squeeze](../reports/2026-10-29-source-preference-full-review.md) |
 | 120共享校正全V开发扩展 | 固定旧八臂，256原场景臂导入/2144新算；新268 MAE1297.482→602.833m、全V1294.074→611.405m，原32未见29组件仍同向，强控/尾部/覆盖限制保留。FixedHuber有不足1m MAE增量而RMSE/P95/P99反向；非独立测试或同行胜负。[Record/Squeeze](../reports/2026-10-29-shared-component-full-review.md) |

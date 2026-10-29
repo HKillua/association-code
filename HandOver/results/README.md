@@ -4,6 +4,9 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [125原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/125/) | T四head OOF/V32十一臂、真实run/launcher、首次failed audit及单独通过的主位置/人口审计；[记录](../../docs/reports/2026-10-29-conditional-source-value-review.md) |
+| [129原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/129/) | 原生候选/拒配六臂、完整可变R人口/同点位置/decoded关联、原launcher和限定独立audit；[记录](../../docs/reports/2026-10-29-native-object-output-review.md) |
+| [130原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/130/) | 原6导入/26新算及十scorer、原服务和独立标签/人口/秩审计、事后三mask单列；[记录](../../docs/reports/2026-10-29-association-geometry-review.md) |
 | [123终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/123/) | 源优先新268/全V300十臂45对、2464旧臂导入/536新算；完整公共逐场/组件/分层、原launcher/退出/成本与独立主位置数组审计，private留服务器。[Record/Squeeze](../../docs/reports/2026-10-29-source-preference-full-review.md) |
 | [124终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/124/) | 原V32软贡献×中心幅度分离、15臂105对及完整主效应/交互/负结果；320旧臂导入/160新算，原launcher/退出/成本/独立主位置审计及未审范围均保留。[Record/Squeeze](../../docs/reports/2026-10-29-source-mix-shrink-review.md) |
 | [118终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/118/) | 原V32/共享相对分量×局部限影响、八臂22比较，全部公共逐场gzip、真实launcher/退出/成本与独立主位置数组审计；private留服务器。[记录](../../docs/reports/2026-10-29-shared-component-review.md) |

@@ -71,7 +71,7 @@ source_matrix_id: MC-RESTART-20261027@1.46
 selected_C_id: CC-C1
 source_P_ids: [P11, P14]
 source_F_ids: [F221, F222, CC-F3, CC-F4, F224]
-source_M_ids: [M92, M93, CC-M1]
+source_M_ids: [M92, M93, CC-M1, M95]
 source_E_ids: [E119, E120, E122]
 research_question: 原T32冻结条件收益head在其余268开发场景和预定组件分层是否仍有新增价值
 hypothesis_and_mechanism: 固定候选的参考风险差条件信息可转移仍AI；不识别物理源质量
@@ -84,8 +84,8 @@ analysis_plan_and_uncertainty: 预定组件集合，非query-IID；unseen仅指�
 resources_time_cost_and_risk: CPU4/RSS6GiB/AS12GiB/5400s advisory/一次；1960导入/1340新增/0refit/0新NN前向
 ethics_safety_privacy_or_compliance: predictor输入无ID/ref；loader身份metadata如实披露；private留server，test封存
 stopping_and_interpretation_rules: 固定V300终点；失败保全不重试，完成先回流，不自动后继
-status: diagnostic-preparation-not-READY
+status: implementation_verified_execution_only_by_HandOver
 evidence_status: partial
-missing_evidence: [ModeC146_record_handoff, remaining268_effect, physical_quality_identification, credible_peer]
+missing_evidence: [remaining268_effect, physical_quality_identification, credible_peer]
 next_skill: record-experiment_after_actual_execution
 ```
