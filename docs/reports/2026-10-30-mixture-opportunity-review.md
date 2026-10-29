@@ -130,3 +130,5 @@ margin<.05的752点仅3.32%，贡献49.69%损害；<.1共8.22%点贡献68.10%。
 mode_C_input_bundle：source_ids=[本Record,SQ-MIXTURE-OPPORTUNITY-20261030-134]；复用MR-P1/MR-P3，新增F232（训练侧条件凸混合空间与OOF高损害误选集中，DE）、M103（读出尺度/风险目标与不确定性处理的候选，AI/UN）、E130（本记录/完整原件/限定独立审计）。MR-C3由空间未知变为目标K2内部有可行空间但未验证可学；MR-C1新增风险读出/角色混杂边界。P14/F232/M103/E130/C53，精读100=70+30不变；next_skill：deep-read Mode C→成熟时discover-innovation，不把路线建议当已验证方法。
 
 本地只取完整脱敏run/summary/32行gzip、科学/审计两launcher的真实请求/终态/日志与服务快照；每点坐标/reference/来源名/身份/alpha/特征/OOF数组均留原服务器private。原件[入口](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_mixture_opportunity/134/)，未复制实时任务队列。
+
+回流已完成：[Mode C1.54](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-154)及局部1.3逐格回填134事前15格。下一[135风险读出草案](../proposals/source_risk_readout_20261030.md)已明确A/A′/B、66个leave-two-out Q拟合与13个仅T温度选择，尚未实现/READY/运行；校准是否有合法增量仍待实证。
