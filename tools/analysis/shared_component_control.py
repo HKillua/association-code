@@ -198,23 +198,29 @@ def construct_predictions(states, nearest, support, sources, groups):
     return predictions, audit, dict(private, **{name+'_query_weights': value for name, value in weights.items()})
 
 
-def analyze_scene(fragment, memberships, retained, public):
+def analyze_scene(fragment, memberships, retained, public, *, imported_artifacts=None, replay_source='115'):
     states, nearest, support = (fragment[k] for k in ('native_states', 'nearest_seconds', 'support'))
     groups = old.groups_from_membership(memberships['WS'], len(states))
-    predictions, audit, private = construct_predictions(states, nearest, support, fragment['sources'], groups)
-    old._same(predictions['WS_MEAN'], retained['WS']['group_states'], '115 exact WS Mean states')
-    old._same(retained['WS']['node_group_indices'], memberships['WS'], '115 WS membership')
+    if imported_artifacts is None:
+        predictions, audit, private = construct_predictions(states, nearest, support, fragment['sources'], groups)
+    else:
+        if set(imported_artifacts) != set(METHODS):
+            raise ValueError('complete original shared-component prediction arms required')
+        predictions = {name: imported_artifacts[name]['group_states'] for name in METHODS}
+        audit, private = public['shared_component_audit'], {}
+    old._same(predictions['WS_MEAN'], retained['WS']['group_states'], replay_source+' exact WS Mean states')
+    old._same(retained['WS']['node_group_indices'], memberships['WS'], replay_source+' WS membership')
     # All prediction operators above have now finished. Truth is only bound below.
     targets, identities = fragment['target_identity_ids'], fragment['identities']
     saved = retained['WS']
-    old._same(saved['target_ids'], targets, '115 complete target registry')
+    old._same(saved['target_ids'], targets, replay_source+' complete target registry')
     truth, valid = saved['aligned_truth'][:len(targets)], saved['aligned_truth_valid'][:len(targets)]
     registry = {identity: row for row, identity in enumerate(targets)}
     if len(registry) != len(targets):
         raise ValueError('duplicate target registry')
     for node, identity in enumerate(identities):
-        old._same(fragment['target'][node], truth[registry[identity]], '056/115 full target')
-        old._same(fragment['target_valid'][node], valid[registry[identity]], '056/115 full target valid')
+        old._same(fragment['target'][node], truth[registry[identity]], '056/'+replay_source+' full target')
+        old._same(fragment['target_valid'][node], valid[registry[identity]], '056/'+replay_source+' full target valid')
     regions = old.fixed_regions(fragment, targets)
     artifacts, methods, arrays = {}, {}, {}
     for name in METHODS:
@@ -224,11 +230,16 @@ def analyze_scene(fragment, memberships, retained, public):
             grouping_kind='predicted', correspondence_policy='anchor_identity_first', return_artifact=True,
             node_input_support=dict(support=support, nearest_seconds=nearest))
         artifact = report.pop('artifact')
+        if imported_artifacts is not None:
+            if set(artifact) != set(imported_artifacts[name]):
+                raise ValueError('imported shared-component artifact schema differs')
+            for key in artifact:
+                old._same(artifact[key], imported_artifacts[name][key], 'original shared artifact/'+name+'/'+key)
         if name == 'WS_MEAN':
             if set(artifact) != set(saved):
-                raise ValueError('115 Mean artifact schema differs')
+                raise ValueError(replay_source+' Mean artifact schema differs')
             for key in saved:
-                old._same(artifact[key], saved[key], '115 exact WS_MEAN/'+key)
+                old._same(artifact[key], saved[key], replay_source+' exact WS_MEAN/'+key)
         else:
             for key in ('aligned_prediction_valid', 'aligned_group_indices', 'node_group_indices',
                         'group_anchor_target_indices', 'group_valid', 'group_node_indices', 'group_offsets'):
@@ -247,8 +258,9 @@ def analyze_scene(fragment, memberships, retained, public):
         pairs[key].update(baseline_method=base, candidate_method=candidate,
                          side_labels=dict(A0=base, candidate=candidate))
     row = dict(scene_id=public['scene_id'], component_id=public['component_id'], node_count=len(states),
-        original115_exact_replay_verified=True, fixed_R_population_invariants_verified=True,
+        fixed_R_population_invariants_verified=True,
         methods=methods, pairwise=pairs, shared_component_audit=audit)
+    row['original'+replay_source+'_exact_replay_verified'] = True
     return row, dict(methods=arrays, pairs=pair_arrays), artifacts, private
 
 
