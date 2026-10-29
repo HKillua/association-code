@@ -1,11 +1,12 @@
 # 当前交接
 
-**2026-10-29新授权：120已真实RUNNING，121 READY。** 原118/119不重开，两个独立具体验证0训练，不互相择参。120原32导入/其余268新算；121复用原118八臂，仅加两源优先臂。
+**2026-10-29新授权：120/121均COMPLETED/exit0，122 READY。** 两项位置控制正完成记录与独立数组核验；122独立核相对速度结构，不改任何预测。原118/119及旧任务不重开，均无自动后继。
 
 | 新发布任务 | 状态 | 合同 |
 |---|---|---|
-| 120固定共享校正扩展 | RUNNING；冻结b202695，服务mtad-b59be0ca7a47.service，原同launcher。CPU0–3，1800s advisory，300评价终点；一次，无自动重试/后继 | [Idea](../docs/proposals/shared_component_full_control_20261029.md)、[L2S-120](L2S-20261029-120.md) |
-| 121源优先强控制 | READY；CPU4–7/RSS4GiB/AS8GiB/600s advisory，原32，八旧臂导入/两新臂；一次，无自动重试/后继 | [Idea](../docs/proposals/source_preference_control_20261029.md)、[L2S-121](L2S-20261029-121.md) |
+| 120固定共享校正扩展 | COMPLETED/exit0；冻结b202695，服务mtad-b59be0ca7a47.service成功退出。300场/38组件/8臂，记录及主要数组审计收尾，无自动后继 | [S2L-120](S2L-20261029-120.md)、[Idea](../docs/proposals/shared_component_full_control_20261029.md)、[L2S-120](L2S-20261029-120.md) |
+| 121源优先强控制 | COMPLETED/exit0；冻结1322dc9，服务mtad-3a6295de9482.service已成功退出。32场/10臂/45对/0训练；记录与独立主要数组核验进行中，无自动后继 | [S2L-121](S2L-20261029-121.md)、[Idea](../docs/proposals/source_preference_control_20261029.md)、[L2S-121](L2S-20261029-121.md) |
+| 122速度相关剩余诊断 | READY；CPU8–11/RSS4GiB/AS8GiB/600s advisory，原V32/4臂6比较，0训练/不改状态；一次，无自动后继 | [Idea](../docs/proposals/shared_motion_time_residual_20261029.md)、[L2S-122](L2S-20261029-122.md) |
 
 **本轮新任务118/119：均COMPLETED并核验。** 冻结b48dae7，各原V32/9组件一次，0训练；118程序91.896s/launcher108.528s，119程序63.215s/launcher82.473s，均exit0，服务inactive/dead、success、Restart=no。Record/Squeeze及Mode C1.39回流完成，无READY或自动后继；旧任务不重跑。
 
