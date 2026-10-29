@@ -11,6 +11,8 @@
 | `LEVEL1-RAW-CASE-CHAIN-20261027-105` | 原CSV固定节点/reference一致性及脱敏issue类型；完整原行仍留服务器 |
 | `LEVEL1-TMTAFF-UNIT-PREP-20261027-106` | 新单位T/V完整人口、监督直方图、7200成员及实际退出；启动快照与最终原件分开命名 |
 | `LEVEL1-TMTAFF-UNIT-BASELINE-A-20261027-107` | 单次服务提交、实际argv/阶段起点及托管核验；GPU摘要明确删去其他进程细节，完整分配记录留服务器。启动快照不是最终结果 |
+| [113终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/113/) | 原107固定端点的独立修复评价；真实退出/命令/全300公共逐场指标、独立数组与尾部审计。[记录](../../docs/reports/2026-10-29-fixed-endpoint-review.md)，原身份/坐标/权重/大预测留服务器 |
+| [115终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/115/) | 固定V32新分区ordinary Mean的完整人口/误差/覆盖/重复、逐点审计及原注释订正。[记录](../../docs/reports/2026-10-29-static-position-review.md) |
 | `LEVEL1-TAIL-DIAG-20261027` | 服务器事后派生件；`d6f79c8`改写其中方向/轴序/排名解释，原版本可从Git `a68fde4`恢复；以本地审计为结论入口 |
 | `LEVEL1-NATIVE-QUERY-20261026-100-summary` | 三臂合并的全人口、逐场/组件对照；不再保三套重复端点表 |
 | `LEVEL1-QUERY-RELATION-20261025-098-*` | 两seed比较与总表，保留原晋级失败的可核依据 |
