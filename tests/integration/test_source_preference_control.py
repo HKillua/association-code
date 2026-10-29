@@ -122,6 +122,17 @@ class SourcePreferenceTests(unittest.TestCase):
             with self.subTest(kind=kind), self.assertRaises(ValueError):
                 p.analyze_scene(fragment, membership, retained, calibration, public)
 
+    def test_full_import_skips_both_new_predictions_and_preserves_all_artifacts(self):
+        fragment, membership, retained, calibration, public = saved_scene()
+        original, _, artifacts, private = p.analyze_scene(fragment, membership, retained, calibration, public)
+        with patch.object(p, 'construct_predictions', side_effect=AssertionError('no new predictions')):
+            row, _, replay, _ = p.analyze_scene(fragment, membership, retained, calibration, original,
+                imported_artifacts=artifacts, imported_private=private)
+        self.assertEqual(row['methods'], original['methods'])
+        for name in p.METHODS:
+            for key in artifacts[name]:
+                np.testing.assert_array_equal(replay[name][key], artifacts[name][key])
+
     def test_metadata_and_full_cached_run_preserve_partial_failure(self):
         for failure in (False, True):
             with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temporary:

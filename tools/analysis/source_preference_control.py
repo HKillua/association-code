@@ -125,14 +125,24 @@ def _close(actual, expected, label):
         raise ValueError(label+' differs')
 
 
-def analyze_scene(fragment, membership, retained, calibration, public):
+def analyze_scene(fragment, membership, retained, calibration, public, *,
+                  imported_artifacts=None, imported_private=None):
     groups = old.groups_from_membership(membership, len(fragment['native_states']))
     for name in LEGACY_METHODS:
         old._same(retained[name]['node_group_indices'], membership, '118 '+name+' membership')
     predictions = {name: retained[name]['group_states'].copy() for name in LEGACY_METHODS}
-    added, audit, private = construct_predictions(fragment['native_states'], fragment['nearest_seconds'],
-        fragment['support'], fragment['sources'], groups, calibration, predictions['WS_MEAN'])
-    predictions.update(added)
+    if imported_artifacts is None:
+        added, audit, private = construct_predictions(fragment['native_states'], fragment['nearest_seconds'],
+            fragment['support'], fragment['sources'], groups, calibration, predictions['WS_MEAN'])
+        predictions.update(added)
+        exact_names = LEGACY_METHODS
+    else:
+        if set(imported_artifacts) != set(METHODS) or imported_private is None:
+            raise ValueError('complete121 artifacts and visible support masks required')
+        predictions = {name: imported_artifacts[name]['group_states'].copy() for name in METHODS}
+        private = imported_private
+        audit = public['source_preference_audit']
+        exact_names = METHODS
     # All predictions are now immutable; truth and identity bind evaluation only.
     saved = retained['WS_MEAN']
     targets, identities = fragment['target_identity_ids'], fragment['identities']
@@ -159,17 +169,18 @@ def analyze_scene(fragment, membership, retained, calibration, public):
             grouping_kind='predicted', correspondence_policy='anchor_identity_first', return_artifact=True,
             node_input_support=dict(support=fragment['support'], nearest_seconds=fragment['nearest_seconds']))
         artifact = report.pop('artifact')
-        if name in LEGACY_METHODS:
-            if set(artifact) != set(retained[name]):
+        if name in exact_names:
+            expected = retained[name] if imported_artifacts is None else imported_artifacts[name]
+            if set(artifact) != set(expected):
                 raise ValueError('original118 full artifact schema differs')
             for key in artifact:
-                old._same(artifact[key], retained[name][key], '118 exact '+name+'/'+key)
+                old._same(artifact[key], expected[key], ('121 exact ' if imported_artifacts is not None else '118 exact ')+name+'/'+key)
         else:
             for key in ('aligned_prediction_valid', 'aligned_group_indices', 'node_group_indices',
                         'group_anchor_target_indices', 'group_valid', 'group_node_indices', 'group_offsets'):
                 old._same(artifact[key], artifacts['WS_MEAN'][key], 'fixed WS '+name+'/'+key)
         methods[name], arrays[name] = qc.describe(report, artifact, fragment, regions)
-        if name in LEGACY_METHODS:
+        if name in exact_names:
             _close(methods[name]['position'], public['methods'][name]['position'], '118 position '+name)
             _close(methods[name]['paper_position'], public['methods'][name]['paper_position'], '118 paper '+name)
         if (methods[name]['population'] != methods['WS_MEAN']['population']
