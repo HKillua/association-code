@@ -1,10 +1,10 @@
 # 当前交接
 
-**2026-10-30新发布134：READY，一次attempt-1。** 用户明确授权T侧混合空间和高损害误选诊断。MR-C3接MR-C1/F231→局部1.2事前15格→Idea1.0/规格/纯核心和全链独立审计fixture已通过。仅原133 T32/22627多源query、127 T缓存，4097固定网格、原3个OOF head；0新拟合/V数组/test。CPU4/RSS6GiB/AS12GiB，1800s advisory；失败保全、不改配方重试。
+**2026-10-30新发布134：RUNNING，一次attempt-1。** 用户明确授权T侧混合空间和高损害误选诊断。MR-C3接MR-C1/F231→局部1.2事前15格→Idea1.0/规格/纯核心和全链独立审计fixture已通过。仅原133 T32/22627多源query、127 T缓存，4097固定网格、原3个OOF head；0新拟合/V数组/test。CPU4/RSS6GiB/AS12GiB，1800s advisory；失败保全、不改配方重试。
 
 | 当前新任务 | 状态 | 合同 |
 |---|---|---|
-| 134训练侧混合/误选诊断 | READY；真实服务尚未启动，push不代表启动 | [L2S-134](L2S-20261030-134.md)、[Idea](../docs/proposals/mixture_opportunity_20261030.md)、[规格](../docs/specs/mixture-opportunity.md) |
+| 134训练侧混合/误选诊断 | RUNNING；冻结0c23bd5，mtad-da36326c911f.service实际active/running、Restart=no，launcher报告payload已启动（2026-10-29 18:06:40Z） | [L2S-134](L2S-20261030-134.md)、[Idea](../docs/proposals/mixture_opportunity_20261030.md)、[规格](../docs/specs/mixture-opportunity.md) |
 
 **2026-10-30本轮133已COMPLETED/exit0并独立核验，无READY、运行服务或自动后继。** 冻结de00011，原服务mtad-9acebeb2c577.service inactive/dead、success、Restart=no；T32/V32/39解析拟合/十臂45对到固定终点，61483数值、233454 exact核验通过。Qsoft对源等权−147.686m，但soft/hard均未超过旧LOW/FixedLOW/Q强控；不自动扩大或调参。
 
