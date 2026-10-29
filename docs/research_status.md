@@ -8,7 +8,7 @@
 
 ## 现在做什么
 
-**2026-10-29用户采纳review后的新批：** [修订后的123 Idea/规格](proposals/source_preference_full_control_20261029.md)先检验LOW/FixedLOW在其余268及未见组件的范围；原32十臂与其余268八旧臂导入，仅新增536场景臂。软混合和中心收缩的独立2×2及固定混合强控先冻结参数，123完成Record→Squeeze→Mode C后再执行；“真实方差可识别”“小样本中心导致尾部”等解释仍为AI/UN。输入/时序与关联/输出同步定向原文、接口及完整局部矩阵研究，不依赖未验证精度权重。执行状态只看HandOver，T_test封存，旧120/121/122不重开。
+**2026-10-29采纳review的新结果：** [123已完成Record/Squeeze](reports/2026-10-29-source-preference-full-review.md)及Mode C1.43：新268同370073点LOW/FixedLOW MAE579.614/500.498m，对FixedMean602.833m；全300同441144点571.209/491.889m，对FixedMean611.405m。校正对LOW的增量延续，但FixedLOW对FixedMean新268有177场差、全300有197场/20组件差，P99仍差；LOW在未见64场与去最大组件的四指标均输FixedMean，不能普遍预定硬源优先。2464旧臂导入/536新算、0训练，398770主位置数值独立核验通过。下一步[15臂独立混合/收缩](proposals/source_mix_shrink_control_20261029.md)检验固定0.75贡献和m/(m+4)幅度的主效应/交互，参数在看123结果前冻结，不据新分数挑参；真实方差和中心方差解释仍AI/UN。五环节review后完整36格见[Mode C1.42](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-142)，输入/时序和关联/对象已有各自具体同信息设计，尚需实现/路径绑定，不依赖未验证权重。执行只看HandOver，T_test封存，旧任务不重开。
 
 **2026-10-29最新完成：** 按项目内skills及完整飞书采纳流程，五环节新增34格局部交叉及12格真实回流，[Mode C1.40–1.41](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-141)。累计P14/F220/M91/E118/C53；深入100＝70＋30及核心104不变，本轮没有新增完整精读计数。三次具体验证均一次终态exit0、完成Record→Squeeze→Mode C；各限定范围独立数值核验通过，无运行服务或自动后继，不把CPU软件检查算科学结果。
 

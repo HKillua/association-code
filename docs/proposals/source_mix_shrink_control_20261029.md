@@ -4,6 +4,8 @@
 
 ## 证据入口与问题
 
+**执行发布补记：** 123的Record/Squeeze及Mode C1.43现已完成，新268校正增量延续而多数场景/P99冲突仍在。本设计的参数和人口此前已冻结（3de43f4），没有据123误差改参；首段“本稿不是READY”为设计时的状态记录，实际领取只见主仓HandOver的独立124条目。
+
 领域/对象是MTAD Level1海上多源航迹位置恢复，当前是重复开发V、离线Q64的内部控制。采用discover-innovation Pattern 2，从风险异质性出发，比较两个独立可替换操作；未预选最终网络骨架。
 
 - 上游Mode C1.41的F218/M89/E116对应120，F219/M90/E117对应121；选择原C10/C51的相对共享校正及[融合局部矩阵§6的SC-C3](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/fusion_action_matrix_20261029.md#6-118回流后的下一层问题相对校正绝对锚定与真正多源增量)。SC-P1/P2、SC-F7–9、SC-M3/4、SC-E7–9保留原含义。本稿使用局部MX标签，不覆盖现有全局编号。
