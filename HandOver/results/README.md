@@ -4,6 +4,7 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [117终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/117/) | 全V300/原32/新268/38组件的8臂16比较、真实命令/退出/成本、完整300场压缩公有原件及独立主要位置审计；原32六预测臂指116，新private留服务器。[记录](../../docs/reports/2026-10-29-query-contribution-full-review.md) |
 | [116终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/116/) | 原V32固定R×W八臂、真实launcher/退出/成本、32公有逐场和独立数组核验；完整private留服务器。[记录](../../docs/reports/2026-10-29-query-contribution-review.md) |
 | `LEVEL1-COORDINATE-METRICS-20261026-101` | 当前102关联的既有坐标结果、mask与尾部证据 |
 | `LEVEL1-PAPER-METRICS-20261026-102` | 300场完整论文维度及独立属性人口；原启动/退出记录齐全 |

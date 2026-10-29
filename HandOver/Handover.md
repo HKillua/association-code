@@ -1,6 +1,6 @@
 # 当前交接
 
-**本轮117 RUNNING：** 已按冻结f333c56单次托管，真实服务mtad-f8ed63393b81.service active/running、Restart=no/Linger=yes。固定全V300、原32六臂只复用、新268八臂、16比较，0训练/模型/GPU。116及旧任务不重跑，无新自动跟进。
+**本轮117已COMPLETED并核验：** 冻结f333c56/服务mtad-f8ed63393b81.service退出0，原V300/38组件/8臂16比较到终点；192场景臂复用、2208新算、0训练，独立主要位置数组核验通过。当前无READY或自动后继，116及旧任务不重跑。
 
 **新授权任务116已COMPLETED并核验：** 冻结80ed87e、服务mtad-ca3fb9ef7880.service退出0，原V32八臂/0训练到固定终点；独立保存数组核验通过。113/115旧批已结束，不重跑；当前无READY或自动后继。
 
@@ -8,7 +8,7 @@
 
 | 任务 | 状态 | 执行／回执入口 |
 |---|---|---|
-| 117全V query控制 | **RUNNING；冻结f333c56，真实systemd已核active/running。** 原32六臂只复用、新268八臂；16比较/固定300终点/0训练。无自动重试/加训。 | [Idea1.0](../docs/proposals/query_contribution_full_control_20261029.md)、[L2S-117](L2S-20261029-117.md)。服务mtad-f8ed63393b81.service、Restart=no；原run117/launcher，真实退出待核，不改116 |
+| 117全V query控制 | **COMPLETED并核验，真实退出0，300场/38组件/8臂16比较。** 程序435.226s/launcher450.513s，0训练；WS NEAR MAE1294.074→964.568m、300场均好，强Anchor/尾部仍有取舍。全WS覆盖低于A0、重复1068>610；无自动后继。 | [S2L-117](S2L-20261029-117.md)、[Record/Squeeze](../docs/reports/2026-10-29-query-contribution-full-review.md)、[L2S](L2S-20261029-117.md)。冻结f333c56、原服务已退出，独立主要数组核验通过；private留服务器，不重跑 |
 | 116固定R×query贡献控制 | **COMPLETED并核验，退出0，32场/9组件/八臂/14比较。** 程序79.940s／launcher99.683s，0训练；WS_NEAR MAE1276.328→927.435m，32场均好，对Anchor仍有MAE/尾部取舍；WS_SB无MAE收益，人口/覆盖/重复exact不变。 | [S2L-116](S2L-20261029-116.md)、[Record/Squeeze](../docs/reports/2026-10-29-query-contribution-review.md)、[L2S](L2S-20261029-116.md)。冻结80ed87e/原服务已退出，独立数组审计通过；原private留服务器，无自动扩量/重试/训练 |
 | 115新组Mean位置控制 | **COMPLETED并核验，退出0，32场55.886s／launcher73.715s。** A0 exact重放全部通过，WS共同69837点MAE1219.73→1268.20m（差）、RMSE2240.36→2159.93m（好）；点覆盖97.7270→98.4417%，重复组92→217。0模型/训练，不能称整体净胜。 | [Record/Squeeze](../docs/reports/2026-10-29-static-position-review.md)、[L2S-115](L2S-20261029-115.md)。冻结cbfe97c，服务mtad-b7b3f402a312，原run115与审计/订正保留；无自动扩量/训练 |
 | 114静态分组pilot | **COMPLETED，退出0，最终run118.060s／launcher122.513s，300场。** 仅WS过原V32 gate，原32不重跑、六臂均扩完268；WS decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，23场/4组件F1仍差，raw不变。 | [Record/Squeeze](../docs/reports/2026-10-29-static-partition-review.md)、[L2S-114](L2S-20261029-114.md)。冻结13ecf2f，服务mtad-92e24b30be2f；原run114保留，0训练，不重跑 |
@@ -31,7 +31,7 @@
 
 ## 执行边界
 
-- 除117外本页任务均已结案、HOLD或撤回；领取只认本表，不重复旧正文命令。[历史摘要](../docs/history/README.md)保存结论和Git位置。
+- 本页任务均已结案、HOLD或撤回；当前无READY，旧正文命令不提供重复领取许可。[历史摘要](../docs/history/README.md)保存结论和Git位置。
 - 按[服务器规则](../docs/server_autonomy.md)单次托管、记录真实退出；活动checkout/config/runs冻结、失败保全、不自动重试。最多四单卡，现场FIFO，兼容设备可共卡，不触碰他人进程。
 - T_test封存，既有056和各任务原配置保持；不设SHA/hash准入。push不代表服务器已启动。
 
