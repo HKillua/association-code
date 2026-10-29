@@ -11,6 +11,8 @@
 
 用户指定的[完整科研流程](docs/research_workflow.md)及附录全部生效，包括项目组织、baseline选择、1a–4b、创新探索、五技能、科研死循环与跨域迁移；不能只遵守其中两节。进入研究阶段先读规范，后续按当前步骤定位原文，不每轮重复生成流程说明。
 
+常用技能完整保存在[项目技能目录](.agents/skills/README.md)。用户未明确指定其他版本时，读取本仓 `.agents/skills/<技能名>/SKILL.md` 及其必要引用，同名全局副本不混读。用户最新要求优先，本文及完整流程对通用技能作项目约束；不能用技能的默认建议覆盖创新判断、证据边界或既有授权。
+
 `analyze-paper → 来源分析 → deep-read Mode C（P/F/M/E与P×F）→ discover-innovation → Idea → 实际执行 → record-experiment → squeeze-experiment → Mode C回流`
 
 - 先独立读懂原文，再讨论借鉴；作者主张SC、直接证据DE、推断AI、未知UN分开。不能先定方案再找依据，连接点也不能冒充完整Idea。

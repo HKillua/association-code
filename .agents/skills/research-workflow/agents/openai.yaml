@@ -1,0 +1,4 @@
+interface:
+  display_name: "六技能研究总控"
+  short_description: "串联文献入库、知识库问答与六技能研究闭环，复用笔记、保留证据并按材料选择阶段"
+  default_prompt: "用 $research-workflow 根据现有文献、笔记和实验材料选择下一阶段，按需保存知识库并保留来源、证据和交接关系。"

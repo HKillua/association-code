@@ -1,0 +1,3 @@
+interface:
+  display_name: "Spec-Driven Coding"
+  short_description: "Plan from requirements and verify code changes"
