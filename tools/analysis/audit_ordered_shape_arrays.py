@@ -26,6 +26,7 @@ from tools.analysis.audit_geometry_arrays import rank_auc
 import numpy as np
 
 IDEA = 'IDEA-ORDERED-SHAPE-SIGNAL-20261029'
+CONTINUATION_IDEA = 'IDEA-ORDERED-SHAPE-CONTINUATION-20261029'
 ARMS = ('SUMMARY', 'ORDERED', 'DISTRIBUTION', 'SHUFFLED')
 CONFUSION = ('tp', 'fp', 'fn', 'tn')
 SCORE_FIELDS = ('pairs', 'labels', 'node_ids', 'sources', 'identities', 'intervals', 'joint_support_queries')
@@ -299,10 +300,37 @@ def inspect_pairs(public, records, scores, thresholds, macros, checks):
         compare(result, public[right+'_vs_'+left], checks, 'pair '+right+'/'+left)
 
 
+def inspect_run_identity(run_path, run, summary, checks):
+    if run['idea_id'] == IDEA:
+        checks.exact(summary['idea_id'] == IDEA and run['plan_version'] == summary['plan_version'] == '1.1', 'exact126/version')
+        return
+    checks.exact(run['idea_id'] == summary['idea_id'] == CONTINUATION_IDEA
+        and run['plan_version'] == summary['plan_version'] == '1.0'
+        and run['scientific_idea_id'] == summary['scientific_idea_id'] == IDEA
+        and run['scientific_plan_version'] == summary['scientific_plan_version'] == '1.1', 'exact132/scientific126 provenance')
+    source_path = Path(run['failed_run'])
+    source = core.read(source_path/'run.json')
+    checks.exact(source['idea_id'] == IDEA and source['plan_version'] == '1.1'
+        and source['status'] == 'FAILED' and source['exit_code'] == 1
+        and source['completed_optimizer_updates'] == 0 and source['completed_arms'] == []
+        and source['optimizer_updates_by_arm'] == {arm: 0 for arm in ARMS}
+        and 'Too many open files' in source['error'], 'original126 zero-update FD failure')
+    checks.exact(Path(summary['failed_run']).resolve() == source_path.resolve()
+        and (run_path/'private/cache').resolve() == (source_path/'private/cache').resolve(), '132 immutable cache lineage')
+    checks.exact(core.read(Path(run['manifest'])) == core.read(Path(source['manifest']))
+        and Path(run['source_system']).resolve() == Path(source['source_system']).resolve(), '132 same manifest/upstream')
+    checks.exact(core.read(run_path/'normalizers.json') == core.read(source_path/'normalizers.json'), '132 exact inherited normalizers')
+    for key in ('original126_restarted', 'raw_cache_rebuilt', 'normalizers_refitted'):
+        checks.exact(run[key] is False, '132 no redo '+key)
+    checks.exact(summary['original126_restarted'] is False and summary['normalizers_refitted'] is False
+        and run['cache_read_only_reference'] is True and run['archive_read'] is False, '132 permissions')
+    checks.value(source['elapsed_seconds'], run['prior_failed_elapsed_seconds'], 'prior_failed_elapsed_seconds', '132 consumed cost')
+
+
 def audit_run(run_path, checks, check_resources=lambda: None):
     run, summary = (core.read(run_path/p) for p in ('run.json', 'summary.json'))
     checks.exact(run['status'] == summary['status'] == 'COMPLETED' and run['exit_code'] == 0, 'completed126 only')
-    checks.exact(run['idea_id'] == summary['idea_id'] == IDEA and run['plan_version'] == summary['plan_version'] == '1.1', 'exact126/version')
+    inspect_run_identity(run_path, run, summary, checks)
     checks.exact(tuple(run['arms']) == tuple(run['completed_arms']) == ARMS and set(summary['methods']) == set(ARMS), 'all four completed arms')
     checks.exact(summary['final_only'] is True and summary['intermediate_validation'] is False
         and run['validation_forward_passes_per_arm'] == 1 and not run['reference_arrays_read']
@@ -344,7 +372,7 @@ def audit_run(run_path, checks, check_resources=lambda: None):
 def audit(run_path, output):
     start = time.monotonic(); before = resource.getrusage(resource.RUSAGE_SELF); checks = ScoreChecks()
     report = dict(status='RUNNING', started_at=datetime.now(timezone.utc).isoformat(),
-        scope='126 final saved scores/raw and paper qualification/counts/metrics, paired changes and training records',
+        scope='126 scientific recipe or strict132 continuation: final saved scores/raw and paper qualification/counts/metrics, paired changes and training records',
         tolerances=dict(rtol=1e-10, atol=1e-12, integer_counts='exact'),
         not_audited=['raw ZIP/physical correctness, reference truth or unobserved identity errors',
             'feature generation, full T normalizer recomputation, checkpoint-to-score inference or training replay',

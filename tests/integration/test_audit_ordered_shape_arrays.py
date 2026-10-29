@@ -1,6 +1,7 @@
 """Independent126 arithmetic/eligibility/plan regressions, synthetic only."""
 from copy import deepcopy
 from pathlib import Path
+import json
 import tempfile
 import unittest
 
@@ -29,6 +30,35 @@ def records():
 
 
 class OrderedShapeAuditTests(unittest.TestCase):
+    def test_132_requires_exact_zero_update_source_and_immutable_cache_norms(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); old, new = root/'126', root/'132'
+            (old/'private/cache').mkdir(parents=True); (new/'private').mkdir(parents=True)
+            (new/'private/cache').symlink_to(old/'private/cache', target_is_directory=True)
+            manifest = root/'manifest.json'; manifest.write_text('{"same":true}')
+            source = dict(idea_id=audit.IDEA, plan_version='1.1', status='FAILED', exit_code=1,
+                completed_optimizer_updates=0, completed_arms=[], optimizer_updates_by_arm={a:0 for a in audit.ARMS},
+                error='OSError: Too many open files', elapsed_seconds=10., manifest=str(manifest), source_system=str(root/'056'))
+            (old/'run.json').write_text(json.dumps(source))
+            for path in (old,new): (path/'normalizers.json').write_text('{"original":1}')
+            run = dict(idea_id=audit.CONTINUATION_IDEA, plan_version='1.0', scientific_idea_id=audit.IDEA,
+                scientific_plan_version='1.1', failed_run=str(old), manifest=str(manifest), source_system=str(root/'056'),
+                original126_restarted=False, raw_cache_rebuilt=False, normalizers_refitted=False,
+                cache_read_only_reference=True, archive_read=False, prior_failed_elapsed_seconds=10.)
+            summary = dict(run)
+            audit.inspect_run_identity(new, run, summary, audit.ScoreChecks())
+            for field in ('raw_cache_rebuilt','normalizers_refitted'):
+                bad = dict(run); bad[field] = True
+                with self.subTest(field=field), self.assertRaises(ValueError):
+                    audit.inspect_run_identity(new, bad, summary, audit.ScoreChecks())
+            (new/'normalizers.json').write_text('{"original":2}')
+            with self.assertRaisesRegex(ValueError, 'inherited normalizers'):
+                audit.inspect_run_identity(new, run, summary, audit.ScoreChecks())
+            (new/'normalizers.json').write_text('{"original":1}')
+            source['completed_optimizer_updates'] = 1; (old/'run.json').write_text(json.dumps(source))
+            with self.assertRaisesRegex(ValueError, 'zero-update FD'):
+                audit.inspect_run_identity(new, run, summary, audit.ScoreChecks())
+
     def test_full_raw_paper_support_and_null_arithmetic_against_saved_schema(self):
         rows = records(); scores = [r['scores'] for r in rows]
         for theta in (0., None, 100.):
