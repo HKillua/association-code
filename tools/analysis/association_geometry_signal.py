@@ -118,7 +118,7 @@ def euclidean_reconstruction(positions, support):
     return checked, maximum
 
 
-def construct_features(states, support, sources, groups, pairs, scores, threshold):
+def construct_features(states, support, sources, groups, pairs, scores, threshold, *, pair_geometry_builder=None):
     """Identity/reference-free API and full pair geometry for the same candidates."""
     states, support, sources = np.asarray(states, np.float64), np.asarray(support), np.asarray(sources)
     pairs, scores = np.asarray(pairs), np.asarray(scores, np.float64)
@@ -138,7 +138,10 @@ def construct_features(states, support, sources, groups, pairs, scores, threshol
     if canonical != groups:
         raise ValueError('original canonical group/member order required')
     candidates, original, proposed = candidates_from_groups(groups, pairs, scores, n, threshold)
-    pair_geometry = distance(states[pairs[:, 0], :, :2], states[pairs[:, 1], :, :2])
+    pair_geometry = (distance(states[pairs[:, 0], :, :2], states[pairs[:, 1], :, :2])
+        if pair_geometry_builder is None else pair_geometry_builder(states, pairs))
+    if pair_geometry_builder is not None and (pair_geometry.shape != (len(pairs), 64) or not np.isfinite(pair_geometry).all()):
+        raise ValueError('complete finite same-query pair geometry required')
     pair_support = support[pairs[:, 0]] & support[pairs[:, 1]]
     pair_index = np.full((n, n), -1, np.int64)
     pair_index[pairs[:, 0], pairs[:, 1]] = np.arange(len(pairs))
