@@ -1,6 +1,6 @@
 # 当前交接
 
-**本轮新任务117 READY：** 独立固定全V300的query控制，原32六臂只复用、新268八臂，16比较；0训练/模型/GPU，一次1200s advisory，见下表。116及旧任务已结束，不重复领取。此次没有新自动跟进。
+**本轮117 RUNNING：** 已按冻结f333c56单次托管，真实服务mtad-f8ed63393b81.service active/running、Restart=no/Linger=yes。固定全V300、原32六臂只复用、新268八臂、16比较，0训练/模型/GPU。116及旧任务不重跑，无新自动跟进。
 
 **新授权任务116已COMPLETED并核验：** 冻结80ed87e、服务mtad-ca3fb9ef7880.service退出0，原V32八臂/0训练到固定终点；独立保存数组核验通过。113/115旧批已结束，不重跑；当前无READY或自动后继。
 
@@ -8,7 +8,7 @@
 
 | 任务 | 状态 | 执行／回执入口 |
 |---|---|---|
-| 117全V query控制 | **READY，独立一次，0训练/模型/GPU。** 原32六臂只复用、补ALL；新268计算8臂，16比较，全300/分层/38组件/去最大组件，支持/空支撑回退分离。软件与独立审查通过；无自动重试/加训。 | [Idea1.0](../docs/proposals/query_contribution_full_control_20261029.md)、[L2S-117](L2S-20261029-117.md)。新run117/新checkout，不改116；真实退出待执行核验 |
+| 117全V query控制 | **RUNNING；冻结f333c56，真实systemd已核active/running。** 原32六臂只复用、新268八臂；16比较/固定300终点/0训练。无自动重试/加训。 | [Idea1.0](../docs/proposals/query_contribution_full_control_20261029.md)、[L2S-117](L2S-20261029-117.md)。服务mtad-f8ed63393b81.service、Restart=no；原run117/launcher，真实退出待核，不改116 |
 | 116固定R×query贡献控制 | **COMPLETED并核验，退出0，32场/9组件/八臂/14比较。** 程序79.940s／launcher99.683s，0训练；WS_NEAR MAE1276.328→927.435m，32场均好，对Anchor仍有MAE/尾部取舍；WS_SB无MAE收益，人口/覆盖/重复exact不变。 | [S2L-116](S2L-20261029-116.md)、[Record/Squeeze](../docs/reports/2026-10-29-query-contribution-review.md)、[L2S](L2S-20261029-116.md)。冻结80ed87e/原服务已退出，独立数组审计通过；原private留服务器，无自动扩量/重试/训练 |
 | 115新组Mean位置控制 | **COMPLETED并核验，退出0，32场55.886s／launcher73.715s。** A0 exact重放全部通过，WS共同69837点MAE1219.73→1268.20m（差）、RMSE2240.36→2159.93m（好）；点覆盖97.7270→98.4417%，重复组92→217。0模型/训练，不能称整体净胜。 | [Record/Squeeze](../docs/reports/2026-10-29-static-position-review.md)、[L2S-115](L2S-20261029-115.md)。冻结cbfe97c，服务mtad-b7b3f402a312，原run115与审计/订正保留；无自动扩量/训练 |
 | 114静态分组pilot | **COMPLETED，退出0，最终run118.060s／launcher122.513s，300场。** 仅WS过原V32 gate，原32不重跑、六臂均扩完268；WS decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，23场/4组件F1仍差，raw不变。 | [Record/Squeeze](../docs/reports/2026-10-29-static-partition-review.md)、[L2S-114](L2S-20261029-114.md)。冻结13ecf2f，服务mtad-92e24b30be2f；原run114保留，0训练，不重跑 |
