@@ -6,6 +6,9 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 131固定收益头全V | 原32导入/只新算268，0fit或神经前向。新268同370073点hard500.498→Q484.847m，256场/34组件好、P99+.604m，Q RMSE不及置乱、对FixedMean多数场差等反例保留。全300同441144点491.889→476.826m；48汇总主位置/人口及完整import独立核验通过。[Record/Squeeze](../reports/2026-10-29-conditional-source-value-full-review.md) |
+| 127原生CV/RTS | 原T32九rho选1e-8，V32六臂/15对，同71071点RTS LOW MAE527.446→380.127m、全量四误差均好，仍有4393/最大组件SSE/exact-native尾部负例；FWD当前尾部差。离线有效点、不与125联合拼分；主位置/人口独立核验通过。[记录](../reports/2026-10-29-native-state-review.md) |
+| 126输入零更新技术失败 | T2100/V300缓存及norm写出后，同时打开4200memmap超过unit软1024，真实exit1/0更新，phase normalizer陈旧；非科学负结果。原件保留，不重启，独立缓存复用恢复须新合同。[记录](../reports/2026-10-29-ordered-input-failure.md) |
 | 125条件贡献 | T32新head LOCO及冻结V32十一臂真实完成；二次比hard MAE447.060→435.061m，30场/8组件改善，P95略差/覆盖重复不变。主位置/人口独立核验通过、首次audit字段失败保留。是固定候选经验收益信号，非物理源健康。[Record/Squeeze](../reports/2026-10-29-conditional-source-value-review.md) |
 | 129原生对象输出 | T拒配有候选富集、duplicate217→175，但少24覆盖目标、混组增22；LOW同点MAE仅−.365m、P99+306.985m，宏F1升/微F1降。当前贪心组并入不晋级，保留组级拒配问题；可变R/decoded独立核验通过。[记录](../reports/2026-10-29-native-object-output-review.md) |
 | 128失败及130几何诊断 | 128遭oomd、6场部分产物和陈旧RUNNING保留；独立130导入6/补26成功。共同候选LOO AUC.448/.527未超过静态MIN .893，候选AUC不是F1，当前固定LOO结束，不否定原生时序；限定标签/人口/秩审计通过。[失败](../reports/2026-10-29-association-geometry-failure.md)/[130记录](../reports/2026-10-29-association-geometry-review.md) |

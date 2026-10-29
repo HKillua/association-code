@@ -4,6 +4,9 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [131原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/131/) | 固定head全V300/新268及预定48汇总，完整公共逐场/十一臂55对/独立主位置与精确import核验；[记录](../../docs/reports/2026-10-29-conditional-source-value-full-review.md) |
+| [127原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/127/) | 真实T九rho/V六臂15对、原生缓存marker、完整位置/分层/成本及限定主位置审计；[记录](../../docs/reports/2026-10-29-native-state-review.md) |
+| [126失败原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/126/) | 原0更新FD失败、stderr/服务与五类缓存文件inventory，原权重不存在不补造；[记录](../../docs/reports/2026-10-29-ordered-input-failure.md) |
 | [125原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/125/) | T四head OOF/V32十一臂、真实run/launcher、首次failed audit及单独通过的主位置/人口审计；[记录](../../docs/reports/2026-10-29-conditional-source-value-review.md) |
 | [129原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/129/) | 原生候选/拒配六臂、完整可变R人口/同点位置/decoded关联、原launcher和限定独立audit；[记录](../../docs/reports/2026-10-29-native-object-output-review.md) |
 | [130原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/130/) | 原6导入/26新算及十scorer、原服务和独立标签/人口/秩审计、事后三mask单列；[记录](../../docs/reports/2026-10-29-association-geometry-review.md) |
