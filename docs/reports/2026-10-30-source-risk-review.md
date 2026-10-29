@@ -111,3 +111,5 @@ Qsoft相对源等权32场/9组件MAE全改善，去最大组件后12364点MAE144
 - **停止/路由**：133已到固定终点，当前温度1soft不自动扩大或调参。形成下一具体Idea与预算后才能另发任务；132保全不变。遵循用户创新标准，相关领域有先例不否定可适配价值，未获强控增量也不否定整个可变多源问题。
 
 mode_C_input_bundle：复用MR-P1（无需新P）；新增直接事实F231（共享源误差信号及soft/hard/强控分离、固定支持域边界）；候选解释M102（排序/尺度/联合风险与最终损害不一致，AI）；E129链接本133Record、原summary和独立audit。更新MR-C1的有限支持/未决条件并连接MR-C3，不把联系写成新已验证方案；P14/F231/M102/E129/C53，精读100=70+30不变。next_skill：deep-read Mode C。
+
+回流完成：[Mode C1.53](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-153)与[局部矩阵§9](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md#source-risk-133-feedback)逐格更新原30格并新增3格；四连接分别保留有限支持/候选边界，未添加未经执行的效果。
