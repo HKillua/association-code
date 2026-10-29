@@ -6,6 +6,8 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 118共享相对分量 | 原V32/WS/同71071点，固定低源校正Mean MAE1276.328→656.041m、RMSE2168.266→1864.654m，并优于本轮Anchor/NEAR；P99有代价、对称gauge差、Huber无增量。0训练，独立主要数组核验；非绝对bias识别或同行胜出。[Record/Squeeze](../reports/2026-10-29-shared-component-review.md) |
+| 119固定状态输出域 | 原V32/六臂只改位置mask；WS SPAN MAE790.264m却比FULL少1676有效点，coverage98.4417→96.1203%，共同误差不变；比UNION多保1094内部缺口且条件误差略低。0训练/恢复重算，不当状态增量/去重。[Record/Squeeze](../reports/2026-10-29-output-domain-review.md) |
 | 117全V query控制与模块拆分 | R/W/恢复/全组输出接口可独立替换、历史数值exact。一次V300/38组件/8臂16比较，0训练；WS NEAR MAE1294.074→964.568m、300场均好，但强Anchor MAE更低/尾部更差，WS完整覆盖比A0低、重复1068>610。普通ALL最近取得大部分收益，支持/回退额外只−5.573m MAE；新paper bias两项更近0不等精度胜出。[Record/Squeeze](../reports/2026-10-29-query-contribution-full-review.md)／[论文比较](../reports/2026-10-29-paper-number-comparison.md) |
 | 116固定身份×query贡献 | 原V32/9组件/8臂零训练，WS_NEAR同71071点MAE1276.328→927.435m、32场均好，但对Anchor MAE更差/尾部更好；WS来源等权当前无增量，覆盖/重复exact不变。透明贡献规则有实际效应，非完整方法净胜或同行比较；一次固定终点与独立数组核验完成。[Record/Squeeze](../reports/2026-10-29-query-contribution-review.md) |
 | 早期Level2数据与完整流程 | 原共同网格存在名义时钟与观测错位，后改真实时间、原生有效短轨；20秒是编码单位。输出尺度修正不等于恢复有效；TCM特征MSE不能换算位置米误差，loss下降不等于完整系统成立。 |

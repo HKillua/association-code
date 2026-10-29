@@ -1,11 +1,11 @@
 # 当前交接
 
-**本轮新任务118/119：READY。** 用户授权全流程矩阵/具体问题与成熟条件并行验证。各一次原V32/9组件、0训练，独立冻结checkout/run，旧任务不重跑。真实启动后更新，READY不等已运行。
+**本轮新任务118/119：均COMPLETED并核验。** 冻结b48dae7，各原V32/9组件一次，0训练；118程序91.896s/launcher108.528s，119程序63.215s/launcher82.473s，均exit0，服务inactive/dead、success、Restart=no。Record/Squeeze及Mode C1.39回流完成，无READY或自动后继；旧任务不重跑。
 
 | 新任务 | 状态 | 合同 |
 |---|---|---|
-| 118共享分量控制 | READY，固定V32/WS/8臂22比较，CPU4/600s advisory | [L2S-118](L2S-20261029-118.md)、[Idea](../docs/proposals/shared_component_control_20261029.md) |
-| 119输出域控制 | READY，固定V32/A0与WS NEAR×3域，CPU4/600s advisory | [L2S-119](L2S-20261029-119.md)、[Idea](../docs/proposals/output_domain_control_20261029.md) |
+| 118共享分量控制 | COMPLETED/exit0，主位置独立数组核验通过；8臂22比较，服务mtad-c347e9074412.service | [S2L-118](S2L-20261029-118.md)、[Record/Squeeze](../docs/reports/2026-10-29-shared-component-review.md)、[L2S](L2S-20261029-118.md) |
+| 119输出域控制 | COMPLETED/exit0，主位置独立数组核验通过；6臂，服务mtad-f222436a1ffb.service | [S2L-119](S2L-20261029-119.md)、[Record/Squeeze](../docs/reports/2026-10-29-output-domain-review.md)、[L2S](L2S-20261029-119.md) |
 
 **本轮117已COMPLETED并核验：** 冻结f333c56/服务mtad-f8ed63393b81.service退出0，原V300/38组件/8臂16比较到终点；192场景臂复用、2208新算、0训练，独立主要位置数组核验通过。该旧批无自动后继，116及旧任务不重跑。
 
@@ -38,7 +38,7 @@
 
 ## 执行边界
 
-- 当前仅118/119新行按本轮合同可领取；其余均已结案、HOLD或撤回，旧正文命令不提供重复领取许可。[历史摘要](../docs/history/README.md)保存结论和Git位置。
+- 当前无READY；118/119已完成、主要独立数组核验及记录回流结束，其余均已结案、HOLD或撤回；旧正文命令不提供重复领取许可。[历史摘要](../docs/history/README.md)保存结论和Git位置。
 - 按[服务器规则](../docs/server_autonomy.md)单次托管、记录真实退出；活动checkout/config/runs冻结、失败保全、不自动重试。最多四单卡，现场FIFO，兼容设备可共卡，不触碰他人进程。
 - T_test封存，既有056和各任务原配置保持；不设SHA/hash准入。push不代表服务器已启动。
 

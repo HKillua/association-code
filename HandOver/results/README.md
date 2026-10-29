@@ -4,6 +4,8 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [118终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/118/) | 原V32/共享相对分量×局部限影响、八臂22比较，全部公共逐场gzip、真实launcher/退出/成本与独立主位置数组审计；private留服务器。[记录](../../docs/reports/2026-10-29-shared-component-review.md) |
+| [119终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/119/) | 原V32固定NEAR状态六臂声明域，完整coverage/lost风险、公共32行、launcher与独立主位置/mask审计；事后公开矩推导单列。[记录](../../docs/reports/2026-10-29-output-domain-review.md) |
 | [117终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/117/) | 全V300/原32/新268/38组件的8臂16比较、真实命令/退出/成本、完整300场压缩公有原件及独立主要位置审计；原32六预测臂指116，新private留服务器。[记录](../../docs/reports/2026-10-29-query-contribution-full-review.md) |
 | [116终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/116/) | 原V32固定R×W八臂、真实launcher/退出/成本、32公有逐场和独立数组核验；完整private留服务器。[记录](../../docs/reports/2026-10-29-query-contribution-review.md) |
 | `LEVEL1-COORDINATE-METRICS-20261026-101` | 当前102关联的既有坐标结果、mask与尾部证据 |
