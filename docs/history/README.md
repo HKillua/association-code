@@ -6,6 +6,7 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 134 T混合空间/高损害误选 | T32/22627多源query、4097固定网格诊断一次退出0并独立核验；参考best单源269.835→grid230.235m，空间39.600m但median.346m；Q小margin(<.1)8.22%点承载68.10%损害。不是合法方法成绩，role99.319%只是混杂诊断，后继风险校准需新Idea。[Record/Squeeze](../reports/2026-10-30-mixture-opportunity-review.md) |
 | 133共享源误差/可变K接口 | 39解析fit，T32/V32/十臂45对一次退出0，61483数值及训练/权重/人口独立核验通过。Qsoft对源等权MAE1276.441→1128.755m，但Qhard547.721m仍不及LOW527.446m/旧Q435.061m。排序信号不等于混合增量，原V反复开发/K2限制保留；当前soft不自动扩量。[Record/Squeeze](../reports/2026-10-30-source-risk-review.md) |
 | 132输入继续的真实部分训练 | 修复FD并复用2400缓存/norm，SUMMARY真实1000GPU更新及权重完好，六Adam step1000；末步评价阶段被oomd杀死，另三臂0步、无完整科学成绩。原RUNNING陈旧、单独终态合成保留，不自动第三次或重训已完成1000；系统触发/评价峰值待查。[Record/Squeeze](../reports/2026-10-29-ordered-input-continuation-failure.md) |
 | 131固定收益头全V | 原32导入/只新算268，0fit或神经前向。新268同370073点hard500.498→Q484.847m，256场/34组件好、P99+.604m，Q RMSE不及置乱、对FixedMean多数场差等反例保留。全300同441144点491.889→476.826m；48汇总主位置/人口及完整import独立核验通过。[Record/Squeeze](../reports/2026-10-29-conditional-source-value-full-review.md) |
