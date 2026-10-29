@@ -1,4 +1,4 @@
-"""One-shot independent saved-array position audit for completed120/121/123.
+"""One-shot independent saved-array position audit for completed120/121/123/124.
 
 Uses only standard JSON/gzip readers and NumPy. No production evaluator,
 predictor, fitting routine, aggregation helper, or reference source is called.
@@ -28,7 +28,7 @@ import numpy as np
 
 RADIUS = 6371000.
 IDS = ('IDEA-SHARED-COMPONENT-FULL-CONTROL-20261029', 'IDEA-SOURCE-PREFERENCE-CONTROL-20261029',
-       'IDEA-SOURCE-PREFERENCE-FULL-CONTROL-20261029')
+       'IDEA-SOURCE-PREFERENCE-FULL-CONTROL-20261029', 'IDEA-SOURCE-MIX-SHRINK-CONTROL-20261029')
 M118 = ('WS_MEAN', 'WS_HUBER', 'WS_FIXED_MEAN', 'WS_FIXED_HUBER',
         'WS_SYMMETRIC_MEAN', 'WS_SYMMETRIC_HUBER', 'WS_ANCHOR', 'WS_NEAREST_SUPPORTED')
 P118 = tuple(('WS_MEAN', m) for m in M118[1:]) + (
@@ -37,6 +37,9 @@ P118 = tuple(('WS_MEAN', m) for m in M118[1:]) + (
     ('WS_FIXED_HUBER', 'WS_SYMMETRIC_HUBER')) + tuple(
     (b, m) for b in ('WS_ANCHOR', 'WS_NEAREST_SUPPORTED') for m in M118[1:6])
 M121 = M118 + ('WS_LOW_SOURCE_SUPPORTED', 'WS_FIXED_LOW_SOURCE_SUPPORTED')
+M124 = M121 + ('WS_SOFT75_SOURCE_SUPPORTED', 'WS_FIXED_SOFT75_SOURCE_SUPPORTED',
+              'WS_SHRINK_LOW_SOURCE_SUPPORTED', 'WS_SHRINK_SOFT75_SOURCE_SUPPORTED',
+              'WS_FIXED_EQUAL_SOURCE_SUPPORTED')
 COUNTS = ('available_target_count', 'available_prediction_count', 'intersection_count',
           'missing_prediction_count', 'prediction_without_target_count',
           'available_target_trajectory_count', 'covered_target_trajectory_count',
@@ -281,11 +284,12 @@ def inspect_summary(report, indices, results, rows, names, checks, label):
 def audit_run(run_path, checks):
     run, summary = (read(run_path/name) for name in ('run.json', 'summary.json'))
     checks.exact(run.get('status') == summary.get('status') == 'COMPLETED' and run.get('exit_code') == 0, 'completed run')
-    checks.exact(run['idea_id'] in IDS and run['idea_id'] == summary['idea_id'], 'supported completed120/121/123')
+    checks.exact(run['idea_id'] in IDS and run['idea_id'] == summary['idea_id'], 'supported completed source control')
     checks.exact(run.get('plan_version') == summary.get('plan_version') == '1.0', 'declared plan version')
     names = run['methods']
-    checks.exact(tuple(names) == (M118 if run['idea_id'] == IDS[0] else M121), 'complete declared methods')
-    required_pairs = P118 if run['idea_id'] == IDS[0] else tuple(combinations(M121, 2))
+    expected_names = M118 if run['idea_id'] == IDS[0] else M124 if run['idea_id'] == IDS[3] else M121
+    checks.exact(tuple(names) == expected_names, 'complete declared methods')
+    required_pairs = P118 if run['idea_id'] == IDS[0] else tuple(combinations(expected_names, 2))
     required_keys = {candidate+'_vs_'+base for base, candidate in required_pairs}
     rows = read(run_path/'scene-summary.json.gz')
     checks.exact(run['scene_ids'] == summary['scene_ids'] == [row['scene_id'] for row in rows], 'complete scene order')
@@ -330,6 +334,13 @@ def audit_run(run_path, checks):
         for label, indices in selections.items():
             inspect_summary(summary[label], indices, results, rows, names, checks, label)
         subsets = len(selections)
+    elif run['idea_id'] == IDS[3]:
+        counts = Counter(row['component_id'] for row in rows)
+        largest = max(components, key=lambda component: counts[component])
+        indices = [i for i, row in enumerate(rows) if row['component_id'] != largest]
+        if indices:
+            inspect_summary(summary['without_largest_component'], indices, results, rows, names, checks, 'without_largest_component')
+            subsets = 1
     return dict(scene_count=len(rows), component_count=len(components), method_count=len(names),
                 pair_count_per_scene=len(rows[0]['pairwise']), imported_original32_scene_count=len(pilot_ids),
                 aggregate_subset_count=1+len(components)+subsets)
@@ -340,7 +351,7 @@ def audit(run_path, output):
     cpu_before = resource.getrusage(resource.RUSAGE_SELF)
     checks = Checks()
     report = dict(status='RUNNING', started_at=datetime.now(timezone.utc).isoformat(),
-        scope='independent NumPy saved-array main position/population audit for120/121/123',
+        scope='independent NumPy saved-array main position/population audit for120/121/123/124',
         earth_radius_metres=RADIUS,
         tolerances=dict(rtol=1e-9, metres_atol=1e-5, mse_atol=.001, rate_atol=1e-12),
         not_audited=['shared center fitting/folds/Huber mechanism or physical bias',
