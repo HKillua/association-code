@@ -1,6 +1,6 @@
 # 当前交接
 
-**2026-10-29：123已COMPLETED/exit0并核验回流；124独立READY。** 123冻结770a9bd、服务mtad-473c05249036.service成功终态，主位置数组398770数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-preference-full-review.md)、[实际回执](S2L-20261029-123.md)。124按[独立合同](L2S-20261029-124.md)一次原V32/15臂105配对，参数已在看123结果前冻结；CPU4/600s advisory/0训练，失败保全不自动重试。原120/121/123不重跑；状态由本段维护，下面均为已结案历史。
+**2026-10-29：123已COMPLETED/exit0并核验回流；124 RUNNING。** 123冻结770a9bd、服务mtad-473c05249036.service成功终态，主位置数组398770数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-preference-full-review.md)、[实际回执](S2L-20261029-123.md)。124冻结1a2967f/服务mtad-25a33ce6acd6.service，已读同launcher/run确认，见[实际回执](S2L-20261029-124.md)与[独立合同](L2S-20261029-124.md)；一次原V32/15臂105配对，参数已在看123结果前冻结，CPU4/600s advisory/0训练，失败保全不自动重试。原120/121/123不重跑；状态由本段维护，下面均为已结案历史。
 
 **2026-10-29本批120/121/122均COMPLETED/exit0并收尾。** 三项固定终点及各自限定范围的独立数值核验通过，Record→Squeeze→Mode C1.41回流完成；当前无READY、运行服务或自动后继。原118/119及旧任务不重开。
 
