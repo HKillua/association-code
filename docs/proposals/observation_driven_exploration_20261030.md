@@ -101,3 +101,63 @@ CPU≤4、RSS6GiB、AS12GiB，9000s advisory；借原127约2612s实际墙时估�
 OD来源/矩阵和root行为与资源审查已完成，版本1.0允许实现纯计算模块、独立runner及有意义测试。实际执行仍待完成实现/审查后独立READY，本文不是自动开跑许可。
 
 两项都必须独立Record→Squeeze→Mode C，出现成功也不直接把136和137冠军组合。本轮不是135重温度搜索，也不取消135；若未来组合，要先定义同状态/同贡献析因合同与固定全人口再独立尝试。没有独立跨传感器/K≥3实测之前，只能主张接口可扩展与当前K2内部效果。
+
+## 5. 标准Idea交接索引
+
+两包分别只消费一个主连接；字段指向本文已冻结合同，不把尚未运行写成结果。
+
+```yaml
+package_type: IDEA_PACKAGE
+package_version: research-pipeline-contract v1.0
+idea_id: IDEA-OBSERVATION-QUALITY-20261030
+plan_version: '1.0'
+source_matrix_id: MC-OBSERVATION-DRIVEN-20261030-v1.1
+selected_C_id: OD-C1
+source_P_ids: [OD-P1, OD-P3]
+source_F_ids: [OD-F1, OD-F2, OD-F4, OD-F5, OD-F6]
+source_M_ids: [OD-M1, OD-M2, OD-M4, OD-M5]
+source_E_ids: [OD-E1, OD-E2, OD-E4, OD-E5, OD-E6]
+research_question: 无reference拟合的源内观测代理能否在同状态下改善source中立贡献
+hypothesis_and_mechanism: §2，可预测性可能携带风险信息，偏差/机动/角色为竞争解释
+testable_predictions: 四个inverse_proxy与同状态sourceequal的完整风险差及floor敏感性
+design_and_controls: §2，两proxy乘两固定floor，nearest替代，V133十旧臂；T只有六合法臂
+sample_materials_or_experimental_units: §1，固定T32/V32完整Q64人口，当前真实K2
+primary_outcome_and_estimand: 四比较的完整V径向MAE/RMSE差，描述性探索
+secondary_outcomes: 尾部/人口/损害/组件/去最大及proxy未知/floor层
+analysis_plan_and_uncertainty: §2，完整逐场及组件bootstrap，不宣query独立或外部测试
+resources_time_cost_and_risk: CPU4/RSS6GiB/AS12GiB/1800s advisory；一次固定64场；T15/V105对
+ethics_safety_privacy_or_compliance: §1，T_test封存，private留server，预测与reference隔离
+stopping_and_interpretation_rules: §2，固定终点，失败保全，不扩floor/据V改规则
+status: exploration
+execution_status: implementation_authorized_not_READY
+missing_evidence: [actual_proxy_effect, physical_noise_identification, independent_K3plus_transfer]
+next_skill: record-experiment_after_actual_execution
+```
+
+```yaml
+package_type: IDEA_PACKAGE
+package_version: research-pipeline-contract v1.0
+idea_id: IDEA-OBSERVATION-SCALE-20261030
+plan_version: '1.0'
+source_matrix_id: MC-OBSERVATION-DRIVEN-20261030-v1.1
+selected_C_id: OD-C2
+source_P_ids: [OD-P2, OD-P3]
+source_F_ids: [OD-F3, OD-F4, OD-F5, OD-F6]
+source_M_ids: [OD-M2, OD-M3, OD-M4, OD-M5]
+source_E_ids: [OD-E3, OD-E4, OD-E5, OD-E6]
+research_question: 原生观测留出能否在同贡献下替代reference选择离线状态尺度
+hypothesis_and_mechanism: §3，留出误差可能保留任务风险排序，相关噪声/bias/插值范围未识别
+testable_predictions: 同sourceequal下obs_RTS对nativeOLS及reference_rho_RTS的完整风险差
+design_and_controls: §3，固定九rho和mask，T观测MSE选择，FWD/RTS及V历史控制
+sample_materials_or_experimental_units: §1/3，固定T32/V32完整native，无holdout节点仍全部输出
+primary_outcome_and_estimand: 两主比较的完整V径向MAE/RMSE差
+secondary_outcomes: FWD/RTS权限、尾部/组件/覆盖/完整配对及真实拟合成本
+analysis_plan_and_uncertainty: §3，完整逐场/组件/去最大，不据V搜索
+resources_time_cost_and_risk: CPU4/RSS6GiB/AS12GiB/9000s advisory；9*N_Teligible+2*(N_T+N_V)fit上界
+ethics_safety_privacy_or_compliance: §1，Traw-only选择，T_test封存，坐标身份留private
+stopping_and_interpretation_rules: §3，无候选失败保全，不扩rho/mask、不自动重试
+status: exploration
+execution_status: implementation_authorized_not_READY
+missing_evidence: [observation_selected_state_effect, heldout_noise_assumptions, independent_transfer]
+next_skill: record-experiment_after_actual_execution
+```
