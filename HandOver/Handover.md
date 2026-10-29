@@ -1,12 +1,12 @@
 # 当前交接
 
-**新授权任务116 READY：** 固定原V32的A0/WS×四query贡献规则，0训练、一次终点，见下表。下段“本批无待执行后继”仅指已经结束的113/115旧批，不取消本次用户新授权。
+**新授权任务116已COMPLETED并核验：** 冻结80ed87e、服务mtad-ca3fb9ef7880.service退出0，原V32八臂/0训练到固定终点；独立保存数组核验通过。113/115旧批已结束，不重跑；当前无READY或自动后继。
 
 更新：2026-10-29。**108/109/110/112均COMPLETED且本地核验；114/115静态分组与位置小验证均已完成；113修复后固定评价已完成并核验。107原失败保留，不重训；本批无待执行后继，mtad自动跟进已删除。** 106/105/104/103/102已完成并核验，不重复领取。104实际范围与服务器回执过度归因的订正见[本地记录](../docs/reports/2026-10-27-three-case-chain-review.md)，105核验与深挖见[本地记录](../docs/reports/2026-10-27-raw-case-chain-review.md)。A授权不包含新增seed/步数/TAM或新方法训练。用户已另行明确允许推倒重来和重新选择研究思路，见[采纳流程](../docs/research_workflow.md)；这不改变107的冻结执行合同，新执行仍须在本表独立列为READY。
 
 | 任务 | 状态 | 执行／回执入口 |
 |---|---|---|
-| 116固定R×query贡献控制 | **READY；零训练，一次固定原V32，CPU≤4/RAM4GiB/600s advisory。** 八臂A0/WS×MEAN/ANCHOR/SOURCE_BALANCED/NEAREST_SUPPORTED，原115两Mean exact重放、同R人口/覆盖exact不变；7单元＋6集成通过，独立审查已修阻断。无自动扩量/重试/训练。 | [Idea1.0](../docs/proposals/query_contribution_control_20261029.md)、[L2S-116](L2S-20261029-116.md)。新run116/新checkout，0模型/GPU/训练/ZIP；原115及输入只读，真实坐标/身份/weights留服务器 |
+| 116固定R×query贡献控制 | **COMPLETED并核验，退出0，32场/9组件/八臂/14比较。** 程序79.940s／launcher99.683s，0训练；WS_NEAR MAE1276.328→927.435m，32场均好，对Anchor仍有MAE/尾部取舍；WS_SB无MAE收益，人口/覆盖/重复exact不变。 | [S2L-116](S2L-20261029-116.md)、[Record/Squeeze](../docs/reports/2026-10-29-query-contribution-review.md)、[L2S](L2S-20261029-116.md)。冻结80ed87e/原服务已退出，独立数组审计通过；原private留服务器，无自动扩量/重试/训练 |
 | 115新组Mean位置控制 | **COMPLETED并核验，退出0，32场55.886s／launcher73.715s。** A0 exact重放全部通过，WS共同69837点MAE1219.73→1268.20m（差）、RMSE2240.36→2159.93m（好）；点覆盖97.7270→98.4417%，重复组92→217。0模型/训练，不能称整体净胜。 | [Record/Squeeze](../docs/reports/2026-10-29-static-position-review.md)、[L2S-115](L2S-20261029-115.md)。冻结cbfe97c，服务mtad-b7b3f402a312，原run115与审计/订正保留；无自动扩量/训练 |
 | 114静态分组pilot | **COMPLETED，退出0，最终run118.060s／launcher122.513s，300场。** 仅WS过原V32 gate，原32不重跑、六臂均扩完268；WS decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，23场/4组件F1仍差，raw不变。 | [Record/Squeeze](../docs/reports/2026-10-29-static-partition-review.md)、[L2S-114](L2S-20261029-114.md)。冻结13ecf2f，服务mtad-92e24b30be2f；原run114保留，0训练，不重跑 |
 | 109固定分数决定诊断 | **COMPLETED，退出0，300场276.326s，RSS547921920B。** raw/A0完整绑定；234/300分区变化，但8随机序all宏F1全部更差/FP增加，不据敏感度认证新方法。 | [Record/Squeeze](../docs/reports/2026-10-29-frozen-decision-review.md)、[原L2S](L2S-20261029-109.md)。冻结af475e0，服务mtad-ee793415d2ba，原run109保留，不重跑 |
@@ -28,7 +28,7 @@
 
 ## 执行边界
 
-- 除116外其余任务均已结案、HOLD或撤回；当前领取名单只看本页。[历史摘要](../docs/history/README.md)保存结论和Git位置。
+- 本页任务均已结案、HOLD或撤回；当前无READY后继，不重复领取旧正文命令。[历史摘要](../docs/history/README.md)保存结论和Git位置。
 - 按[服务器规则](../docs/server_autonomy.md)单次托管、记录真实退出；活动checkout/config/runs冻结、失败保全、不自动重试。最多四单卡，现场FIFO，兼容设备可共卡，不触碰他人进程。
 - T_test封存，既有056和各任务原配置保持；不设SHA/hash准入。push不代表服务器已启动。
 

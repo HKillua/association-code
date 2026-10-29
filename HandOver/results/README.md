@@ -4,6 +4,7 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [116终态证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/116/) | 原V32固定R×W八臂、真实launcher/退出/成本、32公有逐场和独立数组核验；完整private留服务器。[记录](../../docs/reports/2026-10-29-query-contribution-review.md) |
 | `LEVEL1-COORDINATE-METRICS-20261026-101` | 当前102关联的既有坐标结果、mask与尾部证据 |
 | `LEVEL1-PAPER-METRICS-20261026-102` | 300场完整论文维度及独立属性人口；原启动/退出记录齐全 |
 | `LEVEL1-THREE-SCENE-DIAG-20261027-103` | 三场全部声明query、来源关系与确定性输入重放证据；私有坐标/端点留服务器 |
