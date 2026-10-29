@@ -68,15 +68,15 @@ A1相对三强控均有方向一致且不被最大组件独占的增量→支持
 
 R=I是固定工作尺度，不是测得1m噪声。只选择`rho=q/r`，单位s⁻³；候选`10^k, k=-10…-2`共9个，候选外不扩搜。首点作为位置prior均值，P0=`diag(1,1,1/3600,1/3600)`（分别位置m²、速度m²/s²），速度0；首观测已经用于prior，不再重复更新。之后按真实原生秒作标准Kalman prediction、innovation和Joseph covariance更新，RTS用相同前向量/参数反向平滑。逆运算用解方程；非有限、非正定失败保全，不自动jitter、更换配方或删轨。
 
-原生观测时刻和Q64 query合并为排序timeline，同刻先观测后query；query只有空观测，不新增测量。RTS在完整timeline平滑，输出全部Q64；query在首/末观测之外分别沿平滑端点位置/速度作CV外推，不把外推称有真实支撑。纬/经还原遵守短弧和合法范围；任何无法还原的真实轨迹保留为失败，不能静默切换回旧OLS。
+仅将首末原生观测闭区间内的Q64 query与原生观测时刻合并为排序timeline，同刻先观测后query；query只有空观测，不新增测量。Kalman/RTS仅在此timeline使用非负dt，禁止把区间外query送入Q(dt)或作负时间滤波。端点状态确定后另行输出区间外query：RTS沿平滑首/末端点位置与速度CV外推；FWD首前使用已声明的首点零速度prior、末后沿最后前向状态CV外推。全部Q64均保留，不把外推称真实支撑。纬/经还原遵守短弧和合法范围；任何无法还原的真实轨迹保留为失败，不能静默切换回旧OLS。
 
 前向均值可以作为额外内部控制，但**不与RTS当作同未来权限的纯算子消融**：首观测前query使用首点prior（前视），不能宣严格因果；已有WS本来也用完整离线场景。若以后研究严格在线，应在首事件未到时保留“尚无输出”及完整漏报人口，并另立前缀关联/到达时间/初始化合同，本项不伪造在线资格。
 
 ### 3.3 拟合、六臂与评价终点
 
-1. T侧固定当前manifest中前32个T_core场景，不依效果选场；只用位置监督，按既有reference offset/gap600/valid规则将同一场景Q64位置对应到每个fragment身份。每candidate按“场景等权→有有效参考的fragment等权→有效query MAE”选最小一个rho，完全相同人口；并列取更小rho。各候选、无参考fragment/点、成本完整保留。该监督不进入V动作，也不估源间噪声比；不用reference速度反推物理单位。
+1. T侧固定当前manifest中前32个T_core场景，不依效果选场；只用位置监督，按既有reference offset/gap600/valid规则将同一场景Q64位置对应到每个fragment身份。每candidate以CV-RTS位置按“场景等权→有有效参考的fragment等权→有效query MAE”选最小一个rho，完全相同人口；FWD与RTS共用这个rho，FWD只是同工作尺度下未来权限对照，不称其经过独立最优调参；并列取更小rho。各候选、无参考fragment/点、成本完整保留。该监督不进入V动作，也不估源间噪声比；不用reference速度反推物理单位。
 2. V侧固定原118的32场/9组件，原114 WS组/首代表、Q64、输出valid与速度/航向完全固定。每fragment独立生成OLD_OLS、NATIVE_CV_FORWARD、NATIVE_CV_RTS位置，分别接同Mean或同LOW支持贡献，得6臂；LOW沿121同冻结source顺序，只有贡献规则变化的比较才归LOW。两新状态模型均不加共享校正/收缩/学权重/τ。
-3. 6臂使用相同原始support和回退规则，不能用滤波后方差删点或增加support。无支持时复制相应状态模型首anchor；全组/重复/漏目标完整保留。原Frozen FixedLOW另列历史强控，**不把旧中心应用到新状态后又归为单一动态收益**；如需组合，是后继独立factorial。
+3. OLD_MEAN/OLD_LOW必须与121原32的保存artifact逐字段exact绑定，包括原states/support/query、source顺序、速度航向、membership/首代表/valid与reference人口；若新native读取链使OLD不能重放原控制，结束并记录输入链差异，不把它算动态增量。6臂使用相同原始support和回退规则，不能用滤波后方差删点或增加support。无支持时复制相应状态模型首anchor；全组/重复/漏目标完整保留。原Frozen FixedLOW另列历史强控，**不把旧中心应用到新状态后又归为单一动态收益**；如需组合，是后继独立factorial。
 4. 主比较RTS_MEAN−OLD_MEAN与RTS_LOW−OLD_LOW的共同完整位置MAE/RMSE，分别归因并列；同时列6臂所有15配对、P95/P99、全部人口/coverage/重复、raw支撑内外、exact-native查询、时间距端点、场景/组件/去最大组件和全链成本。FWD对RTS只是未来信息/平滑差异，不宣纯模型优胜。
 5. 一次T32×9工作尺度选择及V32×6完整评价，0神经训练/0GPU；CPU4/RSS4GiB/AS8GiB/7200s advisory。实际原生事件数、Kalman更新/RTS步数、原始读取、参考查询、评价与写盘都计成本，不把0训练说成0拟合。单次attempt；固定终点结束，失败不自动重试/改网格/删难轨/扩量。
 
