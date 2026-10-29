@@ -1,6 +1,6 @@
 # 当前交接
 
-**2026-10-29本轮：130独立READY；125/126/127 RUNNING；129已exit0待独立核验；128保留失败。** 130按[独立分块合同](L2S-20261029-130.md)六场原件导入/只新算26；不重启128，不改数值/人口。129冻结2d6cd7b、服务mtad-5f4679c6bf19.service真实exit0/32场130.273s，待独立可变分区数组与全pair审计、Record/Squeeze回流，不重领。125同冻结/服务mtad-70b051b1ddef.service，126/127冻结603d244、服务mtad-6deeed0fedd1.service/mtad-b7342f356c9b.service继续原合同；实际记录见各S2L。127的64场CACHE_COMPLETED产物已冻结。128服务oomd失败、6/32/缺summary和exit且原RUNNING陈旧，失败记录与Mode C1.45已保留；旧任务不重跑。
+**2026-10-29本轮：125/129/130已COMPLETED/exit0；126/127原合同RUNNING；128保留失败。** 129独立可变分区数组/decoded全pair核验通过、Record/Squeeze已写，[S2L-129](S2L-20261029-129.md)。125冻结2d6cd7b、服务mtad-70b051b1ddef.service，程序390.618s/V32十一臂；原独立audit字段KeyError保留，另发新审计入口核验，不重跑科学run。130冻结64ac7d4、服务mtad-79fbecfb79be.service，原6场导入/26新算、210.681s，待限定保存数组核验及回流，[S2L-130](S2L-20261029-130.md)。126/127冻结603d244、服务mtad-6deeed0fedd1.service/mtad-b7342f356c9b.service继续原终点；实际记录见各S2L。127的64场CACHE_COMPLETED已冻结。131实现待125正式回流及独立review，未READY/未启动。128 oomd失败、6/32/缺summary和exit且原RUNNING陈旧，失败记录与Mode C1.45保留。旧任务不重跑。
 
 **2026-10-29：123/124均COMPLETED/exit0并核验回流，无READY/运行服务或自动后继。** 123冻结770a9bd、服务mtad-473c05249036.service成功终态，全300/十臂45配对，398770主位置数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-preference-full-review.md)、[实际回执](S2L-20261029-123.md)。124冻结1a2967f、服务mtad-25a33ce6acd6.service成功终态，原32/15臂105配对，111780主位置数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-mix-shrink-review.md)、[实际回执](S2L-20261029-124.md)。固定soft=.75/m0=4未获整体增益，当前配方不自动调参/扩量/训练；原120/121/123/124不重跑。下面均为已结案历史，不从旧READY恢复执行。
 
