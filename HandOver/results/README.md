@@ -4,6 +4,7 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [132失败原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/132/) | 原RUNNING/实际oomd终态、2400cache与共享plan元数据、SUMMARY1000保存checkpoint限制性核验、事后资源快照；原权重/大数组留server，无完整四臂成绩。[记录](../../docs/reports/2026-10-29-ordered-input-continuation-failure.md) |
 | [131原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/131/) | 固定head全V300/新268及预定48汇总，完整公共逐场/十一臂55对/独立主位置与精确import核验；[记录](../../docs/reports/2026-10-29-conditional-source-value-full-review.md) |
 | [127原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/127/) | 真实T九rho/V六臂15对、原生缓存marker、完整位置/分层/成本及限定主位置审计；[记录](../../docs/reports/2026-10-29-native-state-review.md) |
 | [126失败原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/126/) | 原0更新FD失败、stderr/服务与五类缓存文件inventory，原权重不存在不补造；[记录](../../docs/reports/2026-10-29-ordered-input-failure.md) |

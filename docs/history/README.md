@@ -6,6 +6,7 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 132输入继续的真实部分训练 | 修复FD并复用2400缓存/norm，SUMMARY真实1000GPU更新及权重完好，六Adam step1000；末步评价阶段被oomd杀死，另三臂0步、无完整科学成绩。原RUNNING陈旧、单独终态合成保留，不自动第三次或重训已完成1000；系统触发/评价峰值待查。[Record/Squeeze](../reports/2026-10-29-ordered-input-continuation-failure.md) |
 | 131固定收益头全V | 原32导入/只新算268，0fit或神经前向。新268同370073点hard500.498→Q484.847m，256场/34组件好、P99+.604m，Q RMSE不及置乱、对FixedMean多数场差等反例保留。全300同441144点491.889→476.826m；48汇总主位置/人口及完整import独立核验通过。[Record/Squeeze](../reports/2026-10-29-conditional-source-value-full-review.md) |
 | 127原生CV/RTS | 原T32九rho选1e-8，V32六臂/15对，同71071点RTS LOW MAE527.446→380.127m、全量四误差均好，仍有4393/最大组件SSE/exact-native尾部负例；FWD当前尾部差。离线有效点、不与125联合拼分；主位置/人口独立核验通过。[记录](../reports/2026-10-29-native-state-review.md) |
 | 126输入零更新技术失败 | T2100/V300缓存及norm写出后，同时打开4200memmap超过unit软1024，真实exit1/0更新，phase normalizer陈旧；非科学负结果。原件保留，不重启，独立缓存复用恢复须新合同。[记录](../reports/2026-10-29-ordered-input-failure.md) |
