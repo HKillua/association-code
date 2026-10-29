@@ -6,6 +6,7 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 124软贡献与中心幅度分离 | 原32/15臂105配对/0训练，320臂导入160新算；FixedHard447.060m，FixedSoft531.012、ShrinkHard455.287、组合555.446m。组合全部32场/9组件差，收缩P99改善伴随MAE/多数场损失；固定.75/m0=4不晋级，不自动扩量/搜参，不否定整类。独立主位置核验通过，[Record/Squeeze](../reports/2026-10-29-source-mix-shrink-review.md) |
 | 123源优先更广范围 | 2464臂导入/536新算、一次全V/0训练。新268 FixedLOW MAE500.498m较LOW579.614/FixedMean602.833更低，仍177场比FM差/P99差；LOW未见与去最大组件四指标输FM。全V FL491.889m，非普遍硬源优先或同行胜负。独立主位置核验通过，[Record/Squeeze](../reports/2026-10-29-source-preference-full-review.md) |
 | 120共享校正全V开发扩展 | 固定旧八臂，256原场景臂导入/2144新算；新268 MAE1297.482→602.833m、全V1294.074→611.405m，原32未见29组件仍同向，强控/尾部/覆盖限制保留。FixedHuber有不足1m MAE增量而RMSE/P95/P99反向；非独立测试或同行胜负。[Record/Squeeze](../reports/2026-10-29-shared-component-full-review.md) |
 | 121源优先归因 | 同原32/71071点，LOW527.446m已优于FixedMean656.041m，FixedLOW再到447.060m；主双源均值额外价值未获支持。校正对源优先仍有80.386m增量，但P99恶化且FL对FM20场差；没有全V源优先成绩。[Record/Squeeze](../reports/2026-10-29-source-preference-review.md) |
