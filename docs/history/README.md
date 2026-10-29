@@ -6,6 +6,9 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 120共享校正全V开发扩展 | 固定旧八臂，256原场景臂导入/2144新算；新268 MAE1297.482→602.833m、全V1294.074→611.405m，原32未见29组件仍同向，强控/尾部/覆盖限制保留。FixedHuber有不足1m MAE增量而RMSE/P95/P99反向；非独立测试或同行胜负。[Record/Squeeze](../reports/2026-10-29-shared-component-full-review.md) |
+| 121源优先归因 | 同原32/71071点，LOW527.446m已优于FixedMean656.041m，FixedLOW再到447.060m；主双源均值额外价值未获支持。校正对源优先仍有80.386m增量，但P99恶化且FL对FM20场差；没有全V源优先成绩。[Record/Squeeze](../reports/2026-10-29-source-preference-review.md) |
+| 122一阶速度相关剩余 | 原32/1605组全保留、1024可评；JOINT对STATIC输入相对残差均值+3.335m、RMSE+.613m，去最大组件后仍差；366解析拟合、0神经训练/物理输出改变。不接当前时间补偿，不能否定独立原生时序路线。[Record/Squeeze](../reports/2026-10-29-shared-motion-time-review.md) |
 | 118共享相对分量 | 原V32/WS/同71071点，固定低源校正Mean MAE1276.328→656.041m、RMSE2168.266→1864.654m，并优于本轮Anchor/NEAR；P99有代价、对称gauge差、Huber无增量。0训练，独立主要数组核验；非绝对bias识别或同行胜出。[Record/Squeeze](../reports/2026-10-29-shared-component-review.md) |
 | 119固定状态输出域 | 原V32/六臂只改位置mask；WS SPAN MAE790.264m却比FULL少1676有效点，coverage98.4417→96.1203%，共同误差不变；比UNION多保1094内部缺口且条件误差略低。0训练/恢复重算，不当状态增量/去重。[Record/Squeeze](../reports/2026-10-29-output-domain-review.md) |
 | 117全V query控制与模块拆分 | R/W/恢复/全组输出接口可独立替换、历史数值exact。一次V300/38组件/8臂16比较，0训练；WS NEAR MAE1294.074→964.568m、300场均好，但强Anchor MAE更低/尾部更差，WS完整覆盖比A0低、重复1068>610。普通ALL最近取得大部分收益，支持/回退额外只−5.573m MAE；新paper bias两项更近0不等精度胜出。[Record/Squeeze](../reports/2026-10-29-query-contribution-full-review.md)／[论文比较](../reports/2026-10-29-paper-number-comparison.md) |
