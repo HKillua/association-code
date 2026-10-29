@@ -1,6 +1,6 @@
 # 当前交接
 
-**2026-10-29本轮新发布：128 RUNNING；126/127独立READY。** 128冻结834c5aa，实际服务mtad-6b9ec1dd0a50.service已读RUNNING；原V32同信息关联诊断，见[L2S-128](L2S-20261029-128.md)。126见[四臂训练合同](L2S-20261029-126.md)，单GPU按UUID兼容共卡/每臂1000成功更新；127见[原生状态合同](L2S-20261029-127.md)，固定T32九尺度及原V32六臂，导出的64场完成cache只读供125/129复用。125 T条件收益与129对象输出仍在实现/核验，尚未READY不领取。旧123/124及更早任务均已结案不重跑。
+**2026-10-29本轮：125/129独立READY；126/127 RUNNING；128 FAILED/systemd-oomd。** 125见[T条件收益合同](L2S-20261029-125.md)，原T32组件LOCO及V32十一臂55对；129见[对象输出合同](L2S-20261029-129.md)，原T32拟一个拒配阈值及V32六臂15对。两项仅读127已CACHE_COMPLETED并冻结的64场cache。126/127冻结603d244，实际服务mtad-6deeed0fedd1.service/mtad-b7342f356c9b.service继续原合同；见[126](L2S-20261029-126.md)、[127](L2S-20261029-127.md)。128实际oomd终态保全，6/32/缺summary及exit，原run残留RUNNING不可重领，见[Record/Squeeze](../docs/reports/2026-10-29-association-geometry-failure.md)，已回流Mode C1.45。130分块内存修复仅准备、未READY，须另行发布，不重启128或修改宿主oomd；旧任务不重跑。
 
 **2026-10-29：123/124均COMPLETED/exit0并核验回流，无READY/运行服务或自动后继。** 123冻结770a9bd、服务mtad-473c05249036.service成功终态，全300/十臂45配对，398770主位置数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-preference-full-review.md)、[实际回执](S2L-20261029-123.md)。124冻结1a2967f、服务mtad-25a33ce6acd6.service成功终态，原32/15臂105配对，111780主位置数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-mix-shrink-review.md)、[实际回执](S2L-20261029-124.md)。固定soft=.75/m0=4未获整体增益，当前配方不自动调参/扩量/训练；原120/121/123/124不重跑。下面均为已结案历史，不从旧READY恢复执行。
 

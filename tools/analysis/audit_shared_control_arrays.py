@@ -29,7 +29,7 @@ import numpy as np
 RADIUS = 6371000.
 IDS = ('IDEA-SHARED-COMPONENT-FULL-CONTROL-20261029', 'IDEA-SOURCE-PREFERENCE-CONTROL-20261029',
        'IDEA-SOURCE-PREFERENCE-FULL-CONTROL-20261029', 'IDEA-SOURCE-MIX-SHRINK-CONTROL-20261029',
-       'IDEA-NATIVE-CV-STATE-CONTROL-20261029')
+       'IDEA-NATIVE-CV-STATE-CONTROL-20261029', 'IDEA-CONDITIONAL-SOURCE-VALUE-20261029')
 M118 = ('WS_MEAN', 'WS_HUBER', 'WS_FIXED_MEAN', 'WS_FIXED_HUBER',
         'WS_SYMMETRIC_MEAN', 'WS_SYMMETRIC_HUBER', 'WS_ANCHOR', 'WS_NEAREST_SUPPORTED')
 P118 = tuple(('WS_MEAN', m) for m in M118[1:]) + (
@@ -43,6 +43,9 @@ M124 = M121 + ('WS_SOFT75_SOURCE_SUPPORTED', 'WS_FIXED_SOFT75_SOURCE_SUPPORTED',
               'WS_FIXED_EQUAL_SOURCE_SUPPORTED')
 M127 = ('WS_MEAN', 'WS_LOW_SOURCE_SUPPORTED', 'WS_CV_FORWARD_MEAN',
         'WS_CV_FORWARD_LOW', 'WS_CV_RTS_MEAN', 'WS_CV_RTS_LOW')
+M125 = ('WS_MEAN', 'WS_FIXED_MEAN', 'WS_LOW_SOURCE_SUPPORTED', 'WS_FIXED_LOW_SOURCE_SUPPORTED',
+        'WS_ANCHOR', 'WS_NEAREST_SUPPORTED', 'WS_FIXED_SOFT75_SOURCE_SUPPORTED',
+        'WS_TMEAN_VALUE_GATE', 'WS_LINEAR_VALUE_GATE', 'WS_QUADRATIC_VALUE_GATE', 'WS_SHUFFLED_VALUE_GATE')
 COUNTS = ('available_target_count', 'available_prediction_count', 'intersection_count',
           'missing_prediction_count', 'prediction_without_target_count',
           'available_target_trajectory_count', 'covered_target_trajectory_count',
@@ -291,7 +294,7 @@ def audit_run(run_path, checks):
     checks.exact(run.get('plan_version') == summary.get('plan_version') == '1.0', 'declared plan version')
     names = run['methods']
     expected_names = (M118 if run['idea_id'] == IDS[0] else M124 if run['idea_id'] == IDS[3]
-                      else M127 if run['idea_id'] == IDS[4] else M121)
+                      else M127 if run['idea_id'] == IDS[4] else M125 if run['idea_id'] == IDS[5] else M121)
     checks.exact(tuple(names) == expected_names, 'complete declared methods')
     required_pairs = P118 if run['idea_id'] == IDS[0] else tuple(combinations(expected_names, 2))
     required_keys = {candidate+'_vs_'+base for base, candidate in required_pairs}
@@ -338,7 +341,7 @@ def audit_run(run_path, checks):
         for label, indices in selections.items():
             inspect_summary(summary[label], indices, results, rows, names, checks, label)
         subsets = len(selections)
-    elif run['idea_id'] in (IDS[3], IDS[4]):
+    elif run['idea_id'] in (IDS[3], IDS[4], IDS[5]):
         counts = Counter(row['component_id'] for row in rows)
         largest = max(components, key=lambda component: counts[component])
         indices = [i for i, row in enumerate(rows) if row['component_id'] != largest]
