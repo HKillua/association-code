@@ -6,6 +6,8 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 138 T证据冲突联合诊断 | T32/12组件/D2 22627点只读join一次exit0并独立核验；区分条件排序可用/读出未兑现与排序错误，role反转154点Q仅8对、占21.222%选择损害；构造恒等、混组/reference/完整人口边界保留。0新物理预测/fit/grid，无新方法成绩或自动后继。[Record/Squeeze](../reports/2026-10-30-observation-conflict-review.md) |
+| 137原生观测选尺度 | T32九rho选1e-4冻结、T/V32完整，一次exit0并独立主要数组核验；V等权1276.441→obsRTS1784.722m/RMSE27531.051m，当前配方不晋级。旧reference尺度同贡献RTS1198.685m保留信号；预测组零支持损害集中非已证物理根因，去最大仍差，不自动改rho/删点或扩大。[Record/Squeeze](../reports/2026-10-30-observation-scale-review.md) |
 | 136观测质量贡献 | 固定T32/V32无reference拟合，T6/V15臂一次科学exit0并独立核验；V71071点equal1276.441→LOO1263.938m，但尾部/10场3组件差且未超nearest/Qhard；OLS1281.827m不利。floor1/100均未触发，不能称稳健。首audit因manifest路径入口失败保留，明确发布的校正只读调用成功，不重跑科学；Record→Squeeze→Mode C1.56完成。[完整记录](../reports/2026-10-30-observation-quality-review.md) |
 | 134 T混合空间/高损害误选 | T32/22627多源query、4097固定网格诊断一次退出0并独立核验；参考best单源269.835→grid230.235m，空间39.600m但median.346m；Q小margin(<.1)8.22%点承载68.10%损害。不是合法方法成绩，role99.319%只是混杂诊断，后继风险校准需新Idea。[Record/Squeeze](../reports/2026-10-30-mixture-opportunity-review.md) |
 | 133共享源误差/可变K接口 | 39解析fit，T32/V32/十臂45对一次退出0，61483数值及训练/权重/人口独立核验通过。Qsoft对源等权MAE1276.441→1128.755m，但Qhard547.721m仍不及LOW527.446m/旧Q435.061m。排序信号不等于混合增量，原V反复开发/K2限制保留；当前soft不自动扩量。[Record/Squeeze](../reports/2026-10-30-source-risk-review.md) |
