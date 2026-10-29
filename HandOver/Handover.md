@@ -1,12 +1,12 @@
 # 当前交接
 
-**2026-10-30夜间新探索：** 136科学与明确发布的校正路径只读审计均COMPLETED/exit0；首审计入口失败保留，Record/Squeeze/Mode C1.56已收尾，无136后继。137真实RUNNING；138已一次提交并核真实RUNNING，其他执行者不要重复领取。旧135仅保留草案，132/133/134不重开。
+**2026-10-30夜间新探索：** 136科学与明确发布的校正路径只读审计均COMPLETED/exit0；首审计入口失败保留，Record/Squeeze/Mode C1.56已收尾，无136后继。137/138科学均COMPLETED/exit0，T32/V32与T32联合诊断各到固定终点；两个固定只读审计已由本聊天领取待一次提交，其他执行者不要重复领取。旧135仅保留草案，132/133/134不重开。
 
 | 新任务 | 当前执行状态 | 固定合同 |
 |---|---|---|
 | 136观测质量贡献 | COMPLETED/exit0 T32/V32；原science及校正audit均inactive/dead success；514201 exact/133221numeric通过，首入口失败保留 | [S2L136](S2L-20261030-136.md)、[Record/Squeeze](../docs/reports/2026-10-30-observation-quality-review.md)，T6/V15臂；弱均值增量不晋级 |
-| 137原生观测选尺度 | RUNNING；实际unit mtad-221298a36879.service，Restart=no/Linger=yes；T选择及恢复各32场，V30/32；固定终点继续，尚非终态 | [L2S137](L2S-20261030-137.md)，9000s advisory/CPU4，独立于136 |
-| 138 T证据冲突联合诊断 | RUNNING；实际unit mtad-35817614de18.service，Restart=no/Linger=yes；T缓存join已7/32 | [L2S138](L2S-20261030-138.md)，T-only/0新物理预测或fit；本批第三上限 |
+| 137原生观测选尺度 | COMPLETED/exit0；原unit inactive/dead success，程序3227.897s；独立audit已领取 | [L2S137](L2S-20261030-137.md)，9000s advisory/CPU4，独立于136 |
+| 138 T证据冲突联合诊断 | COMPLETED/exit0；原unit inactive/dead success，程序51.432s；独立audit已领取 | [L2S138](L2S-20261030-138.md)，T-only/0新物理预测或fit；本批第三上限 |
 
 **2026-10-30本轮134已COMPLETED/exit0且独立核验，无READY、运行服务或自动后继。** 冻结0c23bd5，T32/12组件/22627合法query/4097网格到固定终点；科学mtad-da36326c911f.service、审计mtad-b2411a581464.service均成功退出/Restart=no。参考混合空间39.600m（median.346m），Q小margin误选损害集中，不能退成固定源优先。
 
