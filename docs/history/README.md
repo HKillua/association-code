@@ -6,6 +6,10 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 146支持外端点/速度分离 | 64场/6142原核/14与21臂一次exit0并独立输出核验；OBS-RTS V1784.722→1241.072m、RMSE灾难修复，但T+11.007m/before受损。接Qhard仅−1.011m/区间跨0、P95/P99差；来源均衡均值更差。保留局部操作证据，未形成稳定系统增量。[Record/Squeeze](../reports/2026-10-30-unsupported-recovery-review.md) |
+| 145列表接口失败 | 原28fe61b首T场157核后TypeError，科学14.077s/exit1、0完整评价；原现场保留。技术E142，不是方法负结果；146独立修复合同不倒填原成功。[失败Record/Squeeze](../reports/2026-10-30-unsupported-recovery-entry-failure.md) |
+| 144实际坐标集合损失 | 13gain fit/13全局选择、288T曲线，完整T32/V32 exit0并输出audit；GLOBAL全alpha0，条件V−.038579m/区间跨0、去最大反向，动作实际全0/1。当前配方不扩大，细小内部收益/分辨率/信息仍未知。[Record/Squeeze](../reports/2026-10-30-actual-mixture-gain-review.md) |
+| 143相对代价选源 | 26凸fit/104Newton更新一次exit0并输出audit；REGRET比PAIR−5.900m，但比Qhard+31.745m，T救回53新增514、误选602→1063，多源尾部差。当前固定潜势配方不扩大，不否定相对学习整体。[Record/Squeeze](../reports/2026-10-30-relative-source-decision-review.md) |
 | 142状态高损害原核复放 | 原64场、T1487/V2770零支持点，624anchor×两rho＝1248核一次exit0；Q64/原5臂/支持层与零支持输出绑定。4393一anchor27个after点末端工作速率775.164m/s×3018.192s形成百万米传播，承担全V99.1792%SSE；已证数值路径，真实native异常原因/船速仍未知。无新方法分数，不自动改rho/删点。[Record/Squeeze](../reports/2026-10-30-state-recovery-tail-review.md) |
 | 141技术入口失败 | once FAILED exit1，首T0 KeyError p95因误读position.all，0CV复放；手造fixture复制错误schema未捕获。原现场/失败保留，技术Mode C1.58；142另立修复合同成功不倒填141。[失败Record/Squeeze](../reports/2026-10-30-state-recovery-tail-entry-failure.md) |
 | 140共享chord风险及集合读出 | 13fit、T6/V13臂一次exit0并独审；V旧Qhard547.721、新risk hard973.953、inverse1068.388、geometry1151.619m，四主差/去最大均不利。V raw负risk50.24%、负F与准确gap不认证条件风险；实际geometry−hard增害>1km10037点，强控/尾部取舍保留，A′/B均不晋级。[Record/Squeeze](../reports/2026-10-30-source-contribution-readout-review.md) |

@@ -1,5 +1,7 @@
 # 143：相对代价监督的源对称选源
 
+执行记录：[Record/Squeeze](../reports/2026-10-30-relative-source-decision-review.md)、[S2L143](../../HandOver/S2L-20261030-143.md)。本文保留事前规格，不提供重复启动许可。
+
 2026-10-30；IDEA_PACKAGE / research-pipeline-contract v1.0，idea_id `IDEA-RELATIVE-SOURCE-DECISION-20261030`，plan_version1.0，pilot/partial。来源MC-SELECTION-READOUT-v1.2／Mode C1.59，SR-C1/P11/P14/F240/M108/E139，邻接F241/M109/E140。复用139/140正式Record、SR原Chroma/CoCo完整AP及原133代码；不新增精读。主模式问题驱动。
 
 ## 问题、机制与差异

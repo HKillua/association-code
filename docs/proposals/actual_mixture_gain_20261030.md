@@ -1,5 +1,7 @@
 # 144：实际坐标融合损失驱动的连续集合读出
 
+执行记录：[Record/Squeeze](../reports/2026-10-30-actual-mixture-gain-review.md)、[S2L144](../../HandOver/S2L-20261030-144.md)。本文保留事前规格，不提供重复启动许可。
+
 2026-10-30；IDEA_PACKAGE / research-pipeline-contract v1.0，idea_id `IDEA-ACTUAL-MIXTURE-GAIN-20261030`，plan_version1.0，pilot/partial。来源MC-SELECTION-READOUT-v1.2／Mode C1.59，SR-C2/P11/P14/F241/M109/E140，邻接134 oracle及F240/E139。复用Chroma ICLR2026完整AP关于同目标实际集成损失（原p5、AppD p15–16）的机制、MeanTraj几何/存在域边界、原node恢复代码；不新增论文/精读，不称忠实作者复现。
 
 ## A/B/C与待验机制

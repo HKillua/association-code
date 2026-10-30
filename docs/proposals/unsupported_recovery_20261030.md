@@ -1,5 +1,7 @@
 # 145：支持域外的端点与传播速度分离
 
+执行记录：原145真实FAILED，见[失败Record/Squeeze](../reports/2026-10-30-unsupported-recovery-entry-failure.md)及[S2L145](../../HandOver/S2L-20261030-145.md)；另立146接口修复成功，科学规格沿本文，原145不重启。
+
 2026-10-30；IDEA_PACKAGE / research-pipeline-contract v1.0；idea_id `IDEA-UNSUPPORTED-RECOVERY-20261030`，plan_version1.0，证据状态partial，pilot。消费Mode C1.59的C55/P04/P13/P14/F242/M107/E141；来源为142正式Record/Squeeze、137原状态选择、127原CV/OLS实现，以及已完整分析的MeanTraj TSP2026关于存在域与输出损失对象的边界。这里复用来源，不新增精读、不把MeanTraj说成本文传播算法。
 
 ## 问题与假设
