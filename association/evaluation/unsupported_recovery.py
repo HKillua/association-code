@@ -41,6 +41,7 @@ def outside_positions(times, query, trace, ols_velocity):
 
 def assemble(motion, groups, observation_states, qhard_states, node_positions):
     """Apply declared interventions to all zero-support group queries only."""
+    groups = [np.asarray(group, np.int64) for group in groups]
     support, sources = motion['support'], motion['sources']
     zero = np.asarray([~support[g].any(0) for g in groups])
     result = {name: (qhard_states if name in NEW[4:] else observation_states).copy() for name in NEW}

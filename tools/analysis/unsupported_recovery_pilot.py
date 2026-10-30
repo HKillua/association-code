@@ -22,7 +22,7 @@ from tools.analysis import source_risk_pilot as source
 from tools.analysis import state_recovery_tail_probe as probe
 
 old = common.old
-IDEA = 'IDEA-UNSUPPORTED-RECOVERY-20261030'
+IDEA = 'IDEA-UNSUPPORTED-RECOVERY-CONTINUATION-20261030'
 INPUTS = ('native_run', 'value_run', 'partition_run', 'source_risk_run', 'quality_run', 'state_run', 'contribution_run')
 T_OLD = ('WS_SOURCE_EQUAL', 'WS_SOURCE_NEAREST', 'WS_SHARED_Q_SOFT', method.QHARD)+original.NEW
 V_OLD = source.METHODS+('WS_SOURCE_NEAREST',)+original.NEW
@@ -90,11 +90,12 @@ def run(args):
                 check(phase=split+'_prediction', last_scene_id=sid)
                 members = common.membership(paths['value_run'], paths['partition_run'], split, sid)
                 motion, groups, mean, pack, _ = common.physical(paths['native_run'], split, sid, members)
-                quality = common.load_artifacts(paths['quality_run']/'private'/f'states-{split}-{sid}.npz', ('WS_SOURCE_NEAREST',), template='WS_SOURCE_EQUAL')
                 risk_file = paths['contribution_run']/'private'/f'states-{split}-{sid}.npz' if split == 'T_core' else paths['source_risk_run']/'private'/f'states-{sid}.npz'
                 risk_names = ('WS_SOURCE_EQUAL', 'WS_SHARED_Q_SOFT', method.QHARD) if split == 'T_core' else source.METHODS
-                retained = dict(common.load_artifacts(risk_file, risk_names, template='WS_SOURCE_EQUAL'), **quality)
-                retained.update(common.load_artifacts(paths['state_run']/'private'/f'states-{split}-{sid}.npz', original.NEW, template='WS_SOURCE_EQUAL'))
+                # Only saved physical predictions are used by the new policy.
+                hard = common.load_npz(risk_file, (method.QHARD+'_group_states',))[method.QHARD+'_group_states']
+                state_file = paths['state_run']/'private'/f'states-{split}-{sid}.npz'
+                observation = common.load_npz(state_file, (method.OBS+'_group_states',))[method.OBS+'_group_states']
                 stored = common.load_npz(paths['state_run']/'private'/f'native-state-{split}-{sid}.npz')
                 for key in ('node_ids', 'query_seconds'):
                     old._same(motion[key], stored[key], '137 motion '+key)
@@ -117,11 +118,14 @@ def run(args):
                     state['native_events_processed'] += trace['native_event_count']
                     state['transition_steps'] += trace['transition_steps']
                     state['rts_steps'] += trace['rts_backward_steps']
-                prediction, zero = method.assemble(motion, groups, retained[method.OBS]['group_states'], retained[method.QHARD]['group_states'], node_positions)
+                prediction, zero = method.assemble(motion, groups, observation, hard, node_positions)
                 # Compare full OLS fallback against its original saved physical states before evaluation.
                 probe.same(prediction[method.NEW[2]][zero, :2], mean[zero, :2], 'native endpoint/OLS velocity original fallback', numeric=True)
                 np.savez_compressed(output/'private'/f'predictions-{split}-{sid}.npz', zero=zero,
                     **{name: values for name, values in prediction.items()}, **{'endpoint_'+key: value for key, value in traces.items()})
+                quality = common.load_artifacts(paths['quality_run']/'private'/f'states-{split}-{sid}.npz', ('WS_SOURCE_NEAREST',), template='WS_SOURCE_EQUAL')
+                retained = dict(common.load_artifacts(risk_file, risk_names, template='WS_SOURCE_EQUAL'), **quality)
+                retained.update(common.load_artifacts(state_file, original.NEW, template='WS_SOURCE_EQUAL'))
                 prediction.update({name: artifact['group_states'] for name, artifact in retained.items()})
                 ev = common.evaluation(paths['native_run'], split, sid, motion)
                 row, local, artifacts = common.evaluate_predictions(motion, groups, pack, ev, prediction, retained, method_names=names, split=split)

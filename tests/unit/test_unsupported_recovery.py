@@ -24,7 +24,7 @@ class UnsupportedRecoveryTests(unittest.TestCase):
     def test_source_balancing_support_in_and_renaming(self):
         motion = dict(states=np.zeros((3, 2, 4)), support=np.array([[True, False]]*3),
                       sources=np.array(['z', 'z', 'a']))
-        groups = [np.array([0, 1, 2])]
+        groups = [[0, 1, 2]]  # Actual groups_from_membership returns lists.
         base, hard = np.ones((1, 2, 4))*2, np.ones((1, 2, 4))*3
         positions = {i: {k: np.array([[0., 0.], [v, 0.]])
                      for k in ('CVP_OLSV', 'NATIVEP_CVV', 'NATIVEP_OLSV', 'HOLD')}
