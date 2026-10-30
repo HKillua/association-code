@@ -7,6 +7,7 @@ from association.data.motion_evidence import build_motion_evidence
 from tools.analysis import within_source_forecast_pilot as p
 from tools.analysis.audit_temporal_source_outputs import audit
 from tools.analysis import robust_endpoint_pilot as robust
+from tools.analysis import endpoint_separation_pilot as endpoint
 from tests.integration.test_source_risk_pilot import scene_arrays
 
 class ForecastPilotIOTests(unittest.TestCase):
@@ -37,6 +38,9 @@ class ForecastPilotIOTests(unittest.TestCase):
             self.assertEqual(result['splits']['T_core']['methods'],6)
             forecast=out;out=root/'158';b=SimpleNamespace(**paths,manifest=manifest,output=out,forecast_run=forecast,time_policy='advisory')
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guarded):robust.run(b)
+            audit(out,out/'independent-output-audit.json');self.assertEqual(p.common.old.frozen.read(out/'run.json')['status'],'COMPLETED')
+            control=out;out=root/'160';c=SimpleNamespace(**paths,manifest=manifest,output=out,endpoint_control_run=control,time_policy='advisory')
+            with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guarded):endpoint.run(c)
             audit(out,out/'independent-output-audit.json');self.assertEqual(p.common.old.frozen.read(out/'run.json')['status'],'COMPLETED')
 
 if __name__=='__main__':unittest.main()
