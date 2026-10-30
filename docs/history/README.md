@@ -10,6 +10,9 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 159表征×表达 | T128固定，13二次/26神经fit、6656真实GPU更新，科学/限定独审/属性与方向补项exit0。V32旧特征网540.295→527.427m、误选761→287，但反转229→278，局部网无稳定额外收益；保留平均候选、不宣高害完成/全300成绩。[Record/Squeeze](../reports/2026-10-31-local-expression-review.md) |
+| 160端点×速度 | 同原生窗/候选七臂，T/V32完整一次exit0及限定独审。端点ONLY V548.006m/RMSE1712.592m，速度/联合V约20km RMSE、联合1163点增害>1km；无数值迭代回退仍灾难，当前不扩大/拼接。全部强控/方向/属性保留。[Record/Squeeze](../reports/2026-10-31-endpoint-separation-review.md) |
+| 161冻结decoder层级 | T2四正对/0训练一次exit0；正常输出与154exact，末两层同query输入响应收缩，首步末层attention极集中；memory缩放改变K/V与分布但没恢复精度。后验跨输入/时间分解和索引迟记单列，不认证唯一训练原因或作者输赢。[Record/Squeeze](../reports/2026-10-31-tfm-decoder-layers-review.md) |
 | 155训练覆盖 / 157冻结头完整V300 | 同10维66系数，T32→128组件12→28；全300同441144点MAE590.760→582.808m、总误选7438→5212、选择excess>1km4466→2890；罕见反转1868→1940、对旧231点增害>1km。科学/限定输出audit通过，四属性缺项另从冻结数组补齐，不是独立健康/外域认证或方法创新完成。[155](../reports/2026-10-30-source-coverage-review.md)/[157](../reports/2026-10-30-t128-full-scope-review.md) |
 | 156历史选模型 / 158当前多尺度速度 | 各T32/V32完整一次exit0/限定输出audit。156T改善却V MAE641.236m/RMSE10068.222m；灾难时距没超过历史最大值。158r1较r2/CV局部有益，但对原Qhard V MAE547.721→547.819m、RMSE1829.356→2654.187m，15点>100km；数值回退/强控/after/四属性补项保留，当前均不扩大/拼接。[156](../reports/2026-10-30-within-source-forecast-review.md)/[158](../reports/2026-10-30-robust-endpoint-review.md) |
 | 154冻结TFM内部路径 | 固定T2四正对，TCM/FC有变化而decoder末端约1e−6；投影非零，零memory有响应却更差，double最后投影约.77m不足解释数十km。各层/attention/训练优化原因未定，不重训107、不拿适配失败判赢作者。[Record/Squeeze](../reports/2026-10-30-tfm-constant-path-review.md) |

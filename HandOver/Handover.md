@@ -4,11 +4,11 @@
 
 ## 当前执行
 
-159/160 READY，由本聊天直接各领取一次：[159局部表征×表达](L2S-20261031-159.md)、[160端点×速度](L2S-20261031-160.md)。仅新独立冻结目录/预算，不改152或复跑154–158；科学后限定独审与完整属性/方向补项按合同执行。当前仅发布，未将READY称已启动或成功。
+**159–161科学与规定限定独审/补项全部各一次exit0，原launcher/服务均成功终态，Record→Squeeze→Mode C1.69收尾。** [S2L159](S2L-20261031-159.md)：6656真实GPU更新、13二次fit，保留平均候选/反转未解，不自动全300；[S2L160](S2L-20261031-160.md)：端点局部信号、速度/联合配方不扩大；[S2L161](S2L-20261031-161.md)：冻结层级与尺度路径、后验跨输入记账完成，唯一训练原因未知，不重训107。161主索引未随具体L2S同步领取已如实补记，原沿革/实际范围不改。本轮无待领取/待审计任务、无自动后继，不改152活动目录或复跑154–158。
 
 **154–158科学各一次exit0，相关限定输出独审及补项已完成，Record→Squeeze→Mode C1.67收尾。** [154路径](S2L-20261030-154.md)、[155覆盖](S2L-20261030-155.md)、[156历史选择](S2L-20261030-156.md)、[157完整范围](S2L-20261030-157.md)、[158当前多尺度](S2L-20261030-158.md)。157固定内部候选保留、156/158不扩大、不拼接；155–158四属性统计缺项已从原冻结数组一次补齐并单列来源/成本，不倒填原独审。没有新READY或自动后继，152活动冻结目录不动。
 
-**152A/B真实原systemd均RUNNING，已实际训练。** [152合同](L2S-20261030-152.md)、[不可变启动原件](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。最后一次有界查询北京时间2026-10-31 **00:16:40**：PTFM已完成2epoch、第3epoch日志8457更新（run.json8450），DeepAF第1epoch日志2011更新（run.json2000、completed_epochs0）；两service active/running、Restart=no，0全V场完成。Result=success/ExecMainStatus0是运行中属性，不当终态成功。固定T初始探针/PTFM归一化已完；不可用训练loss代替物理末轮评价。活动合同仍比较原147，不加157/换配方/加额度。151已成功终态；旧148不续跑，无自动后继/抢卡/SSH值守。
+**152A/B真实原systemd均RUNNING，已实际训练。** [152合同](L2S-20261030-152.md)、[不可变启动原件](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。最后一次有界查询北京时间2026-10-31 **01:27:09**：PTFM已完成4epoch、第5epoch日志12343更新（run.json12325），DeepAF第1epoch日志2945更新（run.json2925、completed_epochs0）；两service active/running、Restart=no，0全V场完成。运行中属性不当终态成功。固定T初始探针/PTFM归一化已完；不可用训练loss代替物理末轮评价。活动合同仍比较原147，不加157/159/换配方/加额度。151已成功终态；旧148不续跑，无自动后继/抢卡/SSH值守。
 
 149/150原独审入口失败保留、新v2限定复算成功；153原数值审计失败与新精度分离复核分别记录。完整[149/150 Record/Squeeze](../docs/reports/2026-10-30-temporal-unsupported-review.md)、[153 Record/Squeeze](../docs/reports/2026-10-30-tmtaff-training-physical-review.md)已回Mode C1.64，当前两配方未稳定升级、不扩大。151数据准备不等训练完成。
 
