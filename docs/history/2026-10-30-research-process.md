@@ -1,0 +1,240 @@
+# 研究过程与交接沿革：2026-10-30入口整理
+
+这里保留整理前两份长入口的**完整原文**，承接其中的问题推导、矩阵/Idea连接、筛选与回退理由、失败记录和执行沿革。仅调整相对链接以适应位置，正文、数字、来源ID、证据边界和未决问题均保留；矩阵、提案、Record/Squeeze及资料库原件仍在原位。
+
+**以下是历史原文，不是当前执行指令。** 原文中的“当前”“下一步”、旧预算与READY均属于当时语境；当前目标/结论只读[研究状态](../research_status.md)，发布/领取只读[当前交接](../../HandOver/Handover.md)。历史内容不自动重开任务。
+
+原版本：[d448799](https://github.com/HKillua/association-code/tree/d448799a710167efc6d5a55947fccf43e5bb03d6)。可分别核对[原研究状态](https://github.com/HKillua/association-code/blob/d448799a710167efc6d5a55947fccf43e5bb03d6/docs/research_status.md)和[原交接](https://github.com/HKillua/association-code/blob/d448799a710167efc6d5a55947fccf43e5bb03d6/HandOver/Handover.md)。资料库的绝对路径是本地来源，GitHub不包含这些原件。
+
+## 原研究状态正文
+
+<!-- BEGIN ORIGINAL docs/research_status.md -->
+# 当前研究状态
+
+更新：2026-10-30。本页是**当前研究目标、结论与下一步的唯一入口**；执行状态只看[HandOver](../../HandOver/Handover.md)。正式数据MTAD Level1：T2100/V300/封存测试600，共享身份限制见[数据约定](../data_contract.md)。056仅是既有条件对照/诊断分组，不规定新方法的分组或骨架。
+
+## 当前要解决什么
+
+围绕海上多源航迹的**融合／恢复与关联**，从本领域真实存在、现有方法尚未很好解决的问题出发研究有效解法，并与可信国际同行在共同任务/指标下比较。用户最新明确认可两类贡献：发现尚未识别的问题；或将其他领域方法适配到本领域，解决本领域已经认识到的问题。**不再把问题本身新颖作为跨域方案的必要条件**；分别判断问题是否尚未很好解决、问题新颖性与方法/迁移新颖性。仅“领域没用过该模块”或原文接口不清，不够认定研究价值。用户明确接受推倒重来：旧090C、056和PTFM/DeepAF均不规定新骨架，允许整体重选表示、时序、关联与融合，阶段划分由问题决定。按用户skills和[飞书采纳流程](../research_workflow.md)先学习成熟解法与生效条件，归纳问题、形成并验证解决办法，再依据机制、消融和必要推导提炼idea；不要求各组件原创，不以论文数/旧模型分数作起步门槛。当前**没有稳定胜过可信同行的证据，也没有有效完成TMTAFF复现**。[用户目标订正原记录](../reports/2026-10-26-goal-reconciliation.md)。
+
+## 现在做什么
+
+**2026-10-30用户调整优先级：优先落实TMTAFF、PTFM、DeepAF在同一数据/指标下的公平实测，同时继续选源错误、混合收益和尾部大错研究。** [共同比较后继设计§9](../reports/2026-10-27-fair-comparison-contract.md#9-2026-10-30三种同行共同任务比较的后继设计)已据原文AP、现代码/config和真实终态写明：先固定WS组的融合比较，再比较实际系统；PTFM/DeepAF不被伪造为自带全片段关联。统一T2100/V300、Q64/单位/信息权限和完整人口，普通强控与cap匹配控制保留；我们的通用候选也须到同一V300，不能拿V32对同行V300。
+
+**下一批准备顺序：** 先核/修三者明确适配差异和共同评价入口，以既有证据及真实T侧有界验证确定具体训练曝光/终点，再发布新合同；首seed20可用性比较，正式重复预定20/21/23，每模型整数额度、调参/选模及成本须先冻结，不硬编充分步数。三个同行就绪可各一路单卡，第四路给成熟科学Idea，未成熟不占卡。本轮仅完成设计和代码边界复核，**尚无新READY、训练或服务器任务**；旧107/113及143/144/146不重跑，132现场不动。来源→Mode C→Idea→实现/实际执行→Record→Squeeze→回流照常，三问题从1.61分别继续，不退固定源优先、不拼模块冠军，也不因公平比较暂停全部科学研究。
+
+**2026-10-30三问题本批完成：** 高损害误选、实际集合损失、支持外长传播已分别形成Idea、实现并完成143/144/146真实T32/V32验证及限定独立输出审计，均COMPLETED/exit0；三份Record→Squeeze→[Mode C1.61回流](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-161)完成。原145真实接口失败保留，146为独立修复合同；本批无活动服务、READY或自动后继，无T_test/新神经/teacher训练，不退固定源优先。
+
+- **[143相对代价选源](../reports/2026-10-30-relative-source-decision-review.md)：** 同10维/原normalizer、65系数共享潜势，普通/损害偏好26凸fit/104Newton更新。V REGRET579.466m较PAIR585.366m有益，但比旧Qhard547.721m差31.745m，[15.215,34.167]，去最大仍差18.006m；T救回53却新增514，误选602→1063，多源P99与实际>1km尾部更差。当前配方不扩大；不把相对弱控/反转少数点收益称解决高害。
+- **[144实际坐标集合loss](../reports/2026-10-30-actual-mixture-gain-review.md)：** 原评分冻结，13个50系数gain fit、13次GLOBAL选择、288次T曲线恢复。GLOBAL全选alpha0、等于Qhard；CONDITIONAL V仅−.038579m，区间跨0，去最大反差+.015059m，T也无益；真实动作全alpha0/1，无内部alpha，不宣已学连续融合。当前配方不扩大；原134条件空间保留，9点训练/有限家族/表达与信息条件尚未分离。
+- **[146支持外传播分离](../reports/2026-10-30-unsupported-recovery-review.md)：** 64场/6142原核、T14/V21臂，支持内与非位置不变。只换OLS速度的OBS-RTS V1784.722→1241.072m，RMSE27531.051→2151.799m，去最大仍益；只换native端点仍1787.312m，局部操作作用有实证。但T同操作+11.007m、before受损，V仍232点新害>1km；接强Qhard仅547.721→546.710m，[−2.744,.809]跨0且P95/P99差。全组source均衡MAE更差、尾部/组件反向，不能取代贡献质量问题。保留支持域与传播分离的局部有效点，未形成稳定完整系统/可信同行提升。
+
+**本批成本及下一问题：** 143/144科学程序180.979/179.423s，146919.152s，原145失败14.077s另计；输出audit及计划before/after/原27点只读补项分别记成本。所有新参数/坐标/身份/大预测仅服务器；监督拟合偏好与真实K2/泛K软件能力分开。后继分别研究：什么合法时序/组证据能分辨少数高害；实际集合loss在细小收益区间的动作分辨率/可学性；如何保住before有益恢复并满足强贡献/尾部与组候选条件。它们是待新Idea检验的问题，不预定模块，不重复同信息换loss、不把三线赢家拼成未测系统；新具体方案沿既有授权自主推进，无需逐轮请批。
+
+**本批矩阵与来源：** [SR v1.3](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#relative-actual-feedback)30→36格、定向复核8旧格；[OD v1.6](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#unsupported-recovery-feedback)39→42格、定向复核6旧格。新增F243/E143、F244/E144、F245/E145，原技术E142保留；累计P14/F245/M109/E145/C55。复用已读来源与原文定位，没有新增论文；深入104＝72领域/相近＋32跨域不变。
+
+**2026-10-30上一轮139–142记录：** 用户指定的139结果分析、140集合读出真实验证和142状态核查均已到固定终点。139/140科学及限定独立数组审计均COMPLETED/exit0；142完整64场、原核复放与旧输出绑定完成；本轮服务均退出。三份Record/Squeeze及独立交叉review、[Mode C1.59回流](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-159)均已完成；原141入口失败单独保留。本轮没有新神经训练、T_test访问或固定源优先策略，不将内部结果冒充可信同行胜负。
+
+- **[139米制选源目标](../reports/2026-10-30-source-selection-evidence-review.md)：** 同10特征/66系数/λ/hard、13个组件隔离fit，只改log标签为径向km。V71071点547.721→564.852m，差+17.131m，组件描述区间[10.120,28.993]m，0好/24差/8平场，去最大仍+15.109m；RMSE/P95差，完整P99虽同，多源域P99也恶化。T D2救回158错却引入304错，602→748；反转154点只8→18正确，90个>1km反转错误未减少。纯组有小均值收益但混组较大损害，不把真实纯度/角色输入政策；此固定目标配方不扩大。
+- **[140集合风险读出](../reports/2026-10-30-source-contribution-readout-review.md)：** 13个T监督chord²风险fit建立A′，同critic比较hard/inverse/geometry，实际K≤2闭式、泛K另有FW软件实现。V同71071点：旧Qhard547.721m，新risk hard973.953m、inverse1068.388m、geometry1151.619m；四个预定主要MAE差均不利，去最大仍差。V可用源query中raw负risk50.24%，clip非负不等校准，代理gap约2.84e−14也不等实际最优；F负与条件/实际恢复相容性需区分。geometry比同risk hard有10037点实际增害>1km，不能用P95/P99局部收益或赢等权代替整体增量。评分A′与读出B均不晋级，不按V改floor/损失。
+- **[142高损害数值路径](../reports/2026-10-30-state-recovery-tail-review.md)：** 64场/1248固定复放核、624唯一anchor，全部T1487/V2770零支持点和Q64/5支持层原指标绑定，四CV逐case复放差0m。4393的52点来自7个anchor，其中一个纯组anchor的27个after点承担全V观测RTS SSE99.1792%；工作末端速率775.164m/s×最大3018.192s形成2339593.867m局部传播，保存径向误差最大2389909.389m。已证该计算放大路径，未证真实船速/原native异常或物理噪声来源；17个坏分支点在真identity片段span并集内，不等预测组有可用输入。T before收益、V before不足及组内时间更近候选不一定解决该27点的反例保留，无新恢复方法成绩。
+
+**上一轮去留（本批已继续验证）：** 139/140当前固定配方到此结束，不为负结果追λ、floor或扩268，也不退固定source编号/匿名角色优先。选源与混合继续区分合法决策信息、风险预测及实际集合恢复的相容性；仅把监督目标换成米/平方量不足，仍可发展合理学习和跨域集合方法。状态路线从已核端点传播出发，分别研究支持域外如何恢复、组内合法候选如何利用，保持完整覆盖和支持内收益，不能按V删坏点/定速度阈值或借真实identity取别组帮助。下一科学方案须新Idea/固定合同，现scope不自动追加143；输入/原生时序/关联/输出仍沿总目标同步研究，轻量/在线是加分而非硬门槛。
+
+**执行与技术沿革：** [141失败Record](../reports/2026-10-30-state-recovery-tail-entry-failure.md)因消费者误读真实position.all入口，首T场0CV终止，原run/launcher不覆盖；修复后另立142并成功，不倒填141。原132现场继续保留。上一批heartbeat已删除，本轮未建SSH值守/守护或新增自动队列；所有实际执行/回执只读HandOver。
+
+**139–142当时的矩阵回流：** [选源/集合矩阵v1.1](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#selection-readout-feedback)逐格回填原24格并增6格，共30格；[观测/恢复矩阵v1.5](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#state-recovery-142-feedback)定向复核6旧格并增3格，共39格。新增F240/E139、F241/M109(AI/UN)/E140、F242/E141，M107只增强已核数值路径、物理原因保持UN，技术E138保留；累计P14/F242/M109/E141/C55。充分深入104＝72领域/相近＋32跨域不变，本轮复用来源未新增论文，不将矩阵格子或审计计成独立科学试验。后继仍从具体问题形成新Idea，不由回流自动产生运行任务。
+
+**2026-10-30夜间新授权与偏好：** 用户接受有先例、协议合理的训练参数/新数据集重拟合，但倾向少依赖这种后端拟合；要求扩大论文探索和探索性实验，并授权睡眠期间持续推进。优先研究不读目标reference拟合全局系数的观测驱动质量/状态/鲁棒融合，135校准草案保留但不作默认路线，不将偏好误写为禁止任何学习。仍按完整来源→Mode C→独立Idea→真实实验→Record→Squeeze→回流；来源优先2025–2026高质量本领域/相近和跨域，全文/公式/实验/反例及可得作者代码分别核，不能用摘要或资料条目凑精读。
+
+**上一批固定终点已到：** 四篇新来源完整分析、最多三项真实有界探索136/137/138均已完成；三项科学及限定独立审计均COMPLETED/exit0，真实服务均inactive/dead success。没有第四项、全V扩量、新神经训练或失败后科学重试；旧132现场保留。136首次审计传错manifest路径的入口失败与另行明确发布的只读校正调用分别留档，未重跑科学。三份Record/Squeeze已完成并review，Record→Squeeze→Mode C1.57全部收尾；不再按旧READY重复领取。
+
+**上一批来源与矩阵：** 136–138前新增JAS2025在线探索MLE、ICLR2026 Chroma、ICML2025 Morphing-Flow及NCAM2026预印本四篇全文来源分析，正文/公式/实验/消融或对应反例、可得作者实现分别记录；前三篇为正式高质量，NCAM只作补充/反例，不充正式发表名额。累计充分深入104＝72领域/相近＋32跨域。原件/独有证据见[来源A](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/label_free_fusion_sources_20261030.md)、[来源B](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_transfer_sources_20261030.md)。[局部矩阵v1.4](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#observation-scale-conflict-feedback)从实施前27格，经136回流30格，再逐格更新原30/新增6格，共36格；[Mode C1.57](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-157)将137/138分项合并为F238/M107AI/E136、F239/M108AI/E137，当时累计P14/F239/M108/E137/C55，不倒填事前依据、不增论文数。作者代码未取得时不宣作者复现，论文声望不覆盖来源内矛盾。
+
+- **[136观测质量贡献](../reports/2026-10-30-observation-quality-review.md)：** 无新增reference系数拟合，固定T32/V32。V同71071点源等权MAE1276.441→LOO1263.938m，仅−12.503m且P95/P99差；OLS1281.827m更差，LOO仍未超nearest926.659m或监督Qhard547.721m等强控。当前倒数proxy配方不晋级/自动扩量。源内可预测性不能直接命名为绝对健康或真实协方差；floor1/100均未触发，相同结果不算尺度鲁棒性证据。Record→Squeeze→Mode C1.56已完成。
+- **[137原生观测选尺度](../reports/2026-10-30-observation-scale-review.md)：** T32九rho内点留出MSE选1e-4后冻结，无新增target-reference拟合；完整T32/V32、33112次解析filter/smoother调用，程序3227.897s。V同71071点，观测RTS的MAE1784.722m/RMSE27531.051m，差于原等权1276.441/2168.137m；旧T-reference尺度的同源等权RTS为1198.685/2136.307m，四项位置指标均改善，保留状态恢复信号。观测配方V预测组零可用源点占3.90%却承担99.69%SSE；这是损害作用域定位，该阶段附加支持层当时尚未独立重建；142已限定补齐，146又完成传播干预，物理来源仍未知。该支持与真实identity各输入片段时间跨度并集不同。完整目标/恢复权限、目标函数与观测噪声等仍是竞争解释，不据V修rho或删坏点。
+- **[138 T侧同query冲突诊断](../reports/2026-10-30-observation-conflict-review.md)：** 只对齐原T32/12组件缓存，D2 22627点、完整37635位置点及58304组query分别保留；0新拟合/物理预测/网格。区分了条件排序有用但混合未兑现、排序本身错误两种情况，不能统一锐化LOO。冲突11053点的实际LOO−nearest为+478.788m，组件区间[-176.441,587.133]跨0；匿名reference最佳角色反转154点中原Q仅选对8点，146次错误贡献其总选择损害21.222%，但另456次误选仍在多数角色。角色/reference只作诊断，混组first-anchor误差不等物理源健康；C/D内支持方代价相等是构造恒等式。当前没有138新方法或新规则泛化成绩。
+
+**136–138当时的问题（后已执行139–146）：** 继续优先少依赖target-reference系数拟合的路线，合理监督拟合仍可作为对照/保留后继，不退固定源优先级。先区分三件事：①什么合法新增观测信息能区分源内平滑与绝对误差，并覆盖稀少角色反转；②已有排序信息应如何按最终集合风险读出，而不是直接倒数加权；③状态选择目标是否覆盖最终query的支持缺口/恢复权限，先核已保存高损害点的端点、时距、成员与传播，再设计可分离验证。它们是具体问题及候选解释，不是预定模型。保留137同贡献reference-RTS与此前125/131条件贡献的有效信号，各自强控/尾部继续约束；不相加模块冠军、不认证真实K≥3、在线、跨域或可信同行净胜。新科学运行仍须新Idea/固定合同/独立READY，不从旧命令续跑。
+
+**上一批跟进已结束：** 三份记录与Mode C回流完成后，本线程heartbeat `mtad`（MTAD夜间探索）已实际删除。当前无运行科学/审计服务、待重复执行任务或本批自动后继；原输入、失败及终态原件保留。执行索引只在HandOver，后继从上述具体未决问题走新Idea/固定合同。
+
+**2026-10-30用户明确范围：统一状态输入下的可变多源航迹融合。** 用户接受各传感器统一提供经纬度、速度、航向；时间戳与来源归属沿用航迹输入约定。本轮聚焦这种共同状态输入，不把原始图像/雷达量测转换作为前置任务。最终方法不得依赖仅两源相对平移、源编号排序的FixedLOW优先或“全A／75%A+25%B”两种固定动作；应支持可变K源（区别于片段数）、换序/重命名等价及来源加入/缺失，根据合法证据处理各源贡献。现有三种配方仅保留为历史证据/对照，不作为最终架构限制；用户未禁止多源校准，也未指定连续权重或某种网络。[实现边界审查及范围订正](../reports/2026-10-30-sensor-scalability-review.md)保留已核两源限制与未测外部泛化。[Mode C1.52及局部30格矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)复用8项原文/实证来源，形成4连接；优先MR-C1共享误差证据，MR-C2校正锚定与MR-C3联合误差风险分开保留。[133事前Idea](../proposals/source_risk_20261030.md)及[规格](../specs/source-risk.md)已落实：同一10维源特征、共享误差头与可变K贡献，T12组件留出/全T共39解析拟合、原V32十臂45对，先分离“挑对源”和“混合有益”。[133真实Record/Squeeze](../reports/2026-10-30-source-risk-review.md)已完成并独立核验：同71071点Qsoft相对源等权MAE1276.441→1128.755m（−11.57%，32场/9组件均好，去最大仍−147.056m），但同分数hard为547.721m，且仍比旧LOW527.446m差20.275m；FixedLOW447.060m和旧Q435.061m仍更低。共享证据有信号，当前soft温度1不能作为最终融合；保留完整强控/尾部/覆盖反例，不自动扩268或按V调参。39解析拟合而非深度网络训练；0新teacher前向/神经更新，程序141.506s。主要数组/39模型/OOF/45比较/人口/主bootstrap核验通过，[Mode C1.53](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-153)完成P14/F231/M102/E129/C53回流，精读100=70+30不变。结构可扩展与实际效果分别验收，132现场保留决定不变。
+
+**2026-10-30训练侧诊断134已真实完成并核验：** [Record/Squeeze](../reports/2026-10-30-mixture-opportunity-review.md)消费局部1.2事前15格/MR-C3接MR-C1。原T32/12组件22627合法多源query，逐点参考best单源269.835→4097格混合230.235m，均值空间39.600m但median仅.346m，>10m39.72%，去最大仍40.805m；连续数值gap平均.352m、最大1.506m。Q OOF误选602点/2.66%，471点损害>1km；margin<.1的8.22%点承载68.10%损害，纯组仍承载64.63%，不能只归因错误组或把小margin直接硬编码等权。匿名source角色reference-best99.319%仅为数据混杂诊断，绝不作为最终固定优先级。0新拟合/teacher/V数组/test，程序73.617s、独立87453数值/223203 exact核验通过。oracle是reference条件空间，不是新方法成绩；[Mode C1.54](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-154)已完成P14/F232/M103/E130/C53回流，论文/精读100不增。
+
+**135历史后继草案（已被本页夜间偏好降为保留路线）：** 继续“统一四状态→合法证据/对象组→不含source ID的共享集合贡献→物理恢复”。133的log误差排序有信号但固定soft读出不足，134又证实存在条件混合空间和高代价小margin错误；下一步先研究只用T决定的风险校准读出A′，比较原hard/soft/源等权A，再据增量决定是否需要共享小网络B/直接米制融合风险目标。校准若使用旧OOF分数留组件，须处理basefit用到外层测试组件的间接泄漏，不能只隔离最后读出便宣全链隔离；新Idea须明确完整base/校准层的组件权限。[135具体草案](../proposals/source_risk_readout_20261030.md)已完成设计审查：9个固定尺度含hard、66个leave-two-component-out Q单头拟合对称复用、12个外层及1个全T校准，base与calibration完整隔离；先实现与独立核验再发布，不需要用户再次批准既有范围。当前没有135代码/新网络训练或READY，不按V追温度、不退固定源角色，也不把低margin指定为均分。0/1支持域状态问题继续与原生时序/输出独立推进，不拼各阶段冠军。MTAD仍实际K2，T/V共享身份及真实外部泛化边界保留。134固定终点收尾，132现场不变。
+
+**2026-10-30用户决定：** 管理员级OOMD日志暂时拿不到，先保留132现场。已有SUMMARY的1000步权重、共享初值/批次计划、normalizer、缓存及失败原件原样保留；暂不重启、重训或发布新的输入继续运行。具体触发条件仍未知，本次回复不构成新的机制或效果证据。
+
+**本轮授权与终点：** 按项目skills/完整飞书采纳流程，T侧条件贡献、输入有序信息、真实原生状态、同信息关联和对象输出分别有独立Idea与一次真实验证，不从V oracle定门控、不把候选解释当机制。只完成本轮已发布固定终点及核验回流，T_test封存；具体执行/领取只见HandOver。
+
+**本批真实结果：** [125/131条件贡献](../reports/2026-10-29-conditional-source-value-full-review.md)保住更广开发增量：固定T32四head，新268同370073点hard MAE500.498→Q484.847m（256好7差5平场/34好2差组件），全300同441144点491.889→476.826m；P99略差、置乱RMSE更低、相对FixedMean多数场差等反例保留。T标签/参数/LOCO/OOF及V300完整48汇总主位置/人口/import各自独立核验通过，不认证物理源健康或全链独立泛化。[127原生状态](../reports/2026-10-29-native-state-review.md)原V32 RTS LOW同71071点527.446→380.127m、全量四误差均好，但4393/最大组件SSE/exact-native尾部差，FWD当前尾部也差；是离线有效点，不与门控拼联合成绩。[129对象输出](../reports/2026-10-29-native-object-output-review.md)保留候选富集，当前贪心合并丢目标/增混组，不晋级；[130固定LOO](../reports/2026-10-29-association-geometry-review.md)未超过同候选静态强控，当前配方结束。上述均Record→Squeeze→Mode C1.46–1.50，累计P14/F229/M100/E127/C53，深入100=70+30不变。
+
+**2026-10-29采纳review后两项真实验证均收尾：** [123 Record/Squeeze](../reports/2026-10-29-source-preference-full-review.md)及Mode C1.43：新268同370073点LOW/FixedLOW MAE579.614/500.498m，对FixedMean602.833m；全300同441144点571.209/491.889m，对FixedMean611.405m。校正对LOW增量延续，FL对FM却新268有177场差、全300有197场/20组件差/P99差；LOW未见及去最大组件四指标输FM，不能普遍硬优先。[124分离验证](../reports/2026-10-29-source-mix-shrink-review.md)完成15臂105配对：原32同71071点FixedHard447.060m，fixedSoft0.75 531.012m、shrinkHard455.287m、组合555.446m；组合全部32场/9组件MAE更差，收缩P99−43.475m伴随MAE/多数场损失，当前固定配方不晋级或自动搜alpha/m0。两项均一次0神经训练，2464/320旧臂导入、536/160新算；独立主位置398770/111780数值核验通过。[Mode C1.42–1.44](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-144)保留全部36格review修正及真实回流，累计P14/F222/M93/E120/C53，充分深入100＝70＋30不变。真实源质量/中心方差仍AI/UN，无可信同行胜出。
+
+**本轮未完成项与下一讨论：** 126 FD失败后，独立132已越过缓存/采样恢复并完成SUMMARY真实1000GPU更新，但末步评价被systemd-oomd终止，其余三臂未训、无完整科学分数；原RUNNING陈旧，已[保全并Record/Squeeze](../reports/2026-10-29-ordered-input-continuation-failure.md)→[Mode C1.51](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-151)。累计P14/F230/M101/E128/C53，132新增仅技术证据、深入100=70+30不变。当前无运行服务/自动后继，先补管理员级OOMD触发日志、明确保全体pair/精确阈值的分阶段评价内存方案；若另订继续，复用SUMMARY1000权重而不重训，再做剩三臂。不能把输入技术终止当方法负结果。研究下一问题仍是条件MAE增量的稀少高损害动作、原生状态组件SSE/exact-native失败及保覆盖的组级接受目标；132不自动再发新配方；本轮用户另授权的多源133见上文，不从V追参、不相加独立成功点。
+
+**2026-10-29较早批次完成：** 按项目内skills及完整飞书采纳流程，五环节新增34格局部交叉及12格真实回流，[Mode C1.40–1.41](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-141)。累计P14/F220/M91/E118/C53；深入100＝70＋30及核心104不变，本轮没有新增完整精读计数。三次具体验证均一次终态exit0、完成Record→Squeeze→Mode C；各限定范围独立数值核验通过，无运行服务或自动后继，不把CPU软件检查算科学结果。
+
+- **[120共享校正更广验证](../reports/2026-10-29-shared-component-full-review.md)：** 原32八臂256场景臂导入、2144新算。新268同370073点Mean MAE1297.482→FixedMean602.833m/RMSE3673.969→3492.697m，超过Anchor/NEAR；原32未见组件64场/29组件仍同向。全300同441144点1294.074→611.405m，P99对Mean仍差、强控仍有负场；完整coverage96.964955%与1068重复组不变。0训练，505.771s/launcher517.111s，非独立测试/物理bias或同行胜出。
+- **[121源优先归因](../reports/2026-10-29-source-preference-review.md)：** 原同71071点，LOW MAE527.446m已经好于FixedMean656.041m，FixedLOW进一步447.060m。事前FixedMean−FixedLOW=+208.981m，未支持双源均值超出经验源优先的主预测；校正对LOW仍有80.386m增量。FixedLOW对FixedMean20场/4组件差，对LOW P99+265.615m，支撑外MAE仍输Anchor；全V源优先效果未知，不能拼入120。0训练，97.631s/launcher105.318s。
+- **[122一阶运动时间项](../reports/2026-10-29-shared-motion-time-review.md)：** 全1605组保留、1024可评/581无定义；JOINT对STATIC输入相对残差均值1160.363→1163.698m、RMSE+0.613m，去最大组件后仍不利。90/96联合fold满秩，未见稳定净增量；结束当前配方、不应用τ，不据此否定其它时序模型。0物理预测变化/神经训练，366解析拟合，14.165s/launcher21.161s。
+
+**当前判断与下一轮的具体入口：** 有效点应发展为合法来源贡献与条件校正，不能预定全源均值或把相对项认作绝对无偏性；下一项先独立检验源优先在新268/未见组件及尾部的范围，并纳入同条件可信近邻。输入路线先检验保时间形状A′相对强22维摘要的真实信息增量，再考虑非平凡约束；时序独立发展原生状态—观测分离及强滤波/平滑对照；关联OA-C6已有同候选整片段留出/完整静态控制的可学信号检验草案；输出OA-C5先建立fragment到物理对象的合法假设，不能靠删点MAE或把分段数当对象数。OA-C4解析只覆盖固定reference有效目标点，未包含另计误报/重复组代价。新训练须冻结相应输入/监督/公平对照/预算与终点后再发布；本轮没有新的GPU完整训练或可信同行共同协议净胜。执行安排只见HandOver。
+
+**上一批问题→矩阵→两项真实验证→Record/Squeeze→Mode C已完成：** 用户明确全流程找具体问题，精度/新增价值优先，轻量/在线端到端为加分目标且不设硬门槛。[Mode C1.38–1.39 §43–44](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-139)包含输入/时序16格、关联/输出24格、融合12格的完整局部问题交叉，以及两项真实回流；不是52份独立证据，深入100＝70＋30不变，累计P14/F217/M88/E115/C53。独立118/119各原V32/9组件一次正常退出0，主要保存数组独立核验通过声明范围，旧任务不重跑。**[118共享项](../reports/2026-10-29-shared-component-review.md)获得值得推进的正向绝对效果：** 同71071点，固定低source共享校正Mean MAE1276.328→656.041m/RMSE2168.266→1864.654m，优于本轮Anchor/NEAR，对Mean31场/8组件好、各1同；P99仍变差、对称gauge MAE1716.225m、Huber无额外总体收益，物理bias与合法绝对锚点UN。**[119输出域](../reports/2026-10-29-output-domain-review.md)分清了输出选择与恢复：** WS SPAN自身MAE927.435→790.264m，但coverage98.4417→96.1203%，共同点误差exact不变；SPAN比UNION多保1094内部缺口点且汇总条件误差略低，非去重或状态学习增量。两项均0训练，程序/launcher分别91.896/108.528s、63.215/82.473s；原件/private分开、无自动后继。下一步发展共享修正的更广开发验证/锚定/尾部与同条件强baseline，同时推进保信息变换约束、状态—观测分离及组条件关联的可训练方案；不因本项正分数预选最终骨架。当前仍未启动新的GPU网络训练或建立可信同行净胜。
+
+**2026-10-29全流程调研范围明确：** 用户要求输入表示、时序、关联、融合和最终输出均调研精进，不能把近期方向性融合候选当作整个研究范围或既定主骨架。本轮已完成[全流程来源覆盖与转化审查](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/whole_pipeline_evidence_audit_20261029.md)：复核既有完整AP、逐篇计数和真实记录，区分源机制/条件/反例、目标实测与未落实项；没有新增精读、全局矩阵编号、实验或READY。现有材料已覆盖原生时间与潜状态、保信息/抗偏差表示、组条件关联和多假设、相关误差/偏差分工、轨迹集合存在域与输出等不同整体起点，实证转化却主要集中于内部诊断及分组/恢复规则。后续按各环节和跨环节联系同步深化来源→矩阵→独立Idea→真实比较，允许整体更换骨架；每个实验单独归因不限制多个方向并行研究。方向头保留为一个待验候选；尚无新完整模型训练或可信国际同行共同协议胜出。
+
+**本轮已完成：** 用户要求继续严格流程挖候选、模块拆分、有效点和论文数值核对。预测链现为R→W→物理恢复→全组输出，旧三普通控制及两新W数值exact；[接口规格](../specs/query-contribution.md)。[Mode C1.36–1.37 §41–42](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-137)已回核CoCo/Dualβ/ESCI等原文，完整24格比较方向借用、共享/局部误差分工、未知相关风险集合，未增深入100＝70＋30计数或预选网络。[117 Record/Squeeze](../reports/2026-10-29-query-contribution-full-review.md)全V300/38组件/8臂16比较一次退出0、独立保存数组主要位置核验通过；原32的192场景臂只复用、2208新算，0训练。新268 NEAR对Mean MAE−325.783m，268场均好；全300 MAE1294.074→964.568m、300场/38组件好，但RMSE/P95/P99略差，Anchor MAE906.787m仍更低。ALL已解释大部分相对均值增益，SUPPORTED额外仅−5.573m MAE且RMSE+7.075m。全WS覆盖96.964955%低于A0 97.210915%，重复1068>610，原32覆盖优势不延续。累计P14/F215/M86/E113/C53，核心104/深入100不变。[论文比较§6](../reports/2026-10-29-paper-number-comparison.md)新117经/纬有符号ME +.011772/−4.530651比TMTAFF6.24/5.88距0更近，**确有有利单项数字**；坐标MAE仍71.142/61.631（10⁻⁴度），不能用bias抵消宣精度胜出。关联8项仍低于TMTAFF，米MAE/RMSE均高于PTFM原表，未建立公平整体胜出。117到300终点收尾，无自动重试/扩量/训练；该局部结果可支持方向或最终输出的独立Idea，强Anchor/Mean/ALL/NEAR及标量组合不可省；全课题范围依上段全流程比较。
+
+**2026-10-29用户新授权已实做：** 同步按skills挖掘候选、推进初步有效点，允许必要模块重构。[Mode C1.34 §39](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-134)复用完整原文/AP，形成4窄问题×9事实的36格交叉，比较query贡献、同原始信息的报告多重性、固定候选的最终输出、可留出共享分量；各有A/B/C、必要A′/竞争解释，未增精读数或预选网络。新接口拆开W与物理恢复、旧Mean/评价API不改，7单元＋6集成软件检查通过；[116一次真实八臂控制及Record/Squeeze](../reports/2026-10-29-query-contribution-review.md)已完成退出0、原V32/9组件/0训练，独立原数组核验通过。固定WS同71071点，NEAR的MAE1276.328→927.435m、32/32场和9/9组件改善；但RMSE2168.266→2173.150m略差，对ANCHOR的MAE仍差82.675m而尾部更好。WS来源等权仅+.112594m，当前配方不晋级；同NEAR下WS对A0共同点MAE/RMSE都改善。覆盖/重复exact不变，WS仍217重复；不宣整体净胜或可信同行胜负。[Mode C1.35 §40](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-135)回流F214/M85/E112，累计P14/F214/M85/E112/C53、深入100＝70＋30不变。**116到固定32终点结束，不自动扩量/训练；其他候选继续按独立条件发展，113/115不重开。** 下一具体问题是合法输入下何时留anchor/借helper、怎样兼顾均值与尾部，以及独立处理输出重复；先具体Idea和预算，不沿旧TFM加训。
+
+**本轮优先级纠正：** 从论文/实验矩阵的具体假设、冲突及跨来源联系中核真实问题，并比较跨领域可迁移机制。已知领域问题可由首次同类跨域适配形成贡献；近邻核查分别判断问题已被识别、方法/迁移是否已有及适配能否解决困难，不能因问题已知就淘汰迁移候选。PTFM/DeepAF保留普通候选，不默认优先。缺协方差、时基或原始量测须区分“当前接口缺失”和“机制无法迁移”，继续分析合法建立条件的路线。同步形成可讨论的问题与解法，允许全新骨架；107按原合同独立推进，不是新研究的前置。
+
+**当前研究判断：** 全流程矩阵已产生不同整体起点及可否证方案；C10/C51的共享相对分量从三场相对结构前进到固定V32的有条件绝对收益，C53/输出域已分离身份、状态、声明人口与风险。固定gauge共享修正值得继续，当前Huber组合不晋级；gauge/支撑外/P99限制与完整WS覆盖/重复代价共同保留。输入保真/抗偏差、原生时间/潜状态、组条件关联/多假设、轨迹集合输出均继续独立发展，方向性借用只是一个候选；实际新训练须有具体问题/输入/预算/终点，不把旧自由残差或普通GRU重新命名为新机制。轻量和在线为可测的加分目标，不排除精度有价值的重或离线解法。
+
+**创新判断按用户2026-10-29明确要求：** 重点是清晰且有意义的新增价值与发展空间，不追求绝对原创。已有相似工作用于学习/定位可改进之处，不自动否定方向；候选不成熟时须提出具体发展路径及价值检验，不能只以“有人做过”结束。规则已写入[AGENTS](../../AGENTS.md)及[采纳流程](../research_workflow.md)。
+
+0. **用户70＋30深入阅读覆盖已达到，转入具体发展价值比较。** [逐篇审计与完整来源入口](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)核原66项中62项充分深入证据（40领域/相近＋22跨域）；随后38个独立完整新AP去重，累计**100项：70领域及相近＋30跨域**。不是本轮重读100篇。104核心含4项仍待补；ALD关键参数supp缺、角度特征关联/IF103044视觉未闭合及未取得的Gaussian–Cauchy TSP全文均未计。用户新补SPL2026/多视Doppler正式全文均已读。近期候选224（旧检索分组132领域及相邻/92跨域）与深入分组不同，不能相加；新增38项按正式/登记年25篇2025、12篇2026、1篇2024重要近邻，实际作者早期稿/正式新增未读内容、全部主结果/消融/技术补充/关键视觉及可得核心代码范围逐AP明示，0作者复现。[精确事件JSON](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_updates_20261029.json)。
+   [Mode C1.25–1.27 §30–32](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-127)已回流全部新增来源，完整增量822格（192/378/252）。本轮继续[Mode C1.28 §33](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-128)：复用9源定向回核，C52两个窄命题16格、C53两个窄命题20格、目标代码/解析2×2，均完整列明不支持格；与旧事实交叉重叠，不能直接当另40份独立证据。累计P14/F205/M80/E103/C53，未声称全历史重审，100篇深入计数不变。[成熟解法与baseline比较](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/fusion_problem_solution_map_20261028.md)保留TM-PMBM、MeanTraj、TPMBM/NEMOT及原生时刻GP等不同起点，不因接口缺口或已有先例整类排除。
+   **四路小验证已完成并回流[Mode C1.29 §34](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-129)。** C52-Pa条件倍率有证，但当前系统无miss模型/真实availability；110全V纯硬单射直接跨源边上界55.5212%，适配身份关系必要，不等MH或当前decoder实测失败；109确认234/300分区可变，但8随机序all宏F1均更差，原source/batch序不能当无信息噪声；112固定V16的G占48.1078%，G仅64.0818%有完整参考，model相对hold特征MSE+.00886522且14/16场不利，另两场和旧全V before保留正收益，不能直接扩成TAM/物理结论。[总记录](../reports/2026-10-29-small-validation-review.md)链接各独立Record/Squeeze及原件，深入100篇计数不变。
+   **114有界静态pilot已完成并得到真实增量。** [Record/Squeeze](../reports/2026-10-29-static-partition-review.md)核完32→268→全300的六臂/全部分母/38组件；仅WS过事前gate，六臂均扩量、pilot未重跑。WS全V decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，新268也同向；23场/4组件allF1恶化、9组件MSTSA召回降，CL召回损失与CC闭包灾难保留。原raw不变，0模型/前向/训练；所有partition本来合法，增量针对本项目anchor_direct，不能证明国际同行有同一缺陷、赢同行或条件B有效。[Mode C1.31 §36](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-131)累计P14/F211/M83/E109/C53，充分深入100篇不变。成熟静态机制适配值得发展，下一步用正确同行和真实物理输出确认新增价值，不因已有先例关方向。
+   **115已完成，结论是多目标取舍，不能宣布整体净胜。** [完整Record/Squeeze](../reports/2026-10-29-static-position-review.md)核同一事前V32/1427目标/72196参考有效位置点、四臂真正新组Mean输出及32场A0 exact重放。WS共同69837点MAE1219.731→1268.202m（差），RMSE2240.358→2159.927m（好）；点coverage97.7270→98.4417%，但duplicate92→217，gained1234/lost718、33目标救回/22丢失。同首代表64483点MAE也差，不能只归新增覆盖或换代表。0模型/GPU/训练/ZIP，cached reference使用明确；逐点/分位数数值复核及原audit表述订正均保留。[Mode C1.32 §37](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-132)累计P14/F212/M84/E110/C53，充分深入100篇不变。
+   **113已完成全V固定端点评价、独立数值核验和[Record/Squeeze](../reports/2026-10-29-fixed-endpoint-review.md)。** 真实退出0、300场、程序25912.028s/launcher25925.460s；0新增训练/TAM/阈值重选。原056组/人口/输入/单位/ref/valid绑定通过，422317共同位置点TFM MAE42787.223/RMSE66332.748m，对同cap128 Mean1127.413/3107.230m、090C439.694/3071.364m；四普通控制及090C在300/300场、38/38组件位置MAE/RMSE均更差，去最大组件仍差，当前端点不具强恢复baseline资格。保留速度实际收益（10.228 vs cap128 Mean25.885m/s）、航向异质性、覆盖/重复/完整尾部和原107失败；非作者完整TMTAFF复现，不能据失败适配宣称赢同行或方法类别无效。[Mode C1.33 §38](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-133)累计P14/F213/M84/E111/C53，充分深入100篇（70＋30）不变。
+   **下一步讨论已经具体化：** 以成熟静态分区的实际关系增量为起点，比较合法query贡献/条件状态证据和最终轨迹输出决定，能否减少MAE/重复而保留关联/覆盖/尾部收益；需拆分恢复规则、额外状态线索、partial构造与selector增量，不预选attention/GNN或继续旧模型。当前结果只证明本项目内部静态控制的价值/局限，不证明国际同行有同一缺陷。115固定32场终点已到，不自动扩量/训练；113固定107末步四属性评价也已收尾，原A/113到此结束；后续具体方法和预算讨论不沿失败端点自动加训。真实执行状态只看交接。
+   **本次有界跟进已结束并删除。** 113/115均已可核终态并完成Record→Squeeze→Mode C；2026-10-29已通过Codex工具删除同线程“MTAD小验证与固定端点回执收尾”（id=mtad）。本次未启动新实验/重训/补seed/TAM；后续不再定时空转，具体方法/预算留待讨论。
+1. **108表示依赖诊断已真实完成/核验/回流，0训练自动后继。** [完整Record/Squeeze](../reports/2026-10-29-pair-representation-review.md)确认原T32/64成员、15.340s退出0；493anchor、6560eligible/12918候选、6358unknown完整保留。402混合anchor全部literal容差碰撞，397仍有机器低位exact差；stats/pointwise/rawB都有内容变化但不等全部可分/分类有效，stats不恢复B时形。[Mode C1.30 §35](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-130)回流E108/F210/M47：指定接口限制得到支持，作者真实装配和可信方法残余瓶颈仍未知，不能据此自动立EQ-Reg或开训。下一研究若需要正则，须在同保信息A′上检验净增量。原108不重跑。
+2. **102/103已执行回传，本地核验通过；三场主因未唯一识别。** [完整实验记录/深挖/回执订正](../reports/2026-10-27-returned-diagnostics-review.md)保留全部人口、对照和不利结果。103的5504声明query中4548可评；共同P95尾195点/15目标占090C SSE98.86%，现有标签下组成员一致，且部分近query原生量测相对reference已出现极大误差。090C三场MAE优于Mean而RMSE劣于Mean；不能只归因错helper、网络外推或直接判reference错误。C03旧GNC方案所需的可识别健康约束未建立，不进入该pilot。原任务结束，不重跑102/103。
+3. **相对配准C10获得有限的预测输入条件支持，尚无绝对精度收益证据。** [完整Record/Squeeze](../reports/2026-10-27-predicted-registration-audit.md)：不看真实身份估计中心，三个场景留出组等权相对残差3179.501→629.063、3937.242→244.724、2903.963→621.317m；3035两个组恶化，1043仅两组留出。早晚query检查是离线插值条件，非在线预测。方向多样性/绝对锚点/全V效果仍未知；与C08/C09[重新比较](../reports/2026-10-27-candidate-feasibility.md#candidate-comparison)，不因已有结构或消融容易先定方法。
+4. **104及105完成，原始reference已有短时大位移，根因仍未知。** [104记录](../reports/2026-10-27-three-case-chain-review.md)的三场极值各±2 query、980项重放检查无不一致。[105记录](../reports/2026-10-27-raw-case-chain-review.md)核对三个事后选定场景的六节点：原量测按既定规则重建后与103保留的完整五维canonical一致，三个目标的reference原始行也一致；三场所选目标的reference原始相邻时间点均可见数十公里短时位移。范围只限所查节点及目标，未证明真实航迹、时间或生成过程，亦不能推断全数据异常率。实际状态以[交接](../../HandOver/Handover.md)为准。
+5. **107原失败保留，独立113零训练评价已完成，当前固定端点不晋级。** [107真实终态](../reports/2026-10-29-107-failure-discovery.md)TCM2424/TFM1000已训完、原fixed056预检KeyError/退出1保全；[旧schema修复](../reports/2026-10-29-fixed056-schema-repair.md)没有修改原cache或放松数值绑定。[113最终记录](../reports/2026-10-29-fixed-endpoint-review.md)核同全V300/原固定组/末步，正常退出0且所有实际物理共同结果已回流。位置严重失效、速度有收益；不认证完整作者复现，不重训107、不加步/seed/TAM。原A预算的固定末步比较已到终点，没有未执行的113后继授权。
+6. **数据选取审计完成：保留现名单做开发比较，不能称作者同协议或身份独立泛化。** [审计与复算](../reports/2026-10-27-dataset-selection-review.md)确认名单按既定规则重建一致，没有按模型成绩挑场；T/V共享6053个原始A键，V最大两个组件占63%。整场Q64与论文SL64的真实时间窗未对齐；旧适配在10183个共同位置点上TFM MAE59040.15m、Anchor583.53m，巨大差距不能全归因选错数据。当前090C仅学习位置，速度/航向沿用Mean。保留难例与封存测试，不据成绩重抽；身份泛化需另定协议，不从unused直接换一批冒称独立测试。
+
+**用户当前决定边界：** 用户已明确回复“同意按草案A执行”，106前置核验已通过；无需再次索取相同预算许可。107原运行已结束，禁止重训；独立113修复后固定评价也已完成并收尾，不自动加步/seed/TAM或更换配方。用户另授权扩大论文、跨域组合和baseline研究；不受旧候选限制，但具体新方法与训练额度仍需形成可讨论的证据和方案。C08/C09/C10的历史证据见[105后讨论材料](../reports/2026-10-27-candidate-feasibility.md#post105-discussion)。C09潜特征通道不能误称为物理属性独立权重。
+
+## 保留的结论
+
+| 对象 | 已核事实 | 决定／证据 |
+|---|---|---|
+| 056与090C/097A | 056固定组位置覆盖97.2109%、9353组/610重复；两seed位置MAE564.834/583.976m | 内部比较起点，不是可信领域同行；[方法](../specs/evidence-association-fusion.md) |
+| 098关系偏置 | 双seed均未过原晋级规则，最终关bias几乎不改变MAE | 当前配方结案；不代表训练期间bias完全无影响。[历史](README.md) |
+| 100原生事件残差 | T0继续训练564.968m，T1固定汇总566.092m，T2 attention汇总567.187m，均未胜090C | 不晋级、不自动加步/seed；两臂都有真实query decoder。[完整分析](../reports/2026-10-26-experiment-review.md) |
+| 101缓存分析 | 090C对Anchor的绝对误差收益96.23%来自helper机会区；少数场景主导平方误差，普通控制亦有大错 | 现象已核，根因未定；不能直接归因错helper、数据坏或需要平滑。[完整分析](../reports/2026-10-26-experiment-review.md) |
+| TMTAFF/PTFM/TSA适配 | 当前实验未建立可信复现；096物理恢复和关联均弱 | 不用失败适配认证“赢同行”；[历史](README.md) |
+| DeepAF | P/V核心存在，真实MTAD适配未完成；与TMTAFF所用四属性改版有差别 | 099暂停；不扩建模拟资格链。[实现边界](../reports/2026-10-25-deepaf-method-audit.md) |
+
+## 判断边界
+
+- 本轮遵循[完整科研流程](../research_workflow.md)：103、104、105、106及本地C10诊断各自完成Idea→实际执行→Record/Squeeze→Mode C；102和额外tail分别按指标合同/事后探索记录。107/113的原事前基线诊断及修复评价均有真实记录，原107失败不被113正常结束覆盖；C09方法Idea未执行。软件验收不是科研成绩。
+- 无效配方缺少新证据就换，不因沉没成本续训；单次负结果也不否定整类模型。旧099的10/28初判、11/1去留节点不因换候选重置；3%等是具体旧合同门槛，不是普适创新定义。
+- 论文指标按[统一定义](../mtad_data_protocols.md)逐项补齐，另保留米制误差、尾部、覆盖/重复、场景/38组件。ME不是MAE；Level1量测kn/reference mps的已核范围见数据约定，历史原生速度不能冒称单位已统一。
+- V反复用于开发，且有共享身份；不声称独立测试泛化。T_test保持封存，不删难例、不拼不同人口或单模块冠军。
+
+详细历史不在本页追加；已执行事实进[结果分析](../reports/2026-10-26-experiment-review.md)，旧阶段进[历史摘要](README.md)。
+
+<!-- END ORIGINAL docs/research_status.md -->
+
+## 原交接正文
+
+<!-- BEGIN ORIGINAL HandOver/Handover.md -->
+# 当前交接
+
+**2026-10-30三问题本批收尾完成：** 143/144/146科学与限定独立输出审计均COMPLETED/exit0，Record→Squeeze→Mode C1.61回流完成；研究结论只见[研究状态](../research_status.md)。原145失败/成本/现场保留。当前无READY、活动服务、自动后继或可重复领取任务；旧正文READY不提供重复执行许可。
+
+| 新任务 | 当前状态 | 固定合同 |
+|---|---|---|
+| 143相对代价选源 | 科学180.979s/输出audit9.021s均exit0；T32/V32/26fit完成，不扩大 | [S2L143](../../HandOver/S2L-20261030-143.md)、[Record/Squeeze](../reports/2026-10-30-relative-source-decision-review.md) |
+| 144实际坐标集合损失 | 科学179.423s/audit8.838s均exit0；13fit/13选择/288曲线，T32/V32完成，不扩大 | [S2L144](../../HandOver/S2L-20261030-144.md)、[Record/Squeeze](../reports/2026-10-30-actual-mixture-gain-review.md) |
+| 145原支持外分离 | FAILED/exit1，首场157核后list/布尔索引错误；0完整评价，原现场保留 | [S2L145](../../HandOver/S2L-20261030-145.md)、[Record/Squeeze](../reports/2026-10-30-unsupported-recovery-entry-failure.md) |
+| 146独立接口修复续接 | 科学919.152s/audit16.779s均exit0；64场/6142核/14与21臂，另只读分层13.301s完成 | [S2L146](../../HandOver/S2L-20261030-146.md)、[Record/Squeeze](../reports/2026-10-30-unsupported-recovery-review.md) |
+
+**2026-10-30本轮139/140/142均完成：** 三份Record/Squeeze及独立交叉review、Mode C1.59回流已完成；最终研究结论见[研究状态](../research_status.md)。139/140科学和限定独审均exit0；142完整数值复放exit0；141原入口失败单独保全。无本轮READY/活动服务/自动后继，旧合同和旧批次不提供重复领取许可，不自动增143。
+
+| 本轮任务 | 真实终态与限定结果 | 回执/记录 |
+|---|---|---|
+| 139米制选源目标 | 科学171.851s/审计49.818s exit0，T32/V32/13fit；V比旧Qhard差17.131m，误选救回158新增304，不扩大 | [S2L139](../../HandOver/S2L-20261030-139.md)、[Record/Squeeze](../reports/2026-10-30-source-selection-evidence-review.md) |
+| 140集合风险贡献 | 科学212.547s/独审80.865s exit0，13fit/T6/V13完整；四主差不利，已补实际增害>1km/max，不晋级 | [S2L140](../../HandOver/S2L-20261030-140.md)、[Record/Squeeze](../reports/2026-10-30-source-contribution-readout-review.md) |
+| 141原状态核查 | FAILED/exit1、0完成场/0CV；真实position.all被误读为平铺，private空；不重启 | [S2L141](../../HandOver/S2L-20261030-141.md)、[失败Record/Squeeze](../reports/2026-10-30-state-recovery-tail-entry-failure.md)，技术Mode C1.58 |
+| 142新独立状态复放 | COMPLETED/exit0，64场/1248核，程序117.324s；T1487/V2770零支持点及端点/保存位置绑定；无新方法分数 | [S2L142](../../HandOver/S2L-20261030-142.md)、[Record/Squeeze](../reports/2026-10-30-state-recovery-tail-review.md) |
+
+**2026-10-30夜间固定三项均已科学终态及限定独立核验：** 136/137/138科学与最终有效审计均COMPLETED/exit0，真实服务均inactive/dead success；三份Record/Squeeze及Mode C1.57回流已完成并review，本批heartbeat `mtad`已删除。136首审计入口失败与另明确发布的校正只读调用分别保留，不算第二次科学尝试。无READY、活动服务或可重复领取任务；本批不再新增第4项。135仅保留草案，132/133/134不重开。
+
+| 本批任务 | 终态与限制 | 真实回执与记录 |
+|---|---|---|
+| 136观测质量贡献 | 科学一次exit0；校正audit514201 exact/133221 numeric通过；首入口失败保留。小均值收益伴尾部代价、不晋级 | [S2L136](../../HandOver/S2L-20261030-136.md)、[Record/Squeeze](../reports/2026-10-30-observation-quality-review.md)；Mode C1.56完成 |
+| 137原生观测选尺度 | 科学3227.897s/exit0；audit651211 exact/175965 numeric通过。T32九rho后冻结、T/V32完整；观测尺度完整V风险不利，不自动改rho/扩量 | [S2L137](../../HandOver/S2L-20261030-137.md)、[Record/Squeeze](../reports/2026-10-30-observation-scale-review.md) |
+| 138 T证据冲突联合诊断 | 科学51.432s/exit0；audit1864969 exact/727920 numeric通过。T32/12组件完整，0新物理预测/fit/grid；只作条件诊断 | [S2L138](../../HandOver/S2L-20261030-138.md)、[Record/Squeeze](../reports/2026-10-30-observation-conflict-review.md) |
+
+**2026-10-30本轮134已COMPLETED/exit0且独立核验，无READY、运行服务或自动后继。** 冻结0c23bd5，T32/12组件/22627合法query/4097网格到固定终点；科学mtad-da36326c911f.service、审计mtad-b2411a581464.service均成功退出/Restart=no。参考混合空间39.600m（median.346m），Q小margin误选损害集中，不能退成固定源优先。
+
+| 本轮任务 | 终态 | 回执与记录 |
+|---|---|---|
+| 134训练侧混合/误选诊断 | COMPLETED/exit0；87453数值/223203 exact独立核验通过，0新fit或V/test读取 | [S2L-134](../../HandOver/S2L-20261030-134.md)、[Record/Squeeze](../reports/2026-10-30-mixture-opportunity-review.md)、[L2S](../../HandOver/L2S-20261030-134.md) |
+
+**2026-10-30本轮133已COMPLETED/exit0并独立核验，无READY、运行服务或自动后继。** 冻结de00011，原服务mtad-9acebeb2c577.service inactive/dead、success、Restart=no；T32/V32/39解析拟合/十臂45对到固定终点，61483数值、233454 exact核验通过。Qsoft对源等权−147.686m，但soft/hard均未超过旧LOW/FixedLOW/Q强控；不自动扩大或调参。
+
+| 本轮任务 | 终态 | 执行与记录 |
+|---|---|---|
+| 133共享源误差与可变K贡献 | COMPLETED/exit0；程序141.506s、launcher159.459s；独立数组核验通过，无后继 | [S2L-133](../../HandOver/S2L-20261030-133.md)、[Record/Squeeze](../reports/2026-10-30-source-risk-review.md)、[L2S-133](../../HandOver/L2S-20261030-133.md) |
+
+**2026-10-30用户补充：** 系统级OOMD日志暂时拿不到，先保留132现场。维持原权重/计划/缓存/失败产物，不发布132输入继续任务，不重启或重训132；不将尚缺日志补写成已查明原因。
+
+**2026-10-29本轮收尾：无READY、运行服务或自动后继。125/127/129/130/131均完成并限定核验回流；126/128/132真实失败保留。** 132服务mtad-792d19ae7466.service在23:44:50被oomd终止，原run/launcher RUNNING陈旧，单独终态合成已存；SUMMARY1000GPU更新/权重完好，其余三臂0步、完整评价未完成，[S2L](../../HandOver/S2L-20261029-132.md)。Record→Squeeze→Mode C1.51完成，先待系统级触发日志和明确继续合同，不自动发第三次，不重训已有SUMMARY1000、不改原配方/失败现场。131更广固定收益结果及48汇总核验完成，[S2L](../../HandOver/S2L-20261029-131.md)；125T独立补证与127离线状态有效点各有边界，不拼联合成绩。旧任务均不重新领取；后面的旧READY/历史段不提供执行许可。
+
+**2026-10-29：123/124均COMPLETED/exit0并核验回流，无READY/运行服务或自动后继。** 123冻结770a9bd、服务mtad-473c05249036.service成功终态，全300/十臂45配对，398770主位置数值核验通过，见[Record/Squeeze](../reports/2026-10-29-source-preference-full-review.md)、[实际回执](../../HandOver/S2L-20261029-123.md)。124冻结1a2967f、服务mtad-25a33ce6acd6.service成功终态，原32/15臂105配对，111780主位置数值核验通过，见[Record/Squeeze](../reports/2026-10-29-source-mix-shrink-review.md)、[实际回执](../../HandOver/S2L-20261029-124.md)。固定soft=.75/m0=4未获整体增益，当前配方不自动调参/扩量/训练；原120/121/123/124不重跑。下面均为已结案历史，不从旧READY恢复执行。
+
+**2026-10-29本批120/121/122均COMPLETED/exit0并收尾。** 三项固定终点及各自限定范围的独立数值核验通过，Record→Squeeze→Mode C1.41回流完成；当前无READY、运行服务或自动后继。原118/119及旧任务不重开。
+
+| 新发布任务 | 状态 | 合同 |
+|---|---|---|
+| 120固定共享校正扩展 | COMPLETED/exit0；冻结b202695，服务mtad-b59be0ca7a47.service成功退出。300场/38组件/8臂22比较，独立主要数组214800数值核验通过；无自动后继 | [S2L-120](../../HandOver/S2L-20261029-120.md)、[Record/Squeeze](../reports/2026-10-29-shared-component-full-review.md)、[L2S-120](../../HandOver/L2S-20261029-120.md) |
+| 121源优先强控制 | COMPLETED/exit0；冻结1322dc9，服务mtad-3a6295de9482.service成功退出。32场/10臂/45对/0训练；独立主要数组49320数值核验通过，无自动后继 | [S2L-121](../../HandOver/S2L-20261029-121.md)、[Record/Squeeze](../reports/2026-10-29-source-preference-review.md)、[L2S-121](../../HandOver/L2S-20261029-121.md) |
+| 122速度相关剩余诊断 | COMPLETED/exit0；冻结6612de9，服务mtad-f7b6f584cdf4.service成功退出。32场/4臂6比较/1024可评组，保存残差1126项核验通过；无自动后继 | [S2L-122](../../HandOver/S2L-20261029-122.md)、[Record/Squeeze](../reports/2026-10-29-shared-motion-time-review.md)、[L2S-122](../../HandOver/L2S-20261029-122.md) |
+
+**本轮新任务118/119：均COMPLETED并核验。** 冻结b48dae7，各原V32/9组件一次，0训练；118程序91.896s/launcher108.528s，119程序63.215s/launcher82.473s，均exit0，服务inactive/dead、success、Restart=no。Record/Squeeze及Mode C1.39回流完成，无READY或自动后继；旧任务不重跑。
+
+| 新任务 | 状态 | 合同 |
+|---|---|---|
+| 118共享分量控制 | COMPLETED/exit0，主位置独立数组核验通过；8臂22比较，服务mtad-c347e9074412.service | [S2L-118](../../HandOver/S2L-20261029-118.md)、[Record/Squeeze](../reports/2026-10-29-shared-component-review.md)、[L2S](../../HandOver/L2S-20261029-118.md) |
+| 119输出域控制 | COMPLETED/exit0，主位置独立数组核验通过；6臂，服务mtad-f222436a1ffb.service | [S2L-119](../../HandOver/S2L-20261029-119.md)、[Record/Squeeze](../reports/2026-10-29-output-domain-review.md)、[L2S](../../HandOver/L2S-20261029-119.md) |
+
+**本轮117已COMPLETED并核验：** 冻结f333c56/服务mtad-f8ed63393b81.service退出0，原V300/38组件/8臂16比较到终点；192场景臂复用、2208新算、0训练，独立主要位置数组核验通过。该旧批无自动后继，116及旧任务不重跑。
+
+**新授权任务116已COMPLETED并核验：** 冻结80ed87e、服务mtad-ca3fb9ef7880.service退出0，原V32八臂/0训练到固定终点；独立保存数组核验通过。113/115旧批已结束，不重跑；该旧批无自动后继。
+
+更新：2026-10-29。**108/109/110/112均COMPLETED且本地核验；114/115静态分组与位置小验证均已完成；113修复后固定评价已完成并核验。107原失败保留，不重训；本批无待执行后继，mtad自动跟进已删除。** 106/105/104/103/102已完成并核验，不重复领取。104实际范围与服务器回执过度归因的订正见[本地记录](../reports/2026-10-27-three-case-chain-review.md)，105核验与深挖见[本地记录](../reports/2026-10-27-raw-case-chain-review.md)。A授权不包含新增seed/步数/TAM或新方法训练。用户已另行明确允许推倒重来和重新选择研究思路，见[采纳流程](../research_workflow.md)；这不改变107的冻结执行合同，新执行仍须在本表独立列为READY。
+
+| 任务 | 状态 | 执行／回执入口 |
+|---|---|---|
+| 117全V query控制 | **COMPLETED并核验，真实退出0，300场/38组件/8臂16比较。** 程序435.226s/launcher450.513s，0训练；WS NEAR MAE1294.074→964.568m、300场均好，强Anchor/尾部仍有取舍。全WS覆盖低于A0、重复1068>610；无自动后继。 | [S2L-117](../../HandOver/S2L-20261029-117.md)、[Record/Squeeze](../reports/2026-10-29-query-contribution-full-review.md)、[L2S](../../HandOver/L2S-20261029-117.md)。冻结f333c56、原服务已退出，独立主要数组核验通过；private留服务器，不重跑 |
+| 116固定R×query贡献控制 | **COMPLETED并核验，退出0，32场/9组件/八臂/14比较。** 程序79.940s／launcher99.683s，0训练；WS_NEAR MAE1276.328→927.435m，32场均好，对Anchor仍有MAE/尾部取舍；WS_SB无MAE收益，人口/覆盖/重复exact不变。 | [S2L-116](../../HandOver/S2L-20261029-116.md)、[Record/Squeeze](../reports/2026-10-29-query-contribution-review.md)、[L2S](../../HandOver/L2S-20261029-116.md)。冻结80ed87e/原服务已退出，独立数组审计通过；原private留服务器，无自动扩量/重试/训练 |
+| 115新组Mean位置控制 | **COMPLETED并核验，退出0，32场55.886s／launcher73.715s。** A0 exact重放全部通过，WS共同69837点MAE1219.73→1268.20m（差）、RMSE2240.36→2159.93m（好）；点覆盖97.7270→98.4417%，重复组92→217。0模型/训练，不能称整体净胜。 | [Record/Squeeze](../reports/2026-10-29-static-position-review.md)、[L2S-115](../../HandOver/L2S-20261029-115.md)。冻结cbfe97c，服务mtad-b7b3f402a312，原run115与审计/订正保留；无自动扩量/训练 |
+| 114静态分组pilot | **COMPLETED，退出0，最终run118.060s／launcher122.513s，300场。** 仅WS过原V32 gate，原32不重跑、六臂均扩完268；WS decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，23场/4组件F1仍差，raw不变。 | [Record/Squeeze](../reports/2026-10-29-static-partition-review.md)、[L2S-114](../../HandOver/L2S-20261029-114.md)。冻结13ecf2f，服务mtad-92e24b30be2f；原run114保留，0训练，不重跑 |
+| 109固定分数决定诊断 | **COMPLETED，退出0，300场276.326s，RSS547921920B。** raw/A0完整绑定；234/300分区变化，但8随机序all宏F1全部更差/FP增加，不据敏感度认证新方法。 | [Record/Squeeze](../reports/2026-10-29-frozen-decision-review.md)、[原L2S](../../HandOver/L2S-20261029-109.md)。冻结af475e0，服务mtad-ee793415d2ba，原run109保留，不重跑 |
+| 110身份容量诊断 | **COMPLETED，退出0，300场4.685s。** 纯硬单射全部跨源真边条件上界55.5212%，同源真边8202、无共同Q64正边11063；不是当前anchor或MH成绩。 | [Record/Squeeze](../reports/2026-10-29-fragment-capacity-review.md)、[原L2S](../../HandOver/L2S-20261029-110.md)。冻结af475e0，服务mtad-ff360346dae5，原run110保留，不重跑 |
+| 112生成支撑报告 | **COMPLETED，退出0，8.201s，RSS540606464B。** V16/2379片段，G48.1078%、其中参考可评64.0818%；G model−hold特征MSE+.00886522，14场差/2场有益。非TAM或物理效果。 | [Record/Squeeze](../reports/2026-10-29-generated-support-review.md)、[原L2S](../../HandOver/L2S-20261029-112.md)。冻结1e55a7f，服务mtad-d8f0704d03f8，原run112保留，不重跑 |
+| 113固定107末步评价 | **COMPLETED并核验，真实退出0，全300场；程序25912.028s／launcher25925.460s。** 原输入/单位/分区/ref/人口绑定通过；共同422317位置点TFM MAE42787.223m，对cap128 Mean1127.413m，位置全部300场/38组件更差；保留速度收益。0新增训练，不晋级强恢复baseline。 | [S2L-113](../../HandOver/S2L-20261029-113.md)、[Record/Squeeze](../reports/2026-10-29-fixed-endpoint-review.md)、[原L2S](../../HandOver/L2S-20261029-113.md)。冻结af475e0、服务mtad-3d23e5ca916c已退出，原run/launcher及300NPZ保留；不重跑/加训，mtad跟进已删除 |
+| 108表示依赖诊断 | **COMPLETED，真实退出0，32场15.340s，launcher15.816s。** 原Idea1.1/原T32/0前向训练执行，白名单回执与Record/Squeeze本地核验通过；不据软件/算子结果认证作者错误或EQ-Reg有效。 | [Record/Squeeze](../reports/2026-10-29-pair-representation-review.md)、[L2S-108](../../HandOver/L2S-20261028-108.md)。冻结1e55a7f，服务mtad-f6d30740bd5e；原run108与启动前路径定位纠正均保留，不重跑 |
+| 107新单位基线A | **FAILED，原退出1；训练两段均COMPLETED（2424/1000），fixed056评价前预检KeyError。** 北京时间10月29日02:56:45结束，总102762.430s，非超时；0自动重试。090C旧fragment NPZ缺sources/membership，不是已观察到输入数值不一致。原code/run/checkpoint保留，不能重启原107或重训。 | [现场终态Record](../reports/2026-10-29-107-failure-discovery.md)、[原L2S-107](../../HandOver/L2S-20261027-107.md)。独立113修复评价已完成，见其Record/Squeeze；原107仍FAILED，不覆盖或重启 |
+| 106新单位人口准备 | **COMPLETED，实际退出0、本地核验通过**。冻结`939bba4`，北京时间21:42:46→22:08:12；程序1526.315s／launcher1528.615s，RSS3151588KiB，7200成员、2400场两阶段完整，mismatch0。0模型/优化/权重/test；TCM eligible155134、2424步恰一遍，末批62 | [真实S2L-106](../../HandOver/S2L-20261027-106.md)、[Record/Squeeze](../reports/2026-10-27-unit-population-review.md)、[启动与终态原件](../../HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/)。本地经SSH读取真实终态后补写，非服务器AI提交；勿重跑 |
+| 105原CSV固定链 | **COMPLETED（执行验收通过，零训练/前向/NPZ/权重）**。冻结`origin/main`＝`d185191`、CPU4、13:06:51Z→13:06:57Z退出0（launcher 13.7 s／程序5.653 s）。九个成员全部READ（3035 量测3,803,180B／参考896,377B／标签8,149B；2819 661,703／46,204／1,755；1043 见run），无成员触发64MiB上限。**六节点全部`full_canonical_exact=true`、`mismatch_count=0`**：重复0、同刻冲突0、时间逆序0、区间外行0；固定事件匹配3035 11/4、2819 11/9、1043 15/15。参考行全部与103一致（3035 191行／2819 89／1043 93），端点13785-14272、789-800、354-367、q55 370-374全match。**整参考成员`global_reference_issue_count`＝64/1/0（整成员计数，未逐条列类型）**。结论仅限实现链一致，不证明物理真值/AIS语义。见[回执](../../HandOver/S2L-20261027-105.md) |
+| 104固定三案例原链 | COMPLETED；15个固定query、980项检查0不一致；本地核验完成。缺服务器绘图，本地用脱敏回执补图。回执中“排除插值或时间问题”的推断不能由一致重放证明 | [原回执](../../HandOver/S2L-20261027-104.md)、[Record/Squeeze与订正](../reports/2026-10-27-three-case-chain-review.md)；不重复领取 |
+| 102完整论文指标 | COMPLETED，本地核验300场主表、人口及056计数通过 | [L2S-102](../../HandOver/L2S-20261026-102.md)、[S2L-102](../../HandOver/S2L-20261026-102.md)；0训练/前向/权重/ZIP，不重复领取 |
+| 103三场诊断 | COMPLETED，本地核验全部声明query、误差及尾部份额通过；主因未唯一识别 | [L2S-103](../../HandOver/L2S-20261027-103.md)、[S2L-103](../../HandOver/S2L-20261027-103.md)；0训练/前向/权重，原输入/参考服务器重放一致，不重复领取 |
+| 099 DeepAF | HOLD | [暂停说明](../../HandOver/L2S-20261025-099.md)；不得使用旧ZIP或旧合同启动 |
+
+101原`request.json/status.json`已补齐，无需再补或重跑。服务器额外tail分析按事后探索记录，不是新模型任务；保留源数据及派生原件，不能直接沿用其中错误轴序、方向或排名结论。
+
+103的私有原身份/坐标/reference端点与原NPZ继续保留在原run；105只回传脱敏汇总和相对差，完整原行/身份/坐标保留服务器。本地预测对应配准条件分析已经结束，不另交服务器重复计算。旧L2S正文的READY、探索Idea或预算草案不提供重复执行或训练许可。
+
+## 执行边界
+
+- 当前只按本页顶部新发布表执行；118/119已完成、主要独立数组核验及记录回流结束，旧任务均已结案、HOLD或撤回；旧正文命令不提供重复领取许可。[历史摘要](README.md)保存结论和Git位置。
+- 按[服务器规则](../server_autonomy.md)单次托管、记录真实退出；活动checkout/config/runs冻结、失败保全、不自动重试。最多四单卡，现场FIFO，兼容设备可共卡，不触碰他人进程。
+- T_test封存，既有056和各任务原配置保持；不设SHA/hash准入。push不代表服务器已启动。
+
+研究目标和下一步见[研究状态](../research_status.md)，保留原件见[结果索引](../../HandOver/results/README.md)。
+
+<!-- END ORIGINAL HandOver/Handover.md -->

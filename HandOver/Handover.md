@@ -1,97 +1,20 @@
 # 当前交接
 
-**2026-10-30三问题本批收尾完成：** 143/144/146科学与限定独立输出审计均COMPLETED/exit0，Record→Squeeze→Mode C1.61回流完成；研究结论只见[研究状态](../docs/research_status.md)。原145失败/成本/现场保留。当前无READY、活动服务、自动后继或可重复领取任务；旧正文READY不提供重复执行许可。
+更新：2026-10-30。只维护发布、领取与待核验事项；研究目标和下一步只读[研究状态](../docs/research_status.md)。旧长入口的[完整交接沿革](../docs/history/2026-10-30-research-process.md#原交接正文)已保留，原L2S/S2L和结果文件均在原位。
 
-| 新任务 | 当前状态 | 固定合同 |
-|---|---|---|
-| 143相对代价选源 | 科学180.979s/输出audit9.021s均exit0；T32/V32/26fit完成，不扩大 | [S2L143](S2L-20261030-143.md)、[Record/Squeeze](../docs/reports/2026-10-30-relative-source-decision-review.md) |
-| 144实际坐标集合损失 | 科学179.423s/audit8.838s均exit0；13fit/13选择/288曲线，T32/V32完成，不扩大 | [S2L144](S2L-20261030-144.md)、[Record/Squeeze](../docs/reports/2026-10-30-actual-mixture-gain-review.md) |
-| 145原支持外分离 | FAILED/exit1，首场157核后list/布尔索引错误；0完整评价，原现场保留 | [S2L145](S2L-20261030-145.md)、[Record/Squeeze](../docs/reports/2026-10-30-unsupported-recovery-entry-failure.md) |
-| 146独立接口修复续接 | 科学919.152s/audit16.779s均exit0；64场/6142核/14与21臂，另只读分层13.301s完成 | [S2L146](S2L-20261030-146.md)、[Record/Squeeze](../docs/reports/2026-10-30-unsupported-recovery-review.md) |
+## 当前执行
 
-**2026-10-30本轮139/140/142均完成：** 三份Record/Squeeze及独立交叉review、Mode C1.59回流已完成；最终研究结论见[研究状态](../docs/research_status.md)。139/140科学和限定独审均exit0；142完整数值复放exit0；141原入口失败单独保全。无本轮READY/活动服务/自动后继，旧合同和旧批次不提供重复领取许可，不自动增143。
+**按最后已核回执，目前没有READY、已提交待领取、运行中或待核验任务，也没有自动后继。** 本次仅整理入口，没有新连接服务器或重新查询服务状态；不能把旧run内陈旧RUNNING当作真实运行。新任务须在此独立发布READY并注明具体合同后才能领取。
 
-| 本轮任务 | 真实终态与限定结果 | 回执/记录 |
-|---|---|---|
-| 139米制选源目标 | 科学171.851s/审计49.818s exit0，T32/V32/13fit；V比旧Qhard差17.131m，误选救回158新增304，不扩大 | [S2L139](S2L-20261030-139.md)、[Record/Squeeze](../docs/reports/2026-10-30-source-selection-evidence-review.md) |
-| 140集合风险贡献 | 科学212.547s/独审80.865s exit0，13fit/T6/V13完整；四主差不利，已补实际增害>1km/max，不晋级 | [S2L140](S2L-20261030-140.md)、[Record/Squeeze](../docs/reports/2026-10-30-source-contribution-readout-review.md) |
-| 141原状态核查 | FAILED/exit1、0完成场/0CV；真实position.all被误读为平铺，private空；不重启 | [S2L141](S2L-20261030-141.md)、[失败Record/Squeeze](../docs/reports/2026-10-30-state-recovery-tail-entry-failure.md)，技术Mode C1.58 |
-| 142新独立状态复放 | COMPLETED/exit0，64场/1248核，程序117.324s；T1487/V2770零支持点及端点/保存位置绑定；无新方法分数 | [S2L142](S2L-20261030-142.md)、[Record/Squeeze](../docs/reports/2026-10-30-state-recovery-tail-review.md) |
+143/144/146科学及限定独立输出审计均COMPLETED/exit0，Record→Squeeze→Mode C1.61收尾完成；145原技术失败保留。此前批次已结案，不重复领取。
 
-**2026-10-30夜间固定三项均已科学终态及限定独立核验：** 136/137/138科学与最终有效审计均COMPLETED/exit0，真实服务均inactive/dead success；三份Record/Squeeze及Mode C1.57回流已完成并review，本批heartbeat `mtad`已删除。136首审计入口失败与另明确发布的校正只读调用分别保留，不算第二次科学尝试。无READY、活动服务或可重复领取任务；本批不再新增第4项。135仅保留草案，132/133/134不重开。
+## 保全与执行边界
 
-| 本批任务 | 终态与限制 | 真实回执与记录 |
-|---|---|---|
-| 136观测质量贡献 | 科学一次exit0；校正audit514201 exact/133221 numeric通过；首入口失败保留。小均值收益伴尾部代价、不晋级 | [S2L136](S2L-20261030-136.md)、[Record/Squeeze](../docs/reports/2026-10-30-observation-quality-review.md)；Mode C1.56完成 |
-| 137原生观测选尺度 | 科学3227.897s/exit0；audit651211 exact/175965 numeric通过。T32九rho后冻结、T/V32完整；观测尺度完整V风险不利，不自动改rho/扩量 | [S2L137](S2L-20261030-137.md)、[Record/Squeeze](../docs/reports/2026-10-30-observation-scale-review.md) |
-| 138 T证据冲突联合诊断 | 科学51.432s/exit0；audit1864969 exact/727920 numeric通过。T32/12组件完整，0新物理预测/fit/grid；只作条件诊断 | [S2L138](S2L-20261030-138.md)、[Record/Squeeze](../docs/reports/2026-10-30-observation-conflict-review.md) |
+- 132：用户明确暂拿不到系统级OOMD日志、先保留现场。SUMMARY1000更新权重、计划、normalizer、缓存和失败产物不动；完整评价及另三臂未完成，不重启/重训或自动发布继续任务。[S2L132](S2L-20261029-132.md)。
+- 107/113及143/144/146不重跑或续旧额度；新比较和科学验证另立明确合同。135仍为保留草案，不是READY。
+- 按[服务器规则](../docs/server_autonomy.md)执行一次、独立冻结目录、最多四单卡/FIFO；失败保全，不自动重试或替换配方。历史READY和命令不提供当前运行许可。
+- 原数据、权重、完整预测和服务器runs保持原位；本轮未操作服务器，未新增自动跟进。
 
-**2026-10-30本轮134已COMPLETED/exit0且独立核验，无READY、运行服务或自动后继。** 冻结0c23bd5，T32/12组件/22627合法query/4097网格到固定终点；科学mtad-da36326c911f.service、审计mtad-b2411a581464.service均成功退出/Restart=no。参考混合空间39.600m（median.346m），Q小margin误选损害集中，不能退成固定源优先。
+## 完成记录入口
 
-| 本轮任务 | 终态 | 回执与记录 |
-|---|---|---|
-| 134训练侧混合/误选诊断 | COMPLETED/exit0；87453数值/223203 exact独立核验通过，0新fit或V/test读取 | [S2L-134](S2L-20261030-134.md)、[Record/Squeeze](../docs/reports/2026-10-30-mixture-opportunity-review.md)、[L2S](L2S-20261030-134.md) |
-
-**2026-10-30本轮133已COMPLETED/exit0并独立核验，无READY、运行服务或自动后继。** 冻结de00011，原服务mtad-9acebeb2c577.service inactive/dead、success、Restart=no；T32/V32/39解析拟合/十臂45对到固定终点，61483数值、233454 exact核验通过。Qsoft对源等权−147.686m，但soft/hard均未超过旧LOW/FixedLOW/Q强控；不自动扩大或调参。
-
-| 本轮任务 | 终态 | 执行与记录 |
-|---|---|---|
-| 133共享源误差与可变K贡献 | COMPLETED/exit0；程序141.506s、launcher159.459s；独立数组核验通过，无后继 | [S2L-133](S2L-20261030-133.md)、[Record/Squeeze](../docs/reports/2026-10-30-source-risk-review.md)、[L2S-133](L2S-20261030-133.md) |
-
-**2026-10-30用户补充：** 系统级OOMD日志暂时拿不到，先保留132现场。维持原权重/计划/缓存/失败产物，不发布132输入继续任务，不重启或重训132；不将尚缺日志补写成已查明原因。
-
-**2026-10-29本轮收尾：无READY、运行服务或自动后继。125/127/129/130/131均完成并限定核验回流；126/128/132真实失败保留。** 132服务mtad-792d19ae7466.service在23:44:50被oomd终止，原run/launcher RUNNING陈旧，单独终态合成已存；SUMMARY1000GPU更新/权重完好，其余三臂0步、完整评价未完成，[S2L](S2L-20261029-132.md)。Record→Squeeze→Mode C1.51完成，先待系统级触发日志和明确继续合同，不自动发第三次，不重训已有SUMMARY1000、不改原配方/失败现场。131更广固定收益结果及48汇总核验完成，[S2L](S2L-20261029-131.md)；125T独立补证与127离线状态有效点各有边界，不拼联合成绩。旧任务均不重新领取；后面的旧READY/历史段不提供执行许可。
-
-**2026-10-29：123/124均COMPLETED/exit0并核验回流，无READY/运行服务或自动后继。** 123冻结770a9bd、服务mtad-473c05249036.service成功终态，全300/十臂45配对，398770主位置数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-preference-full-review.md)、[实际回执](S2L-20261029-123.md)。124冻结1a2967f、服务mtad-25a33ce6acd6.service成功终态，原32/15臂105配对，111780主位置数值核验通过，见[Record/Squeeze](../docs/reports/2026-10-29-source-mix-shrink-review.md)、[实际回执](S2L-20261029-124.md)。固定soft=.75/m0=4未获整体增益，当前配方不自动调参/扩量/训练；原120/121/123/124不重跑。下面均为已结案历史，不从旧READY恢复执行。
-
-**2026-10-29本批120/121/122均COMPLETED/exit0并收尾。** 三项固定终点及各自限定范围的独立数值核验通过，Record→Squeeze→Mode C1.41回流完成；当前无READY、运行服务或自动后继。原118/119及旧任务不重开。
-
-| 新发布任务 | 状态 | 合同 |
-|---|---|---|
-| 120固定共享校正扩展 | COMPLETED/exit0；冻结b202695，服务mtad-b59be0ca7a47.service成功退出。300场/38组件/8臂22比较，独立主要数组214800数值核验通过；无自动后继 | [S2L-120](S2L-20261029-120.md)、[Record/Squeeze](../docs/reports/2026-10-29-shared-component-full-review.md)、[L2S-120](L2S-20261029-120.md) |
-| 121源优先强控制 | COMPLETED/exit0；冻结1322dc9，服务mtad-3a6295de9482.service成功退出。32场/10臂/45对/0训练；独立主要数组49320数值核验通过，无自动后继 | [S2L-121](S2L-20261029-121.md)、[Record/Squeeze](../docs/reports/2026-10-29-source-preference-review.md)、[L2S-121](L2S-20261029-121.md) |
-| 122速度相关剩余诊断 | COMPLETED/exit0；冻结6612de9，服务mtad-f7b6f584cdf4.service成功退出。32场/4臂6比较/1024可评组，保存残差1126项核验通过；无自动后继 | [S2L-122](S2L-20261029-122.md)、[Record/Squeeze](../docs/reports/2026-10-29-shared-motion-time-review.md)、[L2S-122](L2S-20261029-122.md) |
-
-**本轮新任务118/119：均COMPLETED并核验。** 冻结b48dae7，各原V32/9组件一次，0训练；118程序91.896s/launcher108.528s，119程序63.215s/launcher82.473s，均exit0，服务inactive/dead、success、Restart=no。Record/Squeeze及Mode C1.39回流完成，无READY或自动后继；旧任务不重跑。
-
-| 新任务 | 状态 | 合同 |
-|---|---|---|
-| 118共享分量控制 | COMPLETED/exit0，主位置独立数组核验通过；8臂22比较，服务mtad-c347e9074412.service | [S2L-118](S2L-20261029-118.md)、[Record/Squeeze](../docs/reports/2026-10-29-shared-component-review.md)、[L2S](L2S-20261029-118.md) |
-| 119输出域控制 | COMPLETED/exit0，主位置独立数组核验通过；6臂，服务mtad-f222436a1ffb.service | [S2L-119](S2L-20261029-119.md)、[Record/Squeeze](../docs/reports/2026-10-29-output-domain-review.md)、[L2S](L2S-20261029-119.md) |
-
-**本轮117已COMPLETED并核验：** 冻结f333c56/服务mtad-f8ed63393b81.service退出0，原V300/38组件/8臂16比较到终点；192场景臂复用、2208新算、0训练，独立主要位置数组核验通过。该旧批无自动后继，116及旧任务不重跑。
-
-**新授权任务116已COMPLETED并核验：** 冻结80ed87e、服务mtad-ca3fb9ef7880.service退出0，原V32八臂/0训练到固定终点；独立保存数组核验通过。113/115旧批已结束，不重跑；该旧批无自动后继。
-
-更新：2026-10-29。**108/109/110/112均COMPLETED且本地核验；114/115静态分组与位置小验证均已完成；113修复后固定评价已完成并核验。107原失败保留，不重训；本批无待执行后继，mtad自动跟进已删除。** 106/105/104/103/102已完成并核验，不重复领取。104实际范围与服务器回执过度归因的订正见[本地记录](../docs/reports/2026-10-27-three-case-chain-review.md)，105核验与深挖见[本地记录](../docs/reports/2026-10-27-raw-case-chain-review.md)。A授权不包含新增seed/步数/TAM或新方法训练。用户已另行明确允许推倒重来和重新选择研究思路，见[采纳流程](../docs/research_workflow.md)；这不改变107的冻结执行合同，新执行仍须在本表独立列为READY。
-
-| 任务 | 状态 | 执行／回执入口 |
-|---|---|---|
-| 117全V query控制 | **COMPLETED并核验，真实退出0，300场/38组件/8臂16比较。** 程序435.226s/launcher450.513s，0训练；WS NEAR MAE1294.074→964.568m、300场均好，强Anchor/尾部仍有取舍。全WS覆盖低于A0、重复1068>610；无自动后继。 | [S2L-117](S2L-20261029-117.md)、[Record/Squeeze](../docs/reports/2026-10-29-query-contribution-full-review.md)、[L2S](L2S-20261029-117.md)。冻结f333c56、原服务已退出，独立主要数组核验通过；private留服务器，不重跑 |
-| 116固定R×query贡献控制 | **COMPLETED并核验，退出0，32场/9组件/八臂/14比较。** 程序79.940s／launcher99.683s，0训练；WS_NEAR MAE1276.328→927.435m，32场均好，对Anchor仍有MAE/尾部取舍；WS_SB无MAE收益，人口/覆盖/重复exact不变。 | [S2L-116](S2L-20261029-116.md)、[Record/Squeeze](../docs/reports/2026-10-29-query-contribution-review.md)、[L2S](L2S-20261029-116.md)。冻结80ed87e/原服务已退出，独立数组审计通过；原private留服务器，无自动扩量/重试/训练 |
-| 115新组Mean位置控制 | **COMPLETED并核验，退出0，32场55.886s／launcher73.715s。** A0 exact重放全部通过，WS共同69837点MAE1219.73→1268.20m（差）、RMSE2240.36→2159.93m（好）；点覆盖97.7270→98.4417%，重复组92→217。0模型/训练，不能称整体净胜。 | [Record/Squeeze](../docs/reports/2026-10-29-static-position-review.md)、[L2S-115](L2S-20261029-115.md)。冻结cbfe97c，服务mtad-b7b3f402a312，原run115与审计/订正保留；无自动扩量/训练 |
-| 114静态分组pilot | **COMPLETED，退出0，最终run118.060s／launcher122.513s，300场。** 仅WS过原V32 gate，原32不重跑、六臂均扩完268；WS decoded宏F1 76.5657→85.1820%，MSTSA mPCA77.9161→82.7318%、mPFA20.2849→14.1685%，23场/4组件F1仍差，raw不变。 | [Record/Squeeze](../docs/reports/2026-10-29-static-partition-review.md)、[L2S-114](L2S-20261029-114.md)。冻结13ecf2f，服务mtad-92e24b30be2f；原run114保留，0训练，不重跑 |
-| 109固定分数决定诊断 | **COMPLETED，退出0，300场276.326s，RSS547921920B。** raw/A0完整绑定；234/300分区变化，但8随机序all宏F1全部更差/FP增加，不据敏感度认证新方法。 | [Record/Squeeze](../docs/reports/2026-10-29-frozen-decision-review.md)、[原L2S](L2S-20261029-109.md)。冻结af475e0，服务mtad-ee793415d2ba，原run109保留，不重跑 |
-| 110身份容量诊断 | **COMPLETED，退出0，300场4.685s。** 纯硬单射全部跨源真边条件上界55.5212%，同源真边8202、无共同Q64正边11063；不是当前anchor或MH成绩。 | [Record/Squeeze](../docs/reports/2026-10-29-fragment-capacity-review.md)、[原L2S](L2S-20261029-110.md)。冻结af475e0，服务mtad-ff360346dae5，原run110保留，不重跑 |
-| 112生成支撑报告 | **COMPLETED，退出0，8.201s，RSS540606464B。** V16/2379片段，G48.1078%、其中参考可评64.0818%；G model−hold特征MSE+.00886522，14场差/2场有益。非TAM或物理效果。 | [Record/Squeeze](../docs/reports/2026-10-29-generated-support-review.md)、[原L2S](L2S-20261029-112.md)。冻结1e55a7f，服务mtad-d8f0704d03f8，原run112保留，不重跑 |
-| 113固定107末步评价 | **COMPLETED并核验，真实退出0，全300场；程序25912.028s／launcher25925.460s。** 原输入/单位/分区/ref/人口绑定通过；共同422317位置点TFM MAE42787.223m，对cap128 Mean1127.413m，位置全部300场/38组件更差；保留速度收益。0新增训练，不晋级强恢复baseline。 | [S2L-113](S2L-20261029-113.md)、[Record/Squeeze](../docs/reports/2026-10-29-fixed-endpoint-review.md)、[原L2S](L2S-20261029-113.md)。冻结af475e0、服务mtad-3d23e5ca916c已退出，原run/launcher及300NPZ保留；不重跑/加训，mtad跟进已删除 |
-| 108表示依赖诊断 | **COMPLETED，真实退出0，32场15.340s，launcher15.816s。** 原Idea1.1/原T32/0前向训练执行，白名单回执与Record/Squeeze本地核验通过；不据软件/算子结果认证作者错误或EQ-Reg有效。 | [Record/Squeeze](../docs/reports/2026-10-29-pair-representation-review.md)、[L2S-108](L2S-20261028-108.md)。冻结1e55a7f，服务mtad-f6d30740bd5e；原run108与启动前路径定位纠正均保留，不重跑 |
-| 107新单位基线A | **FAILED，原退出1；训练两段均COMPLETED（2424/1000），fixed056评价前预检KeyError。** 北京时间10月29日02:56:45结束，总102762.430s，非超时；0自动重试。090C旧fragment NPZ缺sources/membership，不是已观察到输入数值不一致。原code/run/checkpoint保留，不能重启原107或重训。 | [现场终态Record](../docs/reports/2026-10-29-107-failure-discovery.md)、[原L2S-107](L2S-20261027-107.md)。独立113修复评价已完成，见其Record/Squeeze；原107仍FAILED，不覆盖或重启 |
-| 106新单位人口准备 | **COMPLETED，实际退出0、本地核验通过**。冻结`939bba4`，北京时间21:42:46→22:08:12；程序1526.315s／launcher1528.615s，RSS3151588KiB，7200成员、2400场两阶段完整，mismatch0。0模型/优化/权重/test；TCM eligible155134、2424步恰一遍，末批62 | [真实S2L-106](S2L-20261027-106.md)、[Record/Squeeze](../docs/reports/2026-10-27-unit-population-review.md)、[启动与终态原件](results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/)。本地经SSH读取真实终态后补写，非服务器AI提交；勿重跑 |
-| 105原CSV固定链 | **COMPLETED（执行验收通过，零训练/前向/NPZ/权重）**。冻结`origin/main`＝`d185191`、CPU4、13:06:51Z→13:06:57Z退出0（launcher 13.7 s／程序5.653 s）。九个成员全部READ（3035 量测3,803,180B／参考896,377B／标签8,149B；2819 661,703／46,204／1,755；1043 见run），无成员触发64MiB上限。**六节点全部`full_canonical_exact=true`、`mismatch_count=0`**：重复0、同刻冲突0、时间逆序0、区间外行0；固定事件匹配3035 11/4、2819 11/9、1043 15/15。参考行全部与103一致（3035 191行／2819 89／1043 93），端点13785-14272、789-800、354-367、q55 370-374全match。**整参考成员`global_reference_issue_count`＝64/1/0（整成员计数，未逐条列类型）**。结论仅限实现链一致，不证明物理真值/AIS语义。见[回执](S2L-20261027-105.md) |
-| 104固定三案例原链 | COMPLETED；15个固定query、980项检查0不一致；本地核验完成。缺服务器绘图，本地用脱敏回执补图。回执中“排除插值或时间问题”的推断不能由一致重放证明 | [原回执](S2L-20261027-104.md)、[Record/Squeeze与订正](../docs/reports/2026-10-27-three-case-chain-review.md)；不重复领取 |
-| 102完整论文指标 | COMPLETED，本地核验300场主表、人口及056计数通过 | [L2S-102](L2S-20261026-102.md)、[S2L-102](S2L-20261026-102.md)；0训练/前向/权重/ZIP，不重复领取 |
-| 103三场诊断 | COMPLETED，本地核验全部声明query、误差及尾部份额通过；主因未唯一识别 | [L2S-103](L2S-20261027-103.md)、[S2L-103](S2L-20261027-103.md)；0训练/前向/权重，原输入/参考服务器重放一致，不重复领取 |
-| 099 DeepAF | HOLD | [暂停说明](L2S-20261025-099.md)；不得使用旧ZIP或旧合同启动 |
-
-101原`request.json/status.json`已补齐，无需再补或重跑。服务器额外tail分析按事后探索记录，不是新模型任务；保留源数据及派生原件，不能直接沿用其中错误轴序、方向或排名结论。
-
-103的私有原身份/坐标/reference端点与原NPZ继续保留在原run；105只回传脱敏汇总和相对差，完整原行/身份/坐标保留服务器。本地预测对应配准条件分析已经结束，不另交服务器重复计算。旧L2S正文的READY、探索Idea或预算草案不提供重复执行或训练许可。
-
-## 执行边界
-
-- 当前只按本页顶部新发布表执行；118/119已完成、主要独立数组核验及记录回流结束，旧任务均已结案、HOLD或撤回；旧正文命令不提供重复领取许可。[历史摘要](../docs/history/README.md)保存结论和Git位置。
-- 按[服务器规则](../docs/server_autonomy.md)单次托管、记录真实退出；活动checkout/config/runs冻结、失败保全、不自动重试。最多四单卡，现场FIFO，兼容设备可共卡，不触碰他人进程。
-- T_test封存，既有056和各任务原配置保持；不设SHA/hash准入。push不代表服务器已启动。
-
-研究目标和下一步见[研究状态](../docs/research_status.md)，保留原件见[结果索引](results/README.md)。
+[历史研究摘要](../docs/history/README.md)按实验链接完整Record/Squeeze；[保留结果索引](results/README.md)提供证据位置；本目录原`L2S-*.md`和`S2L-*.md`保留。需要旧过程时读[原交接正文](../docs/history/2026-10-30-research-process.md#原交接正文)，不从历史叙述恢复队列。

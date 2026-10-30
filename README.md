@@ -11,8 +11,8 @@
 | 项目常用技能、完整正文与调用 | [8 项技能](.agents/skills/README.md) |
 | 数据、单位与指标 | [数据约定](docs/data_contract.md)、[论文指标](docs/mtad_data_protocols.md) |
 | 在用实现与命令 | [方法说明](docs/specs/evidence-association-fusion.md)、[运行入口](tools/experiments/README.md) |
-| 结案结论与旧文件恢复 | [历史摘要](docs/history/README.md) |
+| 结案结论、完整推导沿革与旧文件恢复 | [历史摘要](docs/history/README.md)、[过程原文](docs/history/2026-10-30-research-process.md) |
 
-代码按 `association/{data,models,training,evaluation,utils}` 分工；文献方法在 `baselines`，命令在 `tools`，配置在 `configs`，必要检查在 `tests`。存在源码或配置不等于待执行任务。
+代码按 `association/{data,models,training,evaluation,utils}` 分工，TMTAFF/PTFM/DeepAF按相同职责存放；部分TSA历史适配在 `baselines`。命令在 `tools`，配置在 `configs`，必要检查在 `tests`。存在源码或配置不等于待执行任务。
 
-原论文与逐篇笔记留在[资料库](../biye-ronghe/README.md)，不在两仓复制当前计划。数据、真实权重、预测、服务器runs及Git历史不随文档整理删除。
+原论文、矩阵和逐篇笔记留在独立资料库（本机 `/Users/a1/Projects/biye-ronghe`，不在本GitHub仓内），本仓研究状态提供对应入口。两仓不复制当前计划；数据、真实权重、预测、服务器runs及Git历史不随文档整理删除。
