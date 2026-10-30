@@ -10,6 +10,9 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 162目标×训练难例质量 | 52神经fit/6656真实GPU更新、科学/限定输出audit/四属性方向补项各一次exit0；fresh四臂均未稳定超冻结159，V527.447/527.987/535.208/576.356m。局部难例救回伴整体新增损害，保留159平均候选、当前配方不扩大；READY早于fixture通过的偏差保留，实际提交前已修正。[Record/Squeeze](../reports/2026-10-31-objective-difficulty-review.md) |
+| 163分组/参考双轴 | T32/V32 oracle一次exit0；V反转290净化后16多/105一/169零，剩16仍错，不能将274丢D2记救回。固定状态换参考最佳集合翻转4728点；后补独立人口/全部参考几何1975795exact核验通过，不认证truth/净化forward/部署增量。[Record/Squeeze](../reports/2026-10-31-group-reference-review.md) |
+| 164冻结K/V分离 | T2四正对四臂一次exit0，normal/both与161 exact；K-only放松首步集中却MAE58.292→58.373km，V-only/both更差。支持部分路径分离，训练唯一原因未知、不重训107。[Record/Squeeze](../reports/2026-10-31-tfm-key-value-review.md) |
 | 159表征×表达 | T128固定，13二次/26神经fit、6656真实GPU更新，科学/限定独审/属性与方向补项exit0。V32旧特征网540.295→527.427m、误选761→287，但反转229→278，局部网无稳定额外收益；保留平均候选、不宣高害完成/全300成绩。[Record/Squeeze](../reports/2026-10-31-local-expression-review.md) |
 | 160端点×速度 | 同原生窗/候选七臂，T/V32完整一次exit0及限定独审。端点ONLY V548.006m/RMSE1712.592m，速度/联合V约20km RMSE、联合1163点增害>1km；无数值迭代回退仍灾难，当前不扩大/拼接。全部强控/方向/属性保留。[Record/Squeeze](../reports/2026-10-31-endpoint-separation-review.md) |
 | 161冻结decoder层级 | T2四正对/0训练一次exit0；正常输出与154exact，末两层同query输入响应收缩，首步末层attention极集中；memory缩放改变K/V与分布但没恢复精度。后验跨输入/时间分解和索引迟记单列，不认证唯一训练原因或作者输赢。[Record/Squeeze](../reports/2026-10-31-tfm-decoder-layers-review.md) |
