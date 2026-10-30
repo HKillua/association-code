@@ -56,7 +56,8 @@ def save_artifacts(path, artifacts):
                                 for key, value in artifact.items()})
 
 
-def evaluate_predictions(motion, groups, pack, ev, predictions, retained, *, method_names, split):
+def evaluate_predictions(motion, groups, pack, ev, predictions, retained, *, method_names, split,
+                         prediction_speed_unit=None):
     names = tuple(method_names)
     if not names or len(set(names)) != len(names) or set(predictions) != set(names):
         raise ValueError('exact unique declared predictions required')
@@ -82,13 +83,21 @@ def evaluate_predictions(motion, groups, pack, ev, predictions, retained, *, met
     artifacts, methods, arrays = {}, {}, {}
     for name in names:
         out = emit_group_outputs(predictions[name], groups, node_count=len(motion['states']))
-        report = old.evaluate_full_scene(out, node_identities=ev['identities'],
-            target_identities=ev['target_ids'], target_states=ev['target_states'],
-            target_valid=ev['target_valid'], node_observed=motion['support'], split=split,
-            grouping_kind='predicted', correspondence_policy='anchor_identity_first',
-            return_artifact=True,
-            node_input_support=dict(support=motion['support'], nearest_seconds=motion['nearest_seconds']))
-        artifact = report.pop('artifact')
+        if prediction_speed_unit is None:
+            report = old.evaluate_full_scene(out, node_identities=ev['identities'],
+                target_identities=ev['target_ids'], target_states=ev['target_states'],
+                target_valid=ev['target_valid'], node_observed=motion['support'], split=split,
+                grouping_kind='predicted', correspondence_policy='anchor_identity_first',
+                return_artifact=True,
+                node_input_support=dict(support=motion['support'], nearest_seconds=motion['nearest_seconds']))
+            artifact = report.pop('artifact')
+        else:
+            from association.evaluation.fusion_benchmark import evaluate_fusion_methods
+            reports, saved = evaluate_fusion_methods({name: out}, prediction_speed_units={name: prediction_speed_unit},
+                node_identities=ev['identities'], target_ids=ev['target_ids'], target_states=ev['target_states'],
+                target_valid=ev['target_valid'], support=motion['support'], nearest_seconds=motion['nearest_seconds'],
+                target_speed_unit='mps', split=split)
+            report, artifact = reports[name], saved[name]
         if name in retained:
             if set(artifact) != set(retained[name]):
                 raise ValueError('original artifact schema differs')
