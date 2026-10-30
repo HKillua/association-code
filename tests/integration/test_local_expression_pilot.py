@@ -7,6 +7,7 @@ from tools.analysis import local_expression_pilot as p
 from tools.analysis.audit_temporal_source_outputs import audit
 from tools.analysis.saved_attribute_accounting import account
 from tools.analysis import objective_difficulty_pilot as objective
+from tools.analysis import group_reference_counterfactual as counterfactual
 from tests.integration.test_source_risk_pilot import scene_arrays
 
 class LocalExpressionIOTests(unittest.TestCase):
@@ -36,6 +37,9 @@ class LocalExpressionIOTests(unittest.TestCase):
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard):p.run(a)
             audit(out,out/'independent-output-audit.json');account(out,out/'four-attribute-accounting.json')
             self.assertEqual(p.common.old.frozen.read(out/'run.json')['optimizer_updates'],1536)
+            b=SimpleNamespace(**paths,manifest=manifest,output=root/'163',expression_run=out)
+            with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])):counterfactual.run(b)
+            self.assertTrue(p.common.old.frozen.read(root/'163'/'summary.json')['oracle_diagnostic_only'])
             expression=out;out=root/'162';b=SimpleNamespace(**paths,manifest=manifest,output=out,head_run=head,expression_run=expression,device='cpu')
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard):objective.run(b)
             audit(out,out/'independent-output-audit.json');account(out,out/'four-attribute-accounting.json')
