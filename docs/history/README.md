@@ -6,6 +6,10 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 142状态高损害原核复放 | 原64场、T1487/V2770零支持点，624anchor×两rho＝1248核一次exit0；Q64/原5臂/支持层与零支持输出绑定。4393一anchor27个after点末端工作速率775.164m/s×3018.192s形成百万米传播，承担全V99.1792%SSE；已证数值路径，真实native异常原因/船速仍未知。无新方法分数，不自动改rho/删点。[Record/Squeeze](../reports/2026-10-30-state-recovery-tail-review.md) |
+| 141技术入口失败 | once FAILED exit1，首T0 KeyError p95因误读position.all，0CV复放；手造fixture复制错误schema未捕获。原现场/失败保留，技术Mode C1.58；142另立修复合同成功不倒填141。[失败Record/Squeeze](../reports/2026-10-30-state-recovery-tail-entry-failure.md) |
+| 140共享chord风险及集合读出 | 13fit、T6/V13臂一次exit0并独审；V旧Qhard547.721、新risk hard973.953、inverse1068.388、geometry1151.619m，四主差/去最大均不利。V raw负risk50.24%、负F与准确gap不认证条件风险；实际geometry−hard增害>1km10037点，强控/尾部取舍保留，A′/B均不晋级。[Record/Squeeze](../reports/2026-10-30-source-contribution-readout-review.md) |
+| 139米制选源目标 | 同输入/66系数/hard仅改log→km，13fit/T4V12一次exit0并独审；V547.721→564.852m，24差8平/去最大仍差15.109m。T救回158却新增304，602→748；反转90个>1km错误未减，纯组小收益/混组较大损害保留。当前配方不扩大。[Record/Squeeze](../reports/2026-10-30-source-selection-evidence-review.md) |
 | 138 T证据冲突联合诊断 | T32/12组件/D2 22627点只读join一次exit0并独立核验；区分条件排序可用/读出未兑现与排序错误，role反转154点Q仅8对、占21.222%选择损害；构造恒等、混组/reference/完整人口边界保留。0新物理预测/fit/grid，无新方法成绩或自动后继。[Record/Squeeze](../reports/2026-10-30-observation-conflict-review.md) |
 | 137原生观测选尺度 | T32九rho选1e-4冻结、T/V32完整，一次exit0并独立主要数组核验；V等权1276.441→obsRTS1784.722m/RMSE27531.051m，当前配方不晋级。旧reference尺度同贡献RTS1198.685m保留信号；预测组零支持损害集中非已证物理根因，去最大仍差，不自动改rho/删点或扩大。[Record/Squeeze](../reports/2026-10-30-observation-scale-review.md) |
 | 136观测质量贡献 | 固定T32/V32无reference拟合，T6/V15臂一次科学exit0并独立核验；V71071点equal1276.441→LOO1263.938m，但尾部/10场3组件差且未超nearest/Qhard；OLS1281.827m不利。floor1/100均未触发，不能称稳健。首audit因manifest路径入口失败保留，明确发布的校正只读调用成功，不重跑科学；Record→Squeeze→Mode C1.56完成。[完整记录](../reports/2026-10-30-observation-quality-review.md) |

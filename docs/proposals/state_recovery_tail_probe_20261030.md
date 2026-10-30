@@ -1,5 +1,7 @@
 # 141：零支持恢复高损害点的传播与映射核查
 
+执行记录：本文保留事前规格/实现核验历史，实际终态见[Record/Squeeze](../reports/2026-10-30-state-recovery-tail-entry-failure.md)及[S2L141](../../HandOver/S2L-20261030-141.md)，不提供再次启动许可。
+
 2026-10-30；IDEA_PACKAGE / research-pipeline-contract v1.0；idea_id `IDEA-STATE-RECOVERY-TAIL-PROBE-20261030`、plan_version1.0。类型computational diagnostic，证据状态partial；不预先选择修复。本轮用户明确授权分别推进选源、贡献及状态高损害核查，旧批次三项上限已经结案，不提供旧命令续跑许可。
 
 ## 依据、问题与竞争解释

@@ -1,5 +1,7 @@
 # 142：修正真实汇总入口后的独立状态传播核查
 
+执行记录：本文保留事前规格/实现核验历史，实际终态见[Record/Squeeze](../reports/2026-10-30-state-recovery-tail-review.md)及[S2L142](../../HandOver/S2L-20261030-142.md)，不提供再次启动许可。
+
 2026-10-30；IDEA_PACKAGE / research-pipeline-contract v1.0；idea_id `IDEA-STATE-RECOVERY-TAIL-CONTINUATION-20261030`、plan_version1.0。消费C55/F238/M107/E136及[141失败Record/Squeeze](../reports/2026-10-30-state-recovery-tail-entry-failure.md)的技术证据；独立新合同，不重启/重命名141，不覆盖失败。
 
 ## 问题、来源与最小变化

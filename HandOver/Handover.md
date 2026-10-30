@@ -1,13 +1,13 @@
 # 当前交接
 
-**2026-10-30新授权执行入口（优先于下方已结案批次）：** 139科学及独立审计均已COMPLETED/exit0，记录分析中；140已完成独立软件核验并由本聊天领取；141一次技术入口失败已保全并完成Record/Squeeze及Mode C1.58，仅修真实schema的新142独立合同已发布，其他执行者不要重复。旧批次“无READY/第三项上限”均为已结案范围，不取消本轮新用户授权。
+**2026-10-30本轮139/140/142均完成：** 三份Record/Squeeze及独立交叉review、Mode C1.59回流已完成；最终研究结论见[研究状态](../docs/research_status.md)。139/140科学和限定独审均exit0；142完整数值复放exit0；141原入口失败单独保全。无本轮READY/活动服务/自动后继，旧合同和旧批次不提供重复领取许可，不自动增143。
 
-| 新任务 | 当前状态 | 唯一固定合同 |
+| 本轮任务 | 真实终态与限定结果 | 回执/记录 |
 |---|---|---|
-| 139米制选源目标 | 科学/审计COMPLETED exit0，T32/V32/13fit；程序171.851s，原服务inactive/dead success | [L2S139](L2S-20261030-139.md)；独审372684 exact/116203 numeric通过，Record/Squeeze处理中 |
-| 140集合风险贡献 | 科学COMPLETED/exit0，T32/V32/13fit，原unit inactive/dead success；只读独审已领取 | [L2S140](L2S-20261030-140.md)，CPU12–15/1800s；T6/V13臂 |
-| 141状态高损害复放 | FAILED/exit1；程序0.454s，0完整场/0CV复放，原private为空，非状态方法负结果 | [L2S141](L2S-20261030-141.md)；真实position.all被误读为平铺，原unit failed/failed Restart=no；原run不重启，Record/Squeeze及Mode C1.58已完成 |
-| 142状态高损害新复放 | COMPLETED/exit0，64场/1248核，原unit inactive/dead success，程序117.324s；Record/Squeeze中 | [L2S142](L2S-20261030-142.md)，code ddc35de，CPU16–17/1800s，新目录一次 |
+| 139米制选源目标 | 科学171.851s/审计49.818s exit0，T32/V32/13fit；V比旧Qhard差17.131m，误选救回158新增304，不扩大 | [S2L139](S2L-20261030-139.md)、[Record/Squeeze](../docs/reports/2026-10-30-source-selection-evidence-review.md) |
+| 140集合风险贡献 | 科学212.547s/独审80.865s exit0，13fit/T6/V13完整；四主差不利，已补实际增害>1km/max，不晋级 | [S2L140](S2L-20261030-140.md)、[Record/Squeeze](../docs/reports/2026-10-30-source-contribution-readout-review.md) |
+| 141原状态核查 | FAILED/exit1、0完成场/0CV；真实position.all被误读为平铺，private空；不重启 | [S2L141](S2L-20261030-141.md)、[失败Record/Squeeze](../docs/reports/2026-10-30-state-recovery-tail-entry-failure.md)，技术Mode C1.58 |
+| 142新独立状态复放 | COMPLETED/exit0，64场/1248核，程序117.324s；T1487/V2770零支持点及端点/保存位置绑定；无新方法分数 | [S2L142](S2L-20261030-142.md)、[Record/Squeeze](../docs/reports/2026-10-30-state-recovery-tail-review.md) |
 
 **2026-10-30夜间固定三项均已科学终态及限定独立核验：** 136/137/138科学与最终有效审计均COMPLETED/exit0，真实服务均inactive/dead success；三份Record/Squeeze及Mode C1.57回流已完成并review，本批heartbeat `mtad`已删除。136首审计入口失败与另明确发布的校正只读调用分别保留，不算第二次科学尝试。无READY、活动服务或可重复领取任务；本批不再新增第4项。135仅保留草案，132/133/134不重开。
 
