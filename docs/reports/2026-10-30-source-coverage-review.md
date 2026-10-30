@@ -9,7 +9,7 @@ EXPERIMENT_RECORD `LEVEL1-SOURCE-T-COVERAGE-20261030-155-attempt-1`，source_ide
 - 冻结905a8f0、新checkout155/一次run。manifest首128T，不按误差/角色选场；原32 pack/监督直接复用133，新增96用151缓存/冻结056全部i<j评分与相同WS构组。旧teacher输入单独mps→kn视图；评分物理OLS速度仍mps，新增source_states存储mps明确标记，位置标签不受其速度存储列影响。
 - 10维/66系数、同log-error/每query总权1/λ1/clip±8；原T32十二组件LOCO测试，新128分别排除相同组件再拟合，另full，共13fit。没有新网络更新、rawCSV/测试或V选N/λ；新增196个teacher分块调用，不等196个样本。T32/V32成员/评分控制保持，预测保存后评价。
 - 训练来源从32场/12组件/45254源query标签/22627有效group-query，变为128场/28组件/166058标签/83029 group-query。slot0非最佳训练query154→393，比例约.681%→.473%；绝对数量增加不等稀有关系相对更受重视。slot0只是匿名评价标签，不是模型输入或固定优先策略。
-- 评价同原T32/V32：T37635/38224位置点、860目标/911组/86重复、35漏轨迹；V71071/72196点、1427目标/1605组/217重复、39漏轨迹。0/1支持与全部速度/航向不变，缺失/重复留分母；四属性/论文统计在原件，ESD未知。
+- 评价同原T32/V32：T37635/38224位置点、860目标/911组/86重复、35漏轨迹；V71071/72196点、1427目标/1605组/217重复、39漏轨迹。0/1支持与全部速度/航向不变，缺失/重复留分母；原共用summary保位置/经纬论文统计，完整四状态数组保留。speed/heading全部统计在终态后按[L2S157补项](../../HandOver/L2S-20261030-157.md)从冻结数组补齐，成本/范围另记，不倒填原audit；ESD未知。
 - 北京时间23:03:12–23:05:38，程序145.351967s/launcher151.839082s、RSS734126080B；CPU8–11×4/RSS8/AS14GiB/3600s advisory未超。原unit `mtad-8f38cf84d7eb.service`真实inactive/dead成功/ExecMainStatus0/Restart=no/Linger=yes。
 
 全部脱敏[原件155](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_temporal_unsupported_full_peers/155/)包括T/V完整summary/逐场gzip、训练128场人口/13fold、原命令/退出/服务、限定audit与追加角色/before-after核算；坐标/身份/模型/系数/大数组留server。

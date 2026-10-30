@@ -5,6 +5,7 @@ import tempfile,unittest
 import numpy as np
 from tools.analysis import t128_frozen_full_scope as p
 from tools.analysis.audit_temporal_source_outputs import audit
+from tools.analysis.saved_attribute_accounting import account
 from tests.integration.test_source_risk_pilot import scene_arrays
 from association.evaluation.fusion_controls import ordinary_fusion
 from association.evaluation.query_contribution import query_contribution
@@ -37,5 +38,7 @@ class FrozenFullScopeTests(unittest.TestCase):
             audit(out,out/'independent-output-audit.json');result=p.common.old.frozen.read(out/'independent-output-audit.json')
             self.assertEqual(result['splits']['V_select']['scenes'],4);self.assertNotIn('T_core',result['splits'])
             summary=p.common.old.frozen.read(out/'summary.json');self.assertGreater(summary['all_components']['methods'][p.NEW]['position']['missing_prediction_count'],0)
+            account(out,out/'four-attribute-accounting.json');full=p.common.old.frozen.read(out/'four-attribute-accounting.json')
+            self.assertEqual(full['splits']['V_select']['methods'][p.NEW]['all']['speed']['unit'],'mps')
 
 if __name__=='__main__':unittest.main()
