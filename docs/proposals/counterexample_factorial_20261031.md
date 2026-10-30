@@ -37,3 +37,9 @@ CPU0–3×4/RSS6/AS12GiB，GPU不可见，1800s advisory；独立checkout160/run
 | 分离表征与表达，监督/训练人口一致 | 新local_source_evidence模块、159 orchestration；同fold/同索引/初始残差零/实际梯度与有限性检查 |
 | 端点与速度正交，不改变合法支持域 | 新robust_native_endpoint模块、160 orchestration；n2/常速/坏端点及真实T/V fixture，限定独审 |
 | 完整输入、退出与评价，不把软件当科学 | 新run/原launcher/request/service/status及全部逐场，失败保全、无自动后继；公开Record列计划偏差 |
+
+## 161：冻结decoder层级与memory幅度（独立定位）
+
+IDEA-TFM-DECODER-LAYERS-20261031，plan1.0，Mode C1.66/1.68的M02/F251/E154连接。仅原T2四正对、107末步checkpoint、原154输出及正常normalizer；0更新/V/test。逐decoder层保存每次自回归末查询的norm1/cross/norm2/norm3/layer输出；原FC2 memory乘1/0/.01/.1四次固定干预，不改变原权重或mask。首步cross-attention的实际输入用原Q/K投影和float64重放logits/softmax，只输出range/entropy/max-prob；不替换实际attention forward、不把一阶重放当所有步或训练梯度。倍率事先固定，不按T误差挑新模型/重训。
+
+输出原154匹配差、全部路径/四臂同204位置指标/真实成本；新原始数组留private。软件核hook不改原预测、移除自身及不同尺度响应。假设memory幅度或层级归一化可能影响输入响应，仍AI/UN；即使层内收缩与缩放响应都出现，也只证操作路径，不认证训练优化唯一根因、attention饱和或可信同行失效。GPU0 UUIDc5a00c37…兼容余量6GiB，CPU16–19×4/RSS8GiB/1800s advisory，新checkout/run/launcher各一次，Restart=no/Linger=yes，失败保全不自动重试。此为已定位失败的有界工具核查，不新增论文或预定融合方案；Record/Squeeze再回M02。
