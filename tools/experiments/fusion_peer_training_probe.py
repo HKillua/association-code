@@ -129,7 +129,8 @@ def probe(model, rows, method, device):
         return dict(count=len(x), mae_m=float(x.mean()), rmse_m=float(np.sqrt(np.mean(x*x))),
                     p95_m=float(np.quantile(x, .95)), p99_m=float(np.quantile(x, .99))) if len(x) else None
     return dict(position=stats(errors), mean_control=stats(control), ptfm_swap_displacement=stats(swaps),
-                scope='fixed first sampled T batch; PTFM core plus Mean outside longest common segment; not V or fair ranking')
+                scope=('fixed first sampled T batch; PTFM core plus Mean outside longest common segment; not V or fair ranking'
+                    if method == 'ptfm' else 'fixed first sampled T batch; DeepAF own closed-loop full Q64 positions, Mean speed/course; not V or fair ranking'))
 
 
 def run(args):
