@@ -1,12 +1,12 @@
 # 当前交接
 
-**2026-10-30新授权执行入口（优先于下方已结案批次）：** 139/140为两个独立解决方案，当前实现及独立软件核验中，尚无其READY；141已由本聊天领取一次直接提交，其他执行者不要重复。旧批次“无READY/第三项上限”均为已结案范围，不取消本轮新用户授权。
+**2026-10-30新授权执行入口（优先于下方已结案批次）：** 139/140为两个独立解决方案；139已完成实现和独立软件核验，由本聊天领取一次直接提交，140软件链/独立审计准备中；141一次技术入口失败已保全，其他执行者不要重复。旧批次“无READY/第三项上限”均为已结案范围，不取消本轮新用户授权。
 
 | 新任务 | 当前状态 | 唯一固定合同 |
 |---|---|---|
-| 139米制选源目标 | IMPLEMENTING，设计已review；尚未READY/运行 | [Idea/spec](../docs/proposals/source_selection_evidence_20261030.md)；只改target，13fits，T4/V12臂 |
+| 139米制选源目标 | READY，已由本聊天领取待一次提交；code ce69afd | [L2S139](L2S-20261030-139.md)，CPU8–11/1800s；T4/V12臂，独立审计同版 |
 | 140集合风险贡献 | IMPLEMENTING，设计已review；尚未READY/运行 | [Idea/spec](../docs/proposals/source_contribution_readout_20261030.md)；新平方风险A′，同critic三个读出，T6/V13臂 |
-| 141状态高损害复放 | READY，已由本聊天领取待一次直接提交；0新方法/训练 | [L2S141](L2S-20261030-141.md)，code dd75fd7，新run/checkout，CPU16–17/1800s advisory |
+| 141状态高损害复放 | FAILED/exit1；程序0.454s，0完整场/0CV复放，原private为空，非状态方法负结果 | [L2S141](L2S-20261030-141.md)；真实position.all被误读为平铺，原unit failed/failed Restart=no；原run不重启，正在Record/Squeeze |
 
 **2026-10-30夜间固定三项均已科学终态及限定独立核验：** 136/137/138科学与最终有效审计均COMPLETED/exit0，真实服务均inactive/dead success；三份Record/Squeeze及Mode C1.57回流已完成并review，本批heartbeat `mtad`已删除。136首审计入口失败与另明确发布的校正只读调用分别保留，不算第二次科学尝试。无READY、活动服务或可重复领取任务；本批不再新增第4项。135仅保留草案，132/133/134不重开。
 
