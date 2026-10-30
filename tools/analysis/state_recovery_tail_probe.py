@@ -1,4 +1,4 @@
-"""141: independently bind zero-support outputs and replay their CV endpoints.
+"""142: independently bind zero-support outputs and replay their CV endpoints.
 
 No producer imports, new model, rho selection, changed output or sealed data.
 The fixed recurrence is transcribed from the published 127 working CV model.
@@ -23,7 +23,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = ''
 import numpy as np
 
 RADIUS = 6371000.
-IDEA = 'IDEA-STATE-RECOVERY-TAIL-PROBE-20261030'
+IDEA = 'IDEA-STATE-RECOVERY-TAIL-CONTINUATION-20261030'
 BASE = 'WS_SOURCE_EQUAL'
 CV_NAMES = tuple(f'WS_{label}_SCALE_{direction}_EQUAL'
                  for label in ('REFERENCE', 'OBS') for direction in ('FORWARD', 'RTS'))
@@ -219,7 +219,7 @@ def inspect_scene(state_run, native_run, split, sid, expected):
         errors[name][valid] = distance(value['aligned_prediction'][:count, :, :2][valid], ev['target_states'][..., :2][valid])
         for key, computed in error_stats(errors[name][valid]).items():
             if key in ('mae', 'mse', 'rmse', 'p95', 'p99'):
-                require(np.isclose(computed, expected['methods'][name]['position'][key], rtol=1e-9, atol=1e-6), 'original primary metric '+key)
+                require(np.isclose(computed, expected['methods'][name]['position']['all'][key], rtol=1e-9, atol=1e-6), 'original primary metric '+key)
         for subset, subset_mask in strata.items():
             original = expected['methods'][name]['fixed_target_strata'][subset]
             computed = error_stats(errors[name][subset_mask])

@@ -78,7 +78,7 @@ class TailTraceTests(unittest.TestCase):
             supported = support[[0, 2]]
             masks = dict(inside_support=identity, outside_support=~identity, source_support_zero=~supported,
                          source_support_one=supported, source_support_multi=np.zeros_like(supported))
-            expected['methods'][name] = dict(position=probe.error_stats(errors.ravel()),
+            expected['methods'][name] = dict(position={'all': probe.error_stats(errors.ravel())},
                 fixed_target_strata={key: dict(point_count=int(mask.sum()), **{
                     k: v for k, v in probe.error_stats(errors[mask]).items() if k in ('mae', 'mse', 'rmse', 'p95', 'p99')})
                     for key, mask in masks.items()})
@@ -117,6 +117,13 @@ class TailTraceTests(unittest.TestCase):
                 np.savez(path, **data)
                 with self.assertRaises(ValueError):
                     probe.inspect_scene(state, native, 'T_core', 'fixture', expected)
+
+    def test_real_nested_metric_contract_required(self):
+        with tempfile.TemporaryDirectory() as temp:
+            state, native, expected = self.fixture(Path(temp))
+            expected['methods'][probe.BASE]['position'] = expected['methods'][probe.BASE]['position']['all']
+            with self.assertRaises(KeyError):
+                probe.inspect_scene(state, native, 'T_core', 'fixture', expected)
 
 
 if __name__ == '__main__':
