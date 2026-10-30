@@ -8,6 +8,7 @@ from tools.analysis.audit_temporal_source_outputs import audit
 from tools.analysis.saved_attribute_accounting import account
 from tools.analysis import objective_difficulty_pilot as objective
 from tools.analysis import group_reference_counterfactual as counterfactual
+from tools.analysis.audit_group_reference_population import audit as audit_counterfactual
 from tests.integration.test_source_risk_pilot import scene_arrays
 
 class LocalExpressionIOTests(unittest.TestCase):
@@ -27,7 +28,7 @@ class LocalExpressionIOTests(unittest.TestCase):
                 if split=='T_core':np.savez_compressed(value/'private'/f'T-features-{sid}.npz',membership=membership)
                 else:p.common.old.frozen.write(partition/'private'/f'scene-{sid}.json.gz',dict(memberships={'WS':membership.tolist()}))
                 m,g,mean,pack,_=p.physical(paths,split,sid);scores=np.zeros(pack['available'].shape);raw=p.recover(m,g,pack,scores,mean)
-                np.savez_compressed(source/'private'/(f'oof-{sid}.npz' if split=='T_core' else f'policy-{sid}.npz'),**{('QUADRATIC__scores' if split=='T_core' else p.BASE+'__scores'):scores})
+                np.savez_compressed(source/'private'/(f'oof-{sid}.npz' if split=='T_core' else f'policy-{sid}.npz'),**{k:v for k,v in pack.items() if isinstance(v,np.ndarray)},membership=membership,**{('QUADRATIC__scores' if split=='T_core' else p.BASE+'__scores'):scores})
                 np.savez_compressed(head/'private'/f'raw-{split}-{sid}.npz',**{p.NEW:raw})
                 if split=='T_core':np.savez_compressed(source/'private'/f'training-{sid}.npz',**{k:v for k,v in {**pack,**p.source.training_labels(pack,g,ev)}.items() if isinstance(v,np.ndarray)})
             original=p.common.evaluation
@@ -39,6 +40,7 @@ class LocalExpressionIOTests(unittest.TestCase):
             self.assertEqual(p.common.old.frozen.read(out/'run.json')['optimizer_updates'],1536)
             b=SimpleNamespace(**paths,manifest=manifest,output=root/'163',expression_run=out)
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])):counterfactual.run(b)
+            audit_counterfactual(root/'163',root/'163'/'independent-population-audit.json')
             self.assertTrue(p.common.old.frozen.read(root/'163'/'summary.json')['oracle_diagnostic_only'])
             expression=out;out=root/'162';b=SimpleNamespace(**paths,manifest=manifest,output=out,head_run=head,expression_run=expression,device='cpu')
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard):objective.run(b)
