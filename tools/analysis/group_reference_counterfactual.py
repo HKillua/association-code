@@ -35,7 +35,9 @@ def scene_counterfactual(m,g,pack,ev,models,original):
         for key in ('selected_error','clean_selected_error','excess','clean_excess'):arrays[name+'_'+key]=np.full(shape,np.nan)
     original_cpu=predict_residual(models['network'],pack['features'].reshape(-1,10),'cpu').reshape(pack['available'].shape)
     cleaned={'quadratic':predict(models['quadratic'],clean['features'].reshape(-1,10)).reshape(clean['available'].shape),'network':predict_residual(models['network'],clean['features'].reshape(-1,10),'cpu').reshape(clean['available'].shape)}
-    registry={str(v):i for i,v in enumerate(ev['target_ids'])};checks=dict(formula_max_difference_m=0.,pure_group_feature_checks=0,cpu_original_choice_changes=0,missing_reference_candidates=0,valid_alternative_query_candidates=0)
+    registry={str(v):i for i,v in enumerate(ev['target_ids'])};checks=dict(formula_max_difference_m=0.,pure_group_feature_checks=0,cpu_original_choice_changes=0,missing_reference_candidates=0,valid_alternative_query_candidates=0);reference_count=0
+    for name in NAMES:
+        for bound in ('min','max'):arrays[name+'_reference_excess_'+bound]=np.full(shape,np.nan)
     def error(states,truth):
         e=risk._position_distance(states[...,:2],truth[...,:2]);other=distances(states,truth);np.testing.assert_allclose(e,other,rtol=1e-10,atol=1e-5,equal_nan=True)
         finite=np.isfinite(e)&np.isfinite(other)
@@ -49,12 +51,16 @@ def scene_counterfactual(m,g,pack,ev,models,original):
         best=np.where(available,e,np.inf).min(0);best_set=available&(e<=best[None,:]+1e-6);arrays['rare'][gid]=eligible&available[0]&(e[0]>best+1e-6)
         for name in NAMES:
             selected,excess=rank(e,original[name][a:b],available);arrays[name+'_wrong'][gid]=eligible&(excess>1e-6);arrays[name+'_selected_error'][gid]=selected;arrays[name+'_excess'][gid]=excess
+            arrays[name+'_reference_excess_min'][gid]=excess;arrays[name+'_reference_excess_max'][gid]=excess
         _,cpu_regret=rank(e,original_cpu[a:b],available);checks['cpu_original_choice_changes']+=int((eligible&((cpu_regret>1e-6)!=arrays['network_wrong'][gid])).sum())
-        for other_id in set(map(str,ev['identities'][group].tolist()))-{identity}:
-            if other_id not in registry:checks['missing_reference_candidates']+=1;continue
+        for other_id in sorted(set(map(str,ev['identities'][group].tolist()))-{identity}):
+            prefix='ref_'+str(reference_count)+'__';reference_count+=1;arrays[prefix+'group_index']=np.asarray(gid);arrays[prefix+'target_identity']=np.asarray(other_id);arrays[prefix+'source_row_start']=np.asarray(a)
+            if other_id not in registry:
+                checks['missing_reference_candidates']+=1;arrays[prefix+'target_index']=np.asarray(-1);arrays[prefix+'valid_original_query']=np.zeros(shape[1],bool);continue
             ix=registry[other_id];mask=eligible&ev['target_valid'][ix,:,:2].all(-1);arrays['alt_seen'][gid]|=mask;checks['valid_alternative_query_candidates']+=int(mask.sum());other=error(pack['source_states'][a:b],ev['target_states'][ix]);best_other=np.where(available,other,np.inf).min(0);set_other=available&(other<=best_other[None,:]+1e-6);arrays['best_flips'][gid]|=mask&(set_other!=best_set).any(0)
+            arrays[prefix+'target_index']=np.asarray(ix);arrays[prefix+'valid_original_query']=mask;arrays[prefix+'source_errors_m']=other
             for name in NAMES:
-                _,regret=rank(other,original[name][a:b],available);arrays[name+'_alt_correct'][gid]|=mask&(regret<=1e-6)
+                _,regret=rank(other,original[name][a:b],available);arrays[name+'_alt_correct'][gid]|=mask&(regret<=1e-6);arrays[name+'_reference_excess_min'][gid,mask]=np.minimum(arrays[name+'_reference_excess_min'][gid,mask],regret[mask]);arrays[name+'_reference_excess_max'][gid,mask]=np.maximum(arrays[name+'_reference_excess_max'][gid,mask],regret[mask])
         cv=clean['available'][ca:cb];count=cv.sum(0);arrays['clean_multi'][gid]=eligible&(count>=2);arrays['clean_one'][gid]=eligible&(count==1);arrays['clean_zero'][gid]=eligible&(count==0)
         if pure:
             np.testing.assert_allclose(pack['features'][a:b],clean['features'][ca:cb],rtol=0,atol=1e-12);checks['pure_group_feature_checks']+=1
@@ -68,7 +74,8 @@ def scene_counterfactual(m,g,pack,ev,models,original):
 def summarize_arrays(arrays,mask):
     use=mask&arrays['eligible'];common=use&arrays['clean_multi'];out=dict(queries=int(use.sum()),alternative_reference_seen=int((use&arrays['alt_seen']).sum()),reference_best_set_flips=int((use&arrays['best_flips']).sum()),purification_multi=int(common.sum()),purification_one=int((use&arrays['clean_one']).sum()),purification_zero=int((use&arrays['clean_zero']).sum()),methods={})
     for n in NAMES:
-        old=arrays[n+'_wrong'];new=arrays[n+'_clean_wrong'];delta=arrays[n+'_clean_selected_error']-arrays[n+'_selected_error'];out['methods'][n]=dict(official_wrong=int((use&old).sum()),official_excess_sum_m=float(arrays[n+'_excess'][use].sum()),official_excess_over_1km=int((use&(arrays[n+'_excess']>1000)).sum()),official_wrong_with_alternative_correct=int((use&old&arrays[n+'_alt_correct']).sum()),common_original_wrong=int((common&old).sum()),common_clean_wrong=int((common&new).sum()),common_rescued=int((common&old&~new).sum()),common_new_wrong=int((common&~old&new).sum()),common_selected_error_delta_sum_m=float(delta[common].sum()),common_new_harm_over_1km=int((common&(delta>1000)).sum()))
+        reference_mask=use&arrays['alt_seen'];span=arrays[n+'_reference_excess_max'][reference_mask]-arrays[n+'_reference_excess_min'][reference_mask]
+        old=arrays[n+'_wrong'];new=arrays[n+'_clean_wrong'];delta=arrays[n+'_clean_selected_error']-arrays[n+'_selected_error'];out['methods'][n]=dict(official_wrong=int((use&old).sum()),official_excess_sum_m=float(arrays[n+'_excess'][use].sum()),official_excess_over_1km=int((use&(arrays[n+'_excess']>1000)).sum()),reference_excess_range_sum_m=float(span.sum()),official_wrong_with_alternative_correct=int((use&old&arrays[n+'_alt_correct']).sum()),common_original_wrong=int((common&old).sum()),common_clean_wrong=int((common&new).sum()),common_rescued=int((common&old&~new).sum()),common_new_wrong=int((common&~old&new).sum()),common_selected_error_delta_sum_m=float(delta[common].sum()),common_new_harm_over_1km=int((common&(delta>1000)).sum()))
     return out
 
 def aggregate(rows):
