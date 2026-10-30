@@ -8,9 +8,13 @@
 
 ## 现在做什么
 
+**2026-10-30新一轮继续授权：** 用户要求分别解决“选源错误”和“选对源但混合未兑现”，同时落实状态高损害点核查，成熟后直接上服务器，不退固定源优先级。本轮消费已完成Mode C1.57及[新24格定向矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，不把来源定向复核重复计为新精读。①[米制选源目标139](proposals/source_selection_evidence_20261030.md)固定10特征/66系数/原hard，仅改log误差目标为米制误差，13个T组件隔离解析拟合，检验高损害错误能否减少；②[集合风险读出140](proposals/source_contribution_readout_20261030.md)先建立合法T弦长平方风险critic A′，再在同critic比较hard/inverse/几何集合贡献，隔离评分目标与读出变化。两项均需真实完整风险检验，不把目标更贴近评价或chord恒等式当净收益保证。数据已核速度接近带噪位置差分，不将其包装为独立健康通道；合理监督拟合仍在用户允许范围，未改成固定源身份策略。两方案经设计review进入实现与针对性核验，执行只看HandOver。
+
+**状态恢复本轮入口：** [141具体核查](proposals/state_recovery_tail_probe_20261030.md)对原T/V全部零支持可评点，独立重建真实span/组对应，并对唯一anchor×原两rho复放固定KF/RTS保留端点状态，绑定旧Q64；预算在发布前按真实复放改1800s/CPU2。不凭wrapped经度反解或公共SSE就宣布外推根因，不改变旧输出/删点/按V选rho；真实中间量完成记录回流后再形成对应状态改法。原132失败现场仍保留，旧136–138不重开。上一批已删除的heartbeat不自动恢复，本轮优先在当前会话完成固定任务。
+
 **2026-10-30夜间新授权与偏好：** 用户接受有先例、协议合理的训练参数/新数据集重拟合，但倾向少依赖这种后端拟合；要求扩大论文探索和探索性实验，并授权睡眠期间持续推进。优先研究不读目标reference拟合全局系数的观测驱动质量/状态/鲁棒融合，135校准草案保留但不作默认路线，不将偏好误写为禁止任何学习。仍按完整来源→Mode C→独立Idea→真实实验→Record→Squeeze→回流；来源优先2025–2026高质量本领域/相近和跨域，全文/公式/实验/反例及可得作者代码分别核，不能用摘要或资料条目凑精读。
 
-**本批固定终点已到：** 四篇新来源完整分析、最多三项真实有界探索136/137/138均已完成；三项科学及限定独立审计均COMPLETED/exit0，真实服务均inactive/dead success。没有第四项、全V扩量、新神经训练或失败后科学重试；旧132现场保留。136首次审计传错manifest路径的入口失败与另行明确发布的只读校正调用分别留档，未重跑科学。三份Record/Squeeze已完成并review，Record→Squeeze→Mode C1.57全部收尾；不再按旧READY重复领取。
+**上一批固定终点已到：** 四篇新来源完整分析、最多三项真实有界探索136/137/138均已完成；三项科学及限定独立审计均COMPLETED/exit0，真实服务均inactive/dead success。没有第四项、全V扩量、新神经训练或失败后科学重试；旧132现场保留。136首次审计传错manifest路径的入口失败与另行明确发布的只读校正调用分别留档，未重跑科学。三份Record/Squeeze已完成并review，Record→Squeeze→Mode C1.57全部收尾；不再按旧READY重复领取。
 
 **来源与矩阵：** 本批新增JAS2025在线探索MLE、ICLR2026 Chroma、ICML2025 Morphing-Flow及NCAM2026预印本四篇全文来源分析，正文/公式/实验/消融或对应反例、可得作者实现分别记录；前三篇为正式高质量，NCAM只作补充/反例，不充正式发表名额。累计充分深入104＝72领域/相近＋32跨域。原件/独有证据见[来源A](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/label_free_fusion_sources_20261030.md)、[来源B](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_transfer_sources_20261030.md)。[局部矩阵v1.4](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#observation-scale-conflict-feedback)从实施前27格，经136回流30格，再逐格更新原30/新增6格，共36格；[Mode C1.57](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-157)将137/138分项合并为F238/M107AI/E136、F239/M108AI/E137，累计P14/F239/M108/E137/C55，不倒填事前依据、不增论文数。作者代码未取得时不宣作者复现，论文声望不覆盖来源内矛盾。
 
@@ -20,7 +24,7 @@
 
 **下一研究问题与去留：** 继续优先少依赖target-reference系数拟合的路线，合理监督拟合仍可作为对照/保留后继，不退固定源优先级。先区分三件事：①什么合法新增观测信息能区分源内平滑与绝对误差，并覆盖稀少角色反转；②已有排序信息应如何按最终集合风险读出，而不是直接倒数加权；③状态选择目标是否覆盖最终query的支持缺口/恢复权限，先核已保存高损害点的端点、时距、成员与传播，再设计可分离验证。它们是具体问题及候选解释，不是预定模型。保留137同贡献reference-RTS与此前125/131条件贡献的有效信号，各自强控/尾部继续约束；不相加模块冠军、不认证真实K≥3、在线、跨域或可信同行净胜。新科学运行仍须新Idea/固定合同/独立READY，不从旧命令续跑。
 
-**本批跟进已结束：** 三份记录与Mode C回流完成后，本线程heartbeat `mtad`（MTAD夜间探索）已实际删除。当前无运行科学/审计服务、待重复执行任务或本批自动后继；原输入、失败及终态原件保留。执行索引只在HandOver，后继从上述具体未决问题走新Idea/固定合同。
+**上一批跟进已结束：** 三份记录与Mode C回流完成后，本线程heartbeat `mtad`（MTAD夜间探索）已实际删除。当前无运行科学/审计服务、待重复执行任务或本批自动后继；原输入、失败及终态原件保留。执行索引只在HandOver，后继从上述具体未决问题走新Idea/固定合同。
 
 **2026-10-30用户明确范围：统一状态输入下的可变多源航迹融合。** 用户接受各传感器统一提供经纬度、速度、航向；时间戳与来源归属沿用航迹输入约定。本轮聚焦这种共同状态输入，不把原始图像/雷达量测转换作为前置任务。最终方法不得依赖仅两源相对平移、源编号排序的FixedLOW优先或“全A／75%A+25%B”两种固定动作；应支持可变K源（区别于片段数）、换序/重命名等价及来源加入/缺失，根据合法证据处理各源贡献。现有三种配方仅保留为历史证据/对照，不作为最终架构限制；用户未禁止多源校准，也未指定连续权重或某种网络。[实现边界审查及范围订正](reports/2026-10-30-sensor-scalability-review.md)保留已核两源限制与未测外部泛化。[Mode C1.52及局部30格矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)复用8项原文/实证来源，形成4连接；优先MR-C1共享误差证据，MR-C2校正锚定与MR-C3联合误差风险分开保留。[133事前Idea](proposals/source_risk_20261030.md)及[规格](specs/source-risk.md)已落实：同一10维源特征、共享误差头与可变K贡献，T12组件留出/全T共39解析拟合、原V32十臂45对，先分离“挑对源”和“混合有益”。[133真实Record/Squeeze](reports/2026-10-30-source-risk-review.md)已完成并独立核验：同71071点Qsoft相对源等权MAE1276.441→1128.755m（−11.57%，32场/9组件均好，去最大仍−147.056m），但同分数hard为547.721m，且仍比旧LOW527.446m差20.275m；FixedLOW447.060m和旧Q435.061m仍更低。共享证据有信号，当前soft温度1不能作为最终融合；保留完整强控/尾部/覆盖反例，不自动扩268或按V调参。39解析拟合而非深度网络训练；0新teacher前向/神经更新，程序141.506s。主要数组/39模型/OOF/45比较/人口/主bootstrap核验通过，[Mode C1.53](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-153)完成P14/F231/M102/E129/C53回流，精读100=70+30不变。结构可扩展与实际效果分别验收，132现场保留决定不变。
 
