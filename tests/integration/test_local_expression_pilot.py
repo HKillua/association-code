@@ -28,7 +28,7 @@ class LocalExpressionIOTests(unittest.TestCase):
                 m,g,mean,pack,_=p.physical(paths,split,sid);scores=np.zeros(pack['available'].shape);raw=p.recover(m,g,pack,scores,mean)
                 np.savez_compressed(source/'private'/(f'oof-{sid}.npz' if split=='T_core' else f'policy-{sid}.npz'),**{('QUADRATIC__scores' if split=='T_core' else p.BASE+'__scores'):scores})
                 np.savez_compressed(head/'private'/f'raw-{split}-{sid}.npz',**{p.NEW:raw})
-                if split=='T_core':np.savez_compressed(source/'private'/f'training-{sid}.npz',**{k:v for k,v in p.source.training_labels(pack,g,ev).items() if isinstance(v,np.ndarray)})
+                if split=='T_core':np.savez_compressed(source/'private'/f'training-{sid}.npz',**{k:v for k,v in {**pack,**p.source.training_labels(pack,g,ev)}.items() if isinstance(v,np.ndarray)})
             original=p.common.evaluation
             def guard(native,split,sid,m):
                 self.assertTrue((out/'private'/f'raw-{split}-{sid}.npz').exists());return original(native,split,sid,m)
