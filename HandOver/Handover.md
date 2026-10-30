@@ -4,6 +4,8 @@
 
 ## 当前执行
 
+**154 READY，由本聊天领取直接提交**：[冻结TFM路径探针](L2S-20261030-154.md)，不重训107；155/156只有事前Idea，尚未发布/执行。Mode C1.65为反例连接分析，不是新成功机制。
+
 **152A/B真实同一launcher/systemd均RUNNING，已实际训练；149/150/151/153已结案回流。** [152合同](L2S-20261030-152.md)、[启动原件与非终态回执](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。21:44:24实际training日志为epoch1第55/27更新；run.json每25更新落盘为50/25，两路T初始探针/PTFM归一化已完。不能把RUNNING当训练/全V评价完成。151原launcher/服务终态成功，整数曝光已核，旧148不续跑。新run各一次，无自动后继/抢卡/SSH值守。
 
 149/150原独审入口失败保留、新v2限定复算成功；153原数值审计失败与新精度分离复核分别记录。完整[149/150 Record/Squeeze](../docs/reports/2026-10-30-temporal-unsupported-review.md)、[153 Record/Squeeze](../docs/reports/2026-10-30-tmtaff-training-physical-review.md)已回Mode C1.64，当前两配方未稳定升级、不扩大。151数据准备不等训练完成。
