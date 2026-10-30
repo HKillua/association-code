@@ -1,11 +1,13 @@
 # 当前交接
 
-**2026-10-30用户新授权的三问题探索：** 高损害误选、实际混合读出、支持域外传播分别立新合同；旧批次“无自动后继”不限制本次新授权。145真实失败已保全；146接口修复达到READY并由本聊天领取，143/144尚在设计，不提供执行许可；不重跑139/140/142。
+**2026-10-30用户新授权的三问题探索：** 高损害误选、实际混合读出、支持域外传播分别立新合同；旧批次“无自动后继”不限制本次新授权。145真实失败已保全；146接口修复达到READY并由本聊天领取，143/144已完成具体合同与软件核验、由本聊天领取一次，按各自合同执行；不重跑139/140/142。
 
 | 新任务 | 当前状态 | 固定合同 |
 |---|---|---|
+| 143相对代价选源 | READY，本聊天领取；26凸fit/CPU4，T6/V13完整 | [L2S143](L2S-20261030-143.md)、[Idea](../docs/proposals/relative_source_decision_20261030.md) |
+| 144实际坐标集合损失 | READY，本聊天领取；13fit+13全局选择/CPU4，T6/V13完整 | [L2S144](L2S-20261030-144.md)、[Idea](../docs/proposals/actual_mixture_gain_20261030.md) |
 | 145原支持外分离 | FAILED/exit1，首场157核后list/布尔索引错误；0完整评价，原现场保留 | [S2L145](S2L-20261030-145.md)、[Record/Squeeze](../docs/reports/2026-10-30-unsupported-recovery-entry-failure.md) |
-| 146独立接口修复续接 | READY，本聊天领取一次；CPU4/1800s advisory，科学范围完全继承145 | [L2S146](L2S-20261030-146.md)、[Idea/spec](../docs/proposals/unsupported_recovery_continuation_20261030.md) |
+| 146独立接口修复续接 | RUNNING，unit mtad-fb7cedadb32a.service，T32完成/V进行中；CPU4，科学范围继承145 | [L2S146](L2S-20261030-146.md)、[Idea/spec](../docs/proposals/unsupported_recovery_continuation_20261030.md) |
 
 **2026-10-30本轮139/140/142均完成：** 三份Record/Squeeze及独立交叉review、Mode C1.59回流已完成；最终研究结论见[研究状态](../docs/research_status.md)。139/140科学和限定独审均exit0；142完整数值复放exit0；141原入口失败单独保全。无本轮READY/活动服务/自动后继，旧合同和旧批次不提供重复领取许可，不自动增143。
 
