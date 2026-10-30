@@ -226,6 +226,68 @@ def endpoint_report(pack, labels, score):
         regret_gt_1000m_sum=float(regret[regret > 1000].sum()))
 
 
+def actual_harm_stats(delta):
+    """Actual radial error(candidate)-error(baseline), never endpoint regret."""
+    delta = np.asarray(delta, float)
+    if delta.ndim != 1 or not np.isfinite(delta).all():
+        raise ValueError('finite one-dimensional common-population error difference required')
+    positive, negative = delta[delta > 0.], delta[delta < 0.]
+    large = positive[positive > 1000.]
+    return dict(common_point_count=len(delta), signed_error_change_sum_m=float(delta.sum()),
+        mean_error_change_m=float(delta.mean()) if len(delta) else None,
+        harm_point_count=len(positive), benefit_point_count=len(negative),
+        tied_point_count=int((delta == 0.).sum()), harm_sum_m=float(positive.sum()),
+        benefit_sum_m=float(-negative.sum()), harm_gt_1000m_count=len(large),
+        harm_gt_1000m_sum_m=float(large.sum()), harm_0_to_1000m_count=int((positive <= 1000.).sum()),
+        harm_0_to_1000m_sum_m=float(positive[positive <= 1000.].sum()),
+        maximum_harm_m=float(positive.max()) if len(positive) else (0. if len(delta) else None))
+
+
+def additional_actual_harm(results, rows, summary, checks):
+    """Reuse independent great-circle errors after common masks were verified.
+
+    Reports every predeclared primary, all scenes and components; no selection,
+    new prediction, source-only/D2 restriction, or threshold search is performed.
+    """
+    components = sorted({r['component_id'] for r in rows})
+    largest = summary['largest_component_id']
+    output = {}
+    for key in PRIMARY:
+        pair = rows[0]['pairwise'][key]
+        baseline, candidate = pair['baseline_method'], pair['candidate_method']
+        differences = []
+        for result in results:
+            a, b = result[baseline]['errors'], result[candidate]['errors']
+            checks.exact(a.shape == b.shape, 'actual harm bound common population')
+            differences.append(b-a)
+        def describe(indices):
+            return actual_harm_stats(np.concatenate([differences[i] for i in indices])
+                                     if indices else np.empty(0))
+        all_rows = describe(list(range(len(rows))))
+        by_component = {c: describe([i for i, r in enumerate(rows) if r['component_id'] == c])
+                        for c in components}
+        public = summary['all_components']['pairwise'][key]['strata']['all']['candidate_minus_A0']
+        checks.value(all_rows['common_point_count'], public['common_point_count'], 'common_point_count', 'actual harm')
+        checks.value(all_rows['mean_error_change_m'], public['mean_error_change'], 'mean_error_change', 'actual harm')
+        checks.value(all_rows['signed_error_change_sum_m'], public['signed_error_change_sum'], 'signed_error_change_sum', 'actual harm')
+        checks.value(all_rows['harm_sum_m']-all_rows['benefit_sum_m'], all_rows['signed_error_change_sum_m'],
+                     'signed_error_change_sum', 'actual harm signed accounting')
+        for field in ('common_point_count', 'harm_point_count', 'benefit_point_count', 'tied_point_count',
+                      'harm_gt_1000m_count', 'harm_0_to_1000m_count'):
+            checks.exact(sum(v[field] for v in by_component.values()) == all_rows[field], 'actual harm component '+field)
+        output[key] = dict(comparison=key, baseline_method=baseline, candidate_method=candidate,
+            all_components=all_rows, by_component=by_component,
+            without_largest_component=describe([i for i, r in enumerate(rows) if r['component_id'] != largest]),
+            largest_component_id=largest,
+            scenes=[dict(scene_id=r['scene_id'], component_id=r['component_id'], **actual_harm_stats(delta))
+                    for r, delta in zip(rows, differences)])
+    return dict(scope='Actual saved physical radial errors on full aligned common target/query population; not source endpoint regret',
+        units='metres', difference='candidate minus baseline',
+        threshold_rule='strictly greater than 1000 metres of additional error; exactly 1000 belongs to (0,1000]',
+        sign_rule='exact sign of independently computed float64 error differences, without epsilon deadband',
+        comparisons=output)
+
+
 def inspect_policy(run_path, paths, split, row, predictions, full, checks):
     sid = row['scene_id']; names = T_METHODS if split == 'T_core' else V_METHODS
     pack = load(run_path/'private'/f'policy-{split}-{sid}.npz')
@@ -335,7 +397,7 @@ def audit_run(run_path, paths, manifest_path, checks):
     checks.exact(state['full_T_models_frozen_before_V'] is True and state['time_policy'] == 'advisory'
         and 1 <= state['cpu_threads'] <= 4, 'declared temporal and resource bounds')
     training, predictions, full = inspect_training(run_path, paths, manifest, tids, checks)
-    scopes = {}
+    scopes, harm = {}, {}
     for split, ids, names, nc, rows_path, sm in (
         ('T_core', tids, T_METHODS, 12, 'T-scene-summary.json.gz', core.read(run_path/'T-summary.json')),
         ('V_select', vids, V_METHODS, 9, 'scene-summary.json.gz', summary)):
@@ -348,13 +410,14 @@ def audit_run(run_path, paths, manifest_path, checks):
             checks.exact(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*(1 if sys.platform == 'darwin' else 1024) <= RAM, 'bounded audit RSS')
         expected = [{k: r[k] for k in ('scene_id', 'component_id', 'risk_policy', 'reference_diagnostic')} for r in rows]
         checks.exact(sm['risk_diagnostics_by_scene'] == expected, 'complete pooled diagnostic scene binding')
-        _, scopes[split] = common.inspect_metric_block(run_path, split, rows, sm, names, checks,
+        results, scopes[split] = common.inspect_metric_block(run_path, split, rows, sm, names, checks,
             expected_scene_ids=ids, expected_component_count=nc, expected_primary_pairs=PRIMARY,
             native_evaluation_root=paths['native_run']/'private/native-evaluation')
+        harm[split] = additional_actual_harm(results, rows, sm, checks)
         if split == 'T_core':
             checks.exact(summary['training_summary'] == sm, 'final nested T summary exact')
     checks.exact(state['completed_training_cache_count'] == state['completed_training_scene_count'] == state['completed_scene_count'] == 32, 'complete fixed endpoint')
-    return dict(metric_scope=scopes, audited_model_count=13,
+    return dict(metric_scope=scopes, additional_actual_harm=harm, audited_model_count=13,
         labeled_source_query_count=sum(int(r['labeled'].sum()) for r in training),
         T_components=12, V_components=9, T_old_score_recovered_controls=3, original_V_controls=10,
         actual_source_count_scope='K<=2; a K>=3 input is rejected, not silently certified')
@@ -367,7 +430,7 @@ def audit(run_path, native_path, source_path, manifest_path, output):
     if any(output == p or p in output.parents for p in (*paths.values(), manifest_path)):
         raise ValueError('audit output cannot alter original inputs')
     report = dict(status='RUNNING', started_at=datetime.now(timezone.utc).isoformat(),
-        scope='Independent140 source packs/labels,13 chord ridge fits/OOF/full,clip,K<=2 hard/inverse/geometry objective and gap,node recovery,old controls,main populations/metrics/bootstrap',
+        scope='Independent140 source packs/labels,13 chord ridge fits/OOF/full,clip,K<=2 hard/inverse/geometry objective and gap,node recovery,old controls,main populations/metrics/bootstrap and four-primary actual physical error harm',
         not_audited=['physical reference correctness or true conditional moments/calibrated sensor health',
             'upstream teacher or original127 OLS correctness', 'general K>=3 solver beyond separate software tests',
             'runtime file-access order beyond code inspection and saved-array equality',

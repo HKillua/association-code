@@ -11,6 +11,25 @@ from tools.analysis import audit_source_contribution_readout as audit
 
 
 class ContributionAuditUnitTests(unittest.TestCase):
+    def test_actual_harm_signed_population_and_strict_threshold(self):
+        values = np.array([-2000., -1., 0., 999., 1000., 1000.1])
+        result = audit.actual_harm_stats(values)
+        self.assertEqual(result['common_point_count'], 6)
+        self.assertEqual(result['harm_point_count'], 3)
+        self.assertEqual(result['benefit_point_count'], 2)
+        self.assertEqual(result['tied_point_count'], 1)
+        self.assertEqual(result['harm_gt_1000m_count'], 1)
+        self.assertAlmostEqual(result['harm_gt_1000m_sum_m'], 1000.1)
+        self.assertEqual(result['harm_0_to_1000m_count'], 2)
+        self.assertAlmostEqual(result['harm_sum_m'], 2999.1)
+        self.assertAlmostEqual(result['benefit_sum_m'], 2001.)
+        self.assertAlmostEqual(result['signed_error_change_sum_m'], 998.1)
+        self.assertAlmostEqual(result['maximum_harm_m'], 1000.1)
+        self.assertEqual(audit.actual_harm_stats(-np.ones(3))['maximum_harm_m'], 0.)
+        self.assertIsNone(audit.actual_harm_stats(np.empty(0))['maximum_harm_m'])
+        with self.assertRaises(ValueError):
+            audit.actual_harm_stats(np.array([np.nan]))
+
     def test_response_and_weighted_fit(self):
         errors = np.array([[1000., 3000., 9000.]])
         row = dict(features=np.zeros((1, 3, 10)), labeled=np.ones((1, 3), bool),
@@ -79,6 +98,15 @@ class ContributionAuditIntegrationTests(unittest.TestCase):
         self.assertEqual(report['metric_scope']['V_select']['pairs_per_scene'], 78)
         for scope in report['metric_scope'].values():
             self.assertEqual(scope['primary_bootstrap_count'], 4)
+        for split, expected_components in (('T_core', 12), ('V_select', 9)):
+            harm = report['additional_actual_harm'][split]['comparisons']
+            self.assertEqual(set(harm), set(audit.PRIMARY))
+            for result in harm.values():
+                self.assertEqual(len(result['scenes']), 32)
+                self.assertEqual(len(result['by_component']), expected_components)
+                overall = result['all_components']
+                self.assertEqual(overall['common_point_count'], sum(r['common_point_count'] for r in result['scenes']))
+                self.assertEqual(overall['harm_gt_1000m_count'], sum(r['harm_gt_1000m_count'] for r in result['scenes']))
 
     def test_chord_label_and_fit_corruption_rejected(self):
         state, paths, manifest = self.context(); args = self.args
