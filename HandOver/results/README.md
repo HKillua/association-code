@@ -4,6 +4,7 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [149/150/151/153原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_temporal_unsupported_full_peers/) | 零域候选/真时序与置乱完整T/V结果、原失败审计与新复核、before/after/角色记账；全2400数据准备；冻结TFM T物理六臂、数值精度边界和真实命令/终态/成本。private坐标/权重仍server。[149/150](../../docs/reports/2026-10-30-temporal-unsupported-review.md)/[151](../../docs/reports/2026-10-30-full-peer-data-review.md)/[153](../../docs/reports/2026-10-30-tmtaff-training-physical-review.md) |
 | [147/148及原107痕迹原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_full_benchmark_peer_connection/) | 六臂全V300完整summary/300场/独立主位置audit，真实T8双模型训练/实际曝光/托管退出及原107只读痕迹；normalizer坐标均值/scale、身份、权重与大数组留服务器；[147](../../docs/reports/2026-10-30-source-risk-full-benchmark-review.md)/[148](../../docs/reports/2026-10-30-fusion-peer-connection-review.md) |
 | [134原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_mixture_opportunity/134/) | T-only混合空间/3原OOF头误选条件、完整公共32逐场/组件/分层/排除scope、科学与审计两launcher/服务终态；[Record/Squeeze](../../docs/reports/2026-10-30-mixture-opportunity-review.md) |
 | [133原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_source_risk/133/) | T32/V32共享误差/可变K接口，10臂45对、39拟合，完整公共逐场/OOF/主bootstrap/真实launcher与独立数组审计；[Record/Squeeze](../../docs/reports/2026-10-30-source-risk-review.md) |
