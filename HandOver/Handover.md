@@ -4,8 +4,8 @@
 
 | 新任务 | 当前状态 | 固定合同 |
 |---|---|---|
-| 143相对代价选源 | READY，本聊天领取；26凸fit/CPU4，T6/V13完整 | [L2S143](L2S-20261030-143.md)、[Idea](../docs/proposals/relative_source_decision_20261030.md) |
-| 144实际坐标集合损失 | READY，本聊天领取；13fit+13全局选择/CPU4，T6/V13完整 | [L2S144](L2S-20261030-144.md)、[Idea](../docs/proposals/actual_mixture_gain_20261030.md) |
+| 143相对代价选源 | 科学COMPLETED/exit0，180.979s、T32/V32/26fit；限定输出审计已领取 | [L2S143](L2S-20261030-143.md)、[Idea](../docs/proposals/relative_source_decision_20261030.md) |
+| 144实际坐标集合损失 | 科学COMPLETED/exit0，179.423s、T32/V32/13fit；限定输出审计已领取 | [L2S144](L2S-20261030-144.md)、[Idea](../docs/proposals/actual_mixture_gain_20261030.md) |
 | 145原支持外分离 | FAILED/exit1，首场157核后list/布尔索引错误；0完整评价，原现场保留 | [S2L145](S2L-20261030-145.md)、[Record/Squeeze](../docs/reports/2026-10-30-unsupported-recovery-entry-failure.md) |
 | 146独立接口修复续接 | RUNNING，unit mtad-fb7cedadb32a.service，T32完成/V进行中；CPU4，科学范围继承145 | [L2S146](L2S-20261030-146.md)、[Idea/spec](../docs/proposals/unsupported_recovery_continuation_20261030.md) |
 
