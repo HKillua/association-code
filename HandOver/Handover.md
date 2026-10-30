@@ -5,9 +5,9 @@
 | 新任务 | 当前状态 | 唯一固定合同 |
 |---|---|---|
 | 139米制选源目标 | 科学/审计COMPLETED exit0，T32/V32/13fit；程序171.851s，原服务inactive/dead success | [L2S139](L2S-20261030-139.md)；独审372684 exact/116203 numeric通过，Record/Squeeze处理中 |
-| 140集合风险贡献 | RUNNING，真实unit mtad-b3551f823123 active/running，13fit与T/V固定终点执行中；code65366cb | [L2S140](L2S-20261030-140.md)，CPU12–15/1800s；T6/V13臂 |
+| 140集合风险贡献 | 科学COMPLETED/exit0，T32/V32/13fit，原unit inactive/dead success；只读独审已领取 | [L2S140](L2S-20261030-140.md)，CPU12–15/1800s；T6/V13臂 |
 | 141状态高损害复放 | FAILED/exit1；程序0.454s，0完整场/0CV复放，原private为空，非状态方法负结果 | [L2S141](L2S-20261030-141.md)；真实position.all被误读为平铺，原unit failed/failed Restart=no；原run不重启，Record/Squeeze及Mode C1.58已完成 |
-| 142状态高损害新复放 | RUNNING，真实unit mtad-6f62d97c6e72 active/running，已越过原首场入口；核/人口/容差不改 | [L2S142](L2S-20261030-142.md)，code ddc35de，CPU16–17/1800s，新目录一次 |
+| 142状态高损害新复放 | COMPLETED/exit0，64场/1248核，原unit inactive/dead success，程序117.324s；Record/Squeeze中 | [L2S142](L2S-20261030-142.md)，code ddc35de，CPU16–17/1800s，新目录一次 |
 
 **2026-10-30夜间固定三项均已科学终态及限定独立核验：** 136/137/138科学与最终有效审计均COMPLETED/exit0，真实服务均inactive/dead success；三份Record/Squeeze及Mode C1.57回流已完成并review，本批heartbeat `mtad`已删除。136首审计入口失败与另明确发布的校正只读调用分别保留，不算第二次科学尝试。无READY、活动服务或可重复领取任务；本批不再新增第4项。135仅保留草案，132/133/134不重开。
 
