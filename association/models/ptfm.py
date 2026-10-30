@@ -139,7 +139,7 @@ def ptfm_inputs(motion,members,*,device='cpu',include_prior=False):
 
 
 class PTFM(nn.Module):
-    def __init__(self,normalizer,*,position_mode='direct'):
+    def __init__(self,normalizer,*,position_mode='direct',sensor_branches=False):
         super().__init__()
         if position_mode not in POSITION_MODES:raise ValueError('unknown PTFM position output mode')
         self.position_mode=position_mode
@@ -173,6 +173,10 @@ class PTFM(nn.Module):
             with torch.no_grad():self.output.weight[:2].zero_();self.output.bias[:2].zero_()
         self.motion_observation_policy='canonical_all'
         self.routing_semantics=RESIDUAL_ROUTING_SEMANTICS if position_mode=='prior095_residual' else ROUTING_SEMANTICS
+        if sensor_branches:
+            if position_mode!='direct':raise ValueError('sensor branches use direct output')
+            self.context_gate=None
+            self.routing_semantics='ptfm-two-sensor-common-support-v2'
 
     def forward(self,anchor,helper,context,origin,base_states=None):
         q=len(anchor)
@@ -197,7 +201,9 @@ class PTFM(nn.Module):
         x=torch.cat((a,b,pe),-1); attended=x*self.attention(x)
         temporal=self.temporal(x.unsqueeze(0))[0].squeeze(0)
         joined=torch.cat((temporal,attended),-1)
-        fused=joined*torch.sigmoid(self.gate(joined)+self.context_gate(context))+self.residual(attended)
+        gate=self.gate(joined)
+        if self.context_gate is not None:gate=gate+self.context_gate(context)
+        fused=joined*torch.sigmoid(gate)+self.residual(attended)
         latent=self.projection(fused)
         normalized=self.output(latent).double()
         local=normalized*self.scale+self.mean
