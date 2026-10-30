@@ -32,7 +32,7 @@ def audit(run,out):
                 for name in names[1:]:
                     checks.array(saved[name]['group_states'][mask],base['group_states'][mask],'unchanged action domain')
                     checks.array(saved[name]['group_states'][...,2:],base['group_states'][...,2:],'unchanged attributes')
-                items.append(core.inspect_scene(saved,row,names,checks))
+                items.append(core.inspect_scene(saved,row,names,checks,expected_split=split))
             cs=sorted({r['component_id'] for r in rows});big=summary['largest_component_id']
             core.inspect_summary(summary['all_components'],list(range(len(rows))),items,rows,names,checks,'full')
             core.inspect_summary(summary['without_largest_component'],[i for i,r in enumerate(rows) if r['component_id']!=big],items,rows,names,checks,'drop')
