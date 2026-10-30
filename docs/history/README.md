@@ -10,6 +10,9 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 155训练覆盖 / 157冻结头完整V300 | 同10维66系数，T32→128组件12→28；全300同441144点MAE590.760→582.808m、总误选7438→5212、选择excess>1km4466→2890；罕见反转1868→1940、对旧231点增害>1km。科学/限定输出audit通过，四属性缺项另从冻结数组补齐，不是独立健康/外域认证或方法创新完成。[155](../reports/2026-10-30-source-coverage-review.md)/[157](../reports/2026-10-30-t128-full-scope-review.md) |
+| 156历史选模型 / 158当前多尺度速度 | 各T32/V32完整一次exit0/限定输出audit。156T改善却V MAE641.236m/RMSE10068.222m；灾难时距没超过历史最大值。158r1较r2/CV局部有益，但对原Qhard V MAE547.721→547.819m、RMSE1829.356→2654.187m，15点>100km；数值回退/强控/after/四属性补项保留，当前均不扩大/拼接。[156](../reports/2026-10-30-within-source-forecast-review.md)/[158](../reports/2026-10-30-robust-endpoint-review.md) |
+| 154冻结TFM内部路径 | 固定T2四正对，TCM/FC有变化而decoder末端约1e−6；投影非零，零memory有响应却更差，double最后投影约.77m不足解释数十km。各层/attention/训练优化原因未定，不重训107、不拿适配失败判赢作者。[Record/Squeeze](../reports/2026-10-30-tfm-constant-path-review.md) |
 | 149零支持候选 / 150时序信息 | 两科学一次exit0、原审计入口失败保留、新v2限定复算通过，Record→Squeeze→Mode C1.64。149最近V RMSE/P99好但MAE/P95差/391点增害>1km；150V−2.500m、误选1126→942，却T+5.489m/602→638、去最大反向/罕见反转未解。当前两配方不扩大，不否定时序/估计方向。[完整记录](../reports/2026-10-30-temporal-unsupported-review.md) |
 | 151完整训练/评价数据连接 | 一次exit0、T2100/V300/46126可训练组、4800声明文件0缺，0训练/测试；完整人口/一次单位转换/冻结V参考及实际更新预算已记，不算方法成绩。[Record/Squeeze](../reports/2026-10-30-full-peer-data-review.md) |
 | 153冻结107 T物理探针 | T8/16正对/27节点出现一次exit0，1024查询四路位置各仅1种坐标；同732有效点TFM36.635km vs Mean1.887km，支持内也差。原数值audit失败与新混合dtype复现/double双算法分析分开；唯一层原因未知，不重训107、不判赢原论文。[Record/Squeeze](../reports/2026-10-30-tmtaff-training-physical-review.md) |

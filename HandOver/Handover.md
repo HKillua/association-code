@@ -4,9 +4,9 @@
 
 ## 当前执行
 
-**154/155/156已Record/Squeeze→Mode C1.66；157科学完成/独审RUNNING；158 READY由本聊天领取直接提交**：[157固定头完整评价](L2S-20261030-157.md)、[158当前多尺度速度](L2S-20261030-158.md)。156配方不扩大；157不新拟合/拼状态冠军，158仅独立反例机制pilot。新run各一次，152活动冻结目录不动。
+**154–158科学各一次exit0，相关限定输出独审及补项已完成，Record→Squeeze→Mode C1.67收尾。** [154路径](S2L-20261030-154.md)、[155覆盖](S2L-20261030-155.md)、[156历史选择](S2L-20261030-156.md)、[157完整范围](S2L-20261030-157.md)、[158当前多尺度](S2L-20261030-158.md)。157固定内部候选保留、156/158不扩大、不拼接；155–158四属性统计缺项已从原冻结数组一次补齐并单列来源/成本，不倒填原独审。没有新READY或自动后继，152活动冻结目录不动。
 
-**152A/B真实同一launcher/systemd均RUNNING，已实际训练；149/150/151/153已结案回流。** [152合同](L2S-20261030-152.md)、[启动原件与非终态回执](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。21:44:24实际training日志为epoch1第55/27更新；run.json每25更新落盘为50/25，两路T初始探针/PTFM归一化已完。不能把RUNNING当训练/全V评价完成。151原launcher/服务终态成功，整数曝光已核，旧148不续跑。新run各一次，无自动后继/抢卡/SSH值守。
+**152A/B真实原systemd均RUNNING，已实际训练。** [152合同](L2S-20261030-152.md)、[不可变启动原件](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。最后一次有界查询北京时间2026-10-30 **23:41:07**：PTFM已完成2epoch、第3epoch日志6477更新（run.json6475），DeepAF第1epoch日志1547更新（run.json1525、completed_epochs0）；两service active/running、Restart=no，0全V场完成。Result=success/ExecMainStatus0是运行中属性，不当终态成功。固定T初始探针/PTFM归一化已完；不可用训练loss代替物理末轮评价。活动合同仍比较原147，不加157/换配方/加额度。151已成功终态；旧148不续跑，无自动后继/抢卡/SSH值守。
 
 149/150原独审入口失败保留、新v2限定复算成功；153原数值审计失败与新精度分离复核分别记录。完整[149/150 Record/Squeeze](../docs/reports/2026-10-30-temporal-unsupported-review.md)、[153 Record/Squeeze](../docs/reports/2026-10-30-tmtaff-training-physical-review.md)已回Mode C1.64，当前两配方未稳定升级、不扩大。151数据准备不等训练完成。
 
