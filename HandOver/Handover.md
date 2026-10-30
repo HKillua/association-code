@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**147 RUNNING；148A/B READY，由本聊天领取直接提交，不重复领取。** [L2S147](L2S-20261030-147.md)冻结133参数统一评价六臂V300，已提交真实unit `mtad-3fd30b6529b0.service`，同一launcher核active/running、Restart=no/Linger=yes；[L2S148](L2S-20261030-148.md)为PTFM/DeepAF各8×4真实T8训练接通，不是全量baseline训练。无自动后继，终态均待核，不把push当启动。
+**本次147/148A/148B及147独立输出审计均COMPLETED/exit0，真实原unit全部inactive/dead，已完成Record→Squeeze→Mode C1.62。** [S2L147](S2L-20261030-147.md)、[S2L148](S2L-20261030-148.md)；原107仅只读痕迹再分析。当前没有READY/运行中/待核验任务，无自动后继。T2100/V300同行全量训练仍未发布，不能重复领取已结束小额合同。
 
 143/144/146科学及限定独立输出审计均COMPLETED/exit0，Record→Squeeze→Mode C1.61收尾完成；145原技术失败保留。此前批次已结案，不重复领取。
 

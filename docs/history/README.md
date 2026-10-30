@@ -10,6 +10,8 @@
 
 | 阶段 | 结论与后续约束 |
 |---|---|
+| 147冻结Qhard全V300 | 六臂/15对一次exit0，原32导入/新268推理，独立主输出/人口/尾部/组件/bootstrap核验；Qhard590.760m、余268为599.026m，相对Mean/Nearest均300场好，但对Mean3039个新增>1km/P99稍差。零支持首anchor回退尚未替换，不是外部泛化/同行净胜。[Record/Squeeze](../reports/2026-10-30-source-risk-full-benchmark-review.md) |
+| 148双同行真实T接线／原107保存痕迹 | PTFM/DeepAF各真实GPU8×4更新一次exit0，新单位/独立源分支/原P-V骨架接通，T探针u8都仍差Mean，不是全T2100/V300排名。原107保存affine/normalizer/单位吻合，802T场/29002unique pair，尺度不证明根因，原107不重训。[Record/Squeeze](../reports/2026-10-30-fusion-peer-connection-review.md) |
 | 146支持外端点/速度分离 | 64场/6142原核/14与21臂一次exit0并独立输出核验；OBS-RTS V1784.722→1241.072m、RMSE灾难修复，但T+11.007m/before受损。接Qhard仅−1.011m/区间跨0、P95/P99差；来源均衡均值更差。保留局部操作证据，未形成稳定系统增量。[Record/Squeeze](../reports/2026-10-30-unsupported-recovery-review.md) |
 | 145列表接口失败 | 原28fe61b首T场157核后TypeError，科学14.077s/exit1、0完整评价；原现场保留。技术E142，不是方法负结果；146独立修复合同不倒填原成功。[失败Record/Squeeze](../reports/2026-10-30-unsupported-recovery-entry-failure.md) |
 | 144实际坐标集合损失 | 13gain fit/13全局选择、288T曲线，完整T32/V32 exit0并输出audit；GLOBAL全alpha0，条件V−.038579m/区间跨0、去最大反向，动作实际全0/1。当前配方不扩大，细小内部收益/分辨率/信息仍未知。[Record/Squeeze](../reports/2026-10-30-actual-mixture-gain-review.md) |

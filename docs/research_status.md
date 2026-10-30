@@ -10,10 +10,10 @@
 
 ## 现在做什么
 
-**按用户最新要求，先把自己的方法把握好：统一评价入口，冻结133参数完成Qhard全V300基准；同行接线与排查同步推进。** [147设计](proposals/source_risk_full_benchmark_20261030.md)只扩量评价，不新拟合或拼接146；[比较设计§9](reports/2026-10-27-fair-comparison-contract.md#9-2026-10-30三种同行共同任务比较的后继设计)区分固定WS组的融合比较与实际完整系统；PTFM/DeepAF注明共同前端，不伪造其全片段关联能力。
+**按用户最新要求，先把自己的方法把握好。统一评价入口与Qhard全V300基准已完成，独立输出复算通过；PTFM/DeepAF真实T8训练已接通，但尚非全量公平成绩。** [147结果](reports/2026-10-30-source-risk-full-benchmark-review.md)为冻结原参数扩量，不拼146；[148/原107痕迹](reports/2026-10-30-fusion-peer-connection-review.md)保留真实GPU更新和未解决的恢复误差。[比较设计§9](reports/2026-10-27-fair-comparison-contract.md#9-2026-10-30三种同行共同任务比较的后继设计)仍区分固定WS组与实际完整系统，PTFM/DeepAF注明共同前端。
 
-1. 核/修三者与原文的明确适配差异及共同评价入口，用既有证据和真实T侧有界验证固定新合同。统一T2100/V300、Q64、单位、信息权限和完整人口；保留强普通控制和输入点数匹配控制，我们的通用候选也扩到同一V300，不拿V32与同行V300排名。
-2. 首seed20作可用性比较，正式重复预定20/21/23；每模型整数训练量、选模/调参额度和成本须先冻结。最多四单卡，三个同行就绪可各一路，第四路给成熟科学Idea。现仅有设计，尚无新READY或训练，旧任务不自动重开。
+1. 固定147六臂全量基准，优先形成高害误选与支持外恢复的独立新Idea；保留整体/覆盖/重复/尾部和原32之外的结果，不在V追温度/阈值。当前零支持仍继承首anchor OLS与圆周歧义约定，尚不满足最终无首代表依赖的整体要求；不退回源编号优先，也不直接重用已失败的SOURCE_ALL配方。
+2. 在148真实T接线基础上接全T2100/V300公平比较，先明确样本/共同支持原域与公共回退域、点数匹配、整数曝光和选模预算，另立具体合同；不能把8步T探针当完整训练。首seed20，正式重复预定20/21/23，最多四单卡/FIFO。TMTAFF先区分T物理恢复、特征/输出/递归失配，旧107不续训。当前发布的147/148均已终态收尾，无新READY或自动后继。
 3. 三问题从Mode C1.61分别生成新Idea，不能重复同信息换loss或拼接模块冠军：
 
 | 问题 | 已有证据与下一项要区分的内容 |
@@ -28,6 +28,8 @@
 
 | 对象／实际范围 | 当前能支持的结论 | 完整证据 |
 |---|---|---|
+| 通用贡献冻结基准，V300 | 共同441144点，Mean/Nearest/Qsoft/Qhard MAE1294.074/964.568/1154.759/590.760m；余268 Qhard599.026m。300场/38组件相对Mean和Nearest场MAE均改善，但对Mean3039点增害>1km、P99略差；零支持3.682%点承担27.666%SSE，回退仍待替换 | [147 Record/Squeeze](reports/2026-10-30-source-risk-full-benchmark-review.md) |
+| 同行接线/失效定位 | PTFM/DeepAF各真实GPU8×4更新，固定T探针u8仍差Mean，未完成T2100/V300排名。原107保存normalizer/affine/单位吻合、1000步仅覆盖802T场/29002unique pair；输出尺度大不等失效根因 | [148与原107痕迹](reports/2026-10-30-fusion-peer-connection-review.md) |
 | WS分组，V300 | 固定056分数，decoded宏F1 76.5657→85.1820%；跨源mPCA77.9161→82.7318%、mPFA20.2849→14.1685%。raw不变；23场/4组件F1变差，完整覆盖/重复仍有代价。是内部增量 | [114](reports/2026-10-29-static-partition-review.md)、[115](reports/2026-10-29-static-position-review.md)、[117](reports/2026-10-29-query-contribution-full-review.md) |
 | 通用来源贡献，T32/V32 | V同71071点源等权MAE1276.441m、Qsoft1128.755m、同评分Qhard547.721m。T参考监督共享二次头有排序信号，不是校准物理健康；当前soft未优于hard | [133](reports/2026-10-30-source-risk-review.md)、[134](reports/2026-10-30-mixture-opportunity-review.md)、[138](reports/2026-10-30-observation-conflict-review.md) |
 | 139/140/143/144，T32/V32 | 米制、相对代价、平方风险及集合gain当前配方均未稳定超Qhard。143为579.466m；144仅−.038579m、区间跨0、动作全0/1，不能宣连续融合成功；当前配方不扩大，不否定整类方法 | [139](reports/2026-10-30-source-selection-evidence-review.md)、[140](reports/2026-10-30-source-contribution-readout-review.md)、[143](reports/2026-10-30-relative-source-decision-review.md)、[144](reports/2026-10-30-actual-mixture-gain-review.md) |
@@ -35,7 +37,7 @@
 | 历史条件有效点 | 125/131条件贡献、127原生RTS有真实收益及完整反例，但依赖已被排除的固定源角色条件，不能作为通用多源最终方案或相加冠军；观测免reference拟合136仅小幅均值收益、强控/尾部未过 | [125/131](reports/2026-10-29-conditional-source-value-full-review.md)、[127](reports/2026-10-29-native-state-review.md)、[136](reports/2026-10-30-observation-quality-review.md) |
 | 可信同行 | 尚无共同协议下稳定胜过TMTAFF/PTFM/DeepAF的证据，TMTAFF有效复现未完成。107有限训练/113评价位置严重失效、速度有收益；不以失败适配判赢原方法 | [113](reports/2026-10-29-fixed-endpoint-review.md)、[DeepAF边界](reports/2026-10-25-deepaf-method-audit.md)、[比较合同](reports/2026-10-27-fair-comparison-contract.md) |
 
-最近143/144/146均到可核终态，完成Record→Squeeze→Mode C1.61；145原技术失败另保留。详细人口、成本、偏差和不利结果见原报告；整理不改变实验、论文或矩阵计数。
+最近147/148A/148B与147独立输出审计均到可核终态，完成Record→Squeeze→Mode C1.62；原107痕迹只读再分析另记，不重训。详细人口、成本、偏差和不利结果见原报告；143/144/146与145原失败保留。
 
 ## 研究材料与推导入口
 
@@ -43,9 +45,9 @@
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.61](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-161)，累计P14/F245/M109/E145/C55 |
+| 全局P/F/M/E/C与回流 | [Mode C1.62](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-162)，累计P14/F247/M109/E149/C55 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v1.3，36格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#relative-actual-feedback) |
+| 选源与集合读出 | [SR v1.4，39格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#full-benchmark-feedback) |
 | 观测驱动与状态恢复 | [OD v1.6，42格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#unsupported-recovery-feedback) |
 | 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入104＝72领域/相近＋32跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |

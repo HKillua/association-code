@@ -4,6 +4,7 @@
 
 | 保留目录 | 目的 |
 |---|---|
+| [147/148及原107痕迹原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_full_benchmark_peer_connection/) | 六臂全V300完整summary/300场/独立主位置audit，真实T8双模型训练/实际曝光/托管退出及原107只读痕迹；normalizer坐标均值/scale、身份、权重与大数组留服务器；[147](../../docs/reports/2026-10-30-source-risk-full-benchmark-review.md)/[148](../../docs/reports/2026-10-30-fusion-peer-connection-review.md) |
 | [134原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_mixture_opportunity/134/) | T-only混合空间/3原OOF头误选条件、完整公共32逐场/组件/分层/排除scope、科学与审计两launcher/服务终态；[Record/Squeeze](../../docs/reports/2026-10-30-mixture-opportunity-review.md) |
 | [133原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261030_source_risk/133/) | T32/V32共享误差/可变K接口，10臂45对、39拟合，完整公共逐场/OOF/主bootstrap/真实launcher与独立数组审计；[Record/Squeeze](../../docs/reports/2026-10-30-source-risk-review.md) |
 | [132失败原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/132/) | 原RUNNING/实际oomd终态、2400cache与共享plan元数据、SUMMARY1000保存checkpoint限制性核验、事后资源快照；原权重/大数组留server，无完整四臂成绩。[记录](../../docs/reports/2026-10-29-ordered-input-continuation-failure.md) |
