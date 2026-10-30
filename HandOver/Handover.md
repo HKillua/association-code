@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**154 READY，由本聊天领取直接提交**：[冻结TFM路径探针](L2S-20261030-154.md)，不重训107；155/156只有事前Idea，尚未发布/执行。Mode C1.65为反例连接分析，不是新成功机制。
+**154科学/launcher COMPLETED/exit0，Record/Squeeze中；155/156 READY，由本聊天各领取直接提交**：[154](L2S-20261030-154.md)、[155 T覆盖](L2S-20261030-155.md)、[156同来源历史预测](L2S-20261030-156.md)。Mode C1.65为事前反例连接分析，不是新成功机制。新run各一次，152活动冻结目录不动。
 
 **152A/B真实同一launcher/systemd均RUNNING，已实际训练；149/150/151/153已结案回流。** [152合同](L2S-20261030-152.md)、[启动原件与非终态回执](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。21:44:24实际training日志为epoch1第55/27更新；run.json每25更新落盘为50/25，两路T初始探针/PTFM归一化已完。不能把RUNNING当训练/全V评价完成。151原launcher/服务终态成功，整数曝光已核，旧148不续跑。新run各一次，无自动后继/抢卡/SSH值守。
 
