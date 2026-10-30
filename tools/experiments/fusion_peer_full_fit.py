@@ -185,7 +185,8 @@ def run(a):
     started=time.monotonic();state=dict(status='RUNNING',idea_id=IDEA,plan_version='1.0',method=a.method,seed=20,
         started_at=datetime.now(timezone.utc).isoformat(),optimizer_updates=0,completed_epochs=0,completed_V_scenes=0,
         data_run=str(a.data_run.resolve()),partition_run=str(a.partition_run.resolve()),qhard_run=str(a.qhard_run.resolve()),
-        state_speed_unit='mps',test_opened=False,validation_selected=False,old_weights_loaded=False,planned_epochs=EPOCHS[a.method],batch_groups=BATCH[a.method])
+        state_speed_unit='mps',test_opened=False,validation_selected=False,old_weights_loaded=False,planned_epochs=EPOCHS[a.method],batch_groups=BATCH[a.method],
+        supervision_count_columns=(['latitude','longitude','speed','course'] if a.method=='ptfm' else ['valid_P_query_points','same_P_count_duplicate_for_legacy_width','finite_difference_V_query_points','unused_zero']))
     def check(**kw):
         state.update(kw,elapsed_seconds=time.monotonic()-started,peak_rss_bytes=common.old.frozen.peak_rss_bytes())
         common.old.frozen.write(output/'run.json',state)
@@ -196,6 +197,7 @@ def run(a):
         if ready['status']!='COMPLETED' or ready['exit_code']!=0 or ready['completed_T_scenes']!=2100 or ready['completed_V_scenes']!=300:raise ValueError('full151 must be completed')
         index=common.old.frozen.read(a.data_run/'private/index.json');training=index['T_core'];scenes=Scenes(training)
         group_count=sum(len(v['groups']) for v in training.values());updates_per_epoch=sum((len(v['groups'])+BATCH[a.method]-1)//BATCH[a.method] for v in training.values())
+        if group_count!=a.expected_training_groups or updates_per_epoch*EPOCHS[a.method]!=a.expected_updates:raise ValueError('published integer exposure differs from prepared index')
         check(phase='normalizer',training_scenes=len(training),trainable_groups=group_count,planned_group_presentations=group_count*EPOCHS[a.method],planned_optimizer_updates=updates_per_epoch*EPOCHS[a.method])
         norm=normalizer(training,scenes,check) if a.method=='ptfm' else None
         model=(PTFM(norm,sensor_branches=True) if a.method=='ptfm' else deep.DeepAFPeer()).to(a.device)
@@ -231,4 +233,5 @@ def run(a):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--method',choices=tuple(EPOCHS),required=True)
     for k in ('data-run','partition-run','qhard-run','output'):p.add_argument('--'+k,type=Path,required=True)
+    p.add_argument('--expected-training-groups',type=int,required=True);p.add_argument('--expected-updates',type=int,required=True)
     p.add_argument('--device',required=True);p.add_argument('--time-policy',choices=('advisory',),required=True);run(p.parse_args())
