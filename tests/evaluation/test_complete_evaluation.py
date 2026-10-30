@@ -8,7 +8,7 @@ from unittest.mock import patch
 import numpy as np
 import torch
 
-from association.evaluation.tmtaff import aggregate_fusion_reports
+from association.evaluation.tmtaff import aggregate_fusion_reports, predicted_observed_controls
 from association.evaluation.scene import evaluate_full_scene, simple_fusion_outputs
 from association.evaluation.grouping import group_predicted_tracks
 from association.evaluation.association import evaluate_scenes, select_threshold
@@ -366,6 +366,27 @@ class AggregateFusionReportTests(unittest.TestCase):
         self.assertIsNone(result['missing']['speed']['rmse'])
         empty = aggregate_fusion_reports([])
         self.assertIsNone(empty['all']['speed']['coverage'])
+
+
+class PredictedObservedControlTests(unittest.TestCase):
+    def test_predicted_controls_keep_groups_masks_and_circular_angles(self):
+        values = np.array([[[10., 179., 2., 359.], [20., 10., 4., 20.]],
+                           [[12., -179., 6., 1.], [99., 99., 99., 99.]],
+                           [[30., 40., 5., 60.], [35., 42., 6., 62.]]])
+        observed = np.array([[True, True], [True, False], [False, False]])
+        controls = predicted_observed_controls(values, observed, [[0, 1], [2]])
+        mean = controls['predicted_mean'][0]
+        np.testing.assert_allclose(mean['states'][0, :3], [11., -180., 4.], atol=1e-12)
+        self.assertLess(abs((mean['states'][0, 3]+180) % 360-180), 1e-12)
+        np.testing.assert_array_equal(mean['states'][1], values[0, 1])
+        for rows in controls.values():
+            self.assertEqual([row['node_indices'] for row in rows], [[0, 1], [2]])
+            self.assertFalse(rows[1]['prediction_valid'].any())
+        np.testing.assert_array_equal(controls['predicted_anchor'][0]['states'], values[0])
+        opposing = np.array([[[1., 0., 1., 90.]], [[2., 180., 2., 270.]]])
+        ambiguous = predicted_observed_controls(opposing, np.ones((2, 1), bool), [[0, 1]])
+        np.testing.assert_array_equal(ambiguous['predicted_mean'][0]['prediction_valid'],
+                                      [[False, False, True, False]])
 
 
 if __name__ == '__main__':

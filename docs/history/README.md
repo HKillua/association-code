@@ -64,6 +64,19 @@
 
 **删除前版本：[`903f679`](https://github.com/HKillua/association-code/tree/903f679)**。096等原件、100逐臂配置/状态/曝光、旧科学合同均可按原路径读取。本地被中断时追加的重复字段映射未发布，撤去重复副本，不删除既有实证分析。
 
+## 2026-10-30退役入口与重复文件清理
+
+清理前版本：[cba6054](https://github.com/HKillua/association-code/tree/cba60543a329e1c67007217101b9ae5bdf39f082)。全仓Python导入/调用、配置读取和文档链接复核后，仅移除以下已结案专用编排；模型、训练/评价核心、checkpoint加载、矩阵、Idea/提案、完整分析及原实验证据保留，未重训或改变数值。
+
+| 移除范围 | 去留依据与原件 |
+|---|---|
+| 096 `tools/experiments/completion_system_evaluate.py`及对应integration测试 | 只组合旧093/094固定端点，无生产导入；当前113和新共同比较不使用它。[历史源码](https://github.com/HKillua/association-code/blob/cba60543a329e1c67007217101b9ae5bdf39f082/tools/experiments/completion_system_evaluate.py)。测试中的有效圆周角/缺失输出检查原样迁入 `tests/evaluation/test_complete_evaluation.py::PredictedObservedControlTests`；缓存比较器及其测试仍保留 |
+| 100 `tools/experiments/native_query_fit.py`、对应integration测试、`configs/native-query-{budget,mean,query}-level1.json` | 固定三臂配方已结案；无剩余生产导入/配置读取。`association`内原生事件表示、模型、训练、评价、权重加载及其测试均保留。[原启动器](https://github.com/HKillua/association-code/blob/cba60543a329e1c67007217101b9ae5bdf39f082/tools/experiments/native_query_fit.py)，配置按原路径读取 |
+| 107 `tools/experiments/run_tmtaff_unit_baseline_A.py`及对应integration测试 | 一次性TCM2424/TFM1000/固定056顺序编排，无生产导入；原107/113已终态且不重训。通用训练、服务托管和评价保留。[历史源码](https://github.com/HKillua/association-code/blob/cba60543a329e1c67007217101b9ae5bdf39f082/tools/experiments/run_tmtaff_unit_baseline_A.py)。原L2S仅将源码链接指向此版本，实际历史命令/回执不改 |
+| 106 `HandOver/results/LEVEL1-TMTAFF-UNIT-PREP-20261027-106/launcher-request.json` | 删除前与同目录 `request.json`逐字节相同；保留被回执/报告引用的完整 `request.json`，不删除唯一请求证据 |
+
+共移除10个文件，原1381行/77645字节中有效通用测试已迁回；这不是删除研究分析来减体积。当前包含论文方法和新实验的共享链仍引用许多旧模块/配置，因此保留；本轮不压缩/删除唯一结果、不改Git历史、不清理环境或真实runs。全仓还修复了历史流程审查中的6处原skill目录迁移链接，仅改定位，原分析正文不变。验证：清理前31项相关检查通过；清理后39项相关检查通过，771项测试导入发现0错误（未运行全套）；全仓1412处Markdown本地路径（含行号引用）检查通过；退役模块/配置无剩余Python调用。源码改动仅撤去专用编排、原样迁移通用测试，未改模型数值。
+
 ## 原件与恢复
 
 - **第二轮精简前：[`9eefd2c`](https://github.com/HKillua/association-code/tree/9eefd2c)**。含本轮移除的已审052—098回传、实验合同及旧变体源码。

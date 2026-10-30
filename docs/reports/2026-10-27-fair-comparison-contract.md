@@ -74,7 +74,7 @@ python tools/experiments/tmtaff_fixed056_evaluate.py \
 | 固定分数评价 | `evaluate_complete(...association_records=..., select_on_validation=False, threshold=...)`逐场核scene/candidate字段且跳过TAM前向 | 绑定056原final-scores和阈值，核原保存组及完整V；结果写明`tam_scoring_forwards=0` |
 | 固定TCM/TFM端点 | `tmtaff_complete_fit.py --phase tcm/tfm`、`--initialize-tcm-from`、固定TFM监测点/末步及真实曝光日志已存在 | 增加一个评价wrapper读取新TFM末步与原056缓存；无需修改训练阶段来选择关联 |
 | 当前TFM评测 | `train_complete.evaluate_tfm_endpoint`强制`oracle_only=True`；现093类输出只是oracle分量诊断 | wrapper额外产出固定056预测组结果；不能把oracle终评改标签冒充预测组 |
-| 旧096组合脚本 | `completion_system_evaluate.py`严格绑定093/094及原completion-policy合同 | 不直接改参数冒用096；提取必要绑定/评价逻辑即可，不继承旧source资格或旧训练额度 |
+| 旧096组合脚本 | [completion_system_evaluate.py（历史源码）](https://github.com/HKillua/association-code/blob/cba60543a329e1c67007217101b9ae5bdf39f082/tools/experiments/completion_system_evaluate.py)严格绑定093/094及原completion-policy合同 | 不直接改参数冒用096；提取必要绑定/评价逻辑即可，不继承旧source资格或旧训练额度 |
 | canonical_all共同控制 | `ordinary_fusion`已有；056缓存已有；新单位timed loader会丢弃raw tracks并拒绝motion混用 | 独立复制056控制速度列，保留原数组；添加cap128可见性匹配控制；禁止原地改缓存 |
 | 公平比较输出 | `evaluate_full_scene`、`ScenePredictionWriter`、论文指标聚合、102补算程序已有 | 对固定056各臂做逐属性共同mask、全人口、P95/P99、38组件、支撑/距离分层及成本汇总，不重复模型前向来补指标 |
 

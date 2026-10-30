@@ -7,7 +7,7 @@
 ## 对照范围和审查方式
 
 - 主仓[AGENTS](../../AGENTS.md)、[完整科研流程及用户契约附录](../research_workflow.md)，包括问题发现主线、baseline、1a–4b、跨域条件创建和实验回流。
-- 用户原版[analyze-paper](/Users/a1/Downloads/skills/analyze-paper/SKILL.md)、[deep-read](/Users/a1/Downloads/skills/deep-read/SKILL.md)、[discover-innovation](/Users/a1/Downloads/skills/discover-innovation/SKILL.md)、[五技能契约](/Users/a1/Downloads/skills/5-skill-research-workflow.md)；已采用的[迁移技能](/Users/a1/.codex/skills/transfer-ml-methods/SKILL.md)及[协调器](/Users/a1/.codex/skills/research-workflow/SKILL.md)。不另造标准。
+- 用户原版[analyze-paper](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/analyze-paper/SKILL.md)、[deep-read](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/deep-read/SKILL.md)、[discover-innovation](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/discover-innovation/SKILL.md)、[五技能契约](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/5-skill-research-workflow.md)；已采用的[迁移技能](/Users/a1/.codex/skills/transfer-ml-methods/SKILL.md)及[协调器](/Users/a1/.codex/skills/research-workflow/SKILL.md)。不另造标准。
 - 上轮[综合分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/cross_transfer_synthesis_20261028.md)、[统一矩阵§27](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-122)、三份分支和七份独立来源分析。三项独立只读审查分别核流程、矩阵推理和来源/迁移证据。
 - 本次定向抽核RAM补表、EQ-Reg两任务核心正则、Faults环境配置、ASF子集代码、CoRiM风险代码、TSP同步条件及IAGM来源链。**这是抽核，不是七篇再次精读或作者结果复验**；文档引用链本身不独立证明每次历史阅读的时间先后。
 - 飞书采用上轮实际核读七节及主仓已采纳的定位，本次未再次通读网页，也未将项目解释冒充网页逐字原文。
@@ -27,7 +27,7 @@
 
 ## 实质发现和已落实订正
 
-**1. 主题相关性被过早写成矩阵连接。** 用户[deep-read C4/C5](/Users/a1/Downloads/skills/deep-read/SKILL.md:156)要求核每个箭头，并写清对象/尺度、隐藏条件和连接理由。单写“◐M47/E56”没有完成这一判断。
+**1. 主题相关性被过早写成矩阵连接。** 用户[deep-read C4/C5](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/deep-read/SKILL.md:156)要求核每个箭头，并写清对象/尺度、隐藏条件和连接理由。单写“◐M47/E56”没有完成这一判断。
 
 | 上轮连接 | 为什么证据不足 | 本次处理 |
 |---|---|---|
@@ -39,7 +39,7 @@
 
 **2. 一处分支把源操作顺序压缩错了，会影响机制推理。** [表征分支](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/cross_transfer_representation_20261028.md)原写“先构图支持、后用时间历史打分”。IAGM实际先timestamp＋BiLSTM历史编码，图消息支持仍由全片段位置均值建立，最终全M×N打分。正确疑问是“已有时间编码是否足以补偿未共时消息邻域”，而非“构图前没有时间信息”。已据[IAGM原文分析§2.1](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/mtad_all_graph_20261028.md#21-实际任务方法与公式)订正并保留改动说明。
 
-**3. 主连接选择依据不足。** 用户[deep-read C6](/Users/a1/Downloads/skills/deep-read/SKILL.md:194)及[迁移技能§2](/Users/a1/.codex/skills/transfer-ml-methods/SKILL.md)要求推荐深入前比较机制、条件缺口、代价和可验证性。原稿只给C46一份展开包，缺相对C45/C47的统一判断。现将C46明确为**条件分析示例，未作优先选择**，三条连接仅暂存讨论；未倒填“此前已经筛选”。六维评分仍未完整执行，不用补几个数字掩盖判断缺口。
+**3. 主连接选择依据不足。** 用户[deep-read C6](/Users/a1/Downloads/05_开发与压缩包/研究技能_skills/deep-read/SKILL.md:194)及[迁移技能§2](/Users/a1/.codex/skills/transfer-ml-methods/SKILL.md)要求推荐深入前比较机制、条件缺口、代价和可验证性。原稿只给C46一份展开包，缺相对C45/C47的统一判断。现将C46明确为**条件分析示例，未作优先选择**，三条连接仅暂存讨论；未倒填“此前已经筛选”。六维评分仍未完整执行，不用补几个数字掩盖判断缺口。
 
 选文与科研入口选择不同：matching和representation分支确有完整材料、互补机制、可追踪代码/消融等阅读理由，不能指控完全没有选文依据；这些理由也不证明C46研究价值最高或作者方法已经易复现。
 
