@@ -15,12 +15,17 @@ def audit(run,out):
     try:
         record=core.read(run/'run.json');checks.exact(record['status']=='COMPLETED' and record['exit_code']==0,'science terminal')
         native=Path(record['native_run']);names=tuple(record['methods']);result['splits']={}
+        splits=record.get('evaluation_splits',['T_core','V_select']);invariants=record.get('invariant_methods',names[1:])
+        checks.exact(bool(splits) and len(set(splits))==len(splits) and set(splits)<=set(['T_core','V_select']),'declared splits')
+        checks.exact(set(invariants)<=set(names),'declared invariant methods')
         for split,ids,filename,rowsfile in [('T_core',record['training_scene_ids'],'T-summary.json','T-scene-summary.json.gz'),('V_select',record['scene_ids'],'summary.json','scene-summary.json.gz')]:
+            if split not in splits:continue
             summary,rows=core.read(run/filename),core.read(run/rowsfile);items=[]
+            checks.array(np.asarray([r['scene_id'] for r in rows]),np.asarray(ids),'complete ordered population')
             for sid,row in zip(ids,rows):
                 z=load(run/'private'/f'states-{split}-{sid}.npz')
                 saved={n:{k[len(n)+1:]:v for k,v in z.items() if k.startswith(n+'_')} for n in names}
-                ev=load(native/'private/native-evaluation'/split/f'scene-{sid}.npz');motion=load(native/'private/native-motion'/split/f'scene-{sid}.npz')
+                ev=load(native/'private'/record.get('native_evaluation_subdir','native-evaluation')/split/f'scene-{sid}.npz');motion=load(native/'private'/record.get('native_motion_subdir','native-motion')/split/f'scene-{sid}.npz')
                 base=saved[names[0]];nt=len(ev['target_ids'])
                 checks.array(base['target_ids'],ev['target_ids'],'native registry')
                 for k,original in [('aligned_truth','target_states'),('aligned_truth_valid','target_valid')]:checks.array(base[k][:nt],ev[original],'native '+k)
@@ -29,7 +34,7 @@ def audit(run,out):
                 checks.array(base['group_anchor_target_indices'],np.array([registry[str(ev['identities'][g[0]])] for g in groups]),'anchor correspondence')
                 counts=np.asarray([sum(motion['support'][g[motion['sources'][g]==s]].any(0) for s in np.unique(motion['sources'][g])) for g in groups])
                 mask=counts>0 if record['mode']=='zero' else counts<=1
-                for name in names[1:]:
+                for name in invariants:
                     checks.array(saved[name]['group_states'][mask],base['group_states'][mask],'unchanged action domain')
                     checks.array(saved[name]['group_states'][...,2:],base['group_states'][...,2:],'unchanged attributes')
                 items.append(core.inspect_scene(saved,row,names,checks,expected_split=split))
