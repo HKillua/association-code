@@ -4,6 +4,8 @@
 
 ## 当前执行
 
+**193 READY，本聊天领取一次。** [L2S193](L2S-20261101-193.md)：MC2.05/C68→新Idea，原T128/39fit/4992GPU更新、原T32/44臂/0V。GPU0兼容共卡/新增≤1GiB、CPU8–11×4/RSS8GiB/3600s advisory；相同初始化/标准化/抽样MEAN/BAG/ORDER，原28强控/选源分组不变，HALF单独保留。9项软件检查通过后发布；成功后一次新audit193/CPU16–19×4无GPU/1800s advisory，失败保全不重投/换配方。无自动194/V/全300/seed，不改152活动预算和原冻结任务。
+
 **192科学资格成功，无待领/待审。** [S2L192](S2L-20261101-192.md)：3f0ba9c冻结一次新run192，原mtad-0983808a95d7.service真实exit0/inactive/dead/Resultsuccess/Restartno/Lingeryes；原T32/2310片段/580384事件，2310积分双表达/原mu和候选权重/旧病例人口绑定，0V/新预测/target评分/训练或似然。launcher18.158249s、45公共原件核齐、private原位。Record→Squeeze→Mode C2.04/SR v4.5/OD v1.18；密度假设不获支持，不部署时间权/经验SE门槛。源论文后续回流另见研究状态，不增加执行队列；原152与178–191/失败冻结，无自动193/全300/seed/新READY。
 
 **191科学/规定独审均成功，无待领/待审。** [S2L191](S2L-20261101-191.md)：f82d8a8冻结各一次，mtad-83ff3fb70d1f.service/mtad-a93aa61965c8.service均真实exit0/inactive/dead/Resultsuccess/Restartno/Lingeryes，原V32/28臂/7702均值、0本轮T评价或新神经监督似然，632.728932s含计划旧病例聚合/65公共原件核齐。Record→Squeeze→Mode C2.02/SR v4.3/OD v1.16；简单MC保条件平均收益、原11/0公里害仍在，不宣等效/全300/缓存速度比。原science/audit/178/188/189/190/152及失败冻结，不自动192/全300/seed/组合/新READY。
