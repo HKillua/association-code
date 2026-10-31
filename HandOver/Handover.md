@@ -4,7 +4,9 @@
 
 ## 当前执行
 
-**183已一次启动，科学RUNNING；186修复资格READY。** 183原312b123独立run/launcher attempt1，`mtad-1b97959ddccf.service`在18:49:50真实active/running/Restartno，T128输入已完成、6fit/1696GPU更新，原额度26fit/6656更新及T32/V32不变，CPU0–3/GPU0。后续独审待科学成功/CPU16–19资格释放FIFO。独立[L2S186](L2S-20261031-186.md)只核修复后的生产list输入和T32原生算术，0V/参考/神经训练，900s advisory；成功先记录回矩阵，不在原184/185目录重投。
+**183科学RUNNING；187/188新科学READY。** 183原312b123独立run/launcher attempt1，`mtad-1b97959ddccf.service`在18:55:05真实active/running/Restartno，T128/26fit/6656GPU更新及T32评价完成，V已15/32，CPU0–3/GPU0。科学成功后一次新audit183、CPU16–19无GPU。独立[L2S187](L2S-20261031-187.md)/[188](L2S-20261031-188.md)在186资格Record→Squeeze→Mode C1.95后重新发布，原184/185 FAILED不改；新Idea/目录/launcher各attempt1，187 CPU8–11/188 CPU20–23无GPU，3600s advisory，公式/数据/对照/终点沿原设计、只修list入口并显式绑定186输入。科学成功后与183独审按完成顺序CPU16–19 FIFO串行，不重投旧任务/组合/自动扩量，发布未等启动。
+
+**186资格成功，无待领/待审。** [S2L186](S2L-20261031-186.md)：20ec7a5、`mtad-79c6129c5bb0.service`真实exit0/inactive/dead，原T32/128次完整list原生生成与独立重建、9240native工作fit、0V参考/神经训练/效果评价，90.650868s、13原件＋清单核齐。Record→Squeeze→Mode C1.95/F291/E194；只认证软件条件，不认科学收益，后继为新187/188合同。
 
 **184/185各一次首场接口失败保全，无科学成绩。** [S2L184](S2L-20261031-184.md)/[185](S2L-20261031-185.md)：原312b123，两个unit`mtad-1dd613fccd75.service`/`mtad-2495a10c7722.service`真实exit1/failed/failed、Restartno，0完整T/V/神经更新，总17.478402s；185首场314个native工作fit已到达、未保存，不能按run.json写零实际拟合。24公共原件＋终态清单核齐，Record→Squeeze→Mode C1.94；15测试遗漏生产list已如实记录，未当C64/C65科学阴性。原失败/183/152/178不改，无旧任务重试。
 

@@ -22,6 +22,8 @@ T128继承178已有features/labels/first-anchor/w，取单支持且≥2候选；
 
 科学新run183，CPU0–3×4/GPU0按UUID兼容共卡≥4GiB、RSS8GiB/3600s advisory，最多四单卡含152；T模型全冻结后才V。非有限/OOM/绑定错误一次失败结束，不能改batch/特征或缩训练重投。验收：native单位/匿名K3/缺失与合法域、同容量同抽样真实小fit/旧模型冻结、无标签权重往返/独立NumPy、全部primary对照顺序与保存评价链。
 
+<a id="endpoint-184"></a>
+
 ## IDEA-ENDPOINT-KINEMATICS-184：双侧位置与导数条件分离
 
 Pattern4/连接C64（9/12，plausible）；不假设182的大gap/不一致能当可靠门限。只在zero且同源严格双侧，完全沿181的eligible源、旧分数选源与tie质量。原178 O、181 B与E等源桥接直接导入并绑定；新chart-linear CL、原生端点速度Hermite CH、单调限制CM分开。base/O/B/E/CL/CH/CM各Mean+NN，两头共28臂，0训练/reference拟合/teacher。
@@ -31,6 +33,8 @@ Pattern4/连接C64（9/12，plausible）；不假设182的大gap/不一致能当
 primary新三臂各对O/B，CH−CL隔离原生导数、CM−CH隔离约束、CM−CL核新增净收益；E提供源等质量强控。CM坐标不越端点是数学形状性质，不保证真实船轨迹/噪声端点正确。未来可以研究校准的带噪端点，但本轮没有伪造其可靠性。
 
 科学run184，CPU16–19×4无GPU/RSS8GiB/3600s advisory；0单侧/单多支持变化，0V调参。验收：Hermite端点/常速解析、三次与GP WNOA条件均值一致、形状范围/日期线、缺报告、K3换序及181控制绑定/保存评价链；保持域及数学限幅证明不能当精度认证。
+
+<a id="persistence-185"></a>
 
 ## IDEA-ONE-SIDED-PERSISTENCE-185：持续速度是否应有有限记忆
 

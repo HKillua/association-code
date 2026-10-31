@@ -50,7 +50,10 @@ def training(a,parent,out,manifest,check):
 
 def run(a):
     parent=p.common.old.frozen.read(a.parent_run/'run.json');qualification=p.common.old.frozen.read(a.qualification_run/'run.json');assert parent['status']==qualification['status']=='COMPLETED';out=a.output;out.mkdir(exist_ok=False);(out/'private').mkdir();(out/'scenes').mkdir();start=time.monotonic();arms,methods,primary=design(a.kind);number={'feature':183,'bridge':184,'persistence':185}[a.kind]
-    state=dict(status='RUNNING',idea_id={183:'IDEA-NATIVE-MOTION-FEATURES-183',184:'IDEA-ENDPOINT-KINEMATICS-184',185:'IDEA-ONE-SIDED-PERSISTENCE-185'}[number],plan_version='1.0',mode='native_motion_'+a.kind,kind=a.kind,methods=methods,parent_run=str(a.parent_run),qualification_run=str(a.qualification_run),bridge_run=str(a.bridge_run),optimizer_updates=0,neural_head_fits=0,analytic_head_fits=0,native_likelihood_fits=0,teacher_forward_calls=0,frontend_optimizer_updates=0,test_opened=False,reference_used_for_prediction=False,started_at=datetime.now(timezone.utc).isoformat(),**{k:parent[k] for k in ('native_run','manifest','training_scene_ids','scene_ids','fit_training_scene_ids')})
+    interface=a.interface_qualification_run
+    if interface is not None:
+        qrecord=p.common.old.frozen.read(interface/'run.json');qsummary=p.common.old.frozen.read(interface/'summary.json');assert a.kind in ('bridge','persistence') and qrecord['status']=='COMPLETED' and qrecord['completed_T_scenes']==32 and qrecord['V_scenes']==0 and qsummary['arithmetic_checks']==128;number+=3
+    state=dict(status='RUNNING',idea_id={183:'IDEA-NATIVE-MOTION-FEATURES-183',184:'IDEA-ENDPOINT-KINEMATICS-184',185:'IDEA-ONE-SIDED-PERSISTENCE-185',187:'IDEA-ENDPOINT-KINEMATICS-187',188:'IDEA-ONE-SIDED-PERSISTENCE-188'}[number],plan_version='1.0',mode='native_motion_'+a.kind,kind=a.kind,methods=methods,parent_run=str(a.parent_run),qualification_run=str(a.qualification_run),interface_qualification_run=str(interface) if interface is not None else None,bridge_run=str(a.bridge_run),optimizer_updates=0,neural_head_fits=0,analytic_head_fits=0,native_likelihood_fits=0,teacher_forward_calls=0,frontend_optimizer_updates=0,test_opened=False,reference_used_for_prediction=False,started_at=datetime.now(timezone.utc).isoformat(),**{k:parent[k] for k in ('native_run','manifest','training_scene_ids','scene_ids','fit_training_scene_ids')})
     def check(**kw):
         state.update(kw,elapsed_seconds=time.monotonic()-start,peak_rss_bytes=p.common.old.frozen.peak_rss_bytes());p.common.old.frozen.write(out/'run.json',state)
         if state['peak_rss_bytes']>8*1024**3:raise MemoryError('RSS8GiB')
@@ -92,4 +95,4 @@ def run(a):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--kind',choices=('feature','bridge','persistence'),required=True)
     for k in ('parent-run','qualification-run','bridge-run','output'):parser.add_argument('--'+k,type=Path,required=True)
-    parser.add_argument('--device',default='cpu');parser.add_argument('--time-policy',choices=('advisory',),required=True);run(parser.parse_args())
+    parser.add_argument('--interface-qualification-run',type=Path);parser.add_argument('--device',default='cpu');parser.add_argument('--time-policy',choices=('advisory',),required=True);run(parser.parse_args())
