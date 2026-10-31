@@ -132,3 +132,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [189平均运动/记忆匹配](../reports/2026-11-01-drift-memory-review.md)：原T32/28臂及规定独核成功，记忆项无稳定平均增量、原34/1害全保留，33HARD害无组内换候选动作，回Mode C1.99/SR v4.0/OD v1.13。
 
 - [190端点×运动×几何](../reports/2026-11-01-fitted-endpoint-review.md)：40臂/全T绑定与规定独审完成，拟合端点在两运动下均更差/损失旧救回；几何差小，保反例与188，回Mode C2.01。
+
+[191平均运动V32验证](../reports/2026-11-01-mean-velocity-validation-review.md)：原28臂/7702均值/0新训练，科学与规定独审成功、632.728932s含计划病例聚合、65公共原件核齐。MC保PG条件平均收益，但原11/0公里害保留、H旧救回71→70，非等效/全300/可信同行。Record→Squeeze→Mode C2.02。

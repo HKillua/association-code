@@ -61,3 +61,5 @@
 - [189回执](../S2L-20261101-189.md)：63公共原件/真实终态清单在资料库`docs/evidence/20261101_drift_memory/189`，坐标/身份/报告均值/逐点条件/完整预测留server。
 
 - [190回执](../S2L-20261101-190.md)：63公共原件/真实终态清单在资料库`docs/evidence/20261101_drift_memory/190`，native参数/坐标/身份/权重/预测留server。
+
+[191完整Record/Squeeze](../../docs/reports/2026-11-01-mean-velocity-validation-review.md)及[S2L191](../S2L-20261101-191.md)：原V32/28臂科学和独审成功，65公共原件/实际命令服务与输入核齐，private原位；平均与纯组尾部/病例聚合同时保留，回Mode C2.02。

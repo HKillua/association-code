@@ -1,4 +1,4 @@
-"""189: T-only matched mean-velocity control; no fit or V read."""
+"""189 T qualification / 191 fixed V validation of the same mean-velocity control."""
 from __future__ import annotations
 import argparse,sys,time
 from pathlib import Path
