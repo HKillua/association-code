@@ -9,6 +9,9 @@ from tools.analysis.saved_attribute_accounting import account
 from tools.analysis import objective_difficulty_pilot as objective
 from tools.analysis import group_reference_counterfactual as counterfactual
 from tools.analysis.audit_group_reference_population import audit as audit_counterfactual
+from tools.analysis import set_conditioned_risk_pilot as context
+from tools.analysis import truth_free_partition_pilot as regroup
+from tools.analysis.audit_variable_group_outputs import audit as audit_regroup
 from tests.integration.test_source_risk_pilot import scene_arrays
 
 class LocalExpressionIOTests(unittest.TestCase):
@@ -46,5 +49,26 @@ class LocalExpressionIOTests(unittest.TestCase):
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard):objective.run(b)
             audit(out,out/'independent-output-audit.json');account(out,out/'four-attribute-accounting.json')
             self.assertEqual(p.common.old.frozen.read(out/'run.json')['optimizer_updates'],1536)
+            out=root/'166';b=SimpleNamespace(**paths,manifest=manifest,output=out,head_run=head,expression_run=expression,device='cpu')
+            with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard):context.run(b)
+            audit(out,out/'independent-output-audit.json');account(out,out/'four-attribute-accounting.json')
+            self.assertEqual(p.common.old.frozen.read(out/'run.json')['optimizer_updates'],768)
+            association=root/'056';association.mkdir();rawscores={}
+            p.common.old.frozen.write(partition/'run.json',dict(source_association=str(association)))
+            for split,sid in [('T_core','1'),('T_core','3'),('V_select','2'),('V_select','4')]:
+                m,ev,mem,_=scene_arrays(sid);pairs=m['pairs'];scores=np.where(mem[pairs[:,0]]==mem[pairs[:,1]],3.,0.)
+                if split=='T_core':np.savez_compressed(value/'private'/f'T-features-{sid}.npz',membership=mem,scores=scores)
+                else:rawscores.update({sid+'_pairs':pairs,sid+'_scores':scores,sid+'_node_ids':m['node_ids']})
+            np.savez_compressed(association/'final-scores.npz',**rawscores)
+            out=root/'165';b=SimpleNamespace(**paths,manifest=manifest,output=out,expression_run=expression,device='cpu')
+            original_agglomerate=regroup.partition.agglomerate
+            def coverage_control(n,pairs,scores,method,*args,**kwargs):
+                # Force a legitimate merging control to exercise lost targets;
+                # this is wiring coverage, not an assertion about actual CL.
+                if method=='CL':return np.zeros(n,np.int64),{},[]
+                return original_agglomerate(n,pairs,scores,method,*args,**kwargs)
+            with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard),patch.object(regroup.partition,'agglomerate',side_effect=coverage_control):regroup.run(b)
+            audit_regroup(out,out/'independent-output-audit.json');account(out,out/'four-attribute-accounting.json')
+            self.assertGreater(p.common.old.frozen.read(out/'summary.json')['all_components']['pairwise']['CL_NN_vs_WS_NN']['coverage_transitions']['lost_target_points'],0)
 
 if __name__=='__main__':unittest.main()

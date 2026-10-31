@@ -12,6 +12,8 @@
 
 **完整V300基准仍为固定T128头582.808m；新159只评价原T32/V32，不能替换全300成绩。** [159表征×表达](reports/2026-10-31-local-expression-review.md)已完成6656次真实GPU更新：V32旧特征残差网540.295→527.427m、误选761→287，但罕见反转229→278；保留平均收益候选，不称高害解决。局部网527.399m不支持稳定额外增量。[157完整结果](reports/2026-10-30-t128-full-scope-review.md)与旧[147基准](reports/2026-10-30-source-risk-full-benchmark-review.md)保持；[比较设计§9](reports/2026-10-27-fair-comparison-contract.md#9-2026-10-30三种同行共同任务比较的后继设计)仍区分固定WS后端任务与完整系统。
 
+本轮新验证按[165–167独立Idea/spec](proposals/object_conditions_context_20261031.md)推进：不读truth的固定分数split/move、冻结159上的集合质量上下文与同容量OWN对照、原TFM损失的冻结梯度定位。软件及真实缓存/覆盖变化链已核验，执行事实只见HandOver；结果尚未产生，不预宣机制/精度。原平均候选与全300基准保留。
+
 本轮162–164已完成服务器真实验证、限定核验及Record→Squeeze→Mode C1.71。[162目标×学习质量](reports/2026-10-31-objective-difficulty-review.md)：四新臂52fit/6656GPU更新，V32为527.447/527.987/535.208/576.356m，均未稳定超过冻结159的527.427m，当前四配方不扩大。旧网256步与新128步曝光分列，不把新弱控胜负当升级。原159平均候选保留，不按V小数挑冠军。
 
 [163分组/参考分离](reports/2026-10-31-group-reference-review.md)给出新的任务条件证据：V32反转290个组×query，真值净化后仅16仍多源、105仅一源、169零源，剩16仍选错；**274个失去多源资格不能记作救回**。固定原状态换候选参考，最佳源集合4728个query发生变化，但不证明官方参考有错。两轴均为oracle诊断，不是新部署成绩。后补独立核中央人口/原错/全部替代几何通过；净化后的特征/forward及物理truth不在独审范围。T纯组44/V纯组16难例仍保留，不能把全部错误归因构组。
@@ -64,7 +66,7 @@
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.71](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-171)，累计P14/F261/M109/E164/C55 |
+| 全局P/F/M/E/C与回流 | [Mode C1.72执行前](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-172)，累计P14/F261/M109/E164/C55 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
 | 选源与集合读出 | [SR v1.9，57格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#objective-reference-feedback) |
 | 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
