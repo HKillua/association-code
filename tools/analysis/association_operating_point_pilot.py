@@ -54,7 +54,7 @@ def run(a):
         for k in ('WS','OWN','CTX'):chosen[k],curves[k]=calibrate(records,k,limit)
         p.common.old.frozen.write(out/'T-calibration.json',dict(limit=limit,chosen=chosen,curves=curves,T_scenes=tids,rule='same raw MSTSA macro PFA budget, max raw macro PCA; tie lower PFA then higher threshold'))
         if any(v is None for v in chosen.values()):check(status='COMPLETED',exit_code=0,phase='T_NOT_QUALIFIED',completed_V_scenes=0);return
-        # Independently rescan the stored grid before any V read; never select with V.
+        # Internal grid consistency before V; independent prefix-count audit is separate.
         for k,best in chosen.items():
             eligible=[r for r in curves[k] if r['metrics'] is not None and r['metrics']['m_pfa']<=limit+1e-12]
             assert best==max(eligible,key=lambda r:(r['metrics']['m_pca'],-r['metrics']['m_pfa'],r['threshold']))

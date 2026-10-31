@@ -10,7 +10,9 @@
 
 ## 现在做什么
 
-用户本轮明确优先提高覆盖率与跨源mPCA/mPFA，并包括前端。新[168前端Record/Squeeze](reports/2026-10-31-association-context-review.md)已T128/2000真实GPU更新、T32/V32六臂及独审/属性全完：V CTX跨源decoded mPCA78.989→82.183%，MAE527.427→436.131m，但mPFA15.550185→15.552221%未降、coverage98.442→97.173%、救11丢32目标、1027新大害；同容量OWN比较仍有共同域均值信号，保条件候选，不当联合升级/自动全300。[169硬条件](reports/2026-10-31-anchor-support-review.md)0训练八臂全完：ANCHOR保覆盖仍伤位置/50新害，SUPPORT几乎冻结搜索、当前配方不扩大。独立新来源STAR NeurIPS2025/TrackTrack CVPR2025的[完整AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)及[Mode C1.75](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-175)已回流：P14/F269/M110/E172/C56、充分深入106＝72领域相近＋34跨域，STAR无实现，非作者复现。下一优先由C56核新score沿旧θ的工作点强控：原/OWN/CTX均按同一T-only规则，不V挑阈值；另保对象人口/状态质量出口，不退固定源。实际执行只读HandOver。
+用户本轮明确优先提高覆盖率与跨源mPCA/mPFA，并包括前端。已补读STAR NeurIPS2025/TrackTrack CVPR2025正文、补充、反例及TrackTrack核心实现，[完整AP与阅读边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)保留，STAR源码未获；充分深入106＝72领域相近＋34跨域，非作者复现。[168](reports/2026-10-31-association-context-review.md)实际T128/2000GPU更新、T32/V32六臂：CTX有共同域均值/召回信号，但覆盖下降和1027新大害，未联合升级。[169](reports/2026-10-31-anchor-support-review.md)0训练八臂：固定代表仍伤位置，硬保每query支持几乎冻结搜索，当前配方关闭。全部真实原件/独审/四属性与后验记账完成，保反例，不退固定源。
+
+**上述工作点强控已由[170](reports/2026-10-31-association-operating-point-review.md)实际完成，不再待设计。** 0训练/teacher、原T32/V32八臂，同一T raw跨源mPFA预算/774候选独立核、V前冻结。V CTXCAL跨源mPCA80.684%/mPFA15.369%、MAE432.801m，但coverage97.694%仍低原98.442%，救17/丢24目标及1001新大害；共同域较同规则OWN有平均增量，跨源指标变化区间均跨0。原scorer标定不变；OWNCAL覆盖略升却mPCA/尾部更差，不能拼冠军。168–170全部原launcher/限定独审/四属性及后验记账成功收尾，回[Mode C1.76](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-176)，P14/F270/M110/E173/C56，106篇不增。当前无覆盖＋跨源双指标稳定联合升级；保关系条件平均信号，下一由T反例核错并对象的输出代价与pair/构组目标接口及成熟解法，不沿V扫阈值或自动加同BCE步数。
 
 **完整V300基准仍为固定T128头582.808m；新159只评价原T32/V32，不能替换全300成绩。** [159表征×表达](reports/2026-10-31-local-expression-review.md)已完成6656次真实GPU更新：V32旧特征残差网540.295→527.427m、误选761→287，但罕见反转229→278；保留平均收益候选，不称高害解决。局部网527.399m不支持稳定额外增量。[157完整结果](reports/2026-10-30-t128-full-scope-review.md)与旧[147基准](reports/2026-10-30-source-risk-full-benchmark-review.md)保持；[比较设计§9](reports/2026-10-27-fair-comparison-contract.md#9-2026-10-30三种同行共同任务比较的后继设计)仍区分固定WS后端任务与完整系统。
 
@@ -22,7 +24,7 @@
 
 [151完整数据准备](reports/2026-10-30-full-peer-data-review.md)已完成T2100/V300、46126可训练组。152A/B仍真实systemd RUNNING并实际优化，fresh seed20、固定150/20epoch对应427800/80800更新，可能跨多天；尚无末轮全V公平分数，实际训练进度只看HandOver。冻结活动合同仍比较原147，不改成157/159；旧148不续跑。
 
-1. 保留157全V300及159平均强控；168条件信号后，先由**C56**做原/OWN/CTX同一T-only规则的工作点强控，原T32/V32、0训练、全raw/decoded/coverage/物理风险，不V挑阈值。C53×P13仍保对象/时刻支持/相容状态接口：169当前硬保原anchor/每query支持配方关闭，不能永久冻结原错组或筛失去支持的点；同候选/状态调用预算再比任务决策。165/168均是条件信号，尚非联合稳定系统升级。
+1. 保留157全V300及159平均强控，168/170的**C56关系条件平均信号**尚未保覆盖。下一先按T原反例明确错并/误拆对象及受影响query的可辨代价，对照成熟集合/图任务目标，再生成同信息/容量/工作点下可归因的新Idea，不能把目标不匹配候选写为根因或无依据加同BCE训练。C53×P13继续核对象/支持/相容状态接口；169当前硬保anchor/全部query支持配方关闭，不永久保原错组/筛失去支持点、不V设cap/阈值；没有新READY或自动全300。
 2. 纯组T44/V16难例与分组支持路线分开，先查现有统计/网格编码没保留的原生时间、局部状态和reference条件，形成可区分的新证据再定实验。166当前联合质量表达没有救回，不自动加步/seed/换loss；0支持旧首anchor回退/圆周歧义未解。真实异构K≥3/新域仍缺，不退固定源优先。
 3. 跟进152固定全T训练/末轮V300同WS任务比较：全部曝光/物理学习、强控/coverage/尾部/成本，PTFM核心缺域与公共Mean扩域分报、DeepAF P/V适配权限明确。不能把共享WS比较称原完整系统复现，活动合同仍比较147。TMTAFF若再做新训练干预须据原loss几何/梯度路径制定可分离具体合同，不能直接续107或以梯度大小选方案；最多四单卡/FIFO，无SSH值守或自动新增训练。
 
@@ -38,6 +40,9 @@
 
 | 对象／实际范围 | 当前能支持的结论 | 完整证据 |
 |---|---|---|
+| 同T工作点控制，原T32/V32 | 0训练、三scorer同T规则/774候选独立核；CTXCAL跨源mPCA80.684%/mPFA15.369%、MAE432.801m，但coverage97.694%低于原98.442%，救17丢24/1001新大害；当前无稳定联合升级 | [170](reports/2026-10-31-association-operating-point-review.md) |
+| 前端上下文，T128训练/原T32-V32 | 2000真实GPU更新、同容量OWN控制；CTX跨源mPCA78.989→82.183%、MAE527.427→436.131m，mPFA基本不变且覆盖下降，保平均/召回条件信号 | [168](reports/2026-10-31-association-context-review.md) |
+| 代表/支持硬约束，T32/V32 | ANCHOR保人口但位置更差，SUPPORT T0/V2moves、无实质联合增量；两当前配方关闭，不永久保原错组 | [169](reports/2026-10-31-anchor-support-review.md) |
 | 无真值分组修正，T32/V32 | 同score/159头，V完整527.427→517.947m/P99下降，但救5丢2目标、共同差区间跨0、T完整略差；新增140个>1km增害全新0/1支持，pure→pure60。保条件信号，不自动扩大 | [165](reports/2026-10-31-truth-free-partition-review.md) |
 | 集合质量上下文，T128/原T32-V32 | OWN/CONTEXT同容量，26fit/3328GPU更新；CONTEXT V527.430938m不超OWN527.424292m或原159527.427043m，纯T44/V16均未救回；当前配方不扩大 | [166](reports/2026-10-31-set-context-risk-review.md) |
 | 冻结TFM原loss梯度，T2四正对 | total/position梯度分开、0optimizer/更新，输入非全断但量级小、输出投影较大；TFM/损失权重exact未变/eval绑定164，仍58km。非唯一训练成因，107不重训 | [167](reports/2026-10-31-tfm-gradient-review.md) |
@@ -69,9 +74,9 @@
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.75](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-175)，累计P14/F269/M110/E172/C56 |
+| 全局P/F/M/E/C与回流 | [Mode C1.76](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-176)，累计P14/F270/M110/E173/C56 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v2.1，69格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#front-association-support-feedback) |
+| 选源与集合读出 | [SR v2.2，72格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#association-calibration-feedback) |
 | 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
 | 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入106＝72领域/相近＋34跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |

@@ -6,6 +6,8 @@
 
 独立[来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)核STAR的节点/边消息、TrackTrack联合候选/初始化与不利消融/失败图/代码差异。原方法缺外观/框/置信度到海上接口，不直接复现，不引一对一约束。STAR对其他视觉tracker集成是有限C经验，完整海上传感器迁移缺失如实记；B=关系条件机制，不是KAN或QP包。
 
+公开原始来源：[STAR正式版](https://proceedings.neurips.cc/paper_files/paper/2025/hash/62c599c5c2b365ba464a26ebad05b690-Abstract-Conference.html)、[TrackTrack正式正文](https://openaccess.thecvf.com/content/CVPR2025/papers/Shim_Focusing_on_Tracks_for_Online_Multi-Object_Tracking_CVPR_2025_paper.pdf)/[补充](https://openaccess.thecvf.com/content/CVPR2025/supplemental/Shim_Focusing_on_Tracks_CVPR_2025_supplemental.pdf)/[作者实现](https://github.com/kamkyu94/TrackTrack)。STAR作者仓访问时仅README，不能按已审作者代码处理；本提案是海上条件适配与控制，不是两原方法的完整复现。
+
 DE：056独立22维pairwise网络，114后置WS仅合并；165同score REF提高32场跨源指标却救5丢2，新增大害全在新0/1支持域。AI分别为①第三节点关系可帮判断模糊边，②搜索输出anchor和query支持被破坏会造成可避免代价。竞争解释包括原score失准/密度捷径/噪声传播、anchor冻结保住原错、相同支持数但状态更差/对应变化；不先写根因。原159的源质量上下文166无效，不等于前端关联上下文已经测过。
 
 ## 168：IDEA-ASSOCIATION-EDGE-CONTEXT-20261031

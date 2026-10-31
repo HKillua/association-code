@@ -8,6 +8,8 @@
 
 ## 保留的研究事实
 
+2026-10-31：[168前端上下文](../reports/2026-10-31-association-context-review.md)、[169代表/支持限制](../reports/2026-10-31-anchor-support-review.md)、[170同T工作点](../reports/2026-10-31-association-operating-point-review.md)各一次科学/规定独审/完整属性成功，前端共2000真实GPU更新。关系条件有平均/召回信号，但丢覆盖/新增大害及跨源区间反例保留，未形成稳定联合升级；硬支持与当前标定配方不自动扩大。完整Mode C1.74–1.76/SR v2.2、STAR/TrackTrack独立来源与所有未采纳理由在资料库，原预测/身份/weights留server。本段为结案证据导航，不恢复任务队列。
+
 | 阶段 | 结论与后续约束 |
 |---|---|
 | 165无真值分组修正 | 0新score/训练，原T32-V32六臂一次exit0并限定输出/J独审、四属性补项。V REF_NN完整MAE517.947m vs WS_NN527.427m，但共同差区间跨0、救5丢2目标/T完整略差，140个新增>1km增害全新0/1支持域；后验只读分层代码/成本保留，不自动扩量。[Record/Squeeze](../reports/2026-10-31-truth-free-partition-review.md) |
