@@ -85,6 +85,41 @@ def mean_velocity_control(m,events,groups,count,weights,base):
     if not np.isfinite(out).all():raise FloatingPointError('nonfinite mean velocity control')
     return out,dict(eligible=eligible),dict(native_mean_computations=means,unknown_selected_node_queries=unknown,decisions=decisions)
 
+def fit_endpoint_models(m,events):
+    """All-native linear working states, shared across fronts; no reference."""
+    from association.evaluation.native_motion import _short_delta
+    models=[];coordinate_gap=velocity_gap=0.;means=0
+    for node in range(len(m['states'])):
+        a,b=events['event_offsets'][node:node+2];t=events['event_times_seconds'][a:b];values=events['event_values'][a:b];xy=values[:,:2].copy()
+        if len(t)<2 or (np.diff(t)<=0).any() or len(t)!=m['native_count'][node]:raise ValueError('full-native increasing times/count binding')
+        xy[:,1]=xy[0,1]+np.r_[0.,np.cumsum(_short_delta(np.diff(xy[:,1])))];ct=t-t.mean();slope=np.sum(ct[:,None]*(xy-xy.mean(0)),axis=0)/(ct@ct);fitted=xy.mean(0)+(t[[0,-1]]-t.mean())[:,None]*slope;fitted[:,1]=(fitted[:,1]+180)%360-180
+        velocity=slope*nc.RADIUS*np.pi/180*np.array([1.,np.cos(np.deg2rad(xy[:,0].mean()))]);velocity_gap=max(velocity_gap,float(np.linalg.norm(velocity-m['ols_velocity_mps'][node])))
+        q=m['query_seconds'];before=q<t[0];after=q>t[-1];use=before|after
+        if not np.array_equal(use,~m['support'][node]):raise ValueError('native support binding')
+        pred=np.empty((len(q),2));pred[before]=xy[0]+(q[before]-t[0])[:,None]*slope;pred[after]=xy[-1]+(q[after]-t[-1])[:,None]*slope;pred[use,0]=np.clip(pred[use,0],-90,90);pred[use,1]=(pred[use,1]+180)%360-180
+        if use.any():coordinate_gap=max(coordinate_gap,float(np.max(np.abs(pred[use]-m['states'][node,use,:2]))))
+        good=events['event_valid'][a:b,2:4].all(1);known=int(good.sum())>=2;speed=values[good,2]*1852/3600;theta=np.deg2rad(values[good,3]);mu=np.column_stack([speed*np.cos(theta),speed*np.sin(theta)]).mean(0) if known else np.zeros(2);means+=int(known)
+        models.append(dict(times=t[[0,-1]],native=values[[0,-1],:2].copy(),fitted=fitted,velocity=velocity,mu=mu,report_known=good[[0,-1]]&known,mean_known=known))
+    if coordinate_gap>1e-10 or velocity_gap>1e-8:raise ValueError(f'old native OLS state binding {coordinate_gap}deg/{velocity_gap}mps')
+    return models,dict(native_OLS_fits=len(models),native_mean_computations=means,max_old_coordinate_gap_deg=coordinate_gap,max_old_velocity_gap_mps=velocity_gap)
+
+def fitted_endpoint_controls(m,models,groups,count,weights,mean_control):
+    out={key:mean_control.copy() for key in ('GL','FL','FM')};eligible=np.zeros(count.shape,bool);joint=eligible.copy();fallbacks=0
+    for gid,nodes in enumerate(groups):
+        nodes=np.asarray(nodes,int);first=min(models[i]['times'][0] for i in nodes);last=max(models[i]['times'][-1] for i in nodes)
+        for j in np.flatnonzero((count[gid]==0)&((m['query_seconds']<first)|(m['query_seconds']>last))):
+            eligible[gid,j]=True;chosen=nodes[weights[nodes,j]>0];mass=weights[chosen,j];values={k:[] for k in out};valid=True
+            if not len(chosen) or not np.isclose(mass.sum(),1.):raise ValueError('frozen189 selected mass required')
+            for node in chosen:
+                model=models[node];edge=0 if m['query_seconds'][j]<model['times'][0] else 1;dt=m['query_seconds'][j]-model['times'][edge];anchor=model['fitted'][edge]
+                if not model['report_known'][edge] or not np.isfinite(anchor).all() or abs(anchor[0])>90:valid=False;break
+                for key,p,v in [('GL',model['native'][edge],model['velocity']),('FL',anchor,model['velocity']),('FM',anchor,model['mu'])]:values[key].append(nc.advance(p,v,dt))
+            if not valid:fallbacks+=1;continue
+            joint[gid,j]=True
+            for key in out:out[key][gid,j,:2]=spherical_position(np.stack(values[key]),mass)
+    if any(not np.isfinite(v).all() for v in out.values()):raise FloatingPointError('nonfinite fitted endpoint state')
+    return out,dict(eligible=eligible,joint=joint),dict(eligible_queries=int(eligible.sum()),joint_queries=int(joint.sum()),joint_fallback_queries=fallbacks)
+
 def persistence(m,events,groups,count,weights,base):
     out={k:base.copy() for k in ('PH','PC','PD','PG')};models=[];native=[];fit_count=constant=boundary=floors=0
     for node in range(len(m['states'])):

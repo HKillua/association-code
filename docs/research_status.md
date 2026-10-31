@@ -10,6 +10,8 @@
 
 ## 现在做什么
 
+[190潜在端点×运动×几何](proposals/fitted_endpoint_factorial_20261101.md)由189新证据和[代码/来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/latent_endpoint_conditions_20261101.md)→Mode C2.00/C66后形成。旧支持外状态实际钉住测量端点，首T157片段/5134点已exact核明；不认端点就是根因。新T32/40臂固定全部178/188/189强控、选中候选/权重，只分几何/拟合端点/平均运动，0V新神经或reference/似然。17软件检查只核实现，实际领取见HandOver；保178及188条件价值，不提前宣方法有效。
+
 [189 T侧匹配干预](reports/2026-11-01-drift-memory-review.md)已完整科学/规定独审：原T32/28臂、4620输入均值/0V新fit，381.231001s、63原件核齐，回Mode C1.99/SR v4.0/OD v1.13。MC去PG记忆后完整T MAE+.000229/+.004334m、区间均跨0，原34/1纯组公里害逐点保留；HARD33害query组内仅一片段，换源无动作空间。保平均运动适配价值，不认每点等效或记忆已证；下一核原生端点与潜在状态及传播几何的操作条件，原178和188条件候选不替换，不自动V/全300。
 
 本轮按182 T资格→来源AP→Mode C1.92–1.95→三个独立Idea→服务器真实执行→Record/Squeeze→Mode C1.96–1.98完成。**保178基准；188带漂移单侧恢复保条件有效候选，183原生信息与187直接端点导数当前配方不晋级。** 执行终态/待领只看HandOver，不将候选解释写为机制。
@@ -125,10 +127,10 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.98](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-198)，累计P14/F294/M119/E197/C65 |
+| 全局P/F/M/E/C与回流 | [Mode C2.00](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-200)，累计P14/F296/M120/E199/C66 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v3.9，144格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#one-sided-persistence-feedback) |
-| 观测驱动与状态恢复 | [OD v1.12，60格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#native-one-sided-drift-feedback) |
+| 选源与集合读出 | [SR v4.1，150格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#latent-endpoint-conditions) |
+| 观测驱动与状态恢复 | [OD v1.14，66格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#latent-endpoint-condition-source) |
 | 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入108＝72领域/相近＋36跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |
 | 历史推导、连接与取舍原文 | [完整研究过程](history/2026-10-30-research-process.md)、[结案摘要](history/README.md)；历史“下一步”不自动成为任务 |
