@@ -6,6 +6,27 @@
 
 原unit `mtad-a0ea4b19a7df.service`：Linger=yes/Restart=no，2026-10-31T05:36:57Z启动，05:37:07.946543Z终止；launcher真实exit1/FAILED，系统服务failed/ExecMainStatus1，无自动重试。worker总10.591636s，science开始05:37:06.190599Z、内部.330745s，峰值RSS393932800B；完成0场/0更新/0预测。环境加载与托管计总墙时，不将science内部时间当全成本。
 
+```yaml
+package_type: EXPERIMENT_RECORD
+package_version: research-pipeline-contract v1.0
+experiment_id: REC-OBJECT-FOREST-171
+source_idea_id: IDEA-OBJECT-FOREST-QUALIFICATION-20261031-171
+plan_version: 1.0
+execution_status: FAILED
+research_question: do_T_lost_objects_have_wrong_forest_edge_gradient_entry
+hypothesis: C57_structured_supervision_may_touch_lost_object_bridges_not_causal_proof
+planned_vs_actual_design_and_controls: planned_original_T32_all_objects_actual_zero_completed_scenes
+actual_configuration: see_L2S171_and_original_request_no_recipe_change
+samples_materials_or_data_provenance: original170_saved_T_partitions_outputs_and127_T_evaluation
+results_with_uncertainty: no_scientific_estimate_KeyError_before_first_scene
+all_runs_or_repetitions: one_attempt_no_retry
+observations_and_deviations: no_summary_endpoint_unmet_unmatched_reference_rows
+evidence_locations: linked_171_science_and_launcher_originals
+known_limits_and_missing_evidence: T_qualification_unknown
+next_routes: preserve_then_explicit_repair_design
+next_skill: squeeze-experiment
+```
+
 原因：`point_coverage`用中央target_ids查所有aligned_target_ids，遇到没有参考的组输出（空target ID）抛`KeyError: ''`。原170评价本已保留这类组；不是人口数据坏/模型效果差。全部12个公共原件（science run＋11 launcher含stderr/真实退出）已回传，[证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261031_structured_association/171/)；身份/坐标继续留原170服务器。未产summary、没有对象/梯度科学结论；计划终点未达成，不填0为无效果。技术失败算一次attempt，不替换原run。
 
 ## SQUEEZE_REPORT — SQ-OBJECT-FOREST-171
@@ -18,6 +39,21 @@
 
 ```yaml
 package_type: SQUEEZE_REPORT
+squeeze_id: SQ-OBJECT-FOREST-171
+input_experiment_record_ids: [REC-OBJECT-FOREST-171]
+claim_scope: technical_boundary_only
+data_quality_and_provenance_gaps: unmatched_output_not_missing_or_corrupt_reference_evidence
+primary_result_with_uncertainty: zero_completed_scientific_scenes_no_effect_estimate
+process_dynamics: one_failed_attempt_10.591636_seconds_393932800_bytes_RSS
+mechanism_and_intermediate_findings: unknown_target_lookup_failure_not_model_mechanism
+errors_heterogeneity_and_boundary_conditions: unmatched_rows_have_no_eligible_reference_queries_in_first_T_scene
+robustness_sensitivity_and_alternative_explanations: added_unmatched_zero_query_and_invalid_positive_query_regression
+new_P: none
+new_F: F273
+new_M: none
+evidence_index: Record171_original_stderr_and_post_failure_first_T_counts
+open_questions: [completed_T_qualification]
+next_routes: explicit_new_repair_Idea_not_original_run_retry
 record_id: REC-OBJECT-FOREST-171
 idea_id: IDEA-OBJECT-FOREST-QUALIFICATION-20261031-171
 source_ids: [C57, E174, E175]
@@ -36,6 +72,27 @@ next_skill: deep-read_Mode_C
 
 事前[plan1.1](../proposals/structured_association_20261031.md)、[L2S172](../../HandOver/L2S-20261031-172.md)，新50520ca/attempt1/`mtad-edf901f4936e.service`，没有覆盖或重投171。原T32/860中央目标、原170score/分区/保存输出、原127motion/eval；0训练/teacher/GPU/新预测/新V/test，ε.1/B4/seed20不改。05:39:34.978388Z启动至05:39:47.017795Z，launcher总12.170251s，science6.935841s、RSS440160256B；32/32成功、真实exit0，服务inactive/dead/ExecMainStatus0/Restart=no/Linger=yes。34科学＋11launcher原件完整回传[172证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261031_structured_association/172/)，身份坐标仍留原127/170服务器。
 
+```yaml
+package_type: EXPERIMENT_RECORD
+package_version: research-pipeline-contract v1.0
+experiment_id: REC-OBJECT-FOREST-172
+source_idea_id: IDEA-OBJECT-FOREST-QUALIFICATION-REPAIR-20261031-172
+plan_version: 1.1
+execution_status: COMPLETED_exit0
+research_question: original171_T_qualification_after_explicit_population_mapping_fix
+hypothesis: same_C57_gradient_entry_question_no_effect_claim
+planned_vs_actual_design_and_controls: complete_original_T32_all860_objects_full_lost_rescued_retained_neither
+actual_configuration: original171_noise_and_full_labels_unchanged_only_unmatched_mapping_fix
+samples_materials_or_data_provenance: original170_and127_T_only_bound_nodes_manifest_order
+results_with_uncertainty: table_below_exploratory_T_counts_no_causal_interval
+all_runs_or_repetitions: one_new_172_attempt_original171_failure_preserved
+observations_and_deviations: none_for172_first_T_checks_for171_labeled_posthoc
+evidence_locations: linked_172_all45_public_originals
+known_limits_and_missing_evidence: no_matched_training_or_deployment_effect_no_independent_domain
+next_routes: squeeze_then_Mode_C
+next_skill: squeeze-experiment
+```
+
 | T-only对象层 | 对象数 | 单片段 | 正类pair质量 | 被错误森林边触及 | 新/丢有效query |
 |---|---:|---:|---:|---:|---:|
 | 全部 | 860 | 73 | 2268 | 314 | 394/417 |
@@ -51,6 +108,21 @@ Squeeze：支持到“已有T丢对象确有可测的结构训练干预入口”
 
 ```yaml
 package_type: SQUEEZE_REPORT
+squeeze_id: SQ-OBJECT-FOREST-172
+input_experiment_record_ids: [REC-OBJECT-FOREST-172]
+claim_scope: T_qualification_not_effect_or_causal_evidence
+data_quality_and_provenance_gaps: bound_saved_nodes_central_population_no_reference_truth_certification
+primary_result_with_uncertainty: all13_lost_objects_touched_also15_rescued_and268_retained
+process_dynamics: one_attempt_32_scenes_zero_updates_12.170251_seconds_440160256_bytes_RSS
+mechanism_and_intermediate_findings: candidate_structured_gradient_entry_not_unique_root_cause
+errors_heterogeneity_and_boundary_conditions: all_lost_2to4_fragments_mixed_groups_not_singletons
+robustness_sensitivity_and_alternative_explanations: matches_original170_T_point_target_transitions_no_second_forest_audit
+new_P: none
+new_F: F274
+new_M: none
+evidence_index: all_T_anonymous_rows_summary_and_original_launcher
+open_questions: [matched_training, unknown_k_deployment, physical_tail]
+next_routes: Mode_C_then_specific_matched_training_Idea
 record_id: REC-OBJECT-FOREST-172
 idea_id: IDEA-OBJECT-FOREST-QUALIFICATION-REPAIR-20261031-172
 source_ids: [C57, SQ-OBJECT-FOREST-171]
