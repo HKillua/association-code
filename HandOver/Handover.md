@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**180/181已各一次启动，科学RUNNING。** [L2S180](L2S-20261031-180.md)、[L2S181](L2S-20261031-181.md)及[180启动](S2L-20261031-180-start.md)/[181启动](S2L-20261031-181-start.md)：11项READY前验收通过，新fcef505独立checkout/run/launcher attempt1，17:38:46北京时间开始。17:43两个原service真实active/running、Restart=no：`mtad-25f88de0572d.service`/`mtad-b64da3f9c141.service`。180已完成39fit/9984GPU更新，正在T32评价；181 T32完成，raw同源双侧资格2019，规则冻结后V已6/32场。运行中无新可信效果，完整科学/规定独审待核。CPU0–3/GPU0共卡与CPU16–19无GPU、3600s advisory；成功后各一次独立收尾，待181科学CPU释放按FIFO串行。原178/152/107/132不动，无自动组合/全300/换配方重投。
+**180/181科学及规定独审全部成功，无待领取/待审。** [S2L180](S2L-20261031-180.md)、[S2L181](S2L-20261031-181.md)：原fcef505独立checkout/run/launcher各attempt1，各一次真实exit0/inactive/dead/Restartno。180科学`mtad-25f88de0572d.service`/审计`mtad-142878bd8c62.service`，39fit/9984GPU更新、原T32/V32二十臂，总863.428706s，99公共原件及清单核齐；181科学`mtad-b64da3f9c141.service`/审计`mtad-2dea828a45db.service`，0训练/原T32-V32二十四臂，总737.574385s，95原件及清单核齐。181科学释放CPU16–19后先181独审、再180独审FIFO。全部主位置/人口/关联/尾部/动作独核，四属性同评价器记账；Record→Squeeze→Mode C1.90–1.91、SR v3.2完成。两当前配方不晋级，保178；原科学/audit/178/152/107/132不改，无自动组合/全300/换配方重投/新READY。
 
 **179已成功终态，无待审/待领取。** [S2L179](S2L-20261031-179.md)：原T32/860目标、0V训练预测，32.243969s，`mtad-acb3599b0192.service`真实exit0/inactive/dead；45公共原件和清单核齐。Record→Squeeze→Mode C1.88后与来源合并1.89，成熟后继为上面两个独立合同。
 
@@ -32,7 +32,7 @@
 
 **154–158科学各一次exit0，相关限定输出独审及补项已完成，Record→Squeeze→Mode C1.67收尾。** [154路径](S2L-20261030-154.md)、[155覆盖](S2L-20261030-155.md)、[156历史选择](S2L-20261030-156.md)、[157完整范围](S2L-20261030-157.md)、[158当前多尺度](S2L-20261030-158.md)。157固定内部候选保留、156/158不扩大、不拼接；155–158四属性统计缺项已从原冻结数组一次补齐并单列来源/成本，不倒填原独审。没有新READY或自动后继，152活动冻结目录不动。
 
-**152A/B真实原systemd均RUNNING，已实际训练。** [152合同](L2S-20261030-152.md)、[不可变启动原件](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。最后一次有界查询北京时间2026-10-31 **17:43:27**：PTFM run.json已完成22epoch/65275更新，DeepAF已完成3epoch/15725更新；两service active/running、Restart=no，0全V场完成。运行中属性不当终态成功。固定T初始探针/PTFM归一化已完；不可用训练loss代替物理末轮评价。活动合同仍比较原147，不加157/159/换配方/加额度。151已成功终态；旧148不续跑，无自动后继/抢卡/SSH值守。
+**152A/B真实原systemd均RUNNING，已实际训练。** [152合同](L2S-20261030-152.md)、[不可变启动原件](S2L-20261030-152-start.md)：全T2100/46126组，PTFM150epoch/427800更新、DeepAF20epoch/80800更新，fresh seed20各一次；冻结bda61e5，unit分别`mtad-e358bc6e1a62.service`、`mtad-ea2cca7761dd.service`，GPU2/3按合同UUID。最后一次有界查询北京时间2026-10-31 **17:57:51**：PTFM run.json已完成23epoch/66025更新，DeepAF已完成3epoch/15900更新；两service active/running、Restart=no，0全V场完成。运行中属性不当终态成功。固定T初始探针/PTFM归一化已完；不可用训练loss代替物理末轮评价。活动合同仍比较原147，不加157/159/换配方/加额度。151已成功终态；旧148不续跑，无自动后继/抢卡/SSH值守。
 
 149/150原独审入口失败保留、新v2限定复算成功；153原数值审计失败与新精度分离复核分别记录。完整[149/150 Record/Squeeze](../docs/reports/2026-10-30-temporal-unsupported-review.md)、[153 Record/Squeeze](../docs/reports/2026-10-30-tmtaff-training-physical-review.md)已回Mode C1.64，当前两配方未稳定升级、不扩大。151数据准备不等训练完成。
 

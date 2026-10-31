@@ -10,15 +10,19 @@
 
 ## 现在做什么
 
-[179 T侧条件分离](reports/2026-10-31-history-tail-qualification-review.md)已完成：104/75新害都已有较好组内候选、base为其中节点，clip全0；纯单19/20、age/margin是重叠关联。原生时间包络内部zero657/623、新害9/33；同源双侧资格及正确连接仍未知。0V/训练/新部署、32.244s、45原件核齐，Record→Squeeze→Mode C1.88。
+[180代价监督](reports/2026-10-31-cost-routing-review.md)与[181原生双侧连接](reports/2026-10-31-native-history-bridge-review.md)科学/规定独审全部完成，Record→Squeeze→Mode C1.90–1.91、SR v3.2/123格。180原T128/39fit/9984GPU更新、T32/V32二十臂，863.429s、99公共原件核齐；181零训练/原T32-V32二十四臂，737.574s、95原件核齐。主位置/人口/关联/尾部独立核验，四属性同评价器完整记账，非独立双实现。实际领取只看HandOver。
 
-独立完整阅读ICML2025两阶段多任务委托24页/全部结果附录与核心代码，保ν>2理论反例、正文/代码差异与联合任务折中；新充分跨域1，**累计108＝72领域相近＋36跨域**。GPTR复读不增。来源合并Mode C1.89/C61/C62、SR v3.0/117格后形成[180选择代价监督](proposals/cost_routing_20261031.md)及[181原生双侧连接](proposals/native_history_bridge_20261031.md)。两条分别匹配继续MSE/物理/高害成本与mask/端点/桥接/源等控，保178平均收益及原H/S，整体/覆盖/尾部全核，不把候选解释写成已证机制；不自动组合或全300。实际领取/启动只看HandOver。
+**保原178平均收益，两项当前配方不晋级。** 180的物理/高害成本对匹配继续回归的V MAE差分别+9.118/+6.826m、+9.303/+7.110m，四区间均在0上；相对178新增>1km害214/189及220/196。继续回归微小收益区间跨0。181桥接优于mask/最近端点/等源桥接，但对完整178仅+.381/−.512m、区间跨0，RMSE/P99两头升、新>1km害41/23、纯组20/12、最大20.941km。两项coverage/关联/速航exact不变，不将局部冠军拼接；不认定log回归、混组或端点传播为已证根因。
+
+[179 T侧条件分离](reports/2026-10-31-history-tail-qualification-review.md)：104/75新害都已有较好组内候选、base为其中节点，clip全0；纯单19/20、age/margin是重叠关联。组包络内部zero657/623；181已建立可见同源双侧资格，但正确物理连接未证、单侧传播未改。0V/训练/新部署、32.244s、45原件核齐，Record→Squeeze→Mode C1.88。
+
+独立完整阅读ICML2025两阶段多任务委托24页/全部结果附录与核心代码，保ν>2理论反例、正文/代码差异与联合任务折中；新充分跨域1，**累计108＝72领域相近＋36跨域**。GPTR复读不增。来源合并Mode C1.89/C61/C62后形成上述两项独立Idea，结果正负均已回矩阵；当前不加同头步数/seed、沿V设cap或自动全300。
 
 [178历史候选动作验证](reports/2026-10-31-history-candidate-review.md)已完成科学/规定独审，Record→Squeeze→Mode C1.87/SR v2.9：原T128/13ridge＋13神经fit/3328GPU更新、原T32-V32/24臂，总1800.894s，98公共原件与清单完整回传。原HARD/STRUCT/159强控及分组不变，同一新评分器M/O与均衡E、零Z/单1/联合O分离，来源充分107不增。
 
 **保留历史候选风险读出的真实平均收益，尾部未解。** V HARD MAE452.992→355.760m、RMSE1502.760→1329.100/P995166.150→5003.510；STRUCT427.241→328.916m、1447.519→1267.936/4842.083→4359.930。O−M及O−E共同均值组件描述区间均在0下，去最大仍改善；全部分组/raw-decoded/coverage/速航exact不变，不称覆盖/前端提升。原两头不同coverage/强控不拼成单方法，仍仅V32，不能替换全300/同行。
 
-V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32/47、单支持96/60；最大增害6.782/16.984km，T P99反而变差。单支持同人口下，相对全历史oracle差>1km的M→1点数V2655→337/2582→297，但这含动作合法性差距，不是M在合法集内排错；oracle不部署。下一从T的纯单支持风险误选与零支持状态传播分别结合来源形成新干预，保护当前平均收益，不直接沿V设cap/拼策略/加步。跨片段历史链接与原生状态重估独立保留；发生域不等根因。178无自动全300/新seed或后继READY，执行终态只看HandOver。
+V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32/47、单支持96/60；最大增害6.782/16.984km，T P99反而变差。单支持同人口下，相对全历史oracle差>1km的M→1点数V2655→337/2582→297，但这含动作合法性差距，不是M在合法集内排错；oracle不部署。其T纯单支持与零支持条件已推动179–181的独立来源/干预，正负结果见上，未据V设cap/拼策略/加步。跨片段历史链接与原生状态重估仍保留；发生域不等根因，不自动全300/新seed，执行终态只看HandOver。
 
 [176最终指标/覆盖工作点](reports/2026-10-31-decoded-coverage-review.md)与[177低支持来源分离](reports/2026-10-31-low-support-attribution-review.md)均已完整收尾，Record→Squeeze→Mode C1.85/SR v2.8。176原T32/V32十八臂、0训练/2240T场候选，R/D/C全选回原HARD/STRUCT阈值；约束未激活，无新增收益，当前网格/预算配方结案。科学＋规定收尾634.112s、96公共原件及清单回传，事后等价核3.359s另记。
 
@@ -50,8 +54,8 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 [151完整数据准备](reports/2026-10-30-full-peer-data-review.md)已完成T2100/V300、46126可训练组。152A/B仍真实systemd RUNNING并实际优化，fresh seed20、固定150/20epoch对应427800/80800更新，可能跨多天；尚无末轮全V公平分数，实际训练进度只看HandOver。冻结活动合同仍比较原147，不改成157/159；旧148不续跑。
 
-1. 176–178均完成，不重复旧工作点/上界核查或无依据续训同头。保178历史候选平均收益，由T新增害分别针对纯单支持风险误选、零支持原生状态/历史传播及跨片段一致性读充分来源/公式/消融/代码，回矩阵后形成可区分干预；原组内状态无空间与有好状态却选错不可混为一类。HARD/STRUCT强控保留，不用oracle部署、不退固定源，不沿V调参。
-2. 纯组T44/V16难例与分组支持路线分开，先查现有统计/网格编码没保留的原生时间、局部状态和reference条件，形成可区分的新证据再定实验。166当前联合质量表达没有救回，不自动加步/seed/换loss；0支持旧首anchor回退/圆周歧义未解。真实异构K≥3/新域仍缺，不退固定源优先。
+1. 179–181已闭环，保178与HARD/STRUCT全部强控；不重复当前成本/双侧配方或无依据续训。针对T纯组有好历史候选却选错，从现有风险特征未表达的局部运动/观测相容性查可见条件，结合充分来源后再定干预；不能把loss替换失败写成信息绝对不足或log为根因。
+2. 零支持分别保同源双侧与单侧/无资格域。181证明仅时间资格不够，T端点运动/噪声相容性、历史连续性与对应仍须分离；单侧长期传播未干预，先结合来源建立新可部署条件。原组内无状态空间与有状态却误选分开，不据V设时距cap，不退固定源优先。纯组旧44/16与新的动作/支持域不混分母；真实异构K≥3/新域仍缺。
 3. 跟进152固定全T训练/末轮V300同WS任务比较：全部曝光/物理学习、强控/coverage/尾部/成本，PTFM核心缺域与公共Mean扩域分报、DeepAF P/V适配权限明确。不能把共享WS比较称原完整系统复现，活动合同仍比较147。TMTAFF若再做新训练干预须据原loss几何/梯度路径制定可分离具体合同，不能直接续107或以梯度大小选方案；最多四单卡/FIFO，无SSH值守或自动新增训练。
 
 | 问题 | 当前分离出的待解条件 |
@@ -66,6 +70,7 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 对象／实际范围 | 当前能支持的结论 | 完整证据 |
 |---|---|---|
+| 成本监督/原生双侧，原T32-V32 | 180匹配成本目标更差，181仅胜局部R/N/E而未超完整O、新增纯组大害；两当前配方不晋级，保178。主位置/关联独核与完整四属性记账完成，不宣机制成立 | [180](reports/2026-10-31-cost-routing-review.md)、[181](reports/2026-10-31-native-history-bridge-review.md) |
 | 历史候选动作，T128训练/原T32-V32 | 3328GPU更新，匹配M/E及Z/1/O分离；V HARD355.760m/STRUCT328.916m，保平均/RMSE/P99信号且coverage/关联exact不变，但128/107新>1km害、T P99反证保留，不称尾部已解 | [178完整记录](reports/2026-10-31-history-candidate-review.md) |
 | 最终指标/覆盖工作点、T低支持分离 | 176十八臂/0训练，R/D/C均选原点，当前配方无增量；177证实单支持害多无选源动作，组内历史与跨输出候选空间不同，oracle不可部署 | [176完整记录](reports/2026-10-31-decoded-coverage-review.md)、[177完整记录](reports/2026-10-31-low-support-attribution-review.md) |
 | 匹配难例HARD/DEC，T128/原T32-V32 | 1024GPU更新/12臂，HARD对WS覆盖/decoded双指标/均值点估计同向，MAE452.992m；关联区间跨0/1499新害、对STRUCT均值差，保折中候选。DEC覆盖最高但未超匹配HARD，当前配方不扩大 | [174分离](reports/2026-10-31-association-decision-review.md)、[175完整记录](reports/2026-10-31-decision-error-mining-review.md) |
@@ -104,11 +109,11 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.85](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-185)，累计P14/F282/M114/E185/C59 |
+| 全局P/F/M/E/C与回流 | [Mode C1.91](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-191)，累计P14/F287/M116/E190/C62 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v2.4，87格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#structured-supervision-feedback) |
+| 选源与集合读出 | [SR v3.2，123格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#cost-routing-feedback) |
 | 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
-| 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入107＝72领域/相近＋35跨域；不是作者复现 |
+| 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入108＝72领域/相近＋36跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |
 | 历史推导、连接与取舍原文 | [完整研究过程](history/2026-10-30-research-process.md)、[结案摘要](history/README.md)；历史“下一步”不自动成为任务 |
 

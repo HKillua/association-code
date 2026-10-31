@@ -8,6 +8,8 @@
 
 ## 保留的研究事实
 
+2026-10-31：[179条件分离](../reports/2026-10-31-history-tail-qualification-review.md)→ICML2025全文/代码及GPTR定向复核→Mode C1.89/C61/C62→[180成本监督](../reports/2026-10-31-cost-routing-review.md)/[181原生双侧](../reports/2026-10-31-native-history-bridge-review.md)实际执行→完整Record/Squeeze→Mode C1.90–1.91/SR v3.2闭环。180的9984GPU更新/二十臂未胜匹配继续回归；181零训练/二十四臂仅胜局部R/N/E，未超完整178，新增纯组/尾部反例保留。各科学/规定收尾一次exit0，194公共原件及清单回传；四属性为完整同评价器记账，非独立双实现。保178平均收益，两具体配方不晋级，不据失败否定成熟机制或重置预算；新充分跨域1使累计108＝72+36，复读/实验不增篇。原矩阵/Idea/负结果完整保留，不恢复旧任务。
+
 2026-10-31：[178历史候选动作](../reports/2026-10-31-history-candidate-review.md)完成原T128/13ridge＋13神经fit/3328GPU更新、原T32/V32/24臂及全部限定独核，1800.894s、98公共原件回传。固定HARD/STRUCT分组，V位置MAE452.992→355.760/427.241→328.916m，M/E及单/零/联合分离支持条件平均收益；coverage/raw-decoded/速航exact不变，仍128/107个新增>1km增害、纯组与T P99反证完整保留。Mode C1.87/SR v2.9，不宣同行/全300/尾部已解，不恢复自动新READY。
 
 2026-10-31：[171失败/172明确修复资格](../reports/2026-10-31-object-forest-qualification-review.md)与[173结构监督](../reports/2026-10-31-structured-association-review.md)全部实际记录闭环。原T对象损失可测入口之后，同信息/容量/初始化/曝光T128两头1024真实GPU更新、原T32/V32八臂和限定独审/属性/1032T网格核完成；STRUCT对BCE有效点覆盖/共同位置平均有条件增量，但decoded关联更差/新大害，覆盖仍低原WS，不整体晋级或自动扩全300。Mode C1.77–1.80/SR v2.3–2.4及独立来源/技术失败/未采纳理由完整保留，充分深入107＝72＋35（2023机制基础例外；LA-MOTR2025 partial不计）。本段只导航结案证据，不恢复旧READY。

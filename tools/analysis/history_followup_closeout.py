@@ -127,7 +127,7 @@ def account(run,dest):
                 a,b,d=[np.concatenate(values[k]) for k in ('old','new','delta')];report[key][scope]=dict(old=stats(a),new=stats(b),mean_delta_m=float(d.mean()) if len(d) else None,new_harm_over_1km=int((d>1000).sum()),rescued_over_1km=int((d< -1000).sum()),max_harm_m=float(max(0,d.max())) if len(d) else None)
             assert report[key]['all']['new_harm_over_1km']==summary['all_components']['pairwise'][key]['actual_harm']['new_harm_over_1km']
         result['splits'][split]=dict(physics=report,harm_changes_relative_original_base=harm_changes,raw_eligible_group_queries=eligible_total)
-    result.update(elapsed_seconds=time.monotonic()-start,peak_rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,max_numpy_score_gap=max_score_gap,scope='independent saved populations/positions/relations/four attributes via generic audit plus frozen controls, actions or native brackets, training/folds/sampling, complete support-purity-harm strata; not physical truth, optimizer replay or causal guarantee')
+    result.update(elapsed_seconds=time.monotonic()-start,peak_rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024,max_numpy_score_gap=max_score_gap,scope='independent main populations/positions/relations via generic audit, same-evaluator full four-attribute accounting, plus independent frozen controls, actions or native brackets, training/folds/sampling and support-purity-harm strata; not independent implementations of all attributes, physical truth, optimizer replay or causal guarantee')
     dest.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
 
 if __name__=='__main__':
