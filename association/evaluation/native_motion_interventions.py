@@ -54,6 +54,37 @@ def ou_displacement(v,mu,beta,dt):
     h=float(dt) if beta==0 else np.sign(dt)*(-np.expm1(-beta*abs(dt)))/beta
     return mu*dt+(v-mu)*h
 
+def mean_velocity_control(m,events,groups,count,weights,base):
+    """Same native endpoint/selection as188, removing only its memory term.
+
+    Computes input means, with no likelihood fit, reference or source priority.
+    Diagnostic node descriptors are working input quantities, not calibrated risk.
+    """
+    out=base.copy();native=[];means=0;profiles=[]
+    for node in range(len(m['states'])):
+        a,b=events['event_offsets'][node:node+2];t=events['event_times_seconds'][a:b];values=events['event_values'][a:b];valid=events['event_valid'][a:b,2:4].all(1)
+        speed=values[valid,2]*1852/3600;theta=np.deg2rad(values[valid,3]);v=speed[:,None]*np.column_stack([np.cos(theta),np.sin(theta)])
+        known=int(valid.sum())>=2;mu=v.mean(0) if known else np.zeros(2);means+=int(known)
+        sec=nc.displacement(values[0,:2],values[-1,:2])/(t[-1]-t[0])
+        profiles.append(dict(mean_speed_mps=float(np.linalg.norm(mu)),report_spread_mps=float(np.sqrt(np.mean(np.sum((v-mu)**2,axis=1)))) if known else 0.,mean_secant_gap_mps=float(np.linalg.norm(mu-sec)),mean_ols_gap_mps=float(np.linalg.norm(mu-m['ols_velocity_mps'][node])),native_count=len(t),span_seconds=float(t[-1]-t[0]),fit_rmse_m=float(m['fit_rmse_m'][node])))
+        native.append((t,values,valid,known,mu))
+    eligible=np.zeros(count.shape,bool);unknown=0;decisions=[]
+    for gid,nodes in enumerate(groups):
+        nodes=np.asarray(nodes,int);first=min(native[i][0][0] for i in nodes);last=max(native[i][0][-1] for i in nodes)
+        for j in np.flatnonzero((count[gid]==0)&((m['query_seconds']<first)|(m['query_seconds']>last))):
+            eligible[gid,j]=True;chosen=nodes[weights[nodes,j]>0];mass=weights[chosen,j];positions=[];dt_values=[];gaps=[]
+            if not len(chosen) or not np.isclose(mass.sum(),1.):raise ValueError('frozen188 selected mass required')
+            for node in chosen:
+                t,values,valid,known,mu=native[node];edge=0 if m['query_seconds'][j]<t[0] else -1;dt=float(m['query_seconds'][j]-t[edge]);dt_values.append(dt)
+                if not known or not valid[edge]:unknown+=1;positions.append(m['states'][node,j,:2]);gaps.append(0.);continue
+                v0=values[edge,2]*1852/3600*np.array([np.cos(np.deg2rad(values[edge,3])),np.sin(np.deg2rad(values[edge,3]))]);gaps.append(float(np.linalg.norm(v0-mu)));positions.append(nc.advance(values[edge,:2],mu,dt))
+            out[gid,j,:2]=spherical_position(np.stack(positions),mass)
+            record=dict(group_index=gid,query_index=int(j),before=bool(m['query_seconds'][j]<first),selected_nodes=chosen.tolist(),absolute_endpoint_dt_seconds=float(mass@np.abs(dt_values)),endpoint_mean_gap_mps=float(mass@np.array(gaps)),group_nodes=len(nodes),group_sources=len(set(m['sources'][nodes].tolist())),selected_nodes_count=len(chosen))
+            for key in profiles[0]:record[key]=float(sum(w*profiles[node][key] for w,node in zip(mass,chosen)))
+            decisions.append(record)
+    if not np.isfinite(out).all():raise FloatingPointError('nonfinite mean velocity control')
+    return out,dict(eligible=eligible),dict(native_mean_computations=means,unknown_selected_node_queries=unknown,decisions=decisions)
+
 def persistence(m,events,groups,count,weights,base):
     out={k:base.copy() for k in ('PH','PC','PD','PG')};models=[];native=[];fit_count=constant=boundary=floors=0
     for node in range(len(m['states'])):

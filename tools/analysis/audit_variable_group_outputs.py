@@ -17,7 +17,10 @@ def audit(run,out,*,extra_scene=None,extra_summary=None):
     start=time.monotonic();checks=core.Checks();result=dict(status='RUNNING',run=str(run))
     try:
         record=core.read(run/'run.json');checks.exact(record['status']=='COMPLETED' and record['exit_code']==0,'terminal science');native=Path(record['native_run']);names=record['methods'];result['splits']={}
+        splits=record.get('evaluation_splits',['T_core','V_select'])
+        checks.exact(bool(splits) and len(set(splits))==len(splits) and set(splits)<=set(['T_core','V_select']),'declared evaluation splits')
         for split,ids,fn,rf in [('T_core',record['training_scene_ids'],'T-summary.json','T-scene-summary.json.gz'),('V_select',record['scene_ids'],'summary.json','scene-summary.json.gz')]:
+            if split not in splits:continue
             summary=core.read(run/fn);rows=core.read(run/rf);items=[];pair_items=[];extra_items=[];checks.exact([r['scene_id'] for r in rows]==ids,'complete order')
             for sid,row in zip(ids,rows):
                 z=load(run/'private'/f'states-{split}-{sid}.npz');saved={n:{k[len(n)+1:]:v for k,v in z.items() if k.startswith(n+'_')} for n in names};ev=load(native/'private/native-evaluation'/split/f'scene-{sid}.npz');nt=len(ev['target_ids']);item={}

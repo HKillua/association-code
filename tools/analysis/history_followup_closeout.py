@@ -83,7 +83,10 @@ def account(run,dest,verification=None):
         from tools.analysis.native_history_bridge_pilot import ARMS,PRIMARY
     parent=Path(r['parent_run']);old=read(parent/'run.json');result=dict(status='COMPLETED',exit_code=0,training=training_report if verification is not None else verify_training(run,r) if cost else dict(updates=0,fits=0),splits={});max_score_gap=0.
     comparisons=list(dict.fromkeys(list(PRIMARY)+[new+'_NN_vs_'+front+'_NN' for front,arms in ARMS.items() for new in arms[2:]]))
+    splits=r.get('evaluation_splits',['T_core','V_select'])
+    if not splits or len(set(splits))!=len(splits) or not set(splits)<=set(['T_core','V_select']):raise ValueError('declared evaluation splits')
     for split,ids,fn in [('T_core',r['training_scene_ids'],'T-summary.json'),('V_select',r['scene_ids'],'summary.json')]:
+        if split not in splits:continue
         pool={k:{} for k in comparisons};harm_changes={};eligible_total={k:0 for k in ARMS}
         for sid in ids:
             m=load(Path(r['native_run'])/'private/native-motion'/split/f'scene-{sid}.npz');ev=load(Path(r['native_run'])/'private/native-evaluation'/split/f'scene-{sid}.npz');q=load(run/'private'/f'partitions-{split}-{sid}.npz');raw=load(run/'private'/f'raw-{split}-{sid}.npz');policy=load(run/'private'/f'policy-{split}-{sid}.npz');oq=load(parent/'private'/f'partitions-{split}-{sid}.npz');op=load(parent/'private'/f'policy-{split}-{sid}.npz');oraw=load(parent/'private'/f'raw-{split}-{sid}.npz');saved=load(run/'private'/f'states-{split}-{sid}.npz');nt=len(ev['target_ids']);tv=ev['target_valid'][...,:2].all(-1);arms_info={}
