@@ -138,3 +138,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 [192采样测度资格](../reports/2026-11-01-sampling-measure-review.md)：T32/2310片段/580384事件、0V新预测，18.158249s一次成功/45原件核齐。内部近均匀，密度解释不获支持；均值差与经验SE不当方法收益/根因，Record→Squeeze→Mode C2.04。
 
 [193导入副作用失败](../reports/2026-11-01-temporal-gate-startup-failure.md)：0fit/更新/完整T/V，首场157均值未checkpoint；9.423s/13原件完整保全，技术原因不作科学阴性，回Mode C2.06。
+
+[194阶段信息匹配](../reports/2026-11-01-temporal-gate-review.md)：39fit/4992GPU更新、原T32/44臂与规定独核完整成功，1113.206649s/66原件。粗阶段ORDER不胜MC、顺序增量未获，旧害/救回与全部强控保留，当前配方不晋级，回Mode C2.07。

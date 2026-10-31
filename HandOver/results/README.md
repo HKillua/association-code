@@ -67,3 +67,5 @@
 [192 Record/Squeeze](../../docs/reports/2026-11-01-sampling-measure-review.md)及[回执](../S2L-20261101-192.md)：原T资格/2310积分与旧病例绑定通过，45公共原件完整、private原位；无新预测/目标指标或V成绩，回Mode C2.04。
 
 | [193失败原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261101_temporal_gate/193/) | 13公共原件/11185B、真实失败退出与CUDA导入原因；[完整记录](../../docs/reports/2026-11-01-temporal-gate-startup-failure.md)，无新科学成绩 |
+
+| [194阶段任务原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261101_temporal_gate/194/) | 66公共原件/148622382B、T128训练与T32-44臂、science/audit真实成功、四项完整核验；[Record/Squeeze](../../docs/reports/2026-11-01-temporal-gate-review.md)，private留服务器 |
