@@ -134,3 +134,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [190端点×运动×几何](../reports/2026-11-01-fitted-endpoint-review.md)：40臂/全T绑定与规定独审完成，拟合端点在两运动下均更差/损失旧救回；几何差小，保反例与188，回Mode C2.01。
 
 [191平均运动V32验证](../reports/2026-11-01-mean-velocity-validation-review.md)：原28臂/7702均值/0新训练，科学与规定独审成功、632.728932s含计划病例聚合、65公共原件核齐。MC保PG条件平均收益，但原11/0公里害保留、H旧救回71→70，非等效/全300/可信同行。Record→Squeeze→Mode C2.02。
+
+[192采样测度资格](../reports/2026-11-01-sampling-measure-review.md)：T32/2310片段/580384事件、0V新预测，18.158249s一次成功/45原件核齐。内部近均匀，密度解释不获支持；均值差与经验SE不当方法收益/根因，Record→Squeeze→Mode C2.04。

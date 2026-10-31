@@ -10,7 +10,9 @@
 
 ## 现在做什么
 
-[192原生采样测度资格](proposals/sampling_measure_qualification_20261101.md)从MC2.03/C67新立：MC按报告数等权，若原生采样不均匀，是否存在与时间平均不同的实际动作空间？先T32完整输入/189旧害与救回描述，0V/训练/新预测；不能提前认密度是根因。三项软件检查通过，实际领取/终态只看HandOver；原178/MC条件收益保留，不重做156历史选模或137九rho。
+[192采样测度资格](reports/2026-11-01-sampling-measure-review.md)一次服务器成功终态：原T32/2310片段/580384事件、全部2310积分双表达及原μ/候选权重/451–344病例绑定，0V/新预测或训练，18.158249s、45公共原件核齐。**本批T内部几乎均匀采样（间隔CV最大4.9924e−5），当前“不规则密度导致大错”的解释不获支持；不自动上时间加权方法。** 两均值有差并不认证该解释或收益；经验SE在旧害/救回重叠，不部署门槛/当校准Cov。Record→Squeeze→Mode C2.04/SR v4.5/OD v1.18，原178/MC条件收益不改。
+
+新增[FlowState ICML2026完整来源分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/flowstate_icml2026_full_source_analysis_20261101.md)：正式26页全部正文/附录/图公式/消融与作者核心模型/配置静态读齐，充分**109＝72领域相近＋37跨域**，0作者复现。来源→Mode C2.05/C68，累计P14/F301/M122/E204/C68；SR v4.6/165格、OD v1.19/81格。值得研究的是原生时序证据与query恢复共同时间语义，非用论文为密度解释背书或预定SSM；源单变量/启发scale/有条件理论，训练loss/版本缺口及完整成本/负例保留，无新训练READY。
 
 [191简单均值运动V32验证](reports/2026-11-01-mean-velocity-validation-review.md)科学/规定独审均成功，原28臂/7702输入均值、0本轮T评价或新神经/reference/似然优化；632.728932s含计划病例聚合，65公共原件核齐，Record→Squeeze→Mode C2.02/SR v4.3/OD v1.16。**保更简单MC的条件候选，178不自动替换。** MC−O MAE−2.676363/−2.385861m，RMSE/P99两头降；H CI跨0/S略低0，去最大+.081137/−.295681m；对188 PG差+.011255/−.000000809m、两CI跨0，不宣严格等效/OU机制已证。原PG公里害11/0全保、H11query集中一场一个两节点组；原公里救回保70/71及42/42、无转公里害。coverage/raw-decoded/速航/强控exact，真实K2/复用V/离线，不宣全300或缓存速度比。
 
@@ -28,8 +30,7 @@
 
 两前端分别保持各自完整人口/覆盖/分组/raw-decoded及速度航向exact，不拼覆盖或指标冠军；三项均已完成科学/规定独审，各自成功真实exit0。主位置/人口/关系/尾部独核，四属性同评价器完整记账非独立双实现；实际主要K2、V32开发域复用，非全V300/新域或可信同行成绩。
 
-**下一步具体问题：** 当前成熟验证189/190/191已收尾，192先核采样测度与工作可靠性条件。保178、MC/PG条件平均价值，转向T原生位置与SOG/COG的时间关系、运动估计可靠性及可用历史条件，区分单片段状态失效和多候选误选，再由来源AP→矩阵→新可归因方案；不能把运动相容/噪声候选先写成根因。统一全段CV拟合端点已有反证，不继续沿同一配方堆窗口/β补丁；不按V设cap、不退源优先，不自动全300/新seed/192。152继续原全量训练，待完整终态后公平评价，不改活动合同。
-
+**下一步具体问题：** 192已收尾并排除当前密度解释，保178及MC/PG条件平均价值。围绕C68核原生报告的时间顺序/局部运动是否提供全段均值缺失的任务信息，并区分未知未来机动、组/reference对应及噪声；来源的单变量scale先建立多通道真实秒与可变K的A′条件。后继最小干预需同信息/同容量的均值、保顺序/破坏顺序和query读出控制，直接核原T任务风险/整体覆盖尾部，不能只凭内部重建loss，亦不直接搬foundation模型。具体输入/训练量/代码验收完毕后才另发独立Idea/READY；当前无193/新训练/全300或自动后继。192不制造虚假精度提升，旧端点/窗口/β阴性和137/156反例保留；152继续原全量训练，待完整终态后公平评价。
 [182原生运动资格](reports/2026-10-31-native-compatibility-review.md)0V/训练/部署、50.646s/45原件；[独立来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/native_motion_transfer_20261031.md)定向复核BKN/Go-RIO/GPTR、CTCRW基础例外保视觉/R链partial，充分108不增。原184/185首场list接口失败/17.478402s保全，不作科学阴性；186原T32/128算术重建、9240工作fit/0V参考/90.650868s成功另记，新187/188不覆盖旧失败。来源/失败/资格/科学结果均已完整回矩阵，MC1.98累计P14/F294/M119/E197/C65、SR v3.9/144格、OD v1.12/60格。
 
 [180代价监督](reports/2026-10-31-cost-routing-review.md)与[181原生双侧连接](reports/2026-10-31-native-history-bridge-review.md)科学/规定独审全部完成，Record→Squeeze→Mode C1.90–1.91、SR v3.2/123格。180原T128/39fit/9984GPU更新、T32/V32二十臂，863.429s、99公共原件核齐；181零训练/原T32-V32二十四臂，737.574s、95原件核齐。主位置/人口/关联/尾部独立核验，四属性同评价器完整记账，非独立双实现。实际领取只看HandOver。
@@ -131,11 +132,11 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C2.03](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-203)，累计P14/F299/M121/E202/C67 |
+| 全局P/F/M/E/C与回流 | [Mode C2.05](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-205)，累计P14/F301/M122/E204/C68 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v4.3，156格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#mean-velocity-validation-feedback) |
-| 观测驱动与状态恢复 | [OD v1.16，72格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#mean-velocity-expression-feedback) |
-| 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入108＝72领域/相近＋36跨域；不是作者复现 |
+| 选源与集合读出 | [SR v4.6，165格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#flowstate-time-semantics-source) |
+| 观测驱动与状态恢复 | [OD v1.19，81格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#flowstate-query-time-source) |
+| 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入109＝72领域/相近＋37跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |
 | 历史推导、连接与取舍原文 | [完整研究过程](history/2026-10-30-research-process.md)、[结案摘要](history/README.md)；历史“下一步”不自动成为任务 |
 
