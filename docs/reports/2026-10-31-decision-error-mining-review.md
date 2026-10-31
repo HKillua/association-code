@@ -151,3 +151,22 @@ new_M: none
 new_E: E182
 next_routes: [deep-read_Mode_C, retain_HARD_coverage_candidate, T_support_state_counterexamples_before_new_Idea]
 ```
+
+
+## 2026-10-31 下一步讨论补注：按已有T分母看风险，区分读出权限
+
+本节只重算原`decision-mining-squeeze.json`已保存统计、查原生产代码，不新增预测/拟合或实验成绩，不修改175原评价与去留。训练侧HARD相对STRUCT的共同点分层如下；“增害”指候选位置误差比对照多出1km，而非绝对误差>1km。
+
+|新组当时支持来源数|共同参考点|>1km新增害|该层增害比例|
+|---|---:|---:|---:|
+|0|1085|140|12.90%|
+|1|13271|195|1.47%|
+|≥2|23308|118|.51%|
+
+T全部37664共同点中0/1域占38.12%，承担335/453＝73.95%新增害；不只是列坏点数量，也保各层完整分母。时间点/片段相关、T已见标签，描述比率不作为独立风险校准。HARD对WS的T零支持平均仍改善，而对STRUCT明显变差，说明应保强对照、不能泛称零支持策略整体失效。
+
+代码DE：[source_weights/recover_source_policy](../../association/evaluation/source_risk.py)在只有一个available来源时质量归一为1，无available时来源质量全0并用mean_states回退；多个同源片段在该时刻按支持均分。因此，冻结组/节点状态/availability后，风险头分数本身不能改变0/1域位置。前端/构组仍能改变成员/支持/历史与代表，圆周歧义也有独立anchor回退。该结构限制不是这些坏点根因已证、也不是前端影响可被排除。
+
+工作点代码DE：[calibrate/operating_point](../../tools/analysis/association_operating_point_pilot.py)按raw跨源mPFA预算选raw mPCA；最终用户目标是decoded跨源双指标与覆盖，二者并不相同。AI候选是标定目标接口可能限制最终折中；没有实测过同一冻结HARD/STRUCT的decoded预算＋覆盖约束对照，不能把它写成已证收益。
+
+下一步建议分两条具体检验：冻结WS/CTX/BCE/STRUCT/HARD做同T范围的raw标定与最终decoded标定/覆盖约束对照，全部规则T冻结再V；并用原T32完整反例与匹配未损害点分离错组、同源片段/状态和参考对应。状态方案须先消费相关充分AP/Mode C条件，再仅替换0域、仅替换1域、联合替换，与原恢复比较，保持分组以核归因；若T核查指向关联则转对应干预，不能预选恢复器。先写具体候选网格/预算/停止规则后才READY，本补注不是新任务合同。此前146/149/160简单最近、均衡、尺度或速度替换的反例沿用，不重复其相同配方。
