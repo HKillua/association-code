@@ -122,3 +122,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [175匹配难例训练](../reports/2026-10-31-decision-error-mining-review.md)：1024真实GPU更新、十二臂/完整独核；HARD保覆盖—关联折中候选，DEC未超匹配控制，全部强控/尾部/四属性和不确定性保留，回Mode C1.82。
 
 - [176最终指标/覆盖工作点](../reports/2026-10-31-decoded-coverage-review.md)、[177低支持分离](../reports/2026-10-31-low-support-attribution-review.md)：工作点三规则均选原点，无增量；T诊断区分受支持/历史候选与跨输出敏感性，oracle不可部署。规定独审/补项全部成功，回Mode C1.85。
+
+- [183原生运动条件信息](../reports/2026-10-31-native-motion-features-review.md)：6656GPU更新/十六臂与规定独核全部成功，部分base门槛旧害减少，但完整均值/RMSE和相对O新害未过，保178，回Mode C1.96/SR v3.7。

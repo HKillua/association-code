@@ -4,7 +4,9 @@
 
 ## 当前执行
 
-**183科学成功、规定独审RUNNING；187/188科学RUNNING。** 183原312b123科学run/launcher各attempt1，`mtad-1b97959ddccf.service`真实exit0/inactive/dead，T128/26fit/6656GPU更新及原T32/V32十六臂完成；19:02:18新3c3e0e3 audit183，`mtad-b06447c04d3a.service`真实active/running，CPU16–19无GPU。新[L2S187](L2S-20261031-187.md)/[188](L2S-20261031-188.md)已19:02:19各一次领取，[实际启动](S2L-20261031-187-188-start.md)；独立3c3e0e3 checkout/run/launcher attempt1，`mtad-d90c0b551ff7.service`/`mtad-45b78b44babb.service`真实active/running/Restartno，187 CPU8–11/188 CPU20–23无GPU，3600s advisory。显式绑定186资格，原184/185 FAILED不改。科学成功后各一次新独审，与183按完成顺序CPU16–19 FIFO串行；不重投旧任务/组合/自动扩量。
+**187/188科学RUNNING。** 新[L2S187](L2S-20261031-187.md)/[188](L2S-20261031-188.md)已19:02:19各一次领取，[实际启动](S2L-20261031-187-188-start.md)；3c3e0e3冻结独立checkout/run/launcher attempt1，`mtad-d90c0b551ff7.service`/`mtad-45b78b44babb.service`真实active/running/Restartno，187 CPU8–11/188 CPU20–23无GPU。显式绑定186，原184/185 FAILED保留。科学成功后各一次新独审CPU16–19按完成顺序FIFO；183已释放，不能重投旧任务/组合/自动扩量。
+
+**183科学/规定独审均成功，无待审。** [S2L183](S2L-20261031-183.md)：科学312b123/`mtad-1b97959ddccf.service`，独审3c3e0e3/`mtad-b06447c04d3a.service`均真实exit0/inactive/dead/Restartno，T128/26fit/6656GPU更新及T32/V32十六臂，683.901688s、98公共原件核齐；Record→Squeeze→Mode C1.96/SR v3.7。保178，原生信息配方未保整体净收益，旧害门槛与对O新增害分开；原science/audit冻结无自动重投/组合/全300。
 
 **186资格成功，无待领/待审。** [S2L186](S2L-20261031-186.md)：20ec7a5、`mtad-79c6129c5bb0.service`真实exit0/inactive/dead，原T32/128次完整list原生生成与独立重建、9240native工作fit、0V参考/神经训练/效果评价，90.650868s、13原件＋清单核齐。Record→Squeeze→Mode C1.95/F291/E194；只认证软件条件，不认科学收益，后继为新187/188合同。
 

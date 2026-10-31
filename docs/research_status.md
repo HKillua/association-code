@@ -10,6 +10,8 @@
 
 ## 现在做什么
 
+[183原生运动条件信息](reports/2026-10-31-native-motion-features-review.md)科学/规定独审均成功，原T128/26fit/6656GPU更新、T32/V32十六臂，683.901688s、98公共原件核齐，Record→Squeeze→Mode C1.96/SR v3.7。**保178平均收益，当前F0/F1不晋级。** F1对O V MAE+3.635/+1.903m、对同容量旧信息F0+3.565/+1.563m，区间均跨0/RMSE升；相对base旧害降128→100/107→80及纯28→14/19→8，但相对O仍新增169/95害，两个门槛不能混同。零/多支持、coverage/关系/速航exact；报告噪声/目标-动作交互仍候选，不自动加步或全300。
+
 [182原生运动资格](reports/2026-10-31-native-compatibility-review.md)已完成，0V训练部署/50.646s/45原件。纯单支持害的native报告外推偏差高但分布重叠，双侧害不能用大gap/大不一致简单拒绝；无双侧469/351、全组单侧451/344与内部双侧分开。结合BKN/Go-RIO/GPTR定向原文与CTCRW基础例外的[独立来源分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/native_motion_transfer_20261031.md)，Record→Squeeze→Mode C1.92–1.93/C63–65、SR v3.4/129格；充分108不增，未完整视觉/R链的新旧来源不充精读名额。
 
 据此形成[183/184/185三条独立最小干预](proposals/native_motion_interventions_20261031.md)：同容量/曝光的新原生运动信息、双侧端点速度与形状约束、单侧方向记忆与漂移分离；保178平均收益/两头强控，整体/覆盖/尾部一起核。不先称机制成立，不自动组合或扩大；实际发布/领取和状态只看HandOver。
@@ -113,9 +115,9 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.91](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-191)，累计P14/F287/M116/E190/C62 |
+| 全局P/F/M/E/C与回流 | [Mode C1.96](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-196)，累计P14/F292/M119/E195/C65 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v3.2，123格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#cost-routing-feedback) |
+| 选源与集合读出 | [SR v3.7，138格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#native-motion-features-feedback) |
 | 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
 | 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入108＝72领域/相近＋36跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |
