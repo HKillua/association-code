@@ -10,6 +10,8 @@
 
 ## 现在做什么
 
+[192原生采样测度资格](proposals/sampling_measure_qualification_20261101.md)从MC2.03/C67新立：MC按报告数等权，若原生采样不均匀，是否存在与时间平均不同的实际动作空间？先T32完整输入/189旧害与救回描述，0V/训练/新预测；不能提前认密度是根因。三项软件检查通过，实际领取/终态只看HandOver；原178/MC条件收益保留，不重做156历史选模或137九rho。
+
 [191简单均值运动V32验证](reports/2026-11-01-mean-velocity-validation-review.md)科学/规定独审均成功，原28臂/7702输入均值、0本轮T评价或新神经/reference/似然优化；632.728932s含计划病例聚合，65公共原件核齐，Record→Squeeze→Mode C2.02/SR v4.3/OD v1.16。**保更简单MC的条件候选，178不自动替换。** MC−O MAE−2.676363/−2.385861m，RMSE/P99两头降；H CI跨0/S略低0，去最大+.081137/−.295681m；对188 PG差+.011255/−.000000809m、两CI跨0，不宣严格等效/OU机制已证。原PG公里害11/0全保、H11query集中一场一个两节点组；原公里救回保70/71及42/42、无转公里害。coverage/raw-decoded/速航/强控exact，真实K2/复用V/离线，不宣全300或缓存速度比。
 
 [190潜在端点×运动×几何](reports/2026-11-01-fitted-endpoint-review.md)科学/规定独审均成功，原T32/40臂、2310 native OLS/均值、0V新神经监督似然，772.287141s、63公共原件核齐，Record→Squeeze→Mode C2.01/SR v4.2/OD v1.15。拟合端点相对同速度原生锚MAE+5.427/+6.872m（OLS速度）、+5.212/+6.701m（报告均值），四描述区间均在0上；平均/RMSE/P99恶化，当前配方不晋级。HARD原33单节点害随均值运动保留到FM，STRUCT原33公里救回只保4且5反转；不把FL旧害减少误计为端点贡献，其OLS速度控制GL本来无此批害。几何完整仅−.014/−.011m，不证明任意区域无影响。真实端部机动、位置与SOG/COG时间关系/可靠性仍UN，不认端点噪声根因或否定所有潜在状态估计。
@@ -26,7 +28,7 @@
 
 两前端分别保持各自完整人口/覆盖/分组/raw-decoded及速度航向exact，不拼覆盖或指标冠军；三项均已完成科学/规定独审，各自成功真实exit0。主位置/人口/关系/尾部独核，四属性同评价器完整记账非独立双实现；实际主要K2、V32开发域复用，非全V300/新域或可信同行成绩。
 
-**下一步具体问题：** 当前成熟验证189/190/191已收尾。保178、MC/PG条件平均价值，转向T原生位置与SOG/COG的时间关系、运动估计可靠性及可用历史条件，区分单片段状态失效和多候选误选，再由来源AP→矩阵→新可归因方案；不能把运动相容/噪声候选先写成根因。统一全段CV拟合端点已有反证，不继续沿同一配方堆窗口/β补丁；不按V设cap、不退源优先，不自动全300/新seed/192。152继续原全量训练，待完整终态后公平评价，不改活动合同。
+**下一步具体问题：** 当前成熟验证189/190/191已收尾，192先核采样测度与工作可靠性条件。保178、MC/PG条件平均价值，转向T原生位置与SOG/COG的时间关系、运动估计可靠性及可用历史条件，区分单片段状态失效和多候选误选，再由来源AP→矩阵→新可归因方案；不能把运动相容/噪声候选先写成根因。统一全段CV拟合端点已有反证，不继续沿同一配方堆窗口/β补丁；不按V设cap、不退源优先，不自动全300/新seed/192。152继续原全量训练，待完整终态后公平评价，不改活动合同。
 
 [182原生运动资格](reports/2026-10-31-native-compatibility-review.md)0V/训练/部署、50.646s/45原件；[独立来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/native_motion_transfer_20261031.md)定向复核BKN/Go-RIO/GPTR、CTCRW基础例外保视觉/R链partial，充分108不增。原184/185首场list接口失败/17.478402s保全，不作科学阴性；186原T32/128算术重建、9240工作fit/0V参考/90.650868s成功另记，新187/188不覆盖旧失败。来源/失败/资格/科学结果均已完整回矩阵，MC1.98累计P14/F294/M119/E197/C65、SR v3.9/144格、OD v1.12/60格。
 
@@ -129,7 +131,7 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C2.02](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-202)，累计P14/F298/M120/E201/C66 |
+| 全局P/F/M/E/C与回流 | [Mode C2.03](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-203)，累计P14/F299/M121/E202/C67 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
 | 选源与集合读出 | [SR v4.3，156格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#mean-velocity-validation-feedback) |
 | 观测驱动与状态恢复 | [OD v1.16，72格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#mean-velocity-expression-feedback) |
