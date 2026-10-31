@@ -25,3 +25,5 @@ T-only诊断上界两项：①当前组各片段已有状态中的最小参考�
 CPU16–19×4无GPU，RSS4GiB/900s advisory，一次；完整匿名逐场/汇总，私有坐标/身份不回传。验收核单源分数无效/多源可影响、已保存片段与输出oracle只作诊断、所有query与损害分母完整，复用中央空参考处理。176验收核同预算目标对照/覆盖底线/undefined不删、无真值分组、T覆盖推断与实际artifact一致及保存→独审fixture。全部通过后各发布READY。
 
 科学完毕分别Record→Squeeze→Mode C；176一次独立保存输出审计/完整四属性/候选分组计数及选择规则独核，177直接oracle候选距离/分母交叉核。无新自动监控或SSH值守。
+
+执行补注：177初版汇总按1域supported、其余all组合报告oracle，未分别输出事前要求的supported/all两套。科学后明确追加一次`low_support_attribution_closeout.py`只读坏点候选距离独核及两套分离计数，不改177原科学/预测、不倒填已输出。176收尾代码同单独checkout冻结；两个科学目录保持c003770。
