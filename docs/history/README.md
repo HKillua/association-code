@@ -124,3 +124,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [176最终指标/覆盖工作点](../reports/2026-10-31-decoded-coverage-review.md)、[177低支持分离](../reports/2026-10-31-low-support-attribution-review.md)：工作点三规则均选原点，无增量；T诊断区分受支持/历史候选与跨输出敏感性，oracle不可部署。规定独审/补项全部成功，回Mode C1.85。
 
 - [183原生运动条件信息](../reports/2026-10-31-native-motion-features-review.md)：6656GPU更新/十六臂与规定独核全部成功，部分base门槛旧害减少，但完整均值/RMSE和相对O新害未过，保178，回Mode C1.96/SR v3.7。
+
+- [187双侧导数/形状约束](../reports/2026-10-31-endpoint-kinematics-review.md)：28臂完整独核成功，CM减少CH退化仍不胜178，保强控/纯组尾部，回Mode C1.97/SR v3.8。

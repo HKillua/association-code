@@ -53,3 +53,5 @@
 - [176回执](../S2L-20261031-176.md)/[177回执](../S2L-20261031-177.md)：完整公共原件在资料库`docs/evidence/20261031_decoded_coverage/{176,177}`；工作点无新收益，诊断不冒充方法成绩，private仍服务器。
 
 - [183回执](../S2L-20261031-183.md) / [完整Record-Squeeze](../../docs/reports/2026-10-31-native-motion-features-review.md)：98公共原件＋终态/传输清单在资料库`docs/evidence/20261031_native_motion/183`，private留server。
+
+- [187回执](../S2L-20261031-187.md)：96公共原件＋真实终态/传输清单在资料库`docs/evidence/20261031_native_motion/187`，原失败及private保留。
