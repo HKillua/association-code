@@ -16,6 +16,7 @@ def hermite(a,p0,p1,d0,d1,span,kind):
 def bridge(m,events,groups,count,scores,base,old_bridge):
     out={k:old_bridge.copy() for k in ('CL','CH','CM')};eligible=np.zeros(count.shape,bool);records=[];fallbacks=0
     for gid,nodes in enumerate(groups):
+        nodes=np.asarray(nodes,int)
         streams=[]
         for source in set(m['sources'][nodes].tolist()):
             own=nodes[m['sources'][nodes]==source];streams.append((own,nc.stream(events,own,speed_unit='kn')))
@@ -63,6 +64,7 @@ def persistence(m,events,groups,count,weights,base):
         models.append(fits);native.append((t,values[:,:2],v,valid))
     eligible=np.zeros(count.shape,bool);unknown=0;decisions=[]
     for gid,nodes in enumerate(groups):
+        nodes=np.asarray(nodes,int)
         first=min(native[i][0][0] for i in nodes);last=max(native[i][0][-1] for i in nodes)
         for j in np.flatnonzero((count[gid]==0)&((m['query_seconds']<first)|(m['query_seconds']>last))):
             eligible[gid,j]=True;chosen=nodes[weights[nodes,j]>0];mass=weights[chosen,j];values={k:[] for k in out};dt_values=[]
