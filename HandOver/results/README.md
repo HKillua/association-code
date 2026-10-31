@@ -44,3 +44,5 @@
 已审093/094/096机器副本、100逐臂冗余返回、重复自动report移出工作区，原件在Git [`903f679`](https://github.com/HKillua/association-code/tree/903f679)，更早来源见[历史摘要](../../docs/history/README.md)。104原始回执未被本地改写；tail文件被服务器后续提交修改，其原版本和订正需分别查看，不将精简摘要冒称原始日志。
 
 完整权重、成功batch日志与逐点NPZ仍在服务器原runs；原路径由各 `original-registration.json` 和旧Git回执保存。按需恢复单文件，不恢复整套旧READY，不新建archive副本。
+
+- [174回执](../S2L-20261031-174.md) / [完整Record-Squeeze](../../docs/reports/2026-10-31-association-decision-review.md)：45份公共原件完整保存在资料库`docs/evidence/20261031_association_decision/174`；原私人输入仍服务器。

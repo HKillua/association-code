@@ -37,3 +37,5 @@
 新增训练选择模块与pilot，复用173数据/评价/独审；不改活动代码。单测核最终组错误与单边错误可不同、两头逐类样本数一致、选择停止梯度、空辅助为0、两头真实更新及4轮完整曝光；存取后无标签推理与原独审fixture复用。全部通过后发布READY。
 
 独立175 checkout/run/launcher attempt1，CPU0–3×4/GPU0 UUID兼容共卡余量至少4GiB，RSS8GiB/1800s advisory；最多4自己单卡含152。末轮后单独audit175 CPU16–19×4无GPU/1800s advisory，一次保存输出独立人口/关联/物理核查＋全四属性、T标定sorted-prefix独核、新增害的支持/纯度/代表对应后验分解；完整公共原件回传，私人mask/预测/权重留服务器。按实际成本记录准备/科学/收尾，不把建议墙时当保证。
+
+实施验收记录：2026-10-31 READY前3项单测/集成测试通过（`test_decision_error_mining`两项、`test_association_context_io`一项），py_compile及diff检查通过。独立175科学冻结5e185db；收尾复用173已留存sorted-prefix/支持/纯度核算，扩展全部9主对比和512步bitmask计数，代码为`tools/analysis/decision_error_mining_closeout.py`。这仅扩展规定核算，不改变科学配方/输出。

@@ -112,3 +112,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 按需读单文件，不另建archive或恢复整套退役流程。[当前结果索引](../../HandOver/results/README.md)登记保留原件。完整服务器输入/权重/预测仍在`/home/wangguangjie/djs/association-code/runs/`，Git摘要不能改名后喂给模型。用户Downloads原ZIP、本地数据/权重/runs和活动服务均未删除；清理也不改写Git历史。
 
 第二轮整理（2026-10-25）：受管理文件557→290，工作副本约51.9→5.0 MiB；Markdown 50→25、Python 249→200、测试文件98→76、配置文件64→49、工具Python 52→33。共享函数与fixture原样迁移，当前096/097/099及物理输入/四权重共17项CPU检查通过，全部测试导入发现无断链。当前096执行/队列/收尾比较代码未改；不把这些软件检查当作真实实验成绩。数据、权重、runs、依赖环境和Git历史保留。
+
+- [174 T打分—分组分离](../reports/2026-10-31-association-decision-review.md)：原T32/860对象完整复放，STRUCT150混组149拆身份降低J；仅T诊断，不证V根因。13.263569s成功，回Mode C1.81。
