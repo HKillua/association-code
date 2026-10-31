@@ -4,6 +4,8 @@
 
 ## 当前执行
 
+**171 READY，本聊天领取一次。** [L2S171](L2S-20261031-171.md)：Mode C1.77/C57的T-only对象损失/森林梯度资格，原T32/0训练/无GPU/不新开V；3项软件核验已过。新独立checkout/run/launcher，一次结束Record→Squeeze→Mode C，未发布172/无自动新训练。152活动合同不改。
+
 **170科学/限定独审/完整属性与T网格独立核验各一次完成，Record→Squeeze→Mode C1.76。** [回执](S2L-20261031-170.md)：0训练/teacher、原T32/V32八臂，θ按同一T规则在V前冻结；science unit `mtad-1b4ebc8f28c8.service`、audit `mtad-8372a8e0239c.service`均真实成功终态，a946321冻结目录不改。公共原件完整回传；168–170本轮无待审/待领取、无自动新READY或全300后继，152/107/132不改。
 
 **168/169科学/限定独审/完整属性及后验记账各一次完成，Record→Squeeze→Mode C1.75。** [168回执](S2L-20261031-168.md)：T128/2000GPU更新、T32/V32六臂，unit `mtad-2e982292721f.service`；[169回执](S2L-20261031-169.md)：0训练、T32/V32八臂，unit `mtad-c677e56f58c3.service`。原launcher及两个独审服务均真实成功终态，0ca218e冻结目录不改。公共原件完整回传、private原位，无科学重试/自动全300；后继从新具体Idea发布，不续旧168/169额度或132，不改152活动合同。

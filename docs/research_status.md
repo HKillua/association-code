@@ -10,6 +10,8 @@
 
 ## 现在做什么
 
+本轮按[独立结构监督AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/structured_association_sources_20261031.md)→[Mode C1.77](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-177)形成C57；充分深入107＝72领域/相近＋35跨域（DiffClust2023机制基础例外，LA-MOTR2025补充/代码缺口partial不计）。[171事前Idea](proposals/structured_association_20261031.md)先核原T错并对象及训练结构梯度是否触及相关错连，0训练/无新V，不先宣目标缺口为根因。3项软件核验已过、具体执行见HandOver；未自动新训练。
+
 用户本轮明确优先提高覆盖率与跨源mPCA/mPFA，并包括前端。已补读STAR NeurIPS2025/TrackTrack CVPR2025正文、补充、反例及TrackTrack核心实现，[完整AP与阅读边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)保留，STAR源码未获；充分深入106＝72领域相近＋34跨域，非作者复现。[168](reports/2026-10-31-association-context-review.md)实际T128/2000GPU更新、T32/V32六臂：CTX有共同域均值/召回信号，但覆盖下降和1027新大害，未联合升级。[169](reports/2026-10-31-anchor-support-review.md)0训练八臂：固定代表仍伤位置，硬保每query支持几乎冻结搜索，当前配方关闭。全部真实原件/独审/四属性与后验记账完成，保反例，不退固定源。
 
 **上述工作点强控已由[170](reports/2026-10-31-association-operating-point-review.md)实际完成，不再待设计。** 0训练/teacher、原T32/V32八臂，同一T raw跨源mPFA预算/774候选独立核、V前冻结。V CTXCAL跨源mPCA80.684%/mPFA15.369%、MAE432.801m，但coverage97.694%仍低原98.442%，救17/丢24目标及1001新大害；共同域较同规则OWN有平均增量，跨源指标变化区间均跨0。原scorer标定不变；OWNCAL覆盖略升却mPCA/尾部更差，不能拼冠军。168–170全部原launcher/限定独审/四属性及后验记账成功收尾，回[Mode C1.76](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-176)，P14/F270/M110/E173/C56，106篇不增。当前无覆盖＋跨源双指标稳定联合升级；保关系条件平均信号，下一由T反例核错并对象的输出代价与pair/构组目标接口及成熟解法，不沿V扫阈值或自动加同BCE步数。
