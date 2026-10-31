@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**189 T-only科学已领取/launcher RUNNING。** [L2S189](L2S-20261101-189.md)/[Idea189](../docs/proposals/drift_memory_ablation_20261101.md)，618dd1e新冻结checkout/run/launcher attempt1，2026-11-01 03:12:37提交；`mtad-22f90c6b5cad.service`03:12:48真实active/running/Restartno，CPU8–11×4无GPU/1800s advisory。当时run.json尚未初始化，不能当完整科学已成功。原T32/28臂/0V，仅补平均速度MC、绑定188 PG害34/1，0新神经/teacher/reference或似然拟合。14 READY前检查/编译/diff通过。成功后一次新audit189、CPU16–19无GPU/1800s advisory、完整规定收尾；原152/178/188及失败冻结，失败保全、无自动V/全300/seed/重投。
+**189科学/规定独审均成功，无待领/待审。** [S2L189](S2L-20261101-189.md)：科学/独审618dd1e冻结各一次，`mtad-22f90c6b5cad.service`/`mtad-845206e1c2ee.service`均真实exit0/inactive/dead/Restartno，原T32/860对象28臂，4620输入均值/0V新神经似然，381.231001s、63公共原件核齐。Record→Squeeze→Mode C1.99/SR v4.0/OD v1.13；MC−PG均值近0但非每点等效，原34/1害保留、33HARD害在单片段组。原科学/audit/178/188/152冻结不动，无自动V/全300/seed/后继READY。
 
 **188科学/规定独审均成功，无待领/待审。** [S2L188](S2L-20261031-188.md)：3c3e0e3冻结science/audit各一次`mtad-45b78b44babb.service`/`mtad-38130eeb7169.service`均真实exit0/inactive/dead/Restartno；原T32/V32二十四臂/24644无标签native工作fit、0新神经，905.577959s科学审计＋1.143570s计划诊断聚合，96公共原件核齐。Record→Squeeze→Mode C1.98/SR v3.9/OD v1.12。PG保条件候选，178不替换，HARD纯组新害/T反例与缺μ-CV直接控保留。原science/audit/184/185失败及186资格均冻结不重投，无自动组合/全300/seed/新READY；后继研究需新具体交接。
 

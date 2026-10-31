@@ -128,3 +128,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [187双侧导数/形状约束](../reports/2026-10-31-endpoint-kinematics-review.md)：28臂完整独核成功，CM减少CH退化仍不胜178，保强控/纯组尾部，回Mode C1.97/SR v3.8。
 
 - [188单侧持续性/漂移](../reports/2026-10-31-one-sided-persistence-review.md)：24臂/24644输入工作fit与规定独核成功，PG保平均/RMSE/P99条件收益，HARD纯组/T新害及缺μ-CV控完整保留，回Mode C1.98/SR v3.9/OD v1.12，非OU机制已证。
+
+- [189平均运动/记忆匹配](../reports/2026-11-01-drift-memory-review.md)：原T32/28臂及规定独核成功，记忆项无稳定平均增量、原34/1害全保留，33HARD害无组内换候选动作，回Mode C1.99/SR v4.0/OD v1.13。
