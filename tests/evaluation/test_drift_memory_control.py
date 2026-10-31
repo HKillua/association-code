@@ -30,6 +30,12 @@ class DriftMemoryControlTests(unittest.TestCase):
         e['event_valid'][:,2:]=False;bad,_,d=ni.mean_velocity_control(m,e,[[0,1,2]],count,w,base);prior,_,_=ni.persistence(m,e,[[0,1,2]],count,w,base);np.testing.assert_array_equal(bad,prior['PG']);np.testing.assert_array_equal(bad[...,2:],base[...,2:]);self.assertEqual(d['unknown_selected_node_queries'],6);self.assertEqual(d['native_mean_computations'],0)
 
     def test_T_only_saved_pipeline_independent_actions_attributes_and_declared_splits(self):
+        self._saved_pipeline('T_core')
+
+    def test_V_only_saved_pipeline_independent_actions_attributes_and_declared_splits(self):
+        self._saved_pipeline('V_select')
+
+    def _saved_pipeline(self,split):
         from tests.integration.test_source_risk_pilot import scene_arrays
         from tools.analysis.association_context_closeout import closeout
         with TemporaryDirectory() as tmp:
@@ -37,8 +43,8 @@ class DriftMemoryControlTests(unittest.TestCase):
             for q in (run,parent,prior):(q/'private').mkdir(parents=True)
             p.common.old.frozen.write(parent/'run.json',dict(status='COMPLETED'))
             (run/'scenes').mkdir();rows=[];arrays=[];profiles={f:[] for f in pilot.ARMS};means=0
-            record=dict(status='COMPLETED',exit_code=0,mode='native_drift_memory_ablation',methods=pilot.METHODS,parent_run=str(parent),persistence_run=str(prior),native_run=str(native),training_scene_ids=['1','3'],scene_ids=[],evaluation_splits=['T_core'],native_mean_computations=0,native_likelihood_fits=0,optimizer_updates=0,neural_head_fits=0)
-            for sid in record['training_scene_ids']:
+            record=dict(status='COMPLETED',exit_code=0,mode='native_drift_memory_ablation',methods=pilot.METHODS,parent_run=str(parent),persistence_run=str(prior),native_run=str(native),training_scene_ids=['1','3'] if split=='T_core' else [],scene_ids=['1','3'] if split=='V_select' else [],evaluation_splits=[split],native_mean_computations=0,native_likelihood_fits=0,optimizer_updates=0,neural_head_fits=0)
+            for sid in ['1','3']:
                 m,ev,member,_=scene_arrays(sid);m['support'][:,-1]=False;g=[[0,1],[2],[3]];_,count=h.descriptors(m,g);node_scores=np.zeros(m['support'].shape);base=np.stack([m['states'][0],m['states'][2],m['states'][3]])
                 values=np.repeat(m['states'][:,0],2,axis=0).copy();values[:,2]/=1852/3600;values[1::2,2]+=1.;events=dict(event_offsets=np.arange(5)*2,event_times_seconds=np.tile([-10.,20.],4),event_values=values,event_valid=np.ones((8,4),bool))
                 _,weights=h.readouts(m,g,count,node_scores,base);op={};raw={};original={};groups={};parts=dict(pairs=m['pairs'],scores=np.ones(len(m['pairs']))*2);parent_parts=dict(pairs=m['pairs'],scores=parts['scores']);policy={};prior_policy={};diags={};relation={}
@@ -56,13 +62,13 @@ class DriftMemoryControlTests(unittest.TestCase):
                     for v in condition:v['scene_id']=sid
                     profiles[front].extend(condition);p.common.old.frozen.write(run/'private'/f'conditions-{front}-{sid}.json.gz',condition)
                 for name,values in [('native-motion',m),('native-events',events),('native-evaluation',ev)]:
-                    folder=native/'private'/name/'T_core';folder.mkdir(parents=True,exist_ok=True);np.savez_compressed(folder/f'scene-{sid}.npz',**values)
-                for dest,filename,values in [(parent,'partitions',parent_parts),(parent,'policy',op),(parent,'raw',original),(prior,'raw',{k:v for k,v in raw.items() if 'MC_' not in k}),(prior,'policy',prior_policy),(run,'raw',raw),(run,'partitions',parts),(run,'policy',policy)]:np.savez_compressed(dest/'private'/f'{filename}-T_core-{sid}.npz',**values)
-                p.common.old.frozen.write(run/'private'/f'diagnostics-T_core-{sid}.json.gz',diags)
-                row,arr,artifact=p.evaluate(m,ev,groups,{},raw,'T_core',method_names=pilot.METHODS);row.update(scene_id=sid,component_id=sid,search={},association=relation);p.common.old.frozen.write(run/'scenes'/f'T_core-{sid}.json.gz',row);p.common.save_artifacts(run/'private'/f'states-T_core-{sid}.npz',artifact);rows.append(row);arrays.append(arr)
-            record['native_mean_computations']=means;p.common.old.frozen.write(run/'run.json',record);summary=p.finish(rows,arrays,pilot.METHODS,pilot.PRIMARY);p.common.old.frozen.write(run/'T-summary.json',summary);p.common.old.frozen.write(run/'T-scene-summary.json.gz',rows);p.common.old.frozen.write(run/'condition-profiles.json',dict(heads={f:pilot.condition_summary(v) for f,v in profiles.items()}))
+                    folder=native/'private'/name/split;folder.mkdir(parents=True,exist_ok=True);np.savez_compressed(folder/f'scene-{sid}.npz',**values)
+                for dest,filename,values in [(parent,'partitions',parent_parts),(parent,'policy',op),(parent,'raw',original),(prior,'raw',{k:v for k,v in raw.items() if 'MC_' not in k}),(prior,'policy',prior_policy),(run,'raw',raw),(run,'partitions',parts),(run,'policy',policy)]:np.savez_compressed(dest/'private'/f'{filename}-{split}-{sid}.npz',**values)
+                p.common.old.frozen.write(run/'private'/f'diagnostics-{split}-{sid}.json.gz',diags)
+                row,arr,artifact=p.evaluate(m,ev,groups,{},raw,split,method_names=pilot.METHODS);row.update(scene_id=sid,component_id=sid,search={},association=relation);p.common.old.frozen.write(run/'scenes'/f'{split}-{sid}.json.gz',row);p.common.save_artifacts(run/'private'/f'states-{split}-{sid}.npz',artifact);rows.append(row);arrays.append(arr)
+            record['native_mean_computations']=means;p.common.old.frozen.write(run/'run.json',record);summary=p.finish(rows,arrays,pilot.METHODS,pilot.PRIMARY);p.common.old.frozen.write(run/('T-summary.json' if split=='T_core' else 'summary.json'),summary);p.common.old.frozen.write(run/('T-scene-summary.json.gz' if split=='T_core' else 'scene-summary.json.gz'),rows);p.common.old.frozen.write(run/'condition-profiles.json',dict(heads={f:pilot.condition_summary(v) for f,v in profiles.items()}))
             closeout(run);audit.account(run,run/'history-followup-accounting.json',(pilot.ARMS,pilot.PRIMARY,audit.reconstruct,dict(fits=0,updates=0)));audit.verify_conditions(run,record)
-            self.assertEqual(set(p.common.old.frozen.read(run/'independent-output-audit.json')['splits']),{'T_core'});self.assertFalse((run/'summary.json').exists());self.assertEqual(p.common.old.frozen.read(run/'drift-condition-accounting.json')['heads']['HARD']['main_eligible_points'],4)
+            self.assertEqual(set(p.common.old.frozen.read(run/'independent-output-audit.json')['splits']),{split});self.assertFalse((run/('summary.json' if split=='T_core' else 'T-summary.json')).exists());self.assertEqual(p.common.old.frozen.read(run/'drift-condition-accounting.json')['heads']['HARD']['main_eligible_points'],4)
             for key in pilot.PRIMARY:
                 right,left=key.split('_vs_');self.assertLess(pilot.METHODS.index(left),pilot.METHODS.index(right))
             record['evaluation_splits']=[];p.common.old.frozen.write(run/'run.json',record)

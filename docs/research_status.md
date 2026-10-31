@@ -10,10 +10,11 @@
 
 ## 现在做什么
 
-[190潜在端点×运动×几何](proposals/fitted_endpoint_factorial_20261101.md)由189新证据和[代码/来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/latent_endpoint_conditions_20261101.md)→Mode C2.00/C66后形成。旧支持外状态实际钉住测量端点，首T157片段/5134点已exact核明；不认端点就是根因。新T32/40臂固定全部178/188/189强控、选中候选/权重，只分几何/拟合端点/平均运动，0V新神经或reference/似然。17软件检查只核实现，实际领取见HandOver；保178及188条件价值，不提前宣方法有效。
+[191平均运动表达的独立V32验证](proposals/mean_velocity_validation_20261101.md)由189 T资格→190反例回流→Mode C2.01/C65后新立，具体领取只看HandOver。复用完全相同的MC公式/原生端点/178选中候选与权重，0新神经、reference或OU似然fit，只新V32/28臂，不重跑T、不加端点组合。18项READY前软件检查及py_compile/diff通过；检查不是MTAD成绩，V结果未出。不退源优先，不自动全300/seed/192。
 
-[189 T侧匹配干预](reports/2026-11-01-drift-memory-review.md)已完整科学/规定独审：原T32/28臂、4620输入均值/0V新fit，381.231001s、63原件核齐，回Mode C1.99/SR v4.0/OD v1.13。MC去PG记忆后完整T MAE+.000229/+.004334m、区间均跨0，原34/1纯组公里害逐点保留；HARD33害query组内仅一片段，换源无动作空间。保平均运动适配价值，不认每点等效或记忆已证；下一核原生端点与潜在状态及传播几何的操作条件，原178和188条件候选不替换，不自动V/全300。
+[190潜在端点×运动×几何](reports/2026-11-01-fitted-endpoint-review.md)科学/规定独审均成功，原T32/40臂、2310 native OLS/均值、0V新神经监督似然，772.287141s、63公共原件核齐，Record→Squeeze→Mode C2.01/SR v4.2/OD v1.15。拟合端点相对同速度原生锚MAE+5.427/+6.872m（OLS速度）、+5.212/+6.701m（报告均值），四描述区间均在0上；平均/RMSE/P99恶化，当前配方不晋级。HARD原33单节点害随均值运动保留到FM，STRUCT原33公里救回只保4且5反转；不把FL旧害减少误计为端点贡献，其OLS速度控制GL本来无此批害。几何完整仅−.014/−.011m，不证明任意区域无影响。真实端部机动、位置与SOG/COG时间关系/可靠性仍UN，不认端点噪声根因或否定所有潜在状态估计。
 
+[189 T侧匹配干预](reports/2026-11-01-drift-memory-review.md)已完整科学/规定独审：原T32/28臂、4620输入均值/0V新fit，381.231001s、63原件核齐，回Mode C1.99。MC去PG记忆后完整T MAE+.000229/+.004334m、区间均跨0，原34/1纯组公里害逐点保留；HARD33害query组内仅一片段，换源无动作空间。保平均运动适配价值，不认每点等效或记忆已证；191仅补更简单表达的真实V效果，178与188条件候选不替换。
 本轮按182 T资格→来源AP→Mode C1.92–1.95→三个独立Idea→服务器真实执行→Record/Squeeze→Mode C1.96–1.98完成。**保178基准；188带漂移单侧恢复保条件有效候选，183原生信息与187直接端点导数当前配方不晋级。** 执行终态/待领只看HandOver，不将候选解释写为机制。
 
 |本轮最小干预|对178的V32完整效果与尾部|取舍/完整记录|
@@ -24,8 +25,7 @@
 
 两前端分别保持各自完整人口/覆盖/分组/raw-decoded及速度航向exact，不拼覆盖或指标冠军；三项均已完成科学/规定独审，各自成功真实exit0。主位置/人口/关系/尾部独核，四属性同评价器完整记账非独立双实现；实际主要K2、V32开发域复用，非全V300/新域或可信同行成绩。
 
-**下一步具体问题：** 从T分离188的平均运动与方向记忆作用。全片段工作β半衰期中位约.165s，数学大β时PG接近同端点平均报告速度CV；当前PC用端点瞬时速度，尚缺μ-CV直接控。该参数分布非仅主点所选节点，不能由此宣收益来自漂移或真实噪声。先建立同节点/端点/权重的平均速度CV匹配控制，并分开HARD新增纯组害的端点/漂移/候选状态与组参考条件，再形成新具体Idea/READY；不按V设cap、不退源优先、不自动加步/seed/全300或拼183+188。即使增量主要来自更可靠平均运动适配，也值得继续发展，不设绝对原创门槛。
-
+**下一步具体问题：** 先完成191原V32全部强控、平均/尾部/旧害救回/coverage与关联核验及记录回流，决定更简单MC能否保留188条件效果；不把缓存成本当全流程加速。下一研究从T原生位置与SOG/COG时间关系、运动估计可靠性及可用历史条件定位单节点反转，尚无新具体干预READY；不按V设cap、不继续全段CV端点补丁、不退源优先、不自动加步/seed/全300。
 [182原生运动资格](reports/2026-10-31-native-compatibility-review.md)0V/训练/部署、50.646s/45原件；[独立来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/native_motion_transfer_20261031.md)定向复核BKN/Go-RIO/GPTR、CTCRW基础例外保视觉/R链partial，充分108不增。原184/185首场list接口失败/17.478402s保全，不作科学阴性；186原T32/128算术重建、9240工作fit/0V参考/90.650868s成功另记，新187/188不覆盖旧失败。来源/失败/资格/科学结果均已完整回矩阵，MC1.98累计P14/F294/M119/E197/C65、SR v3.9/144格、OD v1.12/60格。
 
 [180代价监督](reports/2026-10-31-cost-routing-review.md)与[181原生双侧连接](reports/2026-10-31-native-history-bridge-review.md)科学/规定独审全部完成，Record→Squeeze→Mode C1.90–1.91、SR v3.2/123格。180原T128/39fit/9984GPU更新、T32/V32二十臂，863.429s、99公共原件核齐；181零训练/原T32-V32二十四臂，737.574s、95原件核齐。主位置/人口/关联/尾部独立核验，四属性同评价器完整记账，非独立双实现。实际领取只看HandOver。
@@ -127,10 +127,10 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C2.00](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-200)，累计P14/F296/M120/E199/C66 |
+| 全局P/F/M/E/C与回流 | [Mode C2.01](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-201)，累计P14/F297/M120/E200/C66 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v4.1，150格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#latent-endpoint-conditions) |
-| 观测驱动与状态恢复 | [OD v1.14，66格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#latent-endpoint-condition-source) |
+| 选源与集合读出 | [SR v4.2，153格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#fitted-endpoint-feedback) |
+| 观测驱动与状态恢复 | [OD v1.15，69格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#fitted-latent-state-feedback) |
 | 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入108＝72领域/相近＋36跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |
 | 历史推导、连接与取舍原文 | [完整研究过程](history/2026-10-30-research-process.md)、[结案摘要](history/README.md)；历史“下一步”不自动成为任务 |
