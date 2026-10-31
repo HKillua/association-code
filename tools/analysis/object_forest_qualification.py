@@ -12,7 +12,13 @@ from tools.analysis import observation_common as c
 def point_coverage(a,prefix,target_ids):
     q=a[prefix+'_aligned_prediction_valid'][...,:2].all(-1)&a[prefix+'_aligned_truth_valid'][...,:2].all(-1)
     result=np.zeros((len(target_ids),q.shape[1]),bool);index={str(t):i for i,t in enumerate(target_ids)}
-    for i,t in enumerate(a[prefix+'_aligned_target_ids']):result[index[str(t)]]|=q[i]
+    for i,t in enumerate(a[prefix+'_aligned_target_ids']):
+        if str(t) not in index:
+            # Unmatched output rows have no reference: they carry no eligible
+            # target-query. Keep them in the original group metrics, not here.
+            if q[i].any():raise ValueError('valid aligned target absent from central population')
+            continue
+        result[index[str(t)]]|=q[i]
     return result
 
 
@@ -35,7 +41,7 @@ def object_rows(identities,target_ids,old,new,corrected_edges,pairs,coverage_old
 
 def run(a):
     out=a.output.resolve();out.mkdir(exist_ok=False);(out/'scenes').mkdir();start=time.monotonic()
-    state=dict(status='RUNNING',idea_id='IDEA-OBJECT-FOREST-QUALIFICATION-20261031-171',plan_version='1.0',
+    state=dict(status='RUNNING',idea_id='IDEA-OBJECT-FOREST-QUALIFICATION-20261031-171' if a.run_id==171 else 'IDEA-OBJECT-FOREST-QUALIFICATION-REPAIR-20261031-172',plan_version='1.0' if a.run_id==171 else '1.1',
         optimizer_updates=0,V_opened=False,test_opened=False,started_at=datetime.now(timezone.utc).isoformat(),
         native_run=str(a.native_run),calibration_run=str(a.calibration_run),manifest=str(a.manifest))
     def check(**kw):
@@ -75,4 +81,5 @@ def run(a):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     for k in ('native-run','calibration-run','manifest','output'):p.add_argument('--'+k,type=Path,required=True)
+    p.add_argument('--run-id',type=int,choices=(171,172),default=171)
     p.add_argument('--time-policy',choices=('advisory',),required=True);run(p.parse_args())

@@ -17,3 +17,9 @@ spec：新增通用upper-edge完整图Kruskal/完整类约束及资格CLI；输�
 一次171新run/冻结checkout/launcher attempt1，CPU16–19×4/RSS4GiB/无GPU，600s advisory/Restart=no/Linger=yes；不重跑170、不自动重试。完成先Record→Squeeze→Mode C，再决定是否具体发布172；这里未发布172或授权无界枚举。
 
 竞争解释：现有特征不足/参考对应/后端状态不相容、loss失配不等唯一根因。损失的forest–WS部署失配、样本扰动方差、目标大小加权可能影响结果；本次不据V调系数或阈值，也不把组纯度当coverage。成熟解法适配有价值即可，不要求绝对首创。
+
+## IDEA-OBJECT-FOREST-QUALIFICATION-REPAIR-20261031-172（plan1.1）
+
+源SQ171/Mode C1.78：171在首场空参考row查表失败，0科学终点，不视方法失败；原件保留。新172只修中央人口映射：未知target且eligible query全false则不映射，无效参考输出仍保原组统计；未知target有任何eligible query明确报错。4项unittest涵盖修复/反例及原森林保证，已通过。其余T32、ε.1/B4/seed20/0训练/0V、输出与资格判据**逐项同171**，不是扩大或替换科学配方。
+
+172新冻结checkout/run/launcher attempt1，CPU16–19×4/RSS4GiB/无GPU/600s advisory，一次故障保全，不自动重投；CLI显式run-id172区分记录。全部T资格成功后Record→Squeeze→Mode C，之后才具体发布新训练Idea；未发布173。

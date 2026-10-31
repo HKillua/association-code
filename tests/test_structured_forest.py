@@ -3,7 +3,7 @@ import numpy as np
 import unittest
 import torch
 from association.training.structured_forest import maximum_forest,forest_contrast,partial_fy_loss
-from tools.analysis.object_forest_qualification import object_rows
+from tools.analysis.object_forest_qualification import object_rows,point_coverage
 
 
 def test_exact_unconstrained_and_full_label_optima():
@@ -46,5 +46,10 @@ class ForestTests(unittest.TestCase):
     def test_optimum(self):test_exact_unconstrained_and_full_label_optima()
     def test_gradient(self):test_envelope_gradient_translation_and_permutation()
     def test_objects(self):test_all_object_losses_include_singleton_and_retained_controls()
+    def test_unmatched_rows_have_no_eligible_reference(self):
+        a=dict(X_aligned_target_ids=np.array(['a','']),X_aligned_prediction_valid=np.ones((2,2,4),bool),X_aligned_truth_valid=np.array([np.ones((2,4),bool),np.zeros((2,4),bool)]))
+        self.assertTrue(point_coverage(a,'X',['a']).all())
+        a['X_aligned_truth_valid'][1]=True
+        with self.assertRaises(ValueError):point_coverage(a,'X',['a'])
 
 if __name__=='__main__':unittest.main()
