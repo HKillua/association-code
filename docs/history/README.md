@@ -126,3 +126,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [183原生运动条件信息](../reports/2026-10-31-native-motion-features-review.md)：6656GPU更新/十六臂与规定独核全部成功，部分base门槛旧害减少，但完整均值/RMSE和相对O新害未过，保178，回Mode C1.96/SR v3.7。
 
 - [187双侧导数/形状约束](../reports/2026-10-31-endpoint-kinematics-review.md)：28臂完整独核成功，CM减少CH退化仍不胜178，保强控/纯组尾部，回Mode C1.97/SR v3.8。
+
+- [188单侧持续性/漂移](../reports/2026-10-31-one-sided-persistence-review.md)：24臂/24644输入工作fit与规定独核成功，PG保平均/RMSE/P99条件收益，HARD纯组/T新害及缺μ-CV控完整保留，回Mode C1.98/SR v3.9/OD v1.12，非OU机制已证。

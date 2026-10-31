@@ -10,13 +10,19 @@
 
 ## 现在做什么
 
-[187双侧端点导数/形状](reports/2026-10-31-endpoint-kinematics-review.md)已完整科学/规定独审、96原件/896.246717s含诊断，Record→Squeeze→Mode C1.97/SR v3.8。CH较仅位置CL V MAE+44.834/+44.406m；CM压下原始导数退化，但对O仍+4.004/+3.471m、新>1km害92/82、纯69/60。坐标范围安全不等精度；保178，原始报告噪声/潜在状态可靠性仍候选，不按V设cap或换公式重投。原184/185首场接口失败及186资格/成本完整保留，新187非旧attempt覆盖。
+本轮按182 T资格→来源AP→Mode C1.92–1.95→三个独立Idea→服务器真实执行→Record/Squeeze→Mode C1.96–1.98完成。**保178基准；188带漂移单侧恢复保条件有效候选，183原生信息与187直接端点导数当前配方不晋级。** 执行终态/待领只看HandOver，不将候选解释写为机制。
 
-[183原生运动条件信息](reports/2026-10-31-native-motion-features-review.md)科学/规定独审均成功，原T128/26fit/6656GPU更新、T32/V32十六臂，683.901688s、98公共原件核齐，Record→Squeeze→Mode C1.96/SR v3.7。**保178平均收益，当前F0/F1不晋级。** F1对O V MAE+3.635/+1.903m、对同容量旧信息F0+3.565/+1.563m，区间均跨0/RMSE升；相对base旧害降128→100/107→80及纯28→14/19→8，但相对O仍新增169/95害，两个门槛不能混同。零/多支持、coverage/关系/速航exact；报告噪声/目标-动作交互仍候选，不自动加步或全300。
+|本轮最小干预|对178的V32完整效果与尾部|取舍/完整记录|
+|---|---|---|
+|183原生运动条件风险修正，T128/26fit/6656GPU更新|MAE+3.635/+1.903m，匹配旧信息头差+3.565/+1.563m、区间均跨0；原base门槛旧害减少，但相对O新增>1km害169/95，RMSE升|保信息能改变部分旧误选的线索，当前配方不晋级；[183完整Record](reports/2026-10-31-native-motion-features-review.md)，683.901688s/98公共原件|
+|187双侧chart-linear/报告Hermite/形状约束，0新增神经训练|CH较CL MAE+44.834/+44.406m；CM减轻CH退化但对O仍+4.004/+3.471m，新>1km害92/82、纯69/60|数学不越端点不等精度，原生报告/潜在状态可靠性仍未分清；[187完整Record](reports/2026-10-31-endpoint-kinematics-review.md)，896.246717s含诊断/96原件|
+|188单侧HOLD/报告CV/零均值及平均漂移OU，24644输入无标签工作fit|PG MAE−2.688/−2.386m，RMSE/P99两头降；H CI跨0/S略低0，去最大+.103/−.298m；V新>1km害11/0（H全纯），T仍34/1|保PG条件候选，不直接替换178/全300；[188完整Record](reports/2026-10-31-one-sided-persistence-review.md)，906.721529s含诊断/96原件|
 
-[182原生运动资格](reports/2026-10-31-native-compatibility-review.md)已完成，0V训练部署/50.646s/45原件。纯单支持害的native报告外推偏差高但分布重叠，双侧害不能用大gap/大不一致简单拒绝；无双侧469/351、全组单侧451/344与内部双侧分开。结合BKN/Go-RIO/GPTR定向原文与CTCRW基础例外的[独立来源分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/native_motion_transfer_20261031.md)，Record→Squeeze→Mode C1.92–1.93/C63–65、SR v3.4/129格；充分108不增，未完整视觉/R链的新旧来源不充精读名额。
+两前端分别保持各自完整人口/覆盖/分组/raw-decoded及速度航向exact，不拼覆盖或指标冠军；三项均已完成科学/规定独审，各自成功真实exit0。主位置/人口/关系/尾部独核，四属性同评价器完整记账非独立双实现；实际主要K2、V32开发域复用，非全V300/新域或可信同行成绩。
 
-据此形成[183/184/185三条独立最小干预](proposals/native_motion_interventions_20261031.md)：同容量/曝光的新原生运动信息、双侧端点速度与形状约束、单侧方向记忆与漂移分离；保178平均收益/两头强控，整体/覆盖/尾部一起核。不先称机制成立，不自动组合或扩大；实际发布/领取和状态只看HandOver。
+**下一步具体问题：** 从T分离188的平均运动与方向记忆作用。全片段工作β半衰期中位约.165s，数学大β时PG接近同端点平均报告速度CV；当前PC用端点瞬时速度，尚缺μ-CV直接控。该参数分布非仅主点所选节点，不能由此宣收益来自漂移或真实噪声。先建立同节点/端点/权重的平均速度CV匹配控制，并分开HARD新增纯组害的端点/漂移/候选状态与组参考条件，再形成新具体Idea/READY；不按V设cap、不退源优先、不自动加步/seed/全300或拼183+188。即使增量主要来自更可靠平均运动适配，也值得继续发展，不设绝对原创门槛。
+
+[182原生运动资格](reports/2026-10-31-native-compatibility-review.md)0V/训练/部署、50.646s/45原件；[独立来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/native_motion_transfer_20261031.md)定向复核BKN/Go-RIO/GPTR、CTCRW基础例外保视觉/R链partial，充分108不增。原184/185首场list接口失败/17.478402s保全，不作科学阴性；186原T32/128算术重建、9240工作fit/0V参考/90.650868s成功另记，新187/188不覆盖旧失败。来源/失败/资格/科学结果均已完整回矩阵，MC1.98累计P14/F294/M119/E197/C65、SR v3.9/144格、OD v1.12/60格。
 
 [180代价监督](reports/2026-10-31-cost-routing-review.md)与[181原生双侧连接](reports/2026-10-31-native-history-bridge-review.md)科学/规定独审全部完成，Record→Squeeze→Mode C1.90–1.91、SR v3.2/123格。180原T128/39fit/9984GPU更新、T32/V32二十臂，863.429s、99公共原件核齐；181零训练/原T32-V32二十四臂，737.574s、95原件核齐。主位置/人口/关联/尾部独立核验，四属性同评价器完整记账，非独立双实现。实际领取只看HandOver。
 
@@ -117,10 +123,10 @@ V联合相对对应base仍新增128/107个>1km增害，纯组28/19、零支持32
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.97](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-197)，累计P14/F293/M119/E196/C65 |
+| 全局P/F/M/E/C与回流 | [Mode C1.98](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-198)，累计P14/F294/M119/E197/C65 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
-| 选源与集合读出 | [SR v3.8，141格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#endpoint-kinematics-feedback) |
-| 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
+| 选源与集合读出 | [SR v3.9，144格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#one-sided-persistence-feedback) |
+| 观测驱动与状态恢复 | [OD v1.12，60格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#native-one-sided-drift-feedback) |
 | 逐篇阅读范围、来源与代码覆盖 | [深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分深入108＝72领域/相近＋36跨域；不是作者复现 |
 | Idea完整设计、假设与否证 | [提案目录](proposals/)；各Record链接对应Idea，未执行/未采纳不删除，135仍仅保留草案 |
 | 历史推导、连接与取舍原文 | [完整研究过程](history/2026-10-30-research-process.md)、[结案摘要](history/README.md)；历史“下一步”不自动成为任务 |

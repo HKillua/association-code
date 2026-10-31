@@ -55,3 +55,5 @@
 - [183回执](../S2L-20261031-183.md) / [完整Record-Squeeze](../../docs/reports/2026-10-31-native-motion-features-review.md)：98公共原件＋终态/传输清单在资料库`docs/evidence/20261031_native_motion/183`，private留server。
 
 - [187回执](../S2L-20261031-187.md)：96公共原件＋真实终态/传输清单在资料库`docs/evidence/20261031_native_motion/187`，原失败及private保留。
+
+- [188回执](../S2L-20261031-188.md)：96公共原件＋真实终态/传输清单在资料库`docs/evidence/20261031_native_motion/188`，原生参数/身份/权重/完整预测留server；计划诊断聚合脚本作为独有证据保留。
