@@ -10,11 +10,13 @@
 
 ## 现在做什么
 
-当前推进[174具体T侧分离](proposals/association_decision_20261031.md)：原173分数与分组完整复放，区分错并的搜索空间与评分目标冲突，并核对象/有效点代价；不新增V或训练。独立检索未知目标数、多片段构组来源，先来源分析/矩阵后决定后继方法，不预选decoder。
+[174 T侧分离](reports/2026-10-31-association-decision-review.md)已完成：32场/860对象，STRUCT150混组中149按真身份拆开降低当前J；对BCE丢9对象全涉及此冲突。不能只押更强J搜索，也不是唯一根因或V规律的证明。Record→Squeeze＋[SGC/OHEM独立来源分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_decision_sources_20261031.md)回Mode C1.81/C58，充分107不增。
+
+当前推进[175匹配难例训练](proposals/association_decision_20261031.md#175一般难例与构组错例的匹配训练)：HARD按单边loss、DEC按当前WS构组错误选辅助边，每步正负数量匹配，原168起点/同512步各头/同T128曝光；保原173四强控，共六前端×Mean/159十二臂。3项软件验收已通过，独立READY一次；部署不依赖真值/固定源，主比较DEC−HARD，覆盖/跨源双指标/平均与尾部联合核。无自动新seed/全300，当前尚无175实证成绩。
 
 本轮[独立结构监督AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/structured_association_sources_20261031.md)→Mode C1.77/C57→171技术失败保全/172明确修复资格→Mode C1.79→新[Idea173](proposals/structured_association_20261031.md)→实际1024GPU更新与原T32/V32八臂→[完整Record/Squeeze](reports/2026-10-31-structured-association-review.md)回[Mode C1.80](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-180)，P14/F275/M111/E178/C57。全部原launcher/科学/限定独审/四属性及1032T候选独立核完成，科学＋收尾671.161s。充分深入107＝72领域/相近＋35跨域（2023机制基础例外，LA-MOTR2025补充/代码partial不计），7项软件验收在READY前通过。
 
-**173保条件增量，不整体晋级。** 同信息/容量/初始化/曝光/工作点下，STRUCT对继续BCE的V有效点coverage96.888→98.032%、MAE438.835→427.241m，共同差−13.827m描述CI[−89.959,−4.464]；但decoded跨源mPCA82.939→81.765%、mPFA14.486→15.573%，933对BCE新>1km害。对原WS覆盖仍低98.442%、救12丢20/1131新害；对冻结CTX平均区间跨0且对象少1。raw召回对BCE有增量却未同向兑现decoded；forest–WS/工作点/桥边失配与状态相容均候选，**未证唯一根因**。未知K部署仍WS，不用训练GT k/固定源。当前λ1/B4/4轮配方关闭自动扩大，无新READY/全300；先T反例分离raw→decoded的对象/时刻支持代价，再查成熟可变对象数/多片段决策机制形成新Idea。
+**173保条件增量，不整体晋级。** 同信息/容量/初始化/曝光/工作点下，STRUCT对继续BCE的V有效点coverage96.888→98.032%、MAE438.835→427.241m，共同差−13.827m描述CI[−89.959,−4.464]；但decoded跨源mPCA82.939→81.765%、mPFA14.486→15.573%，933对BCE新>1km害。对原WS覆盖仍低98.442%、救12丢20/1131新害；对冻结CTX平均区间跨0且对象少1。raw召回对BCE有增量却未同向兑现decoded；forest–WS/工作点/桥边失配与状态相容均候选，**未证唯一根因**。未知K部署仍WS，不用训练GT k/固定源。当前λ1/B4/4轮配方关闭自动扩大/全300；其后T分离已由174完成，新175为单独C58实验，不是续173配方。
 
 用户明确优先提高覆盖率与跨源mPCA/mPFA，并包括前端。前批STAR NeurIPS2025/TrackTrack CVPR2025正文、补充、反例及TrackTrack核心实现的[完整AP与阅读边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)保留，STAR源码未获；当批充分106，当前累计107，非作者复现。[168](reports/2026-10-31-association-context-review.md)实际T128/2000GPU更新、T32/V32六臂：CTX有共同域均值/召回信号，但覆盖下降和1027新大害，未联合升级。[169](reports/2026-10-31-anchor-support-review.md)0训练八臂：固定代表仍伤位置，硬保每query支持几乎冻结搜索，当前配方关闭。全部真实原件/独审/四属性与后验记账完成，保反例，不退固定源。
 
@@ -30,7 +32,7 @@
 
 [151完整数据准备](reports/2026-10-30-full-peer-data-review.md)已完成T2100/V300、46126可训练组。152A/B仍真实systemd RUNNING并实际优化，fresh seed20、固定150/20epoch对应427800/80800更新，可能跨多天；尚无末轮全V公平分数，实际训练进度只看HandOver。冻结活动合同仍比较原147，不改成157/159；旧148不续跑。
 
-1. 保留157全V300/159平均强控与C56关系条件平均信号、C57同曝光结构监督条件增量。171–173对象代价资格及真实训练已经完成，下一先在T保存分数/输出分离raw恢复真边却decoded丢失的具体反例、错并对对象与按query支持的代价，再对照成熟可变对象数/多片段决策机制形成同信息/容量/曝光/工作点的具体Idea；不能把目标/decoder失配候选写成根因或无依据沿V换loss/λ/θ。C53×P13状态相容仍分开，169硬保anchor/全部query支持当前配方关闭，不永久保错组/筛失支持点、不退源优先；无新READY或自动全300。
+1. 执行175同信息/容量/曝光与匹配辅助数量的HARD/DEC训练，原173 BCE/STRUCT及CTX/WS四强控绑定。先核T冻结/实际优化，再核原V32完整与共同人口、对象/点coverage、raw/decoded跨源mPCA/mPFA及新增大害；仅一般难例收益不归构组反馈独有机制。174已分离T当前J冲突，不重复旧诊断或预选新decoder。C53×P13状态相容仍独立未解，不永久保错组/筛失支持点、不退源优先；无自动全300。
 2. 纯组T44/V16难例与分组支持路线分开，先查现有统计/网格编码没保留的原生时间、局部状态和reference条件，形成可区分的新证据再定实验。166当前联合质量表达没有救回，不自动加步/seed/换loss；0支持旧首anchor回退/圆周歧义未解。真实异构K≥3/新域仍缺，不退固定源优先。
 3. 跟进152固定全T训练/末轮V300同WS任务比较：全部曝光/物理学习、强控/coverage/尾部/成本，PTFM核心缺域与公共Mean扩域分报、DeepAF P/V适配权限明确。不能把共享WS比较称原完整系统复现，活动合同仍比较147。TMTAFF若再做新训练干预须据原loss几何/梯度路径制定可分离具体合同，不能直接续107或以梯度大小选方案；最多四单卡/FIFO，无SSH值守或自动新增训练。
 
@@ -81,7 +83,7 @@
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.80](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-180)，累计P14/F275/M111/E178/C57 |
+| 全局P/F/M/E/C与回流 | [Mode C1.81](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-181)，累计P14/F278/M113/E181/C58 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
 | 选源与集合读出 | [SR v2.4，87格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#structured-supervision-feedback) |
 | 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
