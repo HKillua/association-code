@@ -116,3 +116,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 - [174 T打分—分组分离](../reports/2026-10-31-association-decision-review.md)：原T32/860对象完整复放，STRUCT150混组149拆身份降低J；仅T诊断，不证V根因。13.263569s成功，回Mode C1.81。
 
 - [175匹配难例训练](../reports/2026-10-31-decision-error-mining-review.md)：1024真实GPU更新、十二臂/完整独核；HARD保覆盖—关联折中候选，DEC未超匹配控制，全部强控/尾部/四属性和不确定性保留，回Mode C1.82。
+
+- [176最终指标/覆盖工作点](../reports/2026-10-31-decoded-coverage-review.md)、[177低支持分离](../reports/2026-10-31-low-support-attribution-review.md)：工作点三规则均选原点，无增量；T诊断区分受支持/历史候选与跨输出敏感性，oracle不可部署。规定独审/补项全部成功，回Mode C1.85。

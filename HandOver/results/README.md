@@ -48,3 +48,5 @@
 - [174回执](../S2L-20261031-174.md) / [完整Record-Squeeze](../../docs/reports/2026-10-31-association-decision-review.md)：45份公共原件完整保存在资料库`docs/evidence/20261031_association_decision/174`；原私人输入仍服务器。
 
 - [175回执](../S2L-20261031-175.md) / [完整Record-Squeeze](../../docs/reports/2026-10-31-decision-error-mining-review.md)：99公共原件＋服务/传输清单在资料库`docs/evidence/20261031_association_decision/175`，private仍服务器；无可信同行胜负声明。
+
+- [176回执](../S2L-20261031-176.md)/[177回执](../S2L-20261031-177.md)：完整公共原件在资料库`docs/evidence/20261031_decoded_coverage/{176,177}`；工作点无新收益，诊断不冒充方法成绩，private仍服务器。

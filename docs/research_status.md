@@ -10,7 +10,11 @@
 
 ## 现在做什么
 
-当前按用户授权推进[176/177](proposals/decision_operating_point_20261031.md)：Mode C1.83/C59的共享网格/预算R→D→C工作点对照，原T32/V32十八臂、0训练；同时C53训练侧低支持反例分离，仅T。4项验收通过、已独立READY，待实际提交与核同一服务。原HARD/STRUCT保强控，oracle仅诊断，不预选新恢复器。
+[176最终指标/覆盖工作点](reports/2026-10-31-decoded-coverage-review.md)与[177低支持来源分离](reports/2026-10-31-low-support-attribution-review.md)均已完整收尾，Record→Squeeze→Mode C1.85/SR v2.8。176原T32/V32十八臂、0训练/2240T场候选，R/D/C全选回原HARD/STRUCT阈值；约束未激活，无新增收益，当前网格/预算配方结案。科学＋规定收尾634.112s、96公共原件及清单回传，事后等价核3.359s另记。
+
+177原T32/860对象、0V/训练/新部署，36.979s成功、57公共原件＋终态记录回传。HARD−STRUCT195个单源害全部单受支持片段；纯0域122害当前组已有状态oracle无改善、其他兼容输出oracle106点有空间。HARD−WS纯1域108害，受支持片段oracle0、全当前组含支持外历史可改善94；不同强控保反证。均是动作空间/对应敏感性，不能部署oracle、判reference错或宣根因。
+
+下一优先围绕**组内原生时序/支持外历史状态的恢复与风险读出**、**跨片段/输出的历史一致性**精读成熟机制、建立适配条件，再单独验证；不是只加旧选源头训练或重跑149均衡/最近。HARD覆盖、STRUCT均值强控保持，C59当前配方不继续扫更细θ。无新READY/自动全300或新seed；充分107不增。
 
 [174 T分离](reports/2026-10-31-association-decision-review.md)→SGC/OHEM独立AP→Mode C1.81/C58→[175真实训练与完整Record/Squeeze](reports/2026-10-31-decision-error-mining-review.md)→**Mode C1.82/SR v2.6已完成**。原T128两头各512步/共1024GPU更新、原T32/V32十二臂；原四强控exact、1548T候选/512步mask及全部人口/关联/四属性/尾部独核，科学＋收尾863.005s、99公共原件回传。充分107＝72+35不增；新增NeurIPS2025来源在冻结后partial，非事前依据。
 
@@ -36,7 +40,7 @@
 
 [151完整数据准备](reports/2026-10-30-full-peer-data-review.md)已完成T2100/V300、46126可训练组。152A/B仍真实systemd RUNNING并实际优化，fresh seed20、固定150/20epoch对应427800/80800更新，可能跨多天；尚无末轮全V公平分数，实际训练进度只看HandOver。冻结活动合同仍比较原147，不改成157/159；旧148不续跑。
 
-1. 保HARD覆盖候选与STRUCT/CTX/BCE/WS强控，下一建议两条有界对照：①冻结网络，T上比较当前raw工作点与最终decoded双指标/覆盖约束的工作点，再V检验，先核目标接口而非直接加训练；②原T32全量反例/匹配未损害点分离错组、同源片段状态和参考对应，结合充分来源选择可部署干预。代码已核：固定组/状态/availability时选源风险分数不能改变0/1域位置，故这部分不能仅靠继续训练选源头修复；前端仍可改变成员/支持。T HARD对STRUCT零支持140/1085点增害>1km，多支持118/23308，发生条件不是已证根因。状态候选成立后按0域/1域/联合分离干预，保持分组核归因；不预选恢复器，不重复146/149/160同配方，不沿V调参。具体合同/预算尚待上述条件收敛，无新READY。
+1. 176/177均完成，不重复当前工作点或低支持核查。由177的T实证分别研究组内原生时序/支持外历史候选风险与跨片段/输出一致性，先读充分来源/公式/消融/代码、更新矩阵后形成最小干预；原组内状态无空间的反例与组内有支持外好状态的反例不可混为一类。HARD/STRUCT强控保留，不用oracle选片段、不退固定源，不沿V调参。
 2. 纯组T44/V16难例与分组支持路线分开，先查现有统计/网格编码没保留的原生时间、局部状态和reference条件，形成可区分的新证据再定实验。166当前联合质量表达没有救回，不自动加步/seed/换loss；0支持旧首anchor回退/圆周歧义未解。真实异构K≥3/新域仍缺，不退固定源优先。
 3. 跟进152固定全T训练/末轮V300同WS任务比较：全部曝光/物理学习、强控/coverage/尾部/成本，PTFM核心缺域与公共Mean扩域分报、DeepAF P/V适配权限明确。不能把共享WS比较称原完整系统复现，活动合同仍比较147。TMTAFF若再做新训练干预须据原loss几何/梯度路径制定可分离具体合同，不能直接续107或以梯度大小选方案；最多四单卡/FIFO，无SSH值守或自动新增训练。
 
@@ -52,6 +56,7 @@
 
 | 对象／实际范围 | 当前能支持的结论 | 完整证据 |
 |---|---|---|
+| 最终指标/覆盖工作点、T低支持分离 | 176十八臂/0训练，R/D/C均选原点，当前配方无增量；177证实单支持害多无选源动作，组内历史与跨输出候选空间不同，oracle不可部署 | [176完整记录](reports/2026-10-31-decoded-coverage-review.md)、[177完整记录](reports/2026-10-31-low-support-attribution-review.md) |
 | 匹配难例HARD/DEC，T128/原T32-V32 | 1024GPU更新/12臂，HARD对WS覆盖/decoded双指标/均值点估计同向，MAE452.992m；关联区间跨0/1499新害、对STRUCT均值差，保折中候选。DEC覆盖最高但未超匹配HARD，当前配方不扩大 | [174分离](reports/2026-10-31-association-decision-review.md)、[175完整记录](reports/2026-10-31-decision-error-mining-review.md) |
 | 结构监督同曝光，T128/原T32-V32 | 两头各512步/共1024GPU更新，STRUCT对BCE coverage96.888→98.032%、共同MAE−13.827m描述CI不跨0；但decoded PCA82.939→81.765/PFA14.486→15.573%、933新>1km害，原WS覆盖仍98.442%更高。保条件信号，当前固定配方不扩大；原171技术失败保全/172资格成功 | [171/172](reports/2026-10-31-object-forest-qualification-review.md)、[173](reports/2026-10-31-structured-association-review.md) |
 | 同T工作点控制，原T32/V32 | 0训练、三scorer同T规则/774候选独立核；CTXCAL跨源mPCA80.684%/mPFA15.369%、MAE432.801m，但coverage97.694%低于原98.442%，救17丢24/1001新大害；当前无稳定联合升级 | [170](reports/2026-10-31-association-operating-point-review.md) |
@@ -88,7 +93,7 @@
 
 | 需要什么 | 入口 |
 |---|---|
-| 全局P/F/M/E/C与回流 | [Mode C1.82](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-182)，累计P14/F279/M113/E182/C58 |
+| 全局P/F/M/E/C与回流 | [Mode C1.85](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-185)，累计P14/F282/M114/E185/C59 |
 | 多源贡献范围与条件 | [多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md) |
 | 选源与集合读出 | [SR v2.4，87格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#structured-supervision-feedback) |
 | 观测驱动与状态恢复 | [OD v1.10，54格](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#endpoint-separation-feedback) |
