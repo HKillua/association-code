@@ -10,6 +10,8 @@
 
 ## 现在做什么
 
+用户本轮明确优先提高覆盖率与跨源mPCA/mPFA，并包括前端关联打分。已独立补读STAR（NeurIPS2025）与TrackTrack（CVPR2025）正文/可得补充/反例及TrackTrack核心源码，入[来源AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)及[Mode C1.74](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-174)：P14/F267/M110/E170/C56，充分深入106＝72领域相近＋34跨域，STAR源码缺失，非作者复现。由C56/C53形成[168/169分离Idea/spec](proposals/association_context_support_20261031.md)，7项核验后发布具体READY：前端同容量OWN/CTX真训练、固定分数下anchor/支持条件控制，均核完整raw/decoded/覆盖/物理风险，不先称机制成立；实际执行只看HandOver，尚无新科学成绩。
+
 **完整V300基准仍为固定T128头582.808m；新159只评价原T32/V32，不能替换全300成绩。** [159表征×表达](reports/2026-10-31-local-expression-review.md)已完成6656次真实GPU更新：V32旧特征残差网540.295→527.427m、误选761→287，但罕见反转229→278；保留平均收益候选，不称高害解决。局部网527.399m不支持稳定额外增量。[157完整结果](reports/2026-10-30-t128-full-scope-review.md)与旧[147基准](reports/2026-10-30-source-risk-full-benchmark-review.md)保持；[比较设计§9](reports/2026-10-27-fair-comparison-contract.md#9-2026-10-30三种同行共同任务比较的后继设计)仍区分固定WS后端任务与完整系统。
 
 本轮165–167服务器科学、限定核验与补项全部完成，并回流Mode C1.73。[165无真值分组](reports/2026-10-31-truth-free-partition-review.md)固定056分数/159头，允许split/move：V32完整MAE527.427→517.947m，P99 7260.394→7166.747m；但共同域区间跨0、救5同时丢2目标、T完整597.179→597.588m，仍有140个新增>1km增害，当前仅保条件候选、不扩大。**140个新大害全部在新组零/单源支持域（22/118），且都same-anchor，pure→pure也有60个**；这部分不能继续归为小网络多源选错。

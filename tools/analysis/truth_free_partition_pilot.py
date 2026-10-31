@@ -41,16 +41,16 @@ def predict_partitions(motion, pairs, scores, original, model, old_nn, device):
     return memberships,groups,packs,scores_by,raw,stats,trace
 
 
-def evaluate(m,ev,groups,packs,raw,split):
+def evaluate(m,ev,groups,packs,raw,split,method_names=METHODS):
     outputs={n:emit_group_outputs(v,groups[n.split('_')[0]],node_count=len(m['states'])) for n,v in raw.items()}
     reports,art=evaluate_fusion_methods(outputs,prediction_speed_units={n:'kn' for n in raw},node_identities=ev['identities'],
         target_ids=ev['target_ids'],target_states=ev['target_states'],target_valid=ev['target_valid'],support=m['support'],
         nearest_seconds=m['nearest_seconds'],target_speed_unit='mps',split=split)
     fragment=dict(query_seconds=m['query_seconds'],identities=ev['identities'],support=m['support'],nearest_seconds=m['nearest_seconds'])
     regions=common.old.fixed_regions(fragment,ev['target_ids']);methods={};arr={}
-    for n in METHODS:methods[n],arr[n]=common.qc.describe(reports[n],art[n],fragment,regions)
+    for n in method_names:methods[n],arr[n]=common.qc.describe(reports[n],art[n],fragment,regions)
     pairs={};pa={}
-    for left,right in combinations(METHODS,2):
+    for left,right in combinations(method_names,2):
         key=right+'_vs_'+left;pairs[key],pa[key],_=common.old.compare_pair(art[left],art[right],regions)
         pairs[key].update(baseline_method=left,candidate_method=right,side_labels=dict(A0=left,candidate=right))
     row=dict(methods=methods,pairwise=pairs);arrays=dict(methods=arr,pairs=pa);add_harm(row,arrays)

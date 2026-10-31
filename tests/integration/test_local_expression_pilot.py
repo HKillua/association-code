@@ -12,6 +12,8 @@ from tools.analysis.audit_group_reference_population import audit as audit_count
 from tools.analysis import set_conditioned_risk_pilot as context
 from tools.analysis import truth_free_partition_pilot as regroup
 from tools.analysis.audit_variable_group_outputs import audit as audit_regroup
+from tools.analysis import association_context_pilot as assoc_context
+from tools.analysis import audit_association_context_outputs as assoc_audit
 from tests.integration.test_source_risk_pilot import scene_arrays
 
 class LocalExpressionIOTests(unittest.TestCase):
@@ -70,5 +72,10 @@ class LocalExpressionIOTests(unittest.TestCase):
             with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard),patch.object(regroup.partition,'agglomerate',side_effect=coverage_control):regroup.run(b)
             audit_regroup(out,out/'independent-output-audit.json');account(out,out/'four-attribute-accounting.json')
             self.assertGreater(p.common.old.frozen.read(out/'summary.json')['all_components']['pairwise']['CL_NN_vs_WS_NN']['coverage_transitions']['lost_target_points'],0)
+            refinement=out;out=root/'169'
+            b=SimpleNamespace(**paths,manifest=manifest,output=out,expression_run=expression,refinement_run=refinement,data_run=data,device='cpu',mode='support')
+            with patch.object(p.common,'metadata',return_value=(['1','3'],['2','4'])),patch.object(p.common,'evaluation',side_effect=guard):assoc_context.run(b)
+            audit_regroup(out,out/'independent-output-audit.json',extra_scene=assoc_audit.scene,extra_summary=assoc_audit.summary)
+            account(out,out/'four-attribute-accounting.json')
 
 if __name__=='__main__':unittest.main()

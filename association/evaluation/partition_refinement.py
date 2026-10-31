@@ -7,7 +7,8 @@ from __future__ import annotations
 import numpy as np
 
 
-def refine_partition(node_count, pairs, scores, membership, *, threshold, max_moves=None):
+def refine_partition(node_count, pairs, scores, membership, *, threshold, max_moves=None,
+                     move_policy='free',support=None,sources=None):
     n = int(node_count)
     pairs, scores = np.asarray(pairs), np.asarray(scores, float)
     membership = np.asarray(membership, np.int64).copy()
@@ -20,6 +21,17 @@ def refine_partition(node_count, pairs, scores, membership, *, threshold, max_mo
     if not np.isfinite(threshold) or (membership < 0).any(): raise ValueError('finite threshold/nonnegative groups')
     groups = sorted(set(membership), key=lambda g: int(np.flatnonzero(membership == g)[0]))
     membership = np.asarray([{g:i for i,g in enumerate(groups)}[v] for v in membership])
+    if move_policy not in ('free','anchors','support'):raise ValueError('unknown move policy')
+    anchors=np.asarray([np.flatnonzero(membership==g)[0] for g in range(len(groups))])
+    original_group_count=len(groups)
+    rejection_counts=dict(anchor_rejections=0,support_rejections=0)
+    if move_policy=='support':
+        support=np.asarray(support);sources=np.asarray(sources)
+        if support.ndim!=2 or support.shape[0]!=n or support.dtype.kind!='b' or sources.shape!=(n,):
+            raise ValueError('boolean query support and one source per node required')
+        _,source_index=np.unique(sources,return_inverse=True)
+        observation_counts=np.zeros((n,int(source_index.max())+1,support.shape[1]),np.int64)
+        for i in range(n):observation_counts[membership[i],source_index[i]]+=support[i]
     budget = 4*n if max_moves is None else int(max_moves)
     if budget < 0: raise ValueError('nonnegative move budget')
     weights = scores-float(threshold)
@@ -34,6 +46,13 @@ def refine_partition(node_count, pairs, scores, membership, *, threshold, max_mo
         targets = np.asarray(active+([int(free[0])] if len(free) else []))
         gains = sums[:,targets]-sums[np.arange(n),membership,None]
         gains[membership[:,None] == targets] = -np.inf
+        if move_policy!='free':
+            for i,j in np.argwhere(gains>1e-10):
+                destination=int(targets[j]);old=int(membership[i])
+                if i==anchors[old] or destination>=original_group_count or i<anchors[destination]:
+                    gains[i,j]=-np.inf;rejection_counts['anchor_rejections']+=1
+                elif move_policy=='support' and np.any((observation_counts[old,source_index[i]]==1)&support[i]):
+                    gains[i,j]=-np.inf;rejection_counts['support_rejections']+=1
         index = int(np.argmax(gains)); value = float(gains.flat[index])
         i,j = np.unravel_index(index,gains.shape)
         return value,int(i),int(targets[j]),int((gains == value).sum())
@@ -41,6 +60,9 @@ def refine_partition(node_count, pairs, scores, membership, *, threshold, max_mo
         gain,node,destination,tie_count = best_move()
         if gain <= 1e-10: break
         old = int(membership[node]); ties += int(tie_count > 1)
+        if move_policy=='support':
+            observation_counts[old,source_index[node]]-=support[node]
+            observation_counts[destination,source_index[node]]+=support[node]
         sums[:,old] -= w[:,node]; sums[:,destination] += w[:,node]
         counts[old] -= 1; counts[destination] += 1; membership[node] = destination
         running += gain
@@ -54,4 +76,5 @@ def refine_partition(node_count, pairs, scores, membership, *, threshold, max_mo
     mapping = {g:i for i,g in enumerate(active)}
     canonical = np.asarray([mapping[v] for v in membership],np.int64)
     return canonical,dict(initial_J=initial,final_J=final,move_count=len(trace),max_moves=budget,
-        locally_optimal=remaining<=1e-10,remaining_best_gain=remaining,tie_decisions=ties),trace
+        locally_optimal=remaining<=1e-10,remaining_best_gain=remaining,tie_decisions=ties,
+        **({} if move_policy=='free' else dict(move_policy=move_policy,**rejection_counts))),trace
