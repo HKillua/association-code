@@ -4,7 +4,9 @@
 
 ## 当前执行
 
-**193 READY，本聊天领取一次。** [L2S193](L2S-20261101-193.md)：MC2.05/C68→新Idea，原T128/39fit/4992GPU更新、原T32/44臂/0V。GPU0兼容共卡/新增≤1GiB、CPU8–11×4/RSS8GiB/3600s advisory；相同初始化/标准化/抽样MEAN/BAG/ORDER，原28强控/选源分组不变，HALF单独保留。9项软件检查通过后发布；成功后一次新audit193/CPU16–19×4无GPU/1800s advisory，失败保全不重投/换配方。无自动194/V/全300/seed，不改152活动预算和原冻结任务。
+**194 READY，本聊天领取一次。** [L2S194](L2S-20261101-194.md)：MC2.06/C68之后独立技术修复，10项软件检查/编译/diff通过；原T128/39fit/4992更新、原T32/44臂/0V。新GPU0兼容共卡、CPU8–11×4/RSS8GiB/CUDA1GiB/3600s advisory；仅隔离审计导入，新冻结入口设备探针记录后一次提交；成功后新audit194/CPU16–19×4/1800s advisory。失败保全，不复投193/194，不自动V/全300/195/加步seed。
+
+**193一次技术失败完整结案。** [S2L193](S2L-20261101-193.md)：原8f92108冻结、mtad-f17ac121a4fe.service FAILED/exit1/Restartno，0fit/更新/完整T/V；首场157均值已计算未checkpoint，9.422683403s/13公共原件核齐。导入CPU审计隐藏GPU已定位，非科学阴性；Record→Squeeze→MC2.06/SR v4.7/OD v1.20，失败原件冻结不重投。
 
 **192科学资格成功，无待领/待审。** [S2L192](S2L-20261101-192.md)：3f0ba9c冻结一次新run192，原mtad-0983808a95d7.service真实exit0/inactive/dead/Resultsuccess/Restartno/Lingeryes；原T32/2310片段/580384事件，2310积分双表达/原mu和候选权重/旧病例人口绑定，0V/新预测/target评分/训练或似然。launcher18.158249s、45公共原件核齐、private原位。Record→Squeeze→Mode C2.04/SR v4.5/OD v1.18；密度假设不获支持，不部署时间权/经验SE门槛。源论文后续回流另见研究状态，不增加执行队列；原152与178–191/失败冻结，无自动193/全300/seed/新READY。
 

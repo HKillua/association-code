@@ -136,3 +136,5 @@ git show 1a25183:HandOver/S2L-20261024-091-summary.md
 [191平均运动V32验证](../reports/2026-11-01-mean-velocity-validation-review.md)：原28臂/7702均值/0新训练，科学与规定独审成功、632.728932s含计划病例聚合、65公共原件核齐。MC保PG条件平均收益，但原11/0公里害保留、H旧救回71→70，非等效/全300/可信同行。Record→Squeeze→Mode C2.02。
 
 [192采样测度资格](../reports/2026-11-01-sampling-measure-review.md)：T32/2310片段/580384事件、0V新预测，18.158249s一次成功/45原件核齐。内部近均匀，密度解释不获支持；均值差与经验SE不当方法收益/根因，Record→Squeeze→Mode C2.04。
+
+[193导入副作用失败](../reports/2026-11-01-temporal-gate-startup-failure.md)：0fit/更新/完整T/V，首场157均值未checkpoint；9.423s/13原件完整保全，技术原因不作科学阴性，回Mode C2.06。

@@ -1,10 +1,14 @@
-import unittest
+import os,subprocess,sys,unittest
 import numpy as np
 import torch
 from association.evaluation import native_phase_gate as p,native_compatibility as nc
 from association.training import temporal_gate as t
 
 class TemporalGateTests(unittest.TestCase):
+    def test_training_entry_preserves_device_environment_in_fresh_process(self):
+        env={**os.environ,'CUDA_VISIBLE_DEVICES':'preserve-task-device'}
+        probe="import os; from tools.analysis import temporal_gate_fixed_pilot; assert os.environ['CUDA_VISIBLE_DEVICES']=='preserve-task-device'"
+        subprocess.run([sys.executable,'-c',probe],env=env,check=True,capture_output=True,text=True)
     def data(self,angle=0):
         n=3;tt=np.arange(8.);values=np.zeros((n*8,4));values[:,2]=np.tile(np.arange(1,9),n)*3600/1852;values[:,3]=angle;events=dict(event_offsets=np.arange(n+1)*8,event_times_seconds=np.tile(tt,n),event_values=values,event_valid=np.ones(values.shape,bool));q=np.array([8.,9.]);v=np.tile([np.cos(np.deg2rad(angle)),np.sin(np.deg2rad(angle))],(n,1));states=np.zeros((n,2,4))
         for i in range(n):states[i,:,:2]=nc.advance(np.zeros(2),v[i],q-7)

@@ -65,3 +65,5 @@
 [191完整Record/Squeeze](../../docs/reports/2026-11-01-mean-velocity-validation-review.md)及[S2L191](../S2L-20261101-191.md)：原V32/28臂科学和独审成功，65公共原件/实际命令服务与输入核齐，private原位；平均与纯组尾部/病例聚合同时保留，回Mode C2.02。
 
 [192 Record/Squeeze](../../docs/reports/2026-11-01-sampling-measure-review.md)及[回执](../S2L-20261101-192.md)：原T资格/2310积分与旧病例绑定通过，45公共原件完整、private原位；无新预测/目标指标或V成绩，回Mode C2.04。
+
+| [193失败原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261101_temporal_gate/193/) | 13公共原件/11185B、真实失败退出与CUDA导入原因；[完整记录](../../docs/reports/2026-11-01-temporal-gate-startup-failure.md)，无新科学成绩 |

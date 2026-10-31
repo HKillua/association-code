@@ -1,6 +1,6 @@
 """193: matched T-only task gate with mean, orderless blocks, ordered blocks."""
 from __future__ import annotations
-import argparse,sys,time
+import argparse,os,sys,time
 from pathlib import Path
 from datetime import datetime,timezone
 if __package__ in (None,''):sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
@@ -10,7 +10,8 @@ from association.evaluation import native_phase_gate as phase
 from association.training import temporal_gate as gate
 from association.evaluation.local_source_evidence import predict_residual
 from tools.analysis import association_context_pilot as p
-from tools.analysis.drift_memory_pilot import ARMS as OLD_ARMS
+# Keep this training entry independent of CPU-only audit imports (193 failure).
+OLD_ARMS={f:(f,s+'O')+tuple(s+k for k in ('PH','PC','PD','PG','MC')) for f,s in [('HARD','H'),('STRUCT','S')]}
 
 ARMS={f:old+(s+'HALF',s+'GM',s+'GB',s+'GT') for f,s,old in [('HARD','H',OLD_ARMS['HARD']),('STRUCT','S',OLD_ARMS['STRUCT'])]}
 METHODS=tuple(k+'_'+s for v in ARMS.values() for k in v for s in ('MEAN','NN'))
@@ -35,12 +36,18 @@ def prepare(a,parent,out,manifest,check):
         models,draws,initial=gate.fit(data,a.device,progress=lambda step:check(phase='T_fit',last_fold=fold,optimizer_updates=done+3*step) if step%16==0 else None);torch.save(models,out/'private'/f'model-{fold}.pt');torch.save(initial,out/'private'/f'initial-{fold}.pt');np.savez_compressed(out/'private'/f'sampling-{fold}.npz',draws=draws);results[fold]=models;foldmeta.append(dict(fold=fold,held_component=held,training_scene_ids=list(dict.fromkeys(data['scene_ids'].tolist())),rows=len(data['w']),weight_sum=float(data['w'].sum()),updates_per_head=128,frozen_risk_fold=fold));curves.extend(dict(fold=fold,kind=k,curve=v['curve']) for k,v in models.items());check(neural_head_fits=3*len(results),optimizer_updates=384*len(results))
     p.common.old.frozen.write(out/'training-folds.json',foldmeta);p.common.old.frozen.write(out/'training-curves.json.gz',curves);return results
 
-def run(a):
+def run(a,*,number=193):
+    if number not in (193,194):raise ValueError('explicit scientific task number')
+    if number==194:
+        failure=p.common.old.frozen.read(a.failure_run/'run.json');assert failure['status']=='FAILED' and failure['idea_id']=='IDEA-TEMPORAL-GATE-193' and failure['optimizer_updates']==0 and failure['V_scenes']==0
     old=p.common.old.frozen;parent=old.read(a.parent_run/'run.json');previous=old.read(a.control_run/'run.json');assert parent['status']==previous['status']=='COMPLETED' and previous['parent_run']==str(a.parent_run) and previous['evaluation_splits']==['T_core'];out=a.output;out.mkdir(exist_ok=False);(out/'private').mkdir();(out/'scenes').mkdir();start=time.monotonic();state=dict(status='RUNNING',idea_id='IDEA-TEMPORAL-GATE-193',plan_version='1.0',mode='temporal_gate',parent_run=str(a.parent_run),control_run=str(a.control_run),native_training_run=str(a.native_training_run),native_run=parent['native_run'],manifest=parent['manifest'],training_scene_ids=parent['training_scene_ids'],fit_training_scene_ids=parent['fit_training_scene_ids'],scene_ids=[],evaluation_splits=['T_core'],V_scenes=0,methods=METHODS,optimizer_updates=0,neural_head_fits=0,analytic_head_fits=0,native_likelihood_fits=0,teacher_forward_calls=0,frontend_optimizer_updates=0,frozen_risk_forward_calls=0,native_mean_computations=0,reference_used_for_prediction=False,test_opened=False,started_at=datetime.now(timezone.utc).isoformat())
     def check(**kwargs):
         state.update(kwargs,elapsed_seconds=time.monotonic()-start,peak_rss_bytes=old.peak_rss_bytes(),cuda_peak_allocated_bytes=torch.cuda.max_memory_allocated());old.write(out/'run.json',state)
         if state['peak_rss_bytes']>8*1024**3 or state['cuda_peak_allocated_bytes']>1024**3:raise MemoryError('RSS8GiB/CUDA1GiB')
     try:
+        state['idea_id']='IDEA-TEMPORAL-GATE-'+str(number)
+        if number==194:
+            state['failure_run']=str(a.failure_run);state['cuda_visible_devices']=os.environ.get('CUDA_VISIBLE_DEVICES');torch.empty(1,device=a.device);state['actual_device_name']=torch.cuda.get_device_name(a.device);check(device_preflight='PASSED')
         torch.set_num_threads(4);manifest=old.read(Path(parent['manifest']));assert len(parent['fit_training_scene_ids'])==128 and len(parent['training_scene_ids'])==32;models=prepare(a,parent,out,manifest,check);check(all_models_frozen_before_evaluation=True,additional_gate_parameters=2145,full_training_models=39)
         rows=[];arrays=[]
         for sid in parent['training_scene_ids']:
@@ -58,7 +65,9 @@ def run(a):
             row.update(scene_id=sid,component_id=str(manifest['components'][sid]),search={},association=relation);p.common.save_artifacts(out/'private'/f'states-T_core-{sid}.npz',artifact);old.write(out/'scenes'/f'T_core-{sid}.json.gz',row);rows.append(row);arrays.append(arr);check(phase='T_core',completed_T_scenes=len(rows))
         result=p.finish(rows,arrays,METHODS,PRIMARY);result.update(status='COMPLETED',idea_id=state['idea_id']);old.write(out/'T-summary.json',result);old.write(out/'T-scene-summary.json.gz',rows);check(status='COMPLETED',exit_code=0,finished_at=datetime.now(timezone.utc).isoformat())
     except BaseException as e:check(status='FAILED',exit_code=1,error=f'{type(e).__name__}: {e}');raise
-if __name__=='__main__':
+def main(number=193):
     parser=argparse.ArgumentParser(description=__doc__)
     for key in ('parent-run','control-run','native-training-run','output','device'):parser.add_argument('--'+key,required=True,type=str if key=='device' else Path)
-    parser.add_argument('--time-policy',choices=('advisory',),required=True);run(parser.parse_args())
+    parser.add_argument('--failure-run',type=Path,required=number==194)
+    parser.add_argument('--time-policy',choices=('advisory',),required=True);run(parser.parse_args(),number=number)
+if __name__=='__main__':main()
