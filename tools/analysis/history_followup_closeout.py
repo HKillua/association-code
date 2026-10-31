@@ -72,14 +72,16 @@ def native_expected(m,events,groups,count,scores,base):
             expected['E'][gid,j,:2]=center(np.stack([v[3] for v in items]),np.ones(len(items)))
     return expected,eligible,sourcecount
 
-def account(run,dest):
+def account(run,dest,verification=None):
     if dest.exists():raise FileExistsError(dest)
     start=time.monotonic();r=read(run/'run.json');assert r['status']=='COMPLETED';cost=r['mode']=='cost_routing'
-    if cost:
+    if verification is not None:
+        ARMS,PRIMARY,reconstruct,training_report=verification
+    elif cost:
         from tools.analysis.cost_routing_pilot import ARMS,PRIMARY
     else:
         from tools.analysis.native_history_bridge_pilot import ARMS,PRIMARY
-    parent=Path(r['parent_run']);old=read(parent/'run.json');result=dict(status='COMPLETED',exit_code=0,training=verify_training(run,r) if cost else dict(updates=0,fits=0),splits={});max_score_gap=0.
+    parent=Path(r['parent_run']);old=read(parent/'run.json');result=dict(status='COMPLETED',exit_code=0,training=training_report if verification is not None else verify_training(run,r) if cost else dict(updates=0,fits=0),splits={});max_score_gap=0.
     comparisons=list(dict.fromkeys(list(PRIMARY)+[new+'_NN_vs_'+front+'_NN' for front,arms in ARMS.items() for new in arms[2:]]))
     for split,ids,fn in [('T_core',r['training_scene_ids'],'T-summary.json'),('V_select',r['scene_ids'],'summary.json')]:
         pool={k:{} for k in comparisons};harm_changes={};eligible_total={k:0 for k in ARMS}
@@ -94,7 +96,9 @@ def account(run,dest):
                 for prefix in prefixes:
                     assert np.array_equal(q[prefix],oq[front]) and np.array_equal(q[prefix+'_scores'],oq[front+'_scores']) and np.array_equal(raw[prefix+'_MEAN'],oraw[front+'_MEAN'])
                     if prefix in prefixes[2:]:assert np.array_equal(raw[prefix+'_NN'][...,2:],base[...,2:])
-                if cost:
+                if verification is not None:
+                    eligible,gap=reconstruct(run,r,split,sid,front,m,events,groups,count,op,oraw,raw,policy);max_score_gap=max(max_score_gap,gap)
+                elif cost:
                     for prefix,kind in zip(prefixes[2:],('MSE','COST','TAIL')):
                         score=policy[prefix+'__scores'];expected=numpy_score(models[kind],op[front+'__features'].reshape(-1,12)).reshape(score.shape);gap=float(np.max(np.abs(score-expected)));max_score_gap=max(max_score_gap,gap);assert gap<1e-4
                         for gid,nodes in enumerate(groups):
