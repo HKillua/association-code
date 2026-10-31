@@ -4,6 +4,8 @@
 
 ## 当前执行
 
+**178 READY，本聊天领取一次。** [L2S178](L2S-20261031-178.md)：5项READY前软件验收通过，原T128共享历史候选风险头13fit/3328GPU更新，原T32/V32/24臂，HARD/STRUCT强控冻结，M/E/Z/1/O分离。新checkout/run/launcher attempt1、GPU0兼容共卡、advisory3600s；成功后一次独立输出/四属性/权重域与T人口/训练量限定收尾。发布不等已启动；失败保全不重试，152活动目录/预算不改。
+
 **176/177科学及规定收尾均成功，Record→Squeeze→Mode C1.85/SR v2.8。** [S2L176](S2L-20261031-176.md)：科学`mtad-53bd1504aa33.service`、独审`mtad-140820cb132f.service`真实exit0/inactive/dead，总634.112s，原T32/V32十八臂/0训练、70候选/2240场分区及全部属性独核，96公共原件＋清单回传；R/D/C均原点，无新成绩。[S2L177](S2L-20261031-177.md)：科学`mtad-27ec89c00a14.service`及规定分离补项`mtad-ef157d7cf6c3.service`同成功终态，总36.979s，32T/860对象/0V、57原件＋服务记录回传；oracle仅诊断。原c003770科学、74642a0收尾冻结目录不改，无待领取/待审或自动新READY，152不改。
 
 **175科学/规定独审/全四属性/校准与mask核算各一次完成。** [回执175](S2L-20261031-175.md)：原5e185db科学`mtad-6e3e6825bb8d.service`、c78b682收尾`mtad-32f9fb4be0f0.service`均真实exit0/inactive/dead；1024GPU更新/原T32-V32十二臂、总863.005s、99公共原件完整回传。Record→Squeeze→Mode C1.82/SR v2.6，保HARD折中候选，DEC当前配方不扩大。原冻结目录不动，无待领取/待审或自动新READY/全300，152不改。
