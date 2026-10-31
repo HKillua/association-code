@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**191原科学RUNNING，尚无终态/待领。** [L2S191](L2S-20261101-191.md)/[实际启动](S2L-20261101-191-start.md)：f82d8a8冻结新run191 checkout，mtad-83ff3fb70d1f.service北京时间04:05:34真实active/running/Restartno/Lingeryes；run完成1/32V、22次native均值、0更新，提交0不当成功。只V32/28臂、189 T资格、原MC不改/0新T评价或监督/似然；CPU8–11×4无GPU/RSS8GiB/1800s advisory。成功后一次新audit191/CPU16–19×4无GPU/1800s advisory，原11/0害/71/42救回与整体/覆盖/尾部全核；失败保全不重投，不自动192/全300/seed，不改152活动/178/188/189/190或失败原件。
+**191科学COMPLETED，规定独审已提交，待真实终态核验。** [L2S191](L2S-20261101-191.md)/[启动](S2L-20261101-191-start.md)：f82d8a8冻结科学/新audit191 checkout各一次；科学mtad-83ff3fb70d1f.service北京时间04:14:06核为exit0/inactive/dead/Restartno/Lingeryes，原V32/28臂、7702输入均值/0新T评价或神经监督似然。科学程序472.487609s/launcher481.399492s，RSS2922741760B。规定新audit191/CPU16–19×4无GPU/1800s advisory，unit mtad-a93aa61965c8.service于04:14:28真实active/running/Restartno，不当成功；原11/0害与71/42救回和整体/coverage/关系/尾部/四属性待核。失败保全不重投，不自动192/全300/seed，不改152活动/178/188/189/190或失败原件。
 
 **190科学/规定独审均成功，无待领/待审。** [S2L190](S2L-20261101-190.md)：6ebf497冻结各一次，`mtad-bb86bc494bf9.service`/`mtad-8c6989cda314.service`均真实exit0/inactive/dead/Restartno；T32/40臂、2310 native OLS/均值、0V新神经监督似然，772.287141s、63原件核齐。Record→Squeeze→Mode C2.01/SR v4.2/OD v1.15。当前拟合端点不晋级，原HARD33单节点害保留且损失旧救回；原science/audit/178/188/189/152冻结，不自动V/全300/seed/重投。
 
