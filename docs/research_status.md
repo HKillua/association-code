@@ -10,6 +10,8 @@
 
 ## 现在做什么
 
+当前推进[174具体T侧分离](proposals/association_decision_20261031.md)：原173分数与分组完整复放，区分错并的搜索空间与评分目标冲突，并核对象/有效点代价；不新增V或训练。独立检索未知目标数、多片段构组来源，先来源分析/矩阵后决定后继方法，不预选decoder。
+
 本轮[独立结构监督AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/structured_association_sources_20261031.md)→Mode C1.77/C57→171技术失败保全/172明确修复资格→Mode C1.79→新[Idea173](proposals/structured_association_20261031.md)→实际1024GPU更新与原T32/V32八臂→[完整Record/Squeeze](reports/2026-10-31-structured-association-review.md)回[Mode C1.80](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-180)，P14/F275/M111/E178/C57。全部原launcher/科学/限定独审/四属性及1032T候选独立核完成，科学＋收尾671.161s。充分深入107＝72领域/相近＋35跨域（2023机制基础例外，LA-MOTR2025补充/代码partial不计），7项软件验收在READY前通过。
 
 **173保条件增量，不整体晋级。** 同信息/容量/初始化/曝光/工作点下，STRUCT对继续BCE的V有效点coverage96.888→98.032%、MAE438.835→427.241m，共同差−13.827m描述CI[−89.959,−4.464]；但decoded跨源mPCA82.939→81.765%、mPFA14.486→15.573%，933对BCE新>1km害。对原WS覆盖仍低98.442%、救12丢20/1131新害；对冻结CTX平均区间跨0且对象少1。raw召回对BCE有增量却未同向兑现decoded；forest–WS/工作点/桥边失配与状态相容均候选，**未证唯一根因**。未知K部署仍WS，不用训练GT k/固定源。当前λ1/B4/4轮配方关闭自动扩大，无新READY/全300；先T反例分离raw→decoded的对象/时刻支持代价，再查成熟可变对象数/多片段决策机制形成新Idea。
