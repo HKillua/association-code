@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**190新T-only科学READY，本聊天领取一次。** [L2S190](L2S-20261101-190.md)/[Idea190](../docs/proposals/fitted_endpoint_factorial_20261101.md)，先由189 Record/Squeeze→MC1.99，再原代码/首T来源AP→MC2.00/C66。原T32/40臂，0V/新神经/监督/似然，input-native OLS拟合和均值计算计成本，端点/运动/几何分离；17 READY前检查/编译/diff通过。新checkout/run/launcher attempt1、CPU8–11×4无GPU/1800s advisory，成功后一次audit190、CPU16–19无GPU/1800s advisory。失败保全，无旧run重投/自动V/全300/seed，发布不等启动。
+**190 T-only科学RUNNING。** [L2S190](L2S-20261101-190.md)/[Idea190](../docs/proposals/fitted_endpoint_factorial_20261101.md)，6ebf497新冻结checkout/run/launcher attempt1，`mtad-bb86bc494bf9.service`2026-11-01 03:40:38真实active/running/Restartno；首场157原生拟合/均值与旧cache绑定通过、完成1/32，CPU8–11×4无GPU/1800s advisory。原T32/40臂/0V新神经监督似然，固定178/188/189全部强控、端点/运动/几何分离。17 READY前检查/编译/diff通过。成功后一次新audit190/CPU16–19×4无GPU/1800s advisory，完整规定收尾；原152和原run冻结不动，失败保全、无自动V/全300/seed/重投。
 
 **189科学/规定独审均成功，无待领/待审。** [S2L189](S2L-20261101-189.md)：科学/独审618dd1e冻结各一次，`mtad-22f90c6b5cad.service`/`mtad-845206e1c2ee.service`均真实exit0/inactive/dead/Restartno，原T32/860对象28臂，4620输入均值/0V新神经似然，381.231001s、63公共原件核齐。Record→Squeeze→Mode C1.99/SR v4.0/OD v1.13；MC−PG均值近0但非每点等效，原34/1害保留、33HARD害在单片段组。原科学/audit/178/188/152冻结不动，无自动V/全300/seed/后继READY。
 
