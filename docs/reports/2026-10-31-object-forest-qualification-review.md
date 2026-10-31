@@ -31,3 +31,36 @@ limitations: scientific_qualification_unknown
 missing_evidence: [completed_T_qualification]
 next_skill: deep-read_Mode_C
 ```
+
+## 172：明确修复后的实际资格检查 — REC/SQ-OBJECT-FOREST-172
+
+事前[plan1.1](../proposals/structured_association_20261031.md)、[L2S172](../../HandOver/L2S-20261031-172.md)，新50520ca/attempt1/`mtad-edf901f4936e.service`，没有覆盖或重投171。原T32/860中央目标、原170score/分区/保存输出、原127motion/eval；0训练/teacher/GPU/新预测/新V/test，ε.1/B4/seed20不改。05:39:34.978388Z启动至05:39:47.017795Z，launcher总12.170251s，science6.935841s、RSS440160256B；32/32成功、真实exit0，服务inactive/dead/ExecMainStatus0/Restart=no/Linger=yes。34科学＋11launcher原件完整回传[172证据](/Users/a1/Projects/biye-ronghe/docs/evidence/20261031_structured_association/172/)，身份坐标仍留原127/170服务器。
+
+| T-only对象层 | 对象数 | 单片段 | 正类pair质量 | 被错误森林边触及 | 新/丢有效query |
+|---|---:|---:|---:|---:|---:|
+| 全部 | 860 | 73 | 2268 | 314 | 394/417 |
+| 丢失 | 13 | 0 | 37 | 13 | 0/417 |
+| 救回 | 17 | 2 | 51 | 15 | 394/0 |
+| 前后保留 | 812 | 69 | 2142 | 268 | 0/0 |
+
+剩18个为前后均未代表对象，不从分母删去。丢失目标片段数`3,2,4,3,3,3,3,4,2,2,3,2,3`，均有异类混合新组；不是singleton漏学的证据。类内正边质量只37/2268约1.63%，但不证明尺寸是原因。32场normalized gap范围0…1.174224，规则资格为true；**该梯度触及全部丢目标，也触及15救回/268保留目标，不是高精度坏边分类器**。森林选负类边的梯度方向向下，真实类内连接梯度方向向上；WS部署和物理效果仍未知。
+
+独立一致性：本地从全部匿名object行重加，T新394/丢417点、救17/丢13目标与原170冻结后验一致；检查无漏场/原T32顺序、全860目标与所有对象层非互斥问题（lost/rescued/retained/neither相互排斥）。这不是第二次科学重算森林或独立最优性审计，最优性只由小图枚举/源码数学特例与rank软件验收支持，完整标签数据准确性未认证。
+
+Squeeze：支持到“已有T丢对象确有可测的结构训练干预入口”；**不支持**BCE/WS是唯一根因、已减少错误、未知K推理获益、覆盖或尾部保证。对照必须保冻结CTX、同起点/全场曝光BCE与BCE＋结构项，不能把额外训练或T标定当新机制。真实T类数只用于训练，部署仍WS/不读取k。MC4少于原文100，训练/推理图目标不同，均为需要实测的适配条件。回Mode C1.79/E177/F274，C57保条件候选，新训练须另立具体合同；原171技术失败不删除。
+
+```yaml
+package_type: SQUEEZE_REPORT
+record_id: REC-OBJECT-FOREST-172
+idea_id: IDEA-OBJECT-FOREST-QUALIFICATION-REPAIR-20261031-172
+source_ids: [C57, SQ-OBJECT-FOREST-171]
+design: original_T32_saved_output_full_label_forest_gradient_qualification
+actual_execution: completed_32_scenes_860_objects_zero_training
+results_with_uncertainty: exploratory_T_all_13_lost_touched_also_15_rescued_no_causal_or_V_claim
+plan_deviations: none_for_172_original_171_failure_retained
+reproducibility: original_request_logs_exit_service_and_all_anonymous_rows_saved
+evidence_status: verified_T_qualification_only
+limitations: no_deployment_effect_or_independent_domain_estimate
+missing_evidence: [matched_structured_training, coverage_association_physical_joint_gain]
+next_skill: deep-read_Mode_C
+```

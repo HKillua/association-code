@@ -10,7 +10,7 @@
 
 ## 现在做什么
 
-本轮按[独立结构监督AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/structured_association_sources_20261031.md)→[Mode C1.77](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-177)形成C57；充分深入107＝72领域/相近＋35跨域（DiffClust2023机制基础例外，LA-MOTR2025补充/代码缺口partial不计）。[171事前Idea](proposals/structured_association_20261031.md)先核原T错并对象及训练结构梯度是否触及相关错连，0训练/无新V，不先宣目标缺口为根因。3项软件核验已过、具体执行见HandOver；未自动新训练。
+本轮[独立结构监督AP](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/structured_association_sources_20261031.md)→Mode C1.77/C57→171技术失败保全/172明确修复成功，[完整Record/Squeeze](reports/2026-10-31-object-forest-qualification-review.md)回[Mode C1.79](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-179)，P14/F274/M111/E177/C57。T32丢13对象均2–4片段/混合组且梯度触及，但15救回/268保留也触及，非安全坏边分类器、非根因证明。充分深入107＝72领域/相近＋35跨域（2023机制基础例外，LA-MOTR2025补充/代码partial不计）。[173具体Idea](proposals/structured_association_20261031.md)据此做T128同起点/信息/容量/曝光BCE vs BCE＋partial FY，共1024GPU更新，T-only同标定/原T32-V32八臂；未知K部署仍WS，训练GT k不入推理。7项软件核验已过，执行见HandOver；无当前新V科学成绩或自动全300。
 
 用户本轮明确优先提高覆盖率与跨源mPCA/mPFA，并包括前端。已补读STAR NeurIPS2025/TrackTrack CVPR2025正文、补充、反例及TrackTrack核心实现，[完整AP与阅读边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/association_context_sources_20261031.md)保留，STAR源码未获；充分深入106＝72领域相近＋34跨域，非作者复现。[168](reports/2026-10-31-association-context-review.md)实际T128/2000GPU更新、T32/V32六臂：CTX有共同域均值/召回信号，但覆盖下降和1027新大害，未联合升级。[169](reports/2026-10-31-anchor-support-review.md)0训练八臂：固定代表仍伤位置，硬保每query支持几乎冻结搜索，当前配方关闭。全部真实原件/独审/四属性与后验记账完成，保反例，不退固定源。
 
