@@ -2,6 +2,8 @@
 
 只读证据，不能代替服务器模型输入。当前任务只见[交接](../Handover.md)，事实解释见[既有研究分析](../../docs/reports/2026-10-26-experiment-review.md)及[102/103回执核验与深挖](../../docs/reports/2026-10-27-returned-diagnostics-review.md)。
 
+2026-11-02存储精简：098总表`summary.json`与106旧进度`progress.jsonl`现为同名`.gz`，解压逐字节保持原件；旧回执中的文件名、字节数和命令描述原传输现场，不改写为后来的存储形式。用`gzip -dc 路径.gz`读取，或解压到临时目录供旧分析命令使用。
+
 | 保留目录 | 目的 |
 |---|---|
 | [180/181原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261031_history_followups/) | 180 T128/39fit/9984GPU更新的训练曲线/人口/fold、T32/V32二十臂；181零训练同源native双侧二十四臂。两者完整场/组件/全部属性、独立主位置/关系/动作/训练核算与同评价器四属性记账、原命令/退出/真实终态和成本，194公共原件＋清单。private原位；[180](../../docs/reports/2026-10-31-cost-routing-review.md)/[181](../../docs/reports/2026-10-31-native-history-bridge-review.md) |

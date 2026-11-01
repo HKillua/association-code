@@ -2,7 +2,9 @@
 
 2026-10-27。**三场的相对源差结构不依赖先用真实身份筛对；预测组留出和query前后半检查均保留明显结构。但这没有证明绝对位置恢复改善，也没有选定最终方法。** 3035有错配组和恶化组，1043留出只有两组，均保留在结果中。
 
-上游为事先写入的[Idea 1.0](../proposals/predicted_registration_audit_20261027.md)（C10，Mode C 1.6a），输入为103已返回的三份公开`points-*.json.gz`。完整数值、每组结果、运行时间、版本和命令保存在[原数值JSON](2026-10-27-predicted-registration-audit.json)；不覆盖103，不重新打开原始ZIP、NPZ或权重。
+上游为事先写入的[Idea 1.0](../proposals/predicted_registration_audit_20261027.md)（C10，Mode C 1.6a），输入为103已返回的三份公开`points-*.json.gz`。完整数值、每组结果、运行时间、版本和命令保存在[原数值JSON](2026-10-27-predicted-registration-audit.json.gz)；不覆盖103，不重新打开原始ZIP、NPZ或权重。
+
+2026-11-02仅将数值附件无损压缩为gzip；下列原执行命令与JSON内部argv仍记当时的`.json`输出，不改写历史。
 
 ## 1. EXPERIMENT_RECORD：实际执行
 

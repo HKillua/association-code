@@ -16,7 +16,7 @@
 
 ### 证据位置和核验层次
 
-原回执目录：[110原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/110/)。包含`run.json`、`summary.json`、`scene-summary.json.gz`、`launch-status.json`、`launch-request.json`、`exit_code.txt`；另补[capacity-size-histogram.json](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/110/capacity-size-histogram.json)，为执行后从原private细行聚合的六行(a,b,count)，未回传任何identity/source编号。独立重聚合结果：[audit JSON](2026-10-29-fragment-capacity-audit.json)。代码定位：[分析入口](../../tools/analysis/fragment_identity_capacity.py)、[原raw指标定义](../../association/evaluation/association.py)。
+原回执目录：[110原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/110/)。包含`run.json`、`summary.json`、`scene-summary.json.gz`、`launch-status.json`、`launch-request.json`、`exit_code.txt`；另补[capacity-size-histogram.json](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/110/capacity-size-histogram.json)，为执行后从原private细行聚合的六行(a,b,count)，未回传任何identity/source编号。独立重聚合结果：[audit JSON](2026-10-29-fragment-capacity-audit.json.gz)。代码定位：[分析入口](../../tools/analysis/fragment_identity_capacity.py)、[原raw指标定义](../../association/evaluation/association.py)。
 
 1. **DE，独立重聚合**：本地仅读返回的300条逐场计数；未导入原程序的pool函数。逐项核scene顺序与本地冻结manifest V_select、38个component映射；20项原始整数及5项衍生人口计数的全局与38组件重聚合均与原summary一致，浮点比例/场景均值在`1e-12`内一致，0差异。独立检查每场`pair_count=N(N−1)/2`、正边同/异源分解、`T=B+下界遗漏边`、全部raw混淆和、正边=TP+FN、eligible+zero分母、noQ拆分及U公式，全部通过。无空场、无缺source场、无跨源真边零分母场；所有300场source_count=2。
 2. **DE，运行记录+静态链**：程序检查原NPZ的完整唯一i<j候选、二值label等价性、有限scores及support0..64，并逐场绑定原056 raw计数后才写完成。返回300行均记录`labels_equivalence_verified=true`。这说明实际执行通过了这些检查；本地未再打开原NPZ，不能称为对4,439,092条原标签的第二次独立校验。
