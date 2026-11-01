@@ -1,0 +1,130 @@
+# 实验与分析报告
+
+按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
+
+## 2026-11-01
+
+- [189：平均运动与OU记忆项的T侧匹配干预](2026-11-01-drift-memory-review.md)
+- [190：拟合端点×运动×几何的T侧因子分离](2026-11-01-fitted-endpoint-review.md)
+- [191：平均运动表达的固定V32验证](2026-11-01-mean-velocity-validation-review.md)
+- [192：采样密度假设的T侧资格与反证](2026-11-01-sampling-measure-review.md)
+- [194原生阶段任务验证：当前小网络门控未超过简单强控](2026-11-01-temporal-gate-review.md)
+- [193阶段信息任务：GPU导入副作用导致启动失败](2026-11-01-temporal-gate-startup-failure.md)
+
+## 2026-10-31
+
+- [169：保代表不等保风险，逐query硬保支持限制了收益](2026-10-31-anchor-support-review.md)
+- [168：前端上下文保留条件收益，尚未同时提升覆盖与误报](2026-10-31-association-context-review.md)
+- [174：多数T混组受当前目标奖励，不支持只换更强搜索](2026-10-31-association-decision-review.md)
+- [170：同T误报预算后保留平均信号，覆盖目标仍未达成](2026-10-31-association-operating-point-review.md)
+- [180：物理选择代价与高害成本监督](2026-10-31-cost-routing-review.md)
+- [175：一般难例与实际构组错例的同预算分离](2026-10-31-decision-error-mining-review.md)
+- [176：最终指标与覆盖约束的工作点对照未产生新增工作点](2026-10-31-decoded-coverage-review.md)
+- [187：双侧端点导数与形状约束的净增量](2026-10-31-endpoint-kinematics-review.md)
+- [160：端点×速度原生分离 — Record→Squeeze](2026-10-31-endpoint-separation-review.md)
+- [163：分组输入与参考对应分离 — Record→Squeeze](2026-10-31-group-reference-review.md)
+- [178：同风险评分器开放组内历史候选](2026-10-31-history-candidate-review.md)
+- [179：历史候选新增害的T侧条件分离](2026-10-31-history-tail-qualification-review.md)
+- [159：局部表征×共享残差网络 — Record→Squeeze](2026-10-31-local-expression-review.md)
+- [177：低支持大错的候选空间与对应敏感性](2026-10-31-low-support-attribution-review.md)
+- [182：T侧原生运动相容性与传播条件](2026-10-31-native-compatibility-review.md)
+- [181：同源原生双侧历史连接](2026-10-31-native-history-bridge-review.md)
+- [186：生产list接口的原T32资格核验](2026-10-31-native-list-qualification-review.md)
+- [183：原生运动条件信息与历史候选风险读出](2026-10-31-native-motion-features-review.md)
+- [184/185：生产分组类型接口失败，非方法阴性](2026-10-31-native-motion-interface-failure.md)
+- [171：T对象/森林资格检查的技术失败与修复证据](2026-10-31-object-forest-qualification-review.md)
+- [162：监督目标×训练难例质量 — Record→Squeeze](2026-10-31-objective-difficulty-review.md)
+- [188：单侧速度记忆与漂移的条件收益及反例](2026-10-31-one-sided-persistence-review.md)
+- [166：集合质量上下文与同容量控制 — Record→Squeeze](2026-10-31-set-context-risk-review.md)
+- [173：结构监督有同曝光平均/有效点收益，未达覆盖与关联联合目标](2026-10-31-structured-association-review.md)
+- [161：冻结decoder逐层与memory幅度 — Record→Squeeze](2026-10-31-tfm-decoder-layers-review.md)
+- [167：冻结TFM原损失梯度路径 — Record→Squeeze](2026-10-31-tfm-gradient-review.md)
+- [164：冻结TFM的K/V尺度分离 — Record→Squeeze](2026-10-31-tfm-key-value-review.md)
+- [165：固定证据下无真值分组修正 — Record→Squeeze](2026-10-31-truth-free-partition-review.md)
+
+## 2026-10-30
+
+- [144：实际坐标集合损失 — Record→Squeeze](2026-10-30-actual-mixture-gain-review.md)
+- [151：全T2100/V300物理缓存 — Record→Squeeze](2026-10-30-full-peer-data-review.md)
+- [148：PTFM/DeepAF真实训练接通与TMTAFF保存端点核查 — Record→Squeeze](2026-10-30-fusion-peer-connection-review.md)
+- [134：训练侧混合空间与高损害误选的记录及深挖](2026-10-30-mixture-opportunity-review.md)
+- [138：T侧观测证据冲突与实际损害的执行记录及深挖](2026-10-30-observation-conflict-review.md)
+- [136：观测质量代理与可变源贡献的执行记录及深挖](2026-10-30-observation-quality-review.md)
+- [137：观测留出选状态尺度的执行记录及深挖](2026-10-30-observation-scale-review.md)
+- [143：相对代价选源 — Record→Squeeze](2026-10-30-relative-source-decision-review.md)
+- [158：当前多尺度速度r1/r2共识 — Record→Squeeze](2026-10-30-robust-endpoint-review.md)
+- [传感器替换与多源扩展：实现边界审查](2026-10-30-sensor-scalability-review.md)
+- [140：平方风险评分与集合几何读出 — Record → Squeeze](2026-10-30-source-contribution-readout-review.md)
+- [155：T128覆盖与同信息评分 — Record→Squeeze](2026-10-30-source-coverage-review.md)
+- [147：Qhard全V300基准 — Record→Squeeze](2026-10-30-source-risk-full-benchmark-review.md)
+- [133：共享源误差得分与可变K贡献的记录及深挖](2026-10-30-source-risk-review.md)
+- [139：米制选源目标的真实结果 — Record → Squeeze](2026-10-30-source-selection-evidence-review.md)
+- [141：状态恢复高损害核查的指标入口失败 — Record → Squeeze](2026-10-30-state-recovery-tail-entry-failure.md)
+- [142：高损害恢复点的独立复放与计算链](2026-10-30-state-recovery-tail-review.md)
+- [157：固定T128头全V300 — Record→Squeeze](2026-10-30-t128-full-scope-review.md)
+- [149/150：零支持候选与时序信息 — Record→Squeeze](2026-10-30-temporal-unsupported-review.md)
+- [154：冻结TFM内部路径 — Record→Squeeze](2026-10-30-tfm-constant-path-review.md)
+- [153：冻结107训练侧物理恢复 — Record→Squeeze](2026-10-30-tmtaff-training-physical-review.md)
+- [145：列表/数组接口失败 — Record→Squeeze](2026-10-30-unsupported-recovery-entry-failure.md)
+- [146：支持外端点/速度分离 — Record→Squeeze](2026-10-30-unsupported-recovery-review.md)
+- [156：同来源历史预测选运动 — Record→Squeeze](2026-10-30-within-source-forecast-review.md)
+
+## 2026-10-29
+
+- [107现场核验：训练完成，固定组评价预检失败](2026-10-29-107-failure-discovery.md)
+- [128：同信息关联诊断的实际中断记录与深挖](2026-10-29-association-geometry-failure.md)
+- [130：固定候选几何／LOO诊断的真实记录与深挖](2026-10-29-association-geometry-review.md)
+- [131：冻结条件收益head扩展到全V的Record与Squeeze](2026-10-29-conditional-source-value-full-review.md)
+- [125：T条件收益预测与冻结V32十一臂验证的真实记录与深挖](2026-10-29-conditional-source-value-review.md)
+- [113：107固定端点全V评价的Record与Squeeze](2026-10-29-fixed-endpoint-review.md)
+- [固定056比较的090C旧缓存格式修复依据](2026-10-29-fixed056-schema-repair.md)
+- [110片段身份容量诊断：真实回执复核与证据深挖](2026-10-29-fragment-capacity-review.md)
+- [109：固定056分数之后的决定——实际记录与深挖](2026-10-29-frozen-decision-review.md)
+- [112生成支撑记账：真实执行记录、独立复核与深挖](2026-10-29-generated-support-review.md)
+- [129：原生连续性候选、T拒配与完整对象输出](2026-10-29-native-object-output-review.md)
+- [127：原生CV/RTS状态控制的Record与Squeeze](2026-10-29-native-state-review.md)
+- [132：首臂1000更新后被oomd终止，完整输入比较尚未完成](2026-10-29-ordered-input-continuation-failure.md)
+- [126：完整输入缓存后、采样计划构造前的文件句柄失败](2026-10-29-ordered-input-failure.md)
+- [119：声明输出域的实际记录与深挖](2026-10-29-output-domain-review.md)
+- [108：候选B的内容是否进入表示——实际记录与深挖](2026-10-29-pair-representation-review.md)
+- [论文原表与当前结果的逐项数值比较](2026-10-29-paper-number-comparison.md)
+- [用户粘贴提案审查：源贡献、精度估计与中心收缩](2026-10-29-proposal-precision-shrinkage-review.md)
+- [117：最近选择的全V收益、强anchor取舍和覆盖反转](2026-10-29-query-contribution-full-review.md)
+- [116：固定身份关系后，query贡献有实际作用，但仍有强控制取舍](2026-10-29-query-contribution-review.md)
+- [120：共享相对校正的全V开发扩展——Record后Squeeze](2026-10-29-shared-component-full-review.md)
+- [留出共享相对分量的绝对效果：118实际记录与深挖](2026-10-29-shared-component-review.md)
+- [122：一阶速度相关共享项没有稳定留组增益](2026-10-29-shared-motion-time-review.md)
+- [四个矩阵问题的小范围验证：实际记录与深挖](2026-10-29-small-validation-review.md)
+- [124：软混合与中心收缩分离验证的真实记录与深挖](2026-10-29-source-mix-shrink-review.md)
+- [123：LOW/FixedLOW全V扩展的真实记录与深挖](2026-10-29-source-preference-full-review.md)
+- [121：源优先对共享校正收益的实际归因](2026-10-29-source-preference-review.md)
+- [114：固定score静态分区——实际记录与深挖](2026-10-29-static-partition-review.md)
+- [115静态分区位置链：实际记录、独立重聚合与取舍](2026-10-29-static-position-review.md)
+
+## 2026-10-28
+
+- [2026-10-28跨域研究思考流程审查](2026-10-28-cross-transfer-workflow-review.md)
+
+## 2026-10-27
+
+- [C06–C09成立条件与比较接口核验](2026-10-27-candidate-feasibility.md)
+- [数据集选取与基线差距：证据审计](2026-10-27-dataset-selection-review.md)
+- [固定056下的TMTAFF同任务比较：实现合同与预算边界](2026-10-27-fair-comparison-contract.md)
+- [固定预测对应下的相对配准条件：实际记录与深挖](2026-10-27-predicted-registration-audit.md)
+- [105 原始 CSV 链核查：记录、复核与深挖](2026-10-27-raw-case-chain-review.md)
+- [102／103回执核验、实验记录与深挖](2026-10-27-returned-diagnostics-review.md)
+- [104原链核查：实际记录和边界](2026-10-27-three-case-chain-review.md)
+- [三个场景诊断的实现核验](2026-10-27-three-scene-software-verification.md)
+- [TMTAFF显式速度单位链：本地软件核验](2026-10-27-tmtaff-speed-unit-verification.md)
+- [106 新单位人口准备：Record / Squeeze](2026-10-27-unit-population-review.md)
+
+## 2026-10-26
+
+- [100／096终态与101经纬度补算：本地审阅](2026-10-26-experiment-review.md)
+- [10月25—26日讨论回读：为什么换方向、现在以什么为目标](2026-10-26-goal-reconciliation.md)
+
+## 2026-10-25
+
+- [DeepAF实现边界：尚无真实MTAD同行成绩](2026-10-25-deepaf-method-audit.md)
+
+配套JSON/CSV等证据保留在报告正文引用的位置；结果原件另见[原件索引](../../HandOver/results/README.md)。

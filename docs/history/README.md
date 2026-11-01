@@ -1,5 +1,7 @@
 # 研究历史摘要
 
+2026-11-02整理：[入口整理记录](2026-11-02-repository-organization.md)、[研究状态/交接完整原文](2026-11-02-research-process.md)。历次[报告](../reports/README.md)与[提案](../proposals/README.md)可按日期查找，当前目标与执行返回主入口。
+
 2026-10-27整理。当前结果只维护[研究状态](../research_status.md)，执行只认[交接索引](../../HandOver/Handover.md)。已结案命令、旧READY、预算和历史“下一步”不恢复成新任务。**优先解释真实实验，不以工具、测试、文档或诊断轮次数量替代科研成果。**
 
 ## 研究推导与原过程
