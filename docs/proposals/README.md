@@ -97,3 +97,7 @@
 - [TMTAFF 新单位数据准备核验（106事前计划）](tmtaff_unit_population_preparation_20261027.md)
 
 配套JSON/CSV等证据保留在报告正文引用的位置；结果原件另见[原件索引](../../HandOver/results/README.md)。
+
+## 2026-11-02
+
+- [195：固定风险头下的候选—动作条件验证](action_conditioned_risk_20261102.md)

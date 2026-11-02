@@ -23,10 +23,10 @@
 
 ## 下一步
 
-1. 保留178与MC/PG条件收益，从194旧害alpha高、旧救回alpha低且仅少数组的反例，区分可见运动条件的跨组收益符号、时序表示/恢复动作与组/reference对应。先形成能区分竞争解释的证据，再立具体替换实验，不预选更大网络。
+1. 保留178与MC/PG条件收益。新代码条件F304/C69：风险按原OLS状态定义，换MC后通常仍固定原选中node；真实排序反转与风险可迁移未知。[195方案](proposals/action_conditioned_risk_20261102.md)分开固定node的动作选择、MC条件重新选node、联合node×动作，在原T32/0训练/0V验证，不接回194粗阶段门控。
 2. 输入、时序、关联、融合、输出五条路线继续按矩阵分析；关联仍以覆盖、跨源mPCA/mPFA和完整位置尾部一起判断。成熟方案先明确输入、训练量、终点和停止条件，再独立发布READY。
 3. 192密度解释、190拟合端点和194粗阶段门控的当前配方已结案，不以加步/seed/窗口/β小补丁续跑；既有反例及未采纳理由继续保留。
-4. 跟进152原全量训练，终态后核原命令/退出、全V300人口、完整指标/尾部/成本，再落实公平比较。当前没有195、新训练READY或自动V/全300扩展；本次仓库整理不创建科学任务或自动跟进。
+4. 跟进152原全量训练，终态后核原命令/退出、全V300人口、完整指标/尾部/成本，再落实公平比较。195按独立具体合同执行；无新训练、自动V/全300或新seed。152仍固定比较原147，不把178/191跨人口代入。
 
 ## 研究材料与推导入口
 
@@ -34,10 +34,10 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.07](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-207)，P14/F303/M122/E206/C68|
+|全局问题—现象—机制—证据|[Mode C2.08](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-208)，P14/F304/M123/E207/C69|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
-|选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，194回流至v4.8/171格|
-|观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，194回流至v1.21/87格|
+|选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，195来源条件至v4.9/174格|
+|观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，195来源条件至v1.22/90格|
 |逐篇正文/补充/代码阅读范围|[深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分109＝72领域/相近＋37跨域；不是作者复现|
 |来源原件与连接|[资料库入口](/Users/a1/Projects/biye-ronghe/docs/README.md)、[FlowState完整来源](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/flowstate_icml2026_full_source_analysis_20261101.md)|
 |Idea与否证/Record与Squeeze|[提案索引](proposals/README.md)、[报告索引](reports/README.md)；未执行、阴性和失败材料同样保留|

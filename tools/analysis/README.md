@@ -144,3 +144,6 @@
 |[saved_attribute_accounting.py](saved_attribute_accounting.py)|Read-only complete physical/paper attribute reports from frozen mps artifacts.|
 |[temporal_gate_closeout.py](temporal_gate_closeout.py)|193: saved T metrics plus matched training, native phase and gate accounting.|
 |[temporal_source_accounting.py](temporal_source_accounting.py)|Read-only Squeeze of149/150: anchor-side zero support and source-slot errors.|
+
+- [action_conditioned_risk_pilot.py](action_conditioned_risk_pilot.py)：195 T侧候选—动作风险验证。
+- [action_conditioned_risk_closeout.py](action_conditioned_risk_closeout.py)：195独立评分/输出复核与上限分析。
