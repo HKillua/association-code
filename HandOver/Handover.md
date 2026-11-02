@@ -4,18 +4,18 @@
 
 ## 当前执行
 
-**152A/B原全量训练继续；195已独立发布READY，尚未提交。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
+**152A/B原全量训练继续；195已一次提交，正在执行。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
 
-|任务|固定额度|北京时间2026-11-02 01:25:27最后有界核验|原服务|
+|任务|固定额度|北京时间2026-11-02 10:20:35最后有界核验|原服务|
 |---|---|---|---|
-|152A PTFM|150epoch/427800更新|RUNNING/training，完成73epoch/208850更新，0全V场|`mtad-e358bc6e1a62.service`，active/running、Restart=no|
-|152B DeepAF|20epoch/80800更新|RUNNING/training，完成11epoch/45375更新，0全V场|`mtad-ea2cca7761dd.service`，active/running、Restart=no|
+|152A PTFM|150epoch/427800更新|RUNNING/training，完成90epoch/258325更新，0全V场|`mtad-e358bc6e1a62.service`，active/running、Restart=no|
+|152B DeepAF|20epoch/80800更新|RUNNING/training，完成13epoch/54650更新，0全V场|`mtad-ea2cca7761dd.service`，active/running、Restart=no|
 
 运行中的Result=success/ExecMainStatus=0不当终态成功；训练loss不能替代固定末轮物理评价。终态后按原合同取必要公共原件，核完整输入/命令/退出、人口、指标、尾部和成本，Record→Squeeze→Mode C。保持同一run与launcher，不重投或续旧148预算。
 
 ### 195新验证
 
-[195合同](L2S-20261102-195.md)：原T32/40臂、0新训练/0V，分开MC动作评分、候选重选和联合选择。CPU8–11×4一次，成功后CPU16–19×4一次独审；保持178/189和原152冻结。提交不等完成，终态后按完整Record→Squeeze→Mode C分析平均、覆盖和尾部。
+[195合同](L2S-20261102-195.md)、[启动回执](S2L-20261102-195-start.md)：原T32/40臂、0新训练/0V，分开MC动作评分、候选重选和联合选择。北京时间10:19:31一次提交，service `mtad-fb18ff58b995.service`，10:19:59已完成1/32场、run/launcher均RUNNING；CPU8–11×4，成功后CPU16–19×4一次独审；保持178/189和原152冻结。提交不等完成，终态后按完整Record→Squeeze→Mode C分析平均、覆盖和尾部。
 
 ## 本轮收尾与保全
 
