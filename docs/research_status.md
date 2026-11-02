@@ -15,6 +15,7 @@
 |关联与覆盖|HARD保折中候选、STRUCT保均值强控；两者覆盖和跨源指标各有代价。[173结构监督](reports/2026-10-31-structured-association-review.md)、[175匹配难例](reports/2026-10-31-decision-error-mining-review.md)、[176工作点](reports/2026-10-31-decoded-coverage-review.md)完整保留。176当前网格三规则都选回原阈值，无新增收益。|
 |历史候选恢复178，原V32|保留真实平均收益：HARD/STRUCT位置MAE355.760/328.916m，覆盖及关联保持各自原值。但相对对应旧base仍新增128/107个>1km增害，T尾部反证未解。[完整178记录](reports/2026-10-31-history-candidate-review.md)。|
 |简单平均运动MC，原V32|191相对178 MAE−2.676/−2.386m，RMSE/P99两头降；H描述区间跨0、去最大组件H略差。原PG公里害11/0仍在，救回保70/71及42/42。保条件候选，未自动替换178。[191记录](reports/2026-11-01-mean-velocity-validation-review.md)。|
+|动作条件风险195，仅T32|JM MAE391.235117/364.845327m，对178−.997387/−2.357123m，对MC−2.059982/−.132478m；MC新增公里害34/1→7/0、救回3/33全保，覆盖不变。描述CI跨0、H P95/P99略差178，原front总害仍107/71。CF得到多数收益，JM重选仅1混组2点；保条件候选，未替换178。[完整195](reports/2026-11-02-action-conditioned-risk-review.md)。|
 |阶段信息门控194，仅T32|真实39fit/4992GPU更新、44臂和规定独审完整完成。ORDER−MC MAE+.047849/+.330501m，ORDER−BAG两头区间跨0；原34/1公里害保28/1，原3/33救回仅保0/28。当前粗四块＋小网络配方不晋级，不否定整个时序方向。[194完整分析](reports/2026-11-01-temporal-gate-review.md)。|
 |解释与反例|192原生片段内部近均匀采样，当前密度解释缺前提；190全段拟合端点两种运动条件均恶化。不能把阶段门控失败、纯组大错或拟合状态当噪声/参考错误已证。[192](reports/2026-11-01-sampling-measure-review.md)、[190](reports/2026-11-01-fitted-endpoint-review.md)、[189](reports/2026-11-01-drift-memory-review.md)。|
 |全300场与同行比较|147/157为完整V300内部贡献基准，MAE590.760/582.808m，后者仍有稀有反转与尾部代价；178/191/194不能跨人口替换这些数字。152按原合同训练PTFM/DeepAF，比较对象仍147。TMTAFF常值/尺度失效尚未获得可信复现或唯一根因。[147](reports/2026-10-30-source-risk-full-benchmark-review.md)、[157](reports/2026-10-30-t128-full-scope-review.md)、[152合同](../HandOver/L2S-20261030-152.md)、[TMTAFF定位](reports/2026-10-31-tfm-gradient-review.md)。|
@@ -23,10 +24,10 @@
 
 ## 下一步
 
-1. 保留178与MC/PG条件收益。新代码条件F304/C69：风险按原OLS状态定义，换MC后通常仍固定原选中node；真实排序反转与风险可迁移未知。[195方案](proposals/action_conditioned_risk_20261102.md)分开固定node的动作选择、MC条件重新选node、联合node×动作，在原T32/0训练/0V验证，不接回194粗阶段门控。
+1. 195已完成并回流C69/F305/E208：保178、MC及CF/JM条件候选。优先另立固定规则V32验证，O/MC/CF/RM/JM和两前端全部保留，先核现有信号的转移，不从T后验设风险差/时间阈值，不先重训。H剩7害同一纯组单node，动作可靠性与node排序分开研究；JM−CF只2混组点，不据此扩大候选模块。[195证据与决策](reports/2026-11-02-action-conditioned-risk-review.md)。本轮无新READY。
 2. 输入、时序、关联、融合、输出五条路线继续按矩阵分析；关联仍以覆盖、跨源mPCA/mPFA和完整位置尾部一起判断。成熟方案先明确输入、训练量、终点和停止条件，再独立发布READY。
 3. 192密度解释、190拟合端点和194粗阶段门控的当前配方已结案，不以加步/seed/窗口/β小补丁续跑；既有反例及未采纳理由继续保留。
-4. 跟进152原全量训练，终态后核原命令/退出、全V300人口、完整指标/尾部/成本，再落实公平比较。195按独立具体合同执行；无新训练、自动V/全300或新seed。152仍固定比较原147，不把178/191跨人口代入。
+4. 跟进152原全量训练，终态后核原命令/退出、全V300人口、完整指标/尾部/成本，再落实公平比较。195科学/独审均已收尾；无自动V/全300、动作条件重训或新seed。152仍固定比较原147，不把178/191跨人口代入。
 
 ## 研究材料与推导入口
 
@@ -34,10 +35,10 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.08](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-208)，P14/F304/M123/E207/C69|
+|全局问题—现象—机制—证据|[Mode C2.09](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-209)，P14/F305/M123/E208/C69|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
-|选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，195来源条件至v4.9/174格|
-|观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，195来源条件至v1.22/90格|
+|选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，195实际回流至v4.10/177格|
+|观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，195实际回流至v1.23/93格|
 |逐篇正文/补充/代码阅读范围|[深入阅读审计](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/deepread_coverage_100_20261028.md)，充分109＝72领域/相近＋37跨域；不是作者复现|
 |来源原件与连接|[资料库入口](/Users/a1/Projects/biye-ronghe/docs/README.md)、[FlowState完整来源](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/flowstate_icml2026_full_source_analysis_20261101.md)|
 |Idea与否证/Record与Squeeze|[提案索引](proposals/README.md)、[报告索引](reports/README.md)；未执行、阴性和失败材料同样保留|

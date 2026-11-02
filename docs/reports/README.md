@@ -2,6 +2,10 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-02
+
+- [195：动作条件风险，平均收益与高害变化的完整验证](2026-11-02-action-conditioned-risk-review.md)
+
 ## 2026-11-01
 
 - [189：平均运动与OU记忆项的T侧匹配干预](2026-11-01-drift-memory-review.md)
