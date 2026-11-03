@@ -2,6 +2,11 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-02
+
+- [195：固定风险头下的候选—动作条件验证](action_conditioned_risk_20261102.md)
+- [196：原V32冻结规则验证plan1.1，独立科学与审计入口](action_conditioned_risk_validation_20261102.md)
+
 ## 2026-11-01
 
 - [189：T侧平均运动与速度记忆的匹配分离](drift_memory_ablation_20261101.md)
@@ -97,7 +102,3 @@
 - [TMTAFF 新单位数据准备核验（106事前计划）](tmtaff_unit_population_preparation_20261027.md)
 
 配套JSON/CSV等证据保留在报告正文引用的位置；结果原件另见[原件索引](../../HandOver/results/README.md)。
-
-## 2026-11-02
-
-- [195：固定风险头下的候选—动作条件验证](action_conditioned_risk_20261102.md)

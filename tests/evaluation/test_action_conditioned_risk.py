@@ -37,4 +37,24 @@ class ActionRiskTests(unittest.TestCase):
         nodes=np.array([0,0,1,2]);modes=np.array([0,1,0,1]);sources=np.array(['a','a','b']);w=a.tie_mass(nodes,modes,sources)
         np.testing.assert_allclose(w,[.125,.125,.25,.5]);np.testing.assert_allclose(a.tie_mass(nodes[::-1],modes[::-1],sources)[::-1],w)
 
+    def test_single_node_action_tie_mixes_states(self):
+        m,e,g,x,c=self.fixture();mc,_,_,_,_=a.candidates(m,e)
+        node=3;old=np.zeros(m['support'].shape);eligible=np.zeros((1,old.shape[1]),bool);eligible[0,0]=True
+        base=m['states'][[node]].copy()
+        out,w=a.readouts(m,[[node]],old,old,mc,eligible,base)
+        np.testing.assert_array_equal(w['CF'][node,0],[.5,.5])
+        expected=a.spherical_position(np.stack([m['states'][node,0,:2],mc[node,0,:2]]),np.array([.5,.5]))
+        np.testing.assert_allclose(out['CF'][0,0,:2],expected,rtol=0,atol=1e-12)
+        np.testing.assert_array_equal(out['CF'][~eligible],base[~eligible])
+
+    def test_cf_tied_original_pool_can_change_node_mass(self):
+        m,e,g,x,c=self.fixture();mc,_,_,_,_=a.candidates(m,e)
+        old=np.ones(m['support'].shape);old[[0,1]]=0;new=old.copy();new[1]=-1;new[2]=-2
+        eligible=np.zeros((2,old.shape[1]),bool);eligible[0,0]=True;base=m['states'][[0,3]].copy()
+        _,w=a.readouts(m,g,old,new,mc,eligible,base)
+        self.assertEqual(w['CF'][1,0,1],1.)
+        self.assertEqual(w['CF'][0,0].sum(),0.)
+        self.assertEqual(w['CF'][2,0].sum(),0.)
+        self.assertEqual(w['JM'][2,0,1],1.)
+
 if __name__=='__main__':unittest.main()
