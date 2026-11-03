@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-**196已READY待领取；152A/B按原全量合同继续，下面的152进度仍为最后记录；195科学与规定独审均完成。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
+**196科学已通过SSH MCP启动；152A/B按原全量合同继续，下面的152进度仍为最后记录；195科学与规定独审均完成。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
 
 |任务|固定额度|北京时间2026-11-02 16:21:49最后有界核验|原服务|
 |---|---|---|---|
@@ -13,9 +13,9 @@
 
 运行中的Result=success/ExecMainStatus=0不当终态成功；训练loss不能替代固定末轮物理评价。终态后按原合同取必要公共原件，核完整输入/命令/退出、人口、指标、尾部和成本，Record→Squeeze→Mode C。保持同一run与launcher，不重投或续旧148预算。
 
-### 196待领取：固定动作评分的原V32验证
+### 196执行中：固定动作评分的原V32验证
 
-[196独立合同与完整命令](L2S-20261103-196.md)、[Idea/plan1.1](../docs/proposals/action_conditioned_risk_validation_20261102.md)。2026-11-03 READY，尚未领取/启动；已完成9项本地软件检查及178/191输入路径和元数据有界核验。原V32/9组件/40臂，T128 full风险头，0新fit/teacher/0T复评/0test。主比较CF−MC，附加JM−CF；先一次science成功后一次规定audit，各CPU4/RSS8GiB/无GPU/1800s advisory，独立196 checkout/run/launcher、失败保全不自动重试。服务器按现场FIFO领取并保存启动回执；push不代表启动。不改195旧run、152活动现场/额度或147比较对象。
+[196独立合同与完整命令](L2S-20261103-196.md)、[Idea/plan1.1](../docs/proposals/action_conditioned_risk_validation_20261102.md)。2026-11-03按用户要求由本聊天经SSH MCP领取；[启动回执](S2L-20261103-196-start.md)。科学服务`mtad-aea314e70600.service`，北京时间13:01:34最后核验active/running、已完成1/32场、stderr空；尚无科学终态，规定独审待科学成功。9项本地软件检查和原输入绑定已核。原V32/9组件/40臂，T128 full风险头，0新fit/teacher/0T复评/0test。主比较CF−MC，附加JM−CF；先一次science成功后一次规定audit，各CPU4/RSS8GiB/无GPU/1800s advisory，独立196 checkout/run/launcher、失败保全不自动重试。已按现场资源使用CPU8–11；服务托管和启动回执已核，运行中状态不代表完成。不改195旧run、152活动现场/额度或147比较对象。
 
 ### 195已收尾
 
