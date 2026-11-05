@@ -1,5 +1,7 @@
 # 部署耗时：同机常驻模型的有界计时
 
+用户已澄清要求完整应用端到端与1Hz在线；该口径的后续实测见[完整链路报告](2026-11-05-pipeline-online-timing.md)。本页只保留早先单组后端计时，不能代替整场/在线部署结论。
+
 2026-11-05，用户询问部署后的大概耗时；按[事前范围](../../HandOver/L2S-20261105-timing.md)完成一次工程profiling。[原代码/全部样本/真实launcher](/Users/a1/Projects/biye-ronghe/docs/evidence/20261105_deployment_timing/originals/)、[清单](/Users/a1/Projects/biye-ronghe/docs/evidence/20261105_deployment_timing/manifest.json)。这次不产生新的精度结论或论文发现，不增加Mode C的文献/现象计数。
 
 ## 测量单位与实际结果

@@ -4,6 +4,8 @@
 
 ## 2026-11-05
 
+- [完整应用链路与1Hz在线回放：从传感器量测到输出](2026-11-05-pipeline-online-timing.md)
+
 - [部署耗时：PTFM、DeepAF与178/O后端的同机有界计时](2026-11-05-deployment-timing.md)
 
 ## 2026-11-03
