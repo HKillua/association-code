@@ -136,6 +136,7 @@ class ResidentRisk:
 def only_O(motion, groups, count, scores, base):
     output = base.copy()
     for gid, members in enumerate(groups):
+        members = np.asarray(members, np.int64)
         for j in np.flatnonzero(count[gid] <= 1):
             selected = members[scores[members, j] == scores[members, j].min()]
             mass = history.source_balanced(selected, motion['sources'])
@@ -205,7 +206,7 @@ class Pipeline:
             scores = corrected+THRESHOLD-self.parent['thresholds'][front]
         mark('context_and_residual_association')
         membership, _, _ = agglomerate(len(m['states']), pairs, scores, 'WS')
-        groups = [np.flatnonzero(membership == k) for k in np.unique(membership)]
+        groups = [np.flatnonzero(membership == k).tolist() for k in np.unique(membership)]
         mark('grouping')
         if ours:
             mean = ordinary_fusion(m['states'], m['nearest_seconds'], m['support'], groups)['predictions']['mean_supported'][[g[0] for g in groups]]
@@ -247,6 +248,18 @@ def run(args):
                  planned_scenes=list(SCENES), methods=list(METHODS), completed_calls=0,
                  online_update_interval_seconds=1., time_policy='advisory')
     rows = []
+    if args.completed_run is not None:
+        previous = read(args.completed_run/'run.json')
+        if previous.get('status') != 'FAILED' or previous.get('completed_calls') != 4:
+            raise ValueError('only the preserved four-call interface failure may supply completed rows')
+        rows = read(args.completed_run/'measurements.json')
+        expected = {('692', 'full_received_window', method, repeat)
+                    for method in ('WS_PTFM', 'WS_DEEPAF') for repeat in range(2)}
+        actual = {(r['scene_id'], r['case'], r['method'], r['repeat']) for r in rows}
+        if actual != expected or len(rows) != 4 or any(not r['software_binding_passed'] for r in rows):
+            raise ValueError('preserved completed measurements differ from the repair contract')
+        rows = [dict(row, completed_source_run=str(args.completed_run)) for row in rows]
+        state.update(reused_completed_calls=4, source_interface_failure=str(args.completed_run))
     def save(**kw):
         state.update(kw, elapsed_seconds=time.monotonic()-started,
                      peak_rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024)
@@ -277,6 +290,9 @@ def run(args):
                         writer.writeheader(); writer.writerows(x for x in raw if float(x['time']) <= cutoff)
                         received = text.getvalue().encode()
                     for method in METHODS:
+                        prior = [r for r in rows if (r['scene_id'], r['case'], r['method']) == (sid, case, method)]
+                        if len(prior) == 2:
+                            continue
                         save(phase='warmup_and_binding', scene_id=sid, case=case, method=method)
                         warm, m, membership, output = pipeline.call(received, sid, manifest['components'][sid], cutoff, method, verify=True)
                         if case == 'full_received_window':
@@ -306,5 +322,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--completed-run', type=Path,
+                        help='reuse the four verified measurements from the preserved interface failure')
     parser.add_argument('--time-policy', choices=('advisory',), required=True)
     run(parser.parse_args())

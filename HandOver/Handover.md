@@ -17,9 +17,9 @@
 
 [196独立合同](L2S-20261103-196.md)、[原启动](S2L-20261103-196-start.md)、[终态回执](S2L-20261103-196.md)。科学mtad-aea314e70600.service与规定独审mtad-5e4919de16da.service均COMPLETED/真实exit0/inactive/dead/Restart=no，11月3日北京13:19:01/13:25:57结束。原V32/9组件/40臂/T128 full头、0新fit/teacher/T复评/test；CPU科学8–11、审计16–19各4线程无GPU，一次attempt1无重试。68公共原件、全32场/完整指标/保持域/三套害救回与动作/组件独核已齐，Record→Squeeze→Mode C2.10完成。本196无待领/待审，不扩V300/训练/默认模型。
 
-### 完整链路与1Hz工程计时待执行
+### 完整链路与1Hz工程计时：原接口失败保全，修正后剩余项目待执行
 
-[独立固定范围](L2S-20261105-pipeline-timing.md)：已实现原始传感器measurement-only入口、全部关联/构组/159+178恢复与序列化；3场×全窗口/连续两次1秒prefix×四组合，72条计时，CPU4/无GPU/RSS4GiB/1800s advisory，一次新attempt。4项软件检查通过，真实端到端结果待执行，原单组后端数字不提供完整部署结论。
+[独立固定范围](L2S-20261105-pipeline-timing.md)：已实现原始传感器measurement-only入口、全部关联/构组/159+178恢复与序列化；3场×全窗口/连续两次1秒prefix×四组合，72条计时，CPU4/无GPU/RSS4GiB/1800s advisory，一次新attempt。原attempt1在分组列表/数组接口失败，4条已核计时保留，unit mtad-cf08277092dc.service真实exit1；[具体修正与剩余68条合同](L2S-20261105-pipeline-timing-repair.md)另立新目录，新增HARD/STRUCT整链多节点组集成探针通过。真实完整结果待执行，原单组后端数字不提供完整部署结论。
 
 ### 11月5日部署工程计时已完成
 
