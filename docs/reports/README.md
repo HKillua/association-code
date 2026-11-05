@@ -2,6 +2,14 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-05
+
+- [部署耗时：PTFM、DeepAF与178/O后端的同机有界计时](2026-11-05-deployment-timing.md)
+
+## 2026-11-03
+
+- [196：冻结动作评分在V32减少旧害，但损失多数MC救回](2026-11-03-action-conditioned-risk-validation-review.md)
+
 ## 2026-11-02
 
 - [195：动作条件风险，平均收益与高害变化的完整验证](2026-11-02-action-conditioned-risk-review.md)

@@ -1,21 +1,25 @@
 # 当前交接
 
-更新：2026-11-03。这里只维护执行、待核验和保全事项；研究目标/结论看[研究状态](../docs/research_status.md)。历次完整合同和回执从[交接记录索引](README.md)查找，整理前正文已[完整保留](../docs/history/2026-11-02-research-process.md#原交接正文)。
+更新：2026-11-05。这里只维护执行、待核验和保全事项；研究目标/结论看[研究状态](../docs/research_status.md)。历次完整合同和回执从[交接记录索引](README.md)查找，整理前正文已[完整保留](../docs/history/2026-11-02-research-process.md#原交接正文)。
 
 ## 当前执行
 
-**196科学已通过SSH MCP启动；152A/B按原全量合同继续，下面的152进度仍为最后记录；195科学与规定独审均完成。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
+**195/196科学与规定独审均已完成；152A/B科学已完成，完整结果与规定收尾待核。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
 
-|任务|固定额度|北京时间2026-11-02 16:21:49最后有界核验|原服务|
+|任务|固定额度|北京时间2026-11-05 14:12:15有界终态核验|原服务|
 |---|---|---|---|
-|152A PTFM|150epoch/427800更新|RUNNING/training，完成102epoch/291650更新，0全V场|`mtad-e358bc6e1a62.service`，active/running、Restart=no|
-|152B DeepAF|20epoch/80800更新|RUNNING/training，完成15epoch/60975更新，0全V场|`mtad-ea2cca7761dd.service`，active/running、Restart=no|
+|152A PTFM|150epoch/427800更新|COMPLETED/exit0，150epoch/427800更新、300/300V|`mtad-e358bc6e1a62.service`，inactive/dead、ExecMainStatus0、Restart=no|
+|152B DeepAF|20epoch/80800更新|COMPLETED/exit0，20epoch/80800更新、300/300V|`mtad-ea2cca7761dd.service`，inactive/dead、ExecMainStatus0、Restart=no|
 
-运行中的Result=success/ExecMainStatus=0不当终态成功；训练loss不能替代固定末轮物理评价。终态后按原合同取必要公共原件，核完整输入/命令/退出、人口、指标、尾部和成本，Record→Squeeze→Mode C。保持同一run与launcher，不重投或续旧148预算。
+152A北京时间11月4日03:59:15、152B 11月3日22:34:06真实结束，原launcher returncode0，科学运行内部368244.844486/348728.843220s；均已完成300场V。完整输出/指标尚未审阅，不预宣科学胜负。按原合同取必要公共原件，核完整输入/命令/退出、人口、指标、尾部和成本，完成规定收尾与Record→Squeeze→Mode C。保持同一run与launcher，不重投或续旧148预算。
 
-### 196执行中：固定动作评分的原V32验证
+### 196已收尾：固定动作评分的原V32验证
 
-[196独立合同与完整命令](L2S-20261103-196.md)、[Idea/plan1.1](../docs/proposals/action_conditioned_risk_validation_20261102.md)。2026-11-03按用户要求由本聊天经SSH MCP领取；[启动回执](S2L-20261103-196-start.md)。科学服务`mtad-aea314e70600.service`，北京时间13:01:34最后核验active/running、已完成1/32场、stderr空；尚无科学终态，规定独审待科学成功。9项本地软件检查和原输入绑定已核。原V32/9组件/40臂，T128 full风险头，0新fit/teacher/0T复评/0test。主比较CF−MC，附加JM−CF；先一次science成功后一次规定audit，各CPU4/RSS8GiB/无GPU/1800s advisory，独立196 checkout/run/launcher、失败保全不自动重试。已按现场资源使用CPU8–11；服务托管和启动回执已核，运行中状态不代表完成。不改195旧run、152活动现场/额度或147比较对象。
+[196独立合同](L2S-20261103-196.md)、[原启动](S2L-20261103-196-start.md)、[终态回执](S2L-20261103-196.md)。科学mtad-aea314e70600.service与规定独审mtad-5e4919de16da.service均COMPLETED/真实exit0/inactive/dead/Restart=no，11月3日北京13:19:01/13:25:57结束。原V32/9组件/40臂/T128 full头、0新fit/teacher/T复评/test；CPU科学8–11、审计16–19各4线程无GPU，一次attempt1无重试。68公共原件、全32场/完整指标/保持域/三套害救回与动作/组件独核已齐，Record→Squeeze→Mode C2.10完成。本196无待领/待审，不扩V300/训练/默认模型。
+
+### 11月5日部署工程计时已完成
+
+[事前有界范围](L2S-20261105-timing.md)、[结果与14公共原件](../docs/reports/2026-11-05-deployment-timing.md)。一次常驻模型计时，CPU16–19×4/GPU0兼容共卡、原权重只读、0fit/update/reference/test；service mtad-58b32b103f4a.service真实exit0/inactive/dead/Restart=no。固定两组Q64/2warmup＋5计时的CPU/GPU后端延迟及排除范围已记录，不提供新精度结论、完整关联前端或流式延迟认证，无后续自动测量。
 
 ### 195已收尾
 
@@ -31,4 +35,4 @@
 
 按[服务器规则](../docs/server_autonomy.md)一次任务、独立冻结目录、最多四单卡/FIFO；失败保全，不自动重试或替换配方，不触碰他人进程。墙时advisory、不加训练额度，不建SSH值守/守护或跨聊天消息。
 
-数据、权重、原身份/坐标、大预测及服务器runs原位保留；公共小型原件和完整回执按原合同回主仓/资料库。195及规定独审已完成；新增196只限原V32一次科学＋一次规定独审，无自动扩大全300或训练额度。Git主仓可同步，活动checkout不得pull。
+数据、权重、原身份/坐标、大预测及服务器runs原位保留；公共小型原件和完整回执按原合同回主仓/资料库。195/196及规定独审已完成，部署有界计时已完成；152科学完成待原合同完整收尾，无自动扩大全300或训练额度。Git主仓可同步，活动checkout不得pull。
