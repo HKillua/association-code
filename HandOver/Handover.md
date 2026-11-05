@@ -17,6 +17,10 @@
 
 [196独立合同](L2S-20261103-196.md)、[原启动](S2L-20261103-196-start.md)、[终态回执](S2L-20261103-196.md)。科学mtad-aea314e70600.service与规定独审mtad-5e4919de16da.service均COMPLETED/真实exit0/inactive/dead/Restart=no，11月3日北京13:19:01/13:25:57结束。原V32/9组件/40臂/T128 full头、0新fit/teacher/T复评/test；CPU科学8–11、审计16–19各4线程无GPU，一次attempt1无重试。68公共原件、全32场/完整指标/保持域/三套害救回与动作/组件独核已齐，Record→Squeeze→Mode C2.10完成。本196无待领/待审，不扩V300/训练/默认模型。
 
+### 完整链路与1Hz工程计时待执行
+
+[独立固定范围](L2S-20261105-pipeline-timing.md)：已实现原始传感器measurement-only入口、全部关联/构组/159+178恢复与序列化；3场×全窗口/连续两次1秒prefix×四组合，72条计时，CPU4/无GPU/RSS4GiB/1800s advisory，一次新attempt。4项软件检查通过，真实端到端结果待执行，原单组后端数字不提供完整部署结论。
+
 ### 11月5日部署工程计时已完成
 
 [事前有界范围](L2S-20261105-timing.md)、[结果与14公共原件](../docs/reports/2026-11-05-deployment-timing.md)。一次常驻模型计时，CPU16–19×4/GPU0兼容共卡、原权重只读、0fit/update/reference/test；service mtad-58b32b103f4a.service真实exit0/inactive/dead/Restart=no。固定两组Q64/2warmup＋5计时的CPU/GPU后端延迟及排除范围已记录，不提供新精度结论、完整关联前端或流式延迟认证，无后续自动测量。
