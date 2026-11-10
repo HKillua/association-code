@@ -4,6 +4,7 @@
 
 ## 2026-11-10
 
+- [离线完整系统与TMTAFF的对照核查](2026-11-10-offline-tmtaff-review.md)
 - [离线精度与在线实时：论文对照资格、同域配对与作者协议适配](2026-11-10-offline-online-route-review.md)
 
 ## 2026-11-05

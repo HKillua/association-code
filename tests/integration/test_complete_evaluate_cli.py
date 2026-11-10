@@ -6,8 +6,10 @@ import io
 import unittest
 from unittest.mock import patch
 
+import numpy as np
 import torch
 
+from association.data.physical_units import KNOT_TO_MPS, SPEED_UNIT_POLICY, unit_metadata
 from association.utils import runtime
 from association.training.tmtaff import STAGES, _configuration, _scenes, _states, load_complete_snapshot
 from association.models.fusion import FusionLoss, PairFusion, PairFusionConfig
@@ -71,6 +73,105 @@ class CompleteEvaluateCliTests(unittest.TestCase):
         run = runtime.read_json(self.root/output/'run.json')
         self.assertEqual(run['status'], status)
         return run
+
+    def use_unit_checkpoint(self):
+        dataset = self.fixture.load(data_config={**self.fixture.data, 'speed_unit_policy': SPEED_UNIT_POLICY})
+        normalizer = fit_normalizer(dataset['train'])
+        model = TimedAssociationModel(ModelConfig(**self.saved['model_config']),
+            self.saved['config']['branch'], max_observations=4, normalizer=normalizer)
+        fusion = PairFusion(PairFusionConfig(**self.saved['fusion_config']), normalizer)
+        objective = FusionLoss(position_loss_mode=self.saved['config']['position_loss_mode'])
+        self.saved['normalizer'] = normalizer
+        self.saved['data_contract'] = _scenes(dataset['train'], dataset['validation'], 4)
+        self.saved['selected']['states'] = _states((model, fusion, objective))
+        torch.save(self.saved, self.checkpoint)
+        return dataset
+
+    def test_physical_speed_checkpoint_restores_units_without_double_conversion(self):
+        from association.evaluation.tmtaff import evaluate_complete
+        dataset = self.use_unit_checkpoint()
+        captured = []
+
+        def checked_evaluation(model, fusion, normalizer, scenes, **kwargs):
+            for scene in scenes:
+                self.assertEqual(scene['physical_units'], unit_metadata(SPEED_UNIT_POLICY))
+                measured = scene['native_values'][..., 2][scene['native_observed']]
+                np.testing.assert_allclose(measured, 5 * KNOT_TO_MPS, rtol=0, atol=1e-12)
+                for target in scene['fusion_targets'].values():
+                    reference = target['states'][:, 2][target['valid'][:, 2]]
+                    np.testing.assert_array_equal(reference, np.full(reference.shape, 5.))
+            captured.append(True)
+            return evaluate_complete(model, fusion, normalizer, scenes, **kwargs)
+
+        with patch('association.evaluation.tmtaff.evaluate_complete', side_effect=checked_evaluation):
+            self.assertEqual(self.invoke(self.args('physical-units')), 0)
+        self.assertEqual(captured, [True])
+        run = self.assert_status('physical-units', 'COMPLETED')
+        self.assertEqual(run['data']['speed_unit_policy'], SPEED_UNIT_POLICY)
+        summary = runtime.read_json(self.root/'physical-units/summary.json')
+        self.assertEqual(summary['normalizer'], self.saved['normalizer'])
+        self.assertEqual(self.saved['data_contract'], _scenes(dataset['train'], dataset['validation'], 4))
+        oracle = summary['evaluation']['fusion']['oracle']
+        self.assertEqual(oracle['all']['speed']['unit'], 'mps')
+        self.assertEqual(oracle['paper_fusion_metrics']['attributes']['speed']['unit'], 'kn')
+        self.assertEqual(run['optimizer_updates'], 0)
+        self.assertFalse(run['normalizer_refit'])
+        self.assertFalse(run['test_opened'])
+
+    def test_invalid_saved_speed_contract_fails_before_archive(self):
+        legacy = copy.deepcopy(self.saved)
+        self.use_unit_checkpoint()
+        for case in ('unknown_policy', 'normalizer_units', 'missing_scene_units',
+                     'changed_scene_units', 'legacy_with_scene_units'):
+            with self.subTest(case=case):
+                saved = copy.deepcopy(legacy if case == 'legacy_with_scene_units' else self.saved)
+                if case == 'unknown_policy':
+                    saved['normalizer']['adapter_config']['speed_unit_policy'] = 'guess'
+                elif case == 'normalizer_units':
+                    saved['normalizer']['physical_units']['state_speed_unit'] = 'kn'
+                elif case == 'missing_scene_units':
+                    del saved['data_contract'][1][0]['physical_units']
+                elif case == 'changed_scene_units':
+                    saved['data_contract'][0][0]['physical_units']['measurement_to_state_factor'] = 1.
+                else:
+                    saved['data_contract'][1][0]['physical_units'] = unit_metadata(SPEED_UNIT_POLICY)
+                torch.save(saved, self.checkpoint)
+                with patch('association.data.dataset.load_timed_dataset',
+                           side_effect=AssertionError('No archive access')) as load:
+                    self.assertEqual(self.invoke(self.args(case)), 1)
+                    load.assert_not_called()
+                self.assert_status(case, 'FAILED')
+
+    def test_route_reports_fusion_group_edges_and_exports_same_membership(self):
+        from tools.offline.__main__ import main as offline_main
+
+        self.saved['config']['validation_batches']['pairs'] = 6
+        torch.save(self.saved, self.checkpoint)
+
+        def score_star(model, embeddings, pairs):
+            pairs = torch.as_tensor(pairs, device=embeddings.device)
+            return ((pairs[:, 0] == 0) & (pairs[:, 1] < 3)).to(embeddings.dtype)
+
+        errors = io.StringIO()
+        with patch.object(TimedAssociationModel, 'score_pairs', score_star):
+            with redirect_stdout(io.StringIO()), redirect_stderr(errors):
+                status = offline_main(['tmtaff-evaluate', *self.args(), '--save-predictions'])
+        self.assertEqual(status, 0, errors.getvalue())
+        self.assert_status('evaluation', 'COMPLETED')
+        evaluation = runtime.read_json(self.root/'evaluation/summary.json')['evaluation']
+        raw, decoded = evaluation['association'], evaluation['decoded_association']
+        self.assertEqual(raw['tp'] + raw['fp'], 2)
+        self.assertEqual(decoded['tp'] + decoded['fp'], 3)
+        for scope in ('itsa', 'mstsa'):
+            self.assertEqual(raw[scope]['pair_count'], decoded[scope]['pair_count'])
+            self.assertIn('mw_pfa', decoded[scope]['paper_metrics'])
+        predictions = self.root/'evaluation/predictions'
+        metadata = runtime.read_json(predictions/'000000.json')
+        self.assertEqual(metadata['scene_id'], '2')
+        prefix = metadata['methods']['predicted']['prefix']
+        with np.load(predictions/'000000.npz', allow_pickle=False) as arrays:
+            np.testing.assert_array_equal(arrays[prefix+'node_group_indices'], [0, 0, 0, 1])
+            self.assertIn(prefix+'aligned_prediction_valid', arrays.files)
 
     def test_multipart_zip_selected_snapshot_without_training_reselection_or_test_reads(self):
         original_source = {p.name: p.read_bytes() for p in self.source.iterdir()}

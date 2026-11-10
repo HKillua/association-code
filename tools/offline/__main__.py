@@ -1,4 +1,4 @@
-"""Run the supported full-window evaluation and peer-training workflows."""
+"""Run the supported offline evaluation and training workflows."""
 from __future__ import annotations
 
 import argparse
@@ -8,6 +8,7 @@ import sys
 
 COMMANDS = {
     'system-evaluate': 'tools.offline.system_evaluate',
+    'tmtaff-evaluate': 'tools.experiments.tmtaff_complete_evaluate',
     'peer-train': 'tools.offline.peer_fit',
 }
 
@@ -20,6 +21,7 @@ def main(argv=None):
                'These are project protocols, not verified author reproductions.')
     parser.add_argument('command', choices=COMMANDS,
                         help='system-evaluate: frozen Level1 V evaluation; '
+                             'tmtaff-evaluate: full-chain TMTAFF snapshot evaluation; '
                              'peer-train: fixed-budget PTFM/DeepAF training and V evaluation')
     # Parse only the command so subcommand flags, including --help, retain
     # their existing meaning and validation in the implementation's parser.

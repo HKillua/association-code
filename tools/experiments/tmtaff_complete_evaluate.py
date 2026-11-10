@@ -22,6 +22,7 @@ def _source_settings(saved, manifest, alignment):
     """Compare saved semantics directly, without a source/hash/version gate."""
     from association.training.tmtaff import STAGES, _configuration
     from association.data.archive import validate_manifest
+    from association.data.physical_units import normalizer_speed_policy, unit_metadata
 
     if saved.get('format_version') != 1 or saved.get('input_adapter') != 'native_time_v1':
         raise ValueError('an explicit native_time_v1 complete checkpoint is required')
@@ -52,6 +53,10 @@ def _source_settings(saved, manifest, alignment):
         raise ValueError('saved normalizer must declare development training splits')
     adapter = normalizer.get('adapter_config', {})
     data = {key: adapter[key] for key in ('length', 'max_observations', 'time_unit_seconds')}
+    speed_policy = normalizer_speed_policy(normalizer)
+    physical_units = unit_metadata(speed_policy)
+    if speed_policy is not None:
+        data['speed_unit_policy'] = speed_policy
     if (normalizer.get('input_adapter') != 'native_time_v1'
             or data['max_observations'] != saved.get('max_observations')
             or data['length'] != saved['model_config']['length']
@@ -74,6 +79,8 @@ def _source_settings(saved, manifest, alignment):
             raise ValueError('manifest scene population/order differs from the checkpoint')
         for row in rows:
             sid = row['scene_id']
+            if row.get('physical_units') != physical_units:
+                raise ValueError(f'saved scene physical units disagree with the normalizer: scene {sid}')
             if (row['split'] not in splits or sid not in manifest['splits'][row['split']]
                     or row['component_id'] != manifest['components'][sid]
                     or row.get('input_adapter') != 'native_time_v1'
@@ -88,8 +95,28 @@ def _source_settings(saved, manifest, alignment):
     return config, data, train_splits
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
+def _decoded_association(evaluation, check):
+    """Score the group membership that actually drove fusion on the raw pair universe."""
+    import numpy as np
+    from association.evaluation.association import evaluate_scenes
+    from association.evaluation.grouping import _partition
+
+    decoded = []
+    for record, scene in zip(evaluation['records'], evaluation['per_scene'], strict=True):
+        check()
+        if str(record['scene_id']) != scene['scene_id']:
+            raise ValueError('association records and fusion groups use different scene order')
+        groups = [group['node_indices'] for group in scene['methods']['predicted']['all_predicted_groups']]
+        membership = np.empty(len(record['node_ids']), dtype=np.int64)
+        for index, members in enumerate(_partition(groups, len(membership))):
+            membership[members] = index
+        pairs = record['pairs']
+        decoded.append(dict(record, scores=membership[pairs[:, 0]] == membership[pairs[:, 1]]))
+    return evaluate_scenes(decoded, .5)
+
+
+def main(argv=None, *, prog=None):
+    parser = argparse.ArgumentParser(prog=prog, description=__doc__)
     parser.add_argument('--archive', type=Path, nargs='+', required=True,
                         help='one ZIP or all continuous ZIP parts in byte order')
     for name in ('checkpoint', 'manifest', 'alignment', 'output', 'device'):
@@ -97,6 +124,8 @@ def main(argv=None):
     parser.add_argument('--max-seconds', type=float, required=True,
                         help='new total budget including loading, preparation, evaluation and result I/O')
     parser.add_argument('--cpu-threads', type=int, default=4)
+    parser.add_argument('--save-predictions', action='store_true',
+                        help='save aligned states, target masks and group membership for paired evaluation')
     args = parser.parse_args(argv)
     started = time.monotonic()
     output, owns_output = Path(args.output), False
@@ -108,6 +137,7 @@ def main(argv=None):
                alignment=str(Path(args.alignment).resolve()), stage='loading',
                optimizer_updates=0, normalizer_refit=False, margin_recalibrated=False,
                threshold_reselected=False, test_opened=False,
+               save_predictions=args.save_predictions,
                budget_scope='this invocation, imports/checkpoint loading/preparation/evaluation/result I/O',
                resume_from=None)
 
@@ -136,6 +166,7 @@ def main(argv=None):
         from association.utils import runtime
         from association.training.tmtaff import _scenes, load_complete_snapshot
         from association.evaluation.tmtaff import evaluate_complete
+        from association.evaluation.artifacts import ScenePredictionWriter
         from association.data.dataset import load_timed_dataset
         check()
         torch.set_num_threads(args.cpu_threads)
@@ -186,16 +217,19 @@ def main(argv=None):
             runtime.write_json(output / 'evaluation-progress.json', item)
             check()
 
+        writer = ScenePredictionWriter(output / 'predictions') if args.save_predictions else None
         evaluation = evaluate_complete(loaded['model'], loaded['fusion'], loaded['normalizer'],
             validation, device=device, batch_tracks=config['validation_batches']['tracks'],
             pair_batch_size=config['validation_batches']['pairs'], select_on_validation=False,
             threshold=loaded['selection']['threshold'], singleton_policy=config['singleton_policy'],
-            check=check, progress=progress)
+            check=check, progress=progress, prediction_writer=writer)
         if device.type == 'cuda':
             torch.cuda.synchronize(device)
         check()
         if evaluation['selection'] is not None or evaluation['threshold'] != loaded['selection']['threshold']:
             raise ValueError('evaluation changed the saved selection/threshold')
+        evaluation['decoded_association'] = _decoded_association(evaluation, check)
+        check()
         run['stage'] = 'result_io'
         runtime.write_json(output / 'summary.json', dict(
             mode=run['mode'], selection=loaded['selection'], normalizer=loaded['normalizer'],

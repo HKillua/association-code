@@ -5,6 +5,7 @@
 ```bash
 python -m tools.offline --help
 python -m tools.offline system-evaluate --help
+python -m tools.offline tmtaff-evaluate --help
 python -m tools.offline peer-train --help
 ```
 
@@ -33,6 +34,12 @@ python -m tools.offline system-evaluate \
 | `--output` | 新目录，保留 `run.json`、`summary.json`、逐场预测和系统对齐数组 |
 
 该命令不训练、不打开封存测试集。它评价项目的全窗口协议，不等于 TMTAFF 作者完整协议复现，也不直接运行147/178等历史专用候选。主要实现为 [system_evaluate.py](system_evaluate.py)。
+
+## TMTAFF 完整快照评价
+
+`tmtaff-evaluate` 读取已完成四阶段训练的完整选定快照、原MTAD压缩包、场景清单和对齐配置。它使用快照自身的关联分数、原阈值及融合模型，在V_select分开报告阈值判边与实际融合分组的ITSA/MSTSA，并汇总四属性融合结果。独立TFM端点应使用原固定分组评价入口。原脚本命令仍可用。[完整快照评价实现](../experiments/tmtaff_complete_evaluate.py)
+
+主要参数是 `--checkpoint`、`--archive`、`--manifest`、`--alignment`、`--output`、`--device` 和 `--max-seconds`。选定快照的原场景、单位和端点绑定需通过检查。`--save-predictions` 可在新结果目录导出实际预测、目标掩码和组成员，用于后续共同有效点比较。已有论文口径、现状和胜出条件见[离线TMTAFF对照核查](../../docs/reports/2026-11-10-offline-tmtaff-review.md)。
 
 ## PTFM / DeepAF 固定预算训练与评价
 
