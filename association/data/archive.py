@@ -46,6 +46,27 @@ class DataError(ValueError):
     """An input cannot be interpreted without an implicit data decision."""
 
 
+def _measurement_values(row):
+    """Return raw numeric values and the canonical measurement issues."""
+    try:
+        values = tuple(float(row[k]) for k in ("time", "lat", "lon", "vel", "cou"))
+    except ValueError:
+        return None, {"nonnumeric_measurement"}
+    if not all(math.isfinite(x) for x in values):
+        return None, {"nonfinite_measurement"}
+    _, lat, lon, vel, cou = values
+    reasons = set()
+    if vel < 0:
+        reasons.add("negative_velocity")
+    if cou == -1:
+        reasons.add("missing_course")
+    elif not 0 <= cou <= 360:
+        reasons.add("course_out_of_range")
+    if not -90 <= lat <= 90 or not -180 <= lon <= 180:
+        reasons.add("coordinate_out_of_range")
+    return values, reasons
+
+
 @dataclass
 class Track:
     node_id: str
@@ -368,25 +389,13 @@ class MTADArchive:
                 node_reasons.add("missing_measurements")
             numeric = []
             for row in raw:
-                try:
-                    values = tuple(float(row[k]) for k in ("time", "lat", "lon", "vel", "cou"))
-                except ValueError:
-                    node_reasons.add("nonnumeric_measurement")
+                values, issues = _measurement_values(row)
+                node_reasons.update(issues)
+                if values is None:
                     continue
-                if not all(math.isfinite(x) for x in values):
-                    node_reasons.add("nonfinite_measurement")
-                    continue
-                time, lat, lon, vel, cou = values
-                if vel < 0:
-                    node_reasons.add("negative_velocity")
-                if cou == -1:
-                    node_reasons.add("missing_course")
-                elif not 0 <= cou <= 360:
-                    node_reasons.add("course_out_of_range")
-                if not -90 <= lat <= 90 or not -180 <= lon <= 180:
-                    node_reasons.add("coordinate_out_of_range")
                 # Keep raw representation for exact-duplicate/conflict checks.
                 numeric.append(values)
+                time = values[0]
                 if entries and not any(e["t_s"] <= time <= e["t_e"] for e in entries):
                     outside_label_intervals += 1
             unique = sorted(set(numeric))
