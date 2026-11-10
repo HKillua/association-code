@@ -1,8 +1,10 @@
 # 当前交接
 
-更新：2026-11-05。这里只维护执行、待核验和保全事项；研究目标/结论看[研究状态](../docs/research_status.md)。历次完整合同和回执从[交接记录索引](README.md)查找，整理前正文已[完整保留](../docs/history/2026-11-02-research-process.md#原交接正文)。
+更新：2026-11-10。这里只维护执行、待核验和保全事项；研究目标/结论看[研究状态](../docs/research_status.md)。历次完整合同和回执从[交接记录索引](README.md)查找，整理前正文已[完整保留](../docs/history/2026-11-02-research-process.md#原交接正文)。
 
 ## 当前执行
+
+用户当前要求先核清离线精度/在线实时两路线的对照与差距，再定主线；本轮仅来源与既有聚合审查，无新增训练、加速优化或在线实验READY。科研优先次序只看研究状态。
 
 **195/196科学与规定独审均已完成；152A/B科学已完成，完整结果与规定收尾待核。** [原合同](L2S-20261030-152.md)、[不可变启动回执](S2L-20261030-152-start.md)。全T2100/46126组，fresh seed20各一次，冻结bda61e5，比较对象仍原147。GPU2/3按合同UUID；不得加157/178、改预算或活动checkout。
 
@@ -11,7 +13,7 @@
 |152A PTFM|150epoch/427800更新|COMPLETED/exit0，150epoch/427800更新、300/300V|`mtad-e358bc6e1a62.service`，inactive/dead、ExecMainStatus0、Restart=no|
 |152B DeepAF|20epoch/80800更新|COMPLETED/exit0，20epoch/80800更新、300/300V|`mtad-ea2cca7761dd.service`，inactive/dead、ExecMainStatus0、Restart=no|
 
-152A北京时间11月4日03:59:15、152B 11月3日22:34:06真实结束，原launcher returncode0，科学运行内部368244.844486/348728.843220s；均已完成300场V。完整输出/指标尚未审阅，不预宣科学胜负。按原合同取必要公共原件，核完整输入/命令/退出、人口、指标、尾部和成本，完成规定收尾与Record→Squeeze→Mode C。保持同一run与launcher，不重投或续旧148预算。
+152A北京时间11月4日03:59:15、152B 11月3日22:34:06真实结束，原launcher returncode0，科学运行内部368244.844486/348728.843220s；均已完成300场V。11月10日通过SSH MCP完成现有公开run/summary的有界聚合初核，见[路线审查与来源字段](../docs/reports/2026-11-10-offline-online-route-review.md)；未读取私有数组、重做推理或启动独审。完整输出/规定审查仍未完成，不预宣科学胜负。按原合同取必要公共原件，核完整输入/命令/退出、人口、指标、尾部和成本，完成规定收尾与Record→Squeeze→Mode C。保持同一run与launcher，不重投或续旧148预算。
 
 ### 196已收尾：固定动作评分的原V32验证
 
