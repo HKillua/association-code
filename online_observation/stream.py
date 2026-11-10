@@ -4,26 +4,48 @@ from __future__ import annotations
 from collections import Counter
 import math
 
-import numpy as np
-
-from association.data.archive import DataError, _measurement_values
-from association.data.physical_units import KNOT_TO_MPS
-from association.evaluation.native_compatibility import RADIUS, advance
+KNOT_TO_MPS = 1852.0 / 3600.0
+EARTH_RADIUS_M = 6_371_000.0
 
 
 def _advance_position(latitude, longitude, speed, course, age):
-    if abs(latitude) == 90.0:
-        # The usual longitude formula is singular at the starting pole.
-        angular = (age / RADIUS) * speed
-        sine = math.sin(angular)
-        latitude_out = (latitude / 90.0) * math.degrees(math.atan2(math.cos(angular), abs(sine)))
-        longitude_offset = 180.0 - course if latitude > 0.0 else course
-        if sine < 0.0:
-            longitude_offset += 180.0
-        return latitude_out, (longitude + longitude_offset + 180.0) % 360.0 - 180.0
-    bearing = math.radians(course)
-    velocity = (speed * math.cos(bearing), speed * math.sin(bearing))
-    return tuple(map(float, advance((latitude, longitude), velocity, age)))
+    """Propagate the last report on a sphere using its tangent bearing."""
+    angular = (age / EARTH_RADIUS_M) * speed
+    if not math.isfinite(angular):
+        raise FloatingPointError("nonfinite travel angle")
+    if angular == 0.0:
+        return latitude, longitude
+    lat, bearing = math.radians(latitude), math.radians(course)
+    sin_lat = math.sin(lat)
+    cos_lat = 0.0 if abs(latitude) == 90.0 else math.cos(lat)
+    radial = math.cos(angular)
+    north = math.sin(angular) * math.cos(bearing)
+    east = math.sin(angular) * math.sin(bearing)
+    # Cartesian coordinates relative to the starting longitude.
+    x = radial * cos_lat - north * sin_lat
+    z = radial * sin_lat + north * cos_lat
+    latitude_out = math.degrees(math.atan2(z, math.hypot(x, east)))
+    longitude_out = longitude + math.degrees(math.atan2(east, x))
+    return latitude_out, (longitude_out + 180.0) % 360.0 - 180.0
+
+
+def _measurement_values(row, stamp):
+    try:
+        lat, lon, speed, course = (float(row[field]) for field in ("lat", "lon", "vel", "cou"))
+    except (TypeError, ValueError):
+        return None, {"nonnumeric_measurement"}
+    if not all(math.isfinite(value) for value in (lat, lon, speed, course)):
+        return None, {"nonfinite_measurement"}
+    issues = set()
+    if not (-90.0 <= lat <= 90.0 and -180.0 <= lon <= 180.0):
+        issues.add("coordinate_out_of_range")
+    if speed < 0.0:
+        issues.add("negative_velocity")
+    if course == -1.0:
+        issues.add("missing_course")
+    elif not 0.0 <= course <= 360.0:
+        issues.add("course_out_of_range")
+    return (stamp, lat, lon, speed, course), issues
 
 
 class StreamState:
@@ -59,14 +81,14 @@ class StreamState:
         for row in rows:
             key = (row["source"], row["batch"])
             if not all(key):
-                raise DataError("measurement lacks source/batch")
+                raise ValueError("measurement lacks source/batch")
             try:
                 stamp = float(row["time"])
-            except ValueError as exc:
-                raise DataError("measurement time must be numeric") from exc
+            except (TypeError, ValueError) as exc:
+                raise ValueError("measurement time must be numeric") from exc
             if not math.isfinite(stamp) or stamp > arrival_time:
-                raise DataError("measurement time must be finite and at or before arrival")
-            values, issues = _measurement_values(row)
+                raise ValueError("measurement time must be finite and at or before arrival")
+            values, issues = _measurement_values(row, stamp)
             observations.append((key, stamp, values, issues))
 
         self._last_arrival = arrival_time
@@ -109,8 +131,6 @@ class StreamState:
             course %= 360.0
             if age > 0 and speed > 0:
                 latitude, longitude = _advance_position(latitude, longitude, speed, course, age)
-                if not np.isfinite([latitude, longitude]).all():
-                    raise FloatingPointError("nonfinite propagated position")
             tracks.append(dict(
                 source=key[0], batch=key[1], latitude=latitude, longitude=longitude,
                 speed_mps=speed, course_degrees=course,

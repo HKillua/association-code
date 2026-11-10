@@ -1,1 +1,1 @@
-"""Source-checkout orchestration for the online research route."""
+"""Historical timing and compatibility commands for online observation."""

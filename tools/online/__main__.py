@@ -1,4 +1,4 @@
-"""Dispatch online-route tools from a source checkout."""
+"""Dispatch the historical timing and compatible replay commands."""
 from __future__ import annotations
 
 import argparse

@@ -4,7 +4,8 @@
 
 |用途|入口|
 |---|---|
-|在线观测的工程回放与整链计时|[online](online/README.md)|
+|在线观测与工程回放|[online_observation](../online_observation/README.md)|
+|原整链计时合同和旧命令|[online](online/README.md)|
 |离线全场系统评价与同行融合训练/评价|[offline](offline/README.md)|
 |单组后端计时与历史计时入口|[工程计时入口](analysis/README.md#工程计时)|
 |其他训练、数据准备、一次性服务托管及兼容入口|[experiments](experiments/README.md)|

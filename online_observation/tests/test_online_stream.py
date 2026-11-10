@@ -1,6 +1,6 @@
 import unittest
 
-from association.online.stream import StreamState
+from online_observation.stream import StreamState
 
 
 def row(time, *, source="9001", batch="0", lat="0", lon="0", vel="10", cou="90"):

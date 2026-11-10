@@ -3,14 +3,17 @@ from contextlib import redirect_stderr
 import io
 import json
 from pathlib import Path
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
 import zipfile
 
-from association.online.stream import StreamState
-from tools.online import causal_replay
-from tools.online.__main__ import main
+from online_observation import causal_replay, measurements
+from online_observation.__main__ import main
+from online_observation.stream import StreamState
 
 
 HEADER = 'batch,source,time,lat,lon,vel,cou\n'
@@ -74,7 +77,17 @@ class CausalReplayCliTests(unittest.TestCase):
                 for scene in manifest['all_scenes']:
                     archive.writestr(f'Level1/关联表/关联结果-{scene}.csv', 'unreadable label')
                     archive.writestr(f'Level1/真实场景/场景-{scene}.csv', 'unreadable reference')
-                    archive.writestr(f'Level1/量测场景/场景-{scene}.csv', HEADER + 'x,A,0,0,0,1,90\n')
+                    archive.writestr(f'Level1/量测场景/场景-{scene}.csv',
+                                     (HEADER + '片段,A,0,0,0,1,90\n').encode('gb18030'))
+            measurement_name = 'Level1/量测场景/场景-0.csv'
+            with zipfile.ZipFile(archive_path) as archive:
+                measurement_offset = archive.getinfo(measurement_name).header_offset
+            payload = archive_path.read_bytes()
+            header_end = payload.index(HEADER.encode('ascii'), measurement_offset) + len(HEADER)
+            cuts = (0, measurement_offset + 11, header_end + 1, len(payload))
+            parts = [root / f'part{i}.zip' for i in range(3)]
+            for part, start, stop in zip(parts, cuts, cuts[1:]):
+                part.write_bytes(payload[start:stop])
             opened = []
             read = zipfile.ZipFile.read
 
@@ -82,17 +95,54 @@ class CausalReplayCliTests(unittest.TestCase):
                 opened.append(member.filename)
                 return read(archive, member, *args, **kwargs)
 
-            with patch.object(causal_replay, '_LEVEL1_MANIFEST', roster), \
+            with patch.object(measurements, '_LEVEL1_MANIFEST', roster), \
                     patch.object(zipfile.ZipFile, 'read', record_read):
-                rows = causal_replay._read_archive_rows([archive_path], roster, '0')
-                self.assertEqual(rows[0]['batch'], 'x')
-                self.assertEqual(opened, ['Level1/量测场景/场景-0.csv'])
+                rows = measurements.read_archive_rows([archive_path], roster, '0')
+                self.assertEqual(rows[0]['batch'], '片段')
+                self.assertEqual(measurements.read_archive_rows(parts, roster, '0'), rows)
+                self.assertEqual(opened, [measurement_name, measurement_name])
+                with self.assertRaises((ValueError, zipfile.BadZipFile)):
+                    measurements.read_archive_rows(parts[-1:], roster, '0')
                 forged = root / 'alternate.json'
-                forged.write_text(json.dumps({**manifest, 'splits': {**splits, 'T_core': ['1']}}),
-                                  encoding='utf-8')
-                with patch.object(causal_replay, 'MTADArchive', side_effect=AssertionError('Opened archive')):
-                    with self.assertRaisesRegex(ValueError, 'frozen Level1 roster'):
-                        causal_replay._read_archive_rows([archive_path], forged, '1')
+                alternate = {**manifest, 'splits': {**splits, 'T_core': ['1'], 'T_test': ['0']},
+                             'component_splits': {'a': 'T_test', 'b': 'T_core'},
+                             'development_scenes': ['1']}
+                forged.write_text(json.dumps(alternate), encoding='utf-8')
+                with self.assertRaises(ValueError):
+                    measurements.read_archive_rows([archive_path], forged, '1')
+                self.assertEqual(opened, [measurement_name, measurement_name])
+
+    def test_public_entry_runs_without_offline_tree_or_site_packages(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            package = Path(causal_replay.__file__).parent
+            shutil.copytree(package, root / package.name,
+                            ignore=shutil.ignore_patterns('tests', '__pycache__'))
+            source = root / 'input.zip'
+            output = root / 'output.jsonl'
+            with zipfile.ZipFile(source, 'w') as archive:
+                archive.writestr('Level1/量测场景/场景-0.csv', HEADER + 'x,A,0,0,0,1,90\n')
+            roster = root / 'configs/data/mtad-level1-scene3000.json'
+            roster.parent.mkdir(parents=True)
+            roster.write_text(json.dumps(dict(
+                dataset_level='Level1', all_scenes=['0'],
+                splits=dict(T_core=['0'], T_head=[], V_select=[], T_test=[]),
+            )), encoding='utf-8')
+            isolated_entry = (
+                'import runpy, sys\n'
+                'sys.path.insert(0, sys.argv.pop(1))\n'
+                'runpy.run_module("online_observation", run_name="__main__", alter_sys=True)\n'
+            )
+            completed = subprocess.run(
+                [sys.executable, '-I', '-S', '-c', isolated_entry, str(root),
+                 'causal-replay', '--archive', str(source), '--manifest', str(roster), '--scene', '0',
+                 '--start', '0', '--stop', '1', '--stale-after-seconds', '2', '--output', str(output)],
+                cwd=root, capture_output=True, text=True, timeout=15,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            _, *ticks = map(json.loads, output.read_text(encoding='utf-8').splitlines())
+            self.assertEqual([row['result']['query_time'] for row in ticks], [0, 1])
+            self.assertGreater(ticks[1]['result']['tracks'][0]['longitude'], 0)
 
     def test_virtual_serial_queue_accumulates_and_drains_without_changing_ticks(self):
         # Two 1.5s services accumulate a queue. Subsequent 0.2s services drain it.
