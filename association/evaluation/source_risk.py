@@ -12,6 +12,8 @@ from association.evaluation.grouping import _partition
 from association.evaluation.query_contribution import recover_group_states
 
 
+MOTION_KEYS = ('states', 'support', 'nearest_seconds', 'sources', 'native_count',
+               'span_seconds', 'fit_rmse_m', 'ols_velocity_mps')
 FEATURE_NAMES = (
     'log_nearest_minutes', 'log_fit_rmse_km', 'log_native_count',
     'log_span_minutes', 'log_supported_count', 'supported_member_fraction',

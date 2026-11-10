@@ -6,7 +6,8 @@
 |---|---|
 | 已有预测的论文指标 | `../analysis/coordinate_metrics.py`，具体参数只看L2S |
 | 数据准备 | `make_scene_manifest.py`、`prepare_scene_data.py`；已有冻结名单不重复生成 |
-| 学习关联／融合／系统 | `evidence_association_fit.py`、`evidence_fusion_fit.py`、`level1_system_evaluate.py` |
+| 学习关联／融合 | `evidence_association_fit.py`、`evidence_fusion_fit.py` |
+| 全场系统评价与152同行训练/评价 | [离线观测入口](../offline/README.md) |
 | 位置恢复与既有端点加载 | `sequence_position_fit.py`、`frozen_position_adapter_fit.py`、`sequence_budget_replication.py` |
 | TMTAFF阶段与评价 | `tmtaff_complete_fit.py`、`tmtaff_complete_evaluate.py`、`tmtaff_downstream_fit.py`、`completion_value_fit.py`、`tmtaff_fixed056_evaluate.py` |
 | 文献适配 | `deepaf_peer_fit.py`、`ptfm_fit.py`、`tsactfer_level1_fit.py`、`tsactfer_full_view_fit.py`；实现存在不表示可信复现已成立 |

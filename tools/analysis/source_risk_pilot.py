@@ -22,6 +22,7 @@ import numpy as np
 from association.evaluation import source_risk as risk
 from association.evaluation.fusion_controls import ordinary_fusion
 from association.evaluation.group_prediction import emit_group_outputs
+from association.evaluation.source_risk import MOTION_KEYS
 from tools.analysis import query_contribution_control as qc
 
 old = qc.old
@@ -33,8 +34,6 @@ POLICIES = {'WS_SOURCE_EQUAL': (None, 'equal'), 'WS_SHARED_Q_SOFT': ('QUADRATIC'
             'WS_SHARED_SHUFFLED_SOFT': ('SHUFFLED', 'soft')}
 METHODS = IMPORTED + tuple(POLICIES)
 PRIMARY = 'WS_SHARED_Q_SOFT_vs_WS_SOURCE_EQUAL'
-MOTION_KEYS = ('states', 'support', 'nearest_seconds', 'sources', 'native_count',
-               'span_seconds', 'fit_rmse_m', 'ols_velocity_mps')
 RAM, ADDRESS_SPACE = 6*1024**3, 12*1024**3
 
 

@@ -5,6 +5,7 @@
 - 唯一代码仓 `/Users/a1/Projects/association-code`，origin `HKillua/association-code`，main；不使用退役v2。
 - 开工读[研究状态](docs/research_status.md)和[交接](HandOver/Handover.md)，检查工作区后fetch，保护用户/其他AI修改。README只导航；历史报告、文献笔记和配置不提供当前执行许可。
 - **目标/结论/下一步只在研究状态维护，领取名单只在HandOver维护。** 不再在README、记忆、台账复制实时快照。旧材料按问题定向读取，不把全部历史灌入当前上下文。
+- 在线观测和离线观测的运行编排分别在 [tools/online](tools/online/README.md) 与 [tools/offline](tools/offline/README.md)。跨路线的数据、模型和指标实现放在 `association`，按调用职责维护一份。迁移入口时保留已有合同使用的命令、导入路径和输出格式。
 - 不要把整理字段和包名当研究进展；读清来源机制、条件、消融与反例后才建矩阵。
 
 ## 科研方法

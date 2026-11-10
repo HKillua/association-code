@@ -82,3 +82,25 @@ def deepaf_visible_inputs(motion, members, *, device='cpu'):
         query_seconds=torch.as_tensor(motion['query_seconds'], dtype=torch.float64, device=device),
         initial_velocity_mps=velocity, origin_latlon=origin,
         base_positions_m=deep.positions_to_local(base[:, :2], origin[None]), helper_support_count=count)
+
+
+@torch.no_grad()
+def predict_group(model, motion, members, method, device):
+    """Apply an existing peer model to the supplied prepared observation window.
+
+    Return predictions, core-valid mask and the public Mean control. Input
+    preparation determines the available time window; this function does not
+    establish causal input or a persistent online state by itself.
+    """
+    mean = group_mean(motion, members)
+    if method == 'deepaf':
+        prediction = model(deepaf_visible_inputs(motion, members, device=device), cache=False)['states'].cpu().numpy()
+        return prediction, np.ones_like(prediction, bool), mean
+    prediction = mean.copy()
+    valid = np.zeros_like(prediction, bool)
+    for segment in sensor_segments(motion, members):
+        query_indices = segment['query_indices']
+        result = model(*ptfm_segment_inputs(segment, device=device))
+        prediction[query_indices] = result['states'].cpu().numpy()
+        valid[query_indices] = True
+    return prediction, valid, mean

@@ -97,7 +97,7 @@
 |原147 Qhard|315.829|2434.336|498.559|3119.914|
 |152A PTFM core|561.948|1199.516|1832.936|3889.653|
 
-两臂保相同目标/真值/真值mask，再取有效预测交集，源码见[common_target_metrics](../../tools/experiments/level1_system_evaluate.py:243)、[直接配对入口](../../tools/experiments/fusion_peer_full_fit.py:143)及[compare_pair](../../tools/analysis/static_partition_position_control.py:116)。本次核7份相关源码与152A冻结执行版本一致。原字段、补读边界见[初核记录的common_core_followup](/Users/a1/Projects/biye-ronghe/docs/evidence/20261110_route_audit/152-aggregate-observation.json)。补读未记秒级时间，不能沿用初核17:27:42。
+两臂保相同目标/真值/真值mask，再取有效预测交集，源码见[common_target_metrics](../../tools/offline/system_evaluate.py#L243)、[直接配对入口](../../tools/offline/peer_fit.py#L157)及[compare_pair](../../tools/analysis/static_partition_position_control.py:116)。重构前的补读核查确认当时7份相关源码与152A冻结执行版本一致。原字段、补读边界见[初核记录的common_core_followup](/Users/a1/Projects/biye-ronghe/docs/evidence/20261110_route_audit/152-aggregate-observation.json)。补读未记秒级时间，不能沿用初核17:27:42。
 
 该表支持“原147在项目共同支持点的MAE/P95/P99更低，PTFM core的RMSE更低”。**不能据315.829低于原文354.2就宣称超越PTFM论文**：共同评价点不等于作者的场景/已知关联/时间窗、训练人口或上下文条件；当前K2的共同域也不能直接推广到K≥3。
 
@@ -113,7 +113,7 @@ PTFM原Table1位置MAE为0.3542km、RMSE为2.6180km；原文训练为最多150�
 |双方：四属性与误差|同窗口、同有效点报告位置/速度/航向及覆盖；我们现有四属性接口可复用|当前147位置头的速航继承Mean；要学习速航须另设目标和拟合，不能冒称现有学习增量|
 |TMTAFF：关联和融合分别比较|已有ITSA/MSTSA四项关联指标及四属性有符号ME入口；保留米制MAE/RMSE以解释实际误差|ME不等MAE；标准残差SD不冒称作者ESD。TMTAFF当前失效实现不能提供可信胜负|
 
-可复用核心而非重写整套方法：[source_risk](../../association/evaluation/source_risk.py:256)支持任意正长度Q和外部分组，但[旧147评价入口](../../tools/analysis/source_risk_full_benchmark.py:94)固定Q64，因此需要独立协议入口。[双源段入口](../../association/models/fusion_peer_inputs.py:25)明确当前同源多片段池化/连续段适配；[152训练](../../tools/experiments/fusion_peer_full_fit.py:203)及[事前差异声明](../proposals/fusion_peer_full_training_20261030.md:17)可定位训练偏离。TMTAFF已有[关联指标](../../association/evaluation/association.py:68)和[论文融合指标](../../association/evaluation/paper_fusion_metrics.py:37)，问题不全是缺指标。
+可复用核心而非重写整套方法：[source_risk](../../association/evaluation/source_risk.py#L258)支持任意正长度Q和外部分组，但[旧147评价入口](../../tools/analysis/source_risk_full_benchmark.py:94)固定Q64，因此需要独立协议入口。[双源段入口](../../association/models/fusion_peer_inputs.py:25)明确当前同源多片段池化/连续段适配；[152训练](../../tools/offline/peer_fit.py#L192)及[事前差异声明](../proposals/fusion_peer_full_training_20261030.md:17)可定位训练偏离。TMTAFF已有[关联指标](../../association/evaluation/association.py:68)和[论文融合指标](../../association/evaluation/paper_fusion_metrics.py:37)，问题不全是缺指标。
 
 **未知仍须保留：** PTFM准确样本/窗口列表与3:2划分；TMTAFF准确3000场景ID/版本、配准/查询细节、阶段训练分配和ESD代码。依据见[PTFM全文复核](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/ptfm_reaudit_20261027.md)、[TMTAFF全文复核](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/tmtaff_reaudit_20261027.md)。原DeepAF的杂波点迹任务与本项目轨迹融合不同，不能靠换单位成为同协议比较。
 
@@ -121,7 +121,7 @@ PTFM原Table1位置MAE为0.3542km、RMSE为2.6180km；原文训练为最多150�
 
 ### 在线并行的代码边界
 
-[现有前缀预处理](../../tools/analysis/deployment_pipeline_timing.py:100)每次重建；[时间查询](../../association/data/timed.py:143)仍是已见前缀min→max的Q64，最后查询也不保证等于当前截止t。[Pipeline.call](../../tools/analysis/deployment_pipeline_timing.py:193)全量评分/分组，无跨次稳定融合ID；[计时回放](../../tools/analysis/deployment_pipeline_timing.py:284)只有相邻两个prefix，不能证明持续1Hz或在线精度。
+[现有前缀预处理](../../association/online/replay.py#L63)每次重建；[时间查询](../../association/data/timed.py:143)仍是已见前缀min→max的Q64，最后查询也不保证等于当前截止t。[Pipeline.call](../../tools/online/pipeline_timing.py#L124)全量评分/分组，无跨次稳定融合ID；[计时回放](../../tools/online/pipeline_timing.py#L220)只有相邻两个prefix，不能证明持续1Hz或在线精度。
 
 在线需独立 `ingest(新记录)` / `predict(t)` 的接口、到达时钟、持续状态与身份管理及连续评价。可复用单位/清洗、纯数值函数与模型结构；[native_motion](../../association/evaluation/native_motion.py:28)可接受单query，但必须仅传已到达的历史，并补不足两点、单轨、空输入的处理，不能直接加载全窗缓存。无新量测时可以预测当前状态，等待/不输出必须计入覆盖。
 

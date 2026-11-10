@@ -4,8 +4,10 @@
 
 |用途|入口|
 |---|---|
-|完整应用与单组后端的计时边界|[工程计时入口](analysis/README.md#工程计时)|
-|训练、数据准备、完整评价与一次性服务托管|[experiments](experiments/README.md)|
+|在线观测的工程回放与整链计时|[online](online/README.md)|
+|离线全场系统评价与同行融合训练/评价|[offline](offline/README.md)|
+|单组后端计时与历史计时入口|[工程计时入口](analysis/README.md#工程计时)|
+|其他训练、数据准备、一次性服务托管及兼容入口|[experiments](experiments/README.md)|
 |冻结输出比较、科学pilot、诊断与独立核验|[analysis](analysis/README.md)|
 |环境准备|[setup](setup/)|
 

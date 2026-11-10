@@ -2,6 +2,15 @@
 
 本页只说明保留代码的数学行为与证据边界。数据定义见[数据约定](../data_contract.md)，成绩与选择见[研究状态](../research_status.md)，执行只看[交接索引](../../HandOver/Handover.md)。已结案配方、逐轮预算和测试清单从[历史摘要](../history/README.md)所列Git版本查阅，不在这里累积。
 
+## 在线与离线的实现边界
+
+|路线|输入权限与输出|运行入口|
+|---|---|---|
+|在线观测|部署侧只使用已到达的记录。现有工程回放按观测时间模拟到达，输出已见窗口的Q64轨迹。当前状态查询、持续身份与1Hz连续输出是后续流式版本的建设范围。|[tools/online](../../tools/online/README.md)|
+|离线观测|使用完整场景观测，生成历史状态及关联结果。预测完成后用标签/reference评价。|[tools/offline](../../tools/offline/README.md)|
+
+`association` 提供两线共享的解析、运动计算、模型预测和指标。数据可见范围由各路线编排决定。新入口在源码仓库根目录执行，既有脚本路径兼容原命令。迁移验收核对新旧CLI参数、调用结果、输出口径及截止后记录的拒绝行为。
+
 ## 从输入到输出
 
 MTAD的measurement是一条已带本地航迹编号的状态记录：`source、batch、time、lat、lon、vel、cou`。同一场景中相同`source/batch`的多条记录组成一段航迹；它不是单个雷达回波，片段数也不等于真实船数。项目从这些记录开始处理，不包含雷达检测及单传感器航迹形成。
@@ -12,8 +21,8 @@ MTAD的measurement是一条已带本地航迹编号的状态记录：`source、b
 |时间与运动证据|合法原生观测→共同Q64时刻、插值/OLS外推状态及支撑信息|[timed.py](../../association/data/timed.py)、[motion_evidence.py](../../association/data/motion_evidence.py)|
 |关联评分|全部`i<j`航迹对→056基础分数；HARD/STRUCT组合另加上下文残差|[evidence_association.py](../../association/models/evidence_association.py)、[association_context.py](../../association/models/association_context.py)|
 |构组|边分数→互不重复、覆盖全部输入节点的组；下述整链组合使用WS聚合|[static_partition_pilot.py](../../tools/analysis/static_partition_pilot.py)的`agglomerate`|
-|融合与恢复|每组运动证据→该组各query的状态；后端按组合接159＋178/O或PTFM/DeepAF|[source_risk.py](../../association/evaluation/source_risk.py)、[history_candidates.py](../../association/evaluation/history_candidates.py)、[同行组预测入口](../../tools/experiments/fusion_peer_full_fit.py)|
-|输出|组成员、query时刻和状态→可发送的JSON bytes|[group_prediction.py](../../association/evaluation/group_prediction.py)、[完整应用计时入口](../../tools/analysis/deployment_pipeline_timing.py)|
+|融合与恢复|每组运动证据→该组各query的状态；后端按组合接159＋178/O或PTFM/DeepAF|[source_risk.py](../../association/evaluation/source_risk.py)、[history_candidates.py](../../association/evaluation/history_candidates.py)、[同行组预测输入与实现](../../association/models/fusion_peer_inputs.py)|
+|输出|组成员、query时刻和状态→可发送的JSON bytes|[group_prediction.py](../../association/evaluation/group_prediction.py)、[在线回放与完整应用计时](../../tools/online/README.md)|
 |评价|保存预测与身份/reference→关联、覆盖及逐属性误差|[论文指标](../mtad_data_protocols.md)、[数据与评价约定](../data_contract.md)|
 
 Q64是覆盖当前场景时间范围的计算/评价网格，不是传感器采样频率，也不代表每秒输出64次。完整窗口允许使用某个历史query之后的观测；按已到数前缀重算与维护增量状态是不同实现。

@@ -2,6 +2,11 @@
 
 唯一代码仓。当前目标和结论只读[研究状态](docs/research_status.md)，服务器只领取[交接索引](HandOver/Handover.md)里的任务。
 
+| 路线 | 工作目录 | 在仓库根目录查看命令 |
+|---|---|---|
+| 在线观测 | [tools/online](tools/online/README.md)，到达数据回放与整链计时 | `python -m tools.online --help` |
+| 离线观测 | [tools/offline](tools/offline/README.md)，全场系统评价与同行融合训练/评价 | `python -m tools.offline --help` |
+
 | 需要什么 | 唯一入口 |
 |---|---|
 | 先理解MTAD数据如何变成输出 | [输入→预处理→关联→融合→输出→评价](docs/specs/evidence-association-fusion.md#从输入到输出) |
@@ -15,6 +20,6 @@
 | 实现接口与命令 | [流程与保留组件](docs/specs/evidence-association-fusion.md)、[工具导航](tools/README.md) |
 | 结案结论、完整推导沿革与旧文件恢复 | [历史摘要](docs/history/README.md)、[过程原文](docs/history/2026-10-30-research-process.md) |
 
-代码按 `association/{data,models,training,evaluation,utils}` 分工，TMTAFF/PTFM/DeepAF按相同职责存放；部分TSA历史适配在 `baselines`。命令在 `tools`，配置在 `configs`，必要检查在 `tests`。存在源码或配置不等于待执行任务。
+两条路线的运行编排分别放在 `tools/online` 和 `tools/offline`。`association/{data,models,training,evaluation,utils}` 提供共享数据、模型与指标，`baselines` 保留部分TSA适配。共用分析和历史实验入口由工具导航定位。配置在 `configs`，验证在 `tests`。
 
 原论文、矩阵和逐篇笔记留在独立资料库（本机 `/Users/a1/Projects/biye-ronghe`，不在本GitHub仓内），本仓研究状态提供对应入口。两仓不复制当前计划；数据、真实权重、预测、服务器runs及Git历史不随文档整理删除。
