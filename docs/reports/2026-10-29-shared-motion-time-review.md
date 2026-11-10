@@ -29,7 +29,7 @@ next_routes: squeeze-experiment then deep-read Mode C
 next_skill: squeeze-experiment
 ```
 
-上游为[事前Idea1.0](../proposals/shared_motion_time_residual_20261029.md)、[输入/时序矩阵IT-C3](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/input_time_action_matrix_20261029.md#7-后续增量先核非平凡作用再分离共享修正的空间与时间解释)及[原交接](../../HandOver/L2S-20261029-122.md)。实现为[shared_motion_time_residual.py](../../tools/analysis/shared_motion_time_residual.py)。独立checkout `/home/wangguangjie/djs/association-code-run122`冻结`6612de9`，事后原件核tracked工作区干净；该版本用于历史定位，不作科学准入。
+上游为[事前Idea1.0](../proposals/shared_motion_time_residual_20261029.md)、[输入/时序矩阵IT-C3](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/input_time_action_matrix_20261029.md#7-后续增量先核非平凡作用再分离共享修正的空间与时间解释)及[原交接](../../HandOver/L2S-20261029-122.md)。实现为[shared_motion_time_residual.py（退役前完整源码）](https://github.com/HKillua/association-code/blob/a63f12a5f56e34ff3b0e68a4182a78312ef50f5e/tools/analysis/shared_motion_time_residual.py)。独立checkout `/home/wangguangjie/djs/association-code-run122`冻结`6612de9`，事后原件核tracked工作区干净；该版本用于历史定位，不作科学准入。
 
 原run：`/home/wangguangjie/djs/association-code/runs/LEVEL1-SHARED-MOTION-TIME-RESIDUAL-20261029-122-attempt-1`，launcher为相同路径加`-launch`。必要脱敏原件位于[资料库122目录](/Users/a1/Projects/biye-ronghe/docs/evidence/20261029_small_validation/122/)：`run.json`、`summary.json`、全部32场的`scene-summary.json.gz`、request/launch/status/exit_code/stdout/stderr/worker.stderr及后补独立审计JSON和完整执行代码。真实chart、带符号b/τ、组差/速度、置换行号和残差数组保存在原run的`private/residuals-<scene>.npz`，本报告不复制。
 

@@ -1,14 +1,25 @@
 # 分析与核验工具索引
 
-按源码首行说明定位，全部入口保留原路径。目录含已结案pilot及仍被其他工具导入的共享函数；此索引不授予执行权限，不表示对应方法已通过科学验证。实际任务看[交接](../../HandOver/Handover.md)，结果与设计看[报告](../../docs/reports/README.md)/[提案](../../docs/proposals/README.md)。
+按用途和源码说明定位。目录含已结案pilot及仍被其他工具导入的共享函数；此索引不授予执行权限，不表示对应方法已通过科学验证。实际任务看[交接](../../HandOver/Handover.md)，结果与设计看[报告](../../docs/reports/README.md)/[提案](../../docs/proposals/README.md)。退役专用工具的来源及恢复方法见[历史入口](../../docs/history/README.md)。
+
+## 工程计时
+
+|边界|入口与原件|
+|---|---|
+|应用收到已分轨measurement CSV字节→清洗/运动/关联/分组/融合→全部组JSON bytes|[deployment_pipeline_timing.py](deployment_pipeline_timing.py)、[完整链路及1Hz前缀回放说明](../../docs/reports/2026-11-05-pipeline-online-timing.md)|
+|缓存motion→单组后端输出；不包含完整前端|[单组后端计时说明](../../docs/reports/2026-11-05-deployment-timing.md)；原一次性脚本保存在[资料库原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261105_deployment_timing/originals/timing_script.py)，不在本仓工具目录|
+
+两种边界不能互换；计时入口不含雷达回波检测、单传感器建轨或网络/显示，也不提供新的精度结论。
 
 ## 比较与指标
+
+<details>
+<summary>展开保存预测的比较与指标工具</summary>
 
 |文件|源码说明|
 |---|---|
 |[compare_association_duration.py](compare_association_duration.py)|060: paired 1000/3000-update system comparison using frozen V caches only.|
 |[compare_completion_policies.py](compare_completion_policies.py)|Paired 093/094 evidence from original completed artifacts, without inference.|
-|[compare_completion_systems.py](compare_completion_systems.py)|096 learned/hold system comparison from complete saved physical predictions.|
 |[compare_deepaf_peer.py](compare_deepaf_peer.py)|099 cached peer comparison and prespecified two-learning-rate selection.|
 |[compare_frozen_position_adapter.py](compare_frozen_position_adapter.py)|090 complete cached CPU comparison; no archive, inference or training.|
 |[compare_physical_predictions.py](compare_physical_predictions.py)|Compare completed development predictions on their saved common support only.|
@@ -16,17 +27,23 @@
 |[compare_sequence_budget_seeds.py](compare_sequence_budget_seeds.py)|097 CPU table: two within-seed budget changes, no inference or training.|
 |[coordinate_metrics.py](coordinate_metrics.py)|Read existing090C arrays; no model, training, archive or rematching.|
 
+</details>
+
 ## 科学验证、条件诊断与共享编排
+
+<details>
+<summary>展开实验入口与共享编排索引</summary>
 
 |文件|源码说明|
 |---|---|
+|[action_conditioned_risk_pilot.py](action_conditioned_risk_pilot.py)|195：T侧候选—动作风险验证。|
+|[action_conditioned_risk_validation.py](action_conditioned_risk_validation.py)|196：冻结O/MC动作评分的原V32验证，不训练或重评T。|
 |[association_context_pilot.py](association_context_pilot.py)|168/169: controlled front-end context or anchor/support-aware regrouping.|
 |[association_decision_audit.py](association_decision_audit.py)|174: bounded T-only score/partition/object audit; oracle is diagnostic only.|
 |[association_geometry_continuation.py](association_geometry_continuation.py)|130: new bounded-memory successor to failed128, importing six complete scenes.|
 |[association_geometry_signal.py](association_geometry_signal.py)|128: same-information group geometry and leave-one-fragment-out diagnostics.|
 |[association_operating_point_pilot.py](association_operating_point_pilot.py)|170: same T-only raw false-acceptance budget for three frozen scorers.|
 |[conditional_source_value.py](conditional_source_value.py)|125: T-component-heldout prediction of the benefit of a fixed soft action.|
-|[conditional_source_value_full.py](conditional_source_value_full.py)|131: extend the four frozen125 value heads to the remaining268 V scenes.|
 |[cost_routing_pilot.py](cost_routing_pilot.py)|180: matched objective continuation, single-support positions only.|
 |[decision_error_mining_pilot.py](decision_error_mining_pilot.py)|175: matched generic-hard vs actual WS-decision error auxiliary training.|
 |[decision_followup_pilot.py](decision_followup_pilot.py)|Independent143/144 pilots: relative decisions or actual-coordinate mixture gain.|
@@ -60,7 +77,6 @@
 |[object_hypothesis_pilot.py](object_hypothesis_pilot.py)|129: native temporal link candidates, T-frozen rejection and real WS unions.|
 |[objective_difficulty_pilot.py](objective_difficulty_pilot.py)|162: same nonlinear source scorer, supervision objective x train difficulty.|
 |[observation_common.py](observation_common.py)|Shared immutable cache/evaluation plumbing for observation-only pilots.|
-|[observation_conflict_probe.py](observation_conflict_probe.py)|138: T-only joined diagnosis of already saved preference and output errors.|
 |[observation_quality_pilot.py](observation_quality_pilot.py)|136: fixed offline observation-quality contribution pilot, T32/V32 once.|
 |[observation_scale_pilot.py](observation_scale_pilot.py)|137: T-only noisy-observation scale selection and fixed T32/V32 recovery.|
 |[ordered_shape_continuation.py](ordered_shape_continuation.py)|132: reuse immutable126 caches/norms; bound sampling-input file handles.|
@@ -74,7 +90,6 @@
 |[set_conditioned_risk_pilot.py](set_conditioned_risk_pilot.py)|166: fixed159 base, own-only capacity control versus other-source quality.|
 |[shared_component_control.py](shared_component_control.py)|Cross-group heldout relative correction x local Huber-distance reweighting.|
 |[shared_component_full_control.py](shared_component_full_control.py)|120: import all original118 arms and extend the frozen recipe to remaining268.|
-|[shared_motion_time_residual.py](shared_motion_time_residual.py)|122: held-out motion-dependent structure in input-only shared source deltas.|
 |[source_contribution_readout_pilot.py](source_contribution_readout_pilot.py)|140 bounded T32/V32 chord-risk/readout pilot; no raw events or neural calls.|
 |[source_coverage_pilot.py](source_coverage_pilot.py)|155: fixed T128 coverage, same10 features/66-coefficient source head.|
 |[source_mix_shrink_control.py](source_mix_shrink_control.py)|124: separately test fixed source mixing and empirical center shrinkage.|
@@ -91,24 +106,25 @@
 |[temporal_gate_fixed_pilot.py](temporal_gate_fixed_pilot.py)|194: explicit new task after the preserved 193 entrypoint import failure.|
 |[temporal_gate_pilot.py](temporal_gate_pilot.py)|193: matched T-only task gate with mean, orderless blocks, ordered blocks.|
 |[temporal_source_pilot.py](temporal_source_pilot.py)|149 zero-support candidates /150 temporal source evidence, fixed T32/V32.|
-|[tmtaff_constant_path.py](tmtaff_constant_path.py)|154: frozen TFΜ path and zero-memory intervention, no training or V.|
-|[tmtaff_decoder_layers.py](tmtaff_decoder_layers.py)|161: frozen decoder layer path and memory-scale interventions, T2 only.|
-|[tmtaff_gradient_flow_probe.py](tmtaff_gradient_flow_probe.py)|167: original physical FusionLoss gradients at immutable107, no update.|
-|[tmtaff_key_value_probe.py](tmtaff_key_value_probe.py)|164: frozen key/value scale factorial. No training or deployment selection.|
 |[tmtaff_saved_training_trace.py](tmtaff_saved_training_trace.py)|Read-only107 TFM trace audit; no forward, reference, V arrays or new fit.|
-|[tmtaff_training_physical_probe.py](tmtaff_training_physical_probe.py)|153: immutable107 T8 physical probe; no training, V, raw CSV or test.|
 |[truth_free_partition_pilot.py](truth_free_partition_pilot.py)|165: same signed evidence, split/move refinement, real regrouped physics.|
 |[unsupported_recovery_pilot.py](unsupported_recovery_pilot.py)|145 fixed T32/V32: endpoint/velocity factors and source-balanced fallback.|
 |[within_source_forecast_pilot.py](within_source_forecast_pilot.py)|156: forecast selection only within a source; fixed anonymous nearest source.|
 
+</details>
+
 ## 核验与记账
+
+<details>
+<summary>展开保存输出的核验与记账工具</summary>
 
 |文件|源码说明|
 |---|---|
+|[action_conditioned_risk_closeout.py](action_conditioned_risk_closeout.py)|195：独立评分/输出复核与上限分析。|
+|[action_conditioned_risk_validation_closeout.py](action_conditioned_risk_validation_closeout.py)|196：V32保存输出、full模型动作与固定害/救回群体核验。|
 |[association_context_closeout.py](association_context_closeout.py)|One read-only output audit followed by complete saved-attribute accounting.|
 |[audit_association_context_outputs.py](audit_association_context_outputs.py)|Independent NumPy raw/decoded association, anchors/support and saved physics.|
 |[audit_conditional_T_arrays.py](audit_conditional_T_arrays.py)|Independent125 T-only labels, component folds, saved heads and OOF audit.|
-|[audit_conditional_full_arrays.py](audit_conditional_full_arrays.py)|Independent131 saved-array position/population and frozen-import audit.|
 |[audit_conditional_value_arrays.py](audit_conditional_value_arrays.py)|Independent saved-array main-position audit for completed125 only.|
 |[audit_followup_outputs.py](audit_followup_outputs.py)|Independent NumPy output audit for143/144/146; does not certify fitted heads.|
 |[audit_full_fusion_benchmark.py](audit_full_fusion_benchmark.py)|Independent NumPy output audit for147, without production prediction/evaluation.|
@@ -117,7 +133,6 @@
 |[audit_mixture_opportunity.py](audit_mixture_opportunity.py)|Independent NumPy audit of134 T-only saved mixture-opportunity diagnostics.|
 |[audit_object_output_arrays.py](audit_object_output_arrays.py)|129 independent saved-array audit with variable partitions and coverage.|
 |[audit_observation_common.py](audit_observation_common.py)|Independent NumPy metric audit helpers for 136/137 saved artifacts.|
-|[audit_observation_conflict.py](audit_observation_conflict.py)|Independent bounded NumPy audit of 138 T-only cached conflict statistics.|
 |[audit_observation_quality.py](audit_observation_quality.py)|One bounded independent NumPy audit of completed 136 saved predictions.|
 |[audit_observation_scale.py](audit_observation_scale.py)|Independent saved-observation selection/position audit for experiment 137.|
 |[audit_ordered_shape_arrays.py](audit_ordered_shape_arrays.py)|One-shot independent126 saved-score/statistics and training-record audit.|
@@ -129,7 +144,6 @@
 |[audit_source_selection_evidence.py](audit_source_selection_evidence.py)|139 independent saved-array audit: fixed features, meter-target Q and hard output.|
 |[audit_temporal_source_outputs.py](audit_temporal_source_outputs.py)|Independent NumPy output audit of149/150; no production policy or fitting.|
 |[audit_three_case_chain.py](audit_three_case_chain.py)|104: bounded audit of three fixed cases in retained 103 evidence.|
-|[audit_tmtaff_training_probe.py](audit_tmtaff_training_probe.py)|Read-only saved153 output audit. No forward, fitting, V or raw CSV.|
 |[audit_variable_group_outputs.py](audit_variable_group_outputs.py)|Independent saved-output/population/J audit for165, allowing coverage changes.|
 |[decision_error_mining_closeout.py](decision_error_mining_closeout.py)|175 saved-output closeout, adapted from the preserved 173 squeeze source; no tuning.|
 |[decoded_coverage_closeout.py](decoded_coverage_closeout.py)|176 saved-output audit and candidate counts; inherited saved-physics decomposition, no tuning.|
@@ -145,5 +159,4 @@
 |[temporal_gate_closeout.py](temporal_gate_closeout.py)|193: saved T metrics plus matched training, native phase and gate accounting.|
 |[temporal_source_accounting.py](temporal_source_accounting.py)|Read-only Squeeze of149/150: anchor-side zero support and source-slot errors.|
 
-- [action_conditioned_risk_pilot.py](action_conditioned_risk_pilot.py)：195 T侧候选—动作风险验证。
-- [action_conditioned_risk_closeout.py](action_conditioned_risk_closeout.py)：195独立评分/输出复核与上限分析。
+</details>

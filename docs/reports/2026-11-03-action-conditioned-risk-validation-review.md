@@ -383,7 +383,7 @@ Within-component ΔMAE is weighted by its own common points. Contribution to ful
 
 ### 196人口、特征与关联公共原件提取（规定audit已另核完成）
 
-来源：`/Users/a1/Projects/biye-ronghe/.research-tmp/196-science-complete` 中 `run.json`、`summary.json.gz`、`scene-summary.json.gz`、`action-feature-accounting.json`。本次只读聚合，没有重新预测、读取服务器私有数组或把本地提取当作规定独审。
+来源：`/Users/a1/Projects/biye-ronghe/docs/evidence/20261103_action_risk_validation/196/run` 中 `run.json`、`summary.json.gz`、`scene-summary.json.gz`、`action-feature-accounting.json`。聚合时使用的`.research-tmp/196-science-complete`临时副本于2026-11-10核对正式原件后清理：三个文件逐字节相同，`summary.json.gz`的解压正文相同但压缩头不同；上文原始SHA仍描述当时临时回传，不改写为正式压缩包的SHA。本次只读聚合，没有重新预测、读取服务器私有数组或把本地提取当作规定独审。
 
 ## 特征人口与改变
 
