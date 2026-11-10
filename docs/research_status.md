@@ -29,7 +29,7 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** 按[离线骨架重选与C70资格方案](proposals/offline_trajectory_reselection_20261110.md)，先核组级全窗四属性状态，在同一合法候选池中检验条件状态证据能否减少误并/错分并改善完整输出。既有T32候选池仅3场有不同的等组数候选，组数受控检验需补合法备选。原生点与片段图关联是候选生成的重选方向。当前未形成可领的执行合同。TMTAFF继续分别核TAM判别与真组补全融合的资格，合格后同场景、同信息、同输出协议比较完整系统。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C71盘点与资格方案](proposals/offline_same_source_swap_20261110.md)发现已有T32分区在纳入176网格后，30场有等组数备选，但没有一场以WS为起点保持各组首节点与源计数。优先检验同源片段互换的关联可达性和旧J选择差距，再按[C70骨架方案](proposals/offline_trajectory_reselection_20261110.md)比较同池条件状态评分并核完整四属性。保留共时跨目标几何C72及条件四属性优化C73。当前未形成可领的执行合同。TMTAFF继续分别核TAM判别与真组补全融合的资格，合格后同场景、同信息、同输出协议比较完整系统。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
 2. **在线独立开发，从因果任务重新选型。** 用户明确在线代码单列于 [online_observation](../online_observation/README.md)，输入、运行、方法与评价独立实现。固定每秒发布当前状态与持续目标身份，因果输入和可变K；确认等待、结果延迟和持续吞吐分别评估，最大结果延迟待定。先核[量测字段可用时刻](data_contract.md#在线字段可用时间)，严格开发协议从已到位置和时间推导运动，原速航等可用时刻核清后再准入。接着在固定Level1开发场景按观测年龄、断续重现与邻近竞争检查候选漏失、误匹配、错误持续和已正确关联时的状态误差。按主要失效比较递推状态估计、延迟确认与联合跟踪等机制，选出有证据支持的骨架。TSA-cTFER留作关联对照候选，原20秒协议和1 Hz适配分列。IFNet/GCI-PMB的对照资格取决于是否能建立其所需的后验输入。
    - 上一轮片段预测和60秒过期仅保留为按CSV整行交付的工程控制。Level1场景692的0–7200秒和1187的3300–3900秒合计7802次查询、4935行量测，峰值6/69个活跃片段，Apple M2服务时间P95为0.091/1.105ms。原件在本地私有`outputs/online-replay-20261110.cqt3tZ/`。记录约束了行时刻，原速航的生成时刻另行审查。未新增在线实验READY。
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
@@ -42,7 +42,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.11](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-211)，P14/F308/M123/E211/C70|
+|全局问题—现象—机制—证据|[Mode C2.12](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-212)，P14/F310/M124/E213/C73|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
 |观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，196实际回流至v1.24/96格|
