@@ -2,6 +2,10 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-10
+
+- [离线骨架重选与条件轨迹评分资格方案](offline_trajectory_reselection_20261110.md)
+
 ## 2026-11-02
 
 - [195：固定风险头下的候选—动作条件验证](action_conditioned_risk_20261102.md)
