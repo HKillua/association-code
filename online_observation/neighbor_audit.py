@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from collections import Counter, defaultdict
-from itertools import combinations, product
+from itertools import chain, combinations, product
 from math import dist
 from statistics import median
 
@@ -372,7 +372,7 @@ def pool_neighbor_audit(results):
     if first is None:
         return _new_summary(())
     output = _new_summary(first["selections"])
-    for result in (first, *iterator):
+    for result in chain((first,), iterator):
         if "historical" in result:
             historical = output.setdefault("historical", {})
             for arm in result["historical"]:

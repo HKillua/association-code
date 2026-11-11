@@ -19,14 +19,17 @@ from .causal_recovery import capture_scene
 from .causal_recovery_metrics import COHORTS, pool_recovery, score_recovery
 from .evaluation_data import read_labels
 from .expansion_confirmation import ConfirmationState, ExpansionRecorder, _members, _strata
+from .expansion_evidence import WitnessEvidence
 from .neighbor_audit import pool_neighbor_audit, score_neighbor_audit
 from .neighbor_witness import NeighborEvidence, NeighborWitnessIndex
+from .neighbor_write_policy import WRITE_POLICY_ARMS, NeighborWritePolicy
 from .nemot_experiment import _events, _write_json
 from .nemot_replay import Edge
 
 
 ROSTER = Path(__file__).with_name("neighbor_witness_roster.json")
 BASELINES = ("geometry", "wide", "witness_confirm")
+HELD_ARMS = (*BASELINES, "dual_report", *WRITE_POLICY_ARMS)
 NEIGHBOR_COHORTS = (*COHORTS, "first_sparse", "outside_sparse")
 MIN_PEER_DISPLACEMENT_M = 120
 MAX_PEER_SPEED_DIFFERENCE_M_S = 2
@@ -38,6 +41,8 @@ class ProbeFrame:
     ring: dict[Edge, NeighborEvidence]
     writes: dict[Edge, NeighborEvidence]
     parallel: dict[Edge, bool | None]
+    written: dict[str, tuple[Edge, ...]]
+    historical: dict[str, dict[Edge, WitnessEvidence]]
 
 
 def _parallel_motion(first, second, stamp):
@@ -55,9 +60,11 @@ def _parallel_motion(first, second, stamp):
 
 
 class NeighborRecorder:
-    def __init__(self):
+    def __init__(self, writing_arms=()):
         self.legacy = ExpansionRecorder()
+        self.writers = {arm: NeighborWritePolicy(arm) for arm in writing_arms}
         self.frames: list[ProbeFrame] = []
+        self.additions: list[dict[str, tuple[Edge, ...]]] = []
 
     def __call__(self, frame, histories, ring, motion):
         new_samples = self.legacy(frame, histories, ring, motion)
@@ -76,24 +83,31 @@ class NeighborRecorder:
         peer_pairs = {pair for peers in by_birth.values() for pair in combinations(sorted(peers), 2)}
         parallel = {pair: _parallel_motion(histories[pair[0]], histories[pair[1]], frame.stamp)
                     for pair in sorted(peer_pairs)}
-        self.frames.append(ProbeFrame(ring_evidence, write_evidence, parallel))
+        selections, historical, written = {}, {}, {}
+        for arm, writer in self.writers.items():
+            selections[arm], historical[arm], written[arm] = writer.decide(
+                self.legacy.frames[-1], ring_evidence, new_samples, write_evidence)
+        self.additions.append(selections)
+        self.frames.append(ProbeFrame(ring_evidence, write_evidence, parallel, written, historical))
 
 
 def _run(archive, manifest, phase, destination):
     members, components, proxies = _members(manifest, phase, ROSTER)
+    held = phase == "held"
+    arms = HELD_ARMS if held else BASELINES
+    references = (*BASELINES, "dual_report") if held else BASELINES
     destination.mkdir(mode=0o700, exist_ok=False)
     spool = destination / "private_frozen"
     spool.mkdir(mode=0o700)
     began = perf_counter()
     scenes = {}
-    references = ("geometry", "wide", "witness_confirm")
     for scene in members:
-        recorder = NeighborRecorder()
+        recorder = NeighborRecorder(WRITE_POLICY_ARMS if held else ())
         frames, fit = capture_scene(_events(archive, manifest, scene), expansion_observer=recorder)
         confirmation = ConfirmationState()
         expansions = recorder.legacy.frames
-        frames = [replace(frame, additions={**frame.additions, **confirmation.decide(expansion)})
-                  for frame, expansion in zip(frames, expansions, strict=True)]
+        frames = [replace(frame, additions={**frame.additions, **confirmation.decide(expansion), **additions})
+                  for frame, expansion, additions in zip(frames, expansions, recorder.additions, strict=True)]
         with gzip.open(spool / f"{scene}.pkl.gz", "xb", compresslevel=1) as stream:
             pickle.dump((frames, expansions, recorder.frames), stream, protocol=pickle.HIGHEST_PROTOCOL)
         first_pools = [sum(peer[0] != key[0] for peer in frame.fresh) for frame in frames for key in frame.born]
@@ -106,13 +120,13 @@ def _run(archive, manifest, phase, destination):
         with gzip.open(spool / f"{scene}.pkl.gz", "rb") as stream:
             frames, expansions, probes = pickle.load(stream)
         labels = read_labels(archive, manifest, scene)
-        detail["recovery"] = score_recovery(frames, labels, arms=BASELINES, references=references,
+        detail["recovery"] = score_recovery(frames, labels, arms=arms, references=references,
                                            cohorts=NEIGHBOR_COHORTS)
-        detail["audit"] = score_neighbor_audit(frames, expansions, probes, labels, arms=BASELINES)
+        detail["audit"] = score_neighbor_audit(frames, expansions, probes, labels, arms=arms)
     _write_json(destination / "summary.json", dict(
         phase=phase, scenes=scenes, clock="ideal_native_measurement_time", training_updates=0,
         strata={name: dict(scene_count=len(parts), component_count=len({s["component"] for s in parts}),
-                           recovery=pool_recovery((s["recovery"] for s in parts), arms=BASELINES,
+                           recovery=pool_recovery((s["recovery"] for s in parts), arms=arms,
                                                   references=references, cohorts=NEIGHBOR_COHORTS),
                            audit=pool_neighbor_audit(s["audit"] for s in parts))
                 for name, parts in _strata(scenes).items() if parts}, wall_seconds=perf_counter() - began,

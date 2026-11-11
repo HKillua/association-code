@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 import unittest
 
+from online_observation.expansion_evidence import WitnessEvidence
 from online_observation.neighbor_audit import pool_neighbor_audit, score_neighbor_audit
 from online_observation.neighbor_witness import NeighborEvidence, NeighborVote, summarize_votes
 
@@ -85,3 +86,40 @@ class NeighborAuditTests(unittest.TestCase):
         evidence = _evidence((1700, 0), votes)
         result = score_neighbor_audit((frame,), (expansion,), (_probe({target: evidence}),), labels)
         self.assertEqual(result["birth"]["all"]["open_edges"]["true"]["strict_clean_conflict"], 1)
+
+    def test_actual_writes_and_reads_keep_denominators_and_birth_incidence(self):
+        target = (("A", "target"), ("B", "target"))
+        witness = (("A", "witness"), ("B", "witness"))
+        labels = {key: key[1] for pair in (target, witness) for key in pair}
+        fresh = (*target, *witness)
+        frames = (
+            _frame(0, (target[1], *witness), (target[1], *witness), geometry=(witness,)),
+            _frame(1, target[:1], fresh, born=target[:1], ring=(target,), wide=(target,)),
+            _frame(2, target[:1], fresh, ring=(target,), wide=(target,)),
+        )
+        legacy = _edge(target, ((witness, (0, 0)),), residual=0)
+        expansions = (_expansion(0), _expansion(1, (legacy,)), _expansion(2, (legacy,)))
+        empty = WitnessEvidence(0, None, ())
+        supported = WitnessEvidence(1, 0, (witness,))
+        probes = (_probe(writes={witness: _evidence((0, 0))}),
+                  _probe(ring={target: _evidence((0, 0))}), _probe(ring={target: _evidence((0, 0))}))
+        probes[0].written = {"veto": (witness,), "positive": ()}
+        probes[0].historical = {"veto": {}, "positive": {}}
+        probes[1].historical = {"veto": {target: empty}, "positive": {target: empty}}
+        probes[2].historical = {"veto": {target: supported}, "positive": {target: empty}}
+        result = score_neighbor_audit(frames, expansions, probes, labels)
+        writes = result["writes"]["true"]
+        self.assertEqual(writes["admitted_witness_confirm"], 1)
+        self.assertEqual(writes["distinct_admitted_veto"], 1)
+        self.assertEqual(writes["admitted_positive"], 0)
+        history = result["historical"]
+        self.assertEqual(history["witness_confirm"]["true"]["residual_compatible"], 2)
+        self.assertEqual(history["veto"]["true"]["residual_compatible"], 1)
+        self.assertEqual(history["positive"]["true"]["n"], 2)
+        self.assertEqual(history["positive"]["true"]["distinct_pairs"], 1)
+        self.assertEqual(history["veto"]["true"]["birth_sparse_n"], 1)
+        self.assertEqual(history["veto"]["true"]["birth_sparse_residual_available"], 0)
+
+        old = {key: value for key, value in result.items() if key != "historical"}
+        mixed = pool_neighbor_audit([json.loads(json.dumps(old)), json.loads(json.dumps(result))])
+        self.assertEqual(mixed["historical"], history)
