@@ -365,6 +365,7 @@ def coverage(original, changed, truth_id, support):
     return dict(represented=len(changed_ids), identities_lost=len(original_ids - changed_ids),
                 identities_gained=len(changed_ids - original_ids), duplicates=new_duplicates,
                 duplicate_increase=new_duplicates - old_duplicates,
+                duplicate_increase_scenes=int(new_duplicates > old_duplicates),
                 same_ship_supported=int(new_support.sum()),
                 same_ship_lost=int((old_support & ~new_support).sum()),
                 same_ship_recovered=int((~old_support & new_support).sum()))
@@ -478,7 +479,7 @@ def qualification(result, base):
     decoded = direction(result['full'])
     coverage_counts = result['full']['RANK']['coverage']
     retained = (all(coverage_counts[k] == 0 for k in ('identities_lost', 'same_ship_lost'))
-                and coverage_counts['duplicate_increase'] <= 0)
+                and coverage_counts['duplicate_increase_scenes'] == 0)
     components = sum(direction(arms) for arms in result['by_component'].values())
     sensitivity = direction(result['without_largest'])
     return dict(raw=raw, decoded=decoded, retained=retained, joint_benefit_components=components,
