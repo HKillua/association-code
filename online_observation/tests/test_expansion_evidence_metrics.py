@@ -76,3 +76,37 @@ class ExpansionEvidenceMetricsTests(unittest.TestCase):
         self.assertEqual(pooled["events"], 8)
         self.assertEqual(pooled["populations"]["first_open_per_pair"]["true"]["counts"]["edges"], 4)
         self.assertEqual(pooled["populations"]["wide_events"]["false_both_seen"]["counts"]["edges"], 4)
+
+    def test_selections_count_first_acceptance_of_each_pair_per_arm(self):
+        frames, labels = _fixture()
+        pair = frames[1].edges[0].pair
+        selections = (
+            {"immediate": (), "wait": ()},
+            {"immediate": (pair,), "wait": ()},
+            {"immediate": (pair[::-1],), "wait": (pair,)},
+            {"immediate": (), "wait": (pair,)},
+        )
+        baseline = score_expansion_evidence(frames, labels)
+        scores = score_expansion_evidence(iter(frames), labels, selections=iter(selections))
+        self.assertEqual(scores["populations"], baseline["populations"])
+        self.assertNotIn("selected", baseline)
+        self.assertEqual(scores["selected"]["immediate"]["edge_events"],
+                         {"true": 0, "false_both_seen": 1, "false_unseen_truth": 1})
+        self.assertEqual(scores["selected"]["immediate"]["first_pairs"],
+                         {"true": 0, "false_both_seen": 0, "false_unseen_truth": 1})
+        self.assertEqual(scores["selected"]["wait"]["first_pairs"],
+                         {"true": 0, "false_both_seen": 1, "false_unseen_truth": 0})
+        reopened = json.loads(json.dumps(scores))
+        pooled = pool_expansion_evidence([baseline, reopened, reopened])
+        self.assertEqual(pooled["selected"]["immediate"]["first_pairs"]["false_unseen_truth"], 2)
+        self.assertEqual(pooled["selected"]["wait"]["edge_events"]["false_both_seen"], 4)
+
+    def test_selections_require_one_mapping_per_frame_and_current_wide_pairs(self):
+        frames, labels = _fixture()
+        pair = frames[1].edges[0].pair
+        for selections in (({}, {}, {}), ({}, {}, {}, {}, {})):
+            with self.subTest(selections=selections), self.assertRaisesRegex(ValueError, "one selection mapping"):
+                score_expansion_evidence(frames, labels, selections=selections)
+        for selections in (({"arm": (pair,)}, {}, {}, {}), ({}, {"arm": (pair, pair[::-1])}, {}, {})):
+            with self.subTest(selections=selections), self.assertRaisesRegex(ValueError, "current frame"):
+                score_expansion_evidence(frames, labels, selections=selections)

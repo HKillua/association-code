@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from bisect import bisect_left
 from collections import Counter, defaultdict
+from itertools import zip_longest
 from math import isfinite
 
 
@@ -46,6 +47,10 @@ def _empty():
             } for population in POPULATIONS
         },
     }
+
+
+def _empty_selection():
+    return {name: Counter(dict.fromkeys(TRUTH_GROUPS, 0)) for name in ("edge_events", "first_pairs")}
 
 
 def _bin(field, value):
@@ -97,20 +102,32 @@ def _record(group, stamp, previous, ends, bins, joints, witness_truth):
         group["joint_support"][condition][outcome] += 1
 
 
-def score_expansion_evidence(frames, labels):
+def score_expansion_evidence(frames, labels, *, selections=None):
     """Grade candidate snapshots using only truth counterparts already arrived.
 
     Each frame supplies a stamp, updated and fresh fragment keys, and open
     edges. Each edge supplies its two keys, W nomination, recorded witnesses,
     and the feature mapping constructed before labels were read. Fragment keys
-    and exact feature values are kept out of the returned result.
+    and exact feature values are kept out of the returned result. Optional
+    selections supply one arm-to-accepted-pairs mapping per frame. Each arm
+    counts every acceptance at its current truth group and each pair once at
+    that arm's first acceptance group.
     """
     result = _empty()
+    missing_frame = object()
+    if selections is None:
+        snapshots = ((frame, {}) for frame in frames)
+    else:
+        snapshots = zip_longest(frames, selections, fillvalue=missing_frame)
+        result["selected"] = {}
+    seen_selected = defaultdict(set)
     seen_keys = set()
     seen_sources = defaultdict(set)
     last_open, last_wide = {}, {}
     previous_stamp = None
-    for frame in frames:
+    for frame, selection in snapshots:
+        if frame is missing_frame or selection is missing_frame:
+            raise ValueError("expansion evidence requires one selection mapping per frame")
         stamp = frame.stamp
         if not isfinite(stamp) or previous_stamp is not None and stamp <= previous_stamp:
             raise ValueError("expansion evidence frames must use increasing finite times")
@@ -130,6 +147,7 @@ def score_expansion_evidence(frames, labels):
         open_truth_ends = {key for edge in frame.edges if labels[edge.pair[0]] == labels[edge.pair[1]]
                            for key in edge.pair}
         current = set()
+        wide_truth = {}
         for edge in frame.edges:
             left, right = pair = tuple(sorted(edge.pair))
             if left[0] == right[0] or not {left, right} <= fresh or pair in current:
@@ -163,9 +181,25 @@ def score_expansion_evidence(frames, labels):
                 if last is None:
                     groups.append(("first_wide_per_pair", None))
                 last_wide[pair] = stamp
+                if selection:
+                    wide_truth[pair] = truth
             for population, previous in groups:
                 group = result["populations"][population][truth]
                 _record(group, stamp, previous, ends, bins, joints, witness_truth)
+        for arm, edges in selection.items():
+            pairs = {tuple(sorted(edge)) for edge in edges}
+            if len(pairs) != len(edges) or not pairs <= wide_truth.keys():
+                raise ValueError("each arm must select unique W nominations in the current frame")
+            if arm not in result["selected"]:
+                result["selected"][arm] = _empty_selection()
+            counts = result["selected"][arm]
+            seen = seen_selected[arm]
+            for pair in pairs:
+                truth = wide_truth[pair]
+                counts["edge_events"][truth] += 1
+                if pair not in seen:
+                    counts["first_pairs"][truth] += 1
+                    seen.add(pair)
     return result
 
 
@@ -182,4 +216,11 @@ def pool_expansion_evidence(results):
                 for family in ("histograms", "joint_support"):
                     for name, counts in source[family].items():
                         target[family][name].update(counts)
+        if "selected" in scene:
+            selected = merged.setdefault("selected", {})
+            for arm, source in scene["selected"].items():
+                if arm not in selected:
+                    selected[arm] = _empty_selection()
+                for name, counts in source.items():
+                    selected[arm][name].update(counts)
     return merged

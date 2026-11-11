@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 import gzip
 import json
 from math import hypot, sqrt
@@ -15,7 +15,7 @@ from time import perf_counter
 import torch
 
 from .causal_recovery import capture_scene
-from .causal_recovery_metrics import pool_recovery, score_recovery
+from .causal_recovery_metrics import ARMS, pool_recovery, score_recovery
 from .evaluation_data import read_labels
 from .expansion_evidence import HistoricalGeometryWitnesses, common_offset_evidence, current_common_offset
 from .expansion_evidence_metrics import pool_expansion_evidence, score_expansion_evidence
@@ -24,6 +24,10 @@ from .nemot_replay import Edge, Fragment
 
 
 ROSTER = Path(__file__).with_name("expansion_confirmation_roster.json")
+CONFIRMATION_ARMS = ("dual_report", "witness_veto", "witness_confirm")
+HELD_ARMS = ("geometry", "wide", *CONFIRMATION_ARMS)
+CONFIRMATION_LIMIT_SECONDS = 60
+WITNESS_RESIDUAL_METRES = 400
 
 
 @dataclass(frozen=True)
@@ -90,6 +94,35 @@ class ExpansionRecorder:
         self.witnesses.observe(frame.stamp, frame.geometry_links, histories)
 
 
+class ConfirmationState:
+    """Publish only eligible W nominations and keep acceptance within each run."""
+
+    def __init__(self):
+        self.confirmed = {arm: set() for arm in CONFIRMATION_ARMS}
+
+    def decide(self, frame):
+        current = {arm: set() for arm in CONFIRMATION_ARMS}
+        for edge in frame.edges:
+            if not edge.wide:
+                continue
+            features = edge.features
+            residual = features["witness_residual_m"]
+            repeat = bool(features["repeat_both"])
+            compatible = residual is not None and residual <= WITNESS_RESIDUAL_METRES
+            allowed = residual is None or compatible
+            within_limit = features["episode_age_s"] <= CONFIRMATION_LIMIT_SECONDS
+            eligibility = {
+                "dual_report": repeat,
+                "witness_veto": repeat and allowed,
+                "witness_confirm": compatible or (repeat and allowed),
+            }
+            for arm, eligible in eligibility.items():
+                if edge.pair in self.confirmed[arm] or (within_limit and eligible):
+                    current[arm].add(edge.pair)
+        self.confirmed = current
+        return {arm: tuple(sorted(pairs)) for arm, pairs in current.items()}
+
+
 def _members(manifest, phase):
     inventory = json.loads(manifest.read_text(encoding="utf-8"))
     roster = json.loads(ROSTER.read_text(encoding="utf-8"))
@@ -125,6 +158,9 @@ def _strata(scenes):
 
 def _run(archive, manifest, phase, destination):
     members, components, proxies = _members(manifest, phase)
+    held = phase == "held"
+    arms = HELD_ARMS if held else ARMS
+    references = ("geometry", "wide", "dual_report", "witness_veto") if held else ("geometry",)
     destination.mkdir(mode=0o700, exist_ok=False)
     spool = destination / "private_frozen"
     spool.mkdir(mode=0o700)
@@ -133,6 +169,10 @@ def _run(archive, manifest, phase, destination):
     for scene in members:
         recorder = ExpansionRecorder()
         frames, fit = capture_scene(_events(archive, manifest, scene), expansion_observer=recorder)
+        if held:
+            confirmation = ConfirmationState()
+            frames = [replace(frame, additions={**frame.additions, **confirmation.decide(expansion)})
+                      for frame, expansion in zip(frames, recorder.frames, strict=True)]
         with gzip.open(spool / f"{scene}.pkl.gz", "xb", compresslevel=1) as stream:
             pickle.dump((frames, recorder.frames), stream, protocol=pickle.HIGHEST_PROTOCOL)
         first_pools = [sum(peer[0] != key[0] for peer in frame.fresh) for frame in frames for key in frame.born]
@@ -145,12 +185,13 @@ def _run(archive, manifest, phase, destination):
         with gzip.open(spool / f"{scene}.pkl.gz", "rb") as stream:
             frames, expansion = pickle.load(stream)
         labels = read_labels(archive, manifest, scene)
-        detail["recovery"] = score_recovery(frames, labels)
-        detail["evidence"] = score_expansion_evidence(expansion, labels)
+        detail["recovery"] = score_recovery(frames, labels, arms=arms, references=references)
+        selections = ({arm: frame.additions[arm] for arm in HELD_ARMS[1:]} for frame in frames) if held else None
+        detail["evidence"] = score_expansion_evidence(expansion, labels, selections=selections)
     _write_json(destination / "summary.json", dict(
         phase=phase, scenes=scenes, clock="ideal_native_measurement_time", training_updates=0,
         strata={name: dict(scene_count=len(parts), component_count=len({s["component"] for s in parts}),
-                           recovery=pool_recovery(s["recovery"] for s in parts),
+                           recovery=pool_recovery((s["recovery"] for s in parts), arms=arms, references=references),
                            evidence=pool_expansion_evidence(s["evidence"] for s in parts))
                 for name, parts in _strata(scenes).items() if parts}, wall_seconds=perf_counter() - began,
     ))
