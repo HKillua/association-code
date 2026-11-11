@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [因果配准锚与共同过去位移的门外真边对照](2026-11-12-online-causal-recovery.md)
+
 - [C90 固定16真对的TFM资格](2026-11-12-tmtaff-true-pair-qualification-review.md)
 
 - [C89 全V300远端速度与历史TMTAFF同场四属性](2026-11-12-v300-far-paper-bridge-review.md)
