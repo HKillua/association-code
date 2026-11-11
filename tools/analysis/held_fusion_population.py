@@ -30,7 +30,7 @@ HELD_IDS = (
 )
 
 
-def load_population(runs):
+def _population_inputs(runs):
     roots = {key: runs / name for key, name in PARENTS.items()}
     records = {key: read(roots[key] / 'run.json') for key in ('partition', 'native', 'mean', 'full_data')}
     if any(row['status'] != 'COMPLETED' or row['exit_code'] != 0 for row in records.values()):
@@ -39,17 +39,13 @@ def load_population(runs):
     marker = read(roots['native'] / 'native-cache.json')
     original_v = marker['scene_ids'][SPLIT]
     original_t = marker['scene_ids']['T_core']
-    components = manifest['components']
-    seen = {components[sid] for sid in original_v + original_t}
-    held = [sid for sid in manifest['splits'][SPLIT] if components[sid] not in seen]
-    held_components = {sid: components[sid] for sid in held}
+    validation = manifest['splits'][SPLIT]
     source_system = str(roots['association'] / 'system')
     archive_paths = marker['archive_paths']
     if (marker['status'] != 'CACHE_COMPLETED' or marker['native_motion_policy'] != 'canonical_all'
             or len(original_v) != 32 or original_t != manifest['splits']['T_core'][:32]
-            or original_v != records['native']['scene_ids'] or tuple(held) != HELD_IDS
-            or len(set(held_components.values())) != 23
-            or records['mean']['scene_ids'] != manifest['splits'][SPLIT]
+            or original_v != records['native']['scene_ids'] or len(validation) != 300
+            or len(set(validation)) != 300 or records['mean']['scene_ids'] != validation
             or records['full_data']['completed_V_scenes'] != 300
             or records['full_data']['state_speed_unit'] != 'mps'
             or records['full_data']['native_run'] != str(roots['native'])
@@ -61,7 +57,22 @@ def load_population(runs):
             or len(set(archive_paths)) != len(archive_paths)
             or not all(Path(path).is_file() for path in archive_paths)):
         raise ValueError('original V population, component disjointness or frozen input lineage differs')
+    return validation, manifest['components'], archive_paths, original_v + original_t
+
+
+def load_population(runs):
+    validation, components, archive_paths, original = _population_inputs(runs)
+    seen = {components[sid] for sid in original}
+    held = [sid for sid in validation if components[sid] not in seen]
+    held_components = {sid: components[sid] for sid in held}
+    if tuple(held) != HELD_IDS or len(set(held_components.values())) != 23:
+        raise ValueError('original V48 development population differs')
     return held, held_components, archive_paths
+
+
+def load_full_population(runs):
+    validation, components, archive_paths, _ = _population_inputs(runs)
+    return validation, {sid: components[sid] for sid in validation}, archive_paths
 
 
 def validate_measurement_archive(runs, archive):
@@ -72,9 +83,9 @@ def validate_measurement_archive(runs, archive):
     validate_archive(archive, read(Path(full['manifest'])))
 
 
-def _require_held(sid):
-    if sid not in HELD_IDS:
-        raise ValueError(f'scene {sid} is outside the frozen V48 development population')
+def _require_scene(sid, scene_ids):
+    if sid not in scene_ids:
+        raise ValueError(f'scene {sid} is outside the declared validation population')
 
 
 def _canonical_tracks(rows, sid, nodes, sources):
@@ -103,9 +114,9 @@ def _canonical_tracks(rows, sid, nodes, sources):
     return tracks
 
 
-def load_scene(runs, sid, archive):
+def load_scene(runs, sid, archive, *, scene_ids=HELD_IDS):
     """Load measurement-only native events, frozen WS, and the original physical Mean."""
-    _require_held(sid)
+    _require_scene(sid, scene_ids)
     full = runs / PARENTS['full_data'] / 'private/motion' / SPLIT / f'scene-{sid}.npz'
     mean = runs / PARENTS['mean'] / 'private'
     with np.load(full, allow_pickle=False) as saved:
@@ -168,9 +179,9 @@ def load_scene(runs, sid, archive):
                 native_motion=legacy_motion)
 
 
-def read_evaluation(runs, sid, nodes, query):
+def read_evaluation(runs, sid, nodes, query, *, scene_ids=HELD_IDS):
     """Read the full 151 target registry only after every V prediction is saved."""
-    _require_held(sid)
+    _require_scene(sid, scene_ids)
     path = runs / PARENTS['full_data'] / 'private/evaluation' / SPLIT / f'scene-{sid}.npz'
     with np.load(path, allow_pickle=False) as saved:
         np.testing.assert_array_equal(saved['node_ids'], nodes)
