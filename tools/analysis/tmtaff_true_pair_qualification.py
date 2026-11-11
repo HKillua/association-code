@@ -17,10 +17,14 @@ from association.data.physical_units import KNOT_TO_MPS, SPEED_UNIT_POLICY, norm
 from association.data.timed import prepare_timed_scene
 from association.evaluation.fusion_controls import attribute_errors, ordinary_fusion
 from association.models.fusion import FusionLoss, PairFusion, PairFusionConfig
-from association.training.common import normalize_scene
+from association.training.common import _optimizer, normalize_scene
 from association.training.tmtaff import load_complete_snapshot
 
 IDEA = 'IDEA-TMTAFF-COMPONENT-QUALIFICATION-20261111'
+PLAN_VERSION = '1.1'
+LEARNING_RATE = .002
+GRADIENT_CLIP = 1.
+LOSS_FIELDS = dict(position_loss_mode='standard_smooth_l1', longitude_loss_mode='shortest_arc')
 SCENES = ('0', '3', '7', '9', '10', '11', '14', '17')
 FEATURES = ('lat', 'lon', 'vel', 'cou')
 CONTROLS = ('CAP128_MEAN', 'CANONICAL_MEAN', 'OLD_TFM')
@@ -93,11 +97,20 @@ def source_checkpoints(root, device):
                     for prefix in COMPLETION_PREFIXES)
             and all(torch.equal(tcm['states'][0][name], tfm['states'][0][name])
                     for name in completion), '107 frozen TCM weights differ')
-    expected = dict(seed=SEED, pair_microbatch=MICROBATCH, gradient_clip=1.0,
-                    position_loss_mode='standard_smooth_l1', longitude_loss_mode='shortest_arc',
-                    lr_schedule='constant')
+    expected = dict(seed=SEED, pair_microbatch=MICROBATCH, gradient_clip=GRADIENT_CLIP,
+                    lr_schedule='constant', **LOSS_FIELDS)
     require(all(tfm['config'][key] == value for key, value in expected.items())
-            and tfm['config']['learning_rates']['TFM_FROZEN'] == .002, '107 optimizer/loss contract differs')
+            and tfm['config']['learning_rates']['TFM_FROZEN'] == LEARNING_RATE
+            and {row['learning_rate'] for row in tfm['history']} == {LEARNING_RATE},
+            '107 optimizer/loss contract differs')
+    groups = tfm['optimizer']['param_groups']
+    require(len(groups) == 1 and len(groups[0]['params']) == 260,
+            '107 TFM optimizer group contract differs')
+    optimizer_reference = group_settings(groups[0])
+    require(optimizer_reference['lr'] == LEARNING_RATE
+            and optimizer_reference['betas'] == (.85, .99)
+            and optimizer_reference['eps'] == 1e-6
+            and optimizer_reference['weight_decay'] == 0., '107 Adam settings differ')
     fusion = PairFusionConfig(fc_hidden=128, output_parameterization='train_position_affine')
     require(tfm['fusion_config'] == vars(fusion), '107 TFM architecture differs')
     rows = {str(row['scene_id']): row for row in tcm['data_contract'][0]
@@ -106,7 +119,7 @@ def source_checkpoints(root, device):
     normalizer = tcm['normalizer']
     del tcm, tfm
     model = load_complete_snapshot(tcm_path, device=device, selected=False)['model']
-    return model.requires_grad_(False), normalizer, fusion, rows, len(completion)
+    return model.requires_grad_(False), normalizer, fusion, rows, len(completion), optimizer_reference
 
 
 def timed_scene(cache, identities, scene_id):
@@ -250,6 +263,30 @@ def metrics(prediction, population, scenes):
     return result
 
 
+def group_settings(group):
+    return {key: value for key, value in group.items() if key != 'params'}
+
+
+def make_arms(config, normalizer, device, optimizer_reference):
+    models = {}
+    for name, loss_class in ARMS.items():
+        torch.manual_seed(SEED)
+        fusion = PairFusion(config, normalizer).to(device)
+        objective = loss_class(**LOSS_FIELDS).to(device)
+        optimizer = _optimizer([*fusion.parameters(), *objective.parameters()],
+                               {'learning_rate': LEARNING_RATE})
+        groups = optimizer.param_groups
+        require(len(groups) == 1 and group_settings(groups[0]) == optimizer_reference
+                and not optimizer.state, f'{name} initial Adam does not match 107')
+        models[name] = fusion, objective, optimizer
+    initial_a, initial_b = (model[0].state_dict() for model in models.values())
+    require(initial_a.keys() == initial_b.keys()
+            and all(torch.equal(initial_a[key], initial_b[key]) for key in initial_a)
+            and all(not bool(values[1].log_variance.any()) for values in models.values()),
+            'A/B initialization mismatch')
+    return models
+
+
 def checkpoint(fusion, objective, population, targets, valid, counts, path):
     """Save forward predictions before opening the quantitative readout."""
     fusion.eval()
@@ -289,7 +326,7 @@ def update(fusion, objective, optimizer, population, targets, valid, counts):
                 and not bool(fusion.state_projection.bias.grad[2:].any()),
                 'position-only branch sent speed/heading gradients')
     gradient = torch.nn.utils.clip_grad_norm_(
-        [*fusion.parameters(), *objective.parameters()], 1., error_if_nonfinite=True)
+        [*fusion.parameters(), *objective.parameters()], GRADIENT_CLIP, error_if_nonfinite=True)
     optimizer.step()
     variance = objective.log_variance.detach().exp().cpu().tolist()
     return dict(total=total, components=dict(zip(FEATURES, components.tolist())),
@@ -317,8 +354,7 @@ def gate(final, initial, cap):
 
 
 def self_check():
-    fields = dict(position_loss_mode='standard_smooth_l1', longitude_loss_mode='shortest_arc')
-    source, position = FusionLoss(**fields), PositionOnlyLoss(**fields)
+    source, position = FusionLoss(**LOSS_FIELDS), PositionOnlyLoss(**LOSS_FIELDS)
     prediction = torch.tensor([[[.2, -179.9, 5., 359.]], [[.4, 45., 3., 1.]]], requires_grad=True)
     target = torch.tensor([[[.1, 179.9, 7., 1.]], [[.5, 44., 2., 359.]]])
     valid = torch.tensor([[[True, True, False, True]], [[True, True, True, True]]])
@@ -333,7 +369,19 @@ def self_check():
     result['total'].backward()
     require(bool(prediction.grad[..., :2].abs().all()) and not bool(prediction.grad[..., 2:].any())
             and not bool(position.log_variance.grad[2:].any()), 'loss ablation self-check failed')
-    print('position loss reuse, wrap, two-chunk parity and isolated gradients passed')
+    original_adam = _optimizer([torch.nn.Parameter(torch.tensor(1.))],
+                               {'learning_rate': LEARNING_RATE})
+    reference = group_settings(original_adam.param_groups[0])
+    require(reference['betas'] == (.85, .99) and reference['eps'] == 1e-6
+            and reference['weight_decay'] == 0., 'reference Adam fixture differs')
+    small = PairFusionConfig(fc_hidden=4, length=2, d_model=4, nhead=2, num_layers=1)
+    models = make_arms(small, None, 'cpu', reference)
+    with torch.no_grad():
+        left = torch.arange(8, dtype=torch.float32).reshape(1, 2, 4)
+        right = left.flip(1)
+        values = [fusion.eval()(left, right)['states'] for fusion, _, _ in models.values()]
+    require(torch.equal(*values), 'same-initialization forward fixture differs')
+    print('107 Adam, same-init forward, position loss wrap, two-chunk parity and isolation passed')
 
 
 def run(args):
@@ -344,7 +392,7 @@ def run(args):
     start = time.monotonic()
     roots = {name: args.runs.resolve() / value for name, value in RUNS.items()}
     counts = dict.fromkeys(ARMS, 0)
-    state = dict(status='RUNNING', idea_id=IDEA, plan_version='1.0', sources={k: str(v) for k, v in roots.items()},
+    state = dict(status='RUNNING', idea_id=IDEA, plan_version=PLAN_VERSION, sources={k: str(v) for k, v in roots.items()},
                  optimizer_updates=counts, raw_archive_read=False, validation_opened=False, test_opened=False,
                  tcm_updates=0, tam_updates=0, joint_updates=0, time_policy=args.time_policy,
                  device=args.device, commit=os.environ.get('C90_EXPECTED_COMMIT'))
@@ -361,7 +409,8 @@ def run(args):
         device = torch.device(args.device)
         require(device.type == 'cuda' and torch.cuda.is_available(), 'C90 requires assigned CUDA device')
         progress('bind_inputs', gpu=torch.cuda.get_device_name(device))
-        model, normalizer, config, contracts, bound_tensors = source_checkpoints(roots['checkpoint'], device)
+        model, normalizer, config, contracts, bound_tensors, optimizer_reference = source_checkpoints(
+            roots['checkpoint'], device)
         population, scenes = load_population(roots, model, normalizer, contracts, device)
         del model
         controls = {name: metrics(population[name], population, scenes) for name in CONTROLS}
@@ -369,9 +418,14 @@ def run(args):
                             target_states=population['truth'], target_valid=population['valid'],
                             selected_support=population['support'],
                             **{name: population[name] for name in CONTROLS})
+        models = make_arms(config, normalizer, device, optimizer_reference)
+        require(all(len(values[2].param_groups[0]['params']) == 260 for values in models.values()),
+                'current optimizer parameter count differs from 107')
         audit = dict(status='PASSED', scenes=scenes, pair_count=16, pair_queries=1024,
                      feature_valid=dict(zip(FEATURES, COUNTS)), support_position_counts=[132, 299, 301],
                      source_completion_tensors=bound_tensors, reference_speed_unit='mps',
+                     adam=optimizer_reference, same_initial_state=True, lr_schedule='constant',
+                     gradient_clip=GRADIENT_CLIP,
                      controls=controls, read_validation=False, read_test=False, read_raw_archive=False)
         write_json(output / 'input_audit.json', audit)
         if args.preflight:
@@ -380,19 +434,6 @@ def run(args):
         targets = torch.as_tensor(population['truth'], dtype=torch.float32, device=device)
         valid = torch.as_tensor(population['valid'], device=device)
         full_counts = valid.sum((0, 1))
-        fields = dict(position_loss_mode='standard_smooth_l1', longitude_loss_mode='shortest_arc')
-        models = {}
-        for name, loss_class in ARMS.items():
-            torch.manual_seed(SEED)
-            fusion = PairFusion(config, normalizer).to(device)
-            objective = loss_class(**fields).to(device)
-            optimizer = torch.optim.Adam([*fusion.parameters(), *objective.parameters()], lr=.002)
-            models[name] = fusion, objective, optimizer
-        initial_a, initial_b = (model[0].state_dict() for model in models.values())
-        require(initial_a.keys() == initial_b.keys()
-                and all(torch.equal(initial_a[key], initial_b[key]) for key in initial_a)
-                and all(not bool(values[1].log_variance.any()) for values in models.values()),
-                'A/B initialization mismatch')
         torch.manual_seed(SEED)
         cuda_rng = {name: torch.cuda.get_rng_state(device).clone() for name in ARMS}
         snapshots, histories = ({name: {} for name in ARMS}, {name: [] for name in ARMS})
@@ -418,15 +459,14 @@ def run(args):
                                    private / f'{name}-u{step:03d}.pt')
             if step == 0:
                 require(np.array_equal(*initial_predictions.values()), 'A/B u0 predictions differ')
-            if step in SNAPSHOTS or step == 1 or step % 8 == 0:
-                write_json(output / 'training.json', dict(history=histories, snapshots=snapshots))
-                progress('training', matched_cuda_rng=torch.equal(*cuda_rng.values()),
-                         peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated(device))
-                require(state['matched_cuda_rng'], 'A/B CUDA dropout RNG streams differ')
+            write_json(output / 'training.json', dict(history=histories, snapshots=snapshots))
+            progress('training', matched_cuda_rng=torch.equal(*cuda_rng.values()),
+                     peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated(device))
+            require(state['matched_cuda_rng'], 'A/B CUDA dropout RNG streams differ')
         results = {name: gate(by_step[str(SNAPSHOTS[-1])]['metrics'], by_step['0']['metrics'], controls['CAP128_MEAN'])
                    for name, by_step in snapshots.items()}
         write_json(output / 'summary.json', dict(
-            status='COMPLETED', idea_id=IDEA, plan_version='1.0', training_population='fixed original 153 T8',
+            status='COMPLETED', idea_id=IDEA, plan_version=PLAN_VERSION, training_population='fixed original 153 T8',
             generalization_measured=False, counts=audit['feature_valid'], scenes=scenes, controls=controls,
             snapshots=snapshots, gates=results, ready_for_separate_true_group_qualification=
             results['ALL_ATTRIBUTES']['four_attribute_pass'], updates=counts,
