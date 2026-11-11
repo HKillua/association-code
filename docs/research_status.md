@@ -29,7 +29,7 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C71盘点与资格方案](proposals/offline_same_source_swap_20261110.md)发现已有T32分区在纳入176网格后，30场有等组数备选，但没有一场以WS为起点保持各组首节点与源计数。优先检验同源片段互换的关联可达性和旧J选择差距，再按[C70骨架方案](proposals/offline_trajectory_reselection_20261110.md)比较同池条件状态评分并核完整四属性。保留共时跨目标几何C72及条件四属性优化C73。当前未形成可领的执行合同。TMTAFF继续分别核TAM判别与真组补全融合的资格，合格后同场景、同信息、同输出协议比较完整系统。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C71已完成科学和独审](reports/2026-11-11-same-source-swap-review.md)。WS保首互换在5/32场有联合改善动作，旧J选中2场，漏选涉及2组件。联合上界补回2/124条同源、14/385条跨源漏边，20/32场组数仍与真实身份数不同。按[C70骨架方案](proposals/offline_trajectory_reselection_20261110.md#c71结果后的状态评分资格)做有界同池状态评分资格。主前端重选能拆并并改变组容量的原生片段候选，检验共时跨目标几何C72的增量。TMTAFF的[分量核验](proposals/tmtaff_component_qualification_20261111.md)已定位下一对照，分别固定TAM对比损失尺度、TCM/TFM真对训练的四属性与位置目标。合格后用同场景、同输入和同输出协议比较完整系统。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
 2. **在线先以相对平移校正做跨源候选，保持位置并源等权做融合对照。** [字段与方法报告](reports/2026-11-11-online-field-and-method-review.md)保存 8 场字段审计、3 场诊断、两项事前资格检查与反例。严格输入为已到经纬、时间和源内片段等同性，原始速航按[字段权限](data_contract.md#在线字段可用时间)遮蔽。前 600 秒无标签估计通过三个训练场的时间留出资格。随后在独立开发场比较校正与宽门，接入允许未匹配的指派，同源长接续独立于发布活动窗，确认随新量测更新。融合先用保持位置和源等权建立共同人口，再核位置更新与速度估计可分离的递推滤波。20 秒年龄加权有 MAE–P99 取舍，按事前联合判据未晋级。相对平移用于跨源比较，绝对坐标和四属性精度另核。TSA-cTFER 保留为关联候选，原 20 秒和适配 1 Hz 条件分别报告。IFNet/GCI-PMB 待建立其后验输入资格。
    - 因果输入、每秒发布、跨次身份、可变 K 及确认、结果延迟和持续吞吐的条件持续有效，最大结果延迟待定。上述为零训练开发选型。原整行控制的本地工程核验仍见 `outputs/online-replay-20261110.cqt3tZ/`，属已结工程证据。在线代码和测试都在 [online_observation](../online_observation/README.md)，无新增服务器 READY。
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
@@ -42,7 +42,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.12](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-212)，P14/F310/M124/E213/C73|
+|全局问题—现象—机制—证据|[Mode C2.13](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-213)，P14/F311/M124/E214/C73|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含两项资格验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|

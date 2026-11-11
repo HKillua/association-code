@@ -4,6 +4,8 @@
 
 ## 2026-11-11
 
+- [C71同源片段互换，原T32科学与独审](2026-11-11-same-source-swap-review.md)
+
 - [MTAD 字段时间审计与在线关联、融合选型](2026-11-11-online-field-and-method-review.md)
 
 ## 2026-11-10
