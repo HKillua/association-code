@@ -2,9 +2,14 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-11
+
+- [TMTAFF分量资格对照](tmtaff_component_qualification_20261111.md)
+
 ## 2026-11-10
 
 - [离线骨架重选与条件轨迹评分资格方案](offline_trajectory_reselection_20261110.md)
+- [C71同源片段互换的资格方案](offline_same_source_swap_20261110.md)
 
 ## 2026-11-02
 

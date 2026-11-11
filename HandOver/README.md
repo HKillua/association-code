@@ -2,6 +2,10 @@
 
 当前领取与保全只读[Handover](Handover.md)。以下按原实验编号导航所有L2S/S2L，保留失败、开始和终态原件；历史READY和预算不自动重启。科学解释在[报告](../docs/reports/README.md)，设计依据在[提案](../docs/proposals/README.md)。
 
+|编号|原合同L2S|
+|---|---|
+|C71同源互换|[20261111-c71](L2S-20261111-c71.md)|
+
 <details>
 <summary>工程计时（2026-11-05）（2项）</summary>
 
