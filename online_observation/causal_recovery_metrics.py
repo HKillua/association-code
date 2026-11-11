@@ -8,7 +8,6 @@ from statistics import median
 
 
 ARMS = ("geometry", "wide", "anchor", "motion")
-AUGMENTED = ARMS[1:]
 DEADLINES = (0, 20, 60, 120, 240)
 HORIZON = DEADLINES[-1]
 COHORTS = ("first", "outside")
@@ -20,7 +19,6 @@ QUERY_COUNTS = (
     "anchor_in_gate_with_all_true_witnesses", "geometry_correct", "geometry_wrong", "geometry_unmatched",
     "motion_supported_in_ring", "motion_qualified_in_ring", "anchor_fitted_in_ring",
     "anchor_in_gate_in_ring", "single_in_gate_in_ring",
-    *(f"{arm}_{metric}" for arm in AUGMENTED for metric in ("recovered", "added_true", "added_false")),
 )
 ARM_COUNTS = ("true_edges", "false_edges", "added_true", "added_false", "events_with_added_true",
               "events_with_added_false", "added_with_false_witness", "distinct_added_true", "distinct_added_false",
@@ -94,44 +92,53 @@ def _delay_summary(population, truncated, delays, paired):
                          unconfirmed_with_truncated_followup=part["unconfirmed_with_truncated_followup"],
                          by_seconds={str(t): sum(value <= t for value in samples) for t in DEADLINES},
                          delay_seconds=_quantiles(samples), samples_seconds=samples)
-    comparisons = {}
-    for arm, part in paired.items():
-        differences = sorted(part["difference_samples_seconds"])
-        only_arm = sorted(part["only_arm_samples_seconds"])
-        comparisons[arm] = dict(
-            both_confirmed=len(differences), only_arm_confirmed=len(only_arm),
-            only_geometry_confirmed=part["only_geometry_confirmed"],
-            neither_confirmed=population - len(differences) - len(only_arm) - part["only_geometry_confirmed"],
-            earlier=sum(value < 0 for value in differences), same=sum(value == 0 for value in differences),
-            later=sum(value > 0 for value in differences), difference_seconds=_quantiles(differences),
-            difference_samples_seconds=differences, only_arm_delay_seconds=_quantiles(only_arm),
-            only_arm_samples_seconds=only_arm,
-        )
-    return dict(population=population, followup_truncated=truncated, arms=arms, versus_geometry=comparisons)
+    output = dict(population=population, followup_truncated=truncated, arms=arms)
+    for reference, groups in paired.items():
+        comparisons = {}
+        for arm, part in groups.items():
+            differences = sorted(part["difference_samples_seconds"])
+            only_arm = sorted(part["only_arm_samples_seconds"])
+            reference_only = part["only_reference_confirmed"]
+            comparisons[arm] = dict(
+                both_confirmed=len(differences), only_arm_confirmed=len(only_arm),
+                neither_confirmed=population - len(differences) - len(only_arm) - reference_only,
+                earlier=sum(value < 0 for value in differences), same=sum(value == 0 for value in differences),
+                later=sum(value > 0 for value in differences), difference_seconds=_quantiles(differences),
+                difference_samples_seconds=differences, only_arm_delay_seconds=_quantiles(only_arm),
+                only_arm_samples_seconds=only_arm,
+            )
+            comparisons[arm][f"only_{reference}_confirmed"] = reference_only
+        output[f"versus_{reference}"] = comparisons
+    return output
 
 
-def _grade_delay(starts, confirmed, scene_end):
+def _grade_delay(starts, confirmed, scene_end, references):
     truncated = {key for key, stamp in starts.items() if scene_end - stamp < HORIZON}
     delays = {arm: dict(samples_seconds=list(values.values()),
                         unconfirmed_with_truncated_followup=len(truncated - values.keys()))
               for arm, values in confirmed.items()}
     paired = {}
-    baseline = confirmed["geometry"]
-    for arm in AUGMENTED:
-        values = confirmed[arm]
-        paired[arm] = dict(difference_samples_seconds=[values[key] - baseline[key] for key in baseline.keys() & values],
-                           only_arm_samples_seconds=[values[key] for key in values.keys() - baseline],
-                           only_geometry_confirmed=len(baseline.keys() - values.keys()))
+    for reference in references:
+        baseline = confirmed[reference]
+        paired[reference] = {
+            arm: dict(difference_samples_seconds=[values[key] - baseline[key] for key in baseline.keys() & values],
+                      only_arm_samples_seconds=[values[key] for key in values.keys() - baseline],
+                      only_reference_confirmed=len(baseline.keys() - values.keys()))
+            for arm, values in confirmed.items() if arm != reference
+        }
     return _delay_summary(len(starts), len(truncated), delays, paired)
 
 
-def score_recovery(frames, labels):
+def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",)):
     """Grade frozen decisions and return scene counts without fragment identities."""
-    queries = {group: Counter(dict.fromkeys(QUERY_COUNTS, 0)) for group in QUERY_GROUPS}
-    arm_counts = {arm: Counter(dict.fromkeys(ARM_COUNTS, 0)) for arm in ARMS}
-    distinct = {arm: {name: set() for name in ("true", "false", "added_true", "added_false")} for arm in ARMS}
+    augmented = tuple(arm for arm in arms if arm != "geometry")
+    query_counts = (*QUERY_COUNTS, *(f"{arm}_{metric}" for arm in augmented
+                                    for metric in ("recovered", "added_true", "added_false")))
+    queries = {group: Counter(dict.fromkeys(query_counts, 0)) for group in QUERY_GROUPS}
+    arm_counts = {arm: Counter(dict.fromkeys(ARM_COUNTS, 0)) for arm in arms}
+    distinct = {arm: {name: set() for name in ("true", "false", "added_true", "added_false")} for arm in arms}
     starts = {name: {} for name in COHORTS}
-    confirmed = {name: {arm: {} for arm in ARMS} for name in COHORTS}
+    confirmed = {name: {arm: {} for arm in arms} for name in COHORTS}
     outside_distinct = set()
     event_count = 0
     scene_end = 0.
@@ -148,7 +155,7 @@ def score_recovery(frames, labels):
         evidence = {item.pair: item for item in frame.evidence}
         selected_true_keys = {}
         added_true_keys, added_false_keys = {}, {}
-        for arm in ARMS:
+        for arm in arms:
             added = set(frame.additions.get(arm, ()))
             true, false = added & truth, added - truth
             selected_true_keys[arm] = base_true_keys | _endpoints(true)
@@ -181,7 +188,7 @@ def score_recovery(frames, labels):
                 outside_distinct.update(true_peers)
                 counts.update(outside=1, outside_true_edge_queries=len(true_peers))
                 counts.update(_evidence_counts([evidence[pair] for pair in true_peers if pair in evidence], truth))
-            for arm in AUGMENTED:
+            for arm in augmented:
                 counts.update({f"{arm}_recovered": outside and key in added_true_keys[arm],
                                f"{arm}_added_true": key in added_true_keys[arm],
                                f"{arm}_added_false": key in added_false_keys[arm]})
@@ -207,7 +214,7 @@ def score_recovery(frames, labels):
     return dict(events=event_count, distinct_outside_true=len(outside_distinct),
                 queries={name: dict(value) for name, value in queries.items()},
                 arms={arm: dict(value) for arm, value in arm_counts.items()},
-                delays={name: _grade_delay(starts[name], confirmed[name], scene_end) for name in COHORTS})
+                delays={name: _grade_delay(starts[name], confirmed[name], scene_end, references) for name in COHORTS})
 
 
 def _sum_counts(parts):
@@ -217,26 +224,33 @@ def _sum_counts(parts):
     return dict(counts)
 
 
-def pool_recovery(results):
+def pool_recovery(results, *, arms=ARMS, references=("geometry",)):
     """Pool additive counts and recompute all empirical delay summaries."""
     scenes = list(results)
     delays = {}
     for cohort in COHORTS:
         parts = [scene["delays"][cohort] for scene in scenes]
-        arms = {arm: dict(samples_seconds=[sample for part in parts for sample in part["arms"][arm]["samples_seconds"]],
-                          unconfirmed_with_truncated_followup=sum(part["arms"][arm]["unconfirmed_with_truncated_followup"]
-                                                                  for part in parts)) for arm in ARMS}
+        arm_delays = {
+            arm: dict(samples_seconds=[sample for part in parts for sample in part["arms"][arm]["samples_seconds"]],
+                      unconfirmed_with_truncated_followup=sum(part["arms"][arm]["unconfirmed_with_truncated_followup"]
+                                                              for part in parts)) for arm in arms
+        }
         paired = {}
-        for arm in AUGMENTED:
-            comparisons = [part["versus_geometry"][arm] for part in parts]
-            paired[arm] = dict(difference_samples_seconds=[value for row in comparisons
-                                                           for value in row["difference_samples_seconds"]],
-                               only_arm_samples_seconds=[value for row in comparisons
-                                                         for value in row["only_arm_samples_seconds"]],
-                               only_geometry_confirmed=sum(row["only_geometry_confirmed"] for row in comparisons))
+        for reference in references:
+            groups = {}
+            for arm in arms:
+                if arm == reference:
+                    continue
+                comparisons = [part[f"versus_{reference}"][arm] for part in parts]
+                groups[arm] = dict(difference_samples_seconds=[value for row in comparisons
+                                                               for value in row["difference_samples_seconds"]],
+                                   only_arm_samples_seconds=[value for row in comparisons
+                                                             for value in row["only_arm_samples_seconds"]],
+                                   only_reference_confirmed=sum(row[f"only_{reference}_confirmed"] for row in comparisons))
+            paired[reference] = groups
         delays[cohort] = _delay_summary(sum(part["population"] for part in parts),
-                                        sum(part["followup_truncated"] for part in parts), arms, paired)
+                                        sum(part["followup_truncated"] for part in parts), arm_delays, paired)
     return dict(events=sum(scene["events"] for scene in scenes),
                 distinct_outside_true=sum(scene["distinct_outside_true"] for scene in scenes),
                 queries={group: _sum_counts(scene["queries"][group] for scene in scenes) for group in QUERY_GROUPS},
-                arms={arm: _sum_counts(scene["arms"][arm] for scene in scenes) for arm in ARMS}, delays=delays)
+                arms={arm: _sum_counts(scene["arms"][arm] for scene in scenes) for arm in arms}, delays=delays)

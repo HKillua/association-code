@@ -82,12 +82,13 @@ def _assign(costs, null):
 class RecoveryTrace:
     """Observe the common geometry without updating its decision state."""
 
-    def __init__(self, fit):
+    def __init__(self, fit, expansion_observer=None):
         self.plane = None
         self.shifts = _registration_shifts(fit)
         self.histories = defaultdict(list)
         self.motion_cache = {}
         self.frames = []
+        self.expansion_observer = expansion_observer
 
     def observed_events(self, events):
         for stamp, positions in events:
@@ -133,6 +134,7 @@ class RecoveryTrace:
 
         additions = {"wide": (), "anchor": (), "motion": ()}
         evidence = []
+        motion = {}
         if ring:
             open_ring = {pair: cost for pair, cost in ring.items() if occupied.isdisjoint(pair)}
             additions["wide"] = _assign(open_ring, COARSE_SQ / 2)
@@ -161,16 +163,19 @@ class RecoveryTrace:
                                          pair in motion_unique, anchor.status, anchor.witnesses, in_gate,
                                          single is not None and _length_sq(_minus(raw, single)) <= GATE_SQ))
             additions["anchor"] = _assign(anchor_costs, NULL_COST)
-        self.frames.append(Frame(stamp, tuple(sorted(updated)), tuple(sorted(born)), tuple(sorted(fresh)),
-                                 tuple(sorted(geometric)), geometry_links, additions, tuple(evidence)))
+        frame = Frame(stamp, tuple(sorted(updated)), tuple(sorted(born)), tuple(sorted(fresh)),
+                      tuple(sorted(geometric)), geometry_links, additions, tuple(evidence))
+        self.frames.append(frame)
+        if self.expansion_observer is not None:
+            self.expansion_observer(frame, self.histories, ring, motion)
 
 
-def capture_scene(events):
+def capture_scene(events, *, expansion_observer=None):
     sources = {key[0] for _, batch in events for key in batch}
     if len(sources) != 2:
         raise ValueError("the frozen Level1 experiment requires exactly two sources per scene")
     fit = estimate_translation(events)
-    observer = RecoveryTrace(fit)
+    observer = RecoveryTrace(fit, expansion_observer)
     replay(observer.observed_events(events), lambda context, stamp, keys: {}, fit=fit, observer=observer)
     return observer.frames, {key: fit[key] for key in ("status", "reason")}
 
