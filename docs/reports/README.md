@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [异步关联的真边可达、排序和错链寿命](2026-11-12-online-nemot-association-diagnostic.md)
+
 - [C83 近远端速度留场复验](2026-11-12-held-speed-readout-review.md)
 
 - [C87 同船支持资格和候选外共视锚](2026-11-12-supplier-provenance-review.md)
