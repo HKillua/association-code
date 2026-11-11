@@ -2,6 +2,8 @@
 
 2026-11-11。范围为 MTAD Level1 已加工量测的理想到达回放。证据包括原文、官方赛题资料、八场字段审计和三场开发诊断。输入权限见[数据约定](../data_contract.md#在线字段可用时间)，方法的事前条件及判据见[诊断和 Idea](../proposals/online_reselection_20261111.md)。[统计原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261111_online_mtad/)
 
+此前的按整行交付工程回放覆盖场景 692 的 0–7200 秒和 1187 的 3300–3900 秒，冷启动和 60 秒过期。共 7802 次查询、4935 行量测，峰值活跃片段 6/69，Apple M2 服务时间 P95 为 0.091/1.105 ms。该记录用于验证按行到达、片段生命周期与发布接口。字段生成时刻由下文审计。[原工程汇总](../../outputs/online-replay-20261110.cqt3tZ/summary.json)
+
 ## 来源分析
 
 `ANALYSIS_PACKAGE` v1.0，`AP-ONLINE-MTAD-20261111`，partial。崔等《基于全球AIS的多源航迹关联数据集》，电子与信息学报 45(2):746–756，正式 2023 年。针对在线可见性复核 §2.6(a–k) 及 (2–3)，以及使用说明 pp1–3、赛题答疑 Q5/Q9/Q11/Q15/Q18/Q23/Q26/Q27/Q29/Q30、评分 V4 pp1–2。数据研究的单位为场景、目标、源片段和观测行。原文目的在于构造带对应关系的多源 AIS 派生数据和竞赛任务。以下按操作和实证定位。[正式原文](https://jeit.ac.cn/cn/article/doi/10.11999/JEIT221202?viewType=HTML) · [官方使用说明](https://jeit.ac.cn/fileDZYXXXB_ONLY/cms/news/info/2022/09/6ef3e2a1f6e94cf9a6a7ba25cf055e48/%E5%9F%BA%E4%BA%8E%E5%85%A8%E7%90%83AIS%E7%9A%84%E5%A4%9A%E6%BA%90%E8%88%AA%E8%BF%B9%E5%85%B3%E8%81%94%E6%95%B0%E6%8D%AE%E9%9B%86%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.pdf) · [赛题答疑](</Users/a1/Downloads/02_金海豚竞赛_航迹关联/赛题文档/形影相随科目答疑.pdf>) · [评分 V4](</Users/a1/Downloads/02_金海豚竞赛_航迹关联/赛题文档/目标航迹关联评分细则V4.pdf>)
