@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C85 拆旧边证据与逐时支持的开发复验](2026-11-12-asymmetric-links-review.md)
+
+- [C86 无支撑远端的同侧有支撑速度读出](2026-11-12-far-supported-speed-review.md)
+
 - [2025–2026 在线观测基线筛选](2026-11-12-online-recent-baseline-review.md)
 
 - [MTAD 首报与二报的运动历史支持](2026-11-12-online-recent-motion-support.md)
