@@ -4,6 +4,14 @@
 
 ## 2026-11-12
 
+- [C90 固定16真对的TFM资格](2026-11-12-tmtaff-true-pair-qualification-review.md)
+
+- [C89 全V300远端速度与历史TMTAFF同场四属性](2026-11-12-v300-far-paper-bridge-review.md)
+
+- [C88 候选外平移校正与实际分区](2026-11-12-external-supplier-translation-review.md)
+
+- [C83 近端速度最大增害的逐点血缘](2026-11-12-held-near-tail-audit.md)
+
 - [异步关联的真边可达、排序和错链寿命](2026-11-12-online-nemot-association-diagnostic.md)
 
 - [C83 近远端速度留场复验](2026-11-12-held-speed-readout-review.md)
