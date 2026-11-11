@@ -125,7 +125,7 @@ def combine_outputs(items):
     )
 
 
-def summarize(rows):
+def summarize(rows, *, modes=MODES):
     result = dict(scene_count=len(rows), components=len({r['component_id'] for r in rows}), arms={})
     for arm in ARMS:
         entries = [r['arms'][arm] for r in rows]
@@ -133,7 +133,7 @@ def summarize(rows):
                                    opportunity_scenes=sum(r['protected_candidates'] > 0 for r in entries),
                                    protected_candidates=sum(r['protected_candidates'] for r in entries),
                                    baseline=combine_outputs([r['baseline'] for r in entries]), modes={})
-        for mode in MODES:
+        for mode in modes:
             details = [r['modes'][mode] for r in entries]
             selected = [r['selected'] for r in details]
             axis_by_scene = np.asarray([[r['edge_net'][a] for a in EDGE_AXES] for r in selected])
