@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [NEMOT 运动预测在异步 MTAD 上的留场结果](2026-11-12-online-nemot-motion.md)
+
 - [C85 拆旧边证据与逐时支持的开发复验](2026-11-12-asymmetric-links-review.md)
 
 - [C86 无支撑远端的同侧有支撑速度读出](2026-11-12-far-supported-speed-review.md)

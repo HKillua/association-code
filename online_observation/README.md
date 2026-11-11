@@ -41,4 +41,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.prefix_gate_probe --help`|同场比较前缀拟合分流和固定 1／4 km 门|
 |`python -m online_observation.continuous_factorial --help`|严格位置输入下比较非等间隔 KF、局部及带空配全局分配，逐秒评分持续 ID|
 |`python -m online_observation.recent_motion_support --help`|对固定 Level1 开发场核原生首报与二报的运动历史、候选和邻轨支持|
+|`python -m online_observation.nemot_experiment --help`|组件隔离的 NEMOT 运动三臂，原生事件回放、固定候选与独立事后评分|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|
