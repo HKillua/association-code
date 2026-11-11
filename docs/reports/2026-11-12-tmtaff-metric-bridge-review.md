@@ -2,7 +2,7 @@
 
 ## EXPERIMENT_RECORD
 
-`REC-OFFLINE-TMTAFF-METRIC-BRIDGE-20261112`，research-pipeline-contract v1.0，2026-11-12，completed。来源 `IDEA-OFFLINE-TMTAFF-METRIC-BRIDGE-20261112` plan1.0、Mode C2.23/C84、F327、M136、E241。问题是C81的最新实际输出在TMTAFF四属性统计维度下如何变化。 [事前Idea](../proposals/offline_trajectory_reselection_20261110.md#c81输出的tmtaff四属性评价) · [冻结合同](../../HandOver/L2S-20261112-c84.md) · [执行终态](../../HandOver/S2L-20261112-c84.md)
+`REC-OFFLINE-TMTAFF-METRIC-BRIDGE-20261112`，research-pipeline-contract v1.0，2026-11-12，completed。来源 `IDEA-OFFLINE-TMTAFF-METRIC-BRIDGE-20261112` plan1.0、Mode C2.22、F327、E241。问题是C81的最新实际输出在TMTAFF四属性统计维度下如何变化。 [事前Idea](../proposals/offline_trajectory_reselection_20261110.md#c81输出的tmtaff四属性评价) · [冻结合同](../../HandOver/L2S-20261112-c84.md) · [执行终态](../../HandOver/S2L-20261112-c84.md)
 
 原127开发V32的32场、9组件、3,851片段、1,605组及1,095,780原生事件。只读原C81两套输出、C77支持和原缓存身份/参考。逐场复现原C81全域、启用、切换和未切换的速度统计与圆周航向，并核位置、航向、有效性、目标对应、覆盖和重复逐项一致。CPU21单线程、空CUDA、8GiB地址空间，实际程序6.831秒、worker9.415秒、峰值RSS415,846,400 B，二者退出0。0新预测、拟合、训练、V选参和原始归档读取，封存测试未打开。 [运行](/Users/a1/Projects/biye-ronghe/docs/evidence/20261112_tmtaff_metric_bridge/science/run.json) · [汇总](/Users/a1/Projects/biye-ronghe/docs/evidence/20261112_tmtaff_metric_bridge/science/summary.json) · [逐场](/Users/a1/Projects/biye-ronghe/docs/evidence/20261112_tmtaff_metric_bridge/science/scenes.json.gz)
 
