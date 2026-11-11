@@ -29,7 +29,7 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C78](reports/2026-11-11-disjoint-partition-candidate-review.md)的两处合法编辑在两个有限池各有20场可保覆盖并去假补漏，事后净增跨源真边51/46条，旧J均选中0个受保护场。C80冻结这两个候选池，验证新的分组评分与接受规则，C72保留候选外共时跨目标几何。[C79](reports/2026-11-11-endpoint-velocity-lineage-review.md)核15,404个原量测端点行，首端43/43、尾端38/90在割线相对差1%内。近端纯组首成员更远的48点，最近字段MAE26.96→13.73m/s，通过局部对照门槛。C81再用可观测条件验证实际近端读出，[C74平滑求导](reports/2026-11-11-fixed-position-motion-readout-review.md)为开发强控。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C80](reports/2026-11-12-disjoint-partition-rerank-review.md)在[C78](reports/2026-11-11-disjoint-partition-candidate-review.md)原两池各有20场受保护机会，旧J和五个新对照实际均选中0场。关闭当前重加权。C82在同池验证独立的同源连续性和跨源共时相对运动，分别查排名与接受，C72保留候选外结构证据。[C81](reports/2026-11-12-near-endpoint-readout-review.md)可观测近端门实际切换79个有效速度点，65好/14差，全域速度MAE1.176843→1.160232m/s，P99下降，覆盖及位置航向保持，达到开发保留门槛。C83在独立保留开发场复验同规则，[C74平滑求导](reports/2026-11-11-fixed-position-motion-readout-review.md)作为对照。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
 2. **在线前缀分流保真通过，无历史拒配未达资格。** 128 个新 T_core 场、3404 个首报。拟合后 1 km、弃权保留 4 km，相对固定 4 km 保留 2133/2138 原正确，少接 239 错，无历史错配只拒 182/400，低于 50%。相对固定 1 km 救回 90 正，新增 27 错。0–3 候选层保留 104/104 原正确，目标错配拒掉 5/13。分流保留为首报保真对照。[冻结计划](proposals/online_prefix_gate_qualification_20261112.md) · [Record/Squeeze](reports/2026-11-12-online-prefix-gate-qualification.md) · [在线 Mode C v16](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v16-前缀分流实验回流)
    - 下一步先查 255 个门内已有新鲜真边的错配，核两侧共同过去时间段的位置增量是否有足量支持，再冻结排序对照。另有 218 个无真对侧历史错配，109 个仅有一个门内假候选，需可匹配性信息或暂定身份机制。开发场超龄恢复误伤和局部活动退化仍约束对照。[固定门留场](reports/2026-11-11-online-held-gate-qualification.md) · [超龄记录](reports/2026-11-11-online-stale-history-qualification.md) · [无历史拒配记录](reports/2026-11-11-online-no-peer-rejection-qualification.md)
    - 继续核真实到达、发布时钟、独立状态参考和持续系统 ID。严格输入、每秒发布、持续身份与可变 K 沿用，代码在 [online_observation](../online_observation/README.md) 独立维护。当前无在线执行合同。[字段权限](data_contract.md#在线字段可用时间)
@@ -43,7 +43,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.20](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-220)，P14/F325/M131/E232/C81|
+|全局问题—现象—机制—证据|[Mode C2.22](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-222)，P14/F327/M133/E241/C83|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|

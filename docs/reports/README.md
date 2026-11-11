@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C80冻结候选池的关联重评分](2026-11-12-disjoint-partition-rerank-review.md)
+
+- [C81近端速度替换的实际输出](2026-11-12-near-endpoint-readout-review.md)
+
 - [前缀配准分流的首报门限资格](2026-11-12-online-prefix-gate-qualification.md)
 
 ## 2026-11-11
