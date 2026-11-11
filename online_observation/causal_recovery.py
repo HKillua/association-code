@@ -187,7 +187,10 @@ def _members(manifest, phase):
         proxies = frozen["proxy_stratum"]
         previous = json.loads(ROSTER_PATH.with_name("nemot_roster.json").read_text(encoding="utf-8"))
         blocked = set(previous["components"].values()) | {components[scene] for scene in DEVELOPMENT}
-        if (set(members) & set(DEVELOPMENT) or any(components[scene] in blocked for scene in members)
+        held = frozen["counts"]["held"]
+        prior_scenes = set(frozen["exclusions"]["prior_online_scene_ids"]) | set(previous["components"])
+        if (len(members) != held["scenes"] or len({components[scene] for scene in members}) != held["components"]
+                or set(members) & prior_scenes or any(components[scene] in blocked for scene in members)
                 or any(components[scene] != frozen["components"][scene] for scene in members)):
             raise ValueError("held recovery roster violates component isolation")
     if len(set(members)) != len(members) or not set(members) <= set(source["splits"]["T_core"]):
