@@ -110,7 +110,7 @@ def evaluate_arm(record, historical, scored, arm, membership, identities, source
         selected = output(index)
         output(nonws)
         result[mode] = dict(
-            selected=selected, choice=index, score_gain=float(gains[i, index]), same_as_old=index == accepted[0],
+            selected=selected, choice=index, score_gain=float(gains[i, index]), same_as_old=bool(index == accepted[0]),
             joint=bool(joint[index]), protected=bool(protected[index]),
             positive_choices=int(positive.sum()), positive_protected=int((protected & positive).sum()),
             eligible_positive_protected=int((protected & positive).sum()),
@@ -165,16 +165,42 @@ def aggregate(rows):
     return dict(result, motion_edge_qualification=stats)
 
 
-def run(runs, c78, output):
-    if output.parent != runs or output == c78:
+def bind_frozen(root, runs, c78, ids):
+    original = read(root/'run.json')
+    if (root.parent != runs or root.name != 'LEVEL1-DISJOINT-MOTION-EVIDENCE-20261112-attempt-1'
+            or original['status'] != 'FAILED' or original['exit_code'] != 1
+            or original['error'] != 'TypeError: Object of type bool_ is not JSON serializable'
+            or original['output'] != str(root) or original['runs'] != str(runs) or original['c78'] != str(c78)
+            or original['split'] != 'T_core' or original['scene_ids'] != ids
+            or original['frozen_scenes'] != len(ids) or original['completed_scenes'] != len(ids)
+            or original['stages'] != ['all_motion_scores_and_candidate_choices_frozen_before_identity']
+            or {f.name for f in (root/'private').glob('motion-*.npz')} != {f'motion-{sid}.npz' for sid in ids}):
+        raise ValueError('original C82 publication failure with complete immutable scores required')
+    return root/'private'
+
+
+def saved_metadata(scored):
+    return {
+        'source': 'original frozen score arrays',
+        'finite_counts': {name: int(np.isfinite(scored[name]).sum())
+                          for fields in MOTION_FIELDS.values() for name in fields},
+        'changed_weights_vs_old': {mode: int(np.count_nonzero(scored['edge'][i] != scored['edge'][0]))
+                                  for i, mode in enumerate(MODES) if i},
+    }
+
+
+def run(runs, c78, output, frozen=None):
+    if output.parent != runs or output in (c78, frozen):
         raise ValueError('new independent output must be under the existing runs directory')
     output.mkdir(exist_ok=False)
     private = output/'private'
-    private.mkdir()
+    if frozen is None:
+        private.mkdir()
     start = time.monotonic()
     state = dict(status='RUNNING', argv=sys.argv, runs=str(runs), c78=str(c78), output=str(output),
                  time_policy='advisory', optimizer_updates=0, gpu_used=False, split='T_core',
                  stages=[], completed_scenes=0, affinity=sorted(os.sched_getaffinity(0)),
+                 frozen_from=str(frozen) if frozen is not None else None,
                  started_at=datetime.now(timezone.utc).isoformat())
 
     def checkpoint(**fields):
@@ -185,23 +211,28 @@ def run(runs, c78, output):
         resource.setrlimit(resource.RLIMIT_AS, (MAX_AS, MAX_AS))
         ids, components = load_population(runs)
         bind_pool(runs, c78, ids)
-        metadata = []
-        checkpoint(phase='blind_scores', scene_ids=ids)
-        for sid in ids:
-            nodes, sources, _, pairs, scores, starts = load_scene(runs, sid)
-            edge, fields, meta = edge_scores(pairs, sources, scores, load_native(runs, sid, nodes, sources))
-            mutable = np.zeros(len(pairs), bool)
-            lookup = dense_edges(pairs, np.arange(len(pairs)), len(nodes))
-            saved = dict(edge=edge, mutable=mutable, **fields)
-            originals = read(c78/'private'/f'candidates-{sid}.json.gz')['arms']
-            for arm in ARMS:
-                result = score_arm(originals[arm], starts['WS'], edge, lookup, mutable)
-                saved.update({arm+'_'+key: value for key, value in zip(('gains', 'accepted', 'forced'), result,
-                                                                       strict=True)})
-            np.savez_compressed(private/f'motion-{sid}.npz', **saved)
-            metadata.append(meta)
-        state['stages'].append('all_motion_scores_and_candidate_choices_frozen_before_identity')
-        checkpoint(phase='truth_evaluation', frozen_scenes=len(metadata))
+        if frozen is not None:
+            private = bind_frozen(frozen, runs, c78, ids)
+            metadata = [None] * len(ids)
+            state['stages'].append('bind_original_pre_identity_scores_without_rescoring')
+        else:
+            metadata = []
+            checkpoint(phase='blind_scores', scene_ids=ids)
+            for sid in ids:
+                nodes, sources, _, pairs, scores, starts = load_scene(runs, sid)
+                edge, fields, meta = edge_scores(pairs, sources, scores, load_native(runs, sid, nodes, sources))
+                mutable = np.zeros(len(pairs), bool)
+                lookup = dense_edges(pairs, np.arange(len(pairs)), len(nodes))
+                saved = dict(edge=edge, mutable=mutable, **fields)
+                originals = read(c78/'private'/f'candidates-{sid}.json.gz')['arms']
+                for arm in ARMS:
+                    result = score_arm(originals[arm], starts['WS'], edge, lookup, mutable)
+                    saved.update({arm+'_'+key: value for key, value in zip(('gains', 'accepted', 'forced'), result,
+                                                                           strict=True)})
+                np.savez_compressed(private/f'motion-{sid}.npz', **saved)
+                metadata.append(meta)
+            state['stages'].append('all_motion_scores_and_candidate_choices_frozen_before_identity')
+        checkpoint(phase='truth_evaluation', scene_ids=ids, frozen_scenes=len(metadata))
         historical = read(c78/'scenes.json')
         if [row['scene_id'] for row in historical] != ids:
             raise ValueError('C78 scene order differs')
@@ -214,6 +245,8 @@ def run(runs, c78, output):
             originals = read(c78/'private'/f'candidates-{sid}.json.gz')['arms']
             with np.load(private/f'motion-{sid}.npz', allow_pickle=False) as cache:
                 scored = {key: cache[key] for key in cache.files}
+            if meta is None:
+                meta = saved_metadata(scored)
             arms = {arm: evaluate_arm(originals[arm], prior['arms'][arm]['2'], scored, arm, membership, identities,
                                       sources, support, pairs) for arm in ARMS}
             rows.append(dict(scene_id=sid, component_id=components[sid], nodes=len(nodes), evidence=meta,
@@ -250,6 +283,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('runs', 'c78', 'output'):
         parser.add_argument('--'+name, type=Path, required=True)
+    parser.add_argument('--frozen', type=Path)
     parser.add_argument('--time-policy', choices=('advisory',), required=True)
     args = parser.parse_args()
-    run(args.runs.resolve(), args.c78.resolve(), args.output.resolve())
+    run(args.runs.resolve(), args.c78.resolve(), args.output.resolve(),
+        args.frozen.resolve() if args.frozen is not None else None)
