@@ -1,6 +1,6 @@
 # 2025–2026 在线观测基线筛选
 
-此前 24 个 T_core 场的四臂中，非等间隔 CV-KF 对位置保持少 37,865 个错漏配对秒，去掉最大共享 A 组件后反增 737。局部与全局分配逐场相同，因为候选子图没有双侧竞争。更早的 128 场首报对照仍有 255 个真边在门内的错配、218 个从未见真对侧的错配，后者有 109 个只有一个假候选。前两种错误所需的证据不同，且首报只有一个本地原始点。 [持续身份结果](2026-11-12-online-continuous-factorial.md) · [首报结果](2026-11-12-online-prefix-gate-qualification.md)
+此前 24 个 T_core 场的四臂中，非等间隔 CV-KF 对位置保持少 37,865 个错漏配对秒，去掉最大共享 A 组件后反增 737。局部与全局分配逐场相同，因为候选子图没有双侧竞争。更早的 128 场首报对照仍有 255 个真边在门内的错配、218 个从未见真对侧的错配，后者有 109 个只有一个门内假候选。前两种错误所需的证据不同，且首报只有一个本地原始点。 [持续身份结果](2026-11-12-online-continuous-factorial.md) · [首报结果](2026-11-12-online-prefix-gate-qualification.md)
 
 定向核对 12 篇 2025–2026 原文及可见作者资产。11 篇有正式出版记录，Fusion-Poly 的 IROS 接收目前由作者仓确认。证据进入 Mode C v20 的 F-ON69–73、M-ON32–34 和 C-ON27–29。 [逐篇章节、原表、反例及公开资产](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_literature_recent_2025_2026_20261112.md) · [P×F 证据矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v20-近期学习基线和可获得的运动信息)
 
