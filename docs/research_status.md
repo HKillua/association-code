@@ -31,7 +31,7 @@
 
 1. **离线重选高精度骨架，并建立可信 TMTAFF 全系统对照。** [C88](reports/2026-11-12-external-supplier-translation-review.md)换场 16/12 组件中，187 个跨源供给仅 6 个有合格外锚且全为同船，四门均保持原 WS，跨源漏/假 43/36、同船逐时支持保持。无门 ABS 漏/假 49/37，丢 40 个同船支持槽。事后 68 个净补漏去假且保原同船支持的候选均被四门拦截，ABS 也无正分。42 个还同时严格降低跨源漏和假，集中于两场，分别出现接受和场内排序失效。外锚保留条件诊断，下一步在固定池上区分 T 侧接受校准与分区评分，用独立组件核实际输出。 [定向原文](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/offline_candidate_readout_sources_20261112.md)
    - [C89](reports/2026-11-12-v300-far-paper-bridge-review.md)完成全 V300 四属性与历史 113 的逐场目标和参考配对。远端规则保留为速度候选，全域 MAE/P99 由 1.410/28.535 降到 0.881/6.992 m/s，经纬、航向及覆盖一致。历史 113 缺已训练 TAM，旧 TFM 真组位置也退化。后续将 FAR 和强位置候选在同一冻结版本评价。[C83 近端追因](reports/2026-11-12-held-near-tail-audit.md)确认并列最大增害 22.505 m/s 源自同一次跨船取值，另外三点同船同源，0.603–3.000 秒的近端速度仍偏大。保留近端对照，供给者证据与同供给者速度估计分别检验。
-   - 现有 V300 加权跨源正确率/误关联率 63.62/43.30%，TMTAFF 原表 91.38/6.87%，作者逐场和窗口未对齐。[C84四属性核查](reports/2026-11-12-tmtaff-metric-bridge-review.md)保留原文指标与覆盖。TMTAFF 正执行[固定16真对 TFM 资格修复](../HandOver/L2S-20261112-c90-r1.md)，TAM 同配对尺度诊断待独立方案。152 按原合同收尾，PTFM/DeepAF 为融合补充。
+   - 现有 V300 加权跨源正确率/误关联率 63.62/43.30%，TMTAFF 原表 91.38/6.87%，作者逐场和窗口未对齐。[C90-R1 真对 TFM 资格](reports/2026-11-12-tmtaff-true-pair-qualification-review.md)恢复原 Adam 后两臂各 32 步，四属性/仅位置的 MAE 36.692/36.022 km，普通 Mean 1.887 km，两臂均趋近常值、未过门。下一设计区分训练早期条件响应如何丢失，TAM 同配对尺度诊断待独立方案。152 按原合同收尾，PTFM/DeepAF 为融合补充。
 2. **在线完成固定候选下的边排序与错链诊断。** 原 28 场、24 稀疏，三臂重放与原件逐场同分。432 个首报中 KF 有 225 个未正确，205 个无门内真边。23,726 个门内真假同时出现的查询中，个体相对 KF 真胜净增 6，72 个对应首报无排序翻转。个体相对 KF 新增／去除错配对秒 729／630，差异段最长 12 秒，共有 26,792 错配对秒。KF 的 54 个 >60 秒段贡献 40.0% 错配。 [冻结方案](proposals/online_nemot_association_diagnostic_20261112.md) · [Record/Squeeze](reports/2026-11-12-online-nemot-association-diagnostic.md) · [在线 Mode C v23](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v23-边可辨性与错链寿命回流)
    - C-ON31 优先核新鲜真边门外的已到配准锚和共同过去运动支持。稀疏拟合／弃权的门外比例 2.18%／14.26%，弃权门外 92.0% 来自三场，下一步需核具体证据及组件泛化。C-ON30 保留同候选配对评分，C-ON28/29 保留已到证据下的有限待定和独立空配。 [原预测三臂](reports/2026-11-12-online-nemot-motion.md)
    - 个体历史保留为在线报文预测对照，HyperSSM 保留独立强预测对照。TSA-cTFER 作者条件与复现缺项见[原文核对](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_tsactfer_protocol_20261112.md)。报文触发预测和关联，1 秒网格仅供可比评分。独立位置参考和真实网络到达仍缺。代码在 [online_observation](../online_observation/README.md) 独立维护。当前无待执行在线合同。
@@ -45,7 +45,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.29](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-229)，P14/F339/M148/E292/C89|
+|全局问题—现象—机制—证据|[Mode C2.30](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-230)，P14/F340/M148/E293/C90|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
