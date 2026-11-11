@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [冻结关联分数的高召回误关联与分组转移](2026-11-12-frozen-association-pr-review.md)
+
+- [C91 原始真对输入核验](2026-11-12-tmtaff-true-pair-raw-audit.md)
+
 - [TMTAFF 数据、训练和评价协议差距](2026-11-12-tmtaff-protocol-gap-audit.md)
 
 - [固定 4–8 km 候选的历史证据与在线确认](2026-11-12-online-expansion-confirmation.md)
