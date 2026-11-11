@@ -29,7 +29,7 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C76](reports/2026-11-11-multiple-disjoint-scope-review.md)的同一组选集在每场1、2、4处时分别触及27、57、90/385条跨源漏边，两处达到事前门槛。C78用每场至多两处的真实候选，验证同时去假补漏、对象覆盖及旧J选择；C72保留候选外共时跨目标几何。[C77](reports/2026-11-11-motion-fallback-attribution-review.md)确定1,680个回退速度点中1,677个沿用域外首成员端点，近端纯组156点跨7组件。C79优先核原端点速度字段和相邻位置区间，再做有界近端对照，[C74平滑求导](reports/2026-11-11-fixed-position-motion-readout-review.md)仍为开发强控。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C78](reports/2026-11-11-disjoint-partition-candidate-review.md)的两处合法编辑在两个有限池各有20场可保覆盖并去假补漏，事后净增跨源真边51/46条，旧J均选中0个受保护场。C80冻结这两个候选池，验证新的分组评分与接受规则，C72保留候选外共时跨目标几何。[C79](reports/2026-11-11-endpoint-velocity-lineage-review.md)核15,404个原量测端点行，首端43/43、尾端38/90在割线相对差1%内。近端纯组首成员更远的48点，最近字段MAE26.96→13.73m/s，通过局部对照门槛。C81再用可观测条件验证实际近端读出，[C74平滑求导](reports/2026-11-11-fixed-position-motion-readout-review.md)为开发强控。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
 2. **在线固定 1 km 未通过留场资格。** 先补读场景留出、选择性风险与海事配准原文，再冻结 32 个未参与在线门选择的 T_core 场景。866 个理想到达首报中，校正 4→1 km 正确 595→563、错 141→78，拒掉无真对侧历史错配 43/72。30/32 个正确损失来自 4 个校正弃权场，28 个拟合场仅失 2 个。[冻结计划](proposals/online_held_gate_qualification_20261111.md) · [Record/Squeeze](reports/2026-11-11-online-held-gate-qualification.md) · [在线 Mode C v14](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v14-留场门限实验回流)
    - 下一步依据 C-ON23，冻结新留场验证前缀拟合成功时收紧、弃权时保留 4 km。事后组合保留 593/595 原正确并少接 60 错。34 个门内有真错配待核共同过去位置增量，29 个无历史近距离错配中 15 个仅有一个门内假候选，需单独的可匹配性信息。开发场 600 秒历史救回 11/14、原正确变错 3 个，局部活动拒配也未达资格。[超龄记录](reports/2026-11-11-online-stale-history-qualification.md) · [无历史拒配记录](reports/2026-11-11-online-no-peer-rejection-qualification.md)
    - 继续核真实到达、发布时钟、独立状态参考和持续系统 ID。严格输入、每秒发布、持续身份与可变 K 沿用，代码在 [online_observation](../online_observation/README.md) 独立维护。当前无在线执行合同。[字段权限](data_contract.md#在线字段可用时间)
@@ -43,7 +43,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.18](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-218)，P14/F323/M129/E228/C79|
+|全局问题—现象—机制—证据|[Mode C2.20](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-220)，P14/F325/M131/E232/C81|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|

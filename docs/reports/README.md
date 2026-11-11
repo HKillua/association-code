@@ -10,6 +10,10 @@
 
 - [首报无真对侧历史时的拒配资格](2026-11-11-online-no-peer-rejection-qualification.md)
 
+- [C78有限池的一处与两处真实分区编辑](2026-11-11-disjoint-partition-candidate-review.md)
+
+- [C79端点速度原量测与几何血缘](2026-11-11-endpoint-velocity-lineage-review.md)
+
 - [C76多处互不冲突的拆并能触及多少关联错误](2026-11-11-multiple-disjoint-scope-review.md)
 
 - [C77固定速航读出的支持边界与旧回退来源](2026-11-11-motion-fallback-attribution-review.md)
