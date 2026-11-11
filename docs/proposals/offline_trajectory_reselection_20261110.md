@@ -67,3 +67,9 @@ C74已在原V32冻结验证。B的固定位置求导达到开发资格。C的原
 `IDEA_PACKAGE`，`IDEA-OFFLINE-NEAR-ENDPOINT-READOUT-20261112`，research-pipeline-contract v1.0，plan1.0，2026-11-12。上游[Mode C2.21/C81](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-221)，P02/P04、F325、M129/M131、E225/E226/E229/E232。C79的固定近端纯组中，首成员端点更远的48点改用最近端点字段后MAE从26.962到13.734 m/s，近端纯组全体P99持平。检验仅凭真实时间与支持条件能否在原V32全部目标上得到有效读出。竞争解释包括换成员后混组、跨源取值偏差和尾部抵消。由于时间距离与成员共同改变，本次比较估计整个固定替换的效应。
 
 固定C74 B与原组、位置、航向、覆盖和参考，候选仅替换可观察的域外无成员支持、最近端点距≤2个Q64步、首成员端点严格更远处的速度。按原C79成员顺序解决平局，字段用已换算的m/s。冻结全部输出后统一评价，混组及换源同时记入。预测全域速度MAE下降，P99不升，去最大组件MAE不升，至少两个组件改善，位置、航向、分组、有效掩码和覆盖保持。全域和局部的有符号偏差、最坏点代价、纯/混组和同/异源分开报告。满足全部条件才保留为开发候选。原V32结果用于开发筛选。 [执行合同](../../HandOver/L2S-20261112-c81.md) · [C79结果](../reports/2026-11-11-endpoint-velocity-lineage-review.md)
+
+## C81输出的TMTAFF四属性评价
+
+`IDEA_PACKAGE`，`IDEA-OFFLINE-TMTAFF-METRIC-BRIDGE-20261112`，research-pipeline-contract v1.0，plan1.0，2026-11-12，diagnostic。上游[Mode C2.22/F327/E241](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-222)、[C81结果](../reports/2026-11-12-near-endpoint-readout-review.md)和[原文指标协议](../mtad_data_protocols.md)。问题是最新实际近端输出在同维度四属性的目标内时间统计、场内目标等权和场景等权下如何表现。原C81仅改速度，因而B与NEAR的经纬、航向、对应和覆盖应逐项相同。局部速度有符号偏差及目标内波动变化可能受不同权重和正负抵消影响，另报MAE和绝对ME。
+
+在原C81完成的V32输出上一次零训练重计指标，场序、Q64、成员和参考原样，属性各自有效掩码。标准残差样本SD与印刷Eq.29诊断分名，线性角度与圆周角度分名。对照既有已完成V300汇总及原文表3时逐行保留人口和权重，C81结果仍为开发V32。若任何固定属性、有效性、覆盖或C81原统计复核失败则保全。报告全32场、9组件及去最大组件。 [执行合同](../../HandOver/L2S-20261112-c84.md)
