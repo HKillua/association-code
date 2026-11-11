@@ -6,6 +6,7 @@
 
 - [在线关联与融合的开发诊断和资格计划](online_reselection_20261111.md)
 - [TMTAFF分量资格对照](tmtaff_component_qualification_20261111.md)
+- [可变容量的拆并候选资格对照](offline_variable_partition_20261111.md)
 
 ## 2026-11-10
 
