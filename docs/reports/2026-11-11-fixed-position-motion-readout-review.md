@@ -12,7 +12,7 @@
 |B 固定位置平滑求导|1.1768|27.1294|23.7433|168.7573|
 |C 原生片段拟合斜率|1.1643|27.1357|23.5182|168.8434|
 
-三臂各有71,090个有效速度点、71,021个有效航向点、1,427声明目标、1,388匹配目标、39个未匹配、217个重复组。位置逐值相同。主C−B两类MAE为−0.01253m/s和−0.22512°，两类P99为+0.00626m/s和+0.08609°，按事前规则未晋级。去最大13场组件，两类MAE仍−0.00801m/s和−0.32049°，9组件分别6好/3差与5好/4差。B−A两类MAE、两类P99和去最大组件方向均达到事前开发资格。[逐场原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261111_motion_readout/science/scenes.json.gz) · [汇总](/Users/a1/Projects/biye-ronghe/docs/evidence/20261111_motion_readout/science/summary.json)
+三臂各有71,090个有效速度点、71,021个有效航向点、1,427声明目标、1,388匹配目标、39个未匹配、217个重复组。位置逐值相同。主C−B两类MAE为−0.01253m/s和−0.22512°，两类P99为+0.00626m/s和+0.08609°，按事前规则未晋级。排除最大组件19场后剩13场，两类MAE仍−0.00801m/s和−0.32049°。全9组件分别6好/3差与5好/4差。B−A两类MAE、两类P99和去最大组件方向均达到事前开发资格。[逐场原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261111_motion_readout/science/scenes.json.gz) · [汇总](/Users/a1/Projects/biye-ronghe/docs/evidence/20261111_motion_readout/science/summary.json)
 
 审计独立增广最小二乘重建3,204个有效拟合、三臂1,232,640个状态值与513,600个掩码值。速航最大绝对数值差1.71×10⁻¹²m/s、3.07×10⁻¹¹°。共享冻结输入读取，审计未查看V标签或参考误差。实际worker与程序退出0，独审launcher有提交后BrokenPipe，见回执。[独审原件](/Users/a1/Projects/biye-ronghe/docs/evidence/20261111_motion_readout/audit/audit.json)
 

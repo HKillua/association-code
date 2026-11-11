@@ -4,6 +4,10 @@
 
 ## 2026-11-11
 
+- [C76多处互不冲突的拆并能触及多少关联错误](2026-11-11-multiple-disjoint-scope-review.md)
+
+- [C77固定速航读出的支持边界与旧回退来源](2026-11-11-motion-fallback-attribution-review.md)
+
 - [C75单次拆并能触及的关联错误](2026-11-11-partition-scope-review.md)
 
 - [C74固定位置后速航读出的V32验证](2026-11-11-fixed-position-motion-readout-review.md)
