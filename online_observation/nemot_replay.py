@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from itertools import combinations, count
 import math
 from time import perf_counter_ns
+from types import MappingProxyType
 
 from .continuous_assignment import solve_global
 from .continuous_metrics import Birth, OPPORTUNITIES, _birth_summary
@@ -174,11 +175,13 @@ def _nearest(key, edges, costs):
     return _other(winners[0], key) if len(winners) == 1 else None
 
 
-def replay(events, predict_learned, *, fit=None):
+def replay(events, predict_learned, *, fit=None, observer=None):
     """Apply three scorers to one geometry graph and record native-time changes.
 
     `predict_learned(context, stamp, keys)` returns residuals in metres for
     each learned arm. A missing residual leaves the shared KF center intact.
+    An optional observer receives read-only views after all arms have decided.
+    Observers must copy any data retained past the callback.
     """
     context = MotionInputs()
     plane = None
@@ -192,6 +195,9 @@ def replay(events, predict_learned, *, fit=None):
     owners = {arm: {} for arm in ARMS}
     identifiers = {arm: count(1) for arm in ARMS}
     memberships = {arm: () for arm in ARMS}
+    if observer is not None:
+        observed_costs = MappingProxyType({arm: MappingProxyType(scores) for arm, scores in costs.items()})
+        observed_memberships = MappingProxyType(memberships)
     runs = {arm: [] for arm in ARMS}
     native_reports = []
     first_seen = {}
@@ -276,6 +282,9 @@ def replay(events, predict_learned, *, fit=None):
                             first_peer_total=peer_count, first_gate_edges=len(edges))
         native_reports.append((stamp, tuple(sorted(updated))))
         event_time.append(perf_counter_ns() - began)
+        if observer is not None:
+            observer(stamp, frozenset(updated), frozenset(born), frozenset(fresh),
+                     observed_costs, observed_memberships)
 
     if fit is None:
         fit = estimate_translation(prefix)
