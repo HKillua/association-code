@@ -102,10 +102,22 @@ def estimate_translation(events):
     ])
 
 
+def registration_distances(key, position, other_key, other, fit):
+    """Return raw and corrected distances with a fixed source orientation."""
+    if key[0] < other_key[0]:
+        ordered_sources, left, right = [key[0], other_key[0]], position, other
+    else:
+        ordered_sources, left, right = [other_key[0], key[0]], other, position
+    raw, east, north = _displacement(left, right)
+    translation = fit["translation_east_north_m"]
+    corrected = raw
+    if translation is not None and ordered_sources == fit["source_order"]:
+        corrected = math.hypot(east - translation[0], north - translation[1])
+    return raw, corrected
+
+
 def birth_predictions(events, fit):
     """Generate paired distances for the same causal cross-source candidates."""
-    source_order = fit["source_order"]
-    translation = fit["translation_east_north_m"]
     latest = {}
     for stamp, positions in events:
         births = positions.keys() - latest.keys()
@@ -118,15 +130,7 @@ def birth_predictions(events, fit):
             for other_key, other in recent.items():
                 if key[0] == other_key[0]:
                     continue
-                # Always orient the vector by source, regardless of which fragment was born.
-                if key[0] < other_key[0]:
-                    ordered_sources, left, right = [key[0], other_key[0]], positions[key], other
-                else:
-                    ordered_sources, left, right = [other_key[0], key[0]], other, positions[key]
-                raw, east, north = _displacement(left, right)
-                corrected = raw
-                if translation is not None and ordered_sources == source_order:
-                    corrected = math.hypot(east - translation[0], north - translation[1])
+                raw, corrected = registration_distances(key, positions[key], other_key, other, fit)
                 pairs.append((other_key, raw, corrected))
             yield key, pairs
 

@@ -4,6 +4,8 @@
 
 ## 2026-11-11
 
+- [首报与下一条报文的在线关联验证](2026-11-11-online-next-report-qualification.md)
+
 - [在线首次关联拒配的事前验证与深挖](2026-11-11-online-rejection-qualification.md)
 
 - [C70固定候选池的状态评分与四属性](2026-11-11-conditional-trajectory-review.md)

@@ -34,4 +34,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.bias_probe --help`|事后核对共时真对应的相对位移|
 |`python -m online_observation.registration_probe --help`|先无标签估计平移，再对晚到片段作共同候选比较|
 |`python -m online_observation.rejection_probe --help`|固定候选与首选，按相同接收数比较首报拒配风险|
+|`python -m online_observation.confirmation_probe --help`|同一后续报告时刻拆分过期、更新、续鲜与开放候选|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|

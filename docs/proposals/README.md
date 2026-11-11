@@ -4,6 +4,7 @@
 
 ## 2026-11-11
 
+- [首报与下一条报文的在线关联验证](online_next_report_qualification_20261111.md)
 - [在线首次关联拒配的事前验证](online_rejection_qualification_20261111.md)
 - [在线关联与融合的开发诊断和资格计划](online_reselection_20261111.md)
 - [TMTAFF分量资格对照](tmtaff_component_qualification_20261111.md)
