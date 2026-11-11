@@ -1,4 +1,4 @@
-"""C90. Qualify the fixed TMTAFF T8 true-pair experiment before group evaluation."""
+"""Fixed TMTAFF T8 true-pair experiments before group evaluation."""
 from __future__ import annotations
 
 import argparse
@@ -22,6 +22,8 @@ from association.training.tmtaff import load_complete_snapshot
 
 IDEA = 'IDEA-TMTAFF-COMPONENT-QUALIFICATION-20261111'
 PLAN_VERSION = '1.1'
+SUPPORT_IDEA = 'IDEA-TMTAFF-TRUE-PAIR-SUPERVISION-20261112'
+REFERENCE_C90 = 'LEVEL1-TMTAFF-TRUE-PAIR-QUALIFICATION-20261112-R1-attempt-1'
 LEARNING_RATE = .002
 GRADIENT_CLIP = 1.
 LOSS_FIELDS = dict(position_loss_mode='standard_smooth_l1', longitude_loss_mode='shortest_arc')
@@ -29,6 +31,7 @@ SCENES = ('0', '3', '7', '9', '10', '11', '14', '17')
 FEATURES = ('lat', 'lon', 'vel', 'cou')
 CONTROLS = ('CAP128_MEAN', 'CANONICAL_MEAN', 'OLD_TFM')
 SNAPSHOTS = (0, 16, 32)
+SUPPORT_SNAPSHOTS = (0, 4, 16, 32)
 SEED = 20
 MICROBATCH = 8
 COUNTS = (732, 732, 729, 732)
@@ -71,6 +74,7 @@ class PositionOnlyLoss(FusionLoss):
 
 
 ARMS = {'ALL_ATTRIBUTES': FusionLoss, 'POSITION_ONLY': PositionOnlyLoss}
+SUPPORT_ARMS = {'FULL_VALID': PositionOnlyLoss, 'DUAL_SUPPORTED': PositionOnlyLoss}
 
 
 def source_checkpoints(root, device):
@@ -234,7 +238,7 @@ def statistics(values):
                 max=float(values.max()))
 
 
-def metrics(prediction, population, scenes):
+def metrics(prediction, population, scenes, *, support_detail=False):
     prediction = np.asarray(prediction, dtype=np.float64)
     truth, valid, support = (population[key] for key in ('truth', 'valid', 'support'))
     errors = attribute_errors(prediction, truth)
@@ -249,17 +253,28 @@ def metrics(prediction, population, scenes):
                        for name, values in errors.items()} for region, keep in regions.items()}
     scene_stats = {}
     displacement = []
+    supported_scenes, supported_displacement = {}, []
+    both = masks['position'] & regions['both_supported']
     for index, row in enumerate(scenes):
         part = slice(2 * index, 2 * index + 2)
         scene_stats[row['scene']] = {name: statistics(values[part][masks[name][part]])
                                      for name, values in errors.items()}
+        if support_detail:
+            supported_scenes[row['scene']] = statistics(errors['position'][part][both[part]])
         if row['distinct_targets']:
             keep = masks['position'][part].all(0)
             first, second = prediction[part]
-            displacement.extend(attribute_errors(first, second)['position'][keep])
+            distances = attribute_errors(first, second)['position']
+            displacement.extend(distances[keep])
+            if support_detail:
+                supported_displacement.extend(distances[both[part].all(0)])
     result['scenes'] = scene_stats
     result['distinct_position_values'] = int(len(np.unique(prediction[..., :2].reshape(-1, 2), axis=0)))
     result['same_query_distinct_target_separation_m'] = statistics(np.asarray(displacement))
+    if support_detail:
+        result['both_supported_scenes'] = supported_scenes
+        result['both_supported_distinct_target_separation_m'] = statistics(
+            np.asarray(supported_displacement))
     return result
 
 
@@ -267,9 +282,9 @@ def group_settings(group):
     return {key: value for key, value in group.items() if key != 'params'}
 
 
-def make_arms(config, normalizer, device, optimizer_reference):
+def make_arms(config, normalizer, device, optimizer_reference, arms=ARMS):
     models = {}
-    for name, loss_class in ARMS.items():
+    for name, loss_class in arms.items():
         torch.manual_seed(SEED)
         fusion = PairFusion(config, normalizer).to(device)
         objective = loss_class(**LOSS_FIELDS).to(device)
@@ -353,6 +368,52 @@ def gate(final, initial, cap):
                 four_attribute_pass=all(decisions.values()))
 
 
+def bind_raw_audit(path):
+    with path.open(encoding='utf-8') as file:
+        audit = json.load(file)
+    expected = dict(status='PASSED', scene_ids=list(SCENES), pair_count=16, pair_queries=1024,
+                    feature_valid=dict(zip(FEATURES, COUNTS)),
+                    support_position_counts=[132, 299, 301], raw_archive_read=True,
+                    validation_opened=False, test_opened=False, c90_contract_exact=True)
+    require(all(audit.get(key) == value for key, value in expected.items()),
+            'independent C91 raw T8 audit is missing or does not certify the fixed population')
+
+
+def bind_reference_population(runs, population):
+    contract = runs / REFERENCE_C90 / 'private/contract.npz'
+    with np.load(contract, allow_pickle=False) as original:
+        for old, current in (('query_seconds', 'query'), ('target_states', 'truth'),
+                             ('target_valid', 'valid'), ('selected_support', 'support'),
+                             *((name, name) for name in CONTROLS)):
+            np.testing.assert_array_equal(population[current], original[old], err_msg=old)
+
+
+def supervision_masks(valid, support):
+    dual = valid.clone()
+    dual[..., :2] &= (support == 2)[..., None]
+    return {'FULL_VALID': valid, 'DUAL_SUPPORTED': dual}
+
+
+def support_gates(full, dual, control):
+    full_position, dual_position = (arm['both_supported']['position'] for arm in (full, dual))
+    scenes_improved = sum(
+        row['count'] > 0 and row['mae'] < full['both_supported_scenes'][scene]['mae']
+        for scene, row in dual['both_supported_scenes'].items()
+    )
+    separation = 'same_query_distinct_target_separation_m'
+    separation_rescued = (dual[separation]['mae'] > full[separation]['mae']
+                          and dual[separation]['mae'] > .01 * control[separation]['mae'])
+    common_improved = all(dual_position[key] < full_position[key] for key in ('mae', 'p99'))
+    control_matched = all(
+        dual[scope]['position'][key] <= control[scope]['position'][key]
+        for scope in ('all', 'both_supported') for key in ('mae', 'p99')
+    )
+    return dict(common_mae_and_p99_improved=common_improved, dual_scenes_improved=scenes_improved,
+                conditioned_separation_rescued=separation_rescued,
+                support_hypothesis_supported=common_improved and scenes_improved >= 2 and separation_rescued,
+                ordinary_control_matched=control_matched)
+
+
 def self_check():
     source, position = FusionLoss(**LOSS_FIELDS), PositionOnlyLoss(**LOSS_FIELDS)
     prediction = torch.tensor([[[.2, -179.9, 5., 359.]], [[.4, 45., 3., 1.]]], requires_grad=True)
@@ -381,6 +442,19 @@ def self_check():
         right = left.flip(1)
         values = [fusion.eval()(left, right)['states'] for fusion, _, _ in models.values()]
     require(torch.equal(*values), 'same-initialization forward fixture differs')
+    support = torch.tensor([[2], [1]])
+    masks = supervision_masks(valid, support)
+    require(torch.equal(masks['FULL_VALID'], valid) and not bool(masks['DUAL_SUPPORTED'][1, :, :2].any())
+            and torch.equal(masks['DUAL_SUPPORTED'][0], valid[0])
+            and torch.equal(masks['DUAL_SUPPORTED'][..., 2:], valid[..., 2:]),
+            'dual-support supervision altered the underlying validity')
+    restricted = prediction.detach().clone().requires_grad_()
+    position(restricted, target, masks['DUAL_SUPPORTED'])['total'].backward()
+    require(bool(restricted.grad[0, 0, :2].abs().all())
+            and not bool(restricted.grad[1].any()), 'unsupported target received position gradient')
+    support_models = make_arms(small, None, 'cpu', reference, SUPPORT_ARMS)
+    require(all(isinstance(values[1], PositionOnlyLoss) for values in support_models.values()),
+            'support arms must use the same position objective')
     print('107 Adam, same-init forward, position loss wrap, two-chunk parity and isolation passed')
 
 
@@ -390,35 +464,47 @@ def run(args):
     private = output / 'private'
     private.mkdir(mode=0o700)
     start = time.monotonic()
-    roots = {name: args.runs.resolve() / value for name, value in RUNS.items()}
-    counts = dict.fromkeys(ARMS, 0)
-    state = dict(status='RUNNING', idea_id=IDEA, plan_version=PLAN_VERSION, sources={k: str(v) for k, v in roots.items()},
+    runs = args.runs.resolve()
+    roots = {name: runs / value for name, value in RUNS.items()}
+    support_study = args.raw_audit is not None
+    arms = SUPPORT_ARMS if support_study else ARMS
+    steps = SUPPORT_SNAPSHOTS if support_study else SNAPSHOTS
+    idea, version = (SUPPORT_IDEA, '1.0') if support_study else (IDEA, PLAN_VERSION)
+    counts = dict.fromkeys(arms, 0)
+    state = dict(status='RUNNING', idea_id=idea, plan_version=version, sources={k: str(v) for k, v in roots.items()},
                  optimizer_updates=counts, raw_archive_read=False, validation_opened=False, test_opened=False,
                  tcm_updates=0, tam_updates=0, joint_updates=0, time_policy=args.time_policy,
-                 device=args.device, commit=os.environ.get('C90_EXPECTED_COMMIT'))
+                 device=args.device, commit=os.environ.get('C91_EXPECTED_COMMIT' if support_study
+                                                           else 'C90_EXPECTED_COMMIT'))
 
     def progress(phase, **fields):
         state.update(fields, phase=phase, elapsed_seconds=time.monotonic() - start,
                      peak_rss_bytes=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * 1024)
         write_json(output / 'run.json', state)
         if phase != 'failed' and state['peak_rss_bytes'] > 8 * 1024**3:
-            raise MemoryError('C90 resident budget exceeded')
+            raise MemoryError('TMTAFF qualification resident budget exceeded')
 
     try:
+        if support_study:
+            progress('bind_raw_audit')
+            bind_raw_audit(args.raw_audit.resolve())
         torch.set_num_threads(4)
         device = torch.device(args.device)
-        require(device.type == 'cuda' and torch.cuda.is_available(), 'C90 requires assigned CUDA device')
+        require(device.type == 'cuda' and torch.cuda.is_available(), 'qualification requires assigned CUDA device')
         progress('bind_inputs', gpu=torch.cuda.get_device_name(device))
         model, normalizer, config, contracts, bound_tensors, optimizer_reference = source_checkpoints(
             roots['checkpoint'], device)
         population, scenes = load_population(roots, model, normalizer, contracts, device)
         del model
-        controls = {name: metrics(population[name], population, scenes) for name in CONTROLS}
+        if support_study:
+            bind_reference_population(runs, population)
+        controls = {name: metrics(population[name], population, scenes, support_detail=support_study)
+                    for name in CONTROLS}
         np.savez_compressed(private / 'contract.npz', query_seconds=population['query'],
                             target_states=population['truth'], target_valid=population['valid'],
                             selected_support=population['support'],
                             **{name: population[name] for name in CONTROLS})
-        models = make_arms(config, normalizer, device, optimizer_reference)
+        models = make_arms(config, normalizer, device, optimizer_reference, arms)
         require(all(len(values[2].param_groups[0]['params']) == 260 for values in models.values()),
                 'current optimizer parameter count differs from 107')
         audit = dict(status='PASSED', scenes=scenes, pair_count=16, pair_queries=1024,
@@ -427,34 +513,46 @@ def run(args):
                      adam=optimizer_reference, same_initial_state=True, lr_schedule='constant',
                      gradient_clip=GRADIENT_CLIP,
                      controls=controls, read_validation=False, read_test=False, read_raw_archive=False)
+        targets = torch.as_tensor(population['truth'], dtype=torch.float32, device=device)
+        valid = torch.as_tensor(population['valid'], device=device)
+        full_counts = valid.sum((0, 1))
+        training_masks = ({name: valid for name in arms} if not support_study else
+                          supervision_masks(valid, torch.as_tensor(population['support'], device=device)))
+        training_counts = {name: mask.sum((0, 1)) for name, mask in training_masks.items()}
+        if support_study:
+            require(tuple(training_counts['FULL_VALID'][:2].tolist()) == (732, 732)
+                    and tuple(training_counts['DUAL_SUPPORTED'][:2].tolist()) == (301, 301),
+                    'C91 position supervision count differs')
+            audit.update(raw_audit=str(args.raw_audit.resolve()), c90_contract_exact=True,
+                         training_position_counts={name: dict(zip(FEATURES[:2], v[:2].tolist()))
+                                                   for name, v in training_counts.items()})
         write_json(output / 'input_audit.json', audit)
         if args.preflight:
             progress('completed', status='COMPLETED', exit_code=0)
             return
-        targets = torch.as_tensor(population['truth'], dtype=torch.float32, device=device)
-        valid = torch.as_tensor(population['valid'], device=device)
-        full_counts = valid.sum((0, 1))
         torch.manual_seed(SEED)
-        cuda_rng = {name: torch.cuda.get_rng_state(device).clone() for name in ARMS}
-        snapshots, histories = ({name: {} for name in ARMS}, {name: [] for name in ARMS})
+        cuda_rng = {name: torch.cuda.get_rng_state(device).clone() for name in arms}
+        snapshots, histories = ({name: {} for name in arms}, {name: [] for name in arms})
         initial_predictions = {}
         progress('training', fixed_inputs_bound=True)
-        for step in range(SNAPSHOTS[-1] + 1):
+        for step in range(steps[-1] + 1):
             for name, (fusion, objective, optimizer) in models.items():
                 if step:
                     torch.cuda.set_rng_state(cuda_rng[name], device)
-                    measurement = update(fusion, objective, optimizer, population, targets, valid, full_counts)
+                    measurement = update(fusion, objective, optimizer, population, targets,
+                                         training_masks[name], training_counts[name])
                     cuda_rng[name] = torch.cuda.get_rng_state(device)
                     histories[name].append(dict(update=step, **measurement))
                     counts[name] = step
-                if step in SNAPSHOTS:
+                if step in steps:
                     prediction, gradients = checkpoint(fusion, objective, population, targets, valid, full_counts,
                                                        private / f'{name}-u{step:03d}.npz')
-                    snapshots[name][str(step)] = dict(metrics=metrics(prediction, population, scenes),
-                                                      position_input_gradients=gradients)
+                    snapshots[name][str(step)] = dict(
+                        metrics=metrics(prediction, population, scenes, support_detail=support_study),
+                        position_input_gradients=gradients)
                     if step == 0:
                         initial_predictions[name] = prediction
-                    if step == SNAPSHOTS[-1]:
+                    if step == steps[-1]:
                         torch.save(dict(fusion=fusion.state_dict(), loss=objective.state_dict()),
                                    private / f'{name}-u{step:03d}.pt')
             if step == 0:
@@ -463,14 +561,19 @@ def run(args):
             progress('training', matched_cuda_rng=torch.equal(*cuda_rng.values()),
                      peak_cuda_allocated_bytes=torch.cuda.max_memory_allocated(device))
             require(state['matched_cuda_rng'], 'A/B CUDA dropout RNG streams differ')
-        results = {name: gate(by_step[str(SNAPSHOTS[-1])]['metrics'], by_step['0']['metrics'], controls['CAP128_MEAN'])
+        results = {name: gate(by_step[str(steps[-1])]['metrics'], by_step['0']['metrics'], controls['CAP128_MEAN'])
                    for name, by_step in snapshots.items()}
+        extra = dict(ready_for_separate_true_group_qualification=results['ALL_ATTRIBUTES']['four_attribute_pass']
+                     if not support_study else False)
+        if support_study:
+            full, dual = (snapshots[name][str(steps[-1])]['metrics'] for name in SUPPORT_ARMS)
+            extra.update(support_gates=support_gates(full, dual, controls['CAP128_MEAN']),
+                         training_position_counts=audit['training_position_counts'])
         write_json(output / 'summary.json', dict(
-            status='COMPLETED', idea_id=IDEA, plan_version=PLAN_VERSION, training_population='fixed original 153 T8',
+            status='COMPLETED', idea_id=idea, plan_version=version, training_population='fixed original 153 T8',
             generalization_measured=False, counts=audit['feature_valid'], scenes=scenes, controls=controls,
-            snapshots=snapshots, gates=results, ready_for_separate_true_group_qualification=
-            results['ALL_ATTRIBUTES']['four_attribute_pass'], updates=counts,
-            pair_presentations={name: count * 16 for name, count in counts.items()}))
+            snapshots=snapshots, gates=results, updates=counts,
+            pair_presentations={name: count * 16 for name, count in counts.items()}, **extra))
         progress('completed', status='COMPLETED', exit_code=0)
     except BaseException as error:
         progress('failed', status='FAILED', exit_code=1, error=f'{type(error).__name__}: {error}')
@@ -482,6 +585,7 @@ def main():
     parser.add_argument('--runs', type=Path)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--device', default='cuda:0')
+    parser.add_argument('--raw-audit', type=Path, help='Run C91 using the passed independent raw T8 audit')
     parser.add_argument('--time-policy', choices=('advisory',), default='advisory')
     parser.add_argument('--preflight', action='store_true')
     parser.add_argument('--self-check', action='store_true')
