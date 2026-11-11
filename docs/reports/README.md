@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [固定 4–8 km 候选的历史证据与在线确认](2026-11-12-online-expansion-confirmation.md)
+
 - [因果配准锚与共同过去位移的门外真边对照](2026-11-12-online-causal-recovery.md)
 
 - [C90 固定16真对的TFM资格](2026-11-12-tmtaff-true-pair-qualification-review.md)
