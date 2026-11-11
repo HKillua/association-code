@@ -135,7 +135,8 @@ def selected_output(index, choices, actions, counts, record, membership, identit
                 group_query_source_support_after=group_source_state.tolist())
 
 
-def evaluate_catalog(record, membership, identity_codes, sources, support, pairs, weights):
+def qualify_catalog(record, membership, identity_codes, sources):
+    """Evaluate complete signed transitions and anchor protection after predictions freeze."""
     actions = [Action(tuple(s), tuple(tuple(p) for p in parts), family)
                for s, parts, family in record['actions']]
     choices = [tuple(c) for c in record['choices']]
@@ -161,6 +162,12 @@ def evaluate_catalog(record, membership, identity_codes, sources, support, pairs
             np.add.at(anchors, new, 1)
         protected[i] = (np.all(anchors[original_anchors > 0] > 0)
                         and anchors.sum()-np.count_nonzero(anchors) <= original_duplicates)
+    return actions, choices, original_anchors, original_duplicates, counts, joint, protected, merit
+
+
+def evaluate_catalog(record, membership, identity_codes, sources, support, pairs, weights):
+    actions, choices, original_anchors, original_duplicates, counts, joint, protected, merit = qualify_catalog(
+        record, membership, identity_codes, sources)
     before = membership[pairs[:, 0]] == membership[pairs[:, 1]]
     base_support = support_state(membership, support, sources)
     checked = {}
