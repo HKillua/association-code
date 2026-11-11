@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [稀疏首报的邻轨证据与见证写入](2026-11-12-online-neighbor-witness.md)
+
 - [冻结关联分数的高召回误关联与分组转移](2026-11-12-frozen-association-pr-review.md)
 
 - [C91 原始真对输入核验](2026-11-12-tmtaff-true-pair-raw-audit.md)
