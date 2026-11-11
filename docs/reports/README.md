@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [2025–2026 在线观测基线筛选](2026-11-12-online-recent-baseline-review.md)
+
+- [MTAD 首报与二报的运动历史支持](2026-11-12-online-recent-motion-support.md)
+
 - [在线持续身份四臂真实回放](2026-11-12-online-continuous-factorial.md)
 
 - [C82 原候选池的运动证据与关联选择](2026-11-12-disjoint-motion-evidence-review.md)

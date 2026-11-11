@@ -1,3 +1,4 @@
+from collections import deque
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -74,6 +75,23 @@ class RecentMotionSupportTests(unittest.TestCase):
         self.assertEqual(event["paired_change"]["gained_true_both_sides_5_points_or_neighbor"], 1)
         self.assertEqual(scored["cohorts"]["second"]["query_points_at_least_5"], 0)
 
+    def test_wrong_with_true_subgroup_and_native_followup(self):
+        data = [row(stamp, "B", name, longitude) for stamp in (0, 20, 40, 60, 80)
+                for name, longitude in (("true", .01), ("false", .002))]
+        data.extend((row(80, "A", "query"), row(199.9, "B", "true", .01)))
+        prepared = probe.prepare_support(event_batches(data))
+        labels = {key: key[1] for key in prepared.first_seen} | {("A", "query"): "true"}
+        scored = probe.score_support(prepared, labels)
+        counts = scored["by_source"][1]["first"]
+        self.assertEqual(counts["nearest_wrong_with_true_reachable"], 1)
+        self.assertEqual(counts["wrong_with_true_reachable_any_true_peer_5"], 1)
+        self.assertEqual(counts["wrong_with_true_reachable_both_peers_5"], 1)
+        self.assertEqual(counts["wrong_with_true_reachable_both_peers_5_and_true_peer_neighbor"], 1)
+        self.assertEqual(scored["by_pool_size"]["0-3"]["first"]["events"], 3)
+        self.assertEqual(prepared.stop, 200)
+        self.assertEqual(prepared.native_stop, 199.9)
+        self.assertEqual(scored["paired"]["second_missing_incomplete_followup"], 1)
+
     def test_prefix_shift_applies_only_strictly_after_600_and_gate_is_inclusive(self):
         seed = {(source, str(i)): (0, longitude + shift)
                 for source, shift in (("A", 0), ("B", .03)) for i, longitude in enumerate((0, .3, .6))}
@@ -86,7 +104,7 @@ class RecentMotionSupportTests(unittest.TestCase):
         self.assertEqual(prepared.second[key].candidates[0].key, candidate)
 
         a, b, c = ("A", "a"), ("B", "b"), ("B", "c")
-        histories = {key: probe.History(0, 0, point, probe.deque((0,))) for key, point in
+        histories = {key: probe.History(0, 0, point, deque((0,))) for key, point in
                      ((a, (0, 0)), (b, (4000, 0)), (c, (4000.001, 0)))}
         sample, = probe._snapshot(0, (a,), histories, {})
         self.assertEqual([item.key for item in sample.candidates], [b])
