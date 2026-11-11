@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C83 近远端速度留场复验](2026-11-12-held-speed-readout-review.md)
+
+- [C87 同船支持资格和候选外共视锚](2026-11-12-supplier-provenance-review.md)
+
 - [NEMOT 运动预测在异步 MTAD 上的留场结果](2026-11-12-online-nemot-motion.md)
 
 - [C85 拆旧边证据与逐时支持的开发复验](2026-11-12-asymmetric-links-review.md)

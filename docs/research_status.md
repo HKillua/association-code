@@ -29,8 +29,8 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C85](reports/2026-11-12-asymmetric-links-review.md)在18个C82组件不交的T开发场复验原生树ABS，较旧J同源/跨源TP+3/+2、FP−2/−1，仍有原时刻支持损失。有门拆边无新增受保护选择。原生树32个事后同时补漏去假候选均被严格门挡住，20个实际保住全部原同身份支持。C87先检验无真值能否辨识支持提供者，C72核候选外的共视锚和相对几何，原生树ABS继续作冻结对照。
-   - [C86](reports/2026-11-12-far-supported-speed-review.md)固定V32远端改用同侧最近有支撑速度，远端1,349点MAE 25.166→1.472m/s，全域1.160232→0.710616m/s、P99 26.895→4.784，覆盖和其他属性保持。C83保留近端原规则，在保留开发场分项及合用复验固定近端、远端读出，不据V32重选阈值。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C87](reports/2026-11-12-supplier-provenance-review.md)相对运动在同可见供给对的AUC .778→.860，冻结阈值未多排除假供给，六个门均未放行兼顾补漏去假的候选。事后同船供给门可放20个、9个为正分。外锚平移在2场共同80对上AUC .961，锚距.889，覆盖80/308。C88在其他组件验证外锚平移、原距离及无锚回退。原生树ABS为固定比较。
+   - [C83](reports/2026-11-12-held-speed-readout-review.md)在留出V48通过近端、远端、合用三项门槛。远端844点MAE30.252→4.453m/s，合用全域2.652→1.597m/s，远端贡献99.19%。远端为统一四属性比较的优先候选，近端21点中5点恶化、最大增害22.505m/s，保留单独尾部审查。
    - 现有V300加权跨源正确率/误关联率63.62/43.30%，TMTAFF原表91.38/6.87%，作者逐场和窗口未对齐。[C84四属性核查](reports/2026-11-12-tmtaff-metric-bridge-review.md)保留原文指标与覆盖。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF为融合补充。
 2. **在线异步运动预测完成真实留场，个体历史降低报文误差。** 训练／选型／留场 64／12／28 场，三组共享 A 组件互斥。KF／个体历史／同源邻轨的留场报文位置 MAE 549.829／537.463／537.104 m，24 个稀疏场 581.962／569.010／568.490 m。持续关联错漏对秒全体 91737／91831／91865，稀疏 66553／66574／66652。个体保留为在线预测对照，本次两学习臂均未通过冻结的关联改善判据。HyperSSM 保留为同协议另一架构强对照。 [名单与 Idea](proposals/online_nemot_motion_20261112.md) · [Record/Squeeze](reports/2026-11-12-online-nemot-motion.md) · [在线 Mode C v22](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v22-异步运动三臂回流)
    - C-ON30 先查同预测和候选下的真假边残差、空配及错链持续，建立直接关联评分的证据。C-ON28 先核有限待定能否新增可解竞争，C-ON29 概率拒配仍缺独立可匹配证据。TSA-cTFER 作为同数据基线，作者 20 秒、3/6 及位置时间输入已核，精确名单、超时及代码权重仍缺。 [作者协议](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_tsactfer_protocol_20261112.md) · [近期原文筛选](reports/2026-11-12-online-recent-baseline-review.md)
@@ -45,7 +45,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.26](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-226)，P14/F333/M142/E278/C87|
+|全局问题—现象—机制—证据|[Mode C2.28](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-228)，P14/F336/M145/E283/C88|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
