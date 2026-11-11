@@ -138,9 +138,10 @@ def _scene_members(archive, pattern, kind):
     return members
 
 
-def read_archive_rows(parts, manifest_path, scene):
+def read_archive_rows(parts, manifest_path, scene, *, required_split=None):
     """Read one Level1 development measurement member from ordered ZIP parts."""
-    payload = _read_development_member(parts, manifest_path, scene, _MEASUREMENT_PATH, 'measurement')
+    payload = _read_development_member(
+        parts, manifest_path, scene, _MEASUREMENT_PATH, 'measurement', required_split=required_split)
     return csv_rows(payload)
 
 
