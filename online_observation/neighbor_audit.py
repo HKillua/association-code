@@ -8,7 +8,7 @@ from statistics import median
 
 from .causal_anchor_support import CONSISTENCY_M
 from .expansion_evidence_metrics import TRUTH_GROUPS
-from .neighbor_witness import WITNESS_TOLERANCE_M, summarize_votes
+from .neighbor_witness import WITNESS_TOLERANCE_M, evidence_signal, summarize_votes
 
 
 BIRTH_GROUPS = ("all", "sparse")
@@ -75,22 +75,6 @@ def _support(fit):
     return fit.support if fit is not None else 0
 
 
-def _signal(consensus, offset):
-    """Classify strong positive, strong conflict and unresolved evidence."""
-    if offset is None:
-        return "missing_clock"
-    best = consensus.best
-    if _support(best) < 2:
-        return "insufficient_support"
-    if _support(consensus.competing) >= best.support:
-        return "competing_offset"
-    if best.assignment_ambiguous:
-        return "ambiguous_assignment"
-    if consensus.residual_m > WITNESS_TOLERANCE_M:
-        return "conflict"
-    return "compatible" if _support(consensus.candidate) >= 2 else "insufficient_at_candidate"
-
-
 def _range_bin(count):
     return str(min(count, 2))
 
@@ -125,7 +109,7 @@ def _record_neighbor(counts, pair, evidence, labels, truth):
     counts[f"best_true_independent_objects_{_range_bin(len(best_true_objects))}"] += 1
     counts["best_contains_focal_true_identity"] += any(labels[a] == labels[b] and labels[a] in excluded
                                                        for a, b in witnesses)
-    signal = _signal(consensus, evidence.candidate_offset)
+    signal = evidence_signal(consensus, evidence.candidate_offset)
     counts[f"signal_{signal}"] += 1
     counts[f"{evidence.clock}_signal_{signal}"] += 1
     if truth != "true":
@@ -139,7 +123,7 @@ def _record_neighbor(counts, pair, evidence, labels, truth):
         clean_signal = "insufficient_objects"
     else:
         clean_consensus = summarize_votes(clean, evidence.candidate_offset)
-        clean_signal = _signal(clean_consensus, evidence.candidate_offset)
+        clean_signal = evidence_signal(clean_consensus, evidence.candidate_offset)
         if clean_signal == "insufficient_support":
             clean_signal = "disagreement"
     counts[f"clean_{clean_signal}"] += 1
@@ -231,6 +215,61 @@ def _record_outcomes(target, selected, key, own_unseen, labels, seen):
             counts[f"{outcomes[reference]}_to_{outcomes[arm]}"] += 1
 
 
+def _history_groups():
+    return {group: Counter() for group in TRUTH_GROUPS}
+
+
+def _record_read(counts, previous, pair, witnesses, residual, born, sparse_born, labels):
+    read = {
+        "n": True,
+        "has_witness": bool(witnesses),
+        "residual_available": residual is not None,
+        "residual_compatible": residual is not None and residual <= WITNESS_TOLERANCE_M,
+    }
+    for metric, present in read.items():
+        counts[metric] += present
+        counts[f"birth_{metric}"] += present * born
+        counts[f"birth_sparse_{metric}"] += present * sparse_born
+        history = previous[metric]
+        if present and pair not in history:
+            counts["distinct_pairs" if metric == "n" else f"distinct_{metric}"] += 1
+            history.add(pair)
+    counts[f"witness_count_{_range_bin(len(witnesses))}"] += 1
+    counts[f"witness_{_witness_truth(witnesses, labels)}"] += 1
+
+
+def _record_historical(output, previous, frame, expansion, observed, labels, seen):
+    nominations = set(frame.additions["wide"])
+    legacy = {edge.pair: edge for edge in expansion.edges if edge.pair in nominations}
+    if legacy.keys() != nominations or any(reads.keys() != nominations for reads in observed.values()):
+        raise ValueError("witness reads must cover the same wide nominations")
+    born = set(frame.born)
+    fresh = Counter(key[0] for key in frame.fresh) if born else Counter()
+    sparse_born = {key for key in born if len(frame.fresh) - fresh[key[0]] <= 3}
+    outputs = output.setdefault("historical", {})
+    for arm, reads in {"witness_confirm": legacy, **observed}.items():
+        groups = outputs.setdefault(arm, _history_groups())
+        prior = previous[arm]
+        for pair, evidence in reads.items():
+            truth = _edge_truth(pair, labels, seen)
+            residual = (evidence.features["witness_residual_m"] if arm == "witness_confirm"
+                        else evidence.residual_m)
+            _record_read(groups[truth], prior, pair, evidence.witnesses, residual,
+                         sum(key in born for key in pair), sum(key in sparse_born for key in pair), labels)
+
+
+def _record_actual_writes(output, previous, opportunities, written, labels, seen):
+    for arm, pairs in {"witness_confirm": tuple(opportunities), **written}.items():
+        if len(set(pairs)) != len(pairs) or not set(pairs) <= opportunities.keys():
+            raise ValueError("witness writes must be unique original geometry sample opportunities")
+        prior = previous[arm]
+        for pair in pairs:
+            counts = output["writes"][_edge_truth(pair, labels, seen)]
+            counts[f"admitted_{arm}"] += 1
+            counts[f"distinct_admitted_{arm}"] += pair not in prior
+            prior.add(pair)
+
+
 def score_neighbor_audit(recovery_frames, expansion_frames, probe_frames, labels, *, arms=()):
     """Return anonymous scene counts from co-timed frames frozen before label access."""
     arms = tuple(arms) or ("geometry", "wide")
@@ -240,6 +279,8 @@ def score_neighbor_audit(recovery_frames, expansion_frames, probe_frames, labels
     seen_birth = {group: set() for group in BIRTH_GROUPS}
     seen_wide_birth = {group: set() for group in BIRTH_GROUPS}
     seen_writes = set()
+    seen_actual_writes = defaultdict(set)
+    seen_historical = defaultdict(lambda: defaultdict(set))
     for frame, expansion, probe in zip(recovery_frames, expansion_frames, probe_frames, strict=True):
         if frame.stamp != expansion.stamp:
             raise ValueError("recovery and expansion frames must describe the same decision")
@@ -266,6 +307,12 @@ def score_neighbor_audit(recovery_frames, expansion_frames, probe_frames, labels
             counts["distinct_pairs"] += pair not in seen_writes
             seen_writes.add(pair)
             _record_neighbor(counts, pair, evidence, labels, truth)
+        actual_writes = getattr(probe, "written", None)
+        if actual_writes:
+            _record_actual_writes(output, seen_actual_writes, probe.writes, actual_writes, labels, seen)
+        historical = getattr(probe, "historical", None)
+        if historical:
+            _record_historical(output, seen_historical, frame, expansion, historical, labels, seen)
         if not frame.born:
             continue
 
@@ -325,7 +372,10 @@ def pool_neighbor_audit(results):
     if first is None:
         return _new_summary(())
     output = _new_summary(first["selections"])
-    _merge_counts(output, first)
-    for result in iterator:
+    for result in (first, *iterator):
+        if "historical" in result:
+            historical = output.setdefault("historical", {})
+            for arm in result["historical"]:
+                historical.setdefault(arm, _history_groups())
         _merge_counts(output, result)
     return output

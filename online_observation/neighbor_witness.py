@@ -138,6 +138,24 @@ def summarize_votes(votes: Iterable[NeighborVote], candidate_offset: Point | Non
     return NeighborConsensus(best, competing, candidate, residual)
 
 
+def evidence_signal(consensus: NeighborConsensus, offset: Point | None) -> str:
+    """Classify compatible, conflicting, or unresolved independent evidence."""
+    if offset is None:
+        return "missing_clock"
+    best = consensus.best
+    if best is None or best.support < 2:
+        return "insufficient_support"
+    if consensus.competing is not None and consensus.competing.support >= best.support:
+        return "competing_offset"
+    if best.assignment_ambiguous:
+        return "ambiguous_assignment"
+    if consensus.residual_m > WITNESS_TOLERANCE_M:
+        return "conflict"
+    if consensus.candidate is not None and consensus.candidate.support >= 2:
+        return "compatible"
+    return "insufficient_at_candidate"
+
+
 class NeighborWitnessIndex:
     """Per-decision positions with cached strictly co-timed neighbor snapshots."""
 

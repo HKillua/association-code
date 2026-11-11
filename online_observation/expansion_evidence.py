@@ -87,18 +87,22 @@ class HistoricalGeometryWitnesses:
     def __init__(self):
         self._samples: dict[Pair, deque[_OffsetSample]] = {}
 
+    def record_sample(self, pair: Pair, sample: _OffsetSample) -> bool:
+        """Record a co-timed sample when both original report bounds advanced."""
+        # One extra slot allows a same-epoch observation to be excluded.
+        history = self._samples.setdefault(pair, deque(maxlen=3))
+        if history and not all(new > previous for new, previous in
+                               zip(sample.report_times, history[-1].report_times, strict=True)):
+            return False
+        history.append(sample)
+        return True
+
     def observe(self, t: float, geometry_links: Iterable[Pair],
                 histories: Mapping[Fragment, History]) -> tuple[tuple[Pair, _OffsetSample], ...]:
         recorded = []
         for left, right in geometry_links:
             sample = _latest_common_sample(histories[left], histories[right], t)
-            if sample is None:
-                continue
-            # One extra slot allows a same-epoch observation to be excluded.
-            history = self._samples.setdefault((left, right), deque(maxlen=3))
-            if not history or all(new > previous for new, previous in
-                                  zip(sample.report_times, history[-1].report_times, strict=True)):
-                history.append(sample)
+            if sample is not None and self.record_sample((left, right), sample):
                 recorded.append(((left, right), sample))
         return tuple(recorded)
 
