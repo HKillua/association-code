@@ -29,7 +29,7 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C71已完成科学和独审](reports/2026-11-11-same-source-swap-review.md)。WS保首互换在5/32场有联合改善动作，旧J选中2场，漏选涉及2组件。联合上界补回2/124条同源、14/385条跨源漏边，20/32场组数仍与真实身份数不同。按[C70骨架方案](proposals/offline_trajectory_reselection_20261110.md#c71结果后的状态评分资格)做有界同池状态评分资格。主前端重选能拆并并改变组容量的原生片段候选，检验共时跨目标几何C72的增量。TMTAFF的[分量核验](proposals/tmtaff_component_qualification_20261111.md)已定位下一对照，分别固定TAM对比损失尺度、TCM/TFM真对训练的四属性与位置目标。合格后用同场景、同输入和同输出协议比较完整系统。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C70科学与独审](reports/2026-11-11-conditional-trajectory-review.md)完成，固定池位置留出评分比同池J少11条同源、43条跨源真边，关闭当前评分配方。主前端推进[可变容量候选诊断](proposals/offline_variable_partition_20261111.md)，固定拆并动作族和原始切口预算，比旧分数与原生运动的候选可达性，几何C72后续独立验证。固定WS与真组中位置估计读出明显改善速航、位置MAE升，按[C74对照](proposals/offline_trajectory_reselection_20261110.md#c70结果后的融合读出对照)准备冻结分组和位置后的读出验证。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
 2. **在线当前处于文献阅读和问题发现阶段。** 按用户明确的顺序，先逐篇读海事实测、时空配准、异步后验融合和在线评价，再用来源与项目观察建立 Mode C。首批定向复核 13 篇论文和 1 份学位论文，整理了相对偏差与时差混淆、暂失与重现时的持续身份、融合相关历史、结果实际可用时间和评价人口五组问题。继续取得最近邻联合配准及现场级联原文，比较已知条件、反例、支持范围和本项目是否有相同现象。证据充分的连接再进入创新筛选与事前设计。[逐篇来源分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_literature_analysis_20261111.md) · [在线 Mode C v3](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v3-文献扩展与问题复核)
    - 已有 8 场字段审计、3 场关联/融合诊断及相对平移、源等权的结果属于开发证据，先前的接入设想回到候选比较。严格输入、每秒发布、跨次身份和可变 K 约束沿用，最大结果延迟待定。实际推理使用 [online_observation](../online_observation/README.md) 的独立代码。当前无在线执行合同。[字段权限](data_contract.md#在线字段可用时间) · [开发证据原报告](reports/2026-11-11-online-field-and-method-review.md)
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
@@ -42,7 +42,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.13](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-213)，P14/F311/M124/E214/C73|
+|全局问题—现象—机制—证据|[Mode C2.14](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-214)，P14/F313/M124/E215/C74|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含两项资格验证回流与文献扩展|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
