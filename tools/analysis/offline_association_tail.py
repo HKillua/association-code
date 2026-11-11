@@ -12,9 +12,11 @@ import numpy as np
 import torch
 from torch.nn import functional as F
 
-from association.models.evidence_association import FEATURE_NAMES, features_from_motion
+from association.evaluation.association import _aggregate, _counts
+from association.models.evidence_association import EvidenceAssociation, features_from_motion
 from association.training.evidence_association import load_checkpoint, normalized_features
 from tools.analysis import association_frozen_pr_audit as audit
+from tools.analysis import supplier_provenance_qualification as supplier
 from tools.analysis import static_partition_pilot as ws
 
 
@@ -25,6 +27,8 @@ STEPS = 1024
 EACH_SCOPE = 128
 CONVERSION = 1852 / 3600
 PARITY = 1e-4
+HEADS = ('BCE', 'RANK')
+ARMS = ('056', '056_T', *HEADS)
 
 
 def require(value, description):
@@ -105,7 +109,7 @@ def infer(motion, pairs, teacher, normalizer, device, heads=None, saved_scores=N
         result['056'][block] = score
         if heads is not None:
             for name, head in heads.items():
-                result[name][block] = score + head(x).squeeze(-1).cpu().numpy().astype(np.float64)
+                result[name][block] = head(x, torch.as_tensor(score, device=device)).cpu().numpy()
     require(all(np.isfinite(values).all() for values in result.values()), 'nonfinite pair score')
     return result
 
@@ -221,12 +225,306 @@ def prepare(args, manifest, original, index, cache, start):
                                    set(components[s] for s in manifest['splits']['V_select']))))
 
 
+def prepare_fit(index, ids, prep, normalizer):
+    pools = defaultdict(list)
+    for sid in ids:
+        row = index[sid]
+        motion = read_motion(row)
+        pairs = all_pairs(len(motion['node_ids']))
+        old = np.load(prep / 'private' / f'scores-{sid}.npy', allow_pickle=False)
+        ids_true = read_identity(row, motion)
+        truth = ids_true[pairs[:, 0]] == ids_true[pairs[:, 1]]
+        for scope, mask in zip(SCOPES, scope_masks(motion, pairs), strict=True):
+            top, rest = tail_indices(old, np.flatnonzero(mask & ~truth))
+            for kind, indices in (('positive', np.flatnonzero(mask & truth)), ('top', top), ('rest', rest)):
+                if len(indices):
+                    x, _ = features(motion, pairs[indices], normalizer)
+                    pools[scope, kind].append((x, old[indices]))
+    result = {}
+    for scope in SCOPES:
+        for kind in ('positive', 'top', 'rest'):
+            blocks = pools[scope, kind]
+            require(bool(blocks), f'empty fit pool {scope} {kind}')
+            result[scope, kind] = tuple(np.concatenate(items) for items in zip(*blocks))
+    return result
+
+
+def fit_heads(pools, device):
+    torch.manual_seed(SEED)
+    heads = {name: EvidenceAssociation().to(device) for name in HEADS}
+    heads['RANK'].load_state_dict(heads['BCE'].state_dict())
+    require(all(torch.equal(value, heads['RANK'].state_dict()[key])
+                for key, value in heads['BCE'].state_dict().items()), 'head initialization differs')
+    opts = {name: torch.optim.Adam(head.parameters(), lr=.001) for name, head in heads.items()}
+    rng = np.random.default_rng(SEED)
+    seen = {key: np.zeros(len(old), bool) for key, (_, old) in pools.items()}
+    population = {key: tuple(torch.from_numpy(a).to(device) for a in values) for key, values in pools.items()}
+    with torch.inference_mode():
+        for x, old in population.values():
+            for head in heads.values():
+                require(torch.equal(head(x[:32], old[:32]), old[:32]), 'u0 score differs from frozen 056')
+    log = []
+    for step in range(1, STEPS + 1):
+        batch = {}
+        for key, (x, old) in population.items():
+            count = EACH_SCOPE if key[1] == 'positive' else EACH_SCOPE // 2
+            drawn = rng.integers(0, len(old), size=count)
+            seen[key][drawn] = True
+            batch[key] = x[drawn], old[drawn]
+        step_log = {}
+        for name, head in heads.items():
+            opts[name].zero_grad(set_to_none=True)
+            logits = {key: head(x, old) for key, (x, old) in batch.items()}
+            losses = []
+            for scope in SCOPES:
+                pos = logits[scope, 'positive']
+                neg = torch.cat([logits[scope, 'top'], logits[scope, 'rest']])
+                if name == 'BCE':
+                    losses.append((F.softplus(-pos).mean() + F.softplus(neg).mean()) / 2)
+                else:
+                    losses.append(F.softplus(neg - pos).mean())
+            loss = torch.stack(losses).mean()
+            require(bool(torch.isfinite(loss)), 'nonfinite objective')
+            loss.backward()
+            norm = torch.nn.utils.clip_grad_norm_(head.parameters(), 1., error_if_nonfinite=True)
+            opts[name].step()
+            if step == 1 or step % 128 == 0:
+                step_log[name] = dict(loss=float(loss.detach()), gradient_norm=float(norm))
+        if step_log:
+            log.append(dict(step=step, **step_log))
+    for head in heads.values():
+        head.eval().requires_grad_(False)
+    counts = {scope: {kind: dict(available=len(seen[scope, kind]), unique_drawn=int(seen[scope, kind].sum()),
+                                presentations=STEPS * (EACH_SCOPE if kind == 'positive' else EACH_SCOPE // 2))
+                      for kind in ('positive', 'top', 'rest')} for scope in SCOPES}
+    return heads, dict(seed=SEED, updates_per_head=STEPS, paired_exposure=True, u0_equal=True,
+                       parameters_per_head=sum(parameter.numel() for parameter in heads['BCE'].parameters()),
+                       population=counts, curve=log)
+
+
+def score_scene(row, sid, normalizer, heads, device, prep, archive):
+    motion = read_motion(row)
+    pairs = all_pairs(len(motion['node_ids']))
+    if archive is None:
+        old = np.load(prep / 'private' / f'scores-{sid}.npy', allow_pickle=False)
+    else:
+        for key, actual in (('node_ids', motion['node_ids']), ('sources', motion['sources']), ('pairs', pairs)):
+            np.testing.assert_array_equal(archive[f'{sid}_{key}'], actual)
+        old = archive[f'{sid}_scores']
+    require(old.shape == (len(pairs),), 'frozen pair score population changed')
+    scores = infer(motion, pairs, None, normalizer, device, heads, old)
+    scores['056_T'] = scores['056']
+    return motion, pairs, scores
+
+
+def recall_point(scores, truth, percent):
+    thresholds, predicted, tp = audit.score_groups(scores, truth)
+    require(int(tp[-1]) > 0, 'recall endpoint has no true edges')
+    i = int(np.searchsorted(tp, (int(tp[-1]) * percent + 99) // 100))
+    return dict(threshold=float(thresholds[i]), tp=int(tp[i]), fp=int(predicted[i] - tp[i]),
+                positive=int(tp[-1]), predicted=int(predicted[i]), pfa=float(1 - tp[i] / predicted[i]))
+
+
+def calibrate(index, ids, normalizer, heads, device, prep):
+    values = {name: [] for name in ('056_T', *HEADS)}
+    truth = []
+    for sid in ids:
+        row = index[sid]
+        motion, pairs, scores = score_scene(row, sid, normalizer, heads, device, prep, None)
+        ids_true = read_identity(row, motion)
+        cross = scope_masks(motion, pairs)[1]
+        truth.append((ids_true[pairs[:, 0]] == ids_true[pairs[:, 1]])[cross])
+        for name in values:
+            values[name].append(scores[name][cross])
+    truth = np.concatenate(truth)
+    return {name: recall_point(np.concatenate(values[name]), truth, 90) for name in values}
+
+
+def decode(n, pairs, scores, thresholds, original):
+    result = {'056': original}
+    for name in ARMS[1:]:
+        shifted = (scores[name] - thresholds[name]) + ws.THRESHOLD
+        membership, _, _ = ws.agglomerate(n, pairs, shifted, 'WS')
+        result[name] = membership
+    return result
+
+
+def coverage(original, changed, truth_id, support):
+    def represented(group):
+        _, first = np.unique(group, return_index=True)
+        identities = set(truth_id[first])
+        return identities, len(first) - len(identities)
+
+    identity_equal = truth_id[:, None] == truth_id[None, :]
+    original_ids, old_duplicates = represented(original)
+    changed_ids, new_duplicates = represented(changed)
+    old_members = original[:, None] == original[None, :]
+    new_members = changed[:, None] == changed[None, :]
+    old_support = supplier.supported(old_members & identity_equal, support)
+    new_support = supplier.supported(new_members & identity_equal, support)
+    return dict(represented=len(changed_ids), identities_lost=len(original_ids - changed_ids),
+                identities_gained=len(changed_ids - original_ids), duplicates=new_duplicates,
+                duplicate_increase=new_duplicates - old_duplicates,
+                same_ship_supported=int(new_support.sum()),
+                same_ship_lost=int((old_support & ~new_support).sum()),
+                same_ship_recovered=int((~old_support & new_support).sum()))
+
+
+def confuse(truth, chosen, mask):
+    t, p = truth[mask], chosen[mask]
+    return dict(pair_count=len(t), positive_count=int(t.sum()), **_counts(t, p))
+
+
+def evaluate(args, split, ids, index, normalizer, heads, thresholds, archive, components):
+    frozen_path = args.output / 'private' / split
+    frozen_path.mkdir()
+    original_ws = args.runs / audit.RUNS['114'] / 'private'
+    for sid in ids:
+        row = index[sid]
+        motion, pairs, scores = score_scene(row, sid, normalizer, heads, args.device, args.prep, archive)
+        n = len(motion['node_ids'])
+        if archive is None:
+            old_groups, _, _ = ws.agglomerate(n, pairs, scores['056'], 'WS')
+        else:
+            old_groups = np.asarray(audit.read_json(original_ws / f'scene-{sid}.json.gz')['memberships']['WS'])
+        memberships = decode(n, pairs, scores, thresholds, old_groups)
+        np.savez(frozen_path / f'{sid}.npz', pairs=pairs,
+                 **{f'score_{name}': values for name, values in scores.items()},
+                 **{f'group_{name}': values for name, values in memberships.items()})
+
+    rows = []
+    rank = {scope: defaultdict(list) for scope in SCOPES}
+    for sid in ids:
+        row = index[sid]
+        motion = read_motion(row)
+        ids_true = read_identity(row, motion)
+        with np.load(frozen_path / f'{sid}.npz', allow_pickle=False) as saved:
+            pairs = saved['pairs']
+            left, right = pairs.T
+            truth = ids_true[left] == ids_true[right]
+            if archive is not None:
+                np.testing.assert_array_equal(truth, archive[f'{sid}_labels'])
+            masks = dict(zip(SCOPES, scope_masks(motion, pairs), strict=True))
+            before = saved['group_056']
+            values = dict(scene=sid, component=components[sid], pairs=len(pairs), arms={})
+            for scope, mask in masks.items():
+                rank[scope]['truth'].append(truth[mask])
+            for name in ARMS:
+                scores, group = saved[f'score_{name}'], saved[f'group_{name}']
+                raw = scores >= thresholds[name]
+                decoded = group[left] == group[right]
+                values['arms'][name] = dict(coverage=coverage(before, group, ids_true, motion['support']))
+                for scope, mask in masks.items():
+                    values['arms'][name][scope] = dict(
+                        raw=confuse(truth, raw, mask), decoded=confuse(truth, decoded, mask),
+                        removed=confuse(truth, raw & ~decoded, mask),
+                        added=confuse(truth, ~raw & decoded, mask),
+                        retained=confuse(truth, raw & decoded, mask))
+                    rank[scope][name].append(scores[mask])
+            rows.append(values)
+    write(args.output / f'{split}-scenes.json', rows)
+    ranking = {}
+    for scope, blocks in rank.items():
+        truth = np.concatenate(blocks['truth'])
+        ranking[scope] = {}
+        for name in ARMS:
+            scores = np.concatenate(blocks[name])
+            ranking[scope][name] = {str(p): recall_point(scores, truth, p) for p in (80, 90)}
+            _, predicted, tp = audit.score_groups(scores, truth)
+            fp = predicted - tp
+            delta_tp, delta_fp = np.diff(tp, prepend=0), np.diff(fp, prepend=0)
+            ranking[scope][name]['pooled_ap'] = float(delta_tp @ (tp / predicted) / tp[-1])
+            ranking[scope][name]['pooled_auc'] = float(
+                delta_tp @ (fp[-1] - fp + .5 * delta_fp) / (tp[-1] * fp[-1]))
+    return summarize_results(rows, ranking)
+
+
+def summarize_results(rows, ranking):
+    def aggregate(items):
+        result = {}
+        for name in ARMS:
+            coverage_totals = Counter()
+            for row in items:
+                coverage_totals.update(row['arms'][name]['coverage'])
+            result[name] = dict(coverage=dict(coverage_totals))
+            for scope in SCOPES:
+                result[name][scope] = {}
+                for stage in ('raw', 'decoded', 'removed', 'added', 'retained'):
+                    result[name][scope][stage] = _aggregate(
+                        [row['arms'][name][scope][stage] for row in items])
+        return result
+
+    by_component = defaultdict(list)
+    for row in rows:
+        by_component[row['component']].append(row)
+    largest = max(by_component, key=lambda c: (len(by_component[c]), c))
+    result = dict(scenes=len(rows), ranking=ranking, largest_component=largest,
+                  by_component={c: aggregate(items) for c, items in by_component.items()},
+                  full=aggregate(rows),
+                  without_largest=aggregate([r for r in rows if r['component'] != largest]))
+    result['gates'] = {base: qualification(result, base) for base in ('056', '056_T', 'BCE')}
+    return result
+
+
+def qualification(result, base):
+    def direction(arms):
+        rank, old = arms['RANK'], arms[base]
+        return (all(rank['mstsa']['decoded'][k] < old['mstsa']['decoded'][k] for k in ('fn', 'fp'))
+                and all(rank['itsa']['decoded'][k] <= old['itsa']['decoded'][k] for k in ('fn', 'fp')))
+
+    ranking = result['ranking']
+    raw = all(ranking['mstsa']['RANK'][p]['fp'] < ranking['mstsa'][base][p]['fp']
+              and ranking['itsa']['RANK'][p]['fp'] <= ranking['itsa'][base][p]['fp'] for p in ('80', '90'))
+    decoded = direction(result['full'])
+    coverage_counts = result['full']['RANK']['coverage']
+    retained = (all(coverage_counts[k] == 0 for k in ('identities_lost', 'same_ship_lost'))
+                and coverage_counts['duplicate_increase'] <= 0)
+    components = sum(direction(arms) for arms in result['by_component'].values())
+    sensitivity = direction(result['without_largest'])
+    return dict(raw=raw, decoded=decoded, retained=retained, joint_benefit_components=components,
+                without_largest=sensitivity, passed=raw and decoded and retained and components >= 2 and sensitivity)
+
+
+def experiment(args, manifest, original, index, start):
+    require(args.prep is not None, 'completed prep path required')
+    prep = audit.read_json(args.prep / 'summary.json')
+    require(prep['qualified'] and audit.read_json(args.prep / 'run.json')['status'] == 'COMPLETED',
+            'prep did not qualify')
+    roles = audit.read_json(args.prep / 'frozen-split.json')
+    require(roles == scene_split(manifest['splits']['T_core'], manifest['components']), 'prep roles changed')
+    _, checkpoint = load_checkpoint(original / 'final.pt', 'cpu')
+    normalizer = checkpoint['normalizer']
+    summary_state(args.output, start, status='RUNNING', phase='fit_population')
+    pools = prepare_fit(index['T_core'], roles['fit'], args.prep, normalizer)
+    heads, training = fit_heads(pools, args.device)
+    torch.save({name: head.state_dict() for name, head in heads.items()}, args.output / 'private' / 'heads.pt')
+    write(args.output / 'training.json', training)
+    del pools
+    summary_state(args.output, start, status='RUNNING', phase='calibration', optimizer_updates=2 * STEPS)
+    calibration = calibrate(index['T_core'], roles['calibration'], normalizer, heads, args.device, args.prep)
+    thresholds = {'056': ws.THRESHOLD, **{name: value['threshold'] for name, value in calibration.items()}}
+    write(args.output / 'calibration.json', dict(thresholds=thresholds, points=calibration))
+    components = manifest['components']
+    summary_state(args.output, start, status='RUNNING', phase='held', optimizer_updates=2 * STEPS)
+    held = evaluate(args, 'held', roles['held'], index['T_core'], normalizer, heads, thresholds, None, components)
+    summary_state(args.output, start, status='RUNNING', phase='V_select', optimizer_updates=2 * STEPS)
+    with np.load(original / 'final-scores.npz', allow_pickle=False) as archive:
+        ids = manifest['splits']['V_select']
+        require(archive['scene_ids'].tolist() == ids, 'V order differs from 056 score archive')
+        dev = evaluate(args, 'V_select', ids, index['V_select'], normalizer, heads, thresholds, archive, components)
+    expected = audit.read_json(args.runs / audit.RUNS['114'] / 'summary.json')['full_V']['decoded']['WS']
+    for scope in SCOPES:
+        audit.check_counts(dev['full']['056'][scope]['decoded'], expected[scope])
+    write(args.output / 'summary.json', dict(held=held, V_select=dev, fixed_thresholds=thresholds))
+
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--mode', choices=('prepare',), required=True)
+    parser.add_argument('--mode', choices=('prepare', 'experiment'), required=True)
     parser.add_argument('--runs', type=Path, required=True)
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--prep', type=Path)
     parser.add_argument('--device', default='cpu')
     parser.add_argument('--time-policy', choices=('advisory',), required=True)
     args = parser.parse_args()
@@ -238,11 +536,15 @@ def main():
     try:
         manifest = audit.read_json(args.manifest)
         original, index, cache = locations(args.runs, manifest)
-        prepare(args, manifest, original, index, cache, start)
+        if args.mode == 'prepare':
+            prepare(args, manifest, original, index, cache, start)
+        else:
+            experiment(args, manifest, original, index, start)
     except Exception as exc:
         summary_state(args.output, start, status='FAILED', error=repr(exc))
         raise
-    summary_state(args.output, start, status='COMPLETED', optimizer_updates=0, test_opened=False)
+    updates = 0 if args.mode == 'prepare' else 2 * STEPS
+    summary_state(args.output, start, status='COMPLETED', optimizer_updates=updates, test_opened=False)
 
 
 if __name__ == '__main__':
