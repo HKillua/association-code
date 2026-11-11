@@ -4,6 +4,12 @@
 
 ## 2026-11-12
 
+- [在线持续身份四臂真实回放](2026-11-12-online-continuous-factorial.md)
+
+- [C82 原候选池的运动证据与关联选择](2026-11-12-disjoint-motion-evidence-review.md)
+
+- [C84 固定C81输出的TMTAFF四属性评价](2026-11-12-tmtaff-metric-bridge-review.md)
+
 - [在线多源航迹关联基线选型](2026-11-12-online-continuous-baseline-selection.md)
 
 - [C80冻结候选池的关联重评分](2026-11-12-disjoint-partition-rerank-review.md)
