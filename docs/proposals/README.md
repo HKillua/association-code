@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [在线持续身份四臂对照](online_continuous_factorial_20261112.md)
+
 - [前缀配准分流的首报门限资格](online_prefix_gate_qualification_20261112.md)
 
 ## 2026-11-11
