@@ -36,6 +36,7 @@ class ExpansionEdge:
     wide: bool
     features: dict[str, float | int | None]
     witnesses: tuple[Edge, ...]
+    witness_offsets: tuple[tuple[Edge, tuple[float, float]], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -88,10 +89,10 @@ class ExpansionRecorder:
                 witness_residual_m=witness.residual_m, repeat_offset_drift_m=repeat_drift,
                 repeat_both=repeat_both, episode_age_s=episode_age,
                 singleton=int(all(degrees[key] == 1 for key in pair)),
-            ), witness.witnesses))
+            ), witness.witnesses, witness.offsets))
         self.nominations = nominations
         self.frames.append(ExpansionFrame(frame.stamp, frame.updated, frame.fresh, tuple(edges)))
-        self.witnesses.observe(frame.stamp, frame.geometry_links, histories)
+        return self.witnesses.observe(frame.stamp, frame.geometry_links, histories)
 
 
 class ConfirmationState:
@@ -123,9 +124,9 @@ class ConfirmationState:
         return {arm: tuple(sorted(pairs)) for arm, pairs in current.items()}
 
 
-def _members(manifest, phase):
+def _members(manifest, phase, roster_path=ROSTER):
     inventory = json.loads(manifest.read_text(encoding="utf-8"))
-    roster = json.loads(ROSTER.read_text(encoding="utf-8"))
+    roster = json.loads(roster_path.read_text(encoding="utf-8"))
     if roster["source_split"] != "T_core" or phase not in roster["splits"]:
         raise ValueError(f"no frozen T_core {phase} roster")
     components = inventory["components"]

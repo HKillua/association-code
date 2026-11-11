@@ -129,7 +129,7 @@ def _grade_delay(starts, confirmed, scene_end, references):
     return _delay_summary(len(starts), len(truncated), delays, paired)
 
 
-def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",)):
+def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",), cohorts=COHORTS):
     """Grade frozen decisions and return scene counts without fragment identities."""
     augmented = tuple(arm for arm in arms if arm != "geometry")
     query_counts = (*QUERY_COUNTS, *(f"{arm}_{metric}" for arm in augmented
@@ -137,8 +137,8 @@ def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",)):
     queries = {group: Counter(dict.fromkeys(query_counts, 0)) for group in QUERY_GROUPS}
     arm_counts = {arm: Counter(dict.fromkeys(ARM_COUNTS, 0)) for arm in arms}
     distinct = {arm: {name: set() for name in ("true", "false", "added_true", "added_false")} for arm in arms}
-    starts = {name: {} for name in COHORTS}
-    confirmed = {name: {arm: {} for arm in arms} for name in COHORTS}
+    starts = {name: {} for name in cohorts}
+    confirmed = {name: {arm: {} for arm in arms} for name in cohorts}
     outside_distinct = set()
     event_count = 0
     scene_end = 0.
@@ -175,16 +175,23 @@ def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",)):
         born = set(frame.born)
         by_source = Counter(key[0] for key in frame.fresh)
         for key in born:
-            starts["first"].setdefault(key, stamp)
+            if "first" in starts:
+                starts["first"].setdefault(key, stamp)
+            if "first_sparse" in starts and len(frame.fresh) - by_source[key[0]] <= 3:
+                starts["first_sparse"].setdefault(key, stamp)
         for key in frame.updated:
             true_peers = truth_by_key[key]
             reachable = not candidates.isdisjoint(true_peers)
             outside = bool(true_peers) and not reachable
+            sparse = len(frame.fresh) - by_source[key[0]] <= 3
             counts = Counter(count=1, fresh_true=bool(true_peers), geometry_reachable=reachable,
                              geometry_correct=key in base_true_keys, geometry_wrong=key in base_false_keys,
                              geometry_unmatched=key not in base_true_keys and key not in base_false_keys)
             if outside:
-                starts["outside"].setdefault(key, stamp)
+                if "outside" in starts:
+                    starts["outside"].setdefault(key, stamp)
+                if "outside_sparse" in starts and sparse:
+                    starts["outside_sparse"].setdefault(key, stamp)
                 outside_distinct.update(true_peers)
                 counts.update(outside=1, outside_true_edge_queries=len(true_peers))
                 counts.update(_evidence_counts([evidence[pair] for pair in true_peers if pair in evidence], truth))
@@ -193,14 +200,14 @@ def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",)):
                                f"{arm}_added_true": key in added_true_keys[arm],
                                f"{arm}_added_false": key in added_false_keys[arm]})
             groups = ["all", "first" if key in born else "continuation"]
-            if len(frame.fresh) - by_source[key[0]] <= 3:
+            if sparse:
                 groups.append("fresh_0_3")
                 if key in born:
                     groups.append("first_fresh_0_3")
             for group in groups:
                 queries[group].update(counts)
 
-        for cohort in COHORTS:
+        for cohort in cohorts:
             initial = starts[cohort]
             for arm, keys in selected_true_keys.items():
                 outcome = confirmed[cohort][arm]
@@ -214,7 +221,7 @@ def score_recovery(frames, labels, *, arms=ARMS, references=("geometry",)):
     return dict(events=event_count, distinct_outside_true=len(outside_distinct),
                 queries={name: dict(value) for name, value in queries.items()},
                 arms={arm: dict(value) for arm, value in arm_counts.items()},
-                delays={name: _grade_delay(starts[name], confirmed[name], scene_end, references) for name in COHORTS})
+                delays={name: _grade_delay(starts[name], confirmed[name], scene_end, references) for name in cohorts})
 
 
 def _sum_counts(parts):
@@ -224,11 +231,11 @@ def _sum_counts(parts):
     return dict(counts)
 
 
-def pool_recovery(results, *, arms=ARMS, references=("geometry",)):
+def pool_recovery(results, *, arms=ARMS, references=("geometry",), cohorts=COHORTS):
     """Pool additive counts and recompute all empirical delay summaries."""
     scenes = list(results)
     delays = {}
-    for cohort in COHORTS:
+    for cohort in cohorts:
         parts = [scene["delays"][cohort] for scene in scenes]
         arm_delays = {
             arm: dict(samples_seconds=[sample for part in parts for sample in part["arms"][arm]["samples_seconds"]],

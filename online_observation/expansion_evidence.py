@@ -4,7 +4,7 @@ from __future__ import annotations
 from bisect import bisect_right
 from collections import deque
 from collections.abc import Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from itertools import combinations
 from math import dist
 from statistics import median
@@ -27,6 +27,7 @@ class WitnessEvidence:
     count: int
     residual_m: float | None
     witnesses: tuple[Pair, ...]
+    offsets: tuple[tuple[Pair, Point], ...] = field(default=(), compare=False)
 
 
 @dataclass(frozen=True)
@@ -87,7 +88,8 @@ class HistoricalGeometryWitnesses:
         self._samples: dict[Pair, deque[_OffsetSample]] = {}
 
     def observe(self, t: float, geometry_links: Iterable[Pair],
-                histories: Mapping[Fragment, History]) -> None:
+                histories: Mapping[Fragment, History]) -> tuple[tuple[Pair, _OffsetSample], ...]:
+        recorded = []
         for left, right in geometry_links:
             sample = _latest_common_sample(histories[left], histories[right], t)
             if sample is None:
@@ -97,6 +99,8 @@ class HistoricalGeometryWitnesses:
             if not history or all(new > previous for new, previous in
                                   zip(sample.report_times, history[-1].report_times, strict=True)):
                 history.append(sample)
+                recorded.append(((left, right), sample))
+        return tuple(recorded)
 
     def lookup(self, pair: Pair, t: float, offset: Point | None) -> WitnessEvidence:
         """Compare with independently stable G pairs selected strictly earlier."""
@@ -113,4 +117,4 @@ class HistoricalGeometryWitnesses:
         agrees = centres and all(dist(first, second) <= CONSISTENCY_M
                                  for first, second in combinations(centres.values(), 2))
         residual = dist(offset, _centre(centres.values())) if offset is not None and agrees else None
-        return WitnessEvidence(len(centres), residual, tuple(sorted(centres)))
+        return WitnessEvidence(len(centres), residual, tuple(sorted(centres)), tuple(sorted(centres.items())))
