@@ -4,6 +4,8 @@
 
 ## 2026-11-11
 
+- [校正后首报 1 km 门限的留场资格](2026-11-11-online-held-gate-qualification.md)
+
 - [超龄历史的首报关联资格](2026-11-11-online-stale-history-qualification.md)
 
 - [首报无真对侧历史时的拒配资格](2026-11-11-online-no-peer-rejection-qualification.md)

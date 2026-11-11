@@ -30,8 +30,9 @@
 ## 下一步
 
 1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C76](reports/2026-11-11-multiple-disjoint-scope-review.md)的同一组选集在每场1、2、4处时分别触及27、57、90/385条跨源漏边，两处达到事前门槛。C78用每场至多两处的真实候选，验证同时去假补漏、对象覆盖及旧J选择；C72保留候选外共时跨目标几何。[C77](reports/2026-11-11-motion-fallback-attribution-review.md)确定1,680个回退速度点中1,677个沿用域外首成员端点，近端纯组156点跨7组件。C79优先核原端点速度字段和相邻位置区间，再做有界近端对照，[C74平滑求导](reports/2026-11-11-fixed-position-motion-readout-review.md)仍为开发强控。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
-2. **在线完成超龄历史与无历史拒配两项验证。** 顺序补读 10 篇原文、冻结 Idea、执行原 T_core 0/3/7 的零训练诊断，再逐项 Record→Squeeze→Mode C。600 秒历史在 14 个中救回 11，全体错 59→51，但 3 个原正确改错，超过事前上限 1。无历史的 28 个错配中，校正后 1 km 即时门拒 21，保留原 198 个正确。即时局部活动仅拒 5、误拒 45，等量对照也退化。[文献原文分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_literature_history_and_rejection_20261111.md) · [超龄记录](reports/2026-11-11-online-stale-history-qualification.md) · [无历史拒配记录](reports/2026-11-11-online-no-peer-rejection-qualification.md) · [在线 Mode C v12](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v12-无历史拒配实验回流)
-   - 下一步先用独立保留场核校正后 1 km 的真丢失、近距离误接和稀疏场。开发场剩余 7 个目标错配均在 1 km 内且有多个门内候选，28 个目标均为同一首报源。旧身份候选资格独立于新鲜状态发布，避免直接覆盖原正确首报。继续核真实到达、发布时钟、独立状态参考和持续系统 ID。严格输入、每秒发布、持续身份与可变 K 沿用，代码在 [online_observation](../online_observation/README.md) 独立维护。当前无在线执行合同。[字段权限](data_contract.md#在线字段可用时间)
+2. **在线固定 1 km 未通过留场资格。** 先补读场景留出、选择性风险与海事配准原文，再冻结 32 个未参与在线门选择的 T_core 场景。866 个理想到达首报中，校正 4→1 km 正确 595→563、错 141→78，拒掉无真对侧历史错配 43/72。30/32 个正确损失来自 4 个校正弃权场，28 个拟合场仅失 2 个。[冻结计划](proposals/online_held_gate_qualification_20261111.md) · [Record/Squeeze](reports/2026-11-11-online-held-gate-qualification.md) · [在线 Mode C v14](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v14-留场门限实验回流)
+   - 下一步依据 C-ON23，冻结新留场验证前缀拟合成功时收紧、弃权时保留 4 km。事后组合保留 593/595 原正确并少接 60 错。34 个门内有真错配待核共同过去位置增量，29 个无历史近距离错配中 15 个仅有一个门内假候选，需单独的可匹配性信息。开发场 600 秒历史救回 11/14、原正确变错 3 个，局部活动拒配也未达资格。[超龄记录](reports/2026-11-11-online-stale-history-qualification.md) · [无历史拒配记录](reports/2026-11-11-online-no-peer-rejection-qualification.md)
+   - 继续核真实到达、发布时钟、独立状态参考和持续系统 ID。严格输入、每秒发布、持续身份与可变 K 沿用，代码在 [online_observation](../online_observation/README.md) 独立维护。当前无在线执行合同。[字段权限](data_contract.md#在线字段可用时间)
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
 4. 196已完成Record→Squeeze→Mode C2.10/F306/E209、SR4.11/OD1.24；区分“回O避害”和“保MC救回”的动作监督/特征条件仅保留为候选，交叉180反例，待对应任务和具体Idea成立再执行。M123仍AI，主eligible O/MC裁剪均0，不按V后验设margin/时间阈值，不自动重训、扩V300或改默认。[196报告](reports/2026-11-03-action-conditioned-risk-validation-review.md)、[固定plan1.1](proposals/action_conditioned_risk_validation_20261102.md)。192密度解释、190拟合端点、194粗阶段门控当前配方已结案，既有反例/未采纳依据保留，不用加步/seed续旧试验。
 5. [11月5日整链计时](reports/2026-11-05-pipeline-online-timing.md)作为工程证据保留：72条记录齐备，但无在线精度/长期吞吐/P95。87片段prefix下PTFM约.895–1.004s，我们HARD约1.974–2.301s/STRUCT约2.234–9.931s；当前全量重算不能承诺中大场景1Hz，不能泛称比PTFM快。2s可以在线，串行吞吐与结果延迟分别评价；当前无加速优化READY或在线精度保证。
@@ -43,7 +44,7 @@
 |材料|入口|
 |---|---|
 |全局问题—现象—机制—证据|[Mode C2.18](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-218)，P14/F323/M129/E228/C79|
-|在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含两项资格验证回流与文献扩展|
+|在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
 |观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，196实际回流至v1.24/96格|
