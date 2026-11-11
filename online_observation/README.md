@@ -22,3 +22,15 @@ python -m online_observation causal-replay \
 ```bash
 python -m unittest discover -s online_observation/tests
 ```
+
+## 严格输入与开发诊断
+
+这些诊断从已到的位置、时间和片段等同性计算，量测速航既不参与预测，也不筛选位置。训练场的 A-B 标签和参考位置只进入评价。输入字段权限、真实回放结果和方法资格见[在线研究报告](../docs/reports/2026-11-11-online-field-and-method-review.md)。
+
+|入口|用途|
+|---|---|
+|`python -m online_observation.field_audit --help`|核对字段与相邻区间、采样时距和批号等同性|
+|`python -m online_observation.association_probe --help`|出生事件的候选门与排序诊断|
+|`python -m online_observation.bias_probe --help`|事后核对共时真对应的相对位移|
+|`python -m online_observation.registration_probe --help`|先无标签估计平移，再对晚到片段作共同候选比较|
+|`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|

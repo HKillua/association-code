@@ -1,6 +1,6 @@
 # 当前研究状态
 
-更新：2026-11-10。这里维护目标、结论和下一步；实际执行只看[交接](../HandOver/Handover.md)。结案全文见[报告索引](reports/README.md)，整理前推导和取舍已[完整保留](history/2026-11-02-research-process.md)，更早沿革见[历史入口](history/README.md)。
+更新：2026-11-11。这里维护目标、结论和下一步；实际执行只看[交接](../HandOver/Handover.md)。结案全文见[报告索引](reports/README.md)，整理前推导和取舍已[完整保留](history/2026-11-02-research-process.md)，更早沿革见[历史入口](history/README.md)。
 
 ## 当前要解决什么
 
@@ -30,8 +30,8 @@
 ## 下一步
 
 1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C71盘点与资格方案](proposals/offline_same_source_swap_20261110.md)发现已有T32分区在纳入176网格后，30场有等组数备选，但没有一场以WS为起点保持各组首节点与源计数。优先检验同源片段互换的关联可达性和旧J选择差距，再按[C70骨架方案](proposals/offline_trajectory_reselection_20261110.md)比较同池条件状态评分并核完整四属性。保留共时跨目标几何C72及条件四属性优化C73。当前未形成可领的执行合同。TMTAFF继续分别核TAM判别与真组补全融合的资格，合格后同场景、同信息、同输出协议比较完整系统。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
-2. **在线独立开发，从因果任务重新选型。** 用户明确在线代码单列于 [online_observation](../online_observation/README.md)，输入、运行、方法与评价独立实现。固定每秒发布当前状态与持续目标身份，因果输入和可变K；确认等待、结果延迟和持续吞吐分别评估，最大结果延迟待定。先核[量测字段可用时刻](data_contract.md#在线字段可用时间)，严格开发协议从已到位置和时间推导运动，原速航等可用时刻核清后再准入。接着在固定Level1开发场景按观测年龄、断续重现与邻近竞争检查候选漏失、误匹配、错误持续和已正确关联时的状态误差。按主要失效比较递推状态估计、延迟确认与联合跟踪等机制，选出有证据支持的骨架。TSA-cTFER留作关联对照候选，原20秒协议和1 Hz适配分列。IFNet/GCI-PMB的对照资格取决于是否能建立其所需的后验输入。
-   - 上一轮片段预测和60秒过期仅保留为按CSV整行交付的工程控制。Level1场景692的0–7200秒和1187的3300–3900秒合计7802次查询、4935行量测，峰值6/69个活跃片段，Apple M2服务时间P95为0.091/1.105ms。原件在本地私有`outputs/online-replay-20261110.cqt3tZ/`。记录约束了行时刻，原速航的生成时刻另行审查。未新增在线实验READY。
+2. **在线先以相对平移校正做跨源候选，保持位置并源等权做融合对照。** [字段与方法报告](reports/2026-11-11-online-field-and-method-review.md)保存 8 场字段审计、3 场诊断、两项事前资格检查与反例。严格输入为已到经纬、时间和源内片段等同性，原始速航按[字段权限](data_contract.md#在线字段可用时间)遮蔽。前 600 秒无标签估计通过三个训练场的时间留出资格。随后在独立开发场比较校正与宽门，接入允许未匹配的指派，同源长接续独立于发布活动窗，确认随新量测更新。融合先用保持位置和源等权建立共同人口，再核位置更新与速度估计可分离的递推滤波。20 秒年龄加权有 MAE–P99 取舍，按事前联合判据未晋级。相对平移用于跨源比较，绝对坐标和四属性精度另核。TSA-cTFER 保留为关联候选，原 20 秒和适配 1 Hz 条件分别报告。IFNet/GCI-PMB 待建立其后验输入资格。
+   - 因果输入、每秒发布、跨次身份、可变 K 及确认、结果延迟和持续吞吐的条件持续有效，最大结果延迟待定。上述为零训练开发选型。原整行控制的本地工程核验仍见 `outputs/online-replay-20261110.cqt3tZ/`，属已结工程证据。在线代码和测试都在 [online_observation](../online_observation/README.md)，无新增服务器 READY。
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
 4. 196已完成Record→Squeeze→Mode C2.10/F306/E209、SR4.11/OD1.24；区分“回O避害”和“保MC救回”的动作监督/特征条件仅保留为候选，交叉180反例，待对应任务和具体Idea成立再执行。M123仍AI，主eligible O/MC裁剪均0，不按V后验设margin/时间阈值，不自动重训、扩V300或改默认。[196报告](reports/2026-11-03-action-conditioned-risk-validation-review.md)、[固定plan1.1](proposals/action_conditioned_risk_validation_20261102.md)。192密度解释、190拟合端点、194粗阶段门控当前配方已结案，既有反例/未采纳依据保留，不用加步/seed续旧试验。
 5. [11月5日整链计时](reports/2026-11-05-pipeline-online-timing.md)作为工程证据保留：72条记录齐备，但无在线精度/长期吞吐/P95。87片段prefix下PTFM约.895–1.004s，我们HARD约1.974–2.301s/STRUCT约2.234–9.931s；当前全量重算不能承诺中大场景1Hz，不能泛称比PTFM快。2s可以在线，串行吞吐与结果延迟分别评价；当前无加速优化READY或在线精度保证。
@@ -43,6 +43,7 @@
 |材料|入口|
 |---|---|
 |全局问题—现象—机制—证据|[Mode C2.12](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-212)，P14/F310/M124/E213/C73|
+|在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含两项资格验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
 |观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，196实际回流至v1.24/96格|

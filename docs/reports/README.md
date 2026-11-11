@@ -2,6 +2,10 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-11
+
+- [MTAD 字段时间审计与在线关联、融合选型](2026-11-11-online-field-and-method-review.md)
+
 ## 2026-11-10
 
 - [离线完整系统与TMTAFF的对照核查](2026-11-10-offline-tmtaff-review.md)
