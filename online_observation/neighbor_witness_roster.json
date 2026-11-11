@@ -471,6 +471,12 @@
       "components": 7,
       "proxy_low_scenes": 10,
       "proxy_high_scenes": 1
+    },
+    "held": {
+      "scenes": 22,
+      "components": 12,
+      "proxy_low_scenes": 17,
+      "proxy_high_scenes": 5
     }
   },
   "splits": {
@@ -486,6 +492,30 @@
       "3736",
       "3777",
       "3997"
+    ],
+    "held": [
+      "276",
+      "396",
+      "439",
+      "488",
+      "820",
+      "1161",
+      "1589",
+      "1600",
+      "1682",
+      "2628",
+      "3168",
+      "3519",
+      "3698",
+      "3827",
+      "3863",
+      "3900",
+      "4264",
+      "4374",
+      "4413",
+      "4480",
+      "4515",
+      "4809"
     ]
   },
   "components": {
@@ -499,7 +529,29 @@
     "3598": "component-b464f73127437fc0e2e0c1c9",
     "3736": "component-4ad4f4b15e8855fdb30bf269",
     "3777": "component-01203634e72228d9582b8b9c",
-    "3997": "component-a68c8dc2cdfeb2277ac5d32a"
+    "3997": "component-a68c8dc2cdfeb2277ac5d32a",
+    "276": "component-1a97afb84b073a6e67c5bb00",
+    "396": "component-fde3da10230624198088bd00",
+    "439": "component-6168d795e66f68b6ea6c3b7a",
+    "488": "component-a976e938a5d6c85e19e75148",
+    "820": "component-13bf8d8c05af98b86d432a08",
+    "1161": "component-a83dc25f641a5649492e3924",
+    "1589": "component-13bf8d8c05af98b86d432a08",
+    "1600": "component-a976e938a5d6c85e19e75148",
+    "1682": "component-6168d795e66f68b6ea6c3b7a",
+    "2628": "component-4eb65272866a82b14a0055d6",
+    "3168": "component-a83dc25f641a5649492e3924",
+    "3519": "component-c99ac42c3dc805025d7c8440",
+    "3698": "component-c99ac42c3dc805025d7c8440",
+    "3827": "component-568f84fe210a79894feac892",
+    "3863": "component-dbb02c2cd61c746138a6dc64",
+    "3900": "component-0b71187a53d6235c8f81020b",
+    "4264": "component-0b71187a53d6235c8f81020b",
+    "4374": "component-fde3da10230624198088bd00",
+    "4413": "component-b0aeff11fe28e9aba924ac2a",
+    "4480": "component-568f84fe210a79894feac892",
+    "4515": "component-4eb65272866a82b14a0055d6",
+    "4809": "component-dbb02c2cd61c746138a6dc64"
   },
   "proxy_bytes": {
     "350": 602,
@@ -512,7 +564,29 @@
     "3598": 756,
     "3736": 741,
     "3777": 938,
-    "3997": 511
+    "3997": 511,
+    "276": 1007,
+    "396": 521,
+    "439": 803,
+    "488": 694,
+    "820": 4583,
+    "1161": 584,
+    "1589": 631,
+    "1600": 508,
+    "1682": 2365,
+    "2628": 1103,
+    "3168": 764,
+    "3519": 628,
+    "3698": 705,
+    "3827": 724,
+    "3863": 704,
+    "3900": 964,
+    "4264": 1550,
+    "4374": 459,
+    "4413": 761,
+    "4480": 600,
+    "4515": 690,
+    "4809": 638
   },
   "proxy_stratum": {
     "350": "low",
@@ -525,13 +599,29 @@
     "3598": "low",
     "3736": "low",
     "3777": "low",
-    "3997": "low"
+    "3997": "low",
+    "276": "contrast",
+    "396": "low",
+    "439": "low",
+    "488": "low",
+    "820": "contrast",
+    "1161": "low",
+    "1589": "low",
+    "1600": "low",
+    "1682": "contrast",
+    "2628": "contrast",
+    "3168": "low",
+    "3519": "low",
+    "3698": "low",
+    "3827": "low",
+    "3863": "low",
+    "3900": "low",
+    "4264": "contrast",
+    "4374": "low",
+    "4413": "low",
+    "4480": "low",
+    "4515": "low",
+    "4809": "low"
   },
-  "freeze_phase": "development",
-  "prospective_held_counts": {
-    "scenes": 22,
-    "components": 12,
-    "proxy_low_scenes": 17,
-    "proxy_high_scenes": 5
-  }
+  "freeze_phase": "held"
 }
