@@ -29,6 +29,9 @@ from tools.analysis.same_source_swap_pilot import MAX_AS, PARENTS, group_members
 
 FIELDS = ('time', 'lat', 'lon', 'vel', 'cou')
 PROXIES = ('first_field', 'first_secant', 'nearest_field', 'nearest_secant')
+RAW_BINDING_KEYS = ('canonical_rows', 'raw_row_indices', 'multiplicities')
+FROZEN_STAGE = 'all_lineage_frozen_before_labels_references_and_prior_errors'
+PUBLICATION_FAILURE = 'TypeError: Object of type int64 is not JSON serializable'
 
 
 def speed_between(left, right, elapsed):
@@ -77,7 +80,7 @@ def bind_measurements(sid, raw, nodes, sources, times, values, offsets):
     raw_row_indices = np.asarray([first_index[key] for key in expected], np.int64)
     multiplicities = np.asarray([counts[key] for key in expected], np.int64)
     return dict(canonical_rows=indices, raw_row_indices=raw_row_indices, multiplicities=multiplicities,
-                course_360_count=sum(value == 360. for value in raw_courses.values()),
+                course_360_count=sum(bool(value == 360.) for value in raw_courses.values()),
                 measurement_row_count=len(raw))
 
 
@@ -200,7 +203,7 @@ def evaluate(sid, component, frozen, saved, lineage, ev, prior_c74, prior_c77):
                          ('inactive_span_only_near_pure',
                           vector['span_only'] & vector['pure'] & (vector['near_steps'] <= 2.))):
         check_error(old[mask], prior_c77['errors']['speed'][region])
-    position_points = reports['B']['full_target_metrics']['all']['position']['available_target_count']
+    position_points = int(reports['B']['full_target_metrics']['all']['position']['available_target_count'])
     require(position_points == prior_c77['reference_position_points']
             and all(reports['B'][key] == prior_c77['population'][key] for key in POPULATION_KEYS),
             'C77 reference or population changed')
@@ -300,7 +303,13 @@ def summarize_vectors(v):
 def pool(rows, vectors):
     require(bool(rows) and len(rows) == len(vectors), 'nonempty scene rows and matching error vectors required')
     def summed(key):
-        return {field: sum(row[key][field] for row in rows) for field in rows[0][key]}
+        result = {}
+        for field in rows[0][key]:
+            values = [row[key][field] for row in rows]
+            require(all(value is None for value in values) or all(value is not None for value in values),
+                    'availability of a report field must match all scenes')
+            result[field] = None if values[0] is None else sum(int(value) for value in values)
+        return result
     return dict(scene_count=len(rows), component_count=len({row['component_id'] for row in rows}),
                 population=summed('population'), raw_endpoint_binding=summed('raw_endpoint_binding'),
                 **{key: sum(row[key] for row in rows) for key in
@@ -309,14 +318,15 @@ def pool(rows, vectors):
                 regions=summarize_vectors({key: np.concatenate([v[key] for v in vectors]) for key in vectors[0]}))
 
 
-def checked_paths(runs, science, fallback, ids):
+def checked_paths(runs, science, fallback, ids, *, need_archive):
     parent = runs/PARENTS['native']
     marker, original = read(parent/'native-cache.json'), read(parent/'run.json')
-    paths = [str(Path(p).resolve(strict=True)) for p in marker['archive_paths']]
+    paths = [str(Path(p).resolve()) for p in marker['archive_paths']]
     require(paths and len(set(paths)) == len(paths) and
-            paths == [str(Path(p).resolve(strict=True)) for p in original['archive_paths']],
+            paths == [str(Path(p).resolve()) for p in original['archive_paths']],
             'archive parts must be the same ordered files recorded by 127')
-    require(all(Path(p).is_file() for p in paths), 'original 127 archive parts must be regular files')
+    if need_archive:
+        require(all(Path(p).is_file() for p in paths), 'original 127 archive parts must be regular files')
     for run in (science, fallback):
         metadata = read(run/'run.json')
         require(metadata['status'] == 'COMPLETED' and metadata['exit_code'] == 0 and
@@ -331,17 +341,93 @@ def checked_paths(runs, science, fallback, ids):
     return paths
 
 
-def run(runs, science, fallback, output):
+def check_failed_publication(attempt, runs, science, fallback, ids, paths):
+    """Accept only the stage-complete attempt interrupted by this serialization failure."""
+    original = read(attempt/'run.json')
+    require(original['status'] == 'FAILED' and original['exit_code'] == 1
+            and original['phase'] == 'evaluate_fixed_correspondence' and original['error'] == PUBLICATION_FAILURE
+            and original['stages'] == [FROZEN_STAGE] and original['split'] == SPLIT
+            and original['scene_ids'] == ids and original['frozen_lineage_scenes'] == len(ids)
+            and original['raw_measurement_members'] == len(ids) and original['raw_label_members'] == 0
+            and original['raw_reference_members'] == 0 and original['optimizer_updates'] == 0
+            and original['predictions_generated'] == 0 and original['test_opened'] is False,
+            'repair requires the failed serialization attempt with complete V32 measurement lineage')
+    require(all(Path(original[key]).resolve() == path for key, path in
+                (('runs', runs), ('science', science), ('fallback', fallback), ('output', attempt)))
+            and original['archive_paths'] == paths, 'failed attempt input paths do not match')
+    require({p.name for p in (attempt/'private').glob('lineage-*.npz')} ==
+            {f'lineage-{sid}.npz' for sid in ids}, 'failed attempt does not contain every original frozen scene')
+
+
+def freeze_measurements(runs, science, fallback, private, ids, paths, checkpoint):
+    manifest = read(Path(read(runs/PARENTS['base']/'run.json')['manifest']))
+    private.mkdir()
+    raw_counts = []
+    with MTADArchive(paths) as archive:
+        validate_archive(archive, manifest)
+        for sid in ids:
+            scene = load_scene(runs, sid)
+            nodes, sources, _, _, _, native, baseline = scene
+            query, times, positions, offsets = native
+            saved = frozen_arrays(science/'private'/f'{sid}.npz')
+            legacy_motion = read_legacy_motion(runs, sid, scene)
+            frozen = freeze_scene(scene, saved, legacy_motion)
+            with np.load(fallback/'private'/f'support-{sid}.npz', allow_pickle=False) as prior:
+                require(set(prior.files) == set(frozen), 'frozen C77 support schema changed')
+                for key, value in frozen.items():
+                    np.testing.assert_array_equal(value, prior[key], err_msg='C77 support field changed: '+key)
+            cache_path = runs/PARENTS['native']/'private'/'native-events'/SPLIT/f'scene-{sid}.npz'
+            with np.load(cache_path, allow_pickle=False) as cache:
+                values, valid = cache['event_values'], cache['event_valid']
+            np.testing.assert_array_equal(values[:, :2], positions)
+            require(valid.all() and np.isfinite(values).all() and (values[:, 2] >= 0.).all(),
+                    'all frozen native attributes must be legal')
+            raw = archive._rows(sid, 'measurements')
+            binding = bind_measurements(sid, raw, nodes, sources, times, values, offsets)
+            lineage = freeze_endpoints(frozen, query, endpoint_arrays(times, values, offsets),
+                                       sources, baseline, legacy_motion)
+            np.savez_compressed(private/f'lineage-{sid}.npz', **lineage,
+                                **{key: binding[key] for key in RAW_BINDING_KEYS})
+            raw_counts.append(dict(canonical_course_360=binding['course_360_count'],
+                                   scene_measurement_rows=binding['measurement_row_count']))
+            checkpoint(frozen_lineage_scenes=len(raw_counts))
+        require([(row['scene_id'], row['kind']) for row in archive.members_read] ==
+                [(sid, 'measurements') for sid in ids], 'unexpected raw archive member read')
+    return raw_counts
+
+
+def load_lineage(path, frozen, extra_counts):
+    with np.load(path, allow_pickle=False) as saved:
+        lineage = {key: saved[key] for key in saved.files if key not in RAW_BINDING_KEYS}
+        indices, raw_rows, counts = (saved[key] for key in RAW_BINDING_KEYS)
+    require(indices.ndim == 1 and indices.dtype.kind in 'iu' and len(indices) > 0
+            and (np.diff(indices) > 0).all() and indices[0] >= 0 and indices[-1] < frozen['event_count']
+            and raw_rows.shape == counts.shape == indices.shape and raw_rows.dtype.kind in 'iu'
+            and (raw_rows >= 0).all() and len(np.unique(raw_rows)) == len(raw_rows)
+            and counts.dtype.kind in 'iu' and (counts > 0).all(),
+            'invalid frozen endpoint row indices or raw multiplicities')
+    outside = np.isin(frozen['cause'], (1, 2, 4, 5))
+    require(lineage['scope'].dtype == bool and all(value.shape == outside.shape for value in lineage.values()),
+            'frozen lineage query shape changed')
+    np.testing.assert_array_equal(lineage['scope'], outside)
+    np.testing.assert_array_equal(lineage['first_age'][outside], frozen['anchor_endpoint_distance'][outside])
+    np.testing.assert_array_equal(lineage['nearest_age'][outside], frozen['distance'][outside])
+    return lineage, dict(canonical_endpoint_rows=len(indices), matched_raw_rows=int(counts.sum()),
+                         exact_duplicate_matches=int((counts-1).sum()), **extra_counts)
+
+
+def run(runs, science, fallback, output, frozen_attempt=None):
     parent = runs/PARENTS['native']
+    protected = (science, fallback, parent) if frozen_attempt is None else (science, fallback, parent, frozen_attempt)
     require(output != runs and all(output != run and run not in output.parents and output not in run.parents
-                                   for run in (science, fallback, parent)), 'new output must not overlap frozen inputs')
+                                   for run in protected), 'new output must not overlap frozen inputs')
     require(output.parent.is_dir(), 'existing parent directory required for new run')
     output.mkdir(exist_ok=False)
-    (output/'private').mkdir()
     started = time.monotonic()
     record = dict(status='RUNNING', split=SPLIT, stages=[], started_at=datetime.now(timezone.utc).isoformat(),
                   runs=str(runs), science=str(science), fallback=str(fallback), output=str(output),
                   optimizer_updates=0, predictions_generated=0, test_opened=False, argv=sys.argv,
+                  frozen_attempt=str(frozen_attempt) if frozen_attempt is not None else None,
                   affinity=sorted(os.sched_getaffinity(0)) if hasattr(os, 'sched_getaffinity') else None)
 
     def checkpoint(**fields):
@@ -352,56 +438,30 @@ def run(runs, science, fallback, output):
         if sys.platform.startswith('linux'):
             resource.setrlimit(resource.RLIMIT_AS, (MAX_AS, MAX_AS))
         ids, components = load_population(runs)
-        paths = checked_paths(runs, science, fallback, ids)
-        manifest = read(Path(read(runs/PARENTS['base']/'run.json')['manifest']))
-        checkpoint(phase='freeze_raw_endpoint_lineage', scene_ids=ids, archive_paths=paths)
-        raw_counts = []
-        with MTADArchive(paths) as archive:
-            validate_archive(archive, manifest)
-            for sid in ids:
-                scene = load_scene(runs, sid)
-                nodes, sources, _, _, _, native, baseline = scene
-                query, times, positions, offsets = native
-                saved = frozen_arrays(science/'private'/f'{sid}.npz')
-                legacy_motion = read_legacy_motion(runs, sid, scene)
-                frozen = freeze_scene(scene, saved, legacy_motion)
-                with np.load(fallback/'private'/f'support-{sid}.npz', allow_pickle=False) as prior:
-                    require(set(prior.files) == set(frozen), 'frozen C77 support schema changed')
-                    for key, value in frozen.items():
-                        np.testing.assert_array_equal(value, prior[key], err_msg='C77 support field changed: '+key)
-                cache_path = runs/PARENTS['native']/'private'/'native-events'/SPLIT/f'scene-{sid}.npz'
-                with np.load(cache_path, allow_pickle=False) as cache:
-                    values, valid = cache['event_values'], cache['event_valid']
-                np.testing.assert_array_equal(values[:, :2], positions)
-                require(valid.all() and np.isfinite(values).all() and (values[:, 2] >= 0.).all(),
-                        'all frozen native attributes must be legal')
-                raw = archive._rows(sid, 'measurements')
-                binding = bind_measurements(sid, raw, nodes, sources, times, values, offsets)
-                lineage = freeze_endpoints(frozen, query, endpoint_arrays(times, values, offsets),
-                                           sources, baseline, legacy_motion)
-                np.savez_compressed(output/'private'/f'lineage-{sid}.npz', **lineage,
-                                    **{key: binding[key] for key in ('canonical_rows', 'raw_row_indices', 'multiplicities')})
-                raw_counts.append(dict(canonical_endpoint_rows=len(binding['canonical_rows']),
-                    matched_raw_rows=int(binding['multiplicities'].sum()),
-                    exact_duplicate_matches=int((binding['multiplicities']-1).sum()),
-                    canonical_course_360=binding['course_360_count'],
-                    scene_measurement_rows=binding['measurement_row_count']))
-                checkpoint(frozen_lineage_scenes=len(raw_counts))
-            require([(row['scene_id'], row['kind']) for row in archive.members_read] ==
-                    [(sid, 'measurements') for sid in ids], 'unexpected raw archive member read')
-        record['stages'].append('all_lineage_frozen_before_labels_references_and_prior_errors')
-        checkpoint(phase='evaluate_fixed_correspondence', raw_measurement_members=len(ids),
+        paths = checked_paths(runs, science, fallback, ids, need_archive=frozen_attempt is None)
+        checkpoint(phase='bind_endpoint_lineage', scene_ids=ids, archive_paths=paths)
+        if frozen_attempt is None:
+            private = output/'private'
+            checkpoint(phase='freeze_raw_endpoint_lineage')
+            raw_counts = freeze_measurements(runs, science, fallback, private, ids, paths, checkpoint)
+            record['stages'].append(FROZEN_STAGE)
+        else:
+            check_failed_publication(frozen_attempt, runs, science, fallback, ids, paths)
+            private = frozen_attempt/'private'
+            raw_counts = [dict(canonical_course_360=None, scene_measurement_rows=None) for _ in ids]
+            record['stages'].append('failed_publication_lineage_reused_without_rereading_measurements')
+        checkpoint(phase='evaluate_fixed_correspondence', frozen_lineage_scenes=len(ids),
+                   raw_measurement_members=len(ids) if frozen_attempt is None else 0,
+                   reused_raw_measurement_members=len(ids) if frozen_attempt is not None else 0,
                    raw_label_members=0, raw_reference_members=0)
         c74_rows, c77_rows = [read(root/'scenes.json.gz') for root in (science, fallback)]
         require([row['scene_id'] for row in c74_rows] == [row['scene_id'] for row in c77_rows] == ids,
                 'original public rows and scene order changed')
         rows, vectors = [], []
-        for sid, prior_c74, prior_c77, binding in zip(ids, c74_rows, c77_rows, raw_counts, strict=True):
+        for sid, prior_c74, prior_c77, extra_counts in zip(ids, c74_rows, c77_rows, raw_counts, strict=True):
             with np.load(fallback/'private'/f'support-{sid}.npz', allow_pickle=False) as saved:
                 frozen = {key: saved[key] for key in saved.files}
-            with np.load(output/'private'/f'lineage-{sid}.npz', allow_pickle=False) as saved:
-                lineage = {key: saved[key] for key in saved.files
-                           if key not in ('canonical_rows', 'raw_row_indices', 'multiplicities')}
+            lineage, binding = load_lineage(private/f'lineage-{sid}.npz', frozen, extra_counts)
             ev = read_reference(runs, sid, frozen['nodes'], frozen['query'])
             row, vec = evaluate(sid, components[sid], frozen, frozen_arrays(science/'private'/f'{sid}.npz'),
                                 lineage, ev, prior_c74, prior_c77)
@@ -421,8 +481,9 @@ def run(runs, science, fallback, output):
                 and result['regions']['near_pure']['count'] == 156
                 and result['regions']['near_pure_first_older']['count'] == 48,
                 'frozen C77 all/near/older speed populations changed')
-        write(output/'scenes.json.gz', [dict(row, regions=summarize_vectors(v))
-                                       for row, v in zip(rows, vectors, strict=True)])
+        temporary = output/'scenes.tmp.json.gz'
+        write(temporary, [dict(row, regions=summarize_vectors(v)) for row, v in zip(rows, vectors, strict=True)])
+        temporary.replace(output/'scenes.json.gz')
         write(output/'summary.json', dict(all_components=result,
             by_component={component: subset([i for i, row in enumerate(rows) if row['component_id'] == component])
                           for component in sorted(set(components.values()))},
@@ -432,6 +493,8 @@ def run(runs, science, fallback, output):
                 comparison='diagnostic scalar proxies on fixed reference rows; emitted C74 A/B/C unchanged',
                 endpoints='earliest or latest of original member events, closest in actual seconds with original member then endpoint ties',
                 raw_binding='only original V32 measurement members; exact selected time, lat, lon, vel and canonical course modulo',
+                repair_missing_raw_fields='canonical_course_360 and scene_measurement_rows were not saved '
+                                          'in original private lineage and are null in publication repair',
                 source_field_speed_units='raw field interpreted as kn and converted once under frozen Level1 policy',
                 secant='adjacent-position spherical displacement over actual seconds; no propagation',
                 distinct_endpoint_unit='same scene, original member and endpoint count once within each stratum',
@@ -517,7 +580,50 @@ def self_check():
             and results['all_eligible']['distinct_first_endpoint_field_to_secant']
                        ['field_minus_adjacent_secant']['count'] == 2,
             'reference alignment, strata or distinct endpoints changed')
-    print('C79 self-check passed: raw lineage, duplicates, endpoint ties, secants, rejection and frozen evaluation.')
+
+    from tempfile import TemporaryDirectory
+
+    with TemporaryDirectory() as directory:
+        tmp = Path(directory).resolve()
+        old = tmp/'old'
+        (old/'private').mkdir(parents=True)
+        artifact = old/'private/lineage-9.npz'
+        np.savez_compressed(artifact, **data, **{key: binding[key] for key in RAW_BINDING_KEYS})
+        runs, science, fallback = (tmp/key for key in ('runs', 'science', 'fallback'))
+        paths = [str(tmp/'measurements.zip')]
+        prior = dict(status='FAILED', exit_code=1, phase='evaluate_fixed_correspondence',
+                     error=PUBLICATION_FAILURE, stages=[FROZEN_STAGE], split=SPLIT, scene_ids=['9'],
+                     frozen_lineage_scenes=1, raw_measurement_members=1, raw_label_members=0,
+                     raw_reference_members=0, optimizer_updates=0, predictions_generated=0,
+                     test_opened=False, runs=str(runs), science=str(science), fallback=str(fallback),
+                     output=str(old), archive_paths=paths)
+        write(old/'run.json', prior)
+        check_failed_publication(old, runs, science, fallback, ['9'], paths)
+        write(old/'run.json', dict(prior, raw_label_members=1))
+        try:
+            check_failed_publication(old, runs, science, fallback, ['9'], paths)
+        except ValueError:
+            pass
+        else:
+            raise AssertionError('a failed attempt with labels in the freeze phase cannot be repaired')
+        for extra in (dict(canonical_course_360=binding['course_360_count'],
+                           scene_measurement_rows=binding['measurement_row_count']),
+                      dict(canonical_course_360=None, scene_measurement_rows=None)):
+            loaded, counts = load_lineage(artifact, frozen, extra)
+            for key in data:
+                np.testing.assert_array_equal(loaded[key], data[key])
+            report_row = dict(row, raw_endpoint_binding=counts)
+            scenes = [dict(report_row, regions=results)]
+            summary = pool([report_row], [vector])
+            write(tmp/'scenes.json.gz', scenes)
+            write(tmp/'summary.json', summary)
+            require(read(tmp/'scenes.json.gz') == scenes and read(tmp/'summary.json') == summary,
+                    'strict JSON and GZ publication round trips changed')
+            require(summary['raw_endpoint_binding']['matched_raw_rows'] == 10
+                    and summary['raw_endpoint_binding']['exact_duplicate_matches'] == 1
+                    and summary['raw_endpoint_binding']['canonical_course_360'] == extra['canonical_course_360'],
+                    'saved row counts or missing-publication values changed')
+    print('C79 self-check passed: raw lineage, endpoint ties, frozen evaluation and strict publication repair.')
 
 
 if __name__ == '__main__':
@@ -526,6 +632,7 @@ if __name__ == '__main__':
     parser.add_argument('--science', type=Path)
     parser.add_argument('--fallback', type=Path)
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--frozen-attempt', type=Path)
     parser.add_argument('--time-policy', choices=('advisory',))
     parser.add_argument('--self-check', action='store_true')
     args = parser.parse_args()
@@ -534,4 +641,5 @@ if __name__ == '__main__':
     elif not all((args.runs, args.science, args.fallback, args.output, args.time_policy)):
         parser.error('--runs, --science, --fallback, --output and --time-policy are required')
     else:
-        run(args.runs.resolve(), args.science.resolve(), args.fallback.resolve(), args.output.resolve())
+        run(args.runs.resolve(), args.science.resolve(), args.fallback.resolve(), args.output.resolve(),
+            frozen_attempt=args.frozen_attempt.resolve() if args.frozen_attempt is not None else None)
