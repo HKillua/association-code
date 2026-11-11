@@ -29,8 +29,10 @@ RIDGE = .01 * DIFFERENCES.T @ DIFFERENCES + 1e-9 * np.eye(KNOT_COUNT)
 ARMS = ('WS_MEAN', 'WS_FRAGMENT', 'WS_GROUP', 'J_GROUP', 'HOLDOUT_GROUP', 'J_ALL_GROUP')
 
 
-def load_native(runs, sid, node_ids, sources):
-    path = runs / PARENTS['native'] / 'private/native-events/T_core' / f'scene-{sid}.npz'
+def load_native(runs, sid, node_ids, sources, *, split='T_core'):
+    if split not in ('T_core', 'V_select'):
+        raise ValueError('native events require a declared development split')
+    path = runs / PARENTS['native'] / 'private/native-events' / split / f'scene-{sid}.npz'
     with np.load(path, allow_pickle=False) as cache:
         if not np.array_equal(cache['node_ids'], node_ids) or not np.array_equal(cache['sources'], sources):
             raise ValueError('native event nodes or sources changed')
@@ -166,7 +168,7 @@ def motion_fields(runs, sid, query, nodes, sources):
     return states, support, nearest
 
 
-def scene_arrays(native):
+def scene_arrays(native, *, check_holdout_origin=True):
     query, times, latlon, offsets = native
     duration = query[-1]-query[0]
     origin = latlon[np.argmin(times)]
@@ -176,7 +178,7 @@ def scene_arrays(native):
     delta = latlon-origin
     delta[:, 1] = (delta[:, 1]+180.) % 360.-180.
     fraction = (times-query[0])/duration
-    if any(lo <= fraction.min() < hi for lo, hi in FOLDS):
+    if check_holdout_origin and any(lo <= fraction.min() < hi for lo, hi in FOLDS):
         raise ValueError('coordinate origin enters a holdout block')
     basis, _ = design(fraction)
     xy = delta*scale
