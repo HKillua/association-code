@@ -2,6 +2,10 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-12
+
+- [前缀配准分流的首报门限资格](2026-11-12-online-prefix-gate-qualification.md)
+
 ## 2026-11-11
 
 - [校正后首报 1 km 门限的留场资格](2026-11-11-online-held-gate-qualification.md)

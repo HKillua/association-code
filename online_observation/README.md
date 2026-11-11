@@ -38,4 +38,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.stale_history_probe --help`|固定首报核超龄候选可达、入门、排序和误伤|
 |`python -m online_observation.peer_activity_probe --help`|固定首选比较局部报告活动和几何拒配|
 |`python -m online_observation.held_gate_probe --help`|固定候选比较留场中的原始／校正距离和 1／4 km 门|
+|`python -m online_observation.prefix_gate_probe --help`|同场比较前缀拟合分流和固定 1／4 km 门|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|
