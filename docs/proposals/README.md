@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [低误关联工作区的固定候选评分](offline_high_precision_association_20261112.md)
+
 - [C91 固定真对的双源支撑位置监督](tmtaff_support_supervision_20261112.md)
 
 - [C88 候选外平移校正的实际分区留场验证](offline_external_supplier_translation_20261112.md)

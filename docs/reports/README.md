@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [C91 固定真对的双源支撑位置监督结果](2026-11-12-tmtaff-support-supervision-review.md)
+
 - [稀疏首报的邻轨证据与见证写入](2026-11-12-online-neighbor-witness.md)
 
 - [冻结关联分数的高召回误关联与分组转移](2026-11-12-frozen-association-pr-review.md)

@@ -31,7 +31,9 @@
 
 1. **离线重选高精度骨架，并建立可信 TMTAFF 全系统对照。** [C88](reports/2026-11-12-external-supplier-translation-review.md)换场 16/12 组件中，187 个跨源供给仅 6 个有合格外锚且全为同船，四门均保持原 WS，跨源漏/假 43/36、同船逐时支持保持。无门 ABS 漏/假 49/37，丢 40 个同船支持槽。事后 68 个净补漏去假且保原同船支持的候选均被四门拦截，ABS 也无正分。42 个还同时严格降低跨源漏和假，集中于两场，分别出现接受和场内排序失效。外锚保留条件诊断，下一步在固定池上区分 T 侧接受校准与分区评分，用独立组件核实际输出。 [定向原文](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/offline_candidate_readout_sources_20261112.md)
    - [C89](reports/2026-11-12-v300-far-paper-bridge-review.md)完成全 V300 四属性与历史 113 的逐场目标和参考配对。远端规则保留为速度候选，全域 MAE/P99 由 1.410/28.535 降到 0.881/6.992 m/s，经纬、航向及覆盖一致。历史 113 缺已训练 TAM，旧 TFM 真组位置也退化。后续将 FAR 和强位置候选在同一冻结版本评价。[C83 近端追因](reports/2026-11-12-held-near-tail-audit.md)确认并列最大增害 22.505 m/s 源自同一次跨船取值，另外三点同船同源，0.603–3.000 秒的近端速度仍偏大。保留近端对照，供给者证据与同供给者速度估计分别检验。
-   - [TMTAFF 协议审计](reports/2026-11-12-tmtaff-protocol-gap-audit.md)在冻结 V300 分区上对称应用 Cui 时间条件，跨源加权正确率/误关联率 63.62/43.30→64.69/36.48%，原表 91.38/6.87%，作者窗口、名单和 mESD 仍待核。只看双源有原生支撑的共同点，历史 113 的位置 MAE 仍为 47.007 km。[C90-R1 真对](reports/2026-11-12-tmtaff-true-pair-qualification-review.md)亦在双支撑层退化。先审真对数据接口，再比较同输入的全有效点与双支撑点训练监督，保留共同点和全域评价。TAM 固定池排序与尺度待独立方案。152 按原合同收尾，PTFM/DeepAF 为融合补充。
+   - [C91](reports/2026-11-12-tmtaff-support-supervision-review.md)原始 T8/16 真对逐值核齐。仅双支撑监督使 301 点位置 MAE 39.595→35.074 km，但 P99 81.565→84.041 km、全域 MAE 36.022→40.827 km，两个端点仍近常值。下一诊断优先隔离 TFM 自回归历史的跨步反传。相同原生输入的独立时窗及配准干预另行设计。
+   - [冻结关联 PR](reports/2026-11-12-frozen-association-pr-review.md)在 90% micro 真边召回下 056 跨源 PFA 75.12%，逐场真值定门仍 72.20%。094A/B 逐场 AUC .505/.517。WS 跨源删 4,682 真、38,433 假，新增 305 真、298 假。优先查完整训练池的高分负例，以同头、同样本分离 BCE 与高精度工作区排序损失，再核最终分区。 [下一方案](proposals/offline_high_precision_association_20261112.md)
+   - [TMTAFF 协议审计](reports/2026-11-12-tmtaff-protocol-gap-audit.md)在冻结 V300 分区上对称应用 Cui 时间条件，跨源加权正确率/误关联率 63.62/43.30→64.69/36.48%，原表 91.38/6.87%。[公开发布档案](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_protocol_and_method_sources_20261112.md)核到 V1/V2 目录中 14 个文件同名、同字节数、同登记 MD5。作者实际 Level、3000 场、配准、时间窗和 mESD 待核。152 按原合同收尾，PTFM/DeepAF 为融合补充。
 2. **在线 C-ON33/35 完成稀疏首报的邻轨证据诊断和写入留场。** 11 开发场与 22 个新留场按共享 A 组件隔离，12 个留场组件此前有其他 C-ON32 场。195 个稀疏首报有 6 个开放真边入射，均无双侧共时邻轨。原几何／8 km 宽门／原见证及两种写入臂当刻正确 42／48／42，错接均 5，查询端未见真对侧的错接均 2。 [两阶段 Record/Squeeze](reports/2026-11-12-online-neighbor-witness.md) · [在线 Mode C v30](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v30-见证写入留场回流)
    - 冲突禁写拦下 478 假、30 真样本，关联和延迟指标与现有见证逐场一致。正证才写在 11 个稀疏场等同纯等待，较现有见证少 784 真、多 44 假事件，主稀疏首次门外 10 个更晚、无提前。保留原几何为工作点，宽门和原见证作对照；后续设计须有能增加独立证据覆盖的来源，长期状态反馈另评。 [前轮固定环确认](reports/2026-11-12-online-expansion-confirmation.md) · [原边排序与错链证据](reports/2026-11-12-online-nemot-association-diagnostic.md)
    - 个体历史与 HyperSSM 保留为在线预测对照，TSA-cTFER 同数据作者条件与复现缺项见[原文核对](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_tsactfer_protocol_20261112.md)。报文触发预测和关联，1 秒网格仅供可比评分。独立位置参考和真实网络到达仍缺。代码在 [online_observation](../online_observation/README.md) 独立维护。当前无待执行在线合同。
@@ -45,7 +47,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.31](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-231)，P14/F343/M150/E296/C91|
+|全局问题—现象—机制—证据|[Mode C2.32](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-232)，P14/F347/M152/E312/C93|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
