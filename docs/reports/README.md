@@ -4,6 +4,10 @@
 
 ## 2026-11-11
 
+- [C75单次拆并能触及的关联错误](2026-11-11-partition-scope-review.md)
+
+- [C74固定位置后速航读出的V32验证](2026-11-11-fixed-position-motion-readout-review.md)
+
 - [首报与下一条报文的在线关联验证](2026-11-11-online-next-report-qualification.md)
 
 - [在线首次关联拒配的事前验证与深挖](2026-11-11-online-rejection-qualification.md)

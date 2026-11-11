@@ -29,7 +29,7 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C70科学与独审](reports/2026-11-11-conditional-trajectory-review.md)完成，同池留出评分少11条同源、43条跨源真边，当前配方关闭。六篇原文定向补读后，[可变容量C75](proposals/offline_variable_partition_20261111.md)先核一次局部拆并能触及多少漏边和假边，再决定是否比较树切口或扩大动作范围。C72保留为候选外共时跨目标几何的独立条件验证。[速航C74](proposals/offline_trajectory_reselection_20261110.md#c70结果后的融合读出对照)先在固定分组和位置上比较同信息平滑求导与原生斜率读出，检查变化幅度和端点。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
+1. **离线重选高精度骨架，并建立可信TMTAFF全系统对照。** [C70](reports/2026-11-11-conditional-trajectory-review.md)同池留出评分少11条同源、43条跨源真边，当前配方关闭。[C75](reports/2026-11-11-partition-scope-review.md)的单次两组再切最多触及54/385条跨源漏边，19/32场组数差至少2。[C76](proposals/offline_variable_partition_20261111.md#c75结果后的动作范围)先用已存计数比较每场1、2、4个互不共享原组的作用域，C72仍为候选外共时跨目标几何的独立条件验证。[C74](reports/2026-11-11-fixed-position-motion-readout-review.md)保留固定位置平滑求导为开发强控，原生斜率的P99门槛未过。[C77](proposals/offline_trajectory_reselection_20261110.md#c74结果后的速航诊断)先核未启用域回退，2.36%的有效速度点贡献约51.1%的速度绝对误差。TMTAFF优先[固定16真对TFM资格](proposals/tmtaff_component_qualification_20261111.md)，已核107端点保存源normalizer与完整数据合同，准备独立T8入口比较原四属性与位置目标。TAM同配对尺度诊断并行准备。152按原合同收尾，PTFM/DeepAF保留为融合补充对照。
 2. **在线完成下一报归因验证。** 新核 10 篇原文，梳理等待、历史检索、联合空配、对侧活动、暂定身份和位移增量。冻结 30 秒诊断后在原 T_core 0/3/7 一次零训练回放，279 个出生都有下一报。开放新候选比只等过期少 2 正、多 4 错，固定预算加最近重选未通过，完成 Record→Squeeze→Mode C v8。初始缺新鲜真候选的 42 个错配，14 个已有超龄真片段、28 个首报前无对侧同身份片段，下一报时共恢复 2 个。[来源分析](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_literature_new_evidence_20261111.md) · [记录与深挖](reports/2026-11-11-online-next-report-qualification.md) · [Mode C v8](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v8-下一报验证回流)
    - 优先量化超龄片段的实际可达性，以及无对侧历史时的可观察拒配依据。两源共同时间支撑上的位移增量、同刻争用的联合空配保留独立候选。继续核真实到达、发布时钟、独立状态参考和持续系统 ID。前次固定距离比未通过，所有现有在线结果为开发证据。按 [online_observation](../online_observation/README.md) 独立开发，严格输入、每秒发布、持续身份和可变 K 沿用。当前无在线执行合同。[字段权限](data_contract.md#在线字段可用时间) · [此前拒配验证](reports/2026-11-11-online-rejection-qualification.md)
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
@@ -42,7 +42,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.15](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-215)，P14/F319/M126/E221/C75|
+|全局问题—现象—机制—证据|[Mode C2.16](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-216)，P14/F321/M128/E223/C77|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含两项资格验证回流与文献扩展|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
