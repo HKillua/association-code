@@ -4,6 +4,8 @@
 
 ## 2026-11-11
 
+- [超龄历史能否恢复首报真候选](online_stale_history_qualification_20261111.md)
+- [首报无真对侧历史时的拒配资格](online_no_peer_rejection_20261111.md)
 - [首报与下一条报文的在线关联验证](online_next_report_qualification_20261111.md)
 - [在线首次关联拒配的事前验证](online_rejection_qualification_20261111.md)
 - [在线关联与融合的开发诊断和资格计划](online_reselection_20261111.md)

@@ -4,6 +4,10 @@
 
 ## 2026-11-11
 
+- [超龄历史的首报关联资格](2026-11-11-online-stale-history-qualification.md)
+
+- [首报无真对侧历史时的拒配资格](2026-11-11-online-no-peer-rejection-qualification.md)
+
 - [C76多处互不冲突的拆并能触及多少关联错误](2026-11-11-multiple-disjoint-scope-review.md)
 
 - [C77固定速航读出的支持边界与旧回退来源](2026-11-11-motion-fallback-attribution-review.md)
