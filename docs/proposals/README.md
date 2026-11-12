@@ -9,6 +9,7 @@
 - [C100 近端速度区间与多区间诊断](near_speed_interval_20261112.md)
 
 - [共同过去区间的整组指派对照](online_interval_assignment_20261112.md)
+- [固定原图的短错段间隙诊断](online_hypothesis_gap_20261112.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)
