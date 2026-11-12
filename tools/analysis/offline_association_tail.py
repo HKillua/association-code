@@ -340,9 +340,9 @@ def calibrate(index, ids, normalizer, heads, device, prep):
     return {name: recall_point(np.concatenate(values[name]), truth, 90) for name in values}
 
 
-def decode(n, pairs, scores, thresholds, original):
+def decode(n, pairs, scores, thresholds, original, arms=ARMS):
     result = {'056': original}
-    for name in ARMS[1:]:
+    for name in arms[1:]:
         shifted = (scores[name] - thresholds[name]) + ws.THRESHOLD
         membership, _, _ = ws.agglomerate(n, pairs, shifted, 'WS')
         result[name] = membership
@@ -377,6 +377,7 @@ def confuse(truth, chosen, mask):
 
 
 def evaluate(args, split, ids, index, normalizer, heads, thresholds, archive, components):
+    arms = ('056', '056_T', *heads)
     frozen_path = args.output / 'private' / split
     frozen_path.mkdir()
     original_ws = args.runs / audit.RUNS['114'] / 'private'
@@ -388,7 +389,7 @@ def evaluate(args, split, ids, index, normalizer, heads, thresholds, archive, co
             old_groups, _, _ = ws.agglomerate(n, pairs, scores['056'], 'WS')
         else:
             old_groups = np.asarray(audit.read_json(original_ws / f'scene-{sid}.json.gz')['memberships']['WS'])
-        memberships = decode(n, pairs, scores, thresholds, old_groups)
+        memberships = decode(n, pairs, scores, thresholds, old_groups, arms)
         np.savez(frozen_path / f'{sid}.npz', pairs=pairs,
                  **{f'score_{name}': values for name, values in scores.items()},
                  **{f'group_{name}': values for name, values in memberships.items()})
@@ -410,7 +411,7 @@ def evaluate(args, split, ids, index, normalizer, heads, thresholds, archive, co
             values = dict(scene=sid, component=components[sid], pairs=len(pairs), arms={})
             for scope, mask in masks.items():
                 rank[scope]['truth'].append(truth[mask])
-            for name in ARMS:
+            for name in arms:
                 scores, group = saved[f'score_{name}'], saved[f'group_{name}']
                 raw = scores >= thresholds[name]
                 decoded = group[left] == group[right]
@@ -428,7 +429,7 @@ def evaluate(args, split, ids, index, normalizer, heads, thresholds, archive, co
     for scope, blocks in rank.items():
         truth = np.concatenate(blocks['truth'])
         ranking[scope] = {}
-        for name in ARMS:
+        for name in arms:
             scores = np.concatenate(blocks[name])
             ranking[scope][name] = {str(p): recall_point(scores, truth, p) for p in (80, 90)}
             _, predicted, tp = audit.score_groups(scores, truth)
@@ -437,13 +438,13 @@ def evaluate(args, split, ids, index, normalizer, heads, thresholds, archive, co
             ranking[scope][name]['pooled_ap'] = float(delta_tp @ (tp / predicted) / tp[-1])
             ranking[scope][name]['pooled_auc'] = float(
                 delta_tp @ (fp[-1] - fp + .5 * delta_fp) / (tp[-1] * fp[-1]))
-    return summarize_results(rows, ranking)
+    return summarize_results(rows, ranking, arms)
 
 
-def summarize_results(rows, ranking):
+def summarize_results(rows, ranking, arms=ARMS):
     def aggregate(items):
         result = {}
-        for name in ARMS:
+        for name in arms:
             coverage_totals = Counter()
             for row in items:
                 coverage_totals.update(row['arms'][name]['coverage'])
@@ -463,21 +464,24 @@ def summarize_results(rows, ranking):
                   by_component={c: aggregate(items) for c, items in by_component.items()},
                   full=aggregate(rows),
                   without_largest=aggregate([r for r in rows if r['component'] != largest]))
-    result['gates'] = {base: qualification(result, base) for base in ('056', '056_T', 'BCE')}
+    if arms == ARMS:
+        result['gates'] = {base: qualification(result, base) for base in ('056', '056_T', 'BCE')}
+    else:
+        result['gates'] = {arm: qualification(result, '056', arm) for arm in arms[2:]}
     return result
 
 
-def qualification(result, base):
+def qualification(result, base, candidate='RANK'):
     def direction(arms):
-        rank, old = arms['RANK'], arms[base]
+        rank, old = arms[candidate], arms[base]
         return (all(rank['mstsa']['decoded'][k] < old['mstsa']['decoded'][k] for k in ('fn', 'fp'))
                 and all(rank['itsa']['decoded'][k] <= old['itsa']['decoded'][k] for k in ('fn', 'fp')))
 
     ranking = result['ranking']
-    raw = all(ranking['mstsa']['RANK'][p]['fp'] < ranking['mstsa'][base][p]['fp']
-              and ranking['itsa']['RANK'][p]['fp'] <= ranking['itsa'][base][p]['fp'] for p in ('80', '90'))
+    raw = all(ranking['mstsa'][candidate][p]['fp'] < ranking['mstsa'][base][p]['fp']
+              and ranking['itsa'][candidate][p]['fp'] <= ranking['itsa'][base][p]['fp'] for p in ('80', '90'))
     decoded = direction(result['full'])
-    coverage_counts = result['full']['RANK']['coverage']
+    coverage_counts = result['full'][candidate]['coverage']
     retained = (all(coverage_counts[k] == 0 for k in ('identities_lost', 'same_ship_lost'))
                 and coverage_counts['duplicate_increase_scenes'] == 0)
     components = sum(direction(arms) for arms in result['by_component'].values())
