@@ -4,6 +4,9 @@
 
 ## 2026-11-12
 
+- [C107 固定配准门的新留场和四属性传播](2026-11-12-association-registered-holdout-fusion-review.md)
+- [C108 双支撑位置残差和 Mean 回退](2026-11-12-tmtaff-dual-position-fallback-review.md)
+- [C109 原参考位置和速度差异的首次观察层](2026-11-12-raw-reference-speed-origin-review.md)
 - [C104 候选外配准的旧供给反证](2026-11-12-association-registered-supplier-exclusion-review.md)
 - [C105 未见场的直接物理位置与查询残差](2026-11-12-tmtaff-unseen-position-readout-review.md)
 - [C106 近端速度尾部的原始区间和跨源对照](2026-11-12-near-speed-tail-lineage-review.md)
