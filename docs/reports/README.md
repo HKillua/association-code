@@ -14,6 +14,7 @@
 
 - [后续报文、竞争边排序与持续错配](2026-11-12-online-competing-reports.md)
 - [固定候选图上的在线区间指派](2026-11-12-online-interval-assignment.md)
+- [短错段间隙的新报文与正确持续对照](2026-11-12-online-hypothesis-gap.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)
