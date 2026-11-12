@@ -12,6 +12,8 @@
 
 离线精度与在线实时持续并行推进，具体工作只看[研究状态](../docs/research_status.md#下一步)。在线开发入口见[独立在线目录](../online_observation/README.md)，原计时合同使用的命令和输出格式继续兼容。当前可领范围以本交接为准。
 
+**在线共时支撑与同源共享创新 READY，本地会话执行。** [固定合同](L2S-20261112-online-shared-innovation.md)。原28场，一次CPU，零训练与新场读取。
+
 **在线相对运动与连续报文已收尾。** [固定合同](L2S-20261112-online-relative-motion.md) · [终态](S2L-20261112-online-relative-motion.md)。原28场一次CPU，真实退出0，已回流Mode C v39。
 
 **在线短错段间隙诊断已收尾。** [冻结合同](L2S-20261112-online-hypothesis-gap.md) · [终态](S2L-20261112-online-hypothesis-gap.md)。原28场捕获、冻结评分恢复和严格晚报核对完成，已回流Mode C v37。
