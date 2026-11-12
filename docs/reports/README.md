@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C104 候选外配准的旧供给反证](2026-11-12-association-registered-supplier-exclusion-review.md)
+- [C105 未见场的直接物理位置与查询残差](2026-11-12-tmtaff-unseen-position-readout-review.md)
+- [C106 近端速度尾部的原始区间和跨源对照](2026-11-12-near-speed-tail-lineage-review.md)
+
 - [C101 固定分区候选内的同船供给接替](2026-11-12-association-native-supplier-replacement-review.md)
 - [C102 固定真对的分层位置读出](2026-11-12-tmtaff-position-readout-review.md)
 - [C103 新留场近端速度、机动代理与片段边界](2026-11-12-near-speed-maneuver-held-review.md)

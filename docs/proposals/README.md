@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C104 候选外配准与旧供给反证](association_registered_supplier_exclusion_20261112.md)
+- [C105 未见场直接物理位置与查询残差](tmtaff_unseen_position_readout_20261112.md)
+- [C106 近端速度尾部的原始区间](near_speed_tail_lineage_20261112.md)
+
 - [C101 同一候选池的原生供给接替](association_native_supplier_replacement_20261112.md)
 - [C102 固定真对的分层位置读出](tmtaff_position_readout_20261112.md)
 - [C103 新留场近端速度与机动边界](near_speed_maneuver_held_20261112.md)
