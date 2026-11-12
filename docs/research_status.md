@@ -29,11 +29,11 @@
 
 ## 下一步
 
-1. **离线重选高精度骨架，并建立可信 TMTAFF 全系统对照。** [C88](reports/2026-11-12-external-supplier-translation-review.md)换场 16/12 组件中，187 个跨源供给仅 6 个有合格外锚且全为同船，四门均保持原 WS，跨源漏/假 43/36、同船逐时支持保持。无门 ABS 漏/假 49/37，丢 40 个同船支持槽。事后 68 个净补漏去假且保原同船支持的候选均被四门拦截，ABS 也无正分。42 个还同时严格降低跨源漏和假，集中于两场，分别出现接受和场内排序失效。外锚保留条件诊断，下一步在固定池上区分 T 侧接受校准与分区评分，用独立组件核实际输出。 [定向原文](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/offline_candidate_readout_sources_20261112.md)
-   - [C89](reports/2026-11-12-v300-far-paper-bridge-review.md)完成全 V300 四属性与历史 113 的逐场目标和参考配对。远端规则保留为速度候选，全域 MAE/P99 由 1.410/28.535 降到 0.881/6.992 m/s，经纬、航向及覆盖一致。历史 113 缺已训练 TAM，旧 TFM 真组位置也退化。后续将 FAR 和强位置候选在同一冻结版本评价。[C83 近端追因](reports/2026-11-12-held-near-tail-audit.md)确认并列最大增害 22.505 m/s 源自同一次跨船取值，另外三点同船同源，0.603–3.000 秒的近端速度仍偏大。保留近端对照，供给者证据与同供给者速度估计分别检验。
-   - [C91](reports/2026-11-12-tmtaff-support-supervision-review.md)原始 T8/16 真对逐值核齐。仅双支撑监督使 301 点位置 MAE 39.595→35.074 km，但 P99 81.565→84.041 km、全域 MAE 36.022→40.827 km，两个端点仍近常值。下一诊断优先隔离 TFM 自回归历史的跨步反传。相同原生输入的独立时窗及配准干预另行设计。
-   - [冻结关联 PR](reports/2026-11-12-frozen-association-pr-review.md)在 90% micro 真边召回下 056 跨源 PFA 75.12%，逐场真值定门仍 72.20%。094A/B 逐场 AUC .505/.517。WS 跨源删 4,682 真、38,433 假，新增 305 真、298 假。优先查完整训练池的高分负例，以同头、同样本分离 BCE 与高精度工作区排序损失，再核最终分区。 [下一方案](proposals/offline_high_precision_association_20261112.md)
-   - [TMTAFF 协议审计](reports/2026-11-12-tmtaff-protocol-gap-audit.md)在冻结 V300 分区上对称应用 Cui 时间条件，跨源加权正确率/误关联率 63.62/43.30→64.69/36.48%，原表 91.38/6.87%。[公开发布档案](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_protocol_and_method_sources_20261112.md)核到 V1/V2 目录中 14 个文件同名、同字节数、同登记 MD5。作者实际 Level、3000 场、配准、时间窗和 mESD 待核。152 按原合同收尾，PTFM/DeepAF 为融合补充。
+1. **离线继续建立高精度关联与可信 TMTAFF 全系统对照。** [C92](reports/2026-11-12-association-tail-contrast-review.md)已补齐全T 27,632,584候选分数，同池BCE/RANK各1024步并完成独审。V跨源90%micro召回FP原056/BCE/RANK为44,754/1,196,033/174,175。RANK最终跨源FN/FP从5,888/8,085变9,663/3,423，损失286,251同船支持槽、增加4,199重复输出，held也未过联合门，两新头不替换原评分。
+   - C92只读深挖区分了关系内部排序缺共同零点和旧静态尾部之外的新假边。后继从完整候选背景约束、跨关系可比较性及组件曝光三项条件筛选单变量设计，再核原WS实际分区。拟合尾部约93%集中同一组件，原056已看全T/V，保留这些边界。[新来源和机制](reports/2026-11-12-association-tail-contrast-review.md#squeeze_report)已回流Mode C2.34/C95，当前没有新增训练READY。C88外锚仍为条件证据，原固定候选与真支持反例保留。
+   - [C94四属性同场](reports/2026-11-12-v300-position-far-review.md)在同V300/WS/目标/Q下合并157位置与FAR速度。主臂位置MAE582.808m、速度MAE.881m/s，航向MAE26.561°、覆盖一致。相对B位置P99由8363.727升8426.138m、新增2210个>1km增害，原21近端点的最坏速度仍56.243m/s。保留同版本联合内部对照，下一步针对位置长尾及近端实际供给证据筛选干预，并核四属性物理一致性。C97只为矩阵连接。
+   - [C93历史梯度](reports/2026-11-12-tmtaff-feedback-gradient-review.md)固定同16真对，实际截断跨步梯度且u0/随机流一致。全域MAE36.022→36.067km，P99 90.352→77.438km，双支撑均值/尾部更差，异目标分离仍仅.026m。该干预未恢复条件响应。C96先定位冻结TCM memory到首步/后段条件读出的敏感性，输入时窗/配准保留为独立问题，再定结构或物理投影干预。
+   - [官方版本与三篇机制原文](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_protocol_revision_and_training_mechanisms_20261112.md)核到两版论文所查配准、抽样/划分和训练协议内容一致，式29歧义仍在。作者实际Level、3000名单、时窗、配准和mESD仍待核。新增两向pAUC、时间梯度与Transformer残差机制的定向阅读和反例已回矩阵。152的规定独审仍待收尾，PTFM/DeepAF继续作为融合补充，原论文数值复现与共同任务适配各自报告。
 2. **在线 C-ON33/35 完成稀疏首报的邻轨证据诊断和写入留场。** 11 开发场与 22 个新留场按共享 A 组件隔离，12 个留场组件此前有其他 C-ON32 场。195 个稀疏首报有 6 个开放真边入射，均无双侧共时邻轨。原几何／8 km 宽门／原见证及两种写入臂当刻正确 42／48／42，错接均 5，查询端未见真对侧的错接均 2。 [两阶段 Record/Squeeze](reports/2026-11-12-online-neighbor-witness.md) · [在线 Mode C v30](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v30-见证写入留场回流)
    - 冲突禁写拦下 478 假、30 真样本，关联和延迟指标与现有见证逐场一致。正证才写在 11 个稀疏场等同纯等待，较现有见证少 784 真、多 44 假事件，主稀疏首次门外 10 个更晚、无提前。保留原几何为工作点，宽门和原见证作对照；后续设计须有能增加独立证据覆盖的来源，长期状态反馈另评。 [前轮固定环确认](reports/2026-11-12-online-expansion-confirmation.md) · [原边排序与错链证据](reports/2026-11-12-online-nemot-association-diagnostic.md)
    - [在线融合源码与迁移筛选](reports/2026-11-12-online-fusion-transfer-review.md)完成来源→[Mode C v31](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v31-在线融合的数据入口与公开实现回核)。CD-PMBM/TM-PMBM（TSP2025）保留为联合存在/关联候选，DetectorContext（FUSION2026）作者PR已公开但未含完整海试；NTNU雷达核心和Stone Soup提供实现参考。优先沿C-ON34核报告机会、点/后验/区间及重复信息单位，再由C-ON28核后续独有报告的消歧人口和有界假设对照；不把未报造为空扫，不续邻轨门限工作点。本轮未运行作者代码或新MTAD实验，未形成新执行READY。
@@ -48,7 +48,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.32](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-232)，P14/F347/M152/E312/C93|
+|全局问题—现象—机制—证据|[Mode C2.34](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-234)，P14/F353/M155/E321/C97|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|

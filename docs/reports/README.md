@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
+- [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)
+- [C94 同一WS分区的位置与远端速度四属性对照](2026-11-12-v300-position-far-review.md)
+
 - [在线融合的数据处理、公开代码与迁移筛选](2026-11-12-online-fusion-transfer-review.md)
 
 - [C91 固定真对的双源支撑位置监督结果](2026-11-12-tmtaff-support-supervision-review.md)

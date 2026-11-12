@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [C93 固定真对的自回归历史反传](tmtaff_autoregressive_history_20261112.md)
+
 - [低误关联工作区的固定候选评分](offline_high_precision_association_20261112.md)
 
 - [C91 固定真对的双源支撑位置监督](tmtaff_support_supervision_20261112.md)
