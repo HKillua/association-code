@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C101 固定分区候选内的同船供给接替](2026-11-12-association-native-supplier-replacement-review.md)
+- [C102 固定真对的分层位置读出](2026-11-12-tmtaff-position-readout-review.md)
+- [C103 新留场近端速度、机动代理与片段边界](2026-11-12-near-speed-maneuver-held-review.md)
+
 - [C98 原WS与混合BCE局部分歧及供给保全](2026-11-12-association-partition-disagreement-review.md)
 - [C99 固定真对的逐层条件差与局部恢复](2026-11-12-tmtaff-encoder-contraction-review.md)
 - [C100 近端速度字段区间与同供给多段对照](2026-11-12-near-speed-interval-review.md)

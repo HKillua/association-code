@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C101 同一候选池的原生供给接替](association_native_supplier_replacement_20261112.md)
+- [C102 固定真对的分层位置读出](tmtaff_position_readout_20261112.md)
+- [C103 新留场近端速度与机动边界](near_speed_maneuver_held_20261112.md)
+
 - [C98 局部分歧与供给保全](association_partition_disagreement_20261112.md)
 - [C99 固定真对的编码差异收缩](tmtaff_encoder_contraction_20261112.md)
 - [C100 近端速度区间与多区间诊断](near_speed_interval_20261112.md)

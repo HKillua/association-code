@@ -5,6 +5,9 @@
 |编号|原合同L2S|原回执S2L|
 |---|---|---|
 |C-ON37在线短错段间隙|[冻结合同](L2S-20261112-online-hypothesis-gap.md) · [评分恢复](L2S-20261112-online-hypothesis-gap-export.md) · [严格晚报](L2S-20261112-online-hypothesis-gap-later.md)|[终态](S2L-20261112-online-hypothesis-gap.md)|
+|C101同船供给接替|[科学](L2S-20261112-c101.md) · [独审](L2S-20261112-c101-audit.md) · [R1](L2S-20261112-c101-audit-r1.md) · [距离分解](L2S-20261112-c101-squeeze.md)|[科学](S2L-20261112-c101.md) · [独审与首失败](S2L-20261112-c101-audit.md) · [距离分解](S2L-20261112-c101-squeeze.md)|
+|C102分层位置读出|[固定合同](L2S-20261112-c102.md)|[科学与复算](S2L-20261112-c102.md)|
+|C103速度窗口新留场|[固定合同](L2S-20261112-c103.md)|[科学与复算](S2L-20261112-c103.md)|
 |C-ON36在线区间指派|[冻结合同](L2S-20261112-online-interval-assignment.md)|[终态](S2L-20261112-online-interval-assignment.md)|
 |C98局部分区分歧|[科学](L2S-20261112-c98.md) · [独审](L2S-20261112-c98-audit.md)|[科学](S2L-20261112-c98.md) · [独审](S2L-20261112-c98-audit.md)|
 |C99逐层条件差|[固定合同](L2S-20261112-c99.md)|[科学与复算](S2L-20261112-c99.md)|
