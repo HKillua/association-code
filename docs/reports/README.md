@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [后续报文、竞争边排序与持续错配](2026-11-12-online-competing-reports.md)
+
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)
 - [C94 同一WS分区的位置与远端速度四属性对照](2026-11-12-v300-position-far-review.md)
