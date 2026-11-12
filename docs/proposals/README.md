@@ -4,6 +4,7 @@
 
 ## 2026-11-12
 
+- [C113 两锚配准的分时核验与整块候选诊断](offline_two_anchor_time_validation_20261112.md)
 - [C107 固定配准门的新留场和四属性传播](association_registered_holdout_fusion_20261112.md)
 - [C108 双支撑位置残差和 Mean 回退](tmtaff_dual_position_fallback_20261112.md)
 - [C109 原参考位置和速度差异追因](raw_reference_speed_origin_20261112.md)
