@@ -24,6 +24,7 @@
 - [固定原图的短错段间隙诊断](online_hypothesis_gap_20261112.md)
 - [误撤正确配对的相对运动与连续报文诊断](online_relative_motion_20261112.md)
 - [共时支撑中断与同源邻轨的共享创新诊断](online_shared_innovation_20261112.md)
+- [异步实报与预测时距能否识别错接](online_async_report_20261112.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)

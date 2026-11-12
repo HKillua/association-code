@@ -16,7 +16,7 @@
 
 **在线共时支撑与同源共享创新已收尾。** [固定合同](L2S-20261112-online-shared-innovation.md) · [终态](S2L-20261112-online-shared-innovation.md)。原28场一次CPU，真实退出0，已回流Mode C v41。
 
-**在线异步报文与预测不确定性 READY，本地会话执行。** [固定合同](L2S-20261112-online-async-report.md)。原28场一次CPU，零训练与新场读取。
+**在线异步报文与预测不确定性已收尾。** [固定合同](L2S-20261112-online-async-report.md) · [终态](S2L-20261112-online-async-report.md)。原28场一次CPU，真实退出0，已回流Mode C v43。
 
 **在线相对运动与连续报文已收尾。** [固定合同](L2S-20261112-online-relative-motion.md) · [终态](S2L-20261112-online-relative-motion.md)。原28场一次CPU，真实退出0，已回流Mode C v39。
 
