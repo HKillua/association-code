@@ -35,9 +35,17 @@ def calibration_catalog(motion, path, thresholds):
     with np.load(path, allow_pickle=False) as saved:
         for key, value in (('pairs', pairs), ('nodes', nodes), ('sources', sources)):
             np.testing.assert_array_equal(saved[key], value)
-        scores = [saved[arm] for arm in ('056', 'M_BCE')]
+        scores = {arm: saved[arm] for arm in ('056', 'M_BCE')}
+    return catalog_from_scores(motion, pairs, scores, thresholds)
+
+
+def catalog_from_scores(motion, pairs, scores, thresholds):
+    sources = motion['sources']
+    n = len(sources)
+    left, right = pairs.T
     membership, margins = [], []
-    for arm, score in zip(('056', 'M_BCE'), scores, strict=True):
+    for arm in ('056', 'M_BCE'):
+        score = scores[arm]
         margin = score - thresholds[arm]
         shifted = score if thresholds[arm] == THRESHOLD else margin + THRESHOLD
         membership.append(agglomerate(n, pairs, shifted, 'WS')[0])
@@ -136,7 +144,7 @@ def cross_scores(query, displacement, anchors, args):
                 anchors=[pair for pair, _ in found])
 
 
-def build_evidence(sid, motion, old, blocks, margin, archive):
+def build_evidence(sid, motion, old, blocks, margin, archive, *, measurement_rows=None):
     support = motion['support']
     relevant = {}
     for block in blocks:
@@ -148,7 +156,9 @@ def build_evidence(sid, motion, old, blocks, margin, archive):
                 relevant.update({pair: set(block['nodes']) for pair in cut})
     if not relevant:
         return []
-    tracks = _canonical_tracks(archive._rows(sid, 'measurements'), sid, motion['node_ids'], motion['sources'])
+    if measurement_rows is None:
+        measurement_rows = archive._rows(sid, 'measurements')
+    tracks = _canonical_tracks(measurement_rows, sid, motion['node_ids'], motion['sources'])
     sizes = [len(track['canonical_times']) for track in tracks]
     np.testing.assert_array_equal(sizes, motion['native_count'])
     offsets = np.r_[0, np.cumsum(sizes)]
