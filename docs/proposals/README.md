@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [共同过去区间的整组指派对照](online_interval_assignment_20261112.md)
+
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)
 - [C97 单场近端最坏速度误差追因](near_absolute_speed_trace_20261112.md)

@@ -6,7 +6,9 @@
 
 离线精度与在线实时持续并行推进，具体工作只看[研究状态](../docs/research_status.md#下一步)。在线开发入口见[独立在线目录](../online_observation/README.md)，原计时合同使用的命令和输出格式继续兼容。当前可领范围以本交接为准。
 
-**在线原有竞争边诊断已收尾。** [固定合同](L2S-20261112-online-competing-reports.md) · [终态](S2L-20261112-online-competing-reports.md)。本地一次CPU回放真实退出0，28场逐场核对一致。当前无在线执行READY或活动服务。
+**在线区间指派 READY，本地会话执行。** [固定合同](L2S-20261112-online-interval-assignment.md)。开发28场、留场48场，各一次CPU，零训练。
+
+**在线原有竞争边诊断已收尾。** [固定合同](L2S-20261112-online-competing-reports.md) · [终态](S2L-20261112-online-competing-reports.md)。本地一次CPU回放真实退出0，28场逐场核对一致。
 
 **C71科学与独审已完成。** [独立合同](L2S-20261111-c71.md)、[终态回执](S2L-20261111-c71.md)。原T32/12组件，WS主起点及HARD/STRUCT敏感性。北京时间14:42:02/14:42:42真实退出0，421,659个动作及843,318项真边增量独核，11份公共原件已回传，结果完成Record→Squeeze→Mode C2.13。
 
