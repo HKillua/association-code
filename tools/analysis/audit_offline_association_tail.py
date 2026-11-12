@@ -175,9 +175,9 @@ def scene_data(row):
     return data
 
 
-def aggregate_arms(rows):
+def aggregate_arms(rows, arms=ARMS):
     result = {}
-    for arm in ARMS:
+    for arm in arms:
         counts = Counter()
         for row in rows:
             counts.update(row['arms'][arm]['coverage'])
@@ -188,15 +188,15 @@ def aggregate_arms(rows):
     return result
 
 
-def gates(summary, base):
+def gates(summary, base, candidate='RANK'):
     def direction(arms):
-        a, b = arms['RANK'], arms[base]
+        a, b = arms[candidate], arms[base]
         return all(a['mstsa']['decoded'][k] < b['mstsa']['decoded'][k] for k in ('fn', 'fp')) and all(
             a['itsa']['decoded'][k] <= b['itsa']['decoded'][k] for k in ('fn', 'fp'))
     rank = summary['ranking']
-    raw = all(rank['mstsa']['RANK'][p]['fp'] < rank['mstsa'][base][p]['fp'] and
-              rank['itsa']['RANK'][p]['fp'] <= rank['itsa'][base][p]['fp'] for p in ('80', '90'))
-    support = summary['full']['RANK']['coverage']
+    raw = all(rank['mstsa'][candidate][p]['fp'] < rank['mstsa'][base][p]['fp'] and
+              rank['itsa'][candidate][p]['fp'] <= rank['itsa'][base][p]['fp'] for p in ('80', '90'))
+    support = summary['full'][candidate]['coverage']
     retained = all(support[k] == 0 for k in ('identities_lost', 'same_ship_lost', 'duplicate_increase_scenes'))
     components = sum(direction(r) for r in summary['by_component'].values())
     decoded = direction(summary['full'])
@@ -205,7 +205,8 @@ def gates(summary, base):
                 without_largest=leave, passed=raw and decoded and retained and components >= 2 and leave)
 
 
-def audit_split(root, split, ids, index, components, thresholds, expected, checks, prep, old_archive):
+def audit_split(root, split, ids, index, components, thresholds, expected, checks, prep, old_archive,
+                *, arms=ARMS, factorial=None):
     historical = read(root/f'{split}-scenes.json')
     assert [row['scene'] for row in historical] == ids
     rows, blocks = [], {scope: defaultdict(list) for scope in SCOPES}
@@ -229,7 +230,7 @@ def audit_split(root, split, ids, index, components, thresholds, expected, check
             row = dict(scene=sid, component=components[sid], pairs=len(pairs), arms={})
             for scope, mask in zip(SCOPES, (same, ~same), strict=True):
                 blocks[scope]['truth'].append(truth[mask])
-            for arm in ARMS:
+            for arm in arms:
                 scores, group = saved[f'score_{arm}'], saved[f'group_{arm}']
                 assert scores.shape == (len(pairs),) and np.isfinite(scores).all() and group.shape == (n,)
                 rebuilt = dense_ws(n, pairs, scores, thresholds[arm], original=arm == '056')
@@ -247,19 +248,27 @@ def audit_split(root, split, ids, index, components, thresholds, expected, check
             checks.verify(row, prior, f'{split}/{sid}')
             pair_total += len(pairs)
             rows.append(row)
-    result = dict(scenes=len(ids), full=aggregate_arms(rows), ranking={}, by_component={})
+    result = dict(scenes=len(ids), full=aggregate_arms(rows, arms), ranking={}, by_component={})
     for scope, values in blocks.items():
         truth = np.concatenate(values['truth'])
-        result['ranking'][scope] = {arm: ranks(np.concatenate(values[arm]), truth) for arm in ARMS}
+        result['ranking'][scope] = {arm: ranks(np.concatenate(values[arm]), truth) for arm in arms}
     for component in sorted({r['component'] for r in rows}):
-        result['by_component'][component] = aggregate_arms([r for r in rows if r['component'] == component])
+        result['by_component'][component] = aggregate_arms([r for r in rows if r['component'] == component], arms)
     largest = max(result['by_component'], key=lambda c: (sum(r['component'] == c for r in rows), c))
     result['largest_component'] = largest
-    result['without_largest'] = aggregate_arms([r for r in rows if r['component'] != largest])
-    result['gates'] = {base: gates(result, base) for base in ('056', '056_T', 'BCE')}
+    result['without_largest'] = aggregate_arms([r for r in rows if r['component'] != largest], arms)
+    if arms == ARMS:
+        result['gates'] = {base: gates(result, base) for base in ('056', '056_T', 'BCE')}
+    else:
+        result['gates'] = {arm: gates(result, '056', arm) for arm in arms[2:]}
+    if factorial is not None:
+        result['factorial'] = factorial(result)
     checks.verify(result, expected, split)
-    return dict(scenes=len(ids), pairs=pair_total, components=len(result['by_component']),
-                replayed_ws_partitions=len(ids)*len(ARMS), gates=result['gates'])
+    public = dict(scenes=len(ids), pairs=pair_total, components=len(result['by_component']),
+                  replayed_ws_partitions=len(ids)*len(arms), gates=result['gates'])
+    if factorial is not None:
+        public['factorial'] = result['factorial']
+    return public
 
 
 def training_and_pools(root, prep, index, roles, checks):

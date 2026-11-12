@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C95 负例覆盖与排序增量](2026-11-12-association-negative-coverage-review.md)
+- [C96 冻结条件记忆与生成前缀](2026-11-12-tmtaff-memory-prefix-review.md)
+- [C97 近端最坏绝对速度误差追因](2026-11-12-near-absolute-speed-trace.md)
+
 - [后续报文、竞争边排序与持续错配](2026-11-12-online-competing-reports.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)

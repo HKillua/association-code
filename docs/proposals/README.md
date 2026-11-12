@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
+- [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)
+- [C97 单场近端最坏速度误差追因](near_absolute_speed_trace_20261112.md)
+
 - [后续报文能否重新区分原有竞争边](online_competing_report_diagnostic_20261112.md)
 
 - [C93 固定真对的自回归历史反传](tmtaff_autoregressive_history_20261112.md)
