@@ -86,13 +86,20 @@ def _direction(value):
     return 0
 
 
-def _measure(gap, stamp, points, priors, shifts, costs):
-    keys = gap.switch.keys
+def _position_readouts(keys, stamp, points, priors, shifts):
     if any(key not in priors or not 0 < stamp - priors[key].stamp <= FRESH_S for key in keys):
         return None
     masked = {key: _add(priors[key].position(stamp, True), shifts.get(key[0], (0., 0.))) for key in keys}
     new = keys.intersection(points)
     seen = masked | {key: _add(points[key], shifts.get(key[0], (0., 0.))) for key in new}
+    return masked, seen, new
+
+
+def _measure(gap, stamp, points, priors, shifts, costs):
+    readouts = _position_readouts(gap.switch.keys, stamp, points, priors, shifts)
+    if readouts is None:
+        return None
+    masked, seen, new = readouts
     old_margin = _margin(gap.switch, lambda edge: _distance_sq(masked[edge[0]], masked[edge[1]]))
     new_margin = _margin(gap.switch, lambda edge: _distance_sq(seen[edge[0]], seen[edge[1]]))
     if not new and new_margin != old_margin:
