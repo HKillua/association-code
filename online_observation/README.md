@@ -50,4 +50,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.interval_assignment_squeeze --help`|从私有冻结回放分解长错段和不同改配动作的后验结果|
 |`python -m online_observation.hypothesis_gap_diagnostic --help`|在原候选和发布上核新涉事报文、同刻屏蔽和自然无新报|
 |`python -m online_observation.hypothesis_gap_later --help`|只在已冻结的分歧窗内核撤边后到达的报告|
+|`python -m online_observation.relative_motion_gap --help`|在原候选和冻结分歧窗上分解位置反转、共时相对位移和连续新报|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|
