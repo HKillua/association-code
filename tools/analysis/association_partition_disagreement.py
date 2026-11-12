@@ -275,10 +275,10 @@ def evaluate_scene(row, states, blocks):
     return result, dict(outcomes), {key: dict(value) for key, value in selected_evidence.items()}
 
 
-def summarize(rows):
+def summarize(rows, arms=ARMS):
     def pool(items):
         result = {}
-        for arm in (*ARMS, 'ORACLE'):
+        for arm in (*arms, 'ORACLE'):
             parts = [row['arms'][arm] for row in items]
             totals = Counter()
             for arm_row in parts:
@@ -307,7 +307,7 @@ def summarize(rows):
     components = {key: pool(items) for key, items in groups.items()}
     without = pool([row for row in rows if row['component'] != largest])
     gates = {}
-    for arm in (*ARMS[1:], 'ORACLE'):
+    for arm in (*arms[1:], 'ORACLE'):
         covered = all(full[arm]['coverage'][key] == 0 for key in
                       ('identities_lost', 'same_ship_lost', 'duplicate_increase_scenes'))
         count = sum(direction(group, arm) for group in components.values())
