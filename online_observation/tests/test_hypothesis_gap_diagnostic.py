@@ -1,9 +1,14 @@
+from collections import Counter
+import gzip
 from io import BytesIO
+import json
+from pathlib import Path
 import pickle
+from tempfile import TemporaryDirectory
 import unittest
 
 from online_observation.continuous_tracker import LocalTrack
-from online_observation.hypothesis_gap_diagnostic import Gap, Switch, _collect, _measure, _score
+from online_observation.hypothesis_gap_diagnostic import Gap, Switch, _collect, _load_frozen, _measure, _score
 from online_observation.nemot_replay import ReplayResult
 
 
@@ -52,7 +57,15 @@ class GapDiagnosticTest(unittest.TestCase):
         self.assertEqual((gaps[0]["end"], gaps[0]["stop"]), ("kf_rejoin", 12.))
         rows, bridges = _score(result, gaps, {A: 1, B: 1, C: 2, D: 2})
         self.assertEqual((rows[0]["true_release"], rows[0]["true_retain"]), (0, 2))
+        self.assertEqual(json.loads(json.dumps(rows))[0]["counts"]["new_events"], 1)
         self.assertEqual(bridges, [])
+
+    def test_resume_preserves_counters_in_the_frozen_capture(self):
+        with TemporaryDirectory() as temporary:
+            path = Path(temporary) / "frozen.pkl.gz"
+            with gzip.open(path, "wb") as stream:
+                pickle.dump(("snapshot", [{"counts": Counter([("new_events", 4), ("quiet_events", 1)])}]), stream)
+            self.assertEqual(_load_frozen(path), ("snapshot", [{"counts": {"new_events": 4, "quiet_events": 1}}]))
 
 
 if __name__ == "__main__":

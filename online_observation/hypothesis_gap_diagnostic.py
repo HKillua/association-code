@@ -239,7 +239,24 @@ def _collect(events, graph_stream, result):
             or counts["candidate_edge_events"] != result.diagnostics["fixed_candidate_edge_events"]
             or counts["reports"] != result.diagnostics["reports"] or graph_stream.read(1)):
         raise ValueError("frozen graph trace differs from the interval baseline")
-    return [asdict(gap) for gap in closed], dict(counts)
+    return [asdict(gap) | {"counts": dict(gap.counts)} for gap in closed], dict(counts)
+
+
+def _load_frozen(path):
+    with gzip.open(path, "rb") as stream:
+        result, gaps = pickle.load(stream)
+    for gap in gaps:
+        counts = gap["counts"]
+        if isinstance(counts, Counter):
+            # The first capture used asdict on a Counter, which rebuilt it
+            # from pairs and made (name, value) into the stored keys.
+            fixed = {}
+            for (name, number), copies in counts.items():
+                if not isinstance(name, str) or not isinstance(number, int) or copies != 1 or name in fixed:
+                    raise ValueError("unrecognized frozen counter encoding")
+                fixed[name] = number
+            gap["counts"] = fixed
+    return result, gaps
 
 
 def _bridges(result, true, by_focal):
@@ -305,39 +322,54 @@ def _run(args):
     if meta["phase"] != "development" or set(scenes) != meta["scenes"].keys():
         raise ValueError("this diagnostic requires the original 28-scene interval development run")
     args.output_dir.mkdir(mode=0o700, exist_ok=False)
-    frozen = args.output_dir / "private_frozen"
-    frozen.mkdir(mode=0o700)
+    frozen = (args.resume_frozen or args.output_dir) / "private_frozen"
+    if args.resume_frozen is None:
+        frozen.mkdir(mode=0o700)
+    elif {path.name for path in frozen.glob("*.pkl.gz")} != {f"scene_{i:02d}.pkl.gz" for i in range(1, len(scenes)+1)}:
+        raise ValueError("resume requires all 28 frozen contrasts")
     started = perf_counter()
     entries = {}
     for i, scene in enumerate(scenes, 1):
         alias = f"scene_{i:02d}"
         with gzip.open(args.interval_run / "private_frozen" / f"{scene}.pkl.gz", "rb") as stream:
             result, _ = pickle.load(stream)
-        with gzip.open(args.graph_run / "private_frozen" / f"{alias}.pkl.gz", "rb") as stream:
-            gaps, counts = _collect(_events(args.archive, args.manifest, scene), stream, result)
-        with gzip.open(frozen / f"{alias}.pkl.gz", "xb", compresslevel=1) as stream:
-            pickle.dump((result, gaps), stream, protocol=pickle.HIGHEST_PROTOCOL)
+        if args.resume_frozen is None:
+            with gzip.open(args.graph_run / "private_frozen" / f"{alias}.pkl.gz", "rb") as stream:
+                gaps, counts = _collect(_events(args.archive, args.manifest, scene), stream, result)
+            with gzip.open(frozen / f"{alias}.pkl.gz", "xb", compresslevel=1) as stream:
+                pickle.dump((result, gaps), stream, protocol=pickle.HIGHEST_PROTOCOL)
+        else:
+            captured, gaps = _load_frozen(frozen / f"{alias}.pkl.gz")
+            if (captured.native_reports != result.native_reports or captured.runs != result.runs
+                    or captured.fit != result.fit or captured.diagnostics != result.diagnostics):
+                raise ValueError("captured contrast does not match the frozen interval run")
+            counts = dict(events=result.diagnostics["events"], reports=result.diagnostics["reports"],
+                          candidate_edge_events=result.diagnostics["fixed_candidate_edge_events"])
         entry = meta["scenes"][scene]
-        entries[alias] = dict(component=entry["component"], sparse=entry["sparse"], counts=counts)
-        print(f"Frozen {i}/{len(scenes)}, {counts['events']} events", flush=True)
+        entries[alias] = dict(component=entry["component"], sparse=entry["sparse"], counts=counts,
+                              focal_windows=sum(len(gap["focal"]) for gap in gaps))
+        stage = "Checked" if args.resume_frozen else "Frozen"
+        print(f"{stage} {i}/{len(scenes)}, {counts['events']} events", flush=True)
 
     print("All report contrasts frozen. Reading evaluation identities.", flush=True)
     for i, scene in enumerate(scenes, 1):
         alias = f"scene_{i:02d}"
-        with gzip.open(frozen / f"{alias}.pkl.gz", "rb") as stream:
-            result, gaps = pickle.load(stream)
+        result, gaps = _load_frozen(frozen / f"{alias}.pkl.gz")
         rows, bridges = _score(result, gaps, read_labels(args.archive, args.manifest, scene))
         entries[alias].update(gaps=rows, bridges=bridges)
     _write_json(args.output_dir / "summary.json", dict(scenes=entries, clock="ideal_native_measurement_time",
                window_seconds=WINDOW_SECONDS, graph_unchanged=True, publications_unchanged=True,
-               training_updates=0, wall_seconds=perf_counter()-started))
+               training_updates=0, resumed_frozen_capture=args.resume_frozen is not None,
+               wall_seconds=perf_counter()-started))
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, nargs=3, required=True)
     parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--graph-run", type=Path, required=True)
+    capture = parser.add_mutually_exclusive_group(required=True)
+    capture.add_argument("--graph-run", type=Path)
+    capture.add_argument("--resume-frozen", type=Path)
     parser.add_argument("--interval-run", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     _run(parser.parse_args(argv))
