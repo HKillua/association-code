@@ -13,6 +13,7 @@
 - [C97 近端最坏绝对速度误差追因](2026-11-12-near-absolute-speed-trace.md)
 
 - [后续报文、竞争边排序与持续错配](2026-11-12-online-competing-reports.md)
+- [固定候选图上的在线区间指派](2026-11-12-online-interval-assignment.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)

@@ -46,4 +46,6 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.causal_recovery --help`|组件隔离的原几何、宽门、因果外锚与共同过去位移，评门外补配及确认时差|
 |`python -m online_observation.expansion_confirmation --help`|固定 4–8 km 候选，分开核对双端续报、外见证冲突暂缓、相符提前和确认时差|
 |`python -m online_observation.neighbor_witness_experiment --help`|稀疏首报的共时邻轨证据、同航竞争和历史见证写入资格|
+|`python -m online_observation.interval_assignment_experiment --help`|固定原候选图和发布时刻，比较整组端点与区间评分，分别评等量换配和留空|
+|`python -m online_observation.interval_assignment_squeeze --help`|从私有冻结回放分解长错段和不同改配动作的后验结果|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|
