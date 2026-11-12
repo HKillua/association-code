@@ -227,43 +227,44 @@ def association_metrics(groups, support, sources, ids):
     return result
 
 
-def pool_association(rows):
+def pool_association(rows, arms=ASSOCIATION):
     return {arm: dict(**{stage: {scope: _aggregate([r[arm][stage][scope] for r in rows]) for scope in c104.c98.SCOPES}
                          for stage in ('decoded', 'added', 'removed')},
                       coverage={key: sum(r[arm]['coverage'][key] for r in rows) for key in rows[0][arm]['coverage']},
                       **{key: sum(r[arm][key] for r in rows) for key in ('true_supply_cut', 'false_supply_cut')})
-            for arm in ASSOCIATION}
+            for arm in arms}
 
 
-def gate(pooled):
-    old, new = (pooled[arm]['decoded'] for arm in ('WS', 'REG'))
+def gate(pooled, baseline='WS'):
+    old, new = (pooled[arm]['decoded'] for arm in (baseline, 'REG'))
     return (all(new['mstsa'][key] < old['mstsa'][key] for key in ('fn', 'fp'))
             and all(new['itsa'][key] <= old['itsa'][key] for key in ('fn', 'fp')))
 
 
-def summarize(rows, matrices):
+def summarize(rows, matrices, *, arms=ASSOCIATION, baseline='WS'):
     grouped = defaultdict(list)
     for row in rows:
         grouped[row['component']].append(row['association'])
     biggest = max(grouped, key=lambda key: (len(grouped[key]), key))
-    full = pool_association([row['association'] for row in rows])
-    without = pool_association([row['association'] for row in rows if row['component'] != biggest])
-    components = {key: pool_association(group) for key, group in grouped.items()}
+    full = pool_association([row['association'] for row in rows], arms)
+    without = pool_association([row['association'] for row in rows if row['component'] != biggest], arms)
+    components = {key: pool_association(group, arms) for key, group in grouped.items()}
     reg = full['REG']
     no_harm = not (reg['true_supply_cut'] or any(reg['coverage'][key] for key in
                    ('identities_lost', 'same_ship_lost', 'duplicate_increase_scenes')))
-    association_pass = no_harm and gate(full) and gate(without) and sum(gate(a) for a in components.values()) >= 2
-    fusion_totals = pool_fusion([row['fusion'] for row in rows], matrices, (*ASSOCIATION, ORACLE))
+    joint_components = sum(gate(group, baseline) for group in components.values())
+    association_pass = no_harm and gate(full, baseline) and gate(without, baseline) and joint_components >= 2
+    fusion_totals = pool_fusion([row['fusion'] for row in rows], matrices, (*arms, ORACLE))
     metrics = fusion_totals['errors']['all']
     fusion_pass = association_pass and all(value['common'] > 0
-        and all(value['common_metrics']['REG'][key] <= value['common_metrics']['WS'][key] for key in ('mae', 'p99'))
-        and value['own']['REG']['n'] >= value['own']['WS']['n'] for value in metrics.values())
+        and all(value['common_metrics']['REG'][key] <= value['common_metrics'][baseline][key] for key in ('mae', 'p99'))
+        and value['own']['REG']['n'] >= value['own'][baseline]['n'] for value in metrics.values())
     eligibility = Counter()
     for row in rows:
         eligibility.update(row['exclusion'])
     return dict(scenes=len(rows), components=len(components), largest=biggest, association=full,
                 without_largest=without, components_association=components,
-                joint_components=sum(gate(a) for a in components.values()), association_pass=association_pass,
+                joint_components=joint_components, association_pass=association_pass,
                 fusion_pass=fusion_pass, clock_unsupported=[row['scene'] for row in rows if not row['clock_supported']],
                 exclusion=eligibility, fusion=fusion_totals)
 
