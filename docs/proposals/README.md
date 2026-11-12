@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [C115 同启用率位置残差限幅和质量门](tmtaff_equal_activation_position_20261112.md)
+- [C117 发布参考原邻接区间的速度与方向对照](reference_interval_fingerprint_20261112.md)
 - [C113 两锚配准的分时核验与整块候选诊断](offline_two_anchor_time_validation_20261112.md)
 - [C107 固定配准门的新留场和四属性传播](association_registered_holdout_fusion_20261112.md)
 - [C108 双支撑位置残差和 Mean 回退](tmtaff_dual_position_fallback_20261112.md)

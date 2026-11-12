@@ -4,6 +4,9 @@
 
 ## 2026-11-12
 
+- [C113 两锚分时验证的整块覆盖和四属性结果](2026-11-12-association-two-anchor-time-validation-review.md)
+- [C115 位置残差限幅、质量和小间距](2026-11-12-tmtaff-equal-activation-position-review.md)
+- [C117 发布参考速度单位、区间与位置回跳](2026-11-12-reference-interval-fingerprint-review.md)
 - [C107 固定配准门的新留场和四属性传播](2026-11-12-association-registered-holdout-fusion-review.md)
 - [C108 双支撑位置残差和 Mean 回退](2026-11-12-tmtaff-dual-position-fallback-review.md)
 - [C109 原参考位置和速度差异的首次观察层](2026-11-12-raw-reference-speed-origin-review.md)
