@@ -6,6 +6,7 @@
 |---|---|---|
 |C-ON39在线共时支撑与同源共享创新|[冻结合同](L2S-20261112-online-shared-innovation.md)|[终态](S2L-20261112-online-shared-innovation.md)|
 |C-ON40在线异步报文与预测不确定性|[冻结合同](L2S-20261112-online-async-report.md)|[终态](S2L-20261112-online-async-report.md)|
+|C-ON41在线跨源残差与历史参照|[冻结合同](L2S-20261112-online-cross-source-calibration.md)|[终态](S2L-20261112-online-cross-source-calibration.md)|
 |C113两锚原生分时验证|[固定合同](L2S-20261112-c113.md)|[科学与独审](S2L-20261112-c113.md)|
 |C115位置等启用率|[固定合同](L2S-20261112-c115.md)|[科学与独审](S2L-20261112-c115.md)|
 |C117发布参考原生区间|[固定合同](L2S-20261112-c117.md)|[科学与独审](S2L-20261112-c117.md)|

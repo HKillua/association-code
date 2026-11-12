@@ -53,4 +53,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.relative_motion_gap --help`|在原候选和冻结分歧窗上分解位置反转、共时相对位移和连续新报|
 |`python -m online_observation.shared_innovation_gap --help`|用冻结图核四端报告、失鲜与原窗终止，再以同刻屏蔽和等幅衰减对照同源邻轨创新|
 |`python -m online_observation.async_report_gap --help`|在原图对照严格接回前及当批的实报、屏蔽和各端预测方差，核误拦与提前量|
+|`python -m online_observation.cross_source_calibration_gap --help`|在原图分解跨源均值与中心离散，核严格过去的外部锚、正确接回与屏蔽|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|

@@ -20,7 +20,7 @@
 
 **在线异步报文与预测不确定性已收尾。** [固定合同](L2S-20261112-online-async-report.md) · [终态](S2L-20261112-online-async-report.md)。原28场一次CPU，真实退出0，已回流Mode C v43。
 
-**在线跨源残差与历史参照 READY，本地会话执行。** [固定合同](L2S-20261112-online-cross-source-calibration.md)。原28场一次CPU，零训练与新场读取。
+**在线跨源残差与历史参照已收尾。** [固定合同](L2S-20261112-online-cross-source-calibration.md) · [终态](S2L-20261112-online-cross-source-calibration.md)。原28场一次CPU，真实退出0，已回流Mode C v45。
 
 **在线相对运动与连续报文已收尾。** [固定合同](L2S-20261112-online-relative-motion.md) · [终态](S2L-20261112-online-relative-motion.md)。原28场一次CPU，真实退出0，已回流Mode C v39。
 
