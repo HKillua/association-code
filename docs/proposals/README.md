@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C98 局部分歧与供给保全](association_partition_disagreement_20261112.md)
+- [C99 固定真对的编码差异收缩](tmtaff_encoder_contraction_20261112.md)
+- [C100 近端速度区间与多区间诊断](near_speed_interval_20261112.md)
+
 - [共同过去区间的整组指派对照](online_interval_assignment_20261112.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)

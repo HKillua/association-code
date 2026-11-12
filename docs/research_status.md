@@ -30,10 +30,10 @@
 ## 下一步
 
 1. **离线继续建立高精度关联与可信 TMTAFF 全系统对照。** [C95](reports/2026-11-12-association-negative-coverage-review.md)同预算替换一半旧尾部负例后，混合BCE跨源90%召回FP由C92复现的1,196,033降至105,720，原056为44,754。V最终跨源FN/FP相对原WS由5,888/8,085降到4,291/4,372，held亦双降。混合BCE丢103个原代表和35,645个同船支持槽，四新臂未过总门。加排序对两种采样的跨源效果相反，当前混合BCE保留为候选分区。
-   - C98核原WS与混合BCE的局部分歧，判断保住同船支撑的改动是否有可观测证据。逐场后验严格安全的整场切换仅V20/held15场。背景负例仍约93%来自同一最大组件，独立组件再加权另立问题。 [C95深挖](reports/2026-11-12-association-negative-coverage-review.md)
-   - [C96](reports/2026-11-12-tmtaff-memory-prefix-review.md)同16真对、三快照和0更新。TFM两编码器异目标相对差由约.57降到约.00046–.00101，FC记忆由.5533降到4.128e−5/1.070e−4，BOS换记忆从19.647km响应降到0/0。C99进一步区分编码器、FC和单步读出，固定输入核输出是否恢复条件差异及物理精度。时窗和配准保留为独立问题。
-   - [C94](reports/2026-11-12-v300-position-far-review.md)是同V300/WS/目标/Q的联合内部对照，位置MAE582.808m、速度MAE.881m/s、位置P99 8426.138m。 [C97](reports/2026-11-12-near-absolute-speed-trace.md)核近端最差点同船组保持约64.46分钟前的速度56.244m/s，换距Q1.984秒同船端点后仍有18.482m/s误差。C100优先查字段时间归属和同供给者多区间速度，保留跨船供给及位置长尾的独立入口。
-   - [四篇定向来源](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_negative_sampling_controls_20261112.md)含采样、点式标尺与速度估计的近邻和反例，已回Mode C2.36。 [官方版本核对](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_protocol_revision_and_training_mechanisms_20261112.md)作者实际Level、3000名单、时窗、配准和mESD仍待核。152的规定独审仍待收尾，PTFM/DeepAF继续作融合补充。当前没有后继离线训练READY。
+   - C98严格保供给在V300跨源漏/假各减3/2，原代表和同船支持保持，held177零改动，未过双人口资格。同池事后安全机会V/held有328/45块，严格规则拦325/45块。局部旧J在V丢207同船支持槽。C101候选先在原分歧域寻找可核的留存冗余和被切供给反证，保持分区级联合验收。背景负例组件再加权另立问题。 [C98结果](reports/2026-11-12-association-partition-disagreement-review.md)
+   - C99固定16真对，残差步的状态幅度比绝对目标差增长更快，六层叠加后相对差很小，FC1继续放大幅度。恢复右第六层attention残差的相对差未恢复最终目标分离。C102候选先在同一批真对与查询上做直接物理读出与固定幅度干预，检验条件信息在编码器、FC和decoder之间还能读出多少。 [C96记忆交换](reports/2026-11-12-tmtaff-memory-prefix-review.md) · [C99逐层证据](reports/2026-11-12-tmtaff-encoder-contraction-review.md)
+   - C100固定21个近端点的28供给片段，6,699个内部点中6,694个字段更贴后一原生区间。末字段延续不统一，片段外邻点均跨多个原生周期。同NEAR供给五段净位移速度MAE 3.367m/s，原字段17.644m/s，仍有4点增害。C103候选在新留场核字段区间、边界回退与机动条件，保留跨船供给及位置长尾的独立入口。C94仍为同V300/WS/目标/Q的联合内部对照，位置MAE582.808m、速度MAE.881m/s、位置P99 8426.138m。 [C100区间与同供给对照](reports/2026-11-12-near-speed-interval-review.md) · [C94四属性](reports/2026-11-12-v300-position-far-review.md)
+   - 六篇定向原文和C98–C100实测已回矩阵，C101–C103为待设计连接。作者实际Level、3,000场名单、时窗、配准和mESD仍待核。152的规定独审仍待收尾，PTFM/DeepAF继续作融合补充。 [本轮矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-238) · [官方版本核对](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_protocol_revision_and_training_mechanisms_20261112.md)
 2. **在线 C-ON33/35 完成稀疏首报的邻轨证据诊断和写入留场。** 11 开发场与 22 个新留场按共享 A 组件隔离，12 个留场组件此前有其他 C-ON32 场。195 个稀疏首报有 6 个开放真边入射，均无双侧共时邻轨。原几何／8 km 宽门／原见证及两种写入臂当刻正确 42／48／42，错接均 5，查询端未见真对侧的错接均 2。 [两阶段 Record/Squeeze](reports/2026-11-12-online-neighbor-witness.md) · [在线 Mode C v30](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v30-见证写入留场回流)
    - 冲突禁写拦下 478 假、30 真样本，关联和延迟指标与现有见证逐场一致。正证才写在 11 个稀疏场等同纯等待，较现有见证少 784 真、多 44 假事件，主稀疏首次门外 10 个更晚、无提前。保留原几何为工作点，宽门和原见证作对照；后续设计须有能增加独立证据覆盖的来源，长期状态反馈另评。 [前轮固定环确认](reports/2026-11-12-online-expansion-confirmation.md) · [原边排序与错链证据](reports/2026-11-12-online-nemot-association-diagnostic.md)
    - C-ON34核实MTAD论文的Pd针对整轨抽取，V4评分说明2秒发送片、V3归档更新为10秒。完整空扫、物理可见性、收报时钟仍缺。CD-PMBM/TM-PMBM保留为条件系统候选，DetectorContext作者PR可作机制参照。 [报告生成与发送协议](data_contract.md) · [公开代码迁移筛选](reports/2026-11-12-online-fusion-transfer-review.md)
@@ -49,7 +49,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.36](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-236)，P14/F358/M158/E330/C100|
+|全局问题—现象—机制—证据|[Mode C2.38](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-238)，P14/F363/M161/E341/C103|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|

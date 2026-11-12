@@ -4,6 +4,10 @@
 
 ## 2026-11-12
 
+- [C98 原WS与混合BCE局部分歧及供给保全](2026-11-12-association-partition-disagreement-review.md)
+- [C99 固定真对的逐层条件差与局部恢复](2026-11-12-tmtaff-encoder-contraction-review.md)
+- [C100 近端速度字段区间与同供给多段对照](2026-11-12-near-speed-interval-review.md)
+
 - [C95 负例覆盖与排序增量](2026-11-12-association-negative-coverage-review.md)
 - [C96 冻结条件记忆与生成前缀](2026-11-12-tmtaff-memory-prefix-review.md)
 - [C97 近端最坏绝对速度误差追因](2026-11-12-near-absolute-speed-trace.md)
