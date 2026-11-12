@@ -27,6 +27,7 @@
 - [固定候选图上的在线区间指派](2026-11-12-online-interval-assignment.md)
 - [短错段间隙的新报文与正确持续对照](2026-11-12-online-hypothesis-gap.md)
 - [新报误撤的相对运动与连续性](2026-11-12-online-relative-motion.md)
+- [稀疏共时支撑与同源邻轨共享创新](2026-11-12-online-shared-innovation.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)
