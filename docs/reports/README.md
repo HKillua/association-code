@@ -4,6 +4,8 @@
 
 ## 2026-11-12
 
+- [在线融合的数据处理、公开代码与迁移筛选](2026-11-12-online-fusion-transfer-review.md)
+
 - [C91 固定真对的双源支撑位置监督结果](2026-11-12-tmtaff-support-supervision-review.md)
 
 - [稀疏首报的邻轨证据与见证写入](2026-11-12-online-neighbor-witness.md)
