@@ -9,6 +9,7 @@ import unittest
 
 from online_observation.continuous_tracker import LocalTrack
 from online_observation.hypothesis_gap_diagnostic import Gap, Switch, _collect, _load_frozen, _measure, _score
+from online_observation.hypothesis_gap_later import _capture_later
 from online_observation.nemot_replay import ReplayResult
 
 
@@ -66,6 +67,29 @@ class GapDiagnosticTest(unittest.TestCase):
             with gzip.open(path, "wb") as stream:
                 pickle.dump(("snapshot", [{"counts": Counter([("new_events", 4), ("quiet_events", 1)])}]), stream)
             self.assertEqual(_load_frozen(path), ("snapshot", [{"counts": {"new_events": 4, "quiet_events": 1}}]))
+
+    def test_later_samples_exclude_both_start_and_rejoin(self):
+        events = ((0., POINTS), (10., {A: POINTS[A]}), (11., {A: POINTS[A]}),
+                  (12., {B: POINTS[B]}), (13., {D: POINTS[D]}))
+        reports = [(t, tuple(sorted(points))) for t, points in events]
+        fit = {"translation_east_north_m": None}
+        costs = tuple((edge, 1. if edge in DROP else 2.) for edge in (*KEEP, *DROP))
+        result = ReplayResult({"kf": [(0., groups(KEEP)), (10., groups(DROP)), (13., groups(KEEP))],
+                               "interval_swap": [(0., groups(KEEP))]}, reports, {},
+                              {"fixed_candidate_edge_events": 20, "reports": 8}, fit, {})
+        stream = BytesIO()
+        for t, keys in reports:
+            pickle.dump((t, keys, keys if not t else (), tuple(POINTS), costs,
+                         DROP if 10. <= t < 13. else KEEP), stream)
+        pickle.dump(result, stream)
+        stream.seek(0)
+        gaps, _ = _collect(events, stream, result)
+        stream.seek(0)
+        samples = _capture_later(events, stream, result, gaps)
+        self.assertEqual(len(samples), 1)
+        self.assertEqual(samples[0]["first_later"]["delay"], 1.)
+        self.assertEqual(samples[0]["first_other_source"]["delay"], 2.)
+        self.assertEqual(samples[0]["first_other_source"]["remaining_seconds"], 1.)
 
 
 if __name__ == "__main__":

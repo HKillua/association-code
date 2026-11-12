@@ -124,6 +124,13 @@ def _outside_report(keys, updated, costs):
     return False
 
 
+def _update_priors(priors, stamp, points):
+    for key, point in points.items():
+        old = priors.get(key)
+        priors[key] = (old.updated(stamp, point) if old is not None and stamp-old.stamp <= MEMORY_S
+                       else LocalTrack(stamp, point, point))
+
+
 def _collect(events, graph_stream, result):
     if not events or len(events) != len(result.native_reports):
         raise ValueError("measurements and frozen replay have different lengths")
@@ -223,10 +230,7 @@ def _collect(events, graph_stream, result):
                 sample["registration"] = registration
                 gap.first_quiet = sample
 
-        for key, point in points.items():
-            old = priors.get(key)
-            priors[key] = (old.updated(stamp, point) if old is not None and stamp-old.stamp <= MEMORY_S
-                           else LocalTrack(stamp, point, point))
+        _update_priors(priors, stamp, points)
         counts.update(events=1, reports=len(reports), candidate_edge_events=len(costs))
         previous_kf, previous_interval, previous_costs, previous_stamp = kf, interval, costs, stamp
 
@@ -280,7 +284,7 @@ def _bridges(result, true, by_focal):
                 if gap is not None:
                     row.update(covered_seconds=max(0., min(c, gap["stop"])-b),
                                stop_reason=gap["end"], first_new_delay=None,
-                               group_had_new=bool(gap["counts"]["new_events"]))
+                               group_had_new=bool(gap["counts"].get("new_events", 0)))
                     evidence = gap["first_new"]
                     if evidence is not None and b+evidence["delay"] < c:
                         row["first_new_delay"] = evidence["delay"]
