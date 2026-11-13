@@ -6,9 +6,9 @@
 
 当前在线、离线验证仅使用MTAD。C128保留为历史，C131外部验证暂停。
 
-**C133 READY。** [MTAD原生供体证据](L2S-20261113-c133.md)。Campus SSH MCP一次CPU。
+**C133已收尾。** [首次与修正终态](S2L-20261113-c133.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0。公开与私有缓存复算通过，Record→Squeeze→Mode C2.52完成。C134待筛，当前无离线待执行合同。
 
-**C130已收尾。** [首次与供体整窗保护终态](S2L-20261113-c130.md)。两份冻结合同经Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.51完成，当前无离线待执行合同。
+**C130已收尾。** [首次与供体整窗保护终态](S2L-20261113-c130.md)。两份冻结合同经Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.51完成。
 
 **C127–C129已收尾。** [固定候选池](S2L-20261113-c127.md) · [双GNSS外测历史记录](S2L-20261113-c128.md) · [同组同输入融合](S2L-20261113-c129.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.50完成。
 
@@ -38,7 +38,7 @@
 
 **在线异源互指单报去复用已收尾。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md) · [终态](S2L-20261113-online-reciprocal-report-downdate.md)。原28场科学和聚合真实退出0，独立复算一致，已回流 Mode C v51。
 
-**在线当批几何增量诊断 READY。** [固定合同](L2S-20261113-online-rejoin-geometry.md)。只读原MTAD 28场，先冻尺度和动作，再连旧匿名评价。
+**在线当批几何增量诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-geometry.md) · [终态](S2L-20261113-online-rejoin-geometry.md)。原28场冻结齐备，首次汇总保全，R1只读原件真实退出0，已回流Mode C v59。
 
 **在线接回缓存证据诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-cache.md) · [终态](S2L-20261113-online-rejoin-cache.md)。原MTAD 28场只读核验真实退出0，已回流 Mode C v57。
 

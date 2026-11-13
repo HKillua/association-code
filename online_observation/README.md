@@ -60,4 +60,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.past_motion_shape_gap --help`|在原图和同一已到历史上比较净位移、两段运动变化及同刻屏蔽|
 |`python -m online_observation.rejoin_batch_diagnostic --help`|固定原接回批，对照当前形状、同刻遮蔽和严格较早的缓存形状|
 |`python -m online_observation.rejoin_cache_diagnostic --help`|固定原接回批，核缓存时距、严格批前配对持续和当批几何对照|
+|`python -m online_observation.rejoin_geometry_diagnostic --help`|固定原接回图和时刻，比较原几何增量、候选间距、预测名义方差和逐边残差|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|

@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C133 MTAD借用位置前的原生供体证据](2026-11-13-fusion-native-donor-evidence-review.md)
 - [C130 MTAD固定供体的同启用率位置借用](2026-11-13-fusion-supplier-matched-activation-review.md)
 - [C127 固定候选池的尾部同船供给回收](2026-11-13-fusion-tail-candidate-recovery-review.md)
 - [C128 Autoferry双船GNSS外测资格](2026-11-13-autoferry-dual-gnss-eligibility-review.md)
@@ -55,6 +56,7 @@
 - [四端共同历史的净位移与两段运动变化](2026-11-13-online-past-motion-shape.md)
 - [MTAD 接回当批的几何、当前形状和缓存](2026-11-13-online-rejoin-batch.md)
 - [MTAD 接回缓存的时距、持续性和当批几何](2026-11-13-online-rejoin-cache.md)
+- [MTAD 当批几何增量的尺度和真边残差](2026-11-13-online-rejoin-geometry.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)

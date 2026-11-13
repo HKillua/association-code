@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C133 借用位置前的原生观测证据](fusion_native_donor_evidence_20261113.md)
 - [C130 固定供体、同启用数的缺观测位置借用](fusion_supplier_matched_activation_20261113.md)
 - [C127 固定候选池的尾部同船供给回收](fusion_tail_candidate_recovery_20261113.md)
 - [C128 Autoferry双船独立位置外测资格](autoferry_dual_gnss_eligibility_20261113.md)
@@ -49,6 +50,7 @@
 - [已到历史的两段运动与整组接回](online_past_motion_shape_20261113.md)
 - [MTAD 接回当批的两段运动证据](online_rejoin_batch_20261113.md)
 - [MTAD 接回当批缓存的时距、持续性与几何](online_rejoin_cache_20261113.md)
+- [MTAD 当批几何增量的尺度与真边改善](online_rejoin_geometry_20261113.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)
