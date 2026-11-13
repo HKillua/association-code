@@ -29,4 +29,4 @@ Campus SSH MCP `job-mwf9p0qu-7ef1`，独立 `a8a39d5`，CPU23–25 单线程，�
 - **DE。** 单独只读重算 C107 历史隔离25场/24组件，得到19块/55候选、5个保首、2个安全双降和3个有害保首，同块安全对有害为0。该人口可查冻结方案的外部暴露边界，排序比较容量为零。它未进入本次拟合侧实验。 [C107隔离人口诊断](</Users/a1/Projects/biye-ronghe/docs/evidence/20261114_c139_association_qualification/c107-isolated-preference-ceiling.json>)
 - **AI／UN。** C139 的固定池成对学习配方结束，未启动新训练。优先更换候选生成骨架，在保首保护下比较直接生成可互换的跨源航迹组，与旧“两端点并集”同预算对照。候选阶段独立报告去最大组件后的安全双降覆盖、拒绝有害改变及原有同船支撑毛损失。C139 只测原生机动可见性和旧分数排序，未检验机动残差是否能辨识身份，不能把本结论推到所有结构化学习。 [原文、矩阵与候选范围](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c139_association_native_partition_20261114.md>)
 
-独立复核全部1,748场、8,281分歧块、35,038候选（含原WS）和27,265,828场内无序对，复算1,912次事后切换、同船支持与两个J。另从18场/6组件的量测独立重算1,190条改边原生区间和速度差。 [独立复核原件](</Users/a1/Projects/biye-ronghe/docs/evidence/20261114_c139_association_qualification/independent-audit.json>)
+独立复核全部1,748场、8,281分歧块、35,038候选（含原WS）和27,265,828场内无序对，复算1,912次事后切换、同船支持与两个J。另从18场/6组件的量测独立重算1,190条改边原生区间和速度差。 [独立复核原件](</Users/a1/Projects/biye-ronghe/docs/evidence/20261114_c139_association_qualification/independent-audit.md>)
