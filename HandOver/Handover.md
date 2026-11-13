@@ -6,7 +6,9 @@
 
 当前在线、离线验证仅使用MTAD。C128保留为历史，C131外部验证暂停。
 
-**C133已收尾。** [首次与修正终态](S2L-20261113-c133.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0。公开与私有缓存复算通过，Record→Squeeze→Mode C2.52完成。C134待筛，当前无离线待执行合同。
+**C134 READY。** [原生连续距离冻结合同](L2S-20261113-c134.md)。Campus SSH MCP一次CPU。
+
+**C133已收尾。** [首次与修正终态](S2L-20261113-c133.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0。公开与私有缓存复算通过，Record→Squeeze→Mode C2.52完成。
 
 **C130已收尾。** [首次与供体整窗保护终态](S2L-20261113-c130.md)。两份冻结合同经Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.51完成。
 
