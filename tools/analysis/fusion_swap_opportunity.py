@@ -130,7 +130,7 @@ def delta_summary(events, threshold):
     return dict(counts, harm_sum_m=harm_sum, benefit_sum_m=benefit_sum, net_delta_m=harm_sum-benefit_sum)
 
 
-def compare(events):
+def compare(events, comparisons=COMPARISONS):
     by_arm = defaultdict(dict)
     for row in events:
         arm = row['arm']
@@ -138,7 +138,7 @@ def compare(events):
         assert key not in by_arm[arm]
         by_arm[arm][key] = row
     changes = defaultdict(list)
-    for arm, baseline in COMPARISONS:
+    for arm, baseline in comparisons:
         key = arm+'/'+baseline
         a,b = by_arm[arm],by_arm[baseline]
         for k in a.keys() & b.keys():
