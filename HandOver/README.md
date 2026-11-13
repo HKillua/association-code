@@ -25,6 +25,7 @@
 |C-ON46在线接回当批|[冻结合同](L2S-20261113-online-rejoin-batch.md)|[终态](S2L-20261113-online-rejoin-batch.md)|
 |C-ON47在线接回缓存证据|[冻结合同](L2S-20261113-online-rejoin-cache.md)|[终态](S2L-20261113-online-rejoin-cache.md)|
 |C-ON48在线当批几何增量|[冻结合同](L2S-20261113-online-rejoin-geometry.md)|[终态](S2L-20261113-online-rejoin-geometry.md)|
+|C-ON49在线批前对侧见证|[冻结合同](L2S-20261113-online-rejoin-witness.md)|[终态](S2L-20261113-online-rejoin-witness.md)|
 |C118固定分区的分属性供给|[固定合同](L2S-20261112-c118.md)|[科学与独审](S2L-20261112-c118.md)|
 |C119隔离组件双目标相对位置|[固定合同](L2S-20261112-c119.md)|[科学与独审](S2L-20261112-c119.md)|
 |C120发布参考速度量化|[固定合同](L2S-20261112-c120.md)|[科学与复算](S2L-20261112-c120.md)|

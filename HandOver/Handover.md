@@ -40,7 +40,7 @@
 
 **在线异源互指单报去复用已收尾。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md) · [终态](S2L-20261113-online-reciprocal-report-downdate.md)。原28场科学和聚合真实退出0，独立复算一致，已回流 Mode C v51。
 
-**在线严格批前对侧见证 READY。** [固定合同](L2S-20261113-online-rejoin-witness.md)。原MTAD 28场，保留同刻屏蔽和原形状对照。
+**在线严格批前对侧见证已收尾。** [固定合同](L2S-20261113-online-rejoin-witness.md) · [终态](S2L-20261113-online-rejoin-witness.md)。原 MTAD 28 场真实退出 0，冻结原件独立复算一致，已回流 Mode C v61。
 
 **在线当批几何增量诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-geometry.md) · [终态](S2L-20261113-online-rejoin-geometry.md)。原28场冻结齐备，首次汇总保全，R1只读原件真实退出0，已回流Mode C v59。
 
