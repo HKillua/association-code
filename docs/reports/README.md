@@ -2,6 +2,12 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-13
+
+- [C121 训练侧新增位置供给资格](2026-11-13-fusion-supplier-train-qualification-review.md)
+- [C122 两船风险邻居与指派余量资格诊断](2026-11-13-tmtaff-neighbor-exchange-eligibility-review.md)
+- [C123 官方计分样例、参考写出与独立海事证据](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c123_reference_scorer_provenance_20261113.md>)
+
 ## 2026-11-12
 
 - [C118 固定分区的新增供给分属性读出](2026-11-12-fusion-added-supplier-attributes-review.md)

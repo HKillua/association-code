@@ -2,6 +2,11 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-13
+
+- [C121 训练侧新增位置供给的资格普查](fusion_supplier_train_qualification_20261113.md)
+- [C122 两船风险邻居与指派余量资格诊断](tmtaff_neighbor_exchange_eligibility_20261113.md)
+
 ## 2026-11-12
 
 - [C118 固定分区的新增供给分属性读出](fusion_added_supplier_attributes_20261112.md)

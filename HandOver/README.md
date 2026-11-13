@@ -4,6 +4,8 @@
 
 |编号|原合同L2S|原回执S2L|
 |---|---|---|
+|C121训练侧新增位置供给资格|[固定合同](L2S-20261113-c121.md)|[科学与公开复算](S2L-20261113-c121.md)|
+|C122两船风险邻居与指派余量|[固定合同](L2S-20261113-c122.md)|[科学与公开复算](S2L-20261113-c122.md)|
 |C-ON39在线共时支撑与同源共享创新|[冻结合同](L2S-20261112-online-shared-innovation.md)|[终态](S2L-20261112-online-shared-innovation.md)|
 |C-ON40在线异步报文与预测不确定性|[冻结合同](L2S-20261112-online-async-report.md)|[终态](S2L-20261112-online-async-report.md)|
 |C-ON41在线跨源残差与历史参照|[冻结合同](L2S-20261112-online-cross-source-calibration.md)|[终态](S2L-20261112-online-cross-source-calibration.md)|
