@@ -4,6 +4,7 @@
 
 ## 2026-11-14
 
+- [离线基线重启审计](2026-11-14-offline-baseline-restart-audit.md)
 - [C142 MTAD同锚绝对位置与相对运动残差](2026-11-14-fusion-source-offset-motion-review.md)
 - [C141 MTAD同预算切口与严格供给保护](2026-11-14-association-native-separation-review.md)
 - [C140 MTAD固定组的等权与原生区间分权](2026-11-14-fusion-interval-smoothing-review.md)
