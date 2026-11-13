@@ -31,6 +31,7 @@
 |C-ON49在线批前对侧见证|[冻结合同](L2S-20261113-online-rejoin-witness.md)|[终态](S2L-20261113-online-rejoin-witness.md)|
 |C-ON50在线对侧新报位移|[冻结合同](L2S-20261113-online-rejoin-fresh-displacement.md)|[终态](S2L-20261113-online-rejoin-fresh-displacement.md)|
 |C-ON51在线缓存断口与异步增量|[冻结合同](L2S-20261113-online-rejoin-async-innovation.md)|[终态](S2L-20261113-online-rejoin-async-innovation.md)|
+|C-ON52在线共同创新与同源留出|[冻结合同](L2S-20261113-online-rejoin-common-innovation.md)|[终态](S2L-20261113-online-rejoin-common-innovation.md)|
 |C118固定分区的分属性供给|[固定合同](L2S-20261112-c118.md)|[科学与独审](S2L-20261112-c118.md)|
 |C119隔离组件双目标相对位置|[固定合同](L2S-20261112-c119.md)|[科学与独审](S2L-20261112-c119.md)|
 |C120发布参考速度量化|[固定合同](L2S-20261112-c120.md)|[科学与复算](S2L-20261112-c120.md)|

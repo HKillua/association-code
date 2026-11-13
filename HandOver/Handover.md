@@ -52,7 +52,7 @@
 
 **在线原生时钟异步增量已收尾。** [固定合同](L2S-20261113-online-rejoin-async-innovation.md) · [终态](S2L-20261113-online-rejoin-async-innovation.md)。原 28 场一次 CPU，真实退出 0，已回流 Mode C v65。
 
-**在线双报共同创新和同源留出 READY。** [固定合同](L2S-20261113-online-rejoin-common-innovation.md)。原 28 场固定候选、共量消融、外部供体和弃权对照。
+**在线双报共同创新和同源留出已收尾。** [固定合同](L2S-20261113-online-rejoin-common-innovation.md) · [终态](S2L-20261113-online-rejoin-common-innovation.md)。原 28 场一次 CPU，真实退出 0，已回流 Mode C v67。
 
 **在线当批几何增量诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-geometry.md) · [终态](S2L-20261113-online-rejoin-geometry.md)。原28场冻结齐备，首次汇总保全，R1只读原件真实退出0，已回流Mode C v59。
 
