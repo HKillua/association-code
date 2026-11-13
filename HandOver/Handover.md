@@ -8,6 +8,8 @@
 
 **C138已收尾。** [最近原生报文终态](S2L-20261114-c138.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，公开及私有审计通过，Record→Squeeze→Mode C2.57完成。C139关联、C140融合待冻结；当前无新增离线执行合同。
 
+**C140 READY。** [固定组原生时标平滑合同](L2S-20261114-c140.md)。Campus SSH MCP一次CPU。
+
 **C137已收尾。** [固定配额双向代价终态](S2L-20261113-c137.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，公开和修正后私有审计通过，Record→Squeeze→Mode C2.56完成。
 
 **C136已收尾。** [去重位置证据终态](S2L-20261113-c136.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，两场原生追溯及公开/私有复算通过，Record→Squeeze→Mode C2.55完成。
