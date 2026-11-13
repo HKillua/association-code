@@ -4,9 +4,9 @@
 
 ## 当前执行
 
-**C124 READY。** [新供给回退与位置尾部](L2S-20261113-c124.md)。Campus SSH MCP一次CPU，固定训练侧人口。
+**C124–C126已收尾。** [新供给与位置尾部](S2L-20261113-c124.md) · [两船原生观测](S2L-20261113-c125.md) · [统一四属性](S2L-20261113-c126.md)。Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件已回传。Record→Squeeze→Mode C2.49完成，当前无离线待执行合同。
 
-**C121–C123已收尾。** [训练侧供给终态](S2L-20261113-c121.md) · [近邻与交换终态](S2L-20261113-c122.md) · [发布资产静态审查](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c123_reference_scorer_provenance_20261113.md>)。C121/C122经Campus SSH MCP各一次CPU，科学、worker真实退出0，公开证据已回传复算。C123官方ZIP校验和静态阅读完成。三项已回流Mode C2.48，当前无离线待执行合同。
+**C121–C123已收尾。** [训练侧供给终态](S2L-20261113-c121.md) · [近邻与交换终态](S2L-20261113-c122.md) · [发布资产静态审查](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c123_reference_scorer_provenance_20261113.md>)。C121/C122经Campus SSH MCP各一次CPU，科学、worker真实退出0，公开证据已回传复算。C123官方ZIP校验和静态阅读完成。三项已回流Mode C2.48。
 
 **C118、C119、C120已收尾。** [分属性供给与独审](S2L-20261112-c118.md) · [隔离组件两船位置](S2L-20261112-c119.md) · [发布参考量化](S2L-20261112-c120.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0，公开原件已回传，Record→Squeeze→Mode C2.47完成。
 

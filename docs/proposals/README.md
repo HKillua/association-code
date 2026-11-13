@@ -4,6 +4,9 @@
 
 ## 2026-11-13
 
+- [C124 仅新观测的回退与全域位置尾部溯源](fusion_supplier_tail_lineage_20261113.md)
+- [C125 两船原生相对观测资格](tmtaff_native_relative_witness_20261113.md)
+- [C126 C94与历史113的同一目标时刻对照](../../HandOver/L2S-20261113-c126.md)
 - [C121 训练侧新增位置供给的资格普查](fusion_supplier_train_qualification_20261113.md)
 - [C122 两船风险邻居与指派余量资格诊断](tmtaff_neighbor_exchange_eligibility_20261113.md)
 

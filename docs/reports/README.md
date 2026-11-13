@@ -4,6 +4,9 @@
 
 ## 2026-11-13
 
+- [C124 新供给回退与全域位置尾部溯源](2026-11-13-fusion-supplier-tail-lineage-review.md)
+- [C125 两船原生观测的相对证据](2026-11-13-tmtaff-native-relative-witness-review.md)
+- [C126 T128+FAR与历史113的同场四属性](2026-11-13-tmtaff-c94-paired-review.md)
 - [C121 训练侧新增位置供给资格](2026-11-13-fusion-supplier-train-qualification-review.md)
 - [C122 两船风险邻居与指派余量资格诊断](2026-11-13-tmtaff-neighbor-exchange-eligibility-review.md)
 - [C123 官方计分样例、参考写出与独立海事证据](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c123_reference_scorer_provenance_20261113.md>)
