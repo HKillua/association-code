@@ -60,6 +60,7 @@
 - [MTAD 接回缓存的时距、持续性和当批几何](2026-11-13-online-rejoin-cache.md)
 - [MTAD 当批几何增量的尺度和真边残差](2026-11-13-online-rejoin-geometry.md)
 - [MTAD 接回的严格批前对侧见证](2026-11-13-online-rejoin-witness.md)
+- [MTAD 分歧后对侧位移的去缓存诊断](2026-11-13-online-rejoin-fresh-displacement.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)

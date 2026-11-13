@@ -54,6 +54,7 @@
 - [MTAD 接回当批缓存的时距、持续性与几何](online_rejoin_cache_20261113.md)
 - [MTAD 当批几何增量的尺度与真边改善](online_rejoin_geometry_20261113.md)
 - [MTAD 接回假边恶化的已到对侧见证](online_rejoin_witness_20261113.md)
+- [MTAD 去缓存复用的分歧后对侧位移](online_rejoin_fresh_displacement_20261113.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)
