@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C130 MTAD固定供体的同启用率位置借用](2026-11-13-fusion-supplier-matched-activation-review.md)
 - [C127 固定候选池的尾部同船供给回收](2026-11-13-fusion-tail-candidate-recovery-review.md)
 - [C128 Autoferry双船GNSS外测资格](2026-11-13-autoferry-dual-gnss-eligibility-review.md)
 - [C129 同组同输入融合对照](2026-11-13-tmtaff-same-group-support-review.md)

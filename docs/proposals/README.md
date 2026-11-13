@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C130 固定供体、同启用数的缺观测位置借用](fusion_supplier_matched_activation_20261113.md)
 - [C127 固定候选池的尾部同船供给回收](fusion_tail_candidate_recovery_20261113.md)
 - [C128 Autoferry双船独立位置外测资格](autoferry_dual_gnss_eligibility_20261113.md)
 - [C129 同首组成员与同CAP128输入的融合对照](../../HandOver/L2S-20261113-c129.md)
