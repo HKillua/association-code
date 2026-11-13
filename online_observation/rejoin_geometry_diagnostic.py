@@ -97,28 +97,36 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("gap-run", "anchor-run", "shape-run", "cache-run", "output-dir"):
         parser.add_argument(f"--{name}", type=Path, required=True)
+    parser.add_argument("--resume-frozen", type=Path)
     args = parser.parse_args(argv)
     args.output_dir.mkdir(mode=0o700, exist_ok=False)
-    frozen = args.output_dir / "frozen"
-    frozen.mkdir(mode=0o700)
     began = perf_counter()
-    for index in range(1, 29):
-        name = f"scene_{index:02d}.pkl.gz"
-        original, gaps = _load_frozen(args.gap_run / "private_frozen" / name)
-        captured = _capture(original, gaps, _read_frozen(args.anchor_run / "private_frozen" / name),
-                            _read_frozen(args.shape_run / "frozen" / name),
-                            _read_frozen(args.cache_run / "frozen" / name))
-        with gzip.open(frozen / name, "xb", compresslevel=1) as stream:
-            pickle.dump(captured, stream, protocol=pickle.HIGHEST_PROTOCOL)
+    filenames = tuple(f"scene_{index:02d}.pkl.gz" for index in range(1, 29))
+    frozen = args.resume_frozen or args.output_dir / "frozen"
+    if args.resume_frozen is None:
+        frozen.mkdir(mode=0o700)
+        for name in filenames:
+            original, gaps = _load_frozen(args.gap_run / "private_frozen" / name)
+            captured = _capture(original, gaps, _read_frozen(args.anchor_run / "private_frozen" / name),
+                                _read_frozen(args.shape_run / "frozen" / name),
+                                _read_frozen(args.cache_run / "frozen" / name))
+            with gzip.open(frozen / name, "xb", compresslevel=1) as stream:
+                pickle.dump(captured, stream, protocol=pickle.HIGHEST_PROTOCOL)
+    if {path.name for path in frozen.glob("*.pkl.gz")} != set(filenames):
+        raise ValueError("the replay requires all 28 frozen scenes, including empty ones")
     print("All geometric evidence and actions frozen. Joining anonymous evaluation.", flush=True)
     previous = json.loads((args.cache_run / "rows.json").read_text(encoding="utf-8"))
     by_scene = defaultdict(list)
     for row in previous:
         by_scene[row["scene"]].append(row)
     output = []
-    for alias, source_rows in by_scene.items():
-        captured = _read_frozen(frozen / f"{alias}.pkl.gz")
-        for old, data in zip(source_rows, captured, strict=True):
+    aliases = {name.removesuffix(".pkl.gz") for name in filenames}
+    if not by_scene.keys() <= aliases:
+        raise ValueError("a joined row has a scene outside the frozen roster")
+    for name in filenames:
+        alias = name.removesuffix(".pkl.gz")
+        captured = _read_frozen(frozen / name)
+        for old, data in zip(by_scene.get(alias, ()), captured, strict=True):
             if old["decisions"]["original"] is None:
                 output.append(old | dict(features=None, decisions=dict.fromkeys(ARMS)))
                 continue
@@ -126,12 +134,13 @@ def main(argv=None):
                     data["decisions"][arm] != old["decisions"][arm] for arm in CONTROLS):
                 raise ValueError("the original causal trigger or controls changed")
             output.append(old | dict(features=data["features"], decisions=data["decisions"]))
-    if (len(output), len(by_scene), sum(x["features"] is not None for x in output)) != (482, 28, 416):
+    if (len(output), sum(x["features"] is not None for x in output)) != (482, 416):
         raise ValueError("the original evaluation population changed")
     comparisons = summarize(output)
     _write_json(args.output_dir / "rows.json", output)
     _write_json(args.output_dir / "summary.json", dict(
-        clock="ideal_native_measurement_time", frozen_windows=len(output), eligible_rejoins=416,
+        clock="ideal_native_measurement_time", frozen_scenes=len(filenames), frozen_windows=len(output), eligible_rejoins=416,
+        resumed_frozen=args.resume_frozen is not None,
         new_measurement_reads=0, external_dataset_reads=0, training_updates=0,
         original_candidate_graph_unchanged=True, original_publications_unchanged=True,
         wall_seconds=perf_counter()-began, **comparisons))
