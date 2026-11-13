@@ -48,6 +48,7 @@
 - [单锚跨目标迁移与正确接回](2026-11-13-online-single-anchor-transfer.md)
 - [双报端点覆盖、预测复用与错接预警](2026-11-13-online-disjoint-report-closure.md)
 - [异源互指剔除前报更新后的晚报证据](2026-11-13-online-reciprocal-report-downdate.md)
+- [四端共同历史的净位移与两段运动变化](2026-11-13-online-past-motion-shape.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)

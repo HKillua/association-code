@@ -57,4 +57,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.single_anchor_transfer_gap --help`|从冻结的跨源残差核单锚的跨目标误差、真假候选排序和弃权|
 |`python -m online_observation.disjoint_report_closure_gap --help`|从冻结的两批报告核四端点覆盖、异源互指及分别遮蔽早报和晚报|
 |`python -m online_observation.reciprocal_report_downdate_gap --help`|从前态重建晚报对侧预测，隔离一条已进入预测的前报更新|
+|`python -m online_observation.past_motion_shape_gap --help`|在原图和同一已到历史上比较净位移、两段运动变化及同刻屏蔽|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|

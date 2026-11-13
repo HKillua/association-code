@@ -42,6 +42,7 @@
 - [单锚跨目标均值迁移与接回保护](online_single_anchor_transfer_20261113.md)
 - [两批报文的端点覆盖与相对残差](online_disjoint_report_closure_20261113.md)
 - [异源互指的单报预测去复用](online_reciprocal_report_downdate_20261113.md)
+- [已到历史的两段运动与整组接回](online_past_motion_shape_20261113.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)

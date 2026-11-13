@@ -32,6 +32,8 @@
 
 **在线异源互指单报去复用已收尾。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md) · [终态](S2L-20261113-online-reciprocal-report-downdate.md)。原28场科学和聚合真实退出0，独立复算一致，已回流 Mode C v51。
 
+**在线已到历史运动变化已收尾。** [固定合同](L2S-20261113-online-past-motion-shape.md) · [终态](S2L-20261113-online-past-motion-shape.md)。原28场科学及汇总真实退出0，独立复算一致，已回流 Mode C v53。
+
 **在线双报端点和预测复用已收尾。** [固定合同](L2S-20261113-online-disjoint-report-closure.md) · [终态](S2L-20261113-online-disjoint-report-closure.md)。原28场一次CPU，真实退出0，已回流Mode C v49。
 
 **在线相对运动与连续报文已收尾。** [固定合同](L2S-20261112-online-relative-motion.md) · [终态](S2L-20261112-online-relative-motion.md)。原28场一次CPU，真实退出0，已回流Mode C v39。
