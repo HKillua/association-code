@@ -63,4 +63,5 @@ python -m unittest discover -s online_observation/tests
 |`python -m online_observation.rejoin_geometry_diagnostic --help`|固定原接回图和时刻，比较原几何增量、候选间距、预测名义方差和逐边残差|
 |`python -m online_observation.rejoin_witness_diagnostic --help`|固定原接回图和时刻，对照严格批前对侧历史、同刻屏蔽和原形状|
 |`python -m online_observation.rejoin_fresh_displacement_diagnostic --help`|固定原接回图与位移区间，逐报剔除旧缓存并记录新报支撑、坐标遮蔽和接回动作|
+|`python -m online_observation.rejoin_async_innovation_diagnostic --help`|复算旧缓存形成的断口，在各条原生新报的时刻比较批前预测、实报和坐标遮蔽|
 |`python -m online_observation.fusion_probe --help`|固定身份的逐秒位置控制及跨源权重比较|
