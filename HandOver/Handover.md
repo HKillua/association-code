@@ -60,6 +60,8 @@
 
 **在线接回前单轨历史诊断已收尾。** [固定合同](L2S-20261114-online-rejoin-track-history.md) · [终态](S2L-20261114-online-rejoin-track-history.md)。原 28 场一次 CPU，真实退出 0，已回流 Mode C v69。
 
+**在线接回前后报与更新消融已收尾。** [固定合同](L2S-20261114-online-rejoin-next-report.md) · [终态](S2L-20261114-online-rejoin-next-report.md)。原 28 场一次 CPU，真实退出 0，已回流 Mode C v71。
+
 **在线当批几何增量诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-geometry.md) · [终态](S2L-20261113-online-rejoin-geometry.md)。原28场冻结齐备，首次汇总保全，R1只读原件真实退出0，已回流Mode C v59。
 
 **在线接回缓存证据诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-cache.md) · [终态](S2L-20261113-online-rejoin-cache.md)。原MTAD 28场只读核验真实退出0，已回流 Mode C v57。
