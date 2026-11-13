@@ -1,4 +1,4 @@
-"""Compatibility entry for :mod:`tools.online.pipeline_timing`."""
+"""Compatibility entry for :mod:`tools.offline.pipeline_timing`."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,7 +7,7 @@ import sys
 if __package__ in (None, ''):
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.online import pipeline_timing as _implementation
+from tools.offline import pipeline_timing as _implementation
 
 if __name__ == '__main__':
     _implementation.main()

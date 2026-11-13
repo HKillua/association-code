@@ -6,7 +6,7 @@
 
 |边界|入口与原件|
 |---|---|
-|应用收到已分轨measurement CSV字节→清洗/运动/关联/分组/融合→全部组JSON bytes|[离线方法前缀计时入口](../online/README.md)、[历史整链计时说明](../../docs/reports/2026-11-05-pipeline-online-timing.md)|
+|应用收到已分轨measurement CSV字节→清洗/运动/关联/分组/融合→全部组JSON bytes|[离线方法前缀计时入口](../offline/README.md#历史整链前缀计时)、[历史整链计时说明](../../docs/reports/2026-11-05-pipeline-online-timing.md)|
 |缓存motion→单组后端输出；不包含完整前端|[单组后端计时说明](../../docs/reports/2026-11-05-deployment-timing.md)；原一次性脚本保存在[资料库原件](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261105_deployment_timing/originals/timing_script.py)，不在本仓工具目录|
 
 两种边界不能互换；计时入口不含雷达回波检测、单传感器建轨或网络/显示，也不提供新的精度结论。

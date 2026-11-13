@@ -7,6 +7,7 @@ python -m tools.offline --help
 python -m tools.offline system-evaluate --help
 python -m tools.offline tmtaff-evaluate --help
 python -m tools.offline peer-train --help
+python -m tools.offline pipeline-timing --help
 ```
 
 这是源代码 checkout 的工具入口，当前安装包不包含 `tools`。研究目标和实验执行安排分别见[研究状态](../../docs/research_status.md)与[交接](../../HandOver/Handover.md)。
@@ -52,6 +53,19 @@ python -m tools.offline system-evaluate \
 - 原模型、损失、数据人口、末步选取、失败保全及输出格式保持不变，无自动重试、续训或测试集访问。
 
 实现见 [peer_fit.py](peer_fit.py)，条件与差异见[既定训练规格](../../docs/proposals/fusion_peer_full_training_20261030.md)。作者数值复现、我们的同协议适配是另需明确数据/窗口/选模条件的工作，不能只换入口名称就认定完成。
+
+## 历史整链前缀计时
+
+`pipeline-timing` 复现 2026 年 11 月 5 日的离线模型整链工程计时。每份已收到的量测前缀从 CSV 解码开始，重新计算关联、分组、融合和 Q64 输出，计时到 JSON 序列化完成。输入沿用原场景、冻结权重和运行产物，输出写入新的 `--output` 目录。`--completed-run` 可复用原修正合同的四条已核计时。运行范围见[原合同](../../HandOver/L2S-20261105-pipeline-timing.md)和[修正合同](../../HandOver/L2S-20261105-pipeline-timing-repair.md)，结果和边界见[历史报告](../../docs/reports/2026-11-05-pipeline-online-timing.md)。
+
+```bash
+python -m tools.offline pipeline-timing \
+  --root "$RUNS" \
+  --output "$NEW_OUTPUT" \
+  --time-policy advisory
+```
+
+[实现](pipeline_timing.py)保留原输入、参数及结果格式。旧 `python -m tools.online pipeline-timing`、`python -m tools.analysis.deployment_pipeline_timing` 和历史合同中的直接脚本均转发到同一实现。
 
 ## 兼容与验证
 

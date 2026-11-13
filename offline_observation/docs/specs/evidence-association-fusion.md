@@ -17,7 +17,7 @@ MTAD的measurement是一条已带本地航迹编号的状态记录：`source、b
 |关联评分|全部`i<j`航迹对→056基础分数；HARD/STRUCT组合另加上下文残差|[evidence_association.py](../../association/models/evidence_association.py)、[association_context.py](../../association/models/association_context.py)|
 |构组|边分数→互不重复、覆盖全部输入节点的组；下述整链组合使用WS聚合|[static_partition_pilot.py](../../tools/analysis/static_partition_pilot.py)的`agglomerate`|
 |融合与恢复|每组运动证据→该组各query的状态；后端按组合接159＋178/O或PTFM/DeepAF|[source_risk.py](../../association/evaluation/source_risk.py)、[history_candidates.py](../../association/evaluation/history_candidates.py)、[同行组预测输入与实现](../../association/models/fusion_peer_inputs.py)|
-|输出|组成员、query时刻和状态→可发送的JSON bytes|[group_prediction.py](../../association/evaluation/group_prediction.py)、[离线骨架的历史应用计时](../../tools/online/README.md)|
+|输出|组成员、query时刻和状态→可发送的JSON bytes|[group_prediction.py](../../association/evaluation/group_prediction.py)、[离线骨架的历史应用计时](../../tools/offline/README.md#历史整链前缀计时)|
 |评价|保存预测与身份/reference→关联、覆盖及逐属性误差|[论文指标](../mtad_data_protocols.md)、[数据与评价约定](../data_contract.md)|
 
 Q64是覆盖当前场景时间范围的计算/评价网格，不是传感器采样频率，也不代表每秒输出64次。完整窗口允许使用某个历史query之后的观测；按已到数前缀重算与维护增量状态是不同实现。

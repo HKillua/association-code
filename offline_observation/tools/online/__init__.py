@@ -1,1 +1,1 @@
-"""Historical prefix timing for the offline pipeline."""
+"""Compatibility paths for historical offline prefix timing."""

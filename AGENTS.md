@@ -1,6 +1,6 @@
 # 仓库入口
 
-- 本仓的现行研究入口是[离线观测](offline_observation/AGENTS.md)。在线任务到[独立在线仓库](https://github.com/HKillua/assocaition-research)执行，从对应仓的研究状态、交接、文献和技能开始。只有任务明确涉及两线时才读取两边的研究上下文。
-- `online_observation/` 保留拆仓快照，按历史提交定位。两仓各自维护代码、配置、测试、实验文档和运行记录。原 MTAD 数据和冻结划分可作为各自的外部数据输入。
+- 本仓从[离线观测](offline_observation/AGENTS.md)进入。在线任务从[独立在线仓库](https://github.com/HKillua/assocaition-research)进入，使用该仓的研究状态、交接和文献。
+- 原 MTAD 数据和冻结划分按本路线数据约定提供。历史命令按原合同定位对应提交与工作目录。
 - **每次科研实验都必须完整遵循用户指定的[飞书科研流程](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd)。** 在线和离线均适用，包括基线复现、组合探索、诊断、消融、回放和留场。执行时读本路线的完整流程，按当次实验关联来源、矩阵、Idea、实际执行、Record、Squeeze 和回流证据。
 - 检查工作区和远端，保护他人修改与冻结运行。用户授权必要核验及提交、推送到现仓。目录重构属于工程工作，科学验证及服务器领取继续遵循各路线的实验合同。

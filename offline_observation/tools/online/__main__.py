@@ -7,7 +7,7 @@ import sys
 
 
 COMMANDS = {
-    'pipeline-timing': 'tools.online.pipeline_timing',
+    'pipeline-timing': 'tools.offline.pipeline_timing',
 }
 
 

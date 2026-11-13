@@ -14,6 +14,7 @@
 |2026-11-02状态/交接完整文本|[过程全文](2026-11-02-research-process.md)|
 |两轮整理的范围和验证|[整理记录](2026-11-02-repository-organization.md)|
 |2026-11-10存储瘦身、工具退役与入口纠正|[整理与恢复记录](2026-11-10-repository-maintenance.md)|
+|2026-11-05离线模型整链前缀计时|[复现入口](../../tools/offline/README.md#历史整链前缀计时) · [报告与原合同](../reports/2026-11-05-pipeline-online-timing.md)|
 
 ## 保留的研究事实
 

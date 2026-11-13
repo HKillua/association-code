@@ -1,4 +1,4 @@
-"""Prepare a received measurement prefix for the existing engineering replay.
+"""Prepare a received measurement prefix for historical offline timing.
 
 The cutoff constrains observation availability; the output remains the historical
 Q64 query grid used by the original timing protocol, not a current-state query.
