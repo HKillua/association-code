@@ -1,0 +1,27 @@
+# C119 · 隔离组件的等启用量双目标相对位置门
+
+## Record
+
+`EXPERIMENT_RECORD REC-TMTAFF-PAIR-RELATIVE-HOLDOUT-20261112` v1.0，2026-11-12，verified。消费 `IDEA-TMTAFF-PAIR-RELATIVE-HOLDOUT-20261112`、Mode C2.46/C119、M177、C115 与 C107。全部原25场/24组件与原T/V及封存组件、C105 T8、C108 V48/V57、C115 校准和评价组件隔离。C107/C113 以前在这些场计算了旧分组位置等四属性，C107 隔离组旧 WS/canonical_all Mean 的 3,869 个共同位置 MAE/P99 为 1.483/8.942 km。该分组人口和原生支撑不同。本轮固定两异身份真跨源对、CAP128、C107 Q64及原参考，评价 50 个真对、3,200 个输出、2,169 个参考有效位置。事前资格普查只核人口、间距计数及原缓存机会。正式七臂均在读取评价数组前保存，无训练或原档标签、参考和封存读取。 [事前设计](../proposals/tmtaff_pair_relative_holdout_20261112.md) · [原C107隔离指标](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_association_registered_holdout_fusion/science/summary.json) · [S2L](../../HandOver/S2L-20261112-c119.md)
+
+冻结 C105 44 系数与 C115 V48 刻度。同一 477.722 m 限幅的主三臂每场均用原双支撑机会半数取整，合计 388/784 个位置。相对门只替换选择，共改 24 个动作槽、集中于 3 场，输出覆盖保持。全部 52 个真实近距 Q 来自4场，39 个至少一端有双支撑机会，分布3场。其中 21/39 被 Mean 的≤1 km预测间距门覆盖。所有真近距中命中23/52，预测近距33个。 [科学聚合](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_tmtaff_pair_relative_holdout/science/summary.json) · [冻结名册](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_tmtaff_pair_relative_holdout/science/freeze.json)
+
+| 位置臂 | 全域 MAE / P99 km | 实际动作 | 同启用点 Mean→本臂 P99 m | >250m / >1km 增害 | 自身启用的真实近距对，向量 MAE km，正确数 |
+| --- | ---: | ---: | ---: | ---: | --- |
+| Mean | 1.850 / 13.953 | 0 | — | 0 / 0 | — |
+| C108 双支撑全开 | 1.636 / 13.953 | 784 | 2454.5→2640.7 | 65 / 2 | 39对，0.992→0.950，26→30 |
+| 幅度限幅 | 1.809 / 13.953 | 388 | 2381.9→2348.6 | 27 / 0 | 20对，0.882→1.115，11→13 |
+| 质量限幅 | 1.801 / 13.953 | 388 | 2514.0→2515.2 | 36 / 0 | 20对，0.979→1.084，10→12 |
+| 相对限幅 | 1.801 / 13.953 | 388 | 2514.0→2515.2 | 36 / 0 | 19对，1.056→1.034，14→14 |
+| 固定质量限幅 | 1.804 / 13.953 | 400 | 2222.7→2410.5 | 44 / 0 | 15对，1.038→1.055，7→7 |
+| 固定相对限幅 | 1.805 / 13.953 | 391 | 2241.3→2417.3 | 42 / 0 | 7对，1.030→0.988，7→7 |
+
+相对门在 26 个质量或相对门实际启用的固定近距并集，向量 MAE 1.093→0.997 km，正确分配 18→16。自身近距可比较样本满足预设的描述规模，自身对 Mean 的向量误差略降且正确数持平。相对质量门的近距启用 20→19、正确数减少、同点启用 P99 增加 1.153 m，联合门未通过。固定迁移的 400→391 个动作和 15→7 个近距动作单列。
+
+## Squeeze
+
+`SQUEEZE_REPORT SQ-TMTAFF-PAIR-RELATIVE-HOLDOUT-20261112` v1.0，verified。 [独立数组复算](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_tmtaff_pair_relative_holdout/array-recomputation.json) · [相对代价复算](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_tmtaff_pair_relative_holdout/relative-penalty-audit.json)
+
+- **DE** 归因于同预算选项的相对代价由 13.137→2.381。预测近距区域去掉 12 个动作、加入 2 个，其余 10 个动作移到预测非近距区域。在真实近距中的双端动作从 1 个增至 3 个。固定活动并集改善 96.5 m 向量 MAE，13 个共同活动近距对仍改善 66.4 m，其中 1 对失去正确指派；另 1 对损失来自只在质量门动作的 7 对。这表明向量收益可与身份几何反转同现，单靠少做动作也解释不了全部收益。
+- **DE** 全域相对臂与质量臂 MAE 相差约 0.113 m，全域 P95/P99及 >250 m 增害相同，逐一去组件后全域 P99 相对 Mean 都保持。原双支撑全开臂的平均精度更好，39 个实际近距对同点向量也有改善，但启用组 P99 增 186.2 m，有 2 个公里级增害。两类方案保留各自取舍，不按单项优点跨臂拼成绩。
+- **AI / UN** 可观测相对修正有控制连续向量误差的价值，本实验的预测近邻门漏掉了 18/39 个有动作机会的真实近距 Q，且代价没有直接保护身份交换边界。现在保留 Mean。若后续存在另行冻结的可比较场，可先验证基于输入不确定性的近邻集合及交换余量是否可预测；已有结果只支持 C119 的条件分解，尚不支持统一四属性或整系统结论。

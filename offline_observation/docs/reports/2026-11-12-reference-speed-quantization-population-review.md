@@ -1,0 +1,28 @@
+# C120 · 固定开发场的参考速度单位和写出形态
+
+## Record
+
+`REC-C120-REFERENCE-SPEED-QUANTIZATION-20261112`，completed，plan1.0。消费 C120、P02/P14×F383/F384/F391/F396/F397、M178。C117同一12普通场/12组件、8历史尾部场/2组件，同一发布Level1原reference。独立CPU27运行4.872秒，科学/worker均真实退出0。原始速度按同场同A-B同原时刻的十进制数去重。同刻冲突及无效速度分别保留，零速单列，无身份和无时刻均0。可比相邻人口、正负超额及双段反向/同向分类逐轨与C117相等。0量测、标签、封存、新预测或训练，正式参考和评分原样。 [冻结Idea](../proposals/reference_speed_quantization_population_20261112.md) · [终态](../../HandOver/S2L-20261112-c120.md) · [公开原件](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_reference_speed_quantization)
+
+| 固定指标 | 普通12场 | 历史尾部场全参考8场 |
+|---|---:|---:|
+| 原行／同身份唯一原时刻 | 7,069／7,063 | 105,916／105,365 |
+| 正速度／零速／冲突／无效 | 6,684／374／4／1 | 101,801／3,290／258／16 |
+| 不同正速度数 | 195 | 239 |
+| 距0.1节精确换算格点≤0.5e−6 m/s | 5,964 | 91,329 |
+| ≤1e−6 m/s | 6,684 | 101,795 |
+| ≤2e−6 m/s | 6,684 | 101,801 |
+| 距0.514粗换算格或0.1m/s格≤1e−6 m/s | 0／0 | 0／0 |
+| 两端正值均贴主格／正超额区间 | 370／390 | 1,837／1,844 |
+| 三端正值均贴主格／双超额反向回跳 | 168／186 | 913／916 |
+| 三端正值均贴主格／双超额同向 | 8／8 | 9／9 |
+
+主格用每0.1节按 `1852/3600` 换算成m/s并取1e−6 m/s。正超额为位置几何速度超两端最大原速度>10m/s，反向回跳需连续两段均正超额、夹角≥120°和合并净距≤路径50%。剩余正超额区间和反向回跳中至少一个端点为零，所有非零端点仍贴主格。其余C117可比普通区间6,551/101,832，在尾部组3个含偏格端点。尾部组28个负超额区间中7个含偏格端点（5个只有一端、2个两端），21个两端均贴格。相邻区间可共享原时刻，不能视为独立事件。
+
+## Squeeze
+
+`SQ-C120-REFERENCE-SPEED-QUANTIZATION-20261112`，verified。**DE** 把C117代表例扩到固定20场，108,485个正端点中108,479个（99.9945%）在1e−6 m/s内。严格未命中6个均在场4771，四个速度值对应39.1、53.7、97.3、98.6节，距各自格点1.222–1.778×10⁻⁶ m/s，在固定2e−6容差全部吻合。两组未见与1022或1023数值对应的正速度。位置超额和回跳与同向反例并存，速度的量化规则在这些正超额类别中一致。 [分场计数和频表](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_reference_speed_quantization/science) · [精确复核](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_reference_speed_quantization/local-public-audit.json)
+
+**DE／AI** 在已回传的速度频表作探索性复算。把最近的0.1节整数码精确转为m/s，转IEEE 754 binary32后以六位小数输出，可按数值重现108,485/108,485个正端点、两组共250种码。重叠184种码在两组输出完全相同。直接精确换算再保留六位为97,293/108,485，先把节数转binary32再换算并转binary32为97,062/108,485。六个严格格点例外都可由前述binary32候选重现。此步骤在观测结果后开展，只支持一种与发布字段一致的数值写出过程；相同数字仍可能由多个作者实现产生。 [探索复算及反例](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261112_reference_speed_quantization/local-public-audit.json) · [AIS SOG规范](https://navcen.uscg.gov/ais-class-a-reports)
+
+**UN** 官方ScienceDB V2记录和DataCite注册元数据给出了成品发布来源。当前仍缺母报供应商、真实采集日期与逐场可逆变换、成品 `真实场景` 的写入代码。无法把量化重现等同于实际SOG标签真值，也不能定位位置跳变最初由哪个环节引入。后续用独立真速度核对须有真实的母报绑定或独立传感器证据。 [公开资产复核](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/offline_c120_reference_asset_lineage_20261112.md)

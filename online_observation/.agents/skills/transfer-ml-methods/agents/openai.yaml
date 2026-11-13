@@ -1,0 +1,3 @@
+interface:
+  display_name: "跨领域机器学习方法迁移"
+  short_description: "从失败现象深挖机制与生效条件，设计有证据支撑的方法迁移和消融验证方案"

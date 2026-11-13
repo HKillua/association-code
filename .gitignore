@@ -9,6 +9,9 @@ venv/
 .env.*
 !.env.example
 .DS_Store
+build/
+dist/
+*.egg-info/
 /data/
 datasets/
 outputs/
