@@ -28,7 +28,7 @@
 
 **在线单锚跨目标迁移已收尾。** [固定合同](L2S-20261113-online-single-anchor-transfer.md) · [终态](S2L-20261113-online-single-anchor-transfer.md)。原28场一次CPU，真实退出0，已回流Mode C v47。
 
-**在线双报端点和预测复用 READY，本地会话执行。** [固定合同](L2S-20261113-online-disjoint-report-closure.md)。原28场冻结报文，零训练与新场。
+**在线双报端点和预测复用已收尾。** [固定合同](L2S-20261113-online-disjoint-report-closure.md) · [终态](S2L-20261113-online-disjoint-report-closure.md)。原28场一次CPU，真实退出0，已回流Mode C v49。
 
 **在线相对运动与连续报文已收尾。** [固定合同](L2S-20261112-online-relative-motion.md) · [终态](S2L-20261112-online-relative-motion.md)。原28场一次CPU，真实退出0，已回流Mode C v39。
 
