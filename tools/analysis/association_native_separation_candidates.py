@@ -105,12 +105,13 @@ def pair_evidence(a, b):
 def cut_candidates(nodes, heads, margins, seeds, counters):
     """Minimize nonnegative frozen pair capacity with the original heads retained."""
     weights = np.maximum(0., margins[np.ix_(nodes, nodes)])
-    graph = nx.Graph()
-    graph.add_nodes_from(range(len(nodes)+2))
     left, right = len(nodes), len(nodes)+1
     i, j = np.nonzero(np.triu(weights, 1))
-    graph.add_weighted_edges_from(zip(i.tolist(), j.tolist(), weights[i, j].tolist()), weight='capacity')
-    hard = float(weights.sum()+1.)
+    ratios = [weight.as_integer_ratio() for weight in weights[i,j].tolist()]
+    denominator = max((d for _, d in ratios), default=1)
+    # All binary floating-point denominators are powers of two. Convert the
+    # exact stored capacities to integers, with no rounding or new cutoff.
+    edges = [(int(a), int(b), n*(denominator//d)) for a,b,(n,d) in zip(i,j,ratios,strict=True)]
     node_index = {node: i for i, node in enumerate(nodes)}
     head_limit = {i for i, node in enumerate(nodes) if len(heads) == 2 and node < heads[1]}
     for pair in seeds:
@@ -123,28 +124,36 @@ def cut_candidates(nodes, heads, margins, seeds, counters):
                 right_nodes.add(node_index[heads[1]])
             if left_nodes & right_nodes:
                 continue
-            edges = [(left, i) for i in sorted(left_nodes)]+[(right, j) for j in sorted(right_nodes)]
-            graph.add_edges_from(edges, capacity=hard)
+            mapping = [left if k in left_nodes else right if k in right_nodes else k
+                       for k in range(len(nodes))]
+            capacities = Counter()
+            for u,v,cost in edges:
+                a,b = mapping[u],mapping[v]
+                if a != b:
+                    capacities[min(a,b),max(a,b)] += cost
+            graph = nx.Graph()
+            graph.add_nodes_from(sorted(set(mapping)))
+            graph.add_weighted_edges_from(((*edge,cost) for edge,cost in capacities.items()), weight='capacity')
             value, (side, other) = nx.minimum_cut(graph, left, right, flow_func=nx.algorithms.flow.edmonds_karp)
-            graph.remove_edges_from(edges)
-            assert left_nodes <= side and right_nodes <= other
-            labels = np.array([int(i in other) for i in range(len(nodes))])
+            assert left in side and right in other
+            labels = np.array([int(k in other) for k in mapping])
+            assert all(labels[k]==0 for k in left_nodes) and all(labels[k]==1 for k in right_nodes)
+            assert value == sum(cost for a,b,cost in edges if labels[a] != labels[b])
             calculated = weights[np.triu(labels[:, None] != labels[None, :], 1)].sum()
-            np.testing.assert_allclose(value, calculated, atol=1e-9, rtol=1e-12)
+            np.testing.assert_allclose(value/denominator, calculated, atol=1e-9, rtol=1e-12)
             if len(nodes) <= 8 and counters['exhaustive_cut_checks'] < 64:
                 feasible = []
                 free = sorted(set(range(len(nodes)))-left_nodes-right_nodes)
                 for mask in range(1 << len(free)):
                     selected = left_nodes | {u for k, u in enumerate(free) if mask & (1 << k)}
-                    rest = sorted(set(range(len(nodes)))-selected)
-                    feasible.append(weights[np.ix_(sorted(selected), rest)].sum())
-                np.testing.assert_allclose(value, min(feasible), atol=1e-9, rtol=1e-12)
+                    feasible.append(sum(cost for a,b,cost in edges if (a in selected) != (b in selected)))
+                assert value == min(feasible)
                 counters['exhaustive_cut_checks'] += 1
-            candidate = (float(value), tuple(c98.frozen.canonical_membership(labels, len(nodes))))
+            candidate = (value, tuple(c98.frozen.canonical_membership(labels, len(nodes))))
             if best is None or candidate < best:
                 best = candidate
         if best is not None:
-            yield pair, best
+            yield pair, (best[0]/denominator,best[1])
 
 
 def make_candidate(nodes, labels, ws, motion, margins):
