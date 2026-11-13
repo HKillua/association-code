@@ -7,6 +7,8 @@
 - [C138 最近原生报文的方向余量](fusion_near_report_20261114.md)
 - [C139 原生事件编码和整分区偏好](association_native_partition_preferences_20261114.md)
 - [C140 固定关联组的原生时标稳健平滑](fusion_interval_weighted_smoothing_20261114.md)
+- [C141 同源近时报文持续分离的候选生成](association_native_separation_candidates_20261114.md)
+- [C142 对称位置锚下的同源相对运动融合](fusion_source_offset_motion_20261114.md)
 
 ## 2026-11-13
 
