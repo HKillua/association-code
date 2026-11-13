@@ -4,9 +4,9 @@
 
 ## 当前执行
 
-**C127 READY。** [固定候选池的尾部供给回收](L2S-20261113-c127.md)。Campus SSH MCP一次CPU，固定C124训练侧人口。
+**C127–C129已收尾。** [固定候选池](S2L-20261113-c127.md) · [双GNSS外测资格](S2L-20261113-c128.md) · [同组同输入融合](S2L-20261113-c129.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.50完成，当前无离线待执行合同。
 
-**C124–C126已收尾。** [新供给与位置尾部](S2L-20261113-c124.md) · [两船原生观测](S2L-20261113-c125.md) · [统一四属性](S2L-20261113-c126.md)。Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件已回传。Record→Squeeze→Mode C2.49完成，当前无离线待执行合同。
+**C124–C126已收尾。** [新供给与位置尾部](S2L-20261113-c124.md) · [两船原生观测](S2L-20261113-c125.md) · [统一四属性](S2L-20261113-c126.md)。Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件已回传。Record→Squeeze→Mode C2.49完成。
 
 **C121–C123已收尾。** [训练侧供给终态](S2L-20261113-c121.md) · [近邻与交换终态](S2L-20261113-c122.md) · [发布资产静态审查](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c123_reference_scorer_provenance_20261113.md>)。C121/C122经Campus SSH MCP各一次CPU，科学、worker真实退出0，公开证据已回传复算。C123官方ZIP校验和静态阅读完成。三项已回流Mode C2.48。
 

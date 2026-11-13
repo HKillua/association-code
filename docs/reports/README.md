@@ -4,6 +4,9 @@
 
 ## 2026-11-13
 
+- [C127 固定候选池的尾部同船供给回收](2026-11-13-fusion-tail-candidate-recovery-review.md)
+- [C128 Autoferry双船GNSS外测资格](2026-11-13-autoferry-dual-gnss-eligibility-review.md)
+- [C129 同组同输入融合对照](2026-11-13-tmtaff-same-group-support-review.md)
 - [C124 新供给回退与全域位置尾部溯源](2026-11-13-fusion-supplier-tail-lineage-review.md)
 - [C125 两船原生观测的相对证据](2026-11-13-tmtaff-native-relative-witness-review.md)
 - [C126 T128+FAR与历史113的同场四属性](2026-11-13-tmtaff-c94-paired-review.md)

@@ -4,6 +4,9 @@
 
 ## 2026-11-13
 
+- [C127 固定候选池的尾部同船供给回收](fusion_tail_candidate_recovery_20261113.md)
+- [C128 Autoferry双船独立位置外测资格](autoferry_dual_gnss_eligibility_20261113.md)
+- [C129 同首组成员与同CAP128输入的融合对照](../../HandOver/L2S-20261113-c129.md)
 - [C124 仅新观测的回退与全域位置尾部溯源](fusion_supplier_tail_lineage_20261113.md)
 - [C125 两船原生相对观测资格](tmtaff_native_relative_witness_20261113.md)
 - [C126 C94与历史113的同一目标时刻对照](../../HandOver/L2S-20261113-c126.md)
