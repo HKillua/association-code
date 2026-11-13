@@ -6,7 +6,6 @@ from pathlib import Path
 import time
 
 import numpy as np
-from scipy.stats import rankdata
 
 from tools.analysis import fusion_tail_candidate_recovery as c127
 from tools.analysis.offline_association_tail import CONVERSION, read_motion, summary_state, write
@@ -20,8 +19,13 @@ DISTANCE = c127.c107._distance
 
 
 def fractional_rank(values):
-    values = np.nan_to_num(np.asarray(values, float), nan=-np.inf)
-    return rankdata(values, method='average') / len(values) if len(values) else values
+    values = np.asarray(values, float)
+    if not len(values):
+        return values
+    values = np.where(np.isnan(values), -np.inf, values)
+    _, inverse, counts = np.unique(values, return_inverse=True, return_counts=True)
+    average = np.cumsum(counts) - (counts - 1) / 2
+    return average[inverse] / len(values)
 
 
 def visible_candidates(motion, saved, scores, blocks, choices, thresholds, original):
