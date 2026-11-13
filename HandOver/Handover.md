@@ -28,7 +28,7 @@
 
 **在线单锚跨目标迁移已收尾。** [固定合同](L2S-20261113-online-single-anchor-transfer.md) · [终态](S2L-20261113-online-single-anchor-transfer.md)。原28场一次CPU，真实退出0，已回流Mode C v47。
 
-**在线异源互指单报去复用 READY。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md)。原28场一次CPU，逐条重建原预测后先冻结删报对照，再连接已有匿名评价。
+**在线异源互指单报去复用已收尾。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md) · [终态](S2L-20261113-online-reciprocal-report-downdate.md)。原28场科学和聚合真实退出0，独立复算一致，已回流 Mode C v51。
 
 **在线双报端点和预测复用已收尾。** [固定合同](L2S-20261113-online-disjoint-report-closure.md) · [终态](S2L-20261113-online-disjoint-report-closure.md)。原28场一次CPU，真实退出0，已回流Mode C v49。
 
