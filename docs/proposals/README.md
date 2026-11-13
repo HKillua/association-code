@@ -2,6 +2,12 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-14
+
+- [C138 最近原生报文的方向余量](fusion_near_report_20261114.md)
+- [C139 原生事件编码和整分区偏好](association_native_partition_preferences_20261114.md)
+- [C140 固定关联组的原生时标稳健平滑](fusion_interval_weighted_smoothing_20261114.md)
+
 ## 2026-11-13
 
 - [C137 位置借用的换出代价](fusion_swap_opportunity_20261113.md)

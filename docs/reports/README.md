@@ -2,6 +2,10 @@
 
 按文件中的日期和标题查找，所有正文保留原路径。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-14
+
+- [C138 MTAD最近报文方向和撤出代价](2026-11-14-fusion-near-report-review.md)
+
 ## 2026-11-13
 
 - [C137 MTAD固定配额下的换入和撤出代价](2026-11-13-fusion-swap-opportunity-review.md)

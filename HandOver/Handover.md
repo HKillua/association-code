@@ -1,12 +1,12 @@
 # 当前交接
 
-更新：2026-11-13。这里只维护执行、待核验和保全事项；研究目标/结论看[研究状态](../docs/research_status.md)。历次完整合同和回执从[交接记录索引](README.md)查找，整理前正文已[完整保留](../docs/history/2026-11-02-research-process.md#原交接正文)。
+更新：2026-11-14。这里只维护执行、待核验和保全事项；研究目标/结论看[研究状态](../docs/research_status.md)。历次完整合同和回执从[交接记录索引](README.md)查找，整理前正文已[完整保留](../docs/history/2026-11-02-research-process.md#原交接正文)。
 
 ## 当前执行
 
 当前在线、离线验证仅使用MTAD。C128保留为历史，C131外部验证暂停。
 
-**C138 READY。** [最近原生报文合同](L2S-20261114-c138.md)。Campus SSH MCP一次CPU。
+**C138已收尾。** [最近原生报文终态](S2L-20261114-c138.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，公开及私有审计通过，Record→Squeeze→Mode C2.57完成。C139关联、C140融合待冻结；当前无新增离线执行合同。
 
 **C137已收尾。** [固定配额双向代价终态](S2L-20261113-c137.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，公开和修正后私有审计通过，Record→Squeeze→Mode C2.56完成。
 
