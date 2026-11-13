@@ -10,7 +10,9 @@
 
 **C140已收尾。** [固定组平滑终态](S2L-20261114-c140.md)。Campus SSH MCP原177场一次CPU，科学与worker真实退出0，公开独审108,968项通过，Record→Squeeze→Mode C2.58完成。结束来源区间分权，等权保留强对照。
 
-C141、C142当前为候选，尚无新离线执行合同。
+**C141 READY。** [同预算切口合同](L2S-20261114-c141.md)。Campus SSH MCP，MTAD拟合侧1,748场，三种种子、共同候选池和固定旧J。
+
+**C142 READY。** [同一绝对锚合同](L2S-20261114-c142.md)。Campus SSH MCP，MTAD原177场，先冻结双块资格，通过后执行同锚对照。
 
 **C138已收尾。** [最近原生报文终态](S2L-20261114-c138.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，公开及私有审计通过，Record→Squeeze→Mode C2.57完成。
 
