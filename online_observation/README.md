@@ -1,5 +1,7 @@
 # MTAD 在线观测
 
+当前代码、研究状态和交接见[独立在线仓库](https://github.com/HKillua/assocaition-research)。本目录保存拆仓快照。
+
 在本目录运行 `python -m online_observation --help`。需要在线研究和测试依赖时，可在独立 Python 环境安装 `python -m pip install -e '.[research]'`。
 
 | 内容 | 入口 |

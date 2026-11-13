@@ -1,5 +1,7 @@
 # 在线观测科研与协作约定
 
+在线观测已迁入[独立在线仓库](https://github.com/HKillua/assocaition-research)。当前任务在新仓执行，使用[独立 AGENTS](https://github.com/HKillua/assocaition-research/blob/main/AGENTS.md)及新仓的研究状态和交接。下文留作拆仓前历史说明。
+
 ## 先确定当前任务
 
 - 本目录是在线观测工程根目录。以本目录的入口、环境、数据约定、证据和执行合同为准。

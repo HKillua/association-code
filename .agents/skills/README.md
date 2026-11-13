@@ -1,6 +1,6 @@
 # 项目常用技能
 
-这里保存本项目实际使用的 8 项技能，技能正文及必要引用完整纳入 Git，GitHub 上可直接阅读，克隆仓库后也可使用。当前任务从[在线工程](../../online_observation/README.md)或[离线工程](../../offline_observation/README.md)的路线内入口读取。
+这里保存本项目实际使用的 8 项技能，技能正文及必要引用完整纳入 Git。当前任务从[独立在线仓库](https://github.com/HKillua/assocaition-research)或[离线工程](../../offline_observation/README.md)的路线入口读取。
 
 | 技能 | 用途与入口 |
 |---|---|
