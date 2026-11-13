@@ -24,13 +24,13 @@ SEPARATION_M = 1000.
 HARM_M = 250.
 
 
-def bracket(t, q, excluded=()):
+def bracket(t, q, excluded=(), max_gap=SHORT_S):
     usable = np.array([j for j in range(len(t)) if j not in excluded], dtype=int) if excluded else np.arange(len(t))
     use = t[usable]
     hi = np.searchsorted(use, q)
     if hi < len(use) and use[hi] == q:
         return (int(usable[hi]),)
-    if 0 < hi < len(use) and use[hi] - use[hi-1] <= SHORT_S:
+    if 0 < hi < len(use) and use[hi] - use[hi-1] <= max_gap:
         return int(usable[hi-1]), int(usable[hi])
     return ()
 
@@ -57,8 +57,9 @@ def endpoint(t, xy, before, query):
 
 def evidence(times, points, group, donor, query, old_q, new_q):
     dt, dp = times[donor], points[donor]
-    native_bracket = bracket(dt, query)
-    outer = bracket(dt, query, native_bracket) if native_bracket else ()
+    native_bracket = bracket(dt, query, max_gap=np.inf)
+    span = float(dt[native_bracket[-1]]-dt[native_bracket[0]]) if native_bracket else None
+    outer = bracket(dt, query, native_bracket) if span is not None and span <= SHORT_S else ()
     local = float(np.linalg.norm(at(dt, dp, query, outer)-new_q)) if outer else None
     witnesses = {}
     bridges, predictions = [], []
@@ -91,8 +92,7 @@ def evidence(times, points, group, donor, query, old_q, new_q):
     continuity = min(predictions)[2] if predictions else None
     identity_reject = min(shared) > SEPARATION_M if len(shared) == 2 else (bridge is not None and bridge > SEPARATION_M)
     position_reject = (local is not None and local > HARM_M) or (continuity is not None and continuity > HARM_M)
-    return dict(witness=shared, bridge_m=bridge, donor_bracket_s=float(dt[native_bracket[-1]]-dt[native_bracket[0]])
-        if native_bracket else None, donor_leave_bracket_m=local, receiver_excess_m=continuity,
+    return dict(witness=shared, bridge_m=bridge, donor_bracket_s=span, donor_leave_bracket_m=local, receiver_excess_m=continuity,
         identity_reject=bool(identity_reject), position_reject=bool(position_reject))
 
 
@@ -115,7 +115,13 @@ def freeze_rows(rows, groups, motion, base, tracks):
         when = motion['query_seconds'][q]
         # Position of the stored interpolant in the same local chart as native points.
         hi = np.searchsorted(dt, when).clip(1, len(dt)-1)
-        new = at(dt, dp, when, (hi-1, hi))
+        native_geo = tracks[donor]['canonical_values'][:, :2]
+        longitude_gap = (native_geo[hi, 1]-native_geo[hi-1, 1]+180.) % 360.-180.
+        fraction = (when-dt[hi-1])/(dt[hi]-dt[hi-1])
+        interpolated = native_geo[hi-1]+fraction*np.array([native_geo[hi, 0]-native_geo[hi-1, 0], longitude_gap])
+        shift = geo-interpolated
+        shift[1] = (shift[1]+180.) % 360.-180.
+        new = at(dt, dp, when, (hi-1, hi))+shift*scale
         row['evidence'] = evidence(times, all_points, groups[group], donor, when, new+offset*scale, new)
     return rows
 
