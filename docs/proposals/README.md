@@ -47,6 +47,7 @@
 - [异源互指的单报预测去复用](online_reciprocal_report_downdate_20261113.md)
 - [已到历史的两段运动与整组接回](online_past_motion_shape_20261113.md)
 - [MTAD 接回当批的两段运动证据](online_rejoin_batch_20261113.md)
+- [MTAD 接回当批缓存的时距、持续性与几何](online_rejoin_cache_20261113.md)
 
 - [C95 负例分配与排序增量](association_negative_coverage_20261112.md)
 - [C96 冻结记忆与前缀干预](tmtaff_memory_prefix_20261112.md)

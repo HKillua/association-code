@@ -20,6 +20,7 @@
 |C-ON44在线异源互指单报去复用|[冻结合同](L2S-20261113-online-reciprocal-report-downdate.md)|[终态](S2L-20261113-online-reciprocal-report-downdate.md)|
 |C-ON45在线已到历史运动变化|[冻结合同](L2S-20261113-online-past-motion-shape.md)|[终态](S2L-20261113-online-past-motion-shape.md)|
 |C-ON46在线接回当批|[冻结合同](L2S-20261113-online-rejoin-batch.md)|[终态](S2L-20261113-online-rejoin-batch.md)|
+|C-ON47在线接回缓存证据|[冻结合同](L2S-20261113-online-rejoin-cache.md)|[终态](S2L-20261113-online-rejoin-cache.md)|
 |C118固定分区的分属性供给|[固定合同](L2S-20261112-c118.md)|[科学与独审](S2L-20261112-c118.md)|
 |C119隔离组件双目标相对位置|[固定合同](L2S-20261112-c119.md)|[科学与独审](S2L-20261112-c119.md)|
 |C120发布参考速度量化|[固定合同](L2S-20261112-c120.md)|[科学与复算](S2L-20261112-c120.md)|

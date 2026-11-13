@@ -36,7 +36,7 @@
 
 **在线异源互指单报去复用已收尾。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md) · [终态](S2L-20261113-online-reciprocal-report-downdate.md)。原28场科学和聚合真实退出0，独立复算一致，已回流 Mode C v51。
 
-**在线接回缓存证据诊断 READY。** [固定合同](L2S-20261113-online-rejoin-cache.md)。只读原MTAD 28场，比较缓存时距、连续配对和当批几何。
+**在线接回缓存证据诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-cache.md) · [终态](S2L-20261113-online-rejoin-cache.md)。原MTAD 28场只读核验真实退出0，已回流 Mode C v57。
 
 **在线接回当批诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-batch.md) · [终态](S2L-20261113-online-rejoin-batch.md)。只读原 MTAD 28 场，真实退出0，已回流 Mode C v55。
 

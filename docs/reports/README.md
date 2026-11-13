@@ -53,6 +53,7 @@
 - [异源互指剔除前报更新后的晚报证据](2026-11-13-online-reciprocal-report-downdate.md)
 - [四端共同历史的净位移与两段运动变化](2026-11-13-online-past-motion-shape.md)
 - [MTAD 接回当批的几何、当前形状和缓存](2026-11-13-online-rejoin-batch.md)
+- [MTAD 接回缓存的时距、持续性和当批几何](2026-11-13-online-rejoin-cache.md)
 
 - [C92 同候选池高分负例与关联评分](2026-11-12-association-tail-contrast-review.md)
 - [C93 固定真对的自回归历史反传](2026-11-12-tmtaff-feedback-gradient-review.md)
