@@ -84,6 +84,46 @@ class FreshDisplacementTest(unittest.TestCase):
         self.assertFalse(decached["qualified"])
         self.assertEqual(decached["post_onset_count"], 0)
 
+    def test_coordinate_mask_preserves_clock_brackets_and_weights(self):
+        result = score_fresh_displacement(SAMPLE, HISTORIES, {RELEASE: (), RETAIN: ()}, 40.0)
+        decached, predicted = result["decached"], result["post_onset_predicted"]
+        self.assertTrue(decached["qualified"])
+        self.assertEqual(predicted["status"], "supported")
+        for name in ("brackets", "coefficients", "available_at", "latest_contributor_at"):
+            self.assertEqual(predicted[name], decached[name])
+        self.assertEqual(predicted["prediction_anchors"], {"release": (20.0, 40.0), "retain": (20.0, 40.0)})
+        self.assertEqual(predicted["latest_coordinate_at"], 50.0)
+        self.assertAlmostEqual(decached["margin_m2"], 100.0)
+        self.assertAlmostEqual(predicted["margin_m2"], 0.0)
+        self.assertEqual(predicted["displacements_m"]["reporter"], decached["displacements_m"]["reporter"])
+        self.assertFalse(predicted["qualified"])
+        self.assertEqual(predicted["post_onset_count"], 0)
+        changed = HISTORIES | {RETAIN: [*HISTORIES[RETAIN][:-1], (70.0, (70.0, 90.0))]}
+        masked = score_fresh_displacement(SAMPLE, changed, {RELEASE: (), RETAIN: ()}, 40.0)
+        self.assertEqual(masked["post_onset_predicted"], predicted)
+        self.assertNotEqual(masked["decached"]["margin_m2"], decached["margin_m2"])
+
+    def test_coordinate_mask_abstains_without_a_qualified_displacement_or_legal_anchors(self):
+        provenance = {RELEASE: (), RETAIN: ()}
+        extended = HISTORIES | {RELEASE: [(0.0, (0.0, 0.0)), *HISTORIES[RELEASE]]}
+        for history, cache, onset, status in (
+            (HISTORIES, provenance, 70.0, "no_qualified_decached"),
+            (HISTORIES, provenance, 39.0, "missing_prediction_history"),
+            (HISTORIES | {RETAIN: [(-30.0, (-30.0, 0.0)), *HISTORIES[RETAIN][1:]]},
+             provenance, 40.0, "gap_too_wide"),
+            (extended | {RETAIN: [(-30.0, (-30.0, 0.0)), *HISTORIES[RETAIN]]},
+             provenance, 20.0, "prediction_gap_too_wide"),
+            (extended | {RETAIN: [(0.0, (0.0, 0.0)), *HISTORIES[RETAIN]]},
+             provenance, 20.0, "prediction_horizon_too_long"),
+        ):
+            with self.subTest(status=status):
+                result = score_fresh_displacement(SAMPLE, history, cache, onset)
+                if status == "gap_too_wide":
+                    self.assertEqual(result["decached"]["status"], status)
+                    status = "no_qualified_decached"
+                self.assertEqual(result["post_onset_predicted"]["status"], status)
+                self.assertIsNone(result["post_onset_predicted"]["margin_m2"])
+
 
 if __name__ == "__main__":
     unittest.main()

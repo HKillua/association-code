@@ -21,7 +21,7 @@ from .relative_motion_gap import _same
 
 def _attribution(fresh):
     observed = fresh["decached"]
-    masked = fresh["post_onset_masked"]
+    masked = fresh["post_onset_predicted"]
     if not observed["qualified"]:
         return dict(result="no_new", release=False, retain=False, mismatch_change_m2=None)
     if masked["status"] != "supported":
@@ -75,8 +75,14 @@ def _readout(sample, histories, previous, onset, base):
                 if set(pair) & set(provenance[key]):
                     raise ValueError("a decached bracket contains an old cache report")
     if any(fresh[name]["available_at"] is not None and fresh[name]["available_at"] >= sample["stamp"]
-           for name in ("unfiltered", "decached", "post_onset_masked")):
+           for name in ("unfiltered", "decached", "post_onset_masked", "post_onset_predicted")):
         raise ValueError("a displacement uses the decision batch or a future report")
+    old_post_onset = {side: tuple(dict(time=t, in_cache=t in (provenance or {}).get(key, ()))
+                                  for t in base["provenance"].get(key, ()) if t > onset)
+                      for side, key in sample["partners"].items()}
+    if sum(map(len, old_post_onset.values())) != old["post_onset_opposite_reports"]:
+        raise ValueError("the original post-onset support changed")
+    fresh["old_post_onset"] = old_post_onset
     attribution = _attribution(fresh)
     decisions = base["decisions"] | _actions(base["decisions"]["current"], fresh, attribution)
     return dict(stamp=sample["stamp"], fresh=fresh, cache_status=cache_status,
@@ -151,12 +157,10 @@ def main(argv=None):
     for index in range(1, len(scenes) + 1):
         alias = f"scene_{index:02d}"
         for previous, captured in zip(by_scene.pop(alias, ()), _read_frozen(frozen / f"{alias}.pkl.gz"), strict=True):
-            if (captured is None) != (previous["features"] is None):
-                raise ValueError("the original legal readout set changed")
-            if captured is None:
+            if previous["features"] is None:
                 rows.append(previous | {"fresh": None})
                 continue
-            if (captured["stamp"] != previous["row"]["stop"]
+            if (captured is None or captured["stamp"] != previous["row"]["stop"]
                     or any(captured["decisions"][arm] != vote for arm, vote in previous["decisions"].items())):
                 raise ValueError("an original rejoin control or decision time changed")
             rows.append(previous | {key: captured[key] for key in ("fresh", "attribution", "decisions", "cache_status")})

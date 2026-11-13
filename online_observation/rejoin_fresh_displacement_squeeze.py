@@ -12,7 +12,7 @@ from .rejoin_witness_squeeze import _direction_label, _truth_side, _truthward, _
 
 FRESH_ARMS = ("fresh_rank", "fresh_attributed", "fresh_guard")
 ARMS = (*WITNESS_ARMS, "unfiltered_rank", *FRESH_ARMS)
-READOUTS = ("unfiltered", "decached", "post_onset_masked")
+READOUTS = ("unfiltered", "decached", "post_onset_masked", "post_onset_predicted")
 SIDES = ("release", "retain")
 
 
@@ -45,19 +45,19 @@ def _compare_actions(target, correct):
                                     for arm in FRESH_ARMS})
 
 
-def _common_support(rows, require_nested_mask=False):
+def _common_support(rows, require_coordinate_mask=False):
     return [entry for entry in rows if entry.get("fresh") is not None
             and entry["fresh"]["decached"]["qualified"]
             and entry["decisions"].get("current") is not None
             and entry["decisions"].get("geometry_masked") is not None
-            and (not require_nested_mask or entry["fresh"]["post_onset_masked"]["margin_m2"] is not None)]
+            and (not require_coordinate_mask or entry["fresh"]["post_onset_predicted"]["margin_m2"] is not None)]
 
 
 def _compare(target, correct):
     return dict(full=_compare_actions(target, correct),
                 same_support=_compare_actions(_common_support(target), _common_support(correct)),
-                same_attribution_support=_compare_actions(_common_support(target, require_nested_mask=True),
-                                                          _common_support(correct, require_nested_mask=True)))
+                same_attribution_support=_compare_actions(_common_support(target, require_coordinate_mask=True),
+                                                          _common_support(correct, require_coordinate_mask=True)))
 
 
 def _sign(value):
@@ -109,6 +109,42 @@ def _candidate_opportunities(rows):
     return {side: dict(totals) for side, totals in counts.items()}
 
 
+def _lineage_counts(rows):
+    counts, roles, old_reports = Counter(), Counter(), Counter()
+    for entry in rows:
+        fresh = entry["fresh"]
+        unfiltered, decached = fresh["unfiltered"], fresh["decached"]
+        raw = {side for side in SIDES if fresh["opportunities"][side]["post_onset"]}
+        outside_cache = {side for side in SIDES if fresh["opportunities"][side]["post_onset_outside_cache"]}
+        old_cache_states = [report["in_cache"] for side in SIDES for report in fresh["old_post_onset"][side]]
+        if len(old_cache_states) != entry["features"]["witness"]["post_onset_opposite_reports"]:
+            raise ValueError("the original used post-onset provenance count changed")
+        old_reports.update(old_cache_states)
+        counts.update(
+            c49_used_post_onset=bool(old_cache_states),
+            c49_used_all_cached=bool(old_cache_states) and all(state is True for state in old_cache_states),
+            c49_used_outside_cache=any(state is False for state in old_cache_states),
+            c49_used_cache_unknown=any(state is None for state in old_cache_states),
+            raw_post_onset_report=bool(raw), raw_post_onset_both=len(raw) == 2,
+            cache_verified=fresh["cache_verified"], outside_cache_post_onset_report=bool(outside_cache),
+            outside_cache_post_onset_both=len(outside_cache) == 2,
+            outside_cache_post_onset_but_no_brackets=bool(outside_cache) and decached["margin_m2"] is None,
+            outside_cache_post_onset_not_used=bool(outside_cache) and decached["margin_m2"] is not None
+            and not decached["post_onset_count"],
+            unfiltered_used_post_onset=unfiltered["post_onset_count"] > 0,
+            decached_used_post_onset=decached["post_onset_count"] > 0,
+            decached_hard_mask_still_supported=decached["qualified"]
+            and fresh["post_onset_masked"]["margin_m2"] is not None,
+        )
+        for stage, available in (("raw", raw), ("outside_cache", outside_cache),
+                                 ("used", decached["post_onset_roles"])):
+            for side in SIDES:
+                roles[f"{side}:{stage}"] += side in available
+    return dict(windows=len(rows), counts=dict(counts), roles=dict(roles),
+                c49_used_post_onset_reports=dict(cached=old_reports[True], outside_cache=old_reports[False],
+                                                 cache_unknown=old_reports[None]))
+
+
 def _direction_transitions(rows, first, second):
     counts = Counter(f"{_sign(first(entry))}->{_sign(second(entry))}" for entry in rows)
     return dict(counts)
@@ -116,7 +152,7 @@ def _direction_transitions(rows, first, second):
 
 def _cohort(rows):
     decached = [entry for entry in rows if entry["fresh"]["decached"]["qualified"]]
-    paired = [entry for entry in decached if entry["fresh"]["post_onset_masked"]["margin_m2"] is not None]
+    paired = [entry for entry in decached if entry["fresh"]["post_onset_predicted"]["margin_m2"] is not None]
     attribution_status, attribution_side, counts = Counter(), Counter(), Counter()
     for entry in rows:
         truth = _truth_side(entry)
@@ -132,7 +168,7 @@ def _cohort(rows):
         mismatch_change = attribution.get("mismatch_change_m2")
         if mismatch_change is not None:
             direction = _sign(fresh["decached"]["margin_m2"])
-            previous = _sign(fresh["post_onset_masked"]["margin_m2"])
+            previous = _sign(fresh["post_onset_predicted"]["margin_m2"])
             counts.update(
                 paired_direction_changed=direction != previous,
                 paired_both_mismatches_grew=all(_direction(mismatch_change[side]) > 0 for side in SIDES),
@@ -162,14 +198,22 @@ def _cohort(rows):
         scenes=dict(Counter(entry["scene"] for entry in rows)),
         components=dict(Counter(entry["component"] for entry in rows)), counts=dict(counts),
         cache_status=dict(Counter(entry["cache_status"] for entry in rows)),
-        opportunities=_candidate_opportunities(rows), readouts={arm: _readout_counts(rows, arm) for arm in READOUTS},
+        opportunities=_candidate_opportunities(rows), lineage=_lineage_counts(rows),
+        readouts={arm: _readout_counts(rows, arm) for arm in READOUTS},
         on_decached_support=support_controls(decached), on_paired_support=support_controls(paired),
+        coordinate_model_on_decached_support=dict(Counter(entry["fresh"]["post_onset_predicted"]["status"]
+                                                          for entry in decached)),
+        coordinate_model_by_role={side: dict(Counter(
+            entry["fresh"]["post_onset_predicted"]["prediction_status_by_role"][side] for entry in decached))
+            for side in SIDES},
         directions=dict(
             c49_to_unfiltered=_direction_transitions(rows, lambda entry: _old_margin(entry["features"]["witness"]),
                                                      readout("unfiltered")),
             unfiltered_to_decached=_direction_transitions(rows, readout("unfiltered"), readout("decached")),
-            post_onset_masked_to_decached=_direction_transitions(paired, readout("post_onset_masked"),
-                                                                 readout("decached")),
+            decached_to_post_onset_masked=_direction_transitions(decached, readout("decached"),
+                                                                 readout("post_onset_masked")),
+            post_onset_predicted_to_decached=_direction_transitions(paired, readout("post_onset_predicted"),
+                                                                    readout("decached")),
         ),
         attribution=dict(statuses=dict(attribution_status), sides=dict(attribution_side)),
         actions={arm: dict(vetoes=sum(entry["decisions"].get(arm) is True for entry in rows),

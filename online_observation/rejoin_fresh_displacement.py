@@ -1,10 +1,11 @@
 """Read cache-disjoint opposite-source displacement on a fixed past interval."""
 from __future__ import annotations
 
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 from math import fsum
 from operator import itemgetter
 
+from .causal_common_motion import MAX_GAP_SECONDS
 from .continuous_tracker import FRESH_S
 from .interval_assignment import MIN_SPAN_SECONDS
 from .nemot_replay import _distance_sq
@@ -33,11 +34,14 @@ def _displacement(track, indices, queries):
             coefficients[time] = weight
 
     points = {track[index][0]: track[index][1] for pair in indices for index in pair}
+    return brackets, coefficients, _weighted_displacement(points, coefficients, brackets[0][0])
+
+
+def _weighted_displacement(points, coefficients, origin_time):
     # Use relative coordinates so rounding in the weight sum cannot leak a translation.
-    origin = points[brackets[0][0]]
-    displacement = tuple(fsum(weight * (points[time][axis] - origin[axis])
-                              for time, weight in coefficients.items()) for axis in range(2))
-    return brackets, coefficients, displacement
+    origin = points[origin_time]
+    return tuple(fsum(weight * (points[time][axis] - origin[axis])
+                      for time, weight in coefficients.items()) for axis in range(2))
 
 
 def _readout(tracks, queries, onset, stamp):
@@ -73,6 +77,58 @@ def _readout(tracks, queries, onset, stamp):
     )
 
 
+def _predict_points(track, requested, onset):
+    before = bisect_right(track, onset, key=_TIME)
+    if before < 2:
+        return "missing_prediction_history", None, {}
+    (earlier, first), (latest, last) = track[before - 2:before]
+    anchors = (earlier, latest)
+    gap = latest - earlier
+    if gap > MAX_GAP_SECONDS:
+        return "prediction_gap_too_wide", anchors, {}
+    if max(requested) - latest > MAX_GAP_SECONDS:
+        return "prediction_horizon_too_long", anchors, {}
+    predictions = {time: tuple(end + ((time - latest) / gap) * (end - start)
+                               for start, end in zip(first, last, strict=True)) for time in requested}
+    return "supported", anchors, predictions
+
+
+def _predict_post_onset(tracks, actual, onset):
+    result = actual | dict(status="no_qualified_decached", margin_m2=None, mismatch_m2=None,
+                           displacements_m=None, latest_coordinate_at=None, qualified=False,
+                           post_onset_roles=(), post_onset_count=0, prediction_anchors={},
+                           prediction_status_by_role=dict.fromkeys(_OPPONENTS, "not_needed"))
+    if not actual["qualified"]:
+        return result
+
+    motions = actual["displacements_m"].copy()
+    coordinates_used = list(actual["coefficients"]["reporter"])
+    failures = []
+    for side in _OPPONENTS:
+        weights = actual["coefficients"][side]
+        needed = [time for time in weights if time > onset]
+        before = {time for time in weights if time <= onset}
+        coordinates_used.extend(before)
+        if not needed:
+            continue
+        status, anchors, predictions = _predict_points(tracks[side], needed, onset)
+        result["prediction_status_by_role"][side] = status
+        result["prediction_anchors"][side] = anchors
+        if status != "supported":
+            failures.append(status)
+            continue
+        points = {time: point for time, point in tracks[side] if time in before} | predictions
+        motions[side] = _weighted_displacement(points, weights, min(weights))
+        coordinates_used.extend(anchors)
+    if failures:
+        return result | {"status": failures[0]}
+
+    mismatches = {side: _distance_sq(motions["reporter"], motions[side]) for side in _OPPONENTS}
+    return result | dict(status="supported", margin_m2=mismatches["retain"] - mismatches["release"],
+                         mismatch_m2=mismatches, displacements_m=motions,
+                         latest_coordinate_at=max(coordinates_used))
+
+
 def score_fresh_displacement(sample, histories, cache_provenance, onset):
     """Compare the two opponents' displacement with the same prior reporter interval.
 
@@ -80,6 +136,8 @@ def score_fresh_displacement(sample, histories, cache_provenance, onset):
     Cache provenance maps original track keys to the native timestamps used by the
     previous shape. Filtering is limited to the opposite tracks. A positive margin
     favors release and a post-onset count includes only nonzero displacement weights.
+    The coordinate mask holds the de-cached brackets and weights fixed, substituting
+    bounded constant-velocity estimates for their post-onset opposite coordinates.
     """
     stamp, reporter = sample["stamp"], sample["reporter"]
     partners = {side: sample["partners"][side] for side in _OPPONENTS}
@@ -114,7 +172,8 @@ def score_fresh_displacement(sample, histories, cache_provenance, onset):
         )
 
     queries = (left, right)
+    decached_readout = _readout(decached, queries, onset, stamp)
     return dict(left=left, right=right, cache_verified=verified, opportunities=opportunities,
                 unfiltered=_readout(tracks, queries, onset, stamp),
-                decached=_readout(decached, queries, onset, stamp),
-                post_onset_masked=_readout(post_onset_masked, queries, onset, stamp))
+                decached=decached_readout, post_onset_masked=_readout(post_onset_masked, queries, onset, stamp),
+                post_onset_predicted=_predict_post_onset(decached, decached_readout, onset))

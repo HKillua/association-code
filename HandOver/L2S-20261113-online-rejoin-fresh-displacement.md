@@ -10,3 +10,5 @@
 ```
 
 `PRIVATE_C49_OUTPUT` 为资料库 `docs/evidence/20261113_online_mtad/rejoin_witness_attempt_1`。
+
+v1.1 一次修订轮用同命令和新输出目录。首轮在匿名连接退出 1，28 份已冻结文件与日志保全。硬删新报保留作覆盖，新增同括点遮蔽的批前等速坐标对照。 [修订依据](../docs/proposals/online_rejoin_fresh_displacement_20261113.md#v11-遮蔽修订)
