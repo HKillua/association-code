@@ -8,6 +8,7 @@ import time
 import numpy as np
 
 from association.data.archive import MTADArchive
+from tools.analysis.fusion_added_supplier_attributes import states_for
 from tools.analysis import fusion_native_donor_evidence as c133
 from tools.analysis.offline_association_tail import read_motion, summary_state, write
 
@@ -119,7 +120,7 @@ def freeze(args, scenes, data):
                 np.testing.assert_array_equal(base['query'],motion['query_seconds'])
                 partition = base['current']
                 mean = base['MEAN']
-                np.testing.assert_array_equal(mean,c127.c107.mean_groups(motion,partition))
+                np.testing.assert_array_equal(mean,states_for(motion,partition,motion['support']))
                 groups = c98.group_nodes(partition)
                 estimates = np.repeat(mean[None],len(ARMS),axis=0)
                 flags = np.zeros((*mean.shape[:2],len(REGIONS)-1),bool)
