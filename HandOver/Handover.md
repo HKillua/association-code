@@ -44,6 +44,8 @@
 
 **在线严格批前对侧见证已收尾。** [固定合同](L2S-20261113-online-rejoin-witness.md) · [终态](S2L-20261113-online-rejoin-witness.md)。原 MTAD 28 场真实退出 0，冻结原件独立复算一致，已回流 Mode C v61。
 
+**在线对侧新报去缓存位移 READY。** [固定合同](L2S-20261113-online-rejoin-fresh-displacement.md)。只用原 MTAD 28 场，同刻屏蔽、当前形状和去新报消融。
+
 **在线当批几何增量诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-geometry.md) · [终态](S2L-20261113-online-rejoin-geometry.md)。原28场冻结齐备，首次汇总保全，R1只读原件真实退出0，已回流Mode C v59。
 
 **在线接回缓存证据诊断已收尾。** [固定合同](L2S-20261113-online-rejoin-cache.md) · [终态](S2L-20261113-online-rejoin-cache.md)。原MTAD 28场只读核验真实退出0，已回流 Mode C v57。
