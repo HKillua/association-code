@@ -10,7 +10,9 @@
 
 离线首要对照明确为 **TMTAFF 完整系统**，同一个冻结版本须在ITSA、MSTSA和四属性融合上同时领先。用户进一步明确离线优先追求精度，允许重选整体方法。原生点与片段图关联、组级全窗状态和有限分区候选进入重新筛选，原056→WS→位置选源作为开发对照。位置改进和PTFM／DeepAF条件融合比较继续保留为内部证据与补充对照。现有完整组合的关联和四属性差距、作者协议边界及验收条件见[离线TMTAFF核查](reports/2026-11-10-offline-tmtaff-review.md)。
 
-最终方案支持可变K和源换序/增减，不依赖固定源编号优先或固定双源配方；真实数据主要K2，软件K3检查不等真实泛化。用户接受合理训练侧监督及新数据集重拟合，倾向少依赖后端reference系数拟合；旧骨架不构成路线约束。
+用户于11月13日明确当前验证仅使用 **MTAD**，适用于在线和离线。可从其他论文与代码借鉴方法、选取对照，实际训练和评价沿用MTAD已有数据权限及划分。当前无其他数据集的验证安排。
+
+最终方案支持可变K和源换序/增减，不依赖固定源编号优先或固定双源配方；真实数据主要K2，软件K3检查不等真实泛化。用户接受合理训练侧监督，倾向少依赖后端reference系数拟合；旧骨架不构成路线约束。
 
 ## 已有依据与保留方案
 
@@ -31,7 +33,7 @@
 
 1. **离线继续建立高精度关联与可信 TMTAFF 全系统对照。** [C95](reports/2026-11-12-association-negative-coverage-review.md)同预算替换一半旧尾部负例后，混合BCE跨源90%召回FP由C92复现的1,196,033降至105,720，原056为44,754。V最终跨源FN/FP相对原WS由5,888/8,085降到4,291/4,372，held亦双降。混合BCE丢103个原代表和35,645个同船支持槽，四新臂未过总门。加排序对两种采样的跨源效果相反，当前混合BCE保留为候选分区。
    - C127在原177场核782个尾部缺供给点。652同分歧块、640有候选同组、630保本组首、0过C104整块准入。630个点均有正混合J候选，但会撤掉供体旧首。放宽使P99 17,986→9,891m、627个正确接回点脱尾，同时187次异船、541个非尾部>250m增害（415同船），原晋级门未过。C130保持供体原输出，仅在首组缺观测时验证身份和绝对位置质量。 [C127](reports/2026-11-13-fusion-tail-candidate-recovery-review.md) · [C124](reports/2026-11-13-fusion-supplier-tail-lineage-review.md)
-   - C128独立Autoferry九场公开数据中8场通过双船GNSS近距外测资格。53个两源正确近距Q，LiDAR到等权均值位置MAE 2.316→2.842m，相对向量3.355→4.177m；身份事后绑定。C131先固定预测前候选、时标和等启用率，评有向相对量，另留独立确认。 [C128](reports/2026-11-13-autoferry-dual-gnss-eligibility-review.md) · [C125](reports/2026-11-13-tmtaff-native-relative-witness-review.md)
+   - 双船位置沿用MTAD的C125证据边界，当前缺独立的近距相对方向参照。Autoferry的C128已归历史，后续C131外部验证暂停。 [C125](reports/2026-11-13-tmtaff-native-relative-witness-review.md) · [C128历史记录](reports/2026-11-13-autoferry-dual-gnss-eligibility-review.md)
    - C129在V300筛出61,097个同首组且逐节点支撑/最近观测时距一致的共同点，C94主臂位置MAE638.891m、历史113 54,498.162m。另4场真正固定WS及同一CAP128输入，113旧权重复现后，历史TFM相对Mean在1,133点的位置MAE 1.101→41.052km，速度23.944→8.425m/s，位置退化不能由分区差独自解释。C132优先查位置读出尺度与速航的异向收益。 [C129](reports/2026-11-13-tmtaff-same-group-support-review.md) · [C126](reports/2026-11-13-tmtaff-c94-paired-review.md)
    - Mode C2.50回填C127–C129与七篇定向来源（含一篇既有海事题名升级）。TMTAFF实际Level、表3场名单、时窗、格宽、配准、mESD实现和母AIS仍缺。历史113未完成TAM，152规定独审待收尾。 [本轮矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-250) · [原表协议](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c126_tmtaff_table3_protocol_20261113.md>)
 2. **在线 C-ON33/35 完成稀疏首报的邻轨证据诊断和写入留场。** 11 开发场与 22 个新留场按共享 A 组件隔离，12 个留场组件此前有其他 C-ON32 场。195 个稀疏首报有 6 个开放真边入射，均无双侧共时邻轨。原几何／8 km 宽门／原见证及两种写入臂当刻正确 42／48／42，错接均 5，查询端未见真对侧的错接均 2。 [两阶段 Record/Squeeze](reports/2026-11-12-online-neighbor-witness.md) · [在线 Mode C v30](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v30-见证写入留场回流)
@@ -48,7 +50,7 @@
    - C-ON43在原28场482窗核双报证据。稀疏目标28组中15个在原接回前有两候选下端点不交的双报、6个当批才有、7个无。全482窗618次提前异源互指读出都直接复用前报。最新双实报命中13／28、误拦28／142，遮晚报12／28、23／142；要求晚报净增量为7／28、21／142，同支持落后屏蔽及单锚。隔离新场未启用。 [双报Record/Squeeze](reports/2026-11-13-online-disjoint-report-closure.md) · [Mode C v49](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v49-双报供给与预测复用回流)
    - C-ON44固定原28场，618次严格窗内互指均可剔除最后一次前报更新。晚报增量62次改向，523次真假分支明确的读出中支持真方向242→236。最新同刻有互指8／28目标、53／142正确对照。去复用且晚报增加正向分差命中2／28、误拦17／142，原预测同规则3／28、15／142，只遮前报同规则3／28、13／142；同组件2／28、5／48。该直接复用可以定位，去复用读出未过晋级条件。 [去复用Record/Squeeze](reports/2026-11-13-online-reciprocal-report-downdate.md) · [Mode C v51](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v51-单报去复用的证据回流)
    - C-ON45重核原生速航由后段位置生成，严格回放沿用遮蔽。原28场最新共同历史覆盖20／28目标、135／142正确，历史右端均未越过分歧起点。两段运动加几何7／28、11／142，净位移加几何7／28、10／142，同组件7／28、5／48对7／28、3／48。要求当刻运动增量只剩2／28、10／142。接回批有局部正确保护，提前量为零。当前去留按提前条件，留场未启用。 [历史运动Record/Squeeze](reports/2026-11-13-online-past-motion-shape.md) · [Mode C v53](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v53-四端共同历史的排序回流)
-   - **在线下一条候选为真实传感器的持续发布评估。** Autoferry已公开的9场含异步雷达／LiDAR检测及独立双船GNSS；C128核出8场近距同支持。该资料可用量测时钟做开发级在线回放，比较同延迟的持续ID、漏检、误接和首报，须另冻结新合同并定义并点、失检和连续身份评分。发布数据不含原生Doppler和独立收报时钟。Mariner公开海试另具真实AIS速航，双目标跨源标签和逐源接收时钟待核。 [外部数据和来源边界](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_past_motion_shape_sources_20261113.md#外部数据能补哪项证据)
+   - 在线候选继续在MTAD的因果回放中筛选，沿用冻结输入权限，核持续身份、漏接、误接和提前量。Autoferry、Mariner的传感器协议作为来源笔记留档。 [外部方法来源](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_past_motion_shape_sources_20261113.md#外部数据能补哪项证据)
    - 个体历史与 HyperSSM 保留为在线预测对照，TSA-cTFER 同数据作者条件与复现缺项见[原文核对](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_tsactfer_protocol_20261112.md)。报文触发预测和关联，1 秒网格仅供可比评分。独立位置参考和真实网络到达仍缺。代码在 [online_observation](../online_observation/README.md) 独立维护。当前无待执行在线合同。
 3. **两线采用同一数据资产与定义，独立实现和验收。** 离线优先精度、覆盖与尾部，在线比较同条件下的精度、延迟和规模。各自固定输入权限、状态时刻、模型选取和输出人口，各自发布有具体输入、训练量、终点和停止条件的独立READY。
 4. 196已完成Record→Squeeze→Mode C2.10/F306/E209、SR4.11/OD1.24；区分“回O避害”和“保MC救回”的动作监督/特征条件仅保留为候选，交叉180反例，待对应任务和具体Idea成立再执行。M123仍AI，主eligible O/MC裁剪均0，不按V后验设margin/时间阈值，不自动重训、扩V300或改默认。[196报告](reports/2026-11-03-action-conditioned-risk-validation-review.md)、[固定plan1.1](proposals/action_conditioned_risk_validation_20261102.md)。192密度解释、190拟合端点、194粗阶段门控当前配方已结案，既有反例/未采纳依据保留，不用加步/seed续旧试验。
