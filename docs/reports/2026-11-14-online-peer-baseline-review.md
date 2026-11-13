@@ -44,3 +44,18 @@ TSA-cTFER 保留为同 MTAD 的作者协议参照。2024 原文有 20 秒顺序�
 | **SeaCrossTrack 2026、HiLO 2025、Castelino 等 2026** | SeaCrossTrack 给原生／统一生命周期结果，作者仓是数据；HiLO 有 BSD 源码，但每样本重置对象集；Castelino 等给异步轨级状态融合公式，作者实验重心为单目标状态。 | 分别支撑生命周期归因、学习融合及状态融合比较。SeaCrossTrack 的 IDF1 优势在统一生命周期后从 7.47 pp 变为 3.63 pp，ID 切换仍增加。 [SeaCrossTrack](https://doi.org/10.3390/jmse14212097) · [HiLO](https://arxiv.org/html/2506.02554v1) · [Castelino 等](https://doi.org/10.3390/s26062003) |
 
 优先核验 Lindenmaier 的局部轨输入与 ModTrack 的可运行空间后端，并保留 Draves 作为机制不同的系统候选。首轮资格用同一 MTAD 已到报文核单源首报、两源各一条、双侧竞争、失鲜与断轨续接。达到全场在线输出资格后，报各法自身合法生命周期下的系统结果，再用同生命周期的对照定位收益来源。用同一延迟预算报告正确确认覆盖，当前发布和事后修订分别评分。CDP-WGL 的主要价值是历史身份稳定性与当前错聚类之间的分离。 [Mode C v77](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v77-双源首报与基线适配复核)
+
+## 多基线名单与标准流程
+
+复核飞书《视频文案》第 1 章基线、1a–4b 和骨架段，第 3 章基线说明，以及五技能段。原文用近两年引用量、代码和后续改进寻找可复现、可对照的骨架，第 3 章允许后继较少。此次按用户要求先选多套基线，以原任务效果、复建材料、因果输入和持续发布条件共同判断。当前属于选型，尚未逐篇补齐完整来源分析或在 MTAD 验证。 [视频文案第 1 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#Wq7gdDT11otUQsx36z6co1qhnjb) · [第 3 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#QxYsdMheSoUZfGxPbYecO8Din7b) · [主仓 AGENTS](../../AGENTS.md#科研方法) · [完整流程](../research_workflow.md#2-必须遵守的研究顺序)
+
+| 选入的基线候选 | 首轮精读和复建要判清的条件 |
+|---|---|
+| **Lindenmaier 2025 与 Draves 2026，并列的完整系统候选** | 分别比较全局轨反馈与跨批互斥假设。前者的算法可独立复建，实测优势有限，局部协方差和存在概率待核。直接后继 Bóka 2026 增加视场与出生模型，可追踪生命周期的改造证据。后者需从原文确定保留分支机制的双源单轨启动、空配和换接，区分当前发布与终局最优。 [Lindenmaier](https://doi.org/10.1109/JSEN.2025.3548899) · [Bóka](https://eprints.sztaki.hu/11134/) · [Draves](https://arxiv.org/html/2610.20290v1) |
+| **ModTrack 2026，第三条完整系统候选，限空间模式** | 公开代码可追溯，软件许可待核。核对其几何跟踪能否在取消终局拼接、没有视觉外观与真实检测机会时保住核心机制。原雷达非真值输入低于论文雷达对照，现有证据不足以认定为 MTAD 强基线。 [ECCV 论文](https://link.springer.com/chapter/10.1007/978-3-032-37490-5_24) · [固定源码](https://github.com/JackRobs25/ModTrack/tree/17afb547fa5f8341743595598fe269768aa28637) |
+| **MH-T2TA 2025、GMvA 2026，固定等待的学习关联候选** | MH-T2TA 有 MTAD 家族的 20／40／60 秒结果及公开算法。GMvA 为 IEEE T-ITS 海事图关联，有作者代码，原入口在窗内重采样并跳过单侧窗。两者共同协议需核单点、单侧、显式空配及窗结束时的可见信息；持续 ID 另核。 [MH-T2TA](https://www.fitee.zjujournals.com/en/article/doi/10.1631/FITEE.2400340/) · [GMvA](https://ira.lib.polyu.edu.hk/handle/10397/119909) · [GMvA 固定源码](https://github.com/LouisYxLu/GMvA/tree/a7207aa645f9a78e255248d299ccfb814e4bb54b) |
+| **CDP-WGL 2025，历史标号与融合对照** | 对照原文中当前分簇、状态融合和历史标签三处行为，重点核同密度、同源互斥与错误历史标签是否可撤销。原比较对象 TC-OSPA² 有作者实现，可核源协议中的差异。 [原文](https://arxiv.org/html/2401.00605v2#S3) · [TC-OSPA² 作者实现](https://github.com/AdelaideAuto-IDLab/Distributed-limitedFoV-MOT) |
+
+扩查保留 AAF-AALM 的空配后验补充、ICAS 2026 SV-PFA-AWTF 的低置信缓冲和统计成组校验。海事三源级联有实测线索，当前只取得出版社摘要。DetectorContext 有 FUSION 2026 海试与公开提交。它与已有候选 CD-PMBM／TM-PMBM 都值得核观测模型，当前 MTAD 报文无法区分未探测与未观测，真实扫描及完整检测集仍缺。 [扩查证据](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_peer_baseline_fit_sources_20261114.md#多基线选型的后继与独立对照) · [PMBM 输入与代码](2026-11-12-online-fusion-transfer-review.md)
+
+按名单先逐篇精读，画从报文到持续输出的原方法骨架，定位后继论文改变的部件、条件与反例。再把可信的来源和真实 MTAD 失败放入 Mode C。1a–2b 从现象归类到可否证的机制假设，Idea 事先写对照、指标和停止条件，3a–4b 通过替换、分离改动、消融与核对因果预测验证。随后如实记录、深挖结果、回填矩阵。全系统比较和固定组件归因依照上面的共同回放。原 28 场仅供开发，留场须先核共享 A 组件独立性。 [标准流程](../research_workflow.md#2-必须遵守的研究顺序) · [飞书五技能](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#S2RFdTEteoRR0mxr52dcsM0SnKb)
