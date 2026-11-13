@@ -22,7 +22,7 @@
 
 **在线跨源残差与历史参照已收尾。** [固定合同](L2S-20261112-online-cross-source-calibration.md) · [终态](S2L-20261112-online-cross-source-calibration.md)。原28场一次CPU，真实退出0，已回流Mode C v45。
 
-**在线单锚跨目标迁移 READY，本地会话执行。** [固定合同](L2S-20261113-online-single-anchor-transfer.md)。原28场只读冻结快照和评价身份，零训练与新场。
+**在线单锚跨目标迁移已收尾。** [固定合同](L2S-20261113-online-single-anchor-transfer.md) · [终态](S2L-20261113-online-single-anchor-transfer.md)。原28场一次CPU，真实退出0，已回流Mode C v47。
 
 **在线相对运动与连续报文已收尾。** [固定合同](L2S-20261112-online-relative-motion.md) · [终态](S2L-20261112-online-relative-motion.md)。原28场一次CPU，真实退出0，已回流Mode C v39。
 

@@ -7,6 +7,7 @@
 |C-ON39在线共时支撑与同源共享创新|[冻结合同](L2S-20261112-online-shared-innovation.md)|[终态](S2L-20261112-online-shared-innovation.md)|
 |C-ON40在线异步报文与预测不确定性|[冻结合同](L2S-20261112-online-async-report.md)|[终态](S2L-20261112-online-async-report.md)|
 |C-ON41在线跨源残差与历史参照|[冻结合同](L2S-20261112-online-cross-source-calibration.md)|[终态](S2L-20261112-online-cross-source-calibration.md)|
+|C-ON42在线单锚跨目标迁移|[冻结合同](L2S-20261113-online-single-anchor-transfer.md)|[终态](S2L-20261113-online-single-anchor-transfer.md)|
 |C118固定分区的分属性供给|[固定合同](L2S-20261112-c118.md)|[科学与独审](S2L-20261112-c118.md)|
 |C119隔离组件双目标相对位置|[固定合同](L2S-20261112-c119.md)|[科学与独审](S2L-20261112-c119.md)|
 |C120发布参考速度量化|[固定合同](L2S-20261112-c120.md)|[科学与复算](S2L-20261112-c120.md)|
