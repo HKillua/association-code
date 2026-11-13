@@ -23,6 +23,7 @@ AnySearch 匿名查询三组，分别返回 7／8／8 条。检索式为 `MTAD M
 | Zhao 等，MIS-GNN，2026，正式刊版 pp.10–13 | MTAD 跨源关联，场景级 80:10:10，报告抽样配对 202,735／26,415／22,822。图由32个100秒节点构成，测试时跨源候选经 Hungarian 指派，报告 AF1 .9264。 | 进入 MSTSA 候选。待核场名单、空配规则、抽样测试对与全候选输出关系、图窗对应时间和代码。 [原刊](https://doi.org/10.1088/1361-6501/ae8929) · [本地原文](/Users/a1/Projects/biye-ronghe/docs/evidence/literature_scout_20261015/direct_sources/misgnn_2026.pdf) |
 | Yuan 等，MVW-GNN，2025；Xu 等，MH-T2TA，2025 | 前者使用 MTAD Level1 场景切分，并另测 Level2。后者公开正文及算法附件，其比较含五个固定场景与 50 次 Monte Carlo。两者目标均为跨源航迹关联。 | 保留作独立结构的 MSTSA 候选。逐篇补预处理、空配、选模和输出差异；MH-T2TA 的生成口径不能直接当作已下载的原 Level1 名单。 [MVW-GNN](https://doi.org/10.1088/1361-6501/ae0497) · [MH-T2TA](https://jzus.zju.edu.cn/article.php?doi=10.1631%2FFITEE.2400340) |
 | TSA-cTFER、PTFM、DeepAF，核对原任务与已有实现 | TSA-cTFER 用两阶段递推指派，本地有离线适配。PTFM 用已关联双源，DeepAF 关联和滤波杂波点迹。 | TSA-cTFER 适配留作关联开发对照，152 留作条件融合对照。作者原报值与我们的共同协议结果分别引用。 [TSA-cTFER](https://www.mdpi.com/2072-4292/16/18/3380) · [PTFM](https://www.mdpi.com/2079-9292/14/17/3461) · [DeepAF](https://www.mdpi.com/2226-4310/12/3/194) |
+| 单源中断补查，TSAGLHA，2026，§4、表1和5 | 原文以 300–600 m/s 的三维模拟轨迹、1秒采样和3–7步中断建样本，完整模型 F1 .9012，去 Transformer .8799，去孪生结构 .8145。 | 仅作 ITSA 方法线索。现阶段的 ITSA 对照优先核陈等同源分支、TSA-cTFER 离线适配与原刊传统 MF 2-D TSA，避免候选清单被跨源论文占满。 [TSAGLHA 原文](https://journals.sagepub.com/doi/full/10.3233/ATDE260137) · [MF 2-D TSA 任务与原引用](https://www.mdpi.com/2076-3417/16/14/7251) |
 | AnySearch 新线索，DRC-TCN、MSTrack、SCTA-Net | DRC-TCN 有作者代码，原文评估单源 AIS 船舶身份分类；MSTrack 需要雷达图像、可见光和 AIS，原数据是 WHUT-MSFVessel；SCTA-Net 本轮只找到题录。 | 前两项不进入 MTAD 同任务整链名单。SCTA-Net 待取原文后再判范围。 [DRC-TCN](https://www.mdpi.com/2077-1312/13/11/2129) · [作者代码](https://github.com/hoyon-lab/AIS_tracking) · [MSTrack](https://www.mdpi.com/1424-8220/25/7/2179) · [SCTA-Net](https://doi.org/10.1049/icp.2026.0995) |
 
 2026-11-14 同源 Crossref `is-referenced-by-count` 返回 TMTAFF 0、MIS-GNN 0、MVW-GNN 2、PTFM 4、TSA-cTFER 12。其余查询遭遇限流或题录未覆盖。计数仅描述该索引，近作的后继和代码维护仍待核。 [Crossref 字段](https://www.crossref.org/documentation/retrieve-metadata/rest-api/)
@@ -33,4 +34,4 @@ AnySearch 匿名查询三组，分别返回 7／8／8 条。检索式为 `MTAD M
 
 共同开发评价沿用已冻结的 [MTAD Level1 数据约定](../data_contract.md)和[指标协议](../mtad_data_protocols.md)，封存测试保持关闭。固定场景、可见量测、查询时刻与参考，整链各用自己的关联、分组和四属性输出，报告 ITSA/MSTSA、覆盖、重复和四属性误差与位置尾部。旧模型和透明传统方法可作为工程对照。只在适用模块下比较 TSA-cTFER、MIS-GNN、MVW-GNN、MH-T2TA、PTFM 与 DeepAF。按实际分层对齐开发场和训练曝光，已有 V300 暴露不得称新留场。
 
-下一步先把 TMTAFF 整链、自动传统链路及至少两个独立关联候选的原文、实现和共同协议核到可复建级别。随后按实测问题建立 Mode C 并冻结第一份基线复建 Idea 和执行合同。当前无新研究运行、基线定案或同行胜负。
+下一步先把 TMTAFF 整链、自动传统链路以及 ITSA、MSTSA 各自的对照核到可复建级别。随后用来源与已有实测建立 Mode C，冻结第一份基线复建 Idea 和执行合同。当前无新研究运行、基线定案或同行胜负。
