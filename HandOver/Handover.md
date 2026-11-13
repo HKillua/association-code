@@ -34,6 +34,8 @@
 
 **在线异源互指单报去复用已收尾。** [固定合同](L2S-20261113-online-reciprocal-report-downdate.md) · [终态](S2L-20261113-online-reciprocal-report-downdate.md)。原28场科学和聚合真实退出0，独立复算一致，已回流 Mode C v51。
 
+**在线接回当批诊断 READY。** [固定合同](L2S-20261113-online-rejoin-batch.md)。只读原 MTAD 28 场已冻结评分，一次本地 CPU，比较当前形状、同刻遮蔽和缓存。
+
 **在线已到历史运动变化已收尾。** [固定合同](L2S-20261113-online-past-motion-shape.md) · [终态](S2L-20261113-online-past-motion-shape.md)。原28场科学及汇总真实退出0，独立复算一致，已回流 Mode C v53。
 
 **在线双报端点和预测复用已收尾。** [固定合同](L2S-20261113-online-disjoint-report-closure.md) · [终态](S2L-20261113-online-disjoint-report-closure.md)。原28场一次CPU，真实退出0，已回流Mode C v49。
