@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C136 MTAD去重的非首节点和第三片段位置证据](2026-11-13-fusion-disjoint-position-review.md)
 - [C135 MTAD不复用原括点的局部位置证据](2026-11-13-fusion-local-position-witness-review.md)
 - [C134 MTAD双时刻与端点桥接的连续距离](2026-11-13-fusion-continuous-witness-review.md)
 - [C133 MTAD借用位置前的原生供体证据](2026-11-13-fusion-native-donor-evidence-review.md)

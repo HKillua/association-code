@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C136 去重的非首节点和第三片段位置证据](fusion_disjoint_position_20261113.md)
 - [C135 双时刻排序和局部位置证据](fusion_local_position_witness_20261113.md)
 - [C134 固定证据资格后的连续距离](fusion_continuous_witness_20261113.md)
 - [C133 借用位置前的原生观测证据](fusion_native_donor_evidence_20261113.md)
