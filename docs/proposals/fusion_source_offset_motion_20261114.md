@@ -1,5 +1,7 @@
 # C142 · 对称位置锚下的同源相对运动融合
 
+**终态。** 原177场双块资格通过，同锚相对残差全域和启用位置P99、增害和近距双船均未过门。结束该配方，保留原等权。 [C142 Record/Squeeze](../reports/2026-11-14-fusion-source-offset-motion-review.md) · [C144 两组联合候选](fusion_pair_displacement_constraint_20261114.md)
+
 `IDEA_PACKAGE IDEA-OFFLINE-SOURCE-OFFSET-MOTION-20261114`，v1.0，候选诊断，待资格清点。来自 Mode C2.58 的 P02／P04／P14、F441–F443、M199、E555／E557–E559。 [证据矩阵](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-258>) · [C140 完整记录](../reports/2026-11-14-fusion-interval-smoothing-review.md)
 
 ## 问题与可检验预测

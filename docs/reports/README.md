@@ -4,6 +4,7 @@
 
 ## 2026-11-14
 
+- [C142 MTAD同锚绝对位置与相对运动残差](2026-11-14-fusion-source-offset-motion-review.md)
 - [C140 MTAD固定组的等权与原生区间分权](2026-11-14-fusion-interval-smoothing-review.md)
 - [C139 MTAD同池完整分区的拟合侧资格](2026-11-14-association-partition-fit-qualification.md)
 - [C138 MTAD最近报文方向和撤出代价](2026-11-14-fusion-near-report-review.md)

@@ -9,6 +9,7 @@
 - [C140 固定关联组的原生时标稳健平滑](fusion_interval_weighted_smoothing_20261114.md)
 - [C141 同源近时报文持续分离的候选生成](association_native_separation_candidates_20261114.md)
 - [C142 对称位置锚下的同源相对运动融合](fusion_source_offset_motion_20261114.md)
+- [C144 保持双船中心位置的相对位移约束](fusion_pair_displacement_constraint_20261114.md)
 
 ## 2026-11-13
 
