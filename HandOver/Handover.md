@@ -6,7 +6,7 @@
 
 当前在线、离线验证仅使用MTAD。C128保留为历史，C131外部验证暂停。
 
-**C135 READY。** [原生局部位置证据](L2S-20261113-c135.md)。Campus SSH MCP一次CPU。
+**C135已收尾。** [局部位置证据终态](S2L-20261113-c135.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，两场原生追溯及公开/私有复算通过。Record→Squeeze→Mode C2.54完成。C136待筛，当前无离线待执行合同。
 
 **C134已收尾。** [原生连续距离终态](S2L-20261113-c134.md)。Campus SSH MCP一次CPU，科学与worker真实退出0，公开和私有复算通过。Record→Squeeze→Mode C2.53完成。
 
