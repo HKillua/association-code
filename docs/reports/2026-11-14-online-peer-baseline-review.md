@@ -47,7 +47,7 @@ TSA-cTFER 保留为同 MTAD 的作者协议参照。2024 原文有 20 秒顺序�
 
 ## 多基线名单与标准流程
 
-复核飞书《视频文案》第 1 章基线、1a–4b 和骨架段，第 3 章基线说明，以及五技能段。原文用近两年引用量、代码和后续改进寻找可复现、可对照的骨架，第 3 章允许后继较少。此次按用户要求先选多套基线，以原任务效果、复建材料、因果输入和持续发布条件共同判断。当前属于选型，尚未逐篇补齐完整来源分析或在 MTAD 验证。 [视频文案第 1 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#Wq7gdDT11otUQsx36z6co1qhnjb) · [第 3 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#QxYsdMheSoUZfGxPbYecO8Din7b) · [主仓 AGENTS](../../AGENTS.md#科研方法) · [完整流程](../research_workflow.md#2-必须遵守的研究顺序)
+复核飞书《视频文案》。第 1 章先列“复现论文”，后列“制造意外实验”“深挖意外现象”“构建 baseline 骨架全景图”。在复现论文一节，原文建议尽量选近两年引用量最高的论文，以便获得源码、找到后续改进并开展组合实验。第 3 章补充，后继较少主要影响骨架改造记录，探索仍可进行。项目选多套基线来自用户明确要求。本轮形成候选名单，已经核了原任务效果、复建材料和 MTAD 输入条件，尚未完成同口径引用比较，也尚无共同 MTAD 整链结果。 [视频文案第 1 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#Wq7gdDT11otUQsx36z6co1qhnjb) · [第 3 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#QxYsdMheSoUZfGxPbYecO8Din7b) · [主仓 AGENTS](../../AGENTS.md#科研方法) · [完整流程](../research_workflow.md#2-必须遵守的研究顺序)
 
 | 选入的基线候选 | 首轮精读和复建要判清的条件 |
 |---|---|
@@ -58,4 +58,6 @@ TSA-cTFER 保留为同 MTAD 的作者协议参照。2024 原文有 20 秒顺序�
 
 扩查保留 AAF-AALM 的空配后验补充、ICAS 2026 SV-PFA-AWTF 的低置信缓冲和统计成组校验。海事三源级联有实测线索，当前只取得出版社摘要。DetectorContext 有 FUSION 2026 海试与公开提交。它与已有候选 CD-PMBM／TM-PMBM 都值得核观测模型，当前 MTAD 报文无法区分未探测与未观测，真实扫描及完整检测集仍缺。 [扩查证据](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_peer_baseline_fit_sources_20261114.md#多基线选型的后继与独立对照) · [PMBM 输入与代码](2026-11-12-online-fusion-transfer-review.md)
 
-按名单先逐篇精读，画从报文到持续输出的原方法骨架，定位后继论文改变的部件、条件与反例。再把可信的来源和真实 MTAD 失败放入 Mode C。1a–2b 从现象归类到可否证的机制假设，Idea 事先写对照、指标和停止条件，3a–4b 通过替换、分离改动、消融与核对因果预测验证。随后如实记录、深挖结果、回填矩阵。全系统比较和固定组件归因依照上面的共同回放。原 28 场仅供开发，留场须先核共享 A 组件独立性。 [标准流程](../research_workflow.md#2-必须遵守的研究顺序) · [飞书五技能](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#S2RFdTEteoRR0mxr52dcsM0SnKb)
+1. **选定并复建多套基线。** 从候选原文读清机制、输入、原评价和后继，保留已有原协议证据及未知。独立复建各法，在原 28 个 MTAD 开发场按共同因果输入和延迟预算从首报跑到持续输出，建立各法可比较的实测起点。作者原文结果与 MTAD 适配结果分别报告。仅在 MTAD 验证。 [视频文案第 1 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#Wq7gdDT11otUQsx36z6co1qhnjb)
+2. **做探索，保留和深挖实际现象。** 逐篇来源分析，结合基线运行和历史 MTAD 证据做 Mode C 的 P×F 矩阵。原文允许根据矩阵组织组合实验，也允许独立来源的发现性组合。项目按 Idea 写清范围和出口后执行，先 Record，再 Squeeze 并回填矩阵。对反常或失败现象反复走 1a–2b，从观察、归类、追问到可证伪因果链。随证据完善基线骨架全景和后继改造位置，按潜在收益和可解决性选研究方向。 [第 1–3 章](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#Wq7gdDT11otUQsx36z6co1qhnjb) · [飞书五技能](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#S2RFdTEteoRR0mxr52dcsM0SnKb)
+3. **针对已定位问题验证解法。** 先查已有解法和生效条件，再在 Idea 定对照、指标、代价和回退线。按 3a–4b 替换部件、分离改动、逐个消融、核对因果预测；跨域时用 A／A′／A′＋B 拆开适配与新增机制的收益。全系统比较和固定组件归因依照上面的共同回放，结果按 Record→Squeeze→Mode C 回流。原 28 场仅供开发，留场须先核共享 A 组件独立性。 [标准流程](../research_workflow.md#2-必须遵守的研究顺序) · [飞书跨域迁移](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd#QifSdePVUomGQwxR0npcYUe8nCf)
