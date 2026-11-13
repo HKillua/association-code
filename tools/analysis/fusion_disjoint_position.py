@@ -200,7 +200,7 @@ def freeze(args, scenes, data, thresholds):
                 if e['nonfirst'] is None and e['third'] is not None:
                     counts['third_increment'] += 1
             totals.update(counts)
-            scene_counts[sid] = dict(counts=counts, swap_counts={a:len(x) for a,x in swaps.items()},
+            scene_counts[sid] = dict(evidence_counts=counts, swap_counts={a:len(x) for a,x in swaps.items()},
                 opportunities=opportunities, swap_types={a:Counter(f"{x['source']}/{x['old']}/{x['new']}" for x in v)
                                                          for a,v in swaps.items()})
             write(private/f'{sid}.json',dict(selected=chosen,evidence=evidence,swaps=swaps,clusters=clusters))
