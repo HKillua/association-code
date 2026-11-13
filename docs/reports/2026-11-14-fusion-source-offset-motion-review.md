@@ -22,6 +22,8 @@
 
 ## Squeeze
 
+扩展公开复算同时核四属性论文式聚合、目标覆盖及全部晋级条件，共417,685项。逐点和近距误差来自匿名数组，论文式部分由逐场已保存的四属性统计独立聚合。 [扩展复算](</Users/a1/Projects/biye-ronghe/docs/evidence/20261114_fusion_source_offset_motion/public-recomputation-plus-paper.json>)
+
 `SQUEEZE_REPORT SQ-OFFLINE-SOURCE-OFFSET-MOTION-20261114`，v1.0，verified。全部177场、4组件、区域×四属性加位置、留一组件和近距配对的公开独立复算共417,193项通过。原Mean／EQUAL与C140精确相同，未启用域及速航保持。独立从4组件各取1场、各取可用Q最多的2窗，复算原生半块谱系、来源计数、锚及8窗485个组×Q的双臂预测。直接KKT与冻结位置最大差1.14e−13度，半块源间位移差最大差2.86e−9米，未接参考。软件阶段另核K2/K3原生位移对来源平移的不变性和对称锚的偏移响应。 [公开复算](</Users/a1/Projects/biye-ronghe/docs/evidence/20261114_fusion_source_offset_motion/public-recomputation.json>) · [原生与求解抽查](</Users/a1/Projects/biye-ronghe/docs/evidence/20261114_fusion_source_offset_motion/independent-private-audit.json>)
 
 - **DE，锚误差与相对残差损失都出现。** 3,368个有效锚点的两新臂逐点同值，MAE 1,739.723米，EQUAL为443.664米。其余69,293个非锚、离窗边>60秒的可评点，EQUAL／同锚绝对／同锚相对MAE为403.318／443.093／1,906.214米。边界退化只解释少数点。四组件的相对臂全域MAE与P99均高于EQUAL和同锚绝对。去最大组件后全域P99为12.811／12.988／15.809公里，启用域P99为4.357／4.562／10.650公里，按同一三臂次序。
