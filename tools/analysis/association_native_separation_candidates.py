@@ -315,7 +315,8 @@ def freeze_scene(args, sid, motion, archive, counters, thresholds):
         blocks.append(dict(candidates=candidates,pools=pools,chosen=chosen,witnesses=witnesses,scopes=scope_rows))
     keys = ('C139', *(f'{mode}_{arm}' for mode in MODES for arm in ARMS))
     groups = {key: materialize(ws,blocks,[b['chosen'][key] for b in blocks]).tolist() for key in keys}
-    return dict(ws=ws.tolist(), blocks=blocks, actual=groups, counts=dict(stats))
+    original_blocks = [block['nodes'] for block in parent['blocks']]
+    return dict(ws=ws.tolist(),blocks=blocks,actual=groups,counts=dict(stats),original_blocks=original_blocks)
 
 
 def evaluate_candidates(ws, candidates, identities, motion, baseline_head_identities):
@@ -356,6 +357,13 @@ def evaluate_scene(frozen, motion, truth):
     target = truth[a] == truth[b]
     same = motion['sources'][a] == motion['sources'][b]
     before = c98.edge_rows(target,ws[a] == ws[b],same)
+    original_block = np.full(len(ws),-1)
+    for j,nodes in enumerate(frozen['original_blocks']):
+        original_block[nodes] = j
+    scope = (original_block[a] >= 0) & (original_block[a] == original_block[b])
+    missed = target & ~same & (ws[a] != ws[b])
+    reachability = dict(cross_fn_inside_c139_scopes=int((missed & scope).sum()),
+                        cross_fn_outside_c139_scopes=int((missed & ~scope).sum()))
     stats = {k:Counter() for k in frozen['actual']}
     choices = {k:[] for k in stats}
     new_head_ids = {k:set() for k in stats}
@@ -411,7 +419,7 @@ def evaluate_scene(frozen, motion, truth):
                        for scope in c98.SCOPES})
         results[arm] = dict(counts=dict(stats[arm]), **outcomes)
     outcome_key = hashlib.sha256(json.dumps(safe_pairs,separators=(',',':')).encode()).hexdigest()
-    return dict(counts=frozen['counts'], baseline=before, arms=results,
+    return dict(counts=frozen['counts'], baseline=before, arms=results, reachability=reachability,
                 safe_block_pattern_sha256=outcome_key)
 
 
@@ -430,7 +438,9 @@ def population(rows):
                 coverage.update(row[name]['coverage'])
                 for scope in c98.SCOPES:
                     delta[scope].update(row[name]['delta'][scope])
-                    confusion[scope].update(row[name]['decoded'][scope])
+                    values = row[name]['decoded'][scope]
+                    confusion[scope].update({key:values[key] for key in
+                                            ('tp','fp','fn','tn','pair_count','positive_count')})
             metrics[name] = dict(
                 changed_scenes=sum(r[name]['changed_groups'] for r in arm_rows),
                 coverage=dict(coverage), delta={k:dict(v) for k,v in delta.items()},
@@ -438,7 +448,9 @@ def population(rows):
                 macro={scope:c98._aggregate([r[name]['decoded'][scope] for r in arm_rows])
                        for scope in c98.SCOPES})
         arms[arm] = dict(counts=dict(counts),**metrics)
-    return dict(scenes=len(rows), components=len({r['component'] for r in rows}), counts=dict(freeze), arms=arms)
+    reachability = sum((Counter(r['reachability']) for r in rows),Counter())
+    return dict(scenes=len(rows),components=len({r['component'] for r in rows}),counts=dict(freeze),
+                arms=arms,reachability=dict(reachability))
 
 
 def gates(full, remaining, components, largest):
