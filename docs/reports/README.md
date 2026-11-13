@@ -4,6 +4,7 @@
 
 ## 2026-11-13
 
+- [C134 MTAD双时刻与端点桥接的连续距离](2026-11-13-fusion-continuous-witness-review.md)
 - [C133 MTAD借用位置前的原生供体证据](2026-11-13-fusion-native-donor-evidence-review.md)
 - [C130 MTAD固定供体的同启用率位置借用](2026-11-13-fusion-supplier-matched-activation-review.md)
 - [C127 固定候选池的尾部同船供给回收](2026-11-13-fusion-tail-candidate-recovery-review.md)
