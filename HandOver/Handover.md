@@ -6,6 +6,8 @@
 
 当前在线、离线验证仅使用MTAD。C128保留为历史，C131外部验证暂停。
 
+**C133 READY。** [MTAD原生供体证据](L2S-20261113-c133.md)。Campus SSH MCP一次CPU。
+
 **C130已收尾。** [首次与供体整窗保护终态](S2L-20261113-c130.md)。两份冻结合同经Campus SSH MCP各一次CPU，科学和worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.51完成，当前无离线待执行合同。
 
 **C127–C129已收尾。** [固定候选池](S2L-20261113-c127.md) · [双GNSS外测历史记录](S2L-20261113-c128.md) · [同组同输入融合](S2L-20261113-c129.md)。Campus SSH MCP各一次CPU，科学与worker真实退出0，公开原件与复算已回传。Record→Squeeze→Mode C2.50完成。
