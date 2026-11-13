@@ -109,7 +109,7 @@ def choose(rows):
     return {arm: order[:budget].tolist() for arm, order in ordering.items()}
 
 
-def score_scene(sid, component, motion, saved, truth, groups, rows, selected, threshold, focus):
+def score_scene(sid, component, motion, saved, truth, groups, rows, selected, threshold, focus, protect_trajectory):
     ids, target_ids = truth['identities'], truth['target_ids']
     np.testing.assert_array_equal(saved['node_ids'], truth['node_ids'])
     np.testing.assert_array_equal(saved['query'], truth['query_seconds'])
@@ -133,6 +133,9 @@ def score_scene(sid, component, motion, saved, truth, groups, rows, selected, th
         if index:
             g, q = zip(*[(rows[i]['donor_group'], rows[i]['q']) for i in index], strict=True)
             np.testing.assert_array_equal(data[ai, g, q], baseline[g, q])
+            if protect_trajectory:
+                donor_groups = sorted(set(g))
+                np.testing.assert_array_equal(data[ai, donor_groups], baseline[donor_groups])
     gi = np.array([first.get(identity, -1) for identity in target_ids])
     keep = gi >= 0
     evaluate = truth['target_valid'] & keep[:, None, None]
@@ -203,12 +206,17 @@ def run(args):
             _, rows = visible_candidates(motion, saved, score, reader(original/'private/held'/f'{sid}.json.gz'),
                 reader(registration/'private/held'/f'{sid}-choices.json'), thresholds,
                 np.load(source/'private'/f'{sid}-selected.npy', allow_pickle=False)[0])
+        unrestricted_count = len(rows)
+        if args.protect_donor_trajectory:
+            donor_groups = {r['donor_group'] for r in rows}
+            rows = [r for r in rows if r['group'] not in donor_groups]
         # Serialize only the fields used in evaluation. NaN features stay out of JSON.
         frozen_rows = [{key: bool(r[key]) if key in ('shared', 'mutual', 'same_source') else r[key]
                         for key in ('group', 'q', 'donor', 'donor_group', 'shared', 'mutual', 'same_source')} for r in rows]
-        write(private/f'{sid}.json', dict(rows=frozen_rows, selected=choose(rows)))
+        write(private/f'{sid}.json', dict(rows=frozen_rows, selected=choose(rows), unrestricted_count=unrestricted_count))
     write(out/'freeze.json', dict(scenes=len(scene_ids), budget='ceil(per-scene visible opportunities / 2)',
-        equal_arms=list(CONTROLLED), selection_uses_evaluation=False, external_data=False, raw_reads=0))
+        equal_arms=list(CONTROLLED), selection_uses_evaluation=False, external_data=False, raw_reads=0,
+        protect_donor_trajectory=args.protect_donor_trajectory))
     prior = reader(source/'summary.json')
     threshold = prior['metrics'][KEEP]['p99']
     focus = {(r['scene'], r['target'], r['q']) for r in reader(source/'focus.json')}
@@ -221,7 +229,9 @@ def run(args):
         with np.load(prior_motion/'private'/f'{sid}.npz', allow_pickle=False) as saved, \
              np.load(index[sid]['evaluation'], allow_pickle=False) as truth:
             error, events, report = score_scene(sid, comp, read_motion(index[sid]), saved, truth,
-                c127.c98.group_nodes(saved['current']), frozen['rows'], frozen['selected'], threshold, focus)
+                c127.c98.group_nodes(saved['current']), frozen['rows'], frozen['selected'], threshold, focus,
+                args.protect_donor_trajectory)
+        report['unrestricted_count'] = frozen['unrestricted_count']
         assert len({report['arms'][a]['planned'] for a in CONTROLLED}) == 1
         for arm, values in report['arms'].items():
             totals[arm].update(values)
@@ -231,14 +241,16 @@ def run(args):
         scene_rows.append(report)
     all_errors = np.concatenate(metrics)
     population = {arm: STATS(all_errors[:, i]) for i, arm in enumerate(ARMS)}
-    for arm in (KEEP, POOL):
+    for arm in ((KEEP,) if args.protect_donor_trajectory else (KEEP, POOL)):
         for key, val in prior['metrics'][arm].items():
             np.testing.assert_allclose(population[arm][key], val, rtol=0., atol=2e-8)
-    for key, val in prior['actions'][POOL].items():
-        if key in totals[POOL]:
-            assert totals[POOL][key] == val
+    if not args.protect_donor_trajectory:
+        for key, val in prior['actions'][POOL].items():
+            if key in totals[POOL]:
+                assert totals[POOL][key] == val
     write(out/'summary.json', dict(scenes=len(scene_ids), components=components, metrics=population,
           totals=totals, opportunity_slots=sum(r['candidates'] for r in scene_rows),
+          unrestricted_slots=sum(r['unrestricted_count'] for r in scene_rows),
           nonzero_budget_scenes=sum(r['candidates'] > 0 for r in scene_rows), focus=len(focus),
           baseline_threshold_m=threshold, coverage=dict(zip(('lat', 'lon', 'speed', 'heading'),
               np.sum([r['evaluated'] for r in scene_rows], axis=0).tolist(), strict=True))))
@@ -251,6 +263,7 @@ def main():
     for name in ('runs', 'manifest', 'output'):
         parser.add_argument(f'--{name}', type=Path, required=True)
     parser.add_argument('--time-policy', choices=('advisory',), required=True)
+    parser.add_argument('--protect-donor-trajectory', action='store_true')
     args = parser.parse_args()
     args.output.mkdir()
     start = time.monotonic()
