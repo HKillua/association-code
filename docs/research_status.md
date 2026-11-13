@@ -32,10 +32,10 @@
 ## 下一步
 
 1. **离线继续建立高精度关联与可信 TMTAFF 全系统对照。** [C95](reports/2026-11-12-association-negative-coverage-review.md)同预算替换一半旧尾部负例后，混合BCE跨源90%召回FP由C92复现的1,196,033降至105,720，原056为44,754。V最终跨源FN/FP相对原WS由5,888/8,085降到4,291/4,372，held亦双降。混合BCE丢103个原代表和35,645个同船支持槽，四新臂未过总门。加排序对两种采样的跨源效果相反，当前混合BCE保留为候选分区。
-   - C136在MTAD原177场、4,133槽、逐场来源×身份可检配额、每臂2,090次与供体整窗保护固定。两新臂仅换1槽，恢复3437同船脱尾，1929仍无合格证据。相对C135回避，真脱尾379→380，错81、非尾部增害248及四属性覆盖保持，P99 13.659→13.651km，仍比J高12.117m。唯一换出点撤掉原有真同船借用并增误差12.44km，旧增害口径不计该变化。KEEP默认及J等预算对照继续保留。C137待核换出原有收益的事前可见证据。 [C136](reports/2026-11-13-fusion-disjoint-position-review.md) · [C135](reports/2026-11-13-fusion-local-position-witness-review.md)
+   - C137固定MTAD原177场、4,133槽、逐场来源×身份可检配额、每臂2,090次及供体整窗。3437同源双时刻三槽配额1，目标3 Q1与目标26 Q60无法同保。撤出位移上界组重现C136，换入减误26.395km、撤出增误12.440km，净减13.955km。稳定保护重现C135，保26且未恢复3，标记和未标记动作增害率均约17.1%。两臂错81，真脱尾380／379，P99 13.651／13.659km，对J 13.639km。相对J换入／换出>250m增害分别70／5和70／6，覆盖一致。KEEP默认和J等预算对照保持。C138待核短时最近报文的方向余量和可迁移性。 [C137](reports/2026-11-13-fusion-swap-opportunity-review.md) · [C136](reports/2026-11-13-fusion-disjoint-position-review.md)
    - 双船位置沿用MTAD的C125证据边界，当前缺独立的近距相对方向参照。Autoferry的C128已归历史，后续C131外部验证暂停。 [C125](reports/2026-11-13-tmtaff-native-relative-witness-review.md) · [C128历史记录](reports/2026-11-13-autoferry-dual-gnss-eligibility-review.md)
    - C129在V300筛出61,097个同首组且逐节点支撑/最近观测时距一致的共同点，C94主臂位置MAE638.891m、历史113 54,498.162m。另4场真正固定WS及同一CAP128输入，113旧权重复现后，历史TFM相对Mean在1,133点的位置MAE 1.101→41.052km，速度23.944→8.425m/s，位置退化不能由分区差独自解释。C132优先查位置读出尺度与速航的异向收益。 [C129](reports/2026-11-13-tmtaff-same-group-support-review.md) · [C126](reports/2026-11-13-tmtaff-c94-paired-review.md)
-   - Mode C2.55回填C136、四篇新题名和一篇既有论文的正文复核。TMTAFF实际Level、表3场名单、时窗、格宽、配准、mESD实现和母AIS仍缺。历史113未完成TAM，152规定独审待收尾。 [本轮矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-255) · [原表协议](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c126_tmtaff_table3_protocol_20261113.md>)
+   - Mode C2.56回填C137与五篇新原文。TMTAFF实际Level、表3场名单、时窗、格宽、配准、mESD实现和母AIS仍缺。历史113未完成TAM，152规定独审待收尾。 [本轮矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-256) · [原表协议](</Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/offline_c126_tmtaff_table3_protocol_20261113.md>)
 2. **在线 C-ON33/35 完成稀疏首报的邻轨证据诊断和写入留场。** 11 开发场与 22 个新留场按共享 A 组件隔离，12 个留场组件此前有其他 C-ON32 场。195 个稀疏首报有 6 个开放真边入射，均无双侧共时邻轨。原几何／8 km 宽门／原见证及两种写入臂当刻正确 42／48／42，错接均 5，查询端未见真对侧的错接均 2。 [两阶段 Record/Squeeze](reports/2026-11-12-online-neighbor-witness.md) · [在线 Mode C v30](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md#v30-见证写入留场回流)
    - 冲突禁写拦下 478 假、30 真样本，关联和延迟指标与现有见证逐场一致。正证才写在 11 个稀疏场等同纯等待，较现有见证少 784 真、多 44 假事件，主稀疏首次门外 10 个更晚、无提前。保留原几何为工作点，宽门和原见证作对照；后续设计须有能增加独立证据覆盖的来源，长期状态反馈另评。 [前轮固定环确认](reports/2026-11-12-online-expansion-confirmation.md) · [原边排序与错链证据](reports/2026-11-12-online-nemot-association-diagnostic.md)
    - C-ON34核实MTAD论文的Pd针对整轨抽取，V4评分说明2秒发送片、V3归档更新为10秒。完整空扫、物理可见性、收报时钟仍缺。CD-PMBM/TM-PMBM保留为条件系统候选，DetectorContext作者PR可作机制参照。 [报告生成与发送协议](data_contract.md) · [公开代码迁移筛选](reports/2026-11-12-online-fusion-transfer-review.md)
@@ -68,7 +68,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.55](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-255)，P14/F432/M195/E527/C137|
+|全局问题—现象—机制—证据|[Mode C2.56](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-256)，P14/F435/M196/E535/C138|
 |在线字段、相对偏差与逐秒状态|[在线 Mode C](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-26_mtad_actual_use/online_causal_replay_mode_c_20261111.md)，含首报、历史、拒配与留场验证回流|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
