@@ -4,6 +4,9 @@
 
 ## 2026-11-12
 
+- [C118 固定分区的新增供给分属性读出](fusion_added_supplier_attributes_20261112.md)
+- [C119 隔离组件的同启用率双目标相对位置门](tmtaff_pair_relative_holdout_20261112.md)
+- [C120 固定参考总体的速度单位和写出形态](reference_speed_quantization_population_20261112.md)
 - [C115 同启用率位置残差限幅和质量门](tmtaff_equal_activation_position_20261112.md)
 - [C117 发布参考原邻接区间的速度与方向对照](reference_interval_fingerprint_20261112.md)
 - [C113 两锚配准的分时核验与整块候选诊断](offline_two_anchor_time_validation_20261112.md)

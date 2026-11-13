@@ -4,6 +4,9 @@
 
 ## 2026-11-12
 
+- [C118 固定分区的新增供给分属性读出](2026-11-12-fusion-added-supplier-attributes-review.md)
+- [C119 隔离组件的等启用量双目标相对位置门](2026-11-12-tmtaff-pair-relative-holdout-review.md)
+- [C120 固定开发场参考速度的单位和写出形态](2026-11-12-reference-speed-quantization-population-review.md)
 - [C113 两锚分时验证的整块覆盖和四属性结果](2026-11-12-association-two-anchor-time-validation-review.md)
 - [C115 位置残差限幅、质量和小间距](2026-11-12-tmtaff-equal-activation-position-review.md)
 - [C117 发布参考速度单位、区间与位置回跳](2026-11-12-reference-interval-fingerprint-review.md)
