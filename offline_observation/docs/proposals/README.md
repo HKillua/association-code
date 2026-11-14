@@ -4,6 +4,7 @@
 
 ## 2026-11-14
 
+- [C147 TMTAFF 自有关联融合整链](offline_tmtaff_own_chain_20261114.md)
 - [C146 固定 DTW 的跨源指派与空配](offline_baseline_assignment_20261114.md)
 - [C145 离线基线的同源接续与跨源对齐](offline_baseline_restart_20261114.md)
 - [C138 最近原生报文的方向余量](fusion_near_report_20261114.md)

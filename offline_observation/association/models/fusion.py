@@ -145,24 +145,30 @@ class PairFusion(nn.Module):
         if values.device != self.bos.device or values.dtype != self.bos.dtype:
             raise ValueError("completed embeddings and PairFusion must use the same device and dtype")
 
-    def forward(self, left: Tensor, right: Tensor) -> dict[str, Tensor]:
-        """Return physical ``states`` and the separate latent ``fused_features``.
-
-        ``fused_features`` is the FC fusion memory, not a physical prediction or
-        a claimed implementation of the paper's ambiguous recursive feedback.
-        """
+    def fuse_features(self, left: Tensor, right: Tensor) -> Tensor:
+        """Encode a pair into the FC memory used by subsequent fusion steps."""
         self._validate_features(left)
         self._validate_features(right)
         if left.shape != right.shape:
             raise ValueError("left and right must have identical shapes")
         if len(left) == 0:
-            # Preserve a gradient path and well-defined shapes for no pairs.
-            return {"states": left.sum(-1, keepdim=True).expand(-1, -1, 4),
-                    "fused_features": left + right}
+            return left + right
         encoded = torch.cat((self.left_encoder(left), self.right_encoder(right)), dim=1)
         memory = self.fc2(self.fc_activation(self.fc1(encoded.flatten(start_dim=1))))
-        memory = memory.reshape(len(left), self.config.length, self.config.d_model)
-        history = self.bos.expand(len(left), -1, -1)
+        return memory.reshape(len(left), self.config.length, self.config.d_model)
+
+    def decode_features(self, memory: Tensor) -> Tensor:
+        """Decode an FC memory into the final four physical states."""
+        self._validate_features(memory)
+        if len(memory) == 0:
+            return memory.sum(-1, keepdim=True).expand(-1, -1, 4)
+        states = self._decode_memory(memory)
+        if not torch.isfinite(states).all():
+            raise ValueError("fusion produced non-finite output")
+        return states
+
+    def _decode_memory(self, memory: Tensor) -> Tensor:
+        history = self.bos.expand(len(memory), -1, -1)
         generated = []
         for step in range(self.config.length):
             decoded = self.decoder(history, memory, tgt_mask=_causal_mask(history.shape[1], history.device))
@@ -173,7 +179,15 @@ class PairFusion(nn.Module):
         raw = self.state_projection(self.output_dropout(torch.cat(generated, dim=1)))
         if self.config.output_parameterization == "train_position_affine":
             raw = torch.cat((raw[..., :2] * self.position_std + self.position_mean, raw[..., 2:]), dim=-1)
-        states = torch.cat((raw[..., :2], F.softplus(raw[..., 2:3]), raw[..., 3:]), dim=-1)
+        return torch.cat((raw[..., :2], F.softplus(raw[..., 2:3]), raw[..., 3:]), dim=-1)
+
+    def forward(self, left: Tensor, right: Tensor) -> dict[str, Tensor]:
+        """Return physical states and the separate FC memory for latent feedback."""
+        memory = self.fuse_features(left, right)
+        if len(memory) == 0:
+            # Preserve the original empty-state left-only gradient.
+            return {"states": left.sum(-1, keepdim=True).expand(-1, -1, 4), "fused_features": memory}
+        states = self._decode_memory(memory)
         if not torch.isfinite(states).all() or not torch.isfinite(memory).all():
             raise ValueError("fusion produced non-finite output")
         return {"states": states, "fused_features": memory}
