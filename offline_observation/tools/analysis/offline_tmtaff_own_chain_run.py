@@ -261,6 +261,8 @@ def main():
     torch.set_num_threads(1)
     torch.backends.cuda.matmul.allow_tf32 = False
     torch.backends.cudnn.allow_tf32 = False
+    torch.cuda.init()
+    torch.cuda.set_device(args.device)
     torch.cuda.reset_peak_memory_stats(args.device)
     prior = runs/BASE
     ids, components, _ = population.load_full_population(runs)
