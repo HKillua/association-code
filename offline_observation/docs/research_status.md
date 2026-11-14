@@ -24,6 +24,8 @@
 
 C146 固定同源链及 DTW，跨源三个门合计损失987个真片段对，固定链的一对一容量损失1,247个。同配额全局相对贪心同时少1,007漏、1,036误，去最大仍少174漏和177误，四属性全域有效点略减，保留作后续强关联对照。显式空配全域再少551漏、多17误，共同位置MAE增加42.79米、少648个有效位置点，现工作点不替换。评分、匹配容量和融合传导后续单独立项。 [C146全文](reports/2026-11-14-offline-baseline-assignment-c146.md) · [执行回执](../HandOver/S2L-20261114-c146.md)
 
+C147 已用自身 TCM/TAM/TFM 重新跑完与 Qhard 的原 V300 同场对照。4,439,092个新分数和旧阈值决定逐值重现，290场只有一组，位置覆盖3.356%。同组同CAP128的支持Mean位置误差好于现有TFM，速航与位置的取舍见报告。论文原表保持复现目标，现模型仅为退化适配证据。完整适配的下一资格先查训练侧关联分数、时空配准与四属性位置读出。 [C147全文](reports/2026-11-14-offline-tmtaff-own-chain-c147.md) · [作者协议核验](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/offline_c147_tmtaff_author_protocol_20261114.md)
+
 ## 已有依据
 
 <details>
@@ -50,7 +52,7 @@ C146 固定同源链及 DTW，跨源三个门合计损失987个真片段对，�
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.62](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-262)，P14/F464/M205/E594/C146|
+|全局问题—现象—机制—证据|[Mode C2.64](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-264)，P14/F470/M207/E600/C147|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
 |观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，196实际回流至v1.24/96格|

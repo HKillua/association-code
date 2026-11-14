@@ -4,6 +4,7 @@
 
 ## 2026-11-14
 
+- [C147 TMTAFF 自有关联整链比较](2026-11-14-offline-tmtaff-own-chain-c147.md)
 - [C146 MTAD 固定 DTW 指派与显式空配](2026-11-14-offline-baseline-assignment-c146.md)
 - [C145 MTAD 离线基线共同协议首测](2026-11-14-offline-baseline-common-c145.md)
 - [离线基线重启审计](2026-11-14-offline-baseline-restart-audit.md)
