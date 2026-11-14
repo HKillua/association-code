@@ -8,7 +8,7 @@
 
 主连接为 **C69**，消费本地已核的 [MC-MTAD-20261102-v2.09](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-209)，对应 **P12/P13/P14 / F305 / M123（AI）/ E208**，上游为[195 Record/Squeeze](../reports/2026-11-02-action-conditioned-risk-review.md)，另引用[191 固定 V32 记录](../reports/2026-11-01-mean-velocity-validation-review.md)的 F298/E201。2026-11-03定向核读了上述完整Mode C小节及[SR v4.10/177格](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md#v410195动作条件风险实际回流)、[OD v1.23/93格](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md#v123195动作条件风险实际回流)，复用其连接和反例，不生成新矩阵版本、P/F/M/E或文献计数。历史矩阵中的“多数收益”须按本方案和195本地复核注明比较分母。
 
-证据状态 `partial`：195/191本地公共summary、动作机会和旧病例聚合已核，规则和代码接口可核；本方案的 V 输出、原数组重建和效应尚不存在。195/191的private原预测、权重和原生数组没有在此次本地复核中重建；对应历史独审不冒称本轮重新执行。按[项目实现技能](../../.agents/skills/spec-driven-coding/SKILL.md)完成独立入口与独审适配；实际运行后才生成本方案的 Record→Squeeze→Mode C 回流。
+证据状态 `partial`：195/191本地公共summary、动作机会和旧病例聚合已核，规则和代码接口可核；本方案的 V 输出、原数组重建和效应尚不存在。195/191的private原预测、权重和原生数组没有在此次本地复核中重建；对应历史独审不冒称本轮重新执行。按[项目实现技能](../../../.agents/skills/spec-driven-coding/SKILL.md)完成独立入口与独审适配；实际运行后才生成本方案的 Record→Squeeze→Mode C 回流。
 
 版本沿革：plan1.0是2026-11-02远程审查附件中的未实现、未READY、未执行设计；原稿保留于用户交付的`association-code-review-20261102 (1).zip`，不倒填成已执行合同。plan1.1补入2026-11-03本地来源核验、单节点动作平局混合语义、明确结果判定与实现验收规格；原V32、模型、40臂、12比较、资源和0新训练范围不变。READY须引用实际通过验收的本版，不能追认plan1.0已通过软件检查。
 

@@ -4,9 +4,8 @@
 
 |用途|入口|
 |---|---|
-|原离线整链前缀计时合同和旧命令|[历史计时](offline/README.md#历史整链前缀计时)|
-|离线全场系统评价与同行融合训练/评价|[offline](offline/README.md)|
-|单组后端计时与历史计时入口|[工程计时入口](analysis/README.md#工程计时)|
+|离线全场评价、同行融合训练和整链前缀计时|[离线命令](offline/README.md) · [历史计时及旧命令](offline/README.md#历史整链前缀计时)|
+|单组后端计时|[工程计时](analysis/README.md#工程计时)|
 |其他训练、数据准备、一次性服务托管及兼容入口|[experiments](experiments/README.md)|
 |冻结输出比较、科学pilot、诊断与独立核验|[analysis](analysis/README.md)|
 |环境准备|[setup](setup/)|

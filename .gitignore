@@ -13,6 +13,7 @@ build/
 dist/
 *.egg-info/
 /data/
+/offline_observation/data/
 datasets/
 outputs/
 runs/
@@ -28,4 +29,6 @@ wandb/
 *.safetensors
 *.pdf
 HandOver/results/**/raw/
+/offline_observation/HandOver/results/**/raw/
 HandOver/results/**/*.npz
+/offline_observation/HandOver/results/**/*.npz

@@ -1,6 +1,6 @@
 # 项目常用技能
 
-这里保存离线工程实际使用的 8 项技能，技能正文及必要引用完整纳入 Git。当前任务从[离线工程](../../offline_observation/README.md)的入口读取。
+这里维护离线工程使用的 8 项技能及其完整引用。当前研究和执行范围分别见[研究状态](../../offline_observation/docs/research_status.md)和[交接](../../offline_observation/HandOver/Handover.md)。
 
 | 技能 | 用途与入口 |
 |---|---|
@@ -13,9 +13,9 @@
 | squeeze-experiment | [结果深挖](squeeze-experiment/SKILL.md)：分析异质性、失败、代价与可支持结论，回流矩阵 |
 | spec-driven-coding | [实现规范](spec-driven-coding/SKILL.md)：从行为规格、仓库证据和必要验证推进代码修改 |
 
-先按[AGENTS](../../AGENTS.md)及[飞书完整科研流程](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd)定位当前阶段，再读取对应技能及其实际需要的引用；不因技能已安装就认为相应研究步骤已经完成。用户最新要求优先，项目约定对通用技能作具体约束，包括创新价值判断、证据边界、实验授权及数据协议。用户未指定其他版本时，优先读取本目录，同名全局副本不混读。
+先按[离线 AGENTS](../../offline_observation/AGENTS.md)和[完整科研流程](../../offline_observation/docs/research_workflow.md)定位阶段，再读对应技能及需要的引用。用户未指定版本时，以本目录为准。
 
-可在提示中明确使用 `$research-workflow`，也可按阶段指定 `$deep-read`、`$record-experiment` 等。[Codex 官方说明](https://learn.chatgpt.com/docs/build-skills#where-codex-loads-local-skills)将仓库内 `.agents/skills/` 列为本地技能发现目录；从本仓或其子目录打开的会话可发现这些技能。当前资料库 `biye-ronghe` 的 `.agents/skills` 通过相对符号链接引用本目录，两条工程各自持有可独立使用的同版正文。
+可以在提示中指定 `$research-workflow`、`$deep-read` 或 `$record-experiment`。离线工程和离线资料库的原技能路径都链接到本目录。
 
 2026-10-29 纳入时保留 8 项技能的全部 16 个源文件，正文与源副本逐字节一致，没有缩写替换。`research-workflow` 和 `spec-driven-coding` 来自当前使用的 `~/.codex/skills/`，其余六项来自 `~/.agents/skills/`；其中五个原始科研技能及总控所带原契约已与用户提供的原件核对一致。随包保留 `references/` 与 `agents/openai.yaml`，不依赖本机绝对路径或个人配置。所选源目录未附 LICENSE/NOTICE，本次不另造许可声明。
 

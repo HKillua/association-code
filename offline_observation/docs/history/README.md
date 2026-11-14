@@ -12,9 +12,11 @@
 |脱敏数值与日志原件|[结果索引](../../HandOver/results/README.md)|
 |2026-10-30状态/交接完整文本|[过程全文](2026-10-30-research-process.md)|
 |2026-11-02状态/交接完整文本|[过程全文](2026-11-02-research-process.md)|
+|2026-11-14交接沿革|[整理前的结案与待核记录](../../HandOver/README.md#handover-2026-11-14)|
 |两轮整理的范围和验证|[整理记录](2026-11-02-repository-organization.md)|
 |2026-11-10存储瘦身、工具退役与入口纠正|[整理与恢复记录](2026-11-10-repository-maintenance.md)|
 |2026-11-05离线模型整链前缀计时|[复现入口](../../tools/offline/README.md#历史整链前缀计时) · [报告与原合同](../reports/2026-11-05-pipeline-online-timing.md)|
+|C128 Autoferry 外测资格|[历史合同与冻结实现](../../HandOver/L2S-20261113-c128.md) · [终态](../../HandOver/S2L-20261113-c128.md)|
 
 ## 保留的研究事实
 

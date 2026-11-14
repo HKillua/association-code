@@ -5,7 +5,7 @@
 |用途|入口|
 |---|---|
 |先理解MTAD怎样变成结果|[输入→预处理→关联→融合→输出→评价](specs/evidence-association-fusion.md#从输入到输出)|
-|方法论与证据规则|[完整科研流程](research_workflow.md)、[AGENTS](../AGENTS.md)、[项目8项skills](../.agents/skills/README.md)|
+|方法论与证据规则|[完整科研流程](research_workflow.md)、[AGENTS](../AGENTS.md)、[项目8项skills](../../.agents/skills/README.md)|
 |数据、单位、人口与评价|[数据约定](data_contract.md)、[论文指标](mtad_data_protocols.md)、[数据配置清单](../configs/data/README.md)|
 |来源→矩阵→Idea的设计|[全部提案](proposals/README.md)，保留上游连接、对照、否证和未采纳方案|
 |实际实验与结果分析|[全部报告](reports/README.md)，包含Record/Squeeze、失败、强控和尾部|

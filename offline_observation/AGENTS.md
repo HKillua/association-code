@@ -15,7 +15,7 @@
 - 执行前关联本次来源分析、Mode C 和 Idea，明确要判别的问题、信息权限、基线与对照、指标、预算和停止／回退条件。各阶段可引用经核实的既有证据。
 - 执行后保留实际配置、原始证据和所有结果，按 Record→Squeeze→Mode C 回流。探索性实验标清性质，历史缺项按事实标记。
 
-常用技能完整保存在[项目技能目录](.agents/skills/README.md)。用户未明确指定其他版本时，读取本仓 `.agents/skills/<技能名>/SKILL.md` 及其必要引用，同名全局副本不混读。用户最新要求优先，本文及完整流程对通用技能作项目约束；不能用技能的默认建议覆盖创新判断、证据边界或既有授权。
+常用技能统一维护在[仓库根目录的技能目录](../.agents/skills/README.md)。用户未指定其他版本时，从中读取对应 `SKILL.md` 及必要引用，同名全局副本不混读。用户最新要求、本文与完整流程优先于通用技能默认建议。
 
 `analyze-paper → 来源分析 → deep-read Mode C（P/F/M/E与P×F）→ discover-innovation → Idea → 实际执行 → record-experiment → squeeze-experiment → Mode C回流`
 
