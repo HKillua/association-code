@@ -47,3 +47,5 @@ AnySearch 匿名查询三组，分别返回 7／8／8 条。检索式为 `MTAD M
 | MSTSA 跨源关联 | 第一份合同以 DTW 与同刻距离建可归因工程对照。MH-T2TA 所用 LCSS 是后选独立传统基线。学习方法优先 IAGM-TAN 的显式空位与图匹配，原文的5,000／1,000场和80/20并不一致，作者代码及名单尚未找到。MIS-GNN 为另一评分骨架；GMvA 有公开代码但依赖 CCTV，只保留可移植的图机制。 [MH-T2TA](https://jzus.zju.edu.cn/article.php?doi=10.1631%2FFITEE.2400340) · [IAGM-TAN](https://doi.org/10.1016/j.neucom.2026.134264) · [MIS-GNN](https://doi.org/10.1088/1361-6501/ae8929) · [近两年分任务筛选](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/offline_baseline_peers_20261114.md) |
 
 Mode C2.60 已冻结。C145 在原 V300 用陈等的端点→跨源对齐结构，三臂各用自身分组，四臂用共同支持 Mean。记录四属性、覆盖、重复、全节点边及尾部。该合同的传统适配不包含作者插值、加权融合和人工步骤。 [Idea](../proposals/offline_baseline_restart_20261114.md) · [READY](../../HandOver/L2S-20261114-c145.md)
+
+C145 已在 Campus 运行结束并回填 Mode C2.61。飞书原文随后从 Chrome 打开，页面显示仍为10月13日修改，主要主题与项目留存流程相符。 [C145 实测](2026-11-14-offline-baseline-common-c145.md) · [飞书原文](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd)

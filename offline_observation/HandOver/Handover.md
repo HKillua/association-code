@@ -4,7 +4,7 @@
 
 ## 当前执行
 
-- 离线验证仅用 MTAD。已回到基线来源筛选和复建。C145 为共同协议首轮，固定全 V300、零训练。 旧局部候选退出执行，C128 归历史、C131 外部验证暂停。 [C145 READY](L2S-20261114-c145.md) [基线回退审计](../docs/reports/2026-11-14-offline-baseline-restart-audit.md)
+- 离线验证仅用 MTAD。C145 已完成全 V300 共同协议首测。新候选待 Idea 与独立合同。旧局部候选退出执行，C128 归历史、C131 外部验证暂停。 [C145 终态](S2L-20261114-c145.md) · [基线回退审计](../docs/reports/2026-11-14-offline-baseline-restart-audit.md)
 
 ## 待核验与保全
 

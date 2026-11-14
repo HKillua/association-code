@@ -4,6 +4,7 @@
 
 ## 2026-11-14
 
+- [C145 MTAD 离线基线共同协议首测](2026-11-14-offline-baseline-common-c145.md)
 - [离线基线重启审计](2026-11-14-offline-baseline-restart-audit.md)
 - [C142 MTAD同锚绝对位置与相对运动残差](2026-11-14-fusion-source-offset-motion-review.md)
 - [C141 MTAD同预算切口与严格供给保护](2026-11-14-association-native-separation-review.md)
