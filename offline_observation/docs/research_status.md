@@ -20,7 +20,9 @@
 2. **模块。** 先核 MIS-GNN、MVW-GNN、MH-T2TA 的跨源候选范围、空配、训练与评价实际单位。TSA-cTFER 适配保留关联开发对照，PTFM／DeepAF 保留固定组融合对照。各方法只在有相应输出和实测资格的项目入表。
 3. **共同实测起点。** 先按原文核明确切的输入和主比较，沿用冻结 Level1 开发数据和独立封存测试。对整链固定场景、量测、查询和评分，报告 ITSA、MSTSA、覆盖、重复、四属性和位置尾部。先完成来源分析、Mode C 和基线复建 Idea，再写对应 READY。获得多套可比实测后回到组合探索和问题分析。 [数据约定](data_contract.md) · [指标协议](mtad_data_protocols.md) · [完整研究顺序](research_workflow.md#从基线到研究问题和解法)
 
-首轮 C145 已完成 MTAD 原 V300。端点＋DTW同源微F1 .7716、跨源 .5509，WS＋Mean 为 .6952／.6024。共同位置P99降低0.871公里，覆盖由96.965%降到96.575%。纯双端CV本版退化，同刻替换DTW存在取舍。保留WS和传统两锚。下一候选先分解跨源候选、容量和指派，再固定分数比较同配额与独立空配。作者复现和本地共同协议各自记录。 [C145全文](reports/2026-11-14-offline-baseline-common-c145.md) · [执行回执](../HandOver/S2L-20261114-c145.md)
+首轮 C145 已完成 MTAD 原 V300。端点＋DTW同源微F1 .7716、跨源 .5509，WS＋Mean 为 .6952／.6024。共同位置P99降低0.871公里，覆盖由96.965%降到96.575%。纯双端CV本版退化，同刻替换DTW存在取舍。保留WS和传统两锚。作者复现和本地共同协议各自记录。 [C145全文](reports/2026-11-14-offline-baseline-common-c145.md) · [执行回执](../HandOver/S2L-20261114-c145.md)
+
+C146 固定同源链及 DTW，跨源三个门合计损失987个真片段对，固定链的一对一容量损失1,247个。同配额全局相对贪心同时少1,007漏、1,036误，去最大仍少174漏和177误，四属性全域有效点略减，保留作后续强关联对照。显式空配全域再少551漏、多17误，共同位置MAE增加42.79米、少648个有效位置点，现工作点不替换。评分、匹配容量和融合传导后续单独立项。 [C146全文](reports/2026-11-14-offline-baseline-assignment-c146.md) · [执行回执](../HandOver/S2L-20261114-c146.md)
 
 ## 已有依据
 
@@ -48,7 +50,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.61](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-261)，P14/F461/M204/E590/C146|
+|全局问题—现象—机制—证据|[Mode C2.62](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-262)，P14/F464/M205/E594/C146|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
 |观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，196实际回流至v1.24/96格|
