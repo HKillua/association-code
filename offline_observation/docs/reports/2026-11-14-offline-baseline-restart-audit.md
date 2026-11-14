@@ -35,3 +35,15 @@ AnySearch 匿名查询三组，分别返回 7／8／8 条。检索式为 `MTAD M
 共同开发评价沿用已冻结的 [MTAD Level1 数据约定](../data_contract.md)和[指标协议](../mtad_data_protocols.md)，封存测试保持关闭。固定场景、可见量测、查询时刻与参考，整链各用自己的关联、分组和四属性输出，报告 ITSA/MSTSA、覆盖、重复和四属性误差与位置尾部。旧模型和透明传统方法可作为工程对照。只在适用模块下比较 TSA-cTFER、MIS-GNN、MVW-GNN、MH-T2TA、PTFM 与 DeepAF。按实际分层对齐开发场和训练曝光，已有 V300 暴露不得称新留场。
 
 下一步先把 TMTAFF 整链、自动传统链路以及 ITSA、MSTSA 各自的对照核到可复建级别。随后用来源与已有实测建立 Mode C，冻结第一份基线复建 Idea 和执行合同。当前无新研究运行、基线定案或同行胜负。
+
+## 来源复核与首轮立项
+
+续轮用 AnySearch 运行8组通用、5组学术及2组代码查询，去重前收回119条。按同源中断、跨源关联、条件融合、完整自动链分别判断。查到的新基线优先采取以下定位。
+
+| 用途 | 当前选型 |
+|---|---|
+| MTAD 作者整链 | TMTAFF、陈等自动分支保留。TMTAFF 已确认 Campus 存在有自身 TAM 的旧096A，300场中290场只剩一组，边接受率99.973%，位置覆盖3.36%。旧107没有完整联合链。陈等原表无数值四属性融合，公开材料的参数与评估场分离也未闭合。两者的原表仅作文献参照。 [TMTAFF核读](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/offline_baseline_tmtaff_20261114.md) · [陈等核读](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/offline_baseline_chen_20261114.md) |
+| ITSA 同源中断 | 选 Chen Yiming 等2025真实岸基雷达的双向中点机制，对照陈等 MTAD 端点距离。先以双端 CV 单变量适配。学习参考为已有 TSA-cTFER 082 原 V300 的全节点对分数及本地 anchor_direct 分区；带保存阈值的 raw／decoded 宏 F1 为.4212／.3729，训练1,000步，选阈用同一 V，历史弱对照。 [HFSWR原文](https://www.mdpi.com/2072-4292/17/3/500) · [TSA-cTFER原文](https://www.mdpi.com/2072-4292/16/18/3380) |
+| MSTSA 跨源关联 | 第一份合同以 DTW 与同刻距离建可归因工程对照。MH-T2TA 所用 LCSS 是后选独立传统基线。学习方法优先 IAGM-TAN 的显式空位与图匹配，原文的5,000／1,000场和80/20并不一致，作者代码及名单尚未找到。MIS-GNN 为另一评分骨架；GMvA 有公开代码但依赖 CCTV，只保留可移植的图机制。 [MH-T2TA](https://jzus.zju.edu.cn/article.php?doi=10.1631%2FFITEE.2400340) · [IAGM-TAN](https://doi.org/10.1016/j.neucom.2026.134264) · [MIS-GNN](https://doi.org/10.1088/1361-6501/ae8929) · [近两年分任务筛选](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/offline_baseline_peers_20261114.md) |
+
+Mode C2.60 已冻结。C145 在原 V300 用陈等的端点→跨源对齐结构，三臂各用自身分组，四臂用共同支持 Mean。记录四属性、覆盖、重复、全节点边及尾部。该合同的传统适配不包含作者插值、加权融合和人工步骤。 [Idea](../proposals/offline_baseline_restart_20261114.md) · [READY](../../HandOver/L2S-20261114-c145.md)

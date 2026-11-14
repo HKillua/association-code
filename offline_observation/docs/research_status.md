@@ -20,6 +20,8 @@
 2. **模块。** 先核 MIS-GNN、MVW-GNN、MH-T2TA 的跨源候选范围、空配、训练与评价实际单位。TSA-cTFER 适配保留关联开发对照，PTFM／DeepAF 保留固定组融合对照。各方法只在有相应输出和实测资格的项目入表。
 3. **共同实测起点。** 先按原文核明确切的输入和主比较，沿用冻结 Level1 开发数据和独立封存测试。对整链固定场景、量测、查询和评分，报告 ITSA、MSTSA、覆盖、重复、四属性和位置尾部。先完成来源分析、Mode C 和基线复建 Idea，再写对应 READY。获得多套可比实测后回到组合探索和问题分析。 [数据约定](data_contract.md) · [指标协议](mtad_data_protocols.md) · [完整研究顺序](research_workflow.md#从基线到研究问题和解法)
 
+首轮 C145 采用陈等自动链中可核的端点→跨源对齐骨架，以统一支持 Mean 输出四属性。同源比较原端点与双端 CV 中点，跨源比较短带 DTW 与同刻距离。作者复现和本地共同协议分别保留。 [Idea](proposals/offline_baseline_restart_20261114.md) · [执行合同](../HandOver/L2S-20261114-c145.md)
+
 ## 已有依据
 
 <details>
@@ -46,7 +48,7 @@
 
 |材料|入口|
 |---|---|
-|全局问题—现象—机制—证据|[Mode C2.59](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-259)，P14/F454/M202/E583/C144|
+|全局问题—现象—机制—证据|[Mode C2.60](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-260)，P14/F457/M203/E586/C145|
 |多源可信度/贡献条件|[多源可靠性矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/multisource_reliability_matrix_20261030.md)|
 |选源与集合读出|[SR矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/selection_readout_matrix_20261030.md)，196实际回流至v4.11/180格|
 |观测驱动与状态恢复|[OD矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-27_expanded_search/observation_driven_matrix_20261030.md)，196实际回流至v1.24/96格|

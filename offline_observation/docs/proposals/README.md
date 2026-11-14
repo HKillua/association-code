@@ -4,6 +4,7 @@
 
 ## 2026-11-14
 
+- [C145 离线基线的同源接续与跨源对齐](offline_baseline_restart_20261114.md)
 - [C138 最近原生报文的方向余量](fusion_near_report_20261114.md)
 - [C139 原生事件编码和整分区偏好](association_native_partition_preferences_20261114.md)
 - [C140 固定关联组的原生时标稳健平滑](fusion_interval_weighted_smoothing_20261114.md)
