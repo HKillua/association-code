@@ -121,28 +121,32 @@ def residual_arrays(aligned):
 def score_scene(path, runs, sid, component, ids):
     with np.load(path, allow_pickle=False) as saved:
         reference = population.read_evaluation(runs, sid, saved['nodes'], saved['query'], scene_ids=ids)
-        targets = len(reference['target_ids'])
-        declarations = dict(node_identities=reference['identities'], target_identities=reference['target_ids'],
-                            target_states=reference['target_states'], target_valid=reference['target_valid'],
-                            node_observed=saved['support'], split=population.SPLIT, grouping_kind='predicted',
-                            correspondence_policy='anchor_identity_first', return_artifact=True,
-                            speed_unit_policy=SPEED_UNIT_POLICY)
-        rows = {}
-        for name in ARMS:
-            membership = saved[f'{name}_membership']
-            groups = output_groups(membership, len(reference['identities']))
-            group_outputs = [dict(node_indices=group, states=states) for group, states in
-                             zip(groups, saved[f'{name}_states'], strict=True)]
-            result = evaluate_full_scene(group_outputs, **declarations)
-            errors, available = residual_arrays(result['artifact'])
-            rows[name] = dict(
-                errors=errors[:targets], available=available[:targets],
-                association=edge_rows(saved, reference['identities'], name, sid, component),
-                paper=result['paper_fusion_metrics'], groups=len(groups),
-                duplicates=result['duplicate_prediction_group_count'],
-                unmatched_targets=len(result['unmatched_target_ids']),
-            )
-    raw_reference = rows['WS']['available']
+        return score_outputs(saved, reference, sid, component, ARMS)
+
+
+def score_outputs(saved, reference, sid, component, arms):
+    targets = len(reference['target_ids'])
+    declarations = dict(node_identities=reference['identities'], target_identities=reference['target_ids'],
+                        target_states=reference['target_states'], target_valid=reference['target_valid'],
+                        node_observed=saved['support'], split=population.SPLIT, grouping_kind='predicted',
+                        correspondence_policy='anchor_identity_first', return_artifact=True,
+                        speed_unit_policy=SPEED_UNIT_POLICY)
+    rows = {}
+    for name in arms:
+        membership = saved[f'{name}_membership']
+        groups = output_groups(membership, len(reference['identities']))
+        group_outputs = [dict(node_indices=group, states=states) for group, states in
+                         zip(groups, saved[f'{name}_states'], strict=True)]
+        result = evaluate_full_scene(group_outputs, **declarations)
+        errors, available = residual_arrays(result['artifact'])
+        rows[name] = dict(
+            errors=errors[:targets], available=available[:targets],
+            association=edge_rows(saved, reference['identities'], name, sid, component),
+            paper=result['paper_fusion_metrics'], groups=len(groups),
+            duplicates=result['duplicate_prediction_group_count'],
+            unmatched_targets=len(result['unmatched_target_ids']),
+        )
+    raw_reference = rows[arms[0]]['available']
     for row in rows.values():
         np.testing.assert_array_equal(raw_reference, row['available'])
     common = raw_reference & np.logical_and.reduce([np.isfinite(row['errors']) for row in rows.values()])
@@ -169,9 +173,9 @@ def physical(arrays, available):
     return summary
 
 
-def aggregate(records, *, paper=True):
+def aggregate(records, *, paper=True, arms=ARMS):
     summary = {}
-    for name in ARMS:
+    for name in arms:
         rows = [row[name] for row in records]
         available = np.sum([row['available'] for row in rows], axis=0)
         summary[name] = dict(
