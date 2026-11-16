@@ -12,7 +12,8 @@
 |脱敏数值与日志原件|[结果索引](../../HandOver/results/README.md)|
 |2026-10-30状态/交接完整文本|[过程全文](2026-10-30-research-process.md)|
 |2026-11-02状态/交接完整文本|[过程全文](2026-11-02-research-process.md)|
-|2026-11-14交接沿革|[整理前的结案与待核记录](../../HandOver/README.md#handover-2026-11-14)|
+|2026-11-14交接沿革|[整理前的结案与待核记录](https://github.com/HKillua/association-code/blob/20b263fd732022f456bb0891a4eb8f2e4250cb4b/offline_observation/HandOver/README.md#handover-2026-11-14)|
+|2026-11-16流程回查和精简|[可证断点、退役范围与冻结原件](2026-11-16-workflow-cleanup.md)|
 |两轮整理的范围和验证|[整理记录](2026-11-02-repository-organization.md)|
 |2026-11-10存储瘦身、工具退役与入口纠正|[整理与恢复记录](2026-11-10-repository-maintenance.md)|
 |2026-11-05离线模型整链前缀计时|[复现入口](../../tools/offline/README.md#历史整链前缀计时) · [报告与原合同](../reports/2026-11-05-pipeline-online-timing.md)|

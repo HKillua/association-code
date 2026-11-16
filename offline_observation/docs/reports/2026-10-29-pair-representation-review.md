@@ -18,7 +18,7 @@
 | 合法数据审计 | 456,793量测行、1,642标签/候选/合法节点，隔离0、精确重复删除0、区间外量测诊断0、隔离损失正边0；本批没有隔离，不证明整个数据集无隔离/质量问题 |
 | 实际时间/终态 | 程序UTC2026-10-28 20:51:10.332959–20:51:25.673301（北京时间10月29日04:51:10–04:51:25），15.340373s；launcher15.815680s，二者COMPLETED、实际退出0。32个progress事件顺序完整；600s advisory未触发 |
 | 资源/权限 | CPU4；RSS150,088KiB＝153,690,112B≈146.57MiB；AS8GiB、RAM预算4GiB。0GPU/模型构造/前向/优化/checkpoint读取/新normalizer，0reference/V/test/未用CSV payload |
-| 代码/环境 | [实际脚本](../../tools/analysis/diagnose_pair_representation_dependency.py)，冻结worktree`association-code-run108`；完整Python路径、三ZIP分卷顺序及argv/environment见launch-request。具体Python/NumPy版本未写回传run，不拿本地版本补填 |
+| 代码/环境 | [实际脚本](https://github.com/HKillua/association-code/blob/20b263fd732022f456bb0891a4eb8f2e4250cb4b/offline_observation/tools/analysis/diagnose_pair_representation_dependency.py)，冻结worktree`association-code-run108`；完整Python路径、三ZIP分卷顺序及argv/environment见launch-request。具体Python/NumPy版本未写回传run，不拿本地版本补填 |
 | 全部提交/偏差 | 科学job实际提交1次、attempt-1，没有失败科学run/重试/换包/加场/调整阈值。启动前操作者读错路径定位文件，过程及纠正如下，不能隐藏也不能误写成实验失败 |
 
 **启动前路径定位纠正：** 原L2S指`090C/execution.json['arguments']['archive']`；根线程实际误读了`090C/preparation.json`的`arguments`，该字段不存在，尚未提交job。随后从真实056 `system/run.json inputs.archive`解析原三分卷，并与107已录TCM argv逐项匹配同一包，再启动108。此为启动前操作定位纠正，`scientific_inputs_changed=false`、`actual_job_submissions=1`；没有改分卷顺序/科学输入或把一次失败计算包装成成功。原件见[定位纠正记录](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261029_small_validation/108/archive-path-resolution.json)。

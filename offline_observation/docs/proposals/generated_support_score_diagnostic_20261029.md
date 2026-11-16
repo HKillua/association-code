@@ -103,7 +103,7 @@ next_skill: record-experiment
 
 `design_and_controls`：
 
-- 脚本为[generated_support_score.py](../../tools/analysis/generated_support_score.py)，仅Python标准库，单次读取已有TCM `run.json/summary.json/completion-evaluation.json`及既定manifest。完成状态/2424预算、native_time单位metadata、Q64/cap128/20s与128特征维均核；不加载checkpoint，不构造/调用模型，不读ZIP/reference CSV。**报告指标已经使用reference，不能以“本次没读CSV”声称未接触参考派生信息。**
+- 脚本为[generated_support_score.py](https://github.com/HKillua/association-code/blob/20b263fd732022f456bb0891a4eb8f2e4250cb4b/offline_observation/tools/analysis/generated_support_score.py)，仅Python标准库，单次读取已有TCM `run.json/summary.json/completion-evaluation.json`及既定manifest。完成状态/2424预算、native_time单位metadata、Q64/cap128/20s与128特征维均核；不加载checkpoint，不构造/调用模型，不读ZIP/reference CSV。**报告指标已经使用reference，不能以“本次没读CSV”声称未接触参考派生信息。**
 - 一次有界解析完整已有报告（≤256MiB；现场约216.8MB），核300场完整原序、全journal fragment数/每场分母/node_index唯一连续；只选固定16场全部fragment参与主要估计。逐fragment保留所有query与缺参考query，核各区域分母/误差和、model与hold同mask；不平均各fragment MSE冒充池化MSE。
 - 对model/state_hold各自按原squared_error_sum与feature_elements池化all/O/before/after/G；G合并before+after，不能平均两端MSE。比较差统一为model−hold，负值表示特征MSE较低。O和G的误差分布/参考覆盖不同，不拿两区均值直接宣称外推导致恶化。
 - 可附原顶层全V300汇总，明确是**既有source输出且与V16重叠**，不是第二独立验证集，也不把它与16场差异解释成模型变化。

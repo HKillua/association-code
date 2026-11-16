@@ -37,7 +37,7 @@ next_skill: squeeze-experiment
 
 研究问题：在已有107 TCM评估中，provided O与generated G占多少query；在同一原参考有效分母上，model与state_hold的冻结特征误差有何差异？这是Pb评分问题的输入/中间量核验，不是对“GG影响身份分数”的完整验证。
 
-上游为[Idea plan1.1](../proposals/generated_support_score_diagnostic_20261029.md)、[112独立合同](../../HandOver/L2S-20261029-112.md)、[C52小矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/c52_stepwise_problem_matrix_20261029.md)。实际入口为[generated_support_score.py](../../tools/analysis/generated_support_score.py)。
+上游为[Idea plan1.1](../proposals/generated_support_score_diagnostic_20261029.md)、[112独立合同](../../HandOver/L2S-20261029-112.md)、[C52小矩阵](/Users/a1/Projects/biye-ronghe/docs/surveys/2026-10-27_expanded_search/c52_stepwise_problem_matrix_20261029.md)。实际入口为[generated_support_score.py](https://github.com/HKillua/association-code/blob/20b263fd732022f456bb0891a4eb8f2e4250cb4b/offline_observation/tools/analysis/generated_support_score.py)。
 
 | 项目 | 事前计划1.1 | 实际事实 |
 |---|---|---|
@@ -122,7 +122,7 @@ G与all均**14场不利/2场有利**；before为15不利/1有利（2479），aft
 | E112-SUM | [112 summary.json](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261029_small_validation/112/summary.json) | 16场全部per_scene、完整区域分母/分子、全V旧顶层、解释边界 |
 | E112-STAT/EXIT | [launch-status](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261029_small_validation/112/launch-status.json)、[exit_code](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261029_small_validation/112/exit_code.txt) | systemd真实退出0、时间、未超时 |
 | E112-REQ | [launch-request](/Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261029_small_validation/112/launch-request.json) | 实际argv/cwd/env、advisory600s |
-| E112-CODE | [汇总入口](../../tools/analysis/generated_support_score.py)、[原writer](../../association/evaluation/tmtaff.py:441) | O/G统计对象、feature target、state_hold重嵌入、逐fragment与顶层schema；汇总不是TAM |
+| E112-CODE | [汇总入口](https://github.com/HKillua/association-code/blob/20b263fd732022f456bb0891a4eb8f2e4250cb4b/offline_observation/tools/analysis/generated_support_score.py)、[原writer](https://github.com/HKillua/association-code/blob/8858a9fdadf6abf4bfb5f75b72825bec8d39aefd/association/evaluation/tmtaff.py#L441) | O/G统计对象、feature target、state_hold重嵌入、逐fragment与顶层schema；汇总不是TAM |
 | E112-PLAN | [Idea1.1](../proposals/generated_support_score_diagnostic_20261029.md)、[112合同](../../HandOver/L2S-20261029-112.md) | 事前选择与目标、上限、失败和结论范围 |
 
 原始大journal路径在E112-RUN的`source_tcm_run`下；未复制原node/identity/坐标到本报告。此记录的实际配置、数据来源、所有运行/重复、结果及偏差均见§1.1–1.6；本次只有一次来源复用诊断，不是一次新的TCM训练/评测。

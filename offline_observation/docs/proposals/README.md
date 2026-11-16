@@ -12,6 +12,9 @@
 - [C140 固定关联组的原生时标稳健平滑](fusion_interval_weighted_smoothing_20261114.md)
 - [C141 同源近时报文持续分离的候选生成](association_native_separation_candidates_20261114.md)
 - [C142 对称位置锚下的同源相对运动融合](fusion_source_offset_motion_20261114.md)
+
+已退出、未执行的 Idea：
+
 - [C143 成对原生指派与逐时同船供给](association_paired_supplier_certificate_20261114.md)
 - [C144 保持双船中心位置的相对位移约束](fusion_pair_displacement_constraint_20261114.md)
 
@@ -24,7 +27,7 @@
 - [C133 借用位置前的原生观测证据](fusion_native_donor_evidence_20261113.md)
 - [C130 固定供体、同启用数的缺观测位置借用](fusion_supplier_matched_activation_20261113.md)
 - [C127 固定候选池的尾部同船供给回收](fusion_tail_candidate_recovery_20261113.md)
-- [C128 Autoferry双船独立位置外测资格](autoferry_dual_gnss_eligibility_20261113.md)
+- [C128 Autoferry双船独立位置外测资格](autoferry_dual_gnss_eligibility_20261113.md)（外部数据历史记录）
 - [C129 同首组成员与同CAP128输入的融合对照](../../HandOver/L2S-20261113-c129.md)
 - [C124 仅新观测的回退与全域位置尾部溯源](fusion_supplier_tail_lineage_20261113.md)
 - [C125 两船原生相对观测资格](tmtaff_native_relative_witness_20261113.md)

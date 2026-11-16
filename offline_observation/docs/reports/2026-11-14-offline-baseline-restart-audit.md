@@ -1,6 +1,6 @@
 # 离线观测基线重启审计
 
-2026-11-14。验证限 MTAD。依据用户指定的 `research-workflow`、项目保存的飞书第一章与第三章核读记录，以及[每次实验的完整约定](../research_workflow.md#2-必须遵守的研究顺序)。本轮做来源重筛和既有记录审计。新的浏览器会话需要飞书登录，使用仓内已留的全文核读映射，未确认网页是否有新版本。 [飞书原文](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4WC7ctFPXnxd)
+2026-11-14。验证限 MTAD。依据用户指定的 `research-workflow`、项目保存的飞书第一章与第三章核读记录，以及[每次实验的完整约定](../research_workflow.md#2-必须遵守的研究顺序)。本轮做来源重筛和既有记录审计。新的浏览器会话需要飞书登录，使用仓内已留的全文核读映射，未确认网页是否有新版本。 [飞书原文](https://my.feishu.cn/wiki/OHs3w9meHiQ3OXk4XC7ctFPXnxd)
 
 ## 最早需要重来的步骤
 
