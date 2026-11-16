@@ -2,6 +2,11 @@
 
 按文件中的日期和标题查找，所有正文保留在本路线目录。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-16
+
+- [C148 同配额端点选择资格](association_endpoint_qualification_c148_20261116.md)
+- [C149 拟合侧航迹向回退与原生证据](heading_fallback_fit_20261116.md)
+
 ## 2026-11-14
 
 - [C147 TMTAFF 自有关联融合整链](offline_tmtaff_own_chain_20261114.md)

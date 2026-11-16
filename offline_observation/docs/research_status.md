@@ -14,4 +14,6 @@
 
 ## 下一步
 
-从[已定位的基线选择断点](reports/2026-11-14-offline-baseline-restart-audit.md)继续。先证据化 TMTAFF 的训练侧窗口及配准、TAM 分数分离度及阈值、TFM 原组位置读出，每次只判别一个可观测解释。并行核同源和跨源候选论文实际任务、输出与协议，保留能做可信共同实测的路线。验证前按完整流程形成来源分析、矩阵连接和 Idea，服务器执行使用对应合同。 [完整流程](research_workflow.md) · [Mode C2.64](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-10-26_mtad_actual_use/reassessment_20261027.md#mode-c-264) · [离线资料库](/Users/a1/Projects/biye-ronghe/offline_observation/README.md)
+用户已授权按文献复核后的两条连接推进。C148 在原拟合侧76个共享组件各取冻结顺序第一场，检验同链、同候选、同配额的端点选择空间和固定空槽归一化势。C149 在全部拟合1,748场复建原C74 B读出，检验航迹向回退错误及未复用原生区间的证据可用性。两项先做训练侧诊断，原cal175、held177、V300和封存测试不进入本轮。方法是否值得进入共同四属性对照由实际结果决定。 [C148 Idea](proposals/association_endpoint_qualification_c148_20261116.md) · [C149 Idea](proposals/heading_fallback_fit_20261116.md) · [执行前矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)
+
+TMTAFF 仍从[基线选择断点](reports/2026-11-14-offline-baseline-restart-audit.md)继续核训练侧窗口、配准、TAM 分数分离度和 TFM 原组位置读出。当前C147退化适配不能代表可信作者复现。各次运行遵循[完整流程](research_workflow.md)，经 Record→Squeeze 后回填矩阵。
