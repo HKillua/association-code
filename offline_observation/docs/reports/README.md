@@ -2,6 +2,10 @@
 
 按文件中的日期和标题查找，所有正文保留在本路线目录。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-17
+
+- [C148 固定跨源链配额下的端点资格](2026-11-17-offline-endpoint-qualification-c148.md)
+
 ## 2026-11-14
 
 - [C147 TMTAFF 自有关联整链比较](2026-11-14-offline-tmtaff-own-chain-c147.md)
