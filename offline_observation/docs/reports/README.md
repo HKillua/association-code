@@ -4,6 +4,7 @@
 
 ## 2026-11-17
 
+- [152A/B 与 TMTAFF 的原件收尾和断点待办](2026-11-17-offline-baseline-ledger-next-actions.md)（只读审计，非完成账本）
 - [C149 拟合侧航迹向回退与未复用观测机会](2026-11-17-offline-heading-fallback-c149.md)
 - [C148 固定跨源链配额下的端点资格](2026-11-17-offline-endpoint-qualification-c148.md)
 

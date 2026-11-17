@@ -16,6 +16,10 @@
 
 ## 下一步
 
-融合从 C149 通过的机会条件进入新的单变量 Idea：只在输入可识别的模型低速回退分支比较原读出和原生区间方向读出，具体启用规则须事前冻结，不能使用评价身份或误差挑点。固定关联组、位置、速度、查询与输出掩码，核全域与启用域圆周 MAE/P99、非尾增害和去最大组件；未复用、跨源与统计独立须分别记。关联保留 C148 证明的端点作用空间，从矩阵重新选择含轨对判别信息的评分机制，并检验换出真供给的代价；不继续扩大或微调已停的行列势参数。本轮两项都未读取原 cal175、held177、V300 或封存测试，尚未发布下一次科学运行合同。 [C149 原 Idea](proposals/heading_fallback_fit_20261116.md) · [结果回流矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)
+- **P0，C150 单区间航迹向。** [Idea 1.0](proposals/heading_native_interval_c150_20261117.md) 已完成并通过独立设计复核，尚未实现或发布 READY。固定 C149 B、C139 WS 及其他三属性，只在原低速回退分支选同组全部成员中点最近的一条未复用原生区间，用球面起始方位替换；没有候选或方位退化就保留 B。比较全域/启用域、去最大、纯混原非尾增害。先实现及软件核验，再冻结一次 SSH MCP 执行，不在拟合结果上补门调参。
+- **P1，轨对评分重选。** 保留 C148 的原图、链、K及其已见端点空间，原行列势参数继续结案。新评分与可见支持保护须分离变量；可见支持不减少不等于真同船供给零丢，不把原毛丢失守线改成净增即可。当前仅建立后续连接，尚无新关联 Idea 或 READY。
+- **P2，基线账本与断点。** [原件待办已核](reports/2026-11-17-offline-baseline-ledger-next-actions.md)。152A/B 复用原日志、末轮权重、逐场数组和终态补齐原合同收尾，不重训；旧代码每轮覆盖同一个检查点，不能假定历史各轮权重都存在。TMTAFF 先查原训练账本，新增训练侧分离度、配准或时窗实验另立 Idea，不在 V300 选参。
+
+上述 C150 仍限原 fit1,748；cal175、held177、V300和封存测试不进入该设计。来源和校正后的 P/F/M/E/C 见[最新矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)。
 
 TMTAFF 仍从[基线选择断点](reports/2026-11-14-offline-baseline-restart-audit.md)继续核训练侧窗口、配准、TAM 分数分离度和 TFM 原组位置读出。当前C147退化适配不能代表可信作者复现。各次运行遵循[完整流程](research_workflow.md)，经 Record→Squeeze 后回填矩阵。
