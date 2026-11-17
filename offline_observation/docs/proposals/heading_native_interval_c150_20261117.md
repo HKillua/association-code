@@ -2,7 +2,7 @@
 
 ## 元数据与本轮边界
 
-`IDEA_PACKAGE IDEA-OFFLINE-HEADING-NATIVE-INTERVAL-C150-20261117`，包版本 research-pipeline-contract v1.0，workflow_contract_version v2.0，plan_version 1.0，created_at 2026-11-17，status `pilot`，**执行状态 `DESIGN_ONLY_NOT_READY`**。证据状态 partial；缺失证据为实际角度干预效果、方向质量、混组选错供体代价及独立人群有效性。下一 skill 为实际执行后的 record-experiment。本轮按用户要求完成 Mode C → Idea；未写新科学实现、未发布 READY、未运行 C150。
+`IDEA_PACKAGE IDEA-OFFLINE-HEADING-NATIVE-INTERVAL-C150-20261117`，包版本 research-pipeline-contract v1.0，workflow_contract_version v2.0，plan_version 1.0，created_at 2026-11-17，status `pilot`。证据状态 partial；缺失证据为实际角度干预效果、方向质量、混组选错供体代价及独立人群有效性。下一 skill 为实际执行后的 record-experiment。11-17 完成 Mode C → Idea 时为 `DESIGN_ONLY_NOT_READY`；11-18 按同一设计完成实现和独立审查，实际领取与执行以[独立合同](../../HandOver/L2S-20261117-c150.md)及[当前交接](../../HandOver/Handover.md)为准，科学规则未修订。
 
 上游矩阵 `MODE-C-OFFLINE-20261117-READOUT-SELECTION`，selected_C_id `C150`；P2，F6/F7/F8/F9，M3，E6/E7/E8/E9。Pattern 2（现象驱动），对象为 MTAD Level1 海事离线固定组的航迹向 COG，非船艏向 HDG。 [Mode C 与来源定位](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md) · [C149 Record / Squeeze](../reports/2026-11-17-offline-heading-fallback-c149.md) · [科研流程](../research_workflow.md)
 
@@ -68,6 +68,6 @@
 
 来源复用项目100篇精读矩阵、六篇提案审计及 C74/C77/C109/C149；最近时间选择、位置方位、圆周平均均已有成熟先例。C74 的原生位置拟合臂改善均值而未改善尾部也是本轮反例。C150 的价值是检验可定位的回退分支及保守操作数排除后，简单合法读出能否保住非尾点并改善尾部；没有新的深度网络或基础算法新颖性主张。[C74 原对照](../reports/2026-11-11-fixed-position-motion-readout-review.md) · [来源审计](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)
 
-预计一次单线程CPU任务，空CUDA，3,600秒advisory，RSS上限8GiB；依据 C149 的1,532秒实测作成本参考，新增候选选择和双臂评分的耗时未知。无需GPU训练。实现后先做合成的软件检查（北/东/南/西、0/360、跨日期线、重复区间、稳定并列、数值退化与标签访问边界），不得先用真实MTAD补试来调规则。本 Idea 已经两项独立只读设计审查，按其意见明确候选复现字段、偏差及非尾分母。实现仍待开发；通过独立实现复核后再发布独立 READY、冻结提交及全新输出目录，由 SSH MCP 一次托管，真实故障保全。原生坐标、身份和点级输出留服务器，只回传必要匿名聚合。
+预计一次单线程CPU任务，空CUDA，3,600秒advisory，RSS上限8GiB；依据 C149 的1,532秒实测作成本参考，新增候选选择和双臂评分的耗时未知。无需GPU训练。实现后先做合成的软件检查（北/东/南/西、0/360、跨日期线、重复区间、稳定并列、数值退化与标签访问边界），不得先用真实MTAD补试来调规则。本 Idea 已经两项独立只读设计审查，按其意见明确候选复现字段、偏差及非尾分母。11-18 实现通过独立静态复核，具体合成测试和独立 READY 记入合同；冻结提交及全新输出目录由 SSH MCP 一次托管，真实故障保全。原生坐标、身份和点级输出留服务器，只回传必要匿名聚合。
 
 支持结果可允许扩大验证这条读出；阴性结果可排除“最近未复用单区间即可带来联合收益”这一低成本方案。二者均按真实协议完成 Record → Squeeze → Mode C。P1关联边权与保护、P2账本/作者协议各自保留入口，不进入 C150 的自变量或成绩。

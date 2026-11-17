@@ -1,6 +1,6 @@
 # 152A/B 和 TMTAFF 的离线基线证据待办
 
-2026-11-17。只核本地已有合同、运行记录、报告和冻结实现。152A/B 的科学运行已结束，完整账本和独立复算待完成。TMTAFF 的训练侧断点待证。本次未运行数据诊断、模型前向或训练。 [离线科研流程](../research_workflow.md#2-必须遵守的研究顺序)
+2026-11-17 初核，11-18 补查回传的 152A/B 运行原件。152A/B 的科学运行已结束，完整账本和独立复算待完成。TMTAFF 的训练侧断点待证。本页仅核合同、既有记录、冻结实现和回传 JSON 原件。 [离线科研流程](../research_workflow.md#2-必须遵守的研究顺序)
 
 ## 152A/B · 用原件收尾
 
@@ -14,6 +14,17 @@
 | 两臂 `scene-summary.json.gz`、`summary.json` 及逐场误差 | 从保存数组独立复算全域、共同域、按场／38 组件、去最大、相对原 147 新增超过 1 公里增害及尾部取舍。完整厚尾、缺测和重复保留。V300 有历史开发暴露和共享身份，组件区间只作描述。原件缺失则登记无法核验的项目。 |
 
 原件逐项接齐后补实际 Record → Squeeze → Mode C，使用原定型号和单次训练路径。权重、私有数组及身份留原服务器目录，回传实际命令、退出和脱敏证据。以上可以利用原件完成，无需重训或新推理。独立真实数据复算另冻结相应实验范围。 [152 原设计](../proposals/fusion_peer_full_training_20261030.md) · [冻结执行代码](https://github.com/HKillua/association-code/blob/bda61e56ab1211d5deb0750c8acc7d88f41c7447/tools/experiments/fusion_peer_full_fit.py) · [已核机读原件](</Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261110_route_audit/152-aggregate-observation.json>)
+
+### 11-18 · 回传运行原件
+
+两臂各回传 8 份 JSON，16 份的远端和本地 SHA-256 均一致。原 `request.json` 的工作目录分别为 `association-code-run152A` 和 `association-code-run152B`，均调用 `tools/experiments/fusion_peer_full_fit.py`，绑定原 151 数据、114 WS 分区和 147 Qhard。请求记录使用原合同 CPU 4–7／12–15 和对应 GPU UUID。两份科学终态均为 `COMPLETED`、退出 0、完成 V300。两份托管终态也均为 `COMPLETED`、返回 0、未超时。 [传输校验](</Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261117_offline_152_ledger/transfer-verification.json>) · [152A 原件](</Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261117_offline_152_ledger/152A>) · [152B 原件](</Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261117_offline_152_ledger/152B>)
+
+| 运行 | 科学／托管耗时（秒） | 建议墙时与实际动作 | 已回传轮次及训练端点 |
+|---|---:|---|---|
+| 152A PTFM | 368,244.844／368,250.005 | 86,400 秒触发提醒，继续当前运行 | 150 条轮次记录，首末轮各 2,852 次更新。科学终态 427,800 次更新。 |
+| 152B DeepAF | 348,728.843／348,740.078 | 172,800 秒触发提醒，继续当前运行 | 20 条轮次记录，首末轮各 4,040 次更新。科学终态 80,800 次更新。 |
+
+两臂的原 `T-probe-u0.json` 和 `T-probe-final.json` 均已回传，固定训练首批实际 6 组、292 个位置点。保存的 PTFM 位置 MAE 由 7,889.452 降至 722.392 米，DeepAF 由 50,620.287 降至 1,998.248 米，同组 Mean 为 1,715.671 米。探针只描述这批训练组。原启动提交和托管终态有据，系统服务最终属性、逐批 `training.jsonl`、末轮权重与归一化绑定、V300 私有数组及独立复算仍待核，Record → Squeeze → Mode C 尚未收尾。 [152A 末轮探针](</Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261117_offline_152_ledger/152A/science-T-probe-final.json>) · [152B 末轮探针](</Users/a1/Projects/biye-ronghe/offline_observation/docs/evidence/20261117_offline_152_ledger/152B/science-T-probe-final.json>)
 
 ## TMTAFF · 断点证据与最小补证
 
