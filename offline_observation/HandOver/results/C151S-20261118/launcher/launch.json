@@ -1,0 +1,31 @@
+{
+  "status": "SUBMITTED",
+  "backend": "systemd",
+  "launcher_pid": 1704911,
+  "linger": "yes",
+  "unit": "mtad-23e9ecdbb039.service",
+  "systemd_argv": [
+    "systemd-run",
+    "--user",
+    "--no-ask-password",
+    "--unit=mtad-23e9ecdbb039.service",
+    "--property=Type=exec",
+    "--property=Restart=no",
+    "--property=KillMode=control-group",
+    "--property=SendSIGKILL=yes",
+    "--property=RuntimeMaxSec=infinity",
+    "--property=TimeoutStopSec=10.000000s",
+    "--property=StandardInput=null",
+    "--property=WorkingDirectory=/home/wangguangjie/djs/association-code-run-c151s-20261118/offline_observation",
+    "--property=StandardOutput=append:/home/wangguangjie/djs/association-code/runs/C151S-20261118-launch-attempt-1/worker.stdout.log",
+    "--property=StandardError=append:/home/wangguangjie/djs/association-code/runs/C151S-20261118-launch-attempt-1/worker.stderr.log",
+    "--",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "/home/wangguangjie/djs/association-code-run-c151s-20261118/offline_observation/tools/experiments/launch_detached.py",
+    "--_worker",
+    "/home/wangguangjie/djs/association-code/runs/C151S-20261118-launch-attempt-1"
+  ],
+  "submission_returncode": 0,
+  "submitted_at": "2026-11-18T06:09:13.349012+00:00",
+  "elapsed_seconds": 0.07578104099957272
+}

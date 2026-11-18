@@ -1,0 +1,125 @@
+{
+  "provenance": "Extracted from original terminal summaries; independent array replay covers the five primary methods in summary.json.",
+  "arms": {
+    "A": {
+      "source": "LEVEL1-FUSION-PEER-FULL-PTFM-20261030-152A-attempt-1/summary.json",
+      "sha256": "a714f1d244af382bc2d51391ea48bac85657f30d1452148f467e2a5cd6c3ec18",
+      "published_controls": {
+        "WS_ANCHOR": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 906.7869378119889,
+          "rmse": 6323.165621878585,
+          "p95": 4103.137556619389,
+          "p99": 11749.94864360456
+        },
+        "WS_NEAREST_SUPPORTED": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 964.5677359475122,
+          "rmse": 3488.8226357515928,
+          "p95": 3866.365777984769,
+          "p99": 8503.413912838096
+        },
+        "CAP128_MEAN": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 1291.5765939306746,
+          "rmse": 3360.1360661927656,
+          "p95": 2670.2294752223934,
+          "p99": 8354.32625748615
+        },
+        "CAP128_NEAREST_SUPPORTED": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 1323.6627190161703,
+          "rmse": 3553.7063832504873,
+          "p95": 4078.9413804282844,
+          "p99": 8509.71522742727
+        }
+      },
+      "published_component_intervals": {
+        "WS_PTFM_PLUS_MEAN_vs_WS_MEAN": {
+          "resamples": 2000,
+          "seed": 20,
+          "point_estimate_m": -555.3919260536431,
+          "percentile95_m": [
+            -734.011421006072,
+            -520.1294877018493
+          ],
+          "independent_test": false
+        },
+        "WS_PTFM_PLUS_MEAN_vs_WS_SHARED_Q_HARD": {
+          "resamples": 2000,
+          "seed": 20,
+          "point_estimate_m": 147.92202855841498,
+          "percentile95_m": [
+            29.575494468809474,
+            164.89279924922405
+          ],
+          "independent_test": false
+        }
+      }
+    },
+    "B": {
+      "source": "LEVEL1-FUSION-PEER-FULL-DEEPAF-20261030-152B-attempt-1/summary.json",
+      "sha256": "758f78ff9e61725be3295b0033b5306b6f591756bc98e811b63106982a57a10c",
+      "published_controls": {
+        "WS_ANCHOR": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 906.7869378119889,
+          "rmse": 6323.165621878585,
+          "p95": 4103.137556619389,
+          "p99": 11749.94864360456
+        },
+        "WS_NEAREST_SUPPORTED": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 964.5677359475122,
+          "rmse": 3488.8226357515928,
+          "p95": 3866.365777984769,
+          "p99": 8503.413912838096
+        },
+        "CAP128_MEAN": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 1291.5765939306746,
+          "rmse": 3360.1360661927656,
+          "p95": 2670.2294752223934,
+          "p99": 8354.32625748615
+        },
+        "CAP128_NEAREST_SUPPORTED": {
+          "intersection_count": 441144,
+          "available_target_count": 454952,
+          "mae": 1323.6627190161703,
+          "rmse": 3553.7063832504873,
+          "p95": 4078.9413804282844,
+          "p99": 8509.71522742727
+        }
+      },
+      "published_component_intervals": {
+        "WS_DEEPAF_PV_vs_WS_MEAN": {
+          "resamples": 2000,
+          "seed": 20,
+          "point_estimate_m": 67.62064299928655,
+          "percentile95_m": [
+            -67.70630915598886,
+            93.85514454938142
+          ],
+          "independent_test": false
+        },
+        "WS_DEEPAF_PV_vs_WS_SHARED_Q_HARD": {
+          "resamples": 2000,
+          "seed": 20,
+          "point_estimate_m": 770.9345976113448,
+          "percentile95_m": [
+            682.2615067922061,
+            780.4312429783147
+          ],
+          "independent_test": false
+        }
+      }
+    }
+  }
+}

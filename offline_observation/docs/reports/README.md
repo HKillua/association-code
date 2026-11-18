@@ -4,6 +4,8 @@
 
 ## 2026-11-18
 
+- [C151S 撤边时的可见供给损失、逐边反例与整块硬门结案](2026-11-18-c151s-swap-supply.md)
+- [152A/B 固定组融合独立复算与 094 拟合侧 TAM 断点](2026-11-18-peer-endpoints-and-tam-fit.md)
 - [C151P 关联前位置平滑的分区、排序和缺测支撑](2026-11-18-association-position-smoothing-c151p.md)
 - [C150 单区间航迹向结案](2026-11-18-offline-heading-interval-c150.md)
 - [关联预处理及基线协议复核](2026-11-18-association-preprocessing-review.md)

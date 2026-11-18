@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "/usr/bin/taskset",
+    "--cpu-list",
+    "22",
+    "/home/wangguangjie/djs/mtad-field-20261016/bin/python",
+    "-m",
+    "tools.analysis.fit_tam_separation",
+    "--runs",
+    "/home/wangguangjie/djs/association-code/runs",
+    "--output",
+    "/home/wangguangjie/djs/association-code/runs/094F-20261118-attempt-1",
+    "--time-policy",
+    "advisory"
+  ],
+  "cwd": "/home/wangguangjie/djs/association-code-run-094f-20261118/offline_observation",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-c5a00c37-f181-90b3-f220-be6e7457f473",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "backend": "systemd",
+  "started_at": "2026-11-18T06:11:13.138116+00:00",
+  "started_monotonic": 520344.227624513,
+  "max_seconds": 1800.0,
+  "grace_seconds": 10.0,
+  "time_policy": "advisory",
+  "finalize_seconds": 1.0,
+  "deadline_monotonic": null
+}
