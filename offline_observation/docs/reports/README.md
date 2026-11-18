@@ -2,6 +2,11 @@
 
 按文件中的日期和标题查找，所有正文保留在本路线目录。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-18
+
+- [C150 单区间航迹向结案](2026-11-18-offline-heading-interval-c150.md)
+- [关联预处理及基线协议复核](2026-11-18-association-preprocessing-review.md)
+
 ## 2026-11-17
 
 - [152A/B 与 TMTAFF 的原件收尾和断点待办](2026-11-17-offline-baseline-ledger-next-actions.md)（只读审计，非完成账本）

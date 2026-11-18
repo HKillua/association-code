@@ -2,9 +2,13 @@
 
 按文件中的日期和标题查找，所有正文保留在本路线目录。当前目标看[研究状态](../research_status.md)，执行看[交接](../../HandOver/Handover.md)；文件存在、历史READY或标题中的方案不等于当前执行许可。
 
+## 2026-11-18
+
+- [C151P 固定跨源图的局部位置平滑](association_position_smoothing_c151p_20261118.md)
+
 ## 2026-11-17
 
-- [C150 模型低速回退的单区间航迹向读出](heading_native_interval_c150_20261117.md)（Idea，非 READY）
+- [C150 模型低速回退的单区间航迹向读出](heading_native_interval_c150_20261117.md)（已结案）
 
 ## 2026-11-16
 

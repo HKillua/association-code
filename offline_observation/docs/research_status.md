@@ -14,12 +14,14 @@
 - **C148 端点选择诊断。** 原 fit 的 76 个组件各首场，同图同 K 的行列势使跨源漏接/误接从 465/419 降至 445/401，但缺测处原有同船跨源支持毛丢失 121，代表身份数少 1；去最大后仍毛丢失 76。本冻结参数未通过事前保护条件，结案、不扩大。未测实际四属性及其覆盖，不作为融合改善或 TMTAFF 胜出的证据。 [Record / Squeeze](reports/2026-11-17-offline-endpoint-qualification-c148.md)
 - **C149 航迹向回退诊断。** 全部原 fit 1,748 场／76 组件完成。复建 C74 B 的模型低速回退分支占共同评价点 13.05%，贡献绝对角误差 42.21%、超过 150° 大误差点 62.01%；去掉最大组件后份额仍为 32.08%／49.26%。去最大后有 39 个组件各至少 10 个此类大误差点，具备事后确认同身份的非首成员未复用区间。事前机会条件通过，但没有替换读出、没有证明方向证据正确，也不是新方法精度收益。 [Record / Squeeze](reports/2026-11-17-offline-heading-fallback-c149.md)
 
+- **C150 单区间替换关闭。** 全域圆周 MAE 27.7310°→27.7322°，救回 47,874 尾点、新增 48,112，去最大仍净增 117。保留原航迹向 B。 [结案](reports/2026-11-18-offline-heading-interval-c150.md)
+
 ## 下一步
 
-- **P0，C150 单区间航迹向。** [Idea 1.0](proposals/heading_native_interval_c150_20261117.md) 的实现通过独立审查及 9 项合成测试，已按[独立 READY](../HandOver/L2S-20261117-c150.md)冻结并启动；[实际回执](../HandOver/S2L-20261117-c150-start.md)。固定 C149 B、C139 WS 及其他三属性，只在原低速回退分支选同组全部成员中点最近的一条未复用原生区间，用球面起始方位替换；没有候选或方位退化就保留 B。比较全域/启用域、去最大、纯混原非尾增害。本次结果待回传，不在拟合结果上补门调参，也不从软件测试推断科学收益。
+- **C151P，关联前的局部位置平滑。** 先在 C148 的拟合侧 76 个组件各首场上固定候选、同源链和各块匹配数，比较原 DTW 与关联专用三点平滑。报告原分区指标、曲线及原同船支持毛损失。 [代码与原文复核](reports/2026-11-18-association-preprocessing-review.md) · [事前设计](proposals/association_position_smoothing_c151p_20261118.md)
 - **P1，轨对评分重选。** 保留 C148 的原图、链、K及其已见端点空间，原行列势参数继续结案。新评分与可见支持保护须分离变量；可见支持不减少不等于真同船供给零丢，不把原毛丢失守线改成净增即可。当前仅建立后续连接，尚无新关联 Idea 或 READY。
 - **P2，基线账本与断点。** [原件待办已核](reports/2026-11-17-offline-baseline-ledger-next-actions.md)。152A/B 复用原日志、末轮权重、逐场数组和终态补齐原合同收尾，不重训；旧代码每轮覆盖同一个检查点，不能假定历史各轮权重都存在。TMTAFF 先查原训练账本，新增训练侧分离度、配准或时窗实验另立 Idea，不在 V300 选参。
 
-上述 C150 仍限原 fit1,748；cal175、held177、V300和封存测试不进入该设计。来源和校正后的 P/F/M/E/C 见[最新矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)。
+C150 已在原 fit 1,748 场结案。C151P 使用该拟合侧固定 76 场。来源与 P/F/M/E/C 见[矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)。
 
 TMTAFF 仍从[基线选择断点](reports/2026-11-14-offline-baseline-restart-audit.md)继续核训练侧窗口、配准、TAM 分数分离度和 TFM 原组位置读出。当前C147退化适配不能代表可信作者复现。各次运行遵循[完整流程](research_workflow.md)，经 Record→Squeeze 后回填矩阵。
