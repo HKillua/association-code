@@ -15,13 +15,13 @@
 - **C149 航迹向回退诊断。** 全部原 fit 1,748 场／76 组件完成。复建 C74 B 的模型低速回退分支占共同评价点 13.05%，贡献绝对角误差 42.21%、超过 150° 大误差点 62.01%；去掉最大组件后份额仍为 32.08%／49.26%。去最大后有 39 个组件各至少 10 个此类大误差点，具备事后确认同身份的非首成员未复用区间。事前机会条件通过，但没有替换读出、没有证明方向证据正确，也不是新方法精度收益。 [Record / Squeeze](reports/2026-11-17-offline-heading-fallback-c149.md)
 
 - **C150 单区间替换关闭。** 全域圆周 MAE 27.7310°→27.7322°，救回 47,874 尾点、新增 48,112，去最大仍净增 117。保留原航迹向 B。 [结案](reports/2026-11-18-offline-heading-interval-c150.md)
+- **C151P 关联前局部位置平滑关闭。** 在拟合侧 76 个组件各首场固定同源链、候选和配额，跨源漏接／误接从 465／419 降到 461／412。原有同船支撑毛丢失 71 个缺测查询，恢复 160 个，去最大仍丢失 67 个。当前保留原跨源输入。 [结案](reports/2026-11-18-association-position-smoothing-c151p.md) · [代码与同行原文](reports/2026-11-18-association-preprocessing-review.md)
 
 ## 下一步
 
-- **C151P，关联前的局部位置平滑。** 先在 C148 的拟合侧 76 个组件各首场上固定候选、同源链和各块匹配数，比较原 DTW 与关联专用三点平滑。报告原分区指标、曲线及原同船支持毛损失。 [代码与原文复核](reports/2026-11-18-association-preprocessing-review.md) · [事前设计](proposals/association_position_smoothing_c151p_20261118.md)
-- **P1，轨对评分重选。** 保留 C148 的原图、链、K及其已见端点空间，原行列势参数继续结案。新评分与可见支持保护须分离变量；可见支持不减少不等于真同船供给零丢，不把原毛丢失守线改成净增即可。当前仅建立后续连接，尚无新关联 Idea 或 READY。
+- **P1，查换边前可辨认的独占供给。** 场 1229 和 0 合计占 C151P 原同船支撑毛丢失的 67 / 71。后续设计先追这两场的原换出边、接收片段的缺口与已有跨源供给，核能否仅用可见输入识别撤出代价。新评分与供给保护各自独立，事前保护条件沿用 C148 和 C151P。
 - **P2，基线账本与断点。** [原件待办已核](reports/2026-11-17-offline-baseline-ledger-next-actions.md)。152A/B 复用原日志、末轮权重、逐场数组和终态补齐原合同收尾，不重训；旧代码每轮覆盖同一个检查点，不能假定历史各轮权重都存在。TMTAFF 先查原训练账本，新增训练侧分离度、配准或时窗实验另立 Idea，不在 V300 选参。
 
-C150 已在原 fit 1,748 场结案。C151P 使用该拟合侧固定 76 场。来源与 P/F/M/E/C 见[矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)。
+C150 已在原 fit 1,748 场结案，C151P 已在该拟合侧固定 76 场结案。来源与 P/F/M/E/C 见[矩阵](/Users/a1/Projects/biye-ronghe/offline_observation/docs/surveys/2026-11-16_maritime_mtad_reading/six-paper-next-step-audit.md)。
 
 TMTAFF 仍从[基线选择断点](reports/2026-11-14-offline-baseline-restart-audit.md)继续核训练侧窗口、配准、TAM 分数分离度和 TFM 原组位置读出。当前C147退化适配不能代表可信作者复现。各次运行遵循[完整流程](research_workflow.md)，经 Record→Squeeze 后回填矩阵。

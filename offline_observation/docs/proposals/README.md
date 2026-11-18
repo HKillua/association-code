@@ -4,7 +4,7 @@
 
 ## 2026-11-18
 
-- [C151P 固定跨源图的局部位置平滑](association_position_smoothing_c151p_20261118.md)
+- [C151P 固定跨源图的局部位置平滑](association_position_smoothing_c151p_20261118.md)（已结案）
 
 ## 2026-11-17
 

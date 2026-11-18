@@ -4,6 +4,7 @@
 
 ## 2026-11-18
 
+- [C151P 关联前位置平滑的分区、排序和缺测支撑](2026-11-18-association-position-smoothing-c151p.md)
 - [C150 单区间航迹向结案](2026-11-18-offline-heading-interval-c150.md)
 - [关联预处理及基线协议复核](2026-11-18-association-preprocessing-review.md)
 
