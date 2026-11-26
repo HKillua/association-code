@@ -1,13 +1,5 @@
-# MTAD 离线观测
+# 已归档
 
-在本目录运行 `python -m tools.offline --help`。需要本地依赖时，可在独立 Python 环境安装 `python -m pip install -e .`。
+本仓库已于 2026-11-26 冻结为档案（标签 `archive-2026-11-26`）。新工作在 `mtad-thesis`（https://github.com/HKillua/mtad-thesis）。
 
-| 内容 | 入口 |
-|---|---|
-| 当前研究与服务器执行 | [研究状态](docs/research_status.md) · [交接](HandOver/Handover.md) |
-| 每次实验遵循的规则 | [AGENTS](AGENTS.md) · [完整科研流程](docs/research_workflow.md) · [技能](../.agents/skills/README.md) |
-| 数据、单位和指标 | [MTAD 数据约定](docs/data_contract.md) · [论文指标](docs/mtad_data_protocols.md) |
-| 训练、全场评价与历史计时 | [命令](tools/README.md) · [系统骨架](docs/specs/evidence-association-fusion.md) |
-| 方案与实际结果 | [提案](docs/proposals/README.md) · [报告](docs/reports/README.md) |
-
-本地研究资料入口为 [离线文献和证据](/Users/a1/Projects/biye-ronghe/offline_observation/README.md)。
+除非用户明确要求，不要读取或修改这里的内容。冻结前的完整内容可以用 `git show archive-2026-11-26:<路径>` 查看；服务器上冻结的运行目录不动。

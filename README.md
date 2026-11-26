@@ -1,7 +1,5 @@
-# MTAD 离线观测
+# 已归档
 
-[离线工程](offline_observation/README.md)包含本仓的研究状态、交接、实验规范及命令入口。
+本仓库已于 2026-11-26 冻结为档案（标签 `archive-2026-11-26`）。新工作在 `mtad-thesis`（https://github.com/HKillua/mtad-thesis）。
 
-在线观测代码与研究资料见[独立在线仓库](https://github.com/HKillua/assocaition-research)。拆仓时的代码按[历史提交](https://github.com/HKillua/association-code/tree/399da72/online_observation)查阅。
-
-原论文、MTAD 数据和本机独有证据由[研究资料库](../biye-ronghe/README.md)维护。历史实验按原合同定位相应提交与工作目录。
+除非用户明确要求，不要读取或修改这里的内容。冻结前的完整内容可以用 `git show archive-2026-11-26:<路径>` 查看；服务器上冻结的运行目录不动。
